@@ -1,0 +1,260 @@
+---
+import App from "./App";
+import Wallet from "../components/Wallet"
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Asset Management Platform" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} - Stability</title>
+	</head>
+	<body>
+		<App client:load>
+			<header>
+				<span class="title"><img src="logo.svg" /></span>
+				<span class="menu">
+					<a href="/">Vaults</a>
+					<!-- <a href="/factory">Factory</a> -->
+				</span>
+				<span class="bar"><Wallet client:only="react" /></span>
+			</header>
+			<main>
+				<h1><span class="text-gradient">{title}</span></h1>
+				<slot />
+			</main>
+		</App>
+	</body>
+</html>
+<style is:global>
+	:root {
+		--accent: 136, 58, 234;
+		--accent-light: 224, 204, 250;
+		--accent-dark: 49, 10, 101;
+		--accent-gradient: linear-gradient(
+			45deg,
+			rgb(var(--accent)),
+			rgb(var(--accent-light)) 30%,
+			white 60%
+		);
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background: #13151a;
+		background-size: 224px;
+	}
+	body {
+		margin: 0;
+	}
+	header {
+		color: aliceblue; 
+		background-color: #23262d;
+		display: flex; 
+		justify-content: space-between;
+		align-items: center;
+		height: 50px;
+	}
+	header > span {
+		width: 30%;
+	}
+	.title {
+		display: flex;
+		align-items: center
+	}
+	.title img {
+		margin: 0 10px;
+		height: 30px;
+	}
+	.menu {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+	}
+	.menu > a {
+		margin: 0;
+		min-width: 90px;
+		height: 50px;
+		color: white;
+		display: flex;
+		align-self: center;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+	}
+	.menu > a.active {
+		background-color: #431f5d;
+	}
+	.menu > a:hover {
+		background-color: #552874;
+	}
+
+	.bar {
+		text-align: right;
+	}
+	#account-block {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		justify-content: flex-end;
+	}
+	#account-block button {
+		margin-left: 10px;
+
+	}
+
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 1200px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1 {
+		font-size: 2rem;
+		font-weight: 700;
+		/* line-height: 1; */
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	h2 {
+		text-align: center;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+
+	.btn {
+		cursor: pointer;
+		text-wrap: nowrap;
+		min-width: 100px;
+		height: 30px;
+		color: white;
+		background-color: indigo;
+		display: inline-flex;
+		margin: 10px;
+		align-self: center;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+	}
+
+	.create-btn {
+		min-width: 50px;
+		padding: 0 10px;
+	}
+
+	.btn-primary {
+		height: 40px;
+		padding: 0 30px;
+		font-size: 1.2rem;
+		font-weight: bold;
+	}
+
+	.overlay {
+		left: 0;
+		top: 0;
+		display: flex;
+		position: fixed;
+		width: 100vw;
+		height: 100vh;
+		z-index: 100;
+		background-color: rgba(0,0,0,0.5);
+		justify-content: center;
+		align-items: center;
+	}
+
+	.modal {
+		display: flex;
+		margin-right: 20px;
+		flex-direction: column;
+		background-color: #3d1d53;
+		min-width: 300px;
+		min-height: 100px;
+		height: auto;
+		z-index: 110;
+		padding: 10px 30px;
+		border-radius: 6px;
+	}
+
+	.modal-title {
+		font-weight: bold;
+		font-size: 1.5rem;
+		display: flex;
+		justify-content: center;
+
+	}
+
+	.build-form {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.build-form > .group {
+		width: 100%;
+		display: flex;
+	}
+
+	.group-label {
+		display: flex;
+		min-width: 150px;
+	}
+
+	.build-form .action {
+		margin-top: 40px;
+		display: flex;
+		justify-content: center;
+	}
+	.build-form .success {
+		margin-top: 40px;
+		margin-bottom: 20px;
+		padding: 10px;
+		display: flex;
+		justify-content: center;
+		color: greenyellow;
+		background-color: green;
+		font-size: 1.4rem;
+		font-weight: bold;
+	}
+	.what-to-build .msg {
+		/* max-width: 600px; */
+		margin: 0 auto;
+	}
+
+	.what-to-build .rewarding-data .allowed-bb-row {
+		display: flex;
+		align-items: center;
+		margin: 10px 0;
+	}
+	.what-to-build .rewarding-data .allowed-bb-row span:first-child {
+		margin-right: 20px;
+		display: flex;
+		align-items: center;
+	}
+
+	.what-to-build .rewarding-data .allowed-bb-row span:first-child img {
+		margin-right: 10px;
+	}
+
+	.token-logo {
+		border-radius: 50%;
+		width: 32px;
+		height: 32px;
+	}
+
+</style>

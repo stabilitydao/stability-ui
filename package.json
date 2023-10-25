@@ -1,0 +1,25 @@
+{
+  "name": "stability-ui-proto",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/react": "^3.0.3",
+    "@nanostores/react": "^0.7.1",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "@web3modal/wagmi": "^3.1.0",
+    "astro": "^3.2.4",
+    "nanostores": "^0.9.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "viem": "^1.16.3",
+    "wagmi": "^1.4.3"
+  }
+}
