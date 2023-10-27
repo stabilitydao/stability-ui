@@ -10,7 +10,7 @@
   * [ ] add loader
   * [ ] create Rewarding vault
 * Vaults page
-  * [ ] Table with sorting and filters
+  * [ ] Table of vaults with sorting and filters
     * symbol
     * type
     * strategy
