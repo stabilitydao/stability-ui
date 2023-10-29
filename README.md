@@ -67,6 +67,17 @@ Clone [platform contracts](https://github.com/stabilitydao/v2) repo, build and d
 forge script DeployPolygonForking --rpc-url http://127.0.0.1:8545 --broadcast --with-gas-price 200000000000
 ```
 
+#### Setup local network in wallet
+
+Add network to Metamask.
+
+```
+Name: Localhost Polygon Forking
+RPC URL: http://127.0.0.1:8545
+Chain ID: 137
+Coin symbol: MATIC
+```
+
 #### Run astro in dev mode
 
 ```
