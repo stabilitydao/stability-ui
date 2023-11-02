@@ -1,5 +1,4 @@
 import type React from "react";
-import { useStore } from "@nanostores/react";
 import { addVaultData, vaultData } from "../state/StabilityStore";
 import { useEffect } from "react";
 import { useAccount, usePublicClient, useNetwork, useWalletClient } from "wagmi";
@@ -13,7 +12,6 @@ export function AppStore(props: React.PropsWithChildren) {
 	const { address } = useAccount();
 	const _publicClient = usePublicClient();
 	const { chain } = useNetwork();
-	const $vaultData = useStore(vaultData);
 
 	useEffect(() => {
 		async function getData() {
