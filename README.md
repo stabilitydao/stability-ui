@@ -20,7 +20,7 @@
     - APR
 - Vault page
   - info
-    - [*] all from table
+    - [ ] all from table
     - [ ] last hardwork
   - [ ] Deposit
   - [ ] Withdraw
