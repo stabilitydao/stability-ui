@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Vault from "../../components/Vault"
+
+const { vault } = Astro.params;
+---
+
+<Layout title="Vault">
+  <div class="my-vault">
+    <Vault vault={vault} client:only="react" />
+  </div>
+</Layout>
+
+<style is:global>
+  .what-to-build table td {
+      padding: 0 20px;
+  }
+  .what-to-build table tbody tr:hover td {
+      background-color: #2f1755;
+  }
+  .what-to-build {
+      font-size: 1rem;
+  }
+</style>
