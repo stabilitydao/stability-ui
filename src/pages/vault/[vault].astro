@@ -4,12 +4,11 @@ import Vault from "../../components/Vault"
 
 const { vault } = Astro.params;
 ---
-
-<Layout title="Vault">
-  <div class="my-vault">
-    <Vault vault={vault} client:only="react" />
-  </div>
-</Layout>
+  <Layout title="Vault">
+    <div class="my-vault">
+      <Vault vault={vault as `0x${string}`} client:only="react" />
+    </div>
+  </Layout>
 
 <style is:global>
   .what-to-build table td {

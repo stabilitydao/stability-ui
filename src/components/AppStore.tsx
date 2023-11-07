@@ -1,5 +1,5 @@
 import type React from "react";
-import { addVaultsData } from "../state/StabilityStore";
+import { addVaultData } from "../state/StabilityStore";
 import { useEffect } from "react";
 import {
   useAccount,
@@ -15,13 +15,15 @@ import {
   userBalance,
 } from "../state/StabilityStore";
 import { readContract } from "viem/actions";
-import { platform } from "../constants";
+import { platform, walletConnectProjectId } from "../constants";
 import PlatformAbi from "../abi/PlatformAbi";
+import { useStore } from "@nanostores/react";
+import { addAssetsPrice } from "./Vault";
 
 export function AppStore(props: React.PropsWithChildren) {
   const { address } = useAccount();
-  const _publicClient = usePublicClient();
   const { chain } = useNetwork();
+  const _publicClient = usePublicClient();
 
   useEffect(() => {
     async function getData() {
@@ -64,7 +66,9 @@ export function AppStore(props: React.PropsWithChildren) {
           const erc721Balance: { [token: string]: bigint } = {};
 
           //function -> .set vault
-          addVaultsData(r);
+          addVaultData(r);
+          addAssetsPrice(r);
+
           console.log(r);
           //
 

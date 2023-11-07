@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useStore } from "@nanostores/react";
-import { vaultsData } from "../state/StabilityStore";
+import { vaultData } from "../state/StabilityStore";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { walletConnectProvider, EIP6963Connector } from "@web3modal/wagmi";
 import { WagmiConfig, configureChains, createConfig, useConfig } from "wagmi";
@@ -16,7 +16,7 @@ import { AppStore } from "../components/AppStore";
 import { walletConnectProjectId } from "../constants";
 
 export function Vaults() {
-  const $vaultData = useStore(vaultsData);
+  const $vaultData = useStore(vaultData);
 
   if (Object.keys($vaultData) && Object.keys($vaultData).length > 0) {
     return (
@@ -33,11 +33,7 @@ export function Vaults() {
                 borderColor: "grey",
               }}>
               <td style={{ display: "grid" }}>
-                {" "}
-                <a href={`/vault/${vaultAdress}`}>
-                  Vault:
-                  {vaultAdress}
-                </a>
+                <a href={`/vault/${vaultAdress}`}>Vault: {vaultAdress}</a>
               </td>
 
               <td>

@@ -43,3 +43,19 @@ export type VaultData = {
   vaultSharePrice: bigint;
   vaultUserBalance: bigint;
 };
+
+export type Token = {
+  chainId: number;
+  address: string;
+  symbol: string;
+  name: string;
+  decimals: number;
+  logoURI: string;
+  tags?: string[];
+};
+
+export type assetPrices = {
+  [address: string]: {
+    tokenPrice: bigint;
+  };
+};
