@@ -59,3 +59,11 @@ export type assetPrices = {
     tokenPrice: bigint;
   };
 };
+
+export type Balances = {
+  [balance: string]: AssetBalance;
+};
+
+export type AssetBalance = {
+  assetBalance: bigint;
+};

@@ -13,11 +13,11 @@ import {
   platformData,
   publicClient,
   userBalance,
+  addAssetBalance,
 } from "../state/StabilityStore";
 import { readContract } from "viem/actions";
 import { platform, walletConnectProjectId } from "../constants";
 import PlatformAbi from "../abi/PlatformAbi";
-import { useStore } from "@nanostores/react";
 import { addAssetsPrice } from "./Vault";
 
 export function AppStore(props: React.PropsWithChildren) {
@@ -65,9 +65,10 @@ export function AppStore(props: React.PropsWithChildren) {
           const erc20Balance: { [token: string]: bigint } = {};
           const erc721Balance: { [token: string]: bigint } = {};
 
-          //function -> .set vault
+          //function -> .set vault/
           addVaultData(r);
           addAssetsPrice(r);
+          addAssetBalance(r);
 
           console.log(r);
           //

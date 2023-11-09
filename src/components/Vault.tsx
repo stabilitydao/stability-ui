@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { readContract } from "viem/actions";
-import { vaultData, assets, assetsPrices } from "../state/StabilityStore";
+import {
+  vaultData,
+  assets,
+  assetsPrices,
+  assetsBalances,
+} from "../state/StabilityStore";
 import {
   useAccount,
   usePublicClient,
@@ -13,7 +18,7 @@ import {
 import VaultAbi from "../abi/VaultAbi";
 import StrategyAbi from "../abi/StrategyAbi";
 import tokensJson from "../stability.tokenlist.json";
-import type { Token, assetPrices } from "../types";
+import type { Token, assetPrices, Balances } from "../types";
 import { formatUnits } from "viem";
 
 type Props = {
@@ -40,13 +45,16 @@ export function addAssetsPrice(data: any) {
 export default function Vault(props: Props) {
   const vaultt: `0x${string}` | undefined = props.vault;
   const $assetsPrices = useStore(assetsPrices);
+  const $assetsBalances = useStore(assetsBalances);
   const vault = useStore(vaultData);
   const strategy = useStore(assets);
   const _publicClient = usePublicClient();
-  const [option, setOption] = useState("");
-  const [defaultOption, setDefaultOption] = useState("");
-  const [defaultOptionValue, setDefaultOptionValue] = useState("");
+
+  const [option, setOption] = useState<string[]>([]);
+  const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
+  const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
   const [tab, setTab] = useState("Deposit");
+  const [balances, setBalances] = useState<Balances>({});
 
   useEffect(() => {
     async function getStrategy() {
@@ -56,7 +64,6 @@ export default function Vault(props: Props) {
           abi: VaultAbi,
           functionName: "strategy",
         })) as `0x${string}` | undefined;
-        console.log(s);
 
         if (typeof s === "string") {
           let ss: string[] = (await readContract(_publicClient, {
@@ -67,45 +74,54 @@ export default function Vault(props: Props) {
 
           if (Array.isArray(ss)) {
             assets.set(ss);
+            loadAssetsBalances(ss);
             defaultAssetsOption(ss);
+            setOption(ss);
             console.log("assets", ss);
-            console.log(option);
           } else {
             console.error("ss is not an array");
           }
         }
       }
     }
-
     getStrategy();
-  }, [vaultt]);
+  }, [props]);
+
+  useEffect(() => {}, []);
 
   //Default assets strategy on <select>
   function defaultAssetsOption(ss: string[]) {
-    const strategyAssets = ss;
-    const defaultOption: string[] = [];
+    const defaultOptionAssets: string[] = [];
 
-    for (let i = 0; i < strategyAssets.length; i++) {
-      const token = tokensJson.tokens.find(
-        token => strategyAssets[i] === token.address
-      );
-
+    for (let i = 0; i < ss.length; i++) {
+      const token = tokensJson.tokens.find(token => ss[i] === token.address);
       if (token) {
-        defaultOption[i] = token.symbol;
+        defaultOptionAssets[i] = token.symbol;
       } else {
-        defaultOption[i] = "Token not found.";
+        defaultOptionAssets[i] = "Token not found.";
       }
     }
-
-    const defaultOptionToString = defaultOption.join(" + ");
-    setDefaultOption(defaultOptionToString);
-    setDefaultOptionValue(ss.join(", "));
-    setOption(ss.join(", "));
+    const defaultOptionSymbolsToString = defaultOptionAssets.join(" + ");
+    setDefaultOptionSymbols(defaultOptionSymbolsToString);
+    setDefaultOptionAssets(ss.join(", "));
   }
-  //Default assets strategy on <select>
 
   function changeOption(e: string) {
-    setOption(e);
+    setOption(e.split(", "));
+  }
+
+  function loadAssetsBalances(e: string) {
+    const assetAdress = e;
+    const balance: Balances = {};
+
+    if ($assetsBalances && e.length > 0) {
+      for (let i = 0; i < e.length; i++) {
+        balance[e[i]] = {
+          assetBalance: $assetsBalances[e[i]].assetBalance,
+        };
+      }
+    }
+    setBalances(balance);
   }
 
   if (props.vault && vault[props.vault]) {
@@ -190,9 +206,9 @@ export default function Vault(props: Props) {
                 onChange={e => changeOption(e.target.value)}
                 style={{ height: "46px" }}>
                 <option
-                  value={defaultOptionValue}
+                  value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
-                  {defaultOption}
+                  {defaultOptionSymbols}
                 </option>
                 {tokensJson.tokens &&
                   tokensJson.tokens.slice(0, -2).map(token => {
@@ -211,7 +227,7 @@ export default function Vault(props: Props) {
                   })}
               </select>
             </div>
-            {defaultOptionValue === option ? (
+            {option.length > 1 ? (
               <div
                 style={{
                   display: "flex",
@@ -221,37 +237,29 @@ export default function Vault(props: Props) {
                   marginTop: "10px",
                   alignItems: "bottom",
                 }}>
-                <div style={{ display: "grid" }}>
-                  <label style={{ textAlign: "center", color: "grey" }}>
-                    Available
-                  </label>
-                  <input
-                    list="amount"
-                    id="amount"
-                    name="amount"
-                    placeholder="0"
-                    style={{
-                      height: "40px",
-                      width: "140px",
-                    }}
-                  />
-                </div>
-                {}
-                <div style={{ display: "grid" }}>
-                  <label style={{ textAlign: "center", color: "grey" }}>
-                    Available
-                  </label>
-                  <input
-                    list="amount"
-                    id="amount"
-                    name="amount"
-                    placeholder="0"
-                    style={{
-                      height: "40px",
-                      width: "140px",
-                    }}
-                  />
-                </div>
+                {strategy &&
+                  strategy.map(asset => (
+                    <div
+                      key={asset}
+                      style={{ display: "grid" }}>
+                      <label style={{ textAlign: "center", color: "grey" }}>
+                        Available
+                      </label>
+                      <input
+                        list="amount"
+                        id="amount"
+                        name="amount"
+                        placeholder={formatUnits(
+                          $assetsBalances[asset].assetBalance,
+                          18
+                        )}
+                        style={{
+                          height: "40px",
+                          width: "140px",
+                        }}
+                      />
+                    </div>
+                  ))}
               </div>
             ) : (
               <div
@@ -266,13 +274,18 @@ export default function Vault(props: Props) {
                   <label style={{ textAlign: "center", color: "grey" }}>
                     Available
                   </label>
-                  <input
-                    list="amount"
-                    id="amount"
-                    name="amount"
-                    placeholder="0"
-                    style={{ height: "40px" }}
-                  />
+                  {option.length === 1 && (
+                    <input
+                      list="amount"
+                      id="amount"
+                      name="amount"
+                      placeholder={formatUnits(
+                        $assetsBalances[option].assetBalance,
+                        18
+                      )}
+                      style={{ height: "40px" }}
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -320,7 +333,7 @@ export default function Vault(props: Props) {
               </p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-help-octagon"
+                class="icon icon-tabler icon-tabler-help-octagon"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
@@ -354,7 +367,7 @@ export default function Vault(props: Props) {
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-help-octagon"
+                class="icon icon-tabler icon-tabler-help-octagon"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
@@ -380,7 +393,7 @@ export default function Vault(props: Props) {
         </div>
 
         <article
-          className="Strategy"
+          class="Strategy"
           style={{
             borderStyle: "solid",
             paddingLeft: "25px",
@@ -445,7 +458,7 @@ export default function Vault(props: Props) {
                         </a>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-external-link"
+                          class="icon icon-tabler icon-tabler-external-link"
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
