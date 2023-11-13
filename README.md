@@ -4,35 +4,11 @@
 
 ### Alpha
 
-* New vault page
-  * [*] List of vaults to build
-  * [*] create Compounding vault
-  * [ ] add loader
-  * [ ] create Rewarding vault
-* Vaults page
-  * [ ] Table of vaults with sorting and filters
-    * symbol
-    * type
-    * strategy
-    * Balance
-    * sharePrice
-    * TVL
-    * APR
-* Vault page
-  * info
-    * [ ] all from table
-    * [ ] last hardwork
-  * [ ] Deposit
-  * [ ] Withdraw
-  * [ ] Claim reward
-  * [ ] Claim all rewards
-
+[Issues](https://github.com/stabilitydao/stability-ui/issues)
 
 ### Beta
 
-* Zap
 * create Rewarding Managed vault
-* vault assets
 * user assets in profile
 * subgraph integration
 * vaults gas reserve
