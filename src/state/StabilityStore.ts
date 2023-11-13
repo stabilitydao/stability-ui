@@ -54,7 +54,6 @@ export function addVaultData(data: any[]) {
       };
     }
     vaultData.set(vault);
-    console.log(vaultData);
   } else {
     console.error("There is an error, arrays lenght are different.");
   }

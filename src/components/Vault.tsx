@@ -14,12 +14,13 @@ import {
   usePublicClient,
   useNetwork,
   useWalletClient,
+  useFeeData,
 } from "wagmi";
 import VaultAbi from "../abi/VaultAbi";
 import StrategyAbi from "../abi/StrategyAbi";
 import tokensJson from "../stability.tokenlist.json";
-import type { Token, assetPrices, Balances } from "../types";
-import { formatUnits } from "viem";
+import type { Token, assetPrices, Balances, AssetBalance } from "../types";
+import { formatUnits, parseUnits } from "viem";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -36,7 +37,6 @@ export function addAssetsPrice(data: any) {
       };
     }
     assetsPrices.set(assetPrice);
-    console.log(assetsPrices);
   } else {
     console.error("There is an error, arrays lenght are different.");
   }
@@ -46,15 +46,50 @@ export default function Vault(props: Props) {
   const vaultt: `0x${string}` | undefined = props.vault;
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
-  const vault = useStore(vaultData);
-  const strategy = useStore(assets);
+  const $vault = useStore(vaultData);
+  const $assets = useStore(assets);
   const _publicClient = usePublicClient();
 
+  function resetInputs() {
+    type input = {
+      [assetAdress: string]: InputAmmount;
+    };
+
+    type InputAmmount = {
+      ammount: string;
+    };
+    const reset: input = {};
+    if ($assets) {
+      for (let i = 0; i < $assets?.length; i++) {
+        reset[$assets[i]] = {
+          ammount: "",
+        };
+      }
+    }
+    setInputs(reset);
+  }
+
+  type LastKeyPressState = {
+    key1?: string;
+    key2?: string;
+  };
   const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
   const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
   const [tab, setTab] = useState("Deposit");
-  const [balances, setBalances] = useState<Balances>({});
+  const [balances, setBalances] = useState<Balance>({});
+  const [inputsPreviewDeposit, setinputsPreviewDeposit] =
+    useState<inputPreview>({});
+  const [inputs, setInputs] = useState<input>({});
+  const [lastKeyPress, setLastKeyPress] = useState<{
+    key1: string | undefined;
+    key2: string | undefined;
+  }>({ key1: undefined, key2: undefined });
+  console.log(defaultOptionAssets);
+  console.log(inputs);
+  console.log(balances);
+  console.log(option);
+  console.log(assets);
 
   useEffect(() => {
     async function getStrategy() {
@@ -64,6 +99,7 @@ export default function Vault(props: Props) {
           abi: VaultAbi,
           functionName: "strategy",
         })) as `0x${string}` | undefined;
+        console.log(s);
 
         if (typeof s === "string") {
           let ss: string[] = (await readContract(_publicClient, {
@@ -71,12 +107,14 @@ export default function Vault(props: Props) {
             abi: StrategyAbi,
             functionName: "assets",
           })) as string[];
+          console.log(ss);
 
           if (Array.isArray(ss)) {
             assets.set(ss);
-            loadAssetsBalances(ss);
-            defaultAssetsOption(ss);
             setOption(ss);
+            // loadAssetsBalances(ss);
+            defaultAssetsOption(ss);
+
             console.log("assets", ss);
           } else {
             console.error("ss is not an array");
@@ -86,8 +124,6 @@ export default function Vault(props: Props) {
     }
     getStrategy();
   }, [props]);
-
-  useEffect(() => {}, []);
 
   //Default assets strategy on <select>
   function defaultAssetsOption(ss: string[]) {
@@ -104,27 +140,186 @@ export default function Vault(props: Props) {
     const defaultOptionSymbolsToString = defaultOptionAssets.join(" + ");
     setDefaultOptionSymbols(defaultOptionSymbolsToString);
     setDefaultOptionAssets(ss.join(", "));
+    console.log(defaultOptionAssets);
+    console.log(defaultOptionSymbols);
   }
 
-  function changeOption(e: string) {
-    setOption(e.split(", "));
+  function changeOption(e: string[]) {
+    resetInputs();
+    setOption(e);
   }
 
-  function loadAssetsBalances(e: string) {
-    const assetAdress = e;
-    const balance: Balances = {};
+  type Balance = {
+    [balance: string]: AssetBalancee;
+  };
 
-    if ($assetsBalances && e.length > 0) {
-      for (let i = 0; i < e.length; i++) {
-        balance[e[i]] = {
-          assetBalance: $assetsBalances[e[i]].assetBalance,
-        };
+  type AssetBalancee = {
+    assetBalance: string;
+  };
+
+  //AssetsBalances
+  useEffect(() => {
+    function loadAssetsBalances() {
+      console.log($assetsBalances);
+      const e = option;
+      console.log(option);
+
+      console.log(e);
+
+      const balance: Balance = {};
+
+      if ($assetsBalances && option && option.length > 1) {
+        for (let i = 0; i < e.length; i++) {
+          const decimals =
+            tokensJson.tokens.find(token => token.address === option[i])
+              ?.decimals ?? 18;
+
+          balance[e[i]] = {
+            assetBalance: formatUnits(
+              $assetsBalances[option[i]].assetBalance,
+              decimals
+            ),
+          };
+        }
+      } else {
+        if (
+          $assetsBalances &&
+          $assetsBalances[option[0]] &&
+          option &&
+          option.length === 1
+        ) {
+          console.log(option[0]);
+          console.log($assetsBalances[option[0]].assetBalance);
+
+          const decimals =
+            tokensJson.tokens.find(token => token.address === option[0])
+              ?.decimals ?? 18;
+
+          balance[option[0]] = {
+            assetBalance: formatUnits(
+              $assetsBalances[option[0]].assetBalance,
+              decimals
+            ),
+          };
+        }
+      }
+
+      setBalances(balance);
+      console.log(balance);
+    }
+    loadAssetsBalances();
+  }, [option]);
+
+  type input = {
+    [assetAdress: string]: InputAmmount;
+  };
+
+  type InputAmmount = {
+    ammount: string;
+  };
+
+  type inputPreview = {
+    [assetAdress: string]: InputAmmountPreview;
+  };
+
+  type InputAmmountPreview = {
+    ammount: bigint;
+  };
+
+  function handleInputChange(a: string, e: string) {
+    let inputValue: input = {};
+
+    const decimals =
+      tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
+
+    const _amount = parseUnits(a, decimals);
+
+    if (a === "") {
+      resetInputs();
+    } else {
+      setInputs(prevInputs => ({
+        ...prevInputs,
+        [e]: {
+          ammount: a,
+        },
+      }));
+
+      setinputsPreviewDeposit(prevInputs => ({
+        ...prevInputs,
+        [e]: {
+          ammount: _amount,
+        },
+      }));
+    }
+    console.log(inputs);
+
+    if (option.length > 1) {
+      setLastKeyPress({ key1: e, key2: a });
+    }
+  }
+  useEffect(() => {
+    async function previewDeposit() {
+      if ($assets && lastKeyPress.key1) {
+        const changedInput = $assets?.indexOf(lastKeyPress.key1);
+
+        const preview: input = {};
+
+        if ($assets && $assets.length > 0) {
+          let amounts: bigint[] = [];
+          for (let i = 0; i < $assets.length; i++) {
+            if (i === changedInput) {
+              amounts.push(inputsPreviewDeposit[lastKeyPress.key1].ammount);
+              console.log(inputsPreviewDeposit);
+            } else {
+              amounts.push(parseUnits("1", 36));
+            }
+          }
+
+          if (typeof vaultt === "string") {
+            try {
+              let t: (bigint | bigint[])[] = (await readContract(
+                _publicClient,
+                {
+                  address: vaultt,
+                  abi: StrategyAbi,
+                  functionName: "previewDepositAssets",
+                  args: [$assets, amounts],
+                }
+              )) as (bigint | bigint[])[];
+
+              const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
+
+              const updateInputs = inputs;
+
+              for (let i = 0; i < $assets.length; i++) {
+                const decimals =
+                  tokensJson.tokens.find(token => token.address === $assets[i])
+                    ?.decimals ?? 18;
+                if (i !== changedInput) {
+                  preview[$assets[i]] = {
+                    ammount: formatUnits(qq[i], decimals).toString(),
+                  };
+                }
+              }
+
+              if (lastKeyPress.key2 !== "") {
+                setInputs(prevInputs => ({
+                  ...prevInputs,
+                  ...preview,
+                }));
+              }
+            } catch (error) {
+              console.error("Error fetching data:", error);
+              resetInputs();
+            }
+          }
+        }
       }
     }
-    setBalances(balance);
-  }
+    previewDeposit();
+  }, [lastKeyPress]);
 
-  if (props.vault && vault[props.vault]) {
+  if (props.vault && $vault[props.vault]) {
     return (
       <>
         <table style={{ display: "flex", justifyContent: "center" }}>
@@ -138,9 +333,9 @@ export default function Vault(props: Props) {
                 borderColor: "grey",
               }}>
               <td>Vault: {props.vault}</td>
-              <td>TVL: {vault[props.vault].vaultSharePrice.toString()}</td>
+              <td>TVL: {$vault[props.vault].vaultSharePrice.toString()}</td>
               <td>
-                User Balance: {vault[props.vault].vaultUserBalance.toString()}
+                User Balance: {$vault[props.vault].vaultUserBalance.toString()}
               </td>
             </tr>
           </tbody>
@@ -195,7 +390,7 @@ export default function Vault(props: Props) {
               style={{
                 display: "grid",
                 justifyContent: "center",
-                width: "330px",
+                width: "auto",
                 margin: "auto",
                 marginTop: "10px",
               }}>
@@ -203,8 +398,8 @@ export default function Vault(props: Props) {
                 Select token
               </label>
               <select
-                onChange={e => changeOption(e.target.value)}
-                style={{ height: "46px" }}>
+                onChange={e => changeOption(e.target.value.split(", "))}
+                style={{ height: "46px", width: "200px" }}>
                 <option
                   value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
@@ -218,83 +413,241 @@ export default function Vault(props: Props) {
                         value={token.address}
                         style={{ textAlign: "center" }}>
                         {token.symbol}
-                        <img
-                          src={token.logoURI}
-                          alt={token.symbol}
-                        />
                       </option>
                     );
                   })}
               </select>
             </div>
-            {option.length > 1 ? (
+            {option && option.length > 1 ? (
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  width: "330px",
+                  display: "grid",
                   margin: "auto",
-                  marginTop: "10px",
-                  alignItems: "bottom",
+                  marginTop: "15px",
+                  fontSize: "15px",
+                  width: "340px",
                 }}>
-                {strategy &&
-                  strategy.map(asset => (
-                    <div
-                      key={asset}
-                      style={{ display: "grid" }}>
-                      <label style={{ textAlign: "center", color: "grey" }}>
-                        Available
-                      </label>
-                      <input
-                        list="amount"
-                        id="amount"
-                        name="amount"
-                        placeholder={formatUnits(
-                          $assetsBalances[asset].assetBalance,
-                          18
-                        )}
+                {option.map(asset => (
+                  <div
+                    key={asset}
+                    style={{
+                      display: "grid",
+                      margin: "auto",
+                      position: "relative",
+                      height: "130px",
+                      borderStyle: "solid",
+                      borderWidth: "1px",
+                      borderColor: "grey",
+                      marginTop: "7px",
+                      marginBottom: "7px",
+                    }}>
+                    <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+                      <div
                         style={{
-                          height: "40px",
-                          width: "140px",
-                        }}
-                      />
+                          position: "absolute",
+                          right: "0",
+                          bottom: "0",
+                          padding: "5px",
+                        }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}>
+                          <div
+                            style={{
+                              textAlign: "left",
+                              color: "grey",
+                              marginLeft: "4px",
+                            }}>
+                            Balance:{" "}
+                            {balances[asset] && balances[asset].assetBalance}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              balances &&
+                              balances[asset] &&
+                              handleInputChange(
+                                balances[asset]?.assetBalance,
+                                asset
+                              )
+                            }
+                            style={{
+                              color: "grey",
+                              border: "solid",
+                              background: "none",
+                              borderWidth: "1px",
+                              marginLeft: "5px",
+                              borderColor: "grey",
+                            }}>
+                            max
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  ))}
+
+                    <input
+                      list="amount"
+                      id={asset}
+                      name="amount"
+                      placeholder="0"
+                      value={inputs[asset] && inputs[asset].ammount}
+                      onChange={e =>
+                        handleInputChange(e.target.value, e.target.id)
+                      }
+                      type="number"
+                      onKeyDown={evt =>
+                        ["e", "E", "+", "-"].includes(evt.key) &&
+                        evt.preventDefault()
+                      }
+                      style={{
+                        width: "300px",
+                        height: "40px",
+                        fontSize: "30px",
+                        background: "none",
+                        borderStyle: "none",
+                        color: "white",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "45%",
+                        right: "20px",
+                      }}>
+                      {defaultOptionSymbols}
+                      <img src="" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div
                 style={{
-                  display: "flex",
-                  width: "330px",
+                  display: "grid",
                   margin: "auto",
-                  marginTop: "10px",
-                  justifyContent: "center",
+                  marginTop: "15px",
+                  fontSize: "15px",
+                  width: "340px",
                 }}>
-                <div style={{ display: "grid" }}>
-                  <label style={{ textAlign: "center", color: "grey" }}>
-                    Available
-                  </label>
-                  {option.length === 1 && (
+                <div
+                  style={{
+                    display: "grid",
+                    width: "300px",
+                    margin: "auto",
+                    position: "relative",
+                    height: "130px",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    borderColor: "grey",
+                    marginTop: "7px",
+                    marginBottom: "7px",
+                  }}>
+                  {balances && balances[option[0]] && (
+                    <div
+                      style={{
+                        marginTop: "5px",
+                        marginBottom: "5px",
+                      }}>
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "0",
+                          bottom: "0",
+                          padding: "5px",
+                        }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}>
+                          <div
+                            style={{
+                              textAlign: "left",
+                              color: "grey",
+                              marginLeft: "4px",
+                            }}>
+                            Balance: {balances[option[0]].assetBalance}
+                          </div>
+                          <button
+                            onClick={() =>
+                              handleInputChange(
+                                balances[option[0]].assetBalance,
+                                option[0]
+                              )
+                            }
+                            type="button"
+                            style={{
+                              color: "grey",
+                              border: "solid",
+                              background: "none",
+                              borderWidth: "1px",
+                              marginLeft: "5px",
+                              borderColor: "grey",
+                            }}>
+                            max
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {option && option.length === 1 && (
                     <input
                       list="amount"
-                      id="amount"
+                      id={option[0]}
+                      value={inputs[option[0]] && inputs[option[0]].ammount}
                       name="amount"
-                      placeholder={formatUnits(
-                        $assetsBalances[option].assetBalance,
-                        18
-                      )}
-                      style={{ height: "40px" }}
+                      placeholder="0"
+                      onChange={e =>
+                        handleInputChange(e.target.value, e.target.id)
+                      }
+                      type="number"
+                      style={{
+                        width: "300px",
+                        height: "40px",
+                        fontSize: "30px",
+                        background: "none",
+                        borderStyle: "none",
+                        color: "white",
+                      }}
                     />
                   )}
+                  <div
+                    style={{ position: "absolute", top: "32%", right: "20px" }}>
+                    {tokensJson.tokens.map(token => {
+                      if (token.address === option[0]) {
+                        return (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                            key={token.address}>
+                            <p>{token.symbol}</p>
+                            <img
+                              style={{
+                                width: "35px",
+                                height: "35px",
+                                borderRadius: "50%",
+                                marginLeft: "4px",
+                              }}
+                              src={token.logoURI}
+                              alt={token.name}
+                            />
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
                 </div>
               </div>
             )}
             {tab === "Deposit" ? (
               <button
                 style={{
-                  height: "45px",
+                  height: "55px",
                   fontSize: "28px",
-                  width: "330px",
+                  width: "350px",
                   margin: "auto",
                   marginTop: "20px",
                 }}>
@@ -303,9 +656,9 @@ export default function Vault(props: Props) {
             ) : (
               <button
                 style={{
-                  height: "45px",
+                  height: "55px",
                   fontSize: "28px",
-                  width: "330px",
+                  width: "350px",
                   margin: "auto",
                   marginTop: "20px",
                 }}>
@@ -316,9 +669,8 @@ export default function Vault(props: Props) {
 
           <section
             style={{
-              paddingLeft: "50px",
-              paddingRight: "50px",
-              paddingBottom: "20px",
+              padding: "25px",
+
               opacity: "50%",
               borderStyle: "solid",
               borderWidth: "1px",
@@ -333,15 +685,15 @@ export default function Vault(props: Props) {
               </p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-help-octagon"
+                className="icon icon-tabler icon-tabler-help-octagon"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
-                stroke-width="2"
+                strokeWidth="2"
                 stroke="currentColor"
                 fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round">
+                strokeLinecap="round"
+                strokeLinejoin="round">
                 <path
                   stroke="none"
                   d="M0 0h24v24H0z"
@@ -367,15 +719,15 @@ export default function Vault(props: Props) {
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-help-octagon"
+                className="icon icon-tabler icon-tabler-help-octagon"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
-                stroke-width="2"
+                strokeWidth="2"
                 stroke="currentColor"
                 fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round">
+                strokeLinecap="round"
+                strokeLinejoin="round">
                 <path
                   stroke="none"
                   d="M0 0h24v24H0z"
@@ -393,7 +745,7 @@ export default function Vault(props: Props) {
         </div>
 
         <article
-          class="Strategy"
+          className="Strategy"
           style={{
             borderStyle: "solid",
             paddingLeft: "25px",
@@ -409,16 +761,16 @@ export default function Vault(props: Props) {
             }}>
             Strategy assets
           </h2>
-          {strategy &&
-            strategy.map(strategy => {
-              const strategyData: Token | undefined = tokensJson.tokens.find(
-                token => token.address === strategy
+          {$assets &&
+            $assets.map(asset => {
+              const assetData: Token | undefined = tokensJson.tokens.find(
+                token => token.address === asset
               );
 
-              if (strategyData && $assetsPrices) {
+              if (assetData && $assetsPrices) {
                 return (
                   <article
-                    key={strategy}
+                    key={asset}
                     style={{
                       padding: "15px",
                       paddingLeft: "20px",
@@ -434,7 +786,7 @@ export default function Vault(props: Props) {
                         alignItems: "center",
                         height: "40px",
                       }}>
-                      <h4>{strategyData.name}</h4>
+                      <h4>{assetData.name}</h4>
                       <div
                         style={{
                           backgroundColor: "#4B0082",
@@ -446,7 +798,7 @@ export default function Vault(props: Props) {
                           padding: "1px",
                         }}>
                         <a
-                          href={`https://polygonscan.com/token/${strategy}`}
+                          href={`https://polygonscan.com/token/${asset}`}
                           style={{
                             textDecoration: "none",
                             color: "white",
@@ -458,15 +810,15 @@ export default function Vault(props: Props) {
                         </a>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          class="icon icon-tabler icon-tabler-external-link"
+                          className="icon icon-tabler icon-tabler-external-link"
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
-                          stroke-width="2"
+                          strokeWidth="2"
                           stroke="currentColor"
                           fill="none"
-                          stroke-linecap="round"
-                          stroke-linejoin="round">
+                          strokeLinecap="round"
+                          strokeLinejoin="round">
                           <path
                             stroke="none"
                             d="M0 0h24v24H0z"
@@ -485,7 +837,7 @@ export default function Vault(props: Props) {
                         width: "100%",
                       }}>
                       <img
-                        src={strategyData.logoURI}
+                        src={assetData.logoURI}
                         style={{
                           borderRadius: "50%",
                           height: "70px",
@@ -495,11 +847,11 @@ export default function Vault(props: Props) {
                       />
                       <div style={{ display: "inline-block" }}>
                         <h5 style={{ marginLeft: "18px" }}>
-                          {strategyData.symbol}
+                          {assetData.symbol}
                         </h5>
                         <p style={{ marginLeft: "18px" }}>
                           Price: $
-                          {formatUnits($assetsPrices[strategy].tokenPrice, 18)}
+                          {formatUnits($assetsPrices[asset].tokenPrice, 18)}
                         </p>
                       </div>
                       <section
