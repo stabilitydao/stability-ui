@@ -21,6 +21,7 @@ import StrategyAbi from "../abi/StrategyAbi";
 import tokensJson from "../stability.tokenlist.json";
 import type { Token, assetPrices, Balances, AssetBalance } from "../types";
 import { formatUnits, parseUnits } from "viem";
+import InsufficientFounds from "./InsufficientFounds";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -50,7 +51,7 @@ export default function Vault(props: Props) {
   const $assets = useStore(assets);
   const _publicClient = usePublicClient();
 
-  function resetInputs() {
+  function resetInputs(e: string[]) {
     type input = {
       [assetAdress: string]: InputAmmount;
     };
@@ -59,20 +60,15 @@ export default function Vault(props: Props) {
       ammount: string;
     };
     const reset: input = {};
-    if ($assets) {
-      for (let i = 0; i < $assets?.length; i++) {
-        reset[$assets[i]] = {
-          ammount: "",
-        };
-      }
+
+    for (let i = 0; i < e.length; i++) {
+      reset[e[i]] = {
+        ammount: "",
+      };
     }
     setInputs(reset);
   }
 
-  type LastKeyPressState = {
-    key1?: string;
-    key2?: string;
-  };
   const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
   const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
@@ -85,11 +81,6 @@ export default function Vault(props: Props) {
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
-  console.log(defaultOptionAssets);
-  console.log(inputs);
-  console.log(balances);
-  console.log(option);
-  console.log(assets);
 
   useEffect(() => {
     async function getStrategy() {
@@ -125,7 +116,6 @@ export default function Vault(props: Props) {
     getStrategy();
   }, [props]);
 
-  //Default assets strategy on <select>
   function defaultAssetsOption(ss: string[]) {
     const defaultOptionAssets: string[] = [];
 
@@ -140,12 +130,10 @@ export default function Vault(props: Props) {
     const defaultOptionSymbolsToString = defaultOptionAssets.join(" + ");
     setDefaultOptionSymbols(defaultOptionSymbolsToString);
     setDefaultOptionAssets(ss.join(", "));
-    console.log(defaultOptionAssets);
-    console.log(defaultOptionSymbols);
   }
 
   function changeOption(e: string[]) {
-    resetInputs();
+    resetInputs(e);
     setOption(e);
   }
 
@@ -160,12 +148,7 @@ export default function Vault(props: Props) {
   //AssetsBalances
   useEffect(() => {
     function loadAssetsBalances() {
-      console.log($assetsBalances);
       const e = option;
-      console.log(option);
-
-      console.log(e);
-
       const balance: Balance = {};
 
       if ($assetsBalances && option && option.length > 1) {
@@ -188,9 +171,6 @@ export default function Vault(props: Props) {
           option &&
           option.length === 1
         ) {
-          console.log(option[0]);
-          console.log($assetsBalances[option[0]].assetBalance);
-
           const decimals =
             tokensJson.tokens.find(token => token.address === option[0])
               ?.decimals ?? 18;
@@ -203,9 +183,7 @@ export default function Vault(props: Props) {
           };
         }
       }
-
       setBalances(balance);
-      console.log(balance);
     }
     loadAssetsBalances();
   }, [option]);
@@ -227,15 +205,13 @@ export default function Vault(props: Props) {
   };
 
   function handleInputChange(a: string, e: string) {
-    let inputValue: input = {};
-
     const decimals =
       tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
 
     const _amount = parseUnits(a, decimals);
 
     if (a === "") {
-      resetInputs();
+      resetInputs(option);
     } else {
       setInputs(prevInputs => ({
         ...prevInputs,
@@ -251,12 +227,12 @@ export default function Vault(props: Props) {
         },
       }));
     }
-    console.log(inputs);
 
     if (option.length > 1) {
       setLastKeyPress({ key1: e, key2: a });
     }
   }
+
   useEffect(() => {
     async function previewDeposit() {
       if ($assets && lastKeyPress.key1) {
@@ -269,7 +245,6 @@ export default function Vault(props: Props) {
           for (let i = 0; i < $assets.length; i++) {
             if (i === changedInput) {
               amounts.push(inputsPreviewDeposit[lastKeyPress.key1].ammount);
-              console.log(inputsPreviewDeposit);
             } else {
               amounts.push(parseUnits("1", 36));
             }
@@ -310,7 +285,7 @@ export default function Vault(props: Props) {
               }
             } catch (error) {
               console.error("Error fetching data:", error);
-              resetInputs();
+              resetInputs(option);
             }
           }
         }
@@ -342,11 +317,9 @@ export default function Vault(props: Props) {
         </table>
         <div
           style={{
-            width: "531px",
-            justifyContent: "center",
+            width: "100%",
             display: "grid",
             margin: "auto",
-            gridGap: 0,
             marginBottom: "50px",
             borderStyle: "solid",
             borderWidth: "1px",
@@ -356,22 +329,29 @@ export default function Vault(props: Props) {
           <div
             style={{
               display: "flex",
+              width: "100%",
+              padding: "0",
             }}>
             <button
               style={{
                 width: "100%",
                 height: "65px",
-                fontSize: "23px",
+                fontSize: "30px",
+                cursor: "pointer",
+                padding: "0",
+                margin: "0",
               }}
               onClick={() => setTab("Deposit")}>
               Deposit
             </button>
-
             <button
               style={{
                 width: "100%",
                 height: "65px",
-                fontSize: "23px",
+                fontSize: "30px",
+                cursor: "pointer",
+                padding: "0",
+                margin: "0",
               }}
               onClick={() => setTab("Withdraw")}>
               Withdraw
@@ -379,17 +359,16 @@ export default function Vault(props: Props) {
           </div>
           <form
             style={{
-              width: "531px",
-              margin: "auto",
+              width: "100%",
               display: "grid",
               justifyContent: "center",
               alignItems: "center",
               marginBottom: "18px",
+              height: "700px",
             }}>
             <div
               style={{
                 display: "grid",
-                justifyContent: "center",
                 width: "auto",
                 margin: "auto",
                 marginTop: "10px",
@@ -399,7 +378,7 @@ export default function Vault(props: Props) {
               </label>
               <select
                 onChange={e => changeOption(e.target.value.split(", "))}
-                style={{ height: "46px", width: "200px" }}>
+                style={{ height: "55px", width: "300px", fontSize: "35px" }}>
                 <option
                   value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
@@ -425,7 +404,7 @@ export default function Vault(props: Props) {
                   margin: "auto",
                   marginTop: "15px",
                   fontSize: "15px",
-                  width: "340px",
+                  width: "100%",
                 }}>
                 {option.map(asset => (
                   <div
@@ -434,12 +413,13 @@ export default function Vault(props: Props) {
                       display: "grid",
                       margin: "auto",
                       position: "relative",
-                      height: "130px",
+                      height: "150px",
                       borderStyle: "solid",
                       borderWidth: "1px",
                       borderColor: "grey",
                       marginTop: "7px",
                       marginBottom: "7px",
+                      paddingLeft: "10px",
                     }}>
                     <div style={{ marginTop: "5px", marginBottom: "5px" }}>
                       <div
@@ -447,7 +427,9 @@ export default function Vault(props: Props) {
                           position: "absolute",
                           right: "0",
                           bottom: "0",
-                          padding: "5px",
+                          padding: "15px",
+                          paddingRight: "12px",
+                          paddingBottom: "12px",
                         }}>
                         <div
                           style={{
@@ -458,7 +440,6 @@ export default function Vault(props: Props) {
                             style={{
                               textAlign: "left",
                               color: "grey",
-                              marginLeft: "4px",
                             }}>
                             Balance:{" "}
                             {balances[asset] && balances[asset].assetBalance}
@@ -492,7 +473,7 @@ export default function Vault(props: Props) {
                       id={asset}
                       name="amount"
                       placeholder="0"
-                      value={inputs[asset] && inputs[asset].ammount}
+                      value={inputs && inputs[asset] && inputs[asset].ammount}
                       onChange={e =>
                         handleInputChange(e.target.value, e.target.id)
                       }
@@ -502,22 +483,44 @@ export default function Vault(props: Props) {
                         evt.preventDefault()
                       }
                       style={{
-                        width: "300px",
+                        width: "60%",
                         height: "40px",
                         fontSize: "30px",
                         background: "none",
                         borderStyle: "none",
                         color: "white",
+                        marginBottom: "15px",
+                        paddingLeft: "15px",
                       }}
                     />
                     <div
                       style={{
                         position: "absolute",
-                        top: "45%",
-                        right: "20px",
+                        top: "27%",
+                        right: "13px",
                       }}>
-                      {defaultOptionSymbols}
-                      <img src="" />
+                      {tokensJson.tokens.map(token => {
+                        if (token.address === asset) {
+                          return (
+                            <div
+                              style={{ display: "flex", alignItems: "center" }}
+                              key={token.address}>
+                              <p>{token.symbol}</p>
+                              <img
+                                style={{
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "50%",
+                                  marginLeft: "8px",
+                                }}
+                                src={token.logoURI}
+                                alt={token.name}
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
                     </div>
                   </div>
                 ))}
@@ -529,20 +532,20 @@ export default function Vault(props: Props) {
                   margin: "auto",
                   marginTop: "15px",
                   fontSize: "15px",
-                  width: "340px",
+                  width: "100%",
                 }}>
                 <div
                   style={{
                     display: "grid",
-                    width: "300px",
                     margin: "auto",
                     position: "relative",
-                    height: "130px",
+                    height: "150px",
                     borderStyle: "solid",
                     borderWidth: "1px",
                     borderColor: "grey",
                     marginTop: "7px",
                     marginBottom: "7px",
+                    paddingLeft: "10px",
                   }}>
                   {balances && balances[option[0]] && (
                     <div
@@ -555,7 +558,9 @@ export default function Vault(props: Props) {
                           position: "absolute",
                           right: "0",
                           bottom: "0",
-                          padding: "5px",
+                          padding: "15px",
+                          paddingRight: "12px",
+                          paddingBottom: "12px",
                         }}>
                         <div
                           style={{
@@ -566,7 +571,6 @@ export default function Vault(props: Props) {
                             style={{
                               textAlign: "left",
                               color: "grey",
-                              marginLeft: "4px",
                             }}>
                             Balance: {balances[option[0]].assetBalance}
                           </div>
@@ -597,25 +601,33 @@ export default function Vault(props: Props) {
                     <input
                       list="amount"
                       id={option[0]}
-                      value={inputs[option[0]] && inputs[option[0]].ammount}
+                      value={
+                        inputs && inputs[option[0]] && inputs[option[0]].ammount
+                      }
                       name="amount"
+                      type="number"
                       placeholder="0"
                       onChange={e =>
                         handleInputChange(e.target.value, e.target.id)
                       }
-                      type="number"
+                      onKeyDown={evt =>
+                        ["e", "E", "+", "-"].includes(evt.key) &&
+                        evt.preventDefault()
+                      }
                       style={{
-                        width: "300px",
+                        width: "60%",
                         height: "40px",
                         fontSize: "30px",
                         background: "none",
                         borderStyle: "none",
                         color: "white",
+                        marginBottom: "15px",
+                        paddingLeft: "15px",
                       }}
                     />
                   )}
                   <div
-                    style={{ position: "absolute", top: "32%", right: "20px" }}>
+                    style={{ position: "absolute", top: "27%", right: "13px" }}>
                     {tokensJson.tokens.map(token => {
                       if (token.address === option[0]) {
                         return (
@@ -625,10 +637,10 @@ export default function Vault(props: Props) {
                             <p>{token.symbol}</p>
                             <img
                               style={{
-                                width: "35px",
-                                height: "35px",
+                                width: "40px",
+                                height: "40px",
                                 borderRadius: "50%",
-                                marginLeft: "4px",
+                                marginLeft: "8px",
                               }}
                               src={token.logoURI}
                               alt={token.name}
@@ -645,22 +657,28 @@ export default function Vault(props: Props) {
             {tab === "Deposit" ? (
               <button
                 style={{
-                  height: "55px",
-                  fontSize: "28px",
-                  width: "350px",
+                  display: "grid",
                   margin: "auto",
-                  marginTop: "20px",
+                  marginTop: "15px",
+                  fontSize: "30px",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "50px",
+                  cursor: "pointer",
                 }}>
                 Deposit
               </button>
             ) : (
               <button
                 style={{
-                  height: "55px",
-                  fontSize: "28px",
-                  width: "350px",
+                  display: "grid",
                   margin: "auto",
-                  marginTop: "20px",
+                  marginTop: "15px",
+                  fontSize: "30px",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "50px",
+                  cursor: "pointer",
                 }}>
                 Withdraw
               </button>
