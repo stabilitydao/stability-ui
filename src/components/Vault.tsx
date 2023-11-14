@@ -19,7 +19,7 @@ import {
 import VaultAbi from "../abi/VaultAbi";
 import StrategyAbi from "../abi/StrategyAbi";
 import tokensJson from "../stability.tokenlist.json";
-import type { Token, assetPrices, Balances, AssetBalance } from "../types";
+import type { Token, assetPrices } from "../types";
 import { formatUnits, parseUnits } from "viem";
 import InsufficientFounds from "./InsufficientFounds";
 
@@ -103,7 +103,7 @@ export default function Vault(props: Props) {
           if (Array.isArray(ss)) {
             assets.set(ss);
             setOption(ss);
-            // loadAssetsBalances(ss);
+
             defaultAssetsOption(ss);
 
             console.log("assets", ss);
@@ -118,7 +118,6 @@ export default function Vault(props: Props) {
 
   function defaultAssetsOption(ss: string[]) {
     const defaultOptionAssets: string[] = [];
-
     for (let i = 0; i < ss.length; i++) {
       const token = tokensJson.tokens.find(token => ss[i] === token.address);
       if (token) {
@@ -153,6 +152,8 @@ export default function Vault(props: Props) {
 
       if ($assetsBalances && option && option.length > 1) {
         for (let i = 0; i < e.length; i++) {
+          console.log($assetsBalances);
+
           const decimals =
             tokensJson.tokens.find(token => token.address === option[i])
               ?.decimals ?? 18;
@@ -186,7 +187,7 @@ export default function Vault(props: Props) {
       setBalances(balance);
     }
     loadAssetsBalances();
-  }, [option]);
+  }, [option, $assetsBalances]);
 
   type input = {
     [assetAdress: string]: InputAmmount;
@@ -364,7 +365,7 @@ export default function Vault(props: Props) {
               justifyContent: "center",
               alignItems: "center",
               marginBottom: "18px",
-              height: "700px",
+              height: "520px",
             }}>
             <div
               style={{
@@ -378,7 +379,7 @@ export default function Vault(props: Props) {
               </label>
               <select
                 onChange={e => changeOption(e.target.value.split(", "))}
-                style={{ height: "55px", width: "300px", fontSize: "35px" }}>
+                style={{ height: "50px", width: "280px", fontSize: "30px" }}>
                 <option
                   value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
@@ -442,7 +443,9 @@ export default function Vault(props: Props) {
                               color: "grey",
                             }}>
                             Balance:{" "}
-                            {balances[asset] && balances[asset].assetBalance}
+                            {balances &&
+                              balances[asset] &&
+                              balances[asset].assetBalance}
                           </div>
                           <button
                             type="button"
@@ -450,7 +453,7 @@ export default function Vault(props: Props) {
                               balances &&
                               balances[asset] &&
                               handleInputChange(
-                                balances[asset]?.assetBalance,
+                                balances[asset].assetBalance,
                                 asset
                               )
                             }
@@ -656,28 +659,24 @@ export default function Vault(props: Props) {
             )}
             {tab === "Deposit" ? (
               <button
+                type="button"
                 style={{
-                  display: "grid",
                   margin: "auto",
-                  marginTop: "15px",
-                  fontSize: "30px",
-                  alignItems: "center",
+                  fontSize: "35px",
                   width: "100%",
-                  height: "50px",
+                  height: "60px",
                   cursor: "pointer",
                 }}>
                 Deposit
               </button>
             ) : (
               <button
+                type="button"
                 style={{
-                  display: "grid",
                   margin: "auto",
-                  marginTop: "15px",
-                  fontSize: "30px",
-                  alignItems: "center",
+                  fontSize: "35px",
                   width: "100%",
-                  height: "50px",
+                  height: "60px",
                   cursor: "pointer",
                 }}>
                 Withdraw
