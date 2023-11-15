@@ -1,12 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import  {Vaults}  from "../layouts/App"
 ---
 
 <Layout title="Vaults">
-	<div>
-		<span style="color: red;">vault table must be here</span>
-	</div>
-	<br>
+  <Vaults client:load/>
 	<br>
 	<div>
 		<a href="/create-vault"><button class="btn">Create vault</button></a>

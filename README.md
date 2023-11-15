@@ -8,29 +8,28 @@
 
 ### Beta
 
-* create Rewarding Managed vault
-* user assets in profile
-* subgraph integration
-* vaults gas reserve
-* strategy info
-
+- create Rewarding Managed vault
+- user assets in profile
+- subgraph integration
+- vaults gas reserve
+- strategy info
 
 ## Develop
 
 ### 👀 Learn stack
 
-* [astro](https://docs.astro.build/en/getting-started/)
-* react
-* [nanostores](https://github.com/nanostores/nanostores)
-* [viem](https://viem.sh/docs/getting-started.html)
-* [wagmi-react](https://wagmi.sh/react/getting-started)
-
+- [astro](https://docs.astro.build/en/getting-started/)
+- react
+- [nanostores](https://github.com/nanostores/nanostores)
+- [viem](https://viem.sh/docs/getting-started.html)
+- [wagmi-react](https://wagmi.sh/react/getting-started)
 
 ### 🧑‍🚀 Start coding
 
 Install foundry on your pc.
 
 #### Run Polygon forking anvil node
+
 ```
 anvil --fork-url <Your Polygon RPC URL> --fork-block-number 48713000
 ```
