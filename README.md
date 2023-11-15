@@ -2,17 +2,7 @@
 
 ## Tasks
 
-### Alpha
-
 [Issues](https://github.com/stabilitydao/stability-ui/issues)
-
-### Beta
-
-- create Rewarding Managed vault
-- user assets in profile
-- subgraph integration
-- vaults gas reserve
-- strategy info
 
 ## Develop
 
@@ -39,6 +29,7 @@ anvil --fork-url <Your Polygon RPC URL> --fork-block-number 48713000
 Clone [platform contracts](https://github.com/stabilitydao/v2) repo, build and deploy.
 
 ```
+forge install
 forge script DeployPolygonForking --rpc-url http://127.0.0.1:8545 --broadcast --with-gas-price 200000000000
 ```
 
