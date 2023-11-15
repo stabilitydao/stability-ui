@@ -39,8 +39,8 @@ export function AppStore(props: React.PropsWithChildren) {
         if (r && Array.isArray(r)) {
           const buildingPrices: { [vaultType: string]: bigint } = {};
           for (let i = 0; i < r[1].length; i++) {
-            const vaultType: string = r[1][i];
-            const buildingPrice = r[3][i];
+            const vaultType: string = r[3][i];
+            const buildingPrice = r[5][i];
             buildingPrices[vaultType] = buildingPrice;
           }
           platformData.set({

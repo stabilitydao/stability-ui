@@ -18,13 +18,23 @@ import {
 } from "wagmi";
 import VaultAbi from "../abi/VaultAbi";
 import StrategyAbi from "../abi/StrategyAbi";
+import ERC20Abi from "../abi/ERC20Abi";
 import tokensJson from "../stability.tokenlist.json";
 import type { Token, assetPrices } from "../types";
 import { formatUnits, parseUnits } from "viem";
 import InsufficientFounds from "./InsufficientFounds";
+import { account, platformData } from "../state/StabilityStore";
 
 type Props = {
   vault?: `0x${string}` | undefined;
+};
+
+type Allowance = {
+  [asset: string]: AssetAllowance;
+};
+
+type AssetAllowance = {
+  allowance: bigint[];
 };
 
 export function addAssetsPrice(data: any) {
@@ -50,6 +60,11 @@ export default function Vault(props: Props) {
   const $vault = useStore(vaultData);
   const $assets = useStore(assets);
   const _publicClient = usePublicClient();
+  const p = useStore(platformData);
+  const $account = useStore(account);
+  console.log(p);
+  console.log($account);
+  console.log(vaultt);
 
   function resetInputs(e: string[]) {
     type input = {
@@ -74,13 +89,14 @@ export default function Vault(props: Props) {
   const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
   const [tab, setTab] = useState("Deposit");
   const [balances, setBalances] = useState<Balance>({});
+  const [inputs, setInputs] = useState<input>({});
   const [inputsPreviewDeposit, setinputsPreviewDeposit] =
     useState<inputPreview>({});
-  const [inputs, setInputs] = useState<input>({});
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
+  const [allowance, setAllowance] = useState<Allowance | undefined>();
 
   useEffect(() => {
     async function getStrategy() {
@@ -103,9 +119,7 @@ export default function Vault(props: Props) {
           if (Array.isArray(ss)) {
             assets.set(ss);
             setOption(ss);
-
             defaultAssetsOption(ss);
-
             console.log("assets", ss);
           } else {
             console.error("ss is not an array");
@@ -147,6 +161,8 @@ export default function Vault(props: Props) {
   //AssetsBalances
   useEffect(() => {
     function loadAssetsBalances() {
+      resetInputs(option);
+
       const e = option;
       const balance: Balance = {};
 
@@ -185,8 +201,30 @@ export default function Vault(props: Props) {
         }
       }
       setBalances(balance);
+      console.log("ASD");
     }
+
+    async function allowance(option: string[]) {
+      const allowanceResult: Allowance = {};
+      for (let i = 0; i < option.length; i++) {
+        let alw: bigint = (await readContract(_publicClient, {
+          address: option[i] as `0x${string}`,
+          abi: ERC20Abi,
+          functionName: "allowance",
+          args: [$account, vaultt],
+        })) as bigint;
+
+        if (!allowanceResult[option[i]]) {
+          allowanceResult[option[i]] = { allowance: [] };
+        }
+        allowanceResult[option[i]].allowance.push(alw);
+      }
+      setAllowance(allowanceResult);
+      console.log(allowanceResult);
+    }
+
     loadAssetsBalances();
+    allowance(option);
   }, [option, $assetsBalances]);
 
   type input = {
@@ -285,7 +323,7 @@ export default function Vault(props: Props) {
                 }));
               }
             } catch (error) {
-              console.error("Error fetching data:", error);
+              console.error("Error: the asset balance is too low.", error);
               resetInputs(option);
             }
           }
@@ -341,6 +379,8 @@ export default function Vault(props: Props) {
                 cursor: "pointer",
                 padding: "0",
                 margin: "0",
+                borderStyle: "solid",
+                borderWidth: "1px",
               }}
               onClick={() => setTab("Deposit")}>
               Deposit
@@ -353,6 +393,8 @@ export default function Vault(props: Props) {
                 cursor: "pointer",
                 padding: "0",
                 margin: "0",
+                borderStyle: "solid",
+                borderWidth: "1px",
               }}
               onClick={() => setTab("Withdraw")}>
               Withdraw
@@ -379,7 +421,12 @@ export default function Vault(props: Props) {
               </label>
               <select
                 onChange={e => changeOption(e.target.value.split(", "))}
-                style={{ height: "50px", width: "280px", fontSize: "30px" }}>
+                style={{
+                  height: "50px",
+                  width: "280px",
+                  fontSize: "30px",
+                  color: "black",
+                }}>
                 <option
                   value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
@@ -666,6 +713,8 @@ export default function Vault(props: Props) {
                   width: "100%",
                   height: "60px",
                   cursor: "pointer",
+                  borderStyle: "solid",
+                  backgroundColor: "grey",
                 }}>
                 Deposit
               </button>
@@ -678,6 +727,8 @@ export default function Vault(props: Props) {
                   width: "100%",
                   height: "60px",
                   cursor: "pointer",
+                  borderStyle: "solid",
+                  borderWidth: "1px",
                 }}>
                 Withdraw
               </button>

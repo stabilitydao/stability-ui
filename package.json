@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^3.0.3",
+    "@astrojs/tailwind": "^5.0.2",
     "@astrojs/vercel": "^5.1.0",
     "@nanostores/react": "^0.7.1",
     "@types/react": "^18.0.21",
@@ -21,6 +22,7 @@
     "nanostores": "^0.9.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "tailwindcss": "^3.3.5",
     "vercel": "^32.5.0",
     "viem": "^1.16.3",
     "wagmi": "^1.4.3"
