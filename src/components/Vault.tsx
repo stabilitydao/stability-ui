@@ -22,19 +22,35 @@ import ERC20Abi from "../abi/ERC20Abi";
 import tokensJson from "../stability.tokenlist.json";
 import type { Token, assetPrices } from "../types";
 import { formatUnits, parseUnits } from "viem";
-import InsufficientFounds from "./InsufficientFounds";
 import { account, platformData } from "../state/StabilityStore";
+import { ApproveDepositForm } from "./ApproveDepositForm";
 
 type Props = {
   vault?: `0x${string}` | undefined;
 };
 
-type Allowance = {
-  [asset: string]: AssetAllowance;
+type Balance = {
+  [balance: string]: AssetBalancee;
 };
 
-type AssetAllowance = {
-  allowance: bigint[];
+type AssetBalancee = {
+  assetBalance: string;
+};
+
+type input = {
+  [assetAdress: string]: InputAmmount;
+};
+
+type InputAmmount = {
+  ammount: string;
+};
+
+type inputPreview = {
+  [assetAdress: string]: InputAmmountPreview;
+};
+
+type InputAmmountPreview = {
+  ammount: bigint;
 };
 
 export function addAssetsPrice(data: any) {
@@ -66,24 +82,6 @@ export default function Vault(props: Props) {
   console.log($account);
   console.log(vaultt);
 
-  function resetInputs(e: string[]) {
-    type input = {
-      [assetAdress: string]: InputAmmount;
-    };
-
-    type InputAmmount = {
-      ammount: string;
-    };
-    const reset: input = {};
-
-    for (let i = 0; i < e.length; i++) {
-      reset[e[i]] = {
-        ammount: "",
-      };
-    }
-    setInputs(reset);
-  }
-
   const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
   const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
@@ -96,7 +94,9 @@ export default function Vault(props: Props) {
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
-  const [allowance, setAllowance] = useState<Allowance | undefined>();
+  const [approveIndex, setApproveIndex] = useState<number | undefined>();
+  console.log(approveIndex);
+  console.log(inputs);
 
   useEffect(() => {
     async function getStrategy() {
@@ -130,35 +130,6 @@ export default function Vault(props: Props) {
     getStrategy();
   }, [props]);
 
-  function defaultAssetsOption(ss: string[]) {
-    const defaultOptionAssets: string[] = [];
-    for (let i = 0; i < ss.length; i++) {
-      const token = tokensJson.tokens.find(token => ss[i] === token.address);
-      if (token) {
-        defaultOptionAssets[i] = token.symbol;
-      } else {
-        defaultOptionAssets[i] = "Token not found.";
-      }
-    }
-    const defaultOptionSymbolsToString = defaultOptionAssets.join(" + ");
-    setDefaultOptionSymbols(defaultOptionSymbolsToString);
-    setDefaultOptionAssets(ss.join(", "));
-  }
-
-  function changeOption(e: string[]) {
-    resetInputs(e);
-    setOption(e);
-  }
-
-  type Balance = {
-    [balance: string]: AssetBalancee;
-  };
-
-  type AssetBalancee = {
-    assetBalance: string;
-  };
-
-  //AssetsBalances
   useEffect(() => {
     function loadAssetsBalances() {
       resetInputs(option);
@@ -201,76 +172,9 @@ export default function Vault(props: Props) {
         }
       }
       setBalances(balance);
-      console.log("ASD");
     }
-
-    async function allowance(option: string[]) {
-      const allowanceResult: Allowance = {};
-      for (let i = 0; i < option.length; i++) {
-        let alw: bigint = (await readContract(_publicClient, {
-          address: option[i] as `0x${string}`,
-          abi: ERC20Abi,
-          functionName: "allowance",
-          args: [$account, vaultt],
-        })) as bigint;
-
-        if (!allowanceResult[option[i]]) {
-          allowanceResult[option[i]] = { allowance: [] };
-        }
-        allowanceResult[option[i]].allowance.push(alw);
-      }
-      setAllowance(allowanceResult);
-      console.log(allowanceResult);
-    }
-
     loadAssetsBalances();
-    allowance(option);
   }, [option, $assetsBalances]);
-
-  type input = {
-    [assetAdress: string]: InputAmmount;
-  };
-
-  type InputAmmount = {
-    ammount: string;
-  };
-
-  type inputPreview = {
-    [assetAdress: string]: InputAmmountPreview;
-  };
-
-  type InputAmmountPreview = {
-    ammount: bigint;
-  };
-
-  function handleInputChange(a: string, e: string) {
-    const decimals =
-      tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
-
-    const _amount = parseUnits(a, decimals);
-
-    if (a === "") {
-      resetInputs(option);
-    } else {
-      setInputs(prevInputs => ({
-        ...prevInputs,
-        [e]: {
-          ammount: a,
-        },
-      }));
-
-      setinputsPreviewDeposit(prevInputs => ({
-        ...prevInputs,
-        [e]: {
-          ammount: _amount,
-        },
-      }));
-    }
-
-    if (option.length > 1) {
-      setLastKeyPress({ key1: e, key2: a });
-    }
-  }
 
   useEffect(() => {
     async function previewDeposit() {
@@ -323,7 +227,10 @@ export default function Vault(props: Props) {
                 }));
               }
             } catch (error) {
-              console.error("Error: the asset balance is too low.", error);
+              console.error(
+                "Error: the asset balance is too low to make conversion.",
+                error
+              );
               resetInputs(option);
             }
           }
@@ -332,6 +239,73 @@ export default function Vault(props: Props) {
     }
     previewDeposit();
   }, [lastKeyPress]);
+
+  function resetInputs(e: string[]) {
+    type input = {
+      [assetAdress: string]: InputAmmount;
+    };
+
+    type InputAmmount = {
+      ammount: string;
+    };
+    const reset: input = {};
+
+    for (let i = 0; i < e.length; i++) {
+      reset[e[i]] = {
+        ammount: "",
+      };
+    }
+    setInputs(reset);
+  }
+
+  function defaultAssetsOption(ss: string[]) {
+    const defaultOptionAssets: string[] = [];
+    for (let i = 0; i < ss.length; i++) {
+      const token = tokensJson.tokens.find(token => ss[i] === token.address);
+      if (token) {
+        defaultOptionAssets[i] = token.symbol;
+      } else {
+        defaultOptionAssets[i] = "Token not found.";
+      }
+    }
+    const defaultOptionSymbolsToString = defaultOptionAssets.join(" + ");
+    setDefaultOptionSymbols(defaultOptionSymbolsToString);
+    setDefaultOptionAssets(ss.join(", "));
+  }
+
+  function changeOption(e: string[]) {
+    resetInputs(e);
+    setOption(e);
+  }
+
+  function handleInputChange(a: string, e: string) {
+    const decimals =
+      tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
+
+    const _amount = parseUnits(a, decimals);
+
+    if (a === "") {
+      resetInputs(option);
+    } else {
+      setInputs(prevInputs => ({
+        ...prevInputs,
+        [e]: {
+          ammount: a,
+        },
+      }));
+
+      setinputsPreviewDeposit(prevInputs => ({
+        ...prevInputs,
+        [e]: {
+          ammount: _amount,
+        },
+      }));
+    }
+
+    if (option.length > 1) {
+      setLastKeyPress({ key1: e, key2: a });
+    }
+  }
 
   if (props.vault && $vault[props.vault]) {
     return (
@@ -707,6 +681,7 @@ export default function Vault(props: Props) {
             {tab === "Deposit" ? (
               <button
                 type="button"
+                onClick={() => setApproveIndex(1)}
                 style={{
                   margin: "auto",
                   fontSize: "35px",
@@ -714,7 +689,7 @@ export default function Vault(props: Props) {
                   height: "60px",
                   cursor: "pointer",
                   borderStyle: "solid",
-                  backgroundColor: "grey",
+                  borderWidth: "1px",
                 }}>
                 Deposit
               </button>
@@ -811,6 +786,27 @@ export default function Vault(props: Props) {
             </p>
           </section>
         </div>
+
+        {p && approveIndex !== undefined && (
+          <div
+            className="overlay"
+            onClick={() => {
+              setApproveIndex(undefined);
+            }}>
+            <div
+              className="modal"
+              onClick={e => {
+                e.preventDefault();
+              }}>
+              <div className="modal-title">Deposit</div>
+              <ApproveDepositForm
+                option={option}
+                vaultt={vaultt}
+                inputs={inputs}
+              />
+            </div>
+          </div>
+        )}
 
         <article
           className="Strategy"
