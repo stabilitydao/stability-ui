@@ -65,52 +65,49 @@ export function ApproveDepositForm(props: Props) {
   useEffect(() => {
     async function check() {
       const allowanceResult: Allowance = {};
+      const approveStatusArray: boolean[] = [];
+      let alw: bigint;
       for (let i = 0; i < props.option.length; i++) {
-        let alw: bigint = (await readContract(_publicClient, {
+        alw = (await readContract(_publicClient, {
           address: props.option[i] as `0x${string}`,
           abi: ERC20Abi,
           functionName: "allowance",
           args: [$account, props.vaultt],
         })) as bigint;
+        console.log(alw);
+      }
 
+      for (let i = 0; i < props.option.length; i++) {
         if (!allowanceResult[props.option[i]]) {
           allowanceResult[props.option[i]] = { allowance: [] };
         }
-        console.log(allowanceResult);
-
         allowanceResult[props.option[i]].allowance.push(alw);
       }
-      console.log(allowanceResult);
+      setAllowance(allowanceResult);
 
       for (let i = 0; i < props.option.length; i++) {
-        console.log(props.inputs[props.option[i]]?.ammount);
-        console.log(props.inputs);
-
-        if (
+        const approveStatus =
           allowanceResult[props.option[i]]?.allowance[0] !== undefined &&
           allowanceResult[props.option[i]]?.allowance[0] <
             parseUnits(
               props.inputs[props.option[i]]?.ammount,
               getTokenData(props.option[i])?.decimals
             ) &&
-          approve !== false
-        ) {
-          setApprove(true);
-        } else {
-          setApprove(false);
-          console.log(approve);
-        }
+          props.inputs[props.option[i]]?.ammount !== "";
+        approveStatusArray.push(approveStatus);
       }
+      const atLeastOneTrue = approveStatusArray.includes(true);
 
-      console.log(allowanceResult);
-      console.log(allowanceResult[props.option[0]]?.allowance[0]);
+      const atLeastOneFalse = approveStatusArray.includes(false);
+      console.log(atLeastOneFalse);
+      console.log(atLeastOneTrue);
+      if (atLeastOneTrue && atLeastOneFalse === false) {
+        setApprove(false);
+      } else {
+        setApprove(true);
+      }
+      console.log(approveStatusArray);
       console.log(approve);
-      console.log(
-        parseUnits(
-          props.inputs[props.option[0]]?.ammount,
-          getTokenData(props.option[0])?.decimals
-        )
-      );
     }
     check();
   }, [props.option]);
