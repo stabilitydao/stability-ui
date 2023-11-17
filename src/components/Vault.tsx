@@ -78,9 +78,6 @@ export default function Vault(props: Props) {
   const _publicClient = usePublicClient();
   const p = useStore(platformData);
   const $account = useStore(account);
-  console.log(p);
-  console.log($account);
-  console.log(vaultt);
 
   const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
@@ -97,6 +94,12 @@ export default function Vault(props: Props) {
   const [approveIndex, setApproveIndex] = useState<number | undefined>();
   console.log(inputs);
   console.log(balances);
+  console.log(defaultOptionAssets);
+  console.log(defaultOptionSymbols);
+  console.log(p);
+  console.log($account);
+  console.log(vaultt);
+  console.log(option);
 
   useEffect(() => {
     async function getStrategy() {
@@ -138,6 +141,8 @@ export default function Vault(props: Props) {
       const balance: Balance = {};
 
       if ($assetsBalances && option && option.length > 1) {
+        console.log(option);
+
         for (let i = 0; i < e.length; i++) {
           console.log($assetsBalances);
 
@@ -805,6 +810,7 @@ export default function Vault(props: Props) {
                 vaultt={vaultt}
                 inputs={inputs}
                 balances={balances}
+                defaultOptionSymbols={defaultOptionSymbols}
               />
             </div>
           </div>

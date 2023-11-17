@@ -13,13 +13,14 @@ import {
   lastTx,
 } from "../state/StabilityStore";
 import { getTokenData } from "../utils";
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
 type Props = {
   option: string[];
   vaultt: `0x${string}` | undefined;
   inputs: input;
   balances: Balance;
+  defaultOptionSymbols: string;
 };
 
 type Balance = {
@@ -55,6 +56,7 @@ export function ApproveDepositForm(props: Props) {
   // todo implement using
 
   const [allowance, setAllowance] = useState<Allowance | undefined>();
+  const [approve, setApprove] = useState(true);
   const [buildResult, setBuildResult] = useState<boolean | undefined>();
   const [boostAmounts, setBoostAmounts] = useState<{ [token: string]: bigint }>(
     {}
@@ -74,38 +76,78 @@ export function ApproveDepositForm(props: Props) {
         if (!allowanceResult[props.option[i]]) {
           allowanceResult[props.option[i]] = { allowance: [] };
         }
+        console.log(allowanceResult);
+
         allowanceResult[props.option[i]].allowance.push(alw);
       }
-      setAllowance(allowanceResult);
       console.log(allowanceResult);
-      console.log(props.inputs);
+
+      for (let i = 0; i < props.option.length; i++) {
+        console.log(props.inputs[props.option[i]]?.ammount);
+        console.log(props.inputs);
+
+        if (
+          allowanceResult[props.option[i]]?.allowance[0] !== undefined &&
+          allowanceResult[props.option[i]]?.allowance[0] <
+            parseUnits(
+              props.inputs[props.option[i]]?.ammount,
+              getTokenData(props.option[i])?.decimals
+            ) &&
+          approve !== false
+        ) {
+          setApprove(true);
+        } else {
+          setApprove(false);
+          console.log(approve);
+        }
+      }
+
+      console.log(allowanceResult);
+      console.log(allowanceResult[props.option[0]]?.allowance[0]);
+      console.log(approve);
+      console.log(
+        parseUnits(
+          props.inputs[props.option[0]]?.ammount,
+          getTokenData(props.option[0])?.decimals
+        )
+      );
     }
     check();
   }, [props.option]);
+
+  const payPerVaultToken = p?.buildingPayPerVaultToken
+    ? getTokenData(p.buildingPayPerVaultToken)
+    : undefined;
 
   return (
     <div className="build-form">
       {buildResult !== true && (
         <>
           <div className="group">
-            <span className="group-label">Assets</span>
-            <span>{props.vaultType}</span>
+            <span className="group-label">Strategy</span>
+            <span>
+              {props.option.length > 1
+                ? props.defaultOptionSymbols
+                : getTokenData(props.option[0])?.symbol}
+            </span>
           </div>
+          {props.option &&
+            props.option.map((token, i) => (
+              <div
+                className="group"
+                key={i}>
+                <span className="group-label">
+                  {getTokenData(token)?.symbol}
+                </span>
+                <span className="group-label">
+                  {props.inputs[token].ammount}
+                </span>
+              </div>
+            ))}
 
           <div className="group">
-            <span className="group-label">Assets description</span>
-            <span>{props.strategyDesc}</span>
-          </div>
-          <div className="group">
-            <span className="group-label">Build price</span>
-            <span>
-              {props.buildingPrice && payPerVaultToken
-                ? `${formatUnits(
-                    props.buildingPrice,
-                    payPerVaultToken.decimals
-                  )} ${payPerVaultToken.symbol}`
-                : "-"}
-            </span>
+            <span className="group-label">Deposit fee</span>
+            <span>{props.option.length === 1 ? "1 SDIV" : "0 SDIV"}</span>
           </div>
           <div className="group">
             <span className="group-label">Your balance</span>
@@ -118,35 +160,12 @@ export function ApproveDepositForm(props: Props) {
                 : "-"}
             </span>
           </div>
-
-          {props.vaultType === "Rewarding" && (
-            <>
-              <div className="group">
-                <span className="group-label">Buy-back token</span>
-                <span>
-                  {getTokenData(props.initParams.initVaultAddresses[0])?.symbol}
-                </span>
-              </div>
-
-              <div>Initial boost rewards</div>
-              <div>
-                {[
-                  ...new Set([
-                    props.initParams.initVaultAddresses[0],
-                    ...props.defaultBoostTokens,
-                  ]),
-                ].map(addresss => {
-                  return <span>{getTokenData(addresss)?.symbol}</span>;
-                })}
-              </div>
-            </>
-          )}
         </>
       )}
 
       {buildResult === undefined && (
         <div className="action">
-          {allowance !== undefined && allowance < props.buildingPrice ? (
+          {allowance !== undefined && approve === true ? (
             <button
               className="btn btn-primary"
               onClick={approve}>
