@@ -6,22 +6,26 @@ import type {
   Vaults,
   assetPrices,
   Balances,
+  TVaultAssets,
 } from "../types";
 
-export const account = atom<string | undefined>();
-export const network = atom<string | undefined>();
-export const publicClient = atom<PublicClient | undefined>();
-export const platformData = atom<PlatformData | undefined>();
-export const userBalance = atom<UserBalance | undefined>();
-export const lastTx = atom<string | undefined>();
-export const assets = atom<string[] | undefined>();
-export const assetsPrices = atom<assetPrices | undefined>();
-export const assetsBalances = atom<Balances | undefined>();
+const account = atom<string | undefined>();
+const network = atom<string | undefined>();
+const publicClient = atom<PublicClient | undefined>();
+const platformData = atom<PlatformData | undefined>();
+const userBalance = atom<UserBalance | undefined>();
+const lastTx = atom<string | undefined>();
+const assets = atom<string[] | undefined>();
+const assetsPrices = atom<assetPrices | undefined>();
+const assetsBalances = atom<Balances | undefined>();
 
-export const vaultData = atom<Vaults>({});
+const vaultData = atom<Vaults>({});
+
+const vaults = atom<any>();
+const vaultAssets = atom<TVaultAssets[] | undefined>();
 
 //Assets balances
-export function addAssetBalance(r: any[]) {
+const addAssetBalance = (r: any[]) => {
   const assets = r[0];
   const _assetsBalances = r[2];
   const balances: Balances = {};
@@ -35,10 +39,10 @@ export function addAssetBalance(r: any[]) {
   } else {
     console.error("There is an error, arrays lenght are different.");
   }
-}
+};
 
 //Vaults list
-export function addVaultData(data: any[]) {
+const addVaultData = (data: any[]) => {
   const vaultAddress = data[3];
   const vaultSharePrice = data[4];
   const vaultUserBalance = data[5];
@@ -57,4 +61,21 @@ export function addVaultData(data: any[]) {
   } else {
     console.error("There is an error, arrays lenght are different.");
   }
-}
+};
+
+export {
+  account,
+  network,
+  publicClient,
+  platformData,
+  userBalance,
+  lastTx,
+  assets,
+  assetsPrices,
+  assetsBalances,
+  vaultData,
+  vaults,
+  addAssetBalance,
+  addVaultData,
+  vaultAssets,
+};

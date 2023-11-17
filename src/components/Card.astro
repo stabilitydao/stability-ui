@@ -1,11 +1,11 @@
 ---
-interface Props {
+interface IProps {
 	title: string;
 	body: string;
 	href: string;
 }
 
-const { href, title, body } = Astro.props;
+const { href, title, body } = Astro.props as IProps;
 ---
 
 <li class="link-card">

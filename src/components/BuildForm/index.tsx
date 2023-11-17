@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { readContract } from "viem/actions";
-import type { InitParams } from "../types";
-import FactoryAbi from "../abi/FactoryAbi";
-import ERC20Abi from "../abi/ERC20Abi";
+
 import { usePublicClient } from "wagmi";
 import { writeContract } from "@wagmi/core";
-import {
-  account,
-  platformData,
-  userBalance,
-  lastTx,
-} from "../state/StabilityStore";
-import { getTokenData } from "../utils";
 import { formatUnits } from "viem";
+import { readContract } from "viem/actions";
+
+import { FactoryABI, ERC20ABI } from "@web3";
+import { account, platformData, userBalance, lastTx } from "@store";
+
+import type { InitParams } from "../../types";
+import { getTokenData } from "../../utils";
 
 type Props = {
   buildingPrice: bigint;
@@ -24,7 +21,7 @@ type Props = {
   defaultBoostTokens: string[];
 };
 
-export function BuildForm(props: Props) {
+function BuildForm(props: Props) {
   const _account = useStore(account);
   const p = useStore(platformData);
   const balance = useStore(userBalance);
@@ -46,7 +43,7 @@ export function BuildForm(props: Props) {
       if (needCheckAllowance && p) {
         const r = await readContract(_publicClient, {
           address: p.buildingPayPerVaultToken,
-          abi: ERC20Abi,
+          abi: ERC20ABI,
           functionName: "allowance",
           args: [_account, p?.factory],
         });
@@ -61,7 +58,7 @@ export function BuildForm(props: Props) {
     if (p) {
       const r = await writeContract({
         address: p.factory,
-        abi: FactoryAbi,
+        abi: FactoryABI,
         functionName: "deployVaultAndStrategy",
         args: [
           props.vaultType,
@@ -87,7 +84,7 @@ export function BuildForm(props: Props) {
     if (p) {
       const r = await writeContract({
         address: p.buildingPayPerVaultToken,
-        abi: ERC20Abi,
+        abi: ERC20ABI,
         functionName: "approve",
         args: [p.factory, props.buildingPrice],
       });
@@ -96,7 +93,7 @@ export function BuildForm(props: Props) {
         setAllowance(
           (await readContract(_publicClient, {
             address: p.buildingPayPerVaultToken,
-            abi: ERC20Abi,
+            abi: ERC20ABI,
             functionName: "allowance",
             args: [_account, p?.factory],
           })) as bigint
@@ -166,7 +163,7 @@ export function BuildForm(props: Props) {
                     props.initParams.initVaultAddresses[0],
                     ...props.defaultBoostTokens,
                   ]),
-                ].map(addresss => {
+                ].map((addresss) => {
                   return <span>{getTokenData(addresss)?.symbol}</span>;
                 })}
               </div>
@@ -180,15 +177,11 @@ export function BuildForm(props: Props) {
           {needCheckAllowance &&
           allowance !== undefined &&
           allowance < props.buildingPrice ? (
-            <button
-              className="btn btn-primary"
-              onClick={approve}>
+            <button className="btn btn-primary" onClick={approve}>
               Approve factory to spend {payPerVaultToken?.symbol}
             </button>
           ) : (
-            <button
-              className="btn btn-primary"
-              onClick={deploy}>
+            <button className="btn btn-primary" onClick={deploy}>
               Deploy
             </button>
           )}
@@ -201,3 +194,4 @@ export function BuildForm(props: Props) {
     </div>
   );
 }
+export { BuildForm };

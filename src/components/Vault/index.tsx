@@ -1,14 +1,8 @@
-/** @format */
-
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
+import { formatUnits, parseUnits } from "viem";
 import { readContract } from "viem/actions";
-import {
-  vaultData,
-  assets,
-  assetsPrices,
-  assetsBalances,
-} from "../state/StabilityStore";
+
 import {
   useAccount,
   usePublicClient,
@@ -16,14 +10,19 @@ import {
   useWalletClient,
   useFeeData,
 } from "wagmi";
-import VaultAbi from "../abi/VaultAbi";
-import StrategyAbi from "../abi/StrategyAbi";
-import ERC20Abi from "../abi/ERC20Abi";
-import tokensJson from "../stability.tokenlist.json";
-import type { Token, assetPrices } from "../types";
-import { formatUnits, parseUnits } from "viem";
-import InsufficientFounds from "./InsufficientFounds";
-import { account, platformData } from "../state/StabilityStore";
+
+import {
+  vaultData,
+  assets,
+  assetsPrices,
+  assetsBalances,
+  account,
+  platformData,
+} from "@store";
+
+import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
+import tokensJson from "../../stability.tokenlist.json";
+import type { Token, assetPrices } from "../../types";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -53,7 +52,7 @@ export function addAssetsPrice(data: any) {
   }
 }
 
-export default function Vault(props: Props) {
+function Vault(props: Props) {
   const vaultt: `0x${string}` | undefined = props.vault;
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
@@ -103,7 +102,7 @@ export default function Vault(props: Props) {
       if (vaultt) {
         let s: `0x${string}` | undefined = (await readContract(_publicClient, {
           address: vaultt,
-          abi: VaultAbi,
+          abi: VaultABI,
           functionName: "strategy",
         })) as `0x${string}` | undefined;
         console.log(s);
@@ -111,7 +110,7 @@ export default function Vault(props: Props) {
         if (typeof s === "string") {
           let ss: string[] = (await readContract(_publicClient, {
             address: s,
-            abi: StrategyAbi,
+            abi: StrategyABI,
             functionName: "assets",
           })) as string[];
           console.log(ss);
@@ -133,7 +132,7 @@ export default function Vault(props: Props) {
   function defaultAssetsOption(ss: string[]) {
     const defaultOptionAssets: string[] = [];
     for (let i = 0; i < ss.length; i++) {
-      const token = tokensJson.tokens.find(token => ss[i] === token.address);
+      const token = tokensJson.tokens.find((token) => ss[i] === token.address);
       if (token) {
         defaultOptionAssets[i] = token.symbol;
       } else {
@@ -171,7 +170,7 @@ export default function Vault(props: Props) {
           console.log($assetsBalances);
 
           const decimals =
-            tokensJson.tokens.find(token => token.address === option[i])
+            tokensJson.tokens.find((token) => token.address === option[i])
               ?.decimals ?? 18;
 
           balance[e[i]] = {
@@ -189,7 +188,7 @@ export default function Vault(props: Props) {
           option.length === 1
         ) {
           const decimals =
-            tokensJson.tokens.find(token => token.address === option[0])
+            tokensJson.tokens.find((token) => token.address === option[0])
               ?.decimals ?? 18;
 
           balance[option[0]] = {
@@ -209,7 +208,7 @@ export default function Vault(props: Props) {
       for (let i = 0; i < option.length; i++) {
         let alw: bigint = (await readContract(_publicClient, {
           address: option[i] as `0x${string}`,
-          abi: ERC20Abi,
+          abi: ERC20ABI,
           functionName: "allowance",
           args: [$account, vaultt],
         })) as bigint;
@@ -245,21 +244,21 @@ export default function Vault(props: Props) {
 
   function handleInputChange(a: string, e: string) {
     const decimals =
-      tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
+      tokensJson.tokens.find((token) => token.address === e)?.decimals ?? 18;
 
     const _amount = parseUnits(a, decimals);
 
     if (a === "") {
       resetInputs(option);
     } else {
-      setInputs(prevInputs => ({
+      setInputs((prevInputs) => ({
         ...prevInputs,
         [e]: {
           ammount: a,
         },
       }));
 
-      setinputsPreviewDeposit(prevInputs => ({
+      setinputsPreviewDeposit((prevInputs) => ({
         ...prevInputs,
         [e]: {
           ammount: _amount,
@@ -295,7 +294,7 @@ export default function Vault(props: Props) {
                 _publicClient,
                 {
                   address: vaultt,
-                  abi: StrategyAbi,
+                  abi: StrategyABI,
                   functionName: "previewDepositAssets",
                   args: [$assets, amounts],
                 }
@@ -307,8 +306,9 @@ export default function Vault(props: Props) {
 
               for (let i = 0; i < $assets.length; i++) {
                 const decimals =
-                  tokensJson.tokens.find(token => token.address === $assets[i])
-                    ?.decimals ?? 18;
+                  tokensJson.tokens.find(
+                    (token) => token.address === $assets[i]
+                  )?.decimals ?? 18;
                 if (i !== changedInput) {
                   preview[$assets[i]] = {
                     ammount: formatUnits(qq[i], decimals).toString(),
@@ -317,7 +317,7 @@ export default function Vault(props: Props) {
               }
 
               if (lastKeyPress.key2 !== "") {
-                setInputs(prevInputs => ({
+                setInputs((prevInputs) => ({
                   ...prevInputs,
                   ...preview,
                 }));
@@ -345,7 +345,8 @@ export default function Vault(props: Props) {
                 borderStyle: "solid",
                 padding: "10px",
                 borderColor: "grey",
-              }}>
+              }}
+            >
               <td>Vault: {props.vault}</td>
               <td>TVL: {$vault[props.vault].vaultSharePrice.toString()}</td>
               <td>
@@ -364,13 +365,15 @@ export default function Vault(props: Props) {
             borderWidth: "1px",
             height: "auto",
             marginTop: "20px",
-          }}>
+          }}
+        >
           <div
             style={{
               display: "flex",
               width: "100%",
               padding: "0",
-            }}>
+            }}
+          >
             <button
               style={{
                 width: "100%",
@@ -382,7 +385,8 @@ export default function Vault(props: Props) {
                 borderStyle: "solid",
                 borderWidth: "1px",
               }}
-              onClick={() => setTab("Deposit")}>
+              onClick={() => setTab("Deposit")}
+            >
               Deposit
             </button>
             <button
@@ -396,7 +400,8 @@ export default function Vault(props: Props) {
                 borderStyle: "solid",
                 borderWidth: "1px",
               }}
-              onClick={() => setTab("Withdraw")}>
+              onClick={() => setTab("Withdraw")}
+            >
               Withdraw
             </button>
           </div>
@@ -408,37 +413,42 @@ export default function Vault(props: Props) {
               alignItems: "center",
               marginBottom: "18px",
               height: "520px",
-            }}>
+            }}
+          >
             <div
               style={{
                 display: "grid",
                 width: "auto",
                 margin: "auto",
                 marginTop: "10px",
-              }}>
+              }}
+            >
               <label style={{ color: "grey", width: "120px" }}>
                 Select token
               </label>
               <select
-                onChange={e => changeOption(e.target.value.split(", "))}
+                onChange={(e) => changeOption(e.target.value.split(", "))}
                 style={{
                   height: "50px",
                   width: "280px",
                   fontSize: "30px",
                   color: "black",
-                }}>
+                }}
+              >
                 <option
                   value={defaultOptionAssets}
-                  style={{ textAlign: "center" }}>
+                  style={{ textAlign: "center" }}
+                >
                   {defaultOptionSymbols}
                 </option>
                 {tokensJson.tokens &&
-                  tokensJson.tokens.slice(0, -2).map(token => {
+                  tokensJson.tokens.slice(0, -2).map((token) => {
                     return (
                       <option
                         key={token.address}
                         value={token.address}
-                        style={{ textAlign: "center" }}>
+                        style={{ textAlign: "center" }}
+                      >
                         {token.symbol}
                       </option>
                     );
@@ -453,8 +463,9 @@ export default function Vault(props: Props) {
                   marginTop: "15px",
                   fontSize: "15px",
                   width: "100%",
-                }}>
-                {option.map(asset => (
+                }}
+              >
+                {option.map((asset) => (
                   <div
                     key={asset}
                     style={{
@@ -468,7 +479,8 @@ export default function Vault(props: Props) {
                       marginTop: "7px",
                       marginBottom: "7px",
                       paddingLeft: "10px",
-                    }}>
+                    }}
+                  >
                     <div style={{ marginTop: "5px", marginBottom: "5px" }}>
                       <div
                         style={{
@@ -478,17 +490,20 @@ export default function Vault(props: Props) {
                           padding: "15px",
                           paddingRight: "12px",
                           paddingBottom: "12px",
-                        }}>
+                        }}
+                      >
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               textAlign: "left",
                               color: "grey",
-                            }}>
+                            }}
+                          >
                             Balance:{" "}
                             {balances &&
                               balances[asset] &&
@@ -511,7 +526,8 @@ export default function Vault(props: Props) {
                               borderWidth: "1px",
                               marginLeft: "5px",
                               borderColor: "grey",
-                            }}>
+                            }}
+                          >
                             max
                           </button>
                         </div>
@@ -524,11 +540,11 @@ export default function Vault(props: Props) {
                       name="amount"
                       placeholder="0"
                       value={inputs && inputs[asset] && inputs[asset].ammount}
-                      onChange={e =>
+                      onChange={(e) =>
                         handleInputChange(e.target.value, e.target.id)
                       }
                       type="number"
-                      onKeyDown={evt =>
+                      onKeyDown={(evt) =>
                         ["e", "E", "+", "-"].includes(evt.key) &&
                         evt.preventDefault()
                       }
@@ -548,13 +564,15 @@ export default function Vault(props: Props) {
                         position: "absolute",
                         top: "27%",
                         right: "13px",
-                      }}>
-                      {tokensJson.tokens.map(token => {
+                      }}
+                    >
+                      {tokensJson.tokens.map((token) => {
                         if (token.address === asset) {
                           return (
                             <div
                               style={{ display: "flex", alignItems: "center" }}
-                              key={token.address}>
+                              key={token.address}
+                            >
                               <p>{token.symbol}</p>
                               <img
                                 style={{
@@ -583,7 +601,8 @@ export default function Vault(props: Props) {
                   marginTop: "15px",
                   fontSize: "15px",
                   width: "100%",
-                }}>
+                }}
+              >
                 <div
                   style={{
                     display: "grid",
@@ -596,13 +615,15 @@ export default function Vault(props: Props) {
                     marginTop: "7px",
                     marginBottom: "7px",
                     paddingLeft: "10px",
-                  }}>
+                  }}
+                >
                   {balances && balances[option[0]] && (
                     <div
                       style={{
                         marginTop: "5px",
                         marginBottom: "5px",
-                      }}>
+                      }}
+                    >
                       <div
                         style={{
                           position: "absolute",
@@ -611,17 +632,20 @@ export default function Vault(props: Props) {
                           padding: "15px",
                           paddingRight: "12px",
                           paddingBottom: "12px",
-                        }}>
+                        }}
+                      >
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
-                          }}>
+                          }}
+                        >
                           <div
                             style={{
                               textAlign: "left",
                               color: "grey",
-                            }}>
+                            }}
+                          >
                             Balance: {balances[option[0]].assetBalance}
                           </div>
                           <button
@@ -639,7 +663,8 @@ export default function Vault(props: Props) {
                               borderWidth: "1px",
                               marginLeft: "5px",
                               borderColor: "grey",
-                            }}>
+                            }}
+                          >
                             max
                           </button>
                         </div>
@@ -657,10 +682,10 @@ export default function Vault(props: Props) {
                       name="amount"
                       type="number"
                       placeholder="0"
-                      onChange={e =>
+                      onChange={(e) =>
                         handleInputChange(e.target.value, e.target.id)
                       }
-                      onKeyDown={evt =>
+                      onKeyDown={(evt) =>
                         ["e", "E", "+", "-"].includes(evt.key) &&
                         evt.preventDefault()
                       }
@@ -677,13 +702,15 @@ export default function Vault(props: Props) {
                     />
                   )}
                   <div
-                    style={{ position: "absolute", top: "27%", right: "13px" }}>
-                    {tokensJson.tokens.map(token => {
+                    style={{ position: "absolute", top: "27%", right: "13px" }}
+                  >
+                    {tokensJson.tokens.map((token) => {
                       if (token.address === option[0]) {
                         return (
                           <div
                             style={{ display: "flex", alignItems: "center" }}
-                            key={token.address}>
+                            key={token.address}
+                          >
                             <p>{token.symbol}</p>
                             <img
                               style={{
@@ -715,7 +742,8 @@ export default function Vault(props: Props) {
                   cursor: "pointer",
                   borderStyle: "solid",
                   backgroundColor: "grey",
-                }}>
+                }}
+              >
                 Deposit
               </button>
             ) : (
@@ -729,7 +757,8 @@ export default function Vault(props: Props) {
                   cursor: "pointer",
                   borderStyle: "solid",
                   borderWidth: "1px",
-                }}>
+                }}
+              >
                 Withdraw
               </button>
             )}
@@ -742,13 +771,15 @@ export default function Vault(props: Props) {
               opacity: "50%",
               borderStyle: "solid",
               borderWidth: "1px",
-            }}>
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center" }}>
               <p
                 style={{
                   padding: "0px",
                   margin: "0px",
-                }}>
+                }}
+              >
                 DEPOSIT FEE
               </p>
               <svg
@@ -761,11 +792,9 @@ export default function Vault(props: Props) {
                 stroke="currentColor"
                 fill="none"
                 strokeLinecap="round"
-                strokeLinejoin="round">
-                <path
-                  stroke="none"
-                  d="M0 0h24v24H0z"
-                  fill="none"></path>
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
                 <path d="M12 16v.01"></path>
                 <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
@@ -776,12 +805,14 @@ export default function Vault(props: Props) {
               style={{
                 display: "flex",
                 alignItems: "center",
-              }}>
+              }}
+            >
               <p
                 style={{
                   padding: "0px",
                   margin: "0px",
-                }}>
+                }}
+              >
                 WITHDRAWAL FEE
               </p>
 
@@ -795,11 +826,9 @@ export default function Vault(props: Props) {
                 stroke="currentColor"
                 fill="none"
                 strokeLinecap="round"
-                strokeLinejoin="round">
-                <path
-                  stroke="none"
-                  d="M0 0h24v24H0z"
-                  fill="none"></path>
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
                 <path d="M12 16v.01"></path>
                 <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
@@ -821,18 +850,20 @@ export default function Vault(props: Props) {
             marginTop: "50px",
             borderWidth: "1px",
             margin: "auto",
-          }}>
+          }}
+        >
           <h2
             style={{
               justifyContent: "start",
               display: "flex",
-            }}>
+            }}
+          >
             Strategy assets
           </h2>
           {$assets &&
-            $assets.map(asset => {
+            $assets.map((asset) => {
               const assetData: Token | undefined = tokensJson.tokens.find(
-                token => token.address === asset
+                (token) => token.address === asset
               );
 
               if (assetData && $assetsPrices) {
@@ -847,13 +878,15 @@ export default function Vault(props: Props) {
                       borderWidth: "1px",
                       borderColor: "grey",
                       marginBottom: "10px",
-                    }}>
+                    }}
+                  >
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         height: "40px",
-                      }}>
+                      }}
+                    >
                       <h4>{assetData.name}</h4>
                       <div
                         style={{
@@ -864,7 +897,8 @@ export default function Vault(props: Props) {
                           marginLeft: "auto",
                           width: "150px",
                           padding: "1px",
-                        }}>
+                        }}
+                      >
                         <a
                           href={`https://polygonscan.com/token/${asset}`}
                           style={{
@@ -873,7 +907,8 @@ export default function Vault(props: Props) {
                             display: "felx",
                             marginRight: "5px",
                             alignItems: "center",
-                          }}>
+                          }}
+                        >
                           Contract
                         </a>
                         <svg
@@ -886,11 +921,13 @@ export default function Vault(props: Props) {
                           stroke="currentColor"
                           fill="none"
                           strokeLinecap="round"
-                          strokeLinejoin="round">
+                          strokeLinejoin="round"
+                        >
                           <path
                             stroke="none"
                             d="M0 0h24v24H0z"
-                            fill="none"></path>
+                            fill="none"
+                          ></path>
                           <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                           <path d="M11 13l9 -9"></path>
                           <path d="M15 4h5v5"></path>
@@ -903,7 +940,8 @@ export default function Vault(props: Props) {
                         display: "flex",
                         alignItems: "center",
                         width: "100%",
-                      }}>
+                      }}
+                    >
                       <img
                         src={assetData.logoURI}
                         style={{
@@ -923,7 +961,8 @@ export default function Vault(props: Props) {
                         </p>
                       </div>
                       <section
-                        style={{ paddingLeft: "100px", paddingRight: "50px" }}>
+                        style={{ paddingLeft: "100px", paddingRight: "50px" }}
+                      >
                         <p style={{ color: "grey" }}></p>
                       </section>
                     </div>
@@ -943,3 +982,4 @@ export default function Vault(props: Props) {
     return <h1>Loading Vault..</h1>;
   }
 }
+export { Vault };
