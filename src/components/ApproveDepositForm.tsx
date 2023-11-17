@@ -65,7 +65,6 @@ export function ApproveDepositForm(props: Props) {
   useEffect(() => {
     async function check() {
       const allowanceResult: Allowance = {};
-      const approveStatusArray: boolean[] = [];
       let alw: bigint;
       for (let i = 0; i < props.option.length; i++) {
         alw = (await readContract(_publicClient, {
@@ -86,28 +85,22 @@ export function ApproveDepositForm(props: Props) {
       setAllowance(allowanceResult);
 
       for (let i = 0; i < props.option.length; i++) {
-        const approveStatus =
+        if (
           allowanceResult[props.option[i]]?.allowance[0] !== undefined &&
           allowanceResult[props.option[i]]?.allowance[0] <
             parseUnits(
               props.inputs[props.option[i]]?.ammount,
               getTokenData(props.option[i])?.decimals
             ) &&
-          props.inputs[props.option[i]]?.ammount !== "";
-        approveStatusArray.push(approveStatus);
+          approve !== false &&
+          props.inputs[props.option[i]]?.ammount !== ""
+        ) {
+          setApprove(true);
+        } else {
+          setApprove(false);
+          console.log(approve);
+        }
       }
-      const atLeastOneTrue = approveStatusArray.includes(true);
-
-      const atLeastOneFalse = approveStatusArray.includes(false);
-      console.log(atLeastOneFalse);
-      console.log(atLeastOneTrue);
-      if (atLeastOneTrue && atLeastOneFalse === false) {
-        setApprove(false);
-      } else {
-        setApprove(true);
-      }
-      console.log(approveStatusArray);
-      console.log(approve);
     }
     check();
   }, [props.option]);
