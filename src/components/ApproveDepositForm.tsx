@@ -18,6 +18,24 @@ import { formatUnits } from "viem";
 type Props = {
   option: string[];
   vaultt: `0x${string}` | undefined;
+  inputs: input;
+  balances: Balance;
+};
+
+type Balance = {
+  [balance: string]: AssetBalancee;
+};
+
+type AssetBalancee = {
+  assetBalance: string;
+};
+
+type input = {
+  [assetAdress: string]: InputAmmount;
+};
+
+type InputAmmount = {
+  ammount: string;
 };
 
 type Allowance = {
@@ -60,13 +78,10 @@ export function ApproveDepositForm(props: Props) {
       }
       setAllowance(allowanceResult);
       console.log(allowanceResult);
+      console.log(props.inputs);
     }
     check();
   }, [props.option]);
-
-  const payPerVaultToken = p?.buildingPayPerVaultToken
-    ? getTokenData(p.buildingPayPerVaultToken)
-    : undefined;
 
   return (
     <div className="build-form">
@@ -138,17 +153,13 @@ export function ApproveDepositForm(props: Props) {
               Approve deposit to spend {payPerVaultToken?.symbol}
             </button>
           ) : (
-            <button
-              className="btn btn-primary"
-              onClick={deploy}>
-              Deposit
-            </button>
+            <button className="btn btn-primary">Deposit</button>
           )}
         </div>
       )}
 
       {buildResult === true && (
-        <div className="success">The vault has beed deployed</div>
+        <div className="success">Deposited succesfully.</div>
       )}
     </div>
   );

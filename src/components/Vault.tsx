@@ -95,8 +95,8 @@ export default function Vault(props: Props) {
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
   const [approveIndex, setApproveIndex] = useState<number | undefined>();
-  console.log(approveIndex);
   console.log(inputs);
+  console.log(balances);
 
   useEffect(() => {
     async function getStrategy() {
@@ -797,12 +797,14 @@ export default function Vault(props: Props) {
               className="modal"
               onClick={e => {
                 e.preventDefault();
+                e.stopPropagation();
               }}>
               <div className="modal-title">Deposit</div>
               <ApproveDepositForm
                 option={option}
                 vaultt={vaultt}
                 inputs={inputs}
+                balances={balances}
               />
             </div>
           </div>

@@ -51,7 +51,7 @@ export function BuildForm(props: Props) {
           args: [_account, p?.factory],
         });
         setAllowance(r as bigint);
-        // console.log('allowance', r)
+        console.log("allowance", r);
       }
     }
     check();
