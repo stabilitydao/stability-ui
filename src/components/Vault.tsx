@@ -23,7 +23,6 @@ import tokensJson from "../stability.tokenlist.json";
 import type { Token, assetPrices } from "../types";
 import { formatUnits, parseUnits } from "viem";
 import { account, platformData } from "../state/StabilityStore";
-import { ApproveDepositForm } from "./ApproveDepositForm";
 import { getTokenData } from "../utils";
 
 type Props = {
@@ -112,7 +111,6 @@ export default function Vault(props: Props) {
           abi: VaultAbi,
           functionName: "strategy",
         })) as `0x${string}` | undefined;
-        console.log(s);
 
         if (typeof s === "string") {
           let ss: string[] = (await readContract(_publicClient, {
@@ -120,14 +118,11 @@ export default function Vault(props: Props) {
             abi: StrategyAbi,
             functionName: "assets",
           })) as string[];
-          console.log(ss);
 
           if (Array.isArray(ss)) {
             assets.set(ss);
             setOption(ss);
             defaultAssetsOption(ss);
-
-            console.log("assets", ss);
           } else {
             console.error("ss is not an array");
           }
@@ -225,8 +220,6 @@ export default function Vault(props: Props) {
                 }
               )) as (bigint | bigint[])[];
               checkInputsAllowance(t[0] as bigint[]);
-              console.log(t);
-              console.log(assetsBalances);
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
@@ -263,7 +256,6 @@ export default function Vault(props: Props) {
   function checkInputsAllowance(input: bigint[]) {
     const apprDepo = [];
     let change = false;
-    console.log($assetsBalances);
 
     for (let i = 0; i < input.length; i++) {
       if (
@@ -289,7 +281,6 @@ export default function Vault(props: Props) {
         } else {
           apprDepo.push(2);
         }
-        console.log(apprDepo);
       }
       const button = checkButtonApproveDeposit(apprDepo);
 
@@ -350,7 +341,6 @@ export default function Vault(props: Props) {
 
   function handleInputChange(a: string, e: string) {
     const decimals = getTokenData(e)?.decimals;
-    console.log(a);
 
     if (decimals) {
       const _amount = parseUnits(a, decimals);
@@ -893,30 +883,6 @@ export default function Vault(props: Props) {
             </p>
           </section>
         </div>
-
-        {p && approveIndex !== undefined && (
-          <div
-            className="overlay"
-            onClick={() => {
-              setApproveIndex(undefined);
-            }}>
-            <div
-              className="modal"
-              onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}>
-              <div className="modal-title">Deposit</div>
-              <ApproveDepositForm
-                option={option}
-                vaultt={vaultt}
-                inputs={inputs}
-                balances={balances}
-                defaultOptionSymbols={defaultOptionSymbols}
-              />
-            </div>
-          </div>
-        )}
 
         <article
           className="Strategy"
