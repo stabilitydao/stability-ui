@@ -226,6 +226,7 @@ export default function Vault(props: Props) {
               )) as (bigint | bigint[])[];
               checkInputsAllowance(t[0] as bigint[]);
               console.log(t);
+              console.log(assetsBalances);
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
@@ -246,11 +247,11 @@ export default function Vault(props: Props) {
               }
             } catch (error) {
               console.error(
-                "Error: the asset balance is too low to make conversion.",
+                "Error: the asset balance is too low to convert.",
                 error
               );
               resetInputs(option);
-              setApprove(0);
+              setApprove(undefined);
             }
           }
         }
@@ -260,28 +261,59 @@ export default function Vault(props: Props) {
   }, [lastKeyPress]);
 
   function checkInputsAllowance(input: bigint[]) {
+    let approveStatus: number = 0;
+    let insuficcientBalance = 0;
+    let deposit = 2;
+    let _approve = 1;
+    console.log(allowance);
+
+    console.log($assetsBalances);
+    console.log(input);
+
+    for (let i = 0; i < input.length; i++) {
+      if (
+        $assets &&
+        $assetsBalances &&
+        input[i] > $assetsBalances[$assets[i]].assetBalance &&
+        lastKeyPress.key2 !== ""
+      ) {
+        insuficcientBalance = 0;
+        if (i === input.length - 1 && insuficcientBalance === 0) {
+          setApprove(insuficcientBalance);
+        }
+      }
+    }
+
+    for (let i = 0; i < input.length; i++) {
+      if (
+        allowance &&
+        $assets &&
+        $assetsBalances &&
+        input[i] < $assetsBalances[$assets[i]].assetBalance &&
+        allowance[$assets[i]].allowance[0] > input[i] &&
+        lastKeyPress.key2 !== ""
+      ) {
+        insuficcientBalance = 0;
+        if (i === input.length - 1 && insuficcientBalance === 0) {
+          setApprove(insuficcientBalance);
+        }
+      }
+    }
+
     for (let i = 0; i < option.length; i++) {
       const decimals: number = getTokenData(option[i])?.decimals as number;
       console.log(input);
       console.log(allowance);
-
-      console.log(decimals);
       if (
         allowance &&
-        allowance[option[i]] &&
         allowance[option[i]].allowance[0] !== undefined &&
         allowance[option[i]].allowance[0] < input[i] &&
         input[i] !== 0n
       ) {
-        setApprove(0);
-        console.log("123");
       } else {
-        console.log("123");
-
-        setApprove(1);
-        console.log(approve);
       }
     }
+    console.log(approveStatus);
   }
 
   function resetInputs(e: string[]) {
@@ -300,6 +332,7 @@ export default function Vault(props: Props) {
       };
     }
     setInputs(reset);
+    setApprove(undefined);
   }
 
   function defaultAssetsOption(ss: string[]) {
@@ -320,15 +353,16 @@ export default function Vault(props: Props) {
   function changeOption(e: string[]) {
     resetInputs(e);
     setOption(e);
-    setApprove(0);
   }
 
   function handleInputChange(a: string, e: string) {
     const decimals = getTokenData(e)?.decimals;
+    console.log(a);
+
     if (decimals) {
       const _amount = parseUnits(a, decimals);
-      if (a === "0") {
-        setApprove(0);
+      if (a === "") {
+        resetInputs(option);
       } else {
         setInputs(prevInputs => ({
           ...prevInputs,
@@ -736,9 +770,9 @@ export default function Vault(props: Props) {
                     borderStyle: "solid",
                     borderWidth: "1px",
                   }}>
-                  Approve
+                  Deposit
                 </button>
-              ) : approve === 0 ? (
+              ) : approve === 2 ? (
                 <button
                   type="button"
                   onClick={() => setApproveIndex(1)}
@@ -752,9 +786,9 @@ export default function Vault(props: Props) {
                     borderStyle: "solid",
                     borderWidth: "1px",
                   }}>
-                  Deposit
+                  Approve
                 </button>
-              ) : (
+              ) : approve === 0 ? (
                 <div
                   style={{
                     display: "flex",
@@ -770,6 +804,8 @@ export default function Vault(props: Props) {
                   }}>
                   INSUFICCIENT BALANCE
                 </div>
+              ) : (
+                <div></div>
               )
             ) : (
               <button
