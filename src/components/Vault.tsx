@@ -261,9 +261,7 @@ export default function Vault(props: Props) {
   }, [lastKeyPress]);
 
   function checkInputsAllowance(input: bigint[]) {
-    let insufficientBalance = 0;
-    let deposit = 2;
-    let _approve = 1;
+    const apprDepo = [];
     let change = false;
     console.log($assetsBalances);
 
@@ -276,25 +274,8 @@ export default function Vault(props: Props) {
       )
         setApprove(0);
       change = true;
-
-      // {
-      //   insufficientBalance = 0;
-      //   console.log("ASD");
-
-      //   if (i === input.length - 1 && insufficientBalance === 0) {
-      //     setApprove(0);
-      //     change = true;
-      //     console.log(insufficientBalance);
-      //   }
-      // } else {
-      //   insufficientBalance = 20;
-      //   if (i === input.length - 1 && insufficientBalance !== 0) {
-      //     change = true;
-      //     console.log(insufficientBalance);
-      //   }
-      // }
     }
-    if (change === false) {
+    if (change === true) {
       for (let i = 0; i < input.length; i++) {
         if (
           allowance &&
@@ -304,16 +285,28 @@ export default function Vault(props: Props) {
           allowance[$assets[i]].allowance[0] > input[i] &&
           lastKeyPress.key2 !== ""
         ) {
-          deposit = 2;
-          if (i === input.length - 1 && deposit === 2) {
-            deposit = 2;
-            // setApprove(insufficientBalance);
-          } else {
-            setApprove(_approve);
-          }
+          apprDepo.push(1);
+        } else {
+          apprDepo.push(2);
         }
+        console.log(apprDepo);
+      }
+      const button = checkButtonApproveDeposit(apprDepo);
+
+      if (button === true) {
+        setApprove(apprDepo[0]);
+      } else {
+        setApprove(1);
       }
     }
+  }
+
+  function checkButtonApproveDeposit(apprDepo: number[]) {
+    if (apprDepo.length < 2) {
+      return true;
+    }
+    const firstElement = apprDepo[0];
+    return apprDepo.every(element => element === firstElement);
   }
 
   function resetInputs(e: string[]) {
