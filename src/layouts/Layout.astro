@@ -1,12 +1,12 @@
 ---
 import App from "./App";
-import Wallet from "../components/Wallet"
+import {Wallet} from "@components/Wallet"
 
-interface Props {
+interface IProps {
 	title: string;
 }
 
-const { title } = Astro.props;
+const { title } = Astro.props as IProps;
 ---
 
 <!doctype html>

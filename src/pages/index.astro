@@ -1,15 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import  {Vaults}  from "../layouts/App"
+import Layout from '@layouts/Layout.astro';
+import {Vaults} from "@components/Vaults"
 ---
 
 <Layout title="Vaults">
   <Vaults client:load/>
 	<br>
 	<div>
-		<a href="/create-vault"><button class="btn">Create vault</button></a>
+		<a href="/create-vault"><button class="bg-[#2c2f38] px-3 py-2 rounded-md">Create vault</button></a>
 	</div>
 </Layout>
-
-<style>
-</style>

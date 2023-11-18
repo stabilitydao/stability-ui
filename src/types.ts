@@ -67,3 +67,15 @@ export type Balances = {
 export type AssetBalance = {
   assetBalance: bigint;
 };
+export type TLocalVault = {
+  name: string;
+  assets: { logo: string; symbol: string }[];
+  symbol: string;
+  type: string;
+  strategy: string;
+  balance: string;
+  sharePrice: string;
+  tvl: string;
+  apr: string;
+};
+export type TVaultAssets = [string, string];
