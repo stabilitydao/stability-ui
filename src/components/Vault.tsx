@@ -261,10 +261,10 @@ export default function Vault(props: Props) {
   }, [lastKeyPress]);
 
   function checkInputsAllowance(input: bigint[]) {
-    let approveStatus: number = 0;
     let insuficcientBalance = 0;
     let deposit = 2;
     let _approve = 1;
+    let change = false;
     console.log(allowance);
 
     console.log($assetsBalances);
@@ -280,6 +280,7 @@ export default function Vault(props: Props) {
         insuficcientBalance = 0;
         if (i === input.length - 1 && insuficcientBalance === 0) {
           setApprove(insuficcientBalance);
+          change = true;
         }
       }
     }
@@ -291,29 +292,17 @@ export default function Vault(props: Props) {
         $assetsBalances &&
         input[i] < $assetsBalances[$assets[i]].assetBalance &&
         allowance[$assets[i]].allowance[0] > input[i] &&
-        lastKeyPress.key2 !== ""
+        lastKeyPress.key2 !== "" &&
+        change !== true
       ) {
-        insuficcientBalance = 0;
-        if (i === input.length - 1 && insuficcientBalance === 0) {
+        deposit = 2;
+        if (i === input.length - 1 && deposit === 2) {
           setApprove(insuficcientBalance);
+        } else {
+          deposit = 1;
         }
       }
     }
-
-    for (let i = 0; i < option.length; i++) {
-      const decimals: number = getTokenData(option[i])?.decimals as number;
-      console.log(input);
-      console.log(allowance);
-      if (
-        allowance &&
-        allowance[option[i]].allowance[0] !== undefined &&
-        allowance[option[i]].allowance[0] < input[i] &&
-        input[i] !== 0n
-      ) {
-      } else {
-      }
-    }
-    console.log(approveStatus);
   }
 
   function resetInputs(e: string[]) {
