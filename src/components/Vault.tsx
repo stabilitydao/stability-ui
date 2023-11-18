@@ -261,14 +261,11 @@ export default function Vault(props: Props) {
   }, [lastKeyPress]);
 
   function checkInputsAllowance(input: bigint[]) {
-    let insuficcientBalance = 0;
+    let insufficientBalance = 0;
     let deposit = 2;
     let _approve = 1;
     let change = false;
-    console.log(allowance);
-
     console.log($assetsBalances);
-    console.log(input);
 
     for (let i = 0; i < input.length; i++) {
       if (
@@ -276,30 +273,44 @@ export default function Vault(props: Props) {
         $assetsBalances &&
         input[i] > $assetsBalances[$assets[i]].assetBalance &&
         lastKeyPress.key2 !== ""
-      ) {
-        insuficcientBalance = 0;
-        if (i === input.length - 1 && insuficcientBalance === 0) {
-          setApprove(insuficcientBalance);
-          change = true;
-        }
-      }
-    }
+      )
+        setApprove(0);
+      change = true;
 
-    for (let i = 0; i < input.length; i++) {
-      if (
-        allowance &&
-        $assets &&
-        $assetsBalances &&
-        input[i] < $assetsBalances[$assets[i]].assetBalance &&
-        allowance[$assets[i]].allowance[0] > input[i] &&
-        lastKeyPress.key2 !== "" &&
-        change !== true
-      ) {
-        deposit = 2;
-        if (i === input.length - 1 && deposit === 2) {
-          setApprove(insuficcientBalance);
-        } else {
-          deposit = 1;
+      // {
+      //   insufficientBalance = 0;
+      //   console.log("ASD");
+
+      //   if (i === input.length - 1 && insufficientBalance === 0) {
+      //     setApprove(0);
+      //     change = true;
+      //     console.log(insufficientBalance);
+      //   }
+      // } else {
+      //   insufficientBalance = 20;
+      //   if (i === input.length - 1 && insufficientBalance !== 0) {
+      //     change = true;
+      //     console.log(insufficientBalance);
+      //   }
+      // }
+    }
+    if (change === false) {
+      for (let i = 0; i < input.length; i++) {
+        if (
+          allowance &&
+          $assets &&
+          $assetsBalances &&
+          input[i] < $assetsBalances[$assets[i]].assetBalance &&
+          allowance[$assets[i]].allowance[0] > input[i] &&
+          lastKeyPress.key2 !== ""
+        ) {
+          deposit = 2;
+          if (i === input.length - 1 && deposit === 2) {
+            deposit = 2;
+            // setApprove(insufficientBalance);
+          } else {
+            setApprove(_approve);
+          }
         }
       }
     }
