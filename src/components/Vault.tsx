@@ -275,7 +275,7 @@ export default function Vault(props: Props) {
         setApprove(0);
       change = true;
     }
-    if (change === true) {
+    if (change === false) {
       for (let i = 0; i < input.length; i++) {
         if (
           allowance &&
