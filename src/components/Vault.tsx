@@ -24,6 +24,7 @@ import type { Token, assetPrices } from "../types";
 import { formatUnits, parseUnits } from "viem";
 import { account, platformData } from "../state/StabilityStore";
 import { ApproveDepositForm } from "./ApproveDepositForm";
+import { getTokenData } from "../utils";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -51,6 +52,14 @@ type inputPreview = {
 
 type InputAmmountPreview = {
   ammount: bigint;
+};
+
+type Allowance = {
+  [asset: string]: AssetAllowance;
+};
+
+type AssetAllowance = {
+  allowance: bigint[];
 };
 
 export function addAssetsPrice(data: any) {
@@ -92,14 +101,8 @@ export default function Vault(props: Props) {
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
   const [approveIndex, setApproveIndex] = useState<number | undefined>();
-  console.log(inputs);
-  console.log(balances);
-  console.log(defaultOptionAssets);
-  console.log(defaultOptionSymbols);
-  console.log(p);
-  console.log($account);
-  console.log(vaultt);
-  console.log(option);
+  const [allowance, setAllowance] = useState<Allowance | undefined>({});
+  const [approve, setApprove] = useState<number | undefined>();
 
   useEffect(() => {
     async function getStrategy() {
@@ -123,6 +126,7 @@ export default function Vault(props: Props) {
             assets.set(ss);
             setOption(ss);
             defaultAssetsOption(ss);
+
             console.log("assets", ss);
           } else {
             console.error("ss is not an array");
@@ -135,27 +139,19 @@ export default function Vault(props: Props) {
 
   useEffect(() => {
     function loadAssetsBalances() {
-      resetInputs(option);
-
-      const e = option;
       const balance: Balance = {};
 
       if ($assetsBalances && option && option.length > 1) {
-        console.log(option);
-
-        for (let i = 0; i < e.length; i++) {
-          console.log($assetsBalances);
-
-          const decimals =
-            tokensJson.tokens.find(token => token.address === option[i])
-              ?.decimals ?? 18;
-
-          balance[e[i]] = {
-            assetBalance: formatUnits(
-              $assetsBalances[option[i]].assetBalance,
-              decimals
-            ),
-          };
+        for (let i = 0; i < option.length; i++) {
+          const decimals = getTokenData(option[i])?.decimals;
+          if (decimals !== undefined) {
+            balance[option[i]] = {
+              assetBalance: formatUnits(
+                $assetsBalances[option[i]].assetBalance,
+                decimals
+              ),
+            };
+          }
         }
       } else {
         if (
@@ -164,20 +160,39 @@ export default function Vault(props: Props) {
           option &&
           option.length === 1
         ) {
-          const decimals =
-            tokensJson.tokens.find(token => token.address === option[0])
-              ?.decimals ?? 18;
-
-          balance[option[0]] = {
-            assetBalance: formatUnits(
-              $assetsBalances[option[0]].assetBalance,
-              decimals
-            ),
-          };
+          const decimals = getTokenData(option[0])?.decimals;
+          if (decimals !== undefined) {
+            balance[option[0]] = {
+              assetBalance: formatUnits(
+                $assetsBalances[option[0]].assetBalance,
+                decimals
+              ),
+            };
+          }
         }
       }
       setBalances(balance);
     }
+
+    async function checkAllowance() {
+      const allowanceResult: Allowance = {};
+
+      for (let i = 0; i < option.length; i++) {
+        const alw = (await readContract(_publicClient, {
+          address: option[i] as `0x${string}`,
+          abi: ERC20Abi,
+          functionName: "allowance",
+          args: [$account, vaultt],
+        })) as bigint;
+
+        if (!allowanceResult[option[i]]) {
+          allowanceResult[option[i]] = { allowance: [] };
+        }
+        allowanceResult[option[i]].allowance.push(alw);
+      }
+      setAllowance(allowanceResult);
+    }
+    checkAllowance();
     loadAssetsBalances();
   }, [option, $assetsBalances]);
 
@@ -209,16 +224,14 @@ export default function Vault(props: Props) {
                   args: [$assets, amounts],
                 }
               )) as (bigint | bigint[])[];
+              checkInputsAllowance(t[0] as bigint[]);
+              console.log(t);
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
-              const updateInputs = inputs;
-
               for (let i = 0; i < $assets.length; i++) {
-                const decimals =
-                  tokensJson.tokens.find(token => token.address === $assets[i])
-                    ?.decimals ?? 18;
-                if (i !== changedInput) {
+                const decimals = getTokenData($assets[i])?.decimals;
+                if (i !== changedInput && decimals) {
                   preview[$assets[i]] = {
                     ammount: formatUnits(qq[i], decimals).toString(),
                   };
@@ -237,6 +250,7 @@ export default function Vault(props: Props) {
                 error
               );
               resetInputs(option);
+              setApprove(0);
             }
           }
         }
@@ -244,6 +258,31 @@ export default function Vault(props: Props) {
     }
     previewDeposit();
   }, [lastKeyPress]);
+
+  function checkInputsAllowance(input: bigint[]) {
+    for (let i = 0; i < option.length; i++) {
+      const decimals: number = getTokenData(option[i])?.decimals as number;
+      console.log(input);
+      console.log(allowance);
+
+      console.log(decimals);
+      if (
+        allowance &&
+        allowance[option[i]] &&
+        allowance[option[i]].allowance[0] !== undefined &&
+        allowance[option[i]].allowance[0] < input[i] &&
+        input[i] !== 0n
+      ) {
+        setApprove(0);
+        console.log("123");
+      } else {
+        console.log("123");
+
+        setApprove(1);
+        console.log(approve);
+      }
+    }
+  }
 
   function resetInputs(e: string[]) {
     type input = {
@@ -266,7 +305,7 @@ export default function Vault(props: Props) {
   function defaultAssetsOption(ss: string[]) {
     const defaultOptionAssets: string[] = [];
     for (let i = 0; i < ss.length; i++) {
-      const token = tokensJson.tokens.find(token => ss[i] === token.address);
+      const token = getTokenData(ss[i]);
       if (token) {
         defaultOptionAssets[i] = token.symbol;
       } else {
@@ -281,34 +320,34 @@ export default function Vault(props: Props) {
   function changeOption(e: string[]) {
     resetInputs(e);
     setOption(e);
+    setApprove(0);
   }
 
   function handleInputChange(a: string, e: string) {
-    const decimals =
-      tokensJson.tokens.find(token => token.address === e)?.decimals ?? 18;
+    const decimals = getTokenData(e)?.decimals;
+    if (decimals) {
+      const _amount = parseUnits(a, decimals);
+      if (a === "0") {
+        setApprove(0);
+      } else {
+        setInputs(prevInputs => ({
+          ...prevInputs,
+          [e]: {
+            ammount: a,
+          },
+        }));
 
-    const _amount = parseUnits(a, decimals);
+        setinputsPreviewDeposit(prevInputs => ({
+          ...prevInputs,
+          [e]: {
+            ammount: _amount,
+          },
+        }));
+      }
 
-    if (a === "") {
-      resetInputs(option);
-    } else {
-      setInputs(prevInputs => ({
-        ...prevInputs,
-        [e]: {
-          ammount: a,
-        },
-      }));
-
-      setinputsPreviewDeposit(prevInputs => ({
-        ...prevInputs,
-        [e]: {
-          ammount: _amount,
-        },
-      }));
-    }
-
-    if (option.length > 1) {
-      setLastKeyPress({ key1: e, key2: a });
+      if (option.length > 1) {
+        setLastKeyPress({ key1: e, key2: a });
+      }
     }
   }
 
@@ -684,20 +723,54 @@ export default function Vault(props: Props) {
               </div>
             )}
             {tab === "Deposit" ? (
-              <button
-                type="button"
-                onClick={() => setApproveIndex(1)}
-                style={{
-                  margin: "auto",
-                  fontSize: "35px",
-                  width: "100%",
-                  height: "60px",
-                  cursor: "pointer",
-                  borderStyle: "solid",
-                  borderWidth: "1px",
-                }}>
-                Deposit
-              </button>
+              approve === 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setApproveIndex(1)}
+                  style={{
+                    margin: "auto",
+                    fontSize: "35px",
+                    width: "100%",
+                    height: "60px",
+                    cursor: "pointer",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                  }}>
+                  Approve
+                </button>
+              ) : approve === 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setApproveIndex(1)}
+                  disabled
+                  style={{
+                    margin: "auto",
+                    fontSize: "35px",
+                    width: "100%",
+                    height: "60px",
+                    cursor: "pointer",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                  }}>
+                  Deposit
+                </button>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    margin: "auto",
+                    color: "grey",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    width: "367px",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "60px",
+                    fontSize: "25px",
+                  }}>
+                  INSUFICCIENT BALANCE
+                </div>
+              )
             ) : (
               <button
                 type="button"
@@ -835,9 +908,7 @@ export default function Vault(props: Props) {
           </h2>
           {$assets &&
             $assets.map(asset => {
-              const assetData: Token | undefined = tokensJson.tokens.find(
-                token => token.address === asset
-              );
+              const assetData: Token | undefined = getTokenData(asset);
 
               if (assetData && $assetsPrices) {
                 return (
