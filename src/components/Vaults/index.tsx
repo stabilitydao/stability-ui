@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+import { ColumnFilter } from "./ColumnFilter";
+
 import { useStore } from "@nanostores/react";
 import { vaultData, vaults, vaultAssets } from "@store";
 
@@ -14,15 +16,72 @@ function Vaults() {
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
 
+  const [tableStates, setTableStates] = useState([
+    { name: "Name", keyName: "name", sortType: "none", dataType: "string" },
+    { name: "Type", keyName: "type", sortType: "none", dataType: "string" },
+    {
+      name: "Strategy",
+      keyName: "strategy",
+      sortType: "none",
+      dataType: "string",
+    },
+    {
+      name: "Balance",
+      keyName: "balance",
+      sortType: "none",
+      dataType: "number",
+    },
+    {
+      name: "Share Price",
+      keyName: "shareprice",
+      sortType: "none",
+      dataType: "number",
+    },
+    { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
+    { name: "APR", keyName: "apr", sortType: "none", dataType: "number" },
+  ]);
+
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
-  const tabFilter = () => {
-    const value: any = search?.current?.value.toLowerCase();
+  const compareHandler = (
+    a: any,
+    b: any,
+    dataType: string,
+    sortOrder: string
+  ) => {
+    if (dataType === "number") {
+      return sortOrder === "ascendentic" ? a - b : b - a;
+    }
+    if (dataType === "string") {
+      return sortOrder === "ascendentic"
+        ? a.localeCompare(b)
+        : b.localeCompare(a);
+    }
+    return 0;
+  };
 
-    const filtred = localVaults.filter((vault) =>
-      vault.symbol.toLowerCase().includes(value)
+  const tableFilter = (table: any) => {
+    const searchValue: any = search?.current?.value.toLowerCase();
+    let sortedVaults: any = localVaults;
+
+    sortedVaults = localVaults.filter((vault) =>
+      vault.symbol.toLowerCase().includes(searchValue)
     );
-    setFilteredVaults(filtred);
+    table.forEach((state: any) => {
+      if (state.sortType !== "none") {
+        sortedVaults = [...sortedVaults].sort((a, b) =>
+          compareHandler(
+            a[state.keyName],
+            b[state.keyName],
+            state.dataType,
+            state.sortType
+          )
+        );
+      }
+    });
+
+    setFilteredVaults(sortedVaults);
+    setTableStates(table);
   };
 
   useEffect(() => {
@@ -49,7 +108,7 @@ function Vaults() {
           type: $vaults[3][index],
           strategy: $vaults[4][index],
           balance: balances[index],
-          sharePrice: String($vaults[5][index]),
+          shareprice: String($vaults[5][index]),
           tvl: String($vaults[6][index]),
           apr: String($vaults[7][index]),
         };
@@ -67,44 +126,30 @@ function Vaults() {
           className="w-full bg-[#2c2f38] outline-none pl-3 py-3 rounded-[4px] border-[2px] border-[#3d404b]  focus:border-[#9baab4] transition-all duration-300"
           placeholder="Search"
           ref={search}
-          onChange={tabFilter}
+          onChange={() => tableFilter(tableStates)}
         />
         <table className="table-auto w-full rounded-lg bg-[#2c2f38] mt-5">
-          <thead>
+          <thead className="select-none">
             <tr className="text-[18px]">
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Type</th>
-              <th className="px-4 py-2 text-center">
-                <p className="inline-block">Strategy</p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="7"
-                  viewBox="0 0 12 7"
-                  fill="none"
-                  className="inline-block ml-[10px] cursor-pointer"
-                >
-                  <path
-                    d="M6 7L11.1962 0.25H0.803848L6 7Z"
-                    fill="white"
-                    fillOpacity="0.6"
-                  />
-                </svg>
-              </th>
-              <th className="px-4 py-2">Balance</th>
-              <th className="px-4 py-2">Share Price</th>
-              <th className="px-4 py-2">TVL</th>
-              <th className="px-4 py-2">APR</th>
+              {tableStates.map((value: any, index: number) => (
+                <ColumnFilter
+                  key={value.name}
+                  index={index}
+                  value={value.name}
+                  table={tableStates}
+                  filter={tableFilter}
+                />
+              ))}
             </tr>
           </thead>
           <tbody>
-            {filteredVaults.map((vault: TLocalVault, index: number) => (
+            {filteredVaults.map((vault: TLocalVault) => (
               <tr
                 className="border-t border-[#4f5158] text-center text-[18px]"
                 key={vault.name}
               >
                 <td className="px-4 py-2 flex items-center justify-center gap-1">
-                  <div className="flex">
+                  <div className="flex max-w-[300px]">
                     <img
                       className="w-8 h-8 rounded-full"
                       src={vault.assets[0].logo}
@@ -116,16 +161,16 @@ function Vaults() {
                       alt={vault.assets[1].symbol}
                     />
                   </div>
-                  <div>
+                  <div className="max-w-[250px]">
                     <p>{vault.name}</p>
                     <p>{vault.symbol}</p>
                   </div>
                 </td>
 
                 <td className=" px-4 py-2">{vault.type}</td>
-                <td className=" px-4 py-2">{vault.strategy}</td>
+                <td className=" max-w-[150px] px-4 py-2">{vault.strategy}</td>
                 <td className=" px-4 py-2">{vault.balance}</td>
-                <td className=" px-4 py-2">{vault.sharePrice}</td>
+                <td className=" px-4 py-2">{vault.shareprice}</td>
                 <td className=" px-4 py-2">{vault.tvl}</td>
                 <td className=" px-4 py-2">{vault.apr}</td>
               </tr>
