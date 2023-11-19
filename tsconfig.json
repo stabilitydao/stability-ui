@@ -10,7 +10,10 @@
       "@web3": ["src/web3"],
       "@layouts/*": ["src/layouts/*"],
       "@pages/*": ["src/pages/*"],
-      "@store": ["src/store"]
+      "@store": ["src/store"],
+      "@utils": ["src/utils"],
+      "@constants": ["src/constants"],
+      "@types": ["src/types"]
     }
   }
 }

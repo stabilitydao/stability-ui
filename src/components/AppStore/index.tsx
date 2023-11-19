@@ -19,8 +19,7 @@ import {
   vaults,
   vaultAssets,
 } from "@store";
-import { platform } from "../../constants";
-import { PlatformABI, IVaultManagerABI } from "@web3";
+import { platform, PlatformABI, IVaultManagerABI } from "@web3";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address } = useAccount();
@@ -101,7 +100,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           return response[1];
         })
       );
-
       if (contractVaults) {
         vaults.set(contractVaults);
       }
