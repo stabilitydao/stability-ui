@@ -74,7 +74,7 @@ export type TLocalVault = {
   type: string;
   strategy: string;
   balance: string;
-  sharePrice: string;
+  shareprice: string;
   tvl: string;
   apr: string;
 };
