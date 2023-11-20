@@ -21,12 +21,14 @@ Install foundry on your pc.
 #### Run Polygon forking anvil node
 
 ```
-anvil --fork-url <Your Polygon RPC URL> --fork-block-number 48713000
+anvil --fork-url <Your Polygon RPC URL> --fork-block-number <Block Number>
 ```
+
+The forking block must be the one on which you received SDIV and MATIC tokens, example: 48713000.
 
 #### Deploy Stability Platform on localhost
 
-Clone [platform contracts](https://github.com/stabilitydao/v2) repo, build and deploy.
+Clone [platform contracts](https://github.com/stabilitydao/stability-contracts) repo, build and deploy.
 
 ```
 forge install

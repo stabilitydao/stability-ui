@@ -1,14 +1,8 @@
-/** @format */
-
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
+import { formatUnits, parseUnits } from "viem";
 import { readContract } from "viem/actions";
-import {
-  vaultData,
-  assets,
-  assetsPrices,
-  assetsBalances,
-} from "../state/StabilityStore";
+
 import {
   useAccount,
   usePublicClient,
@@ -16,14 +10,20 @@ import {
   useWalletClient,
   useFeeData,
 } from "wagmi";
-import VaultAbi from "../abi/VaultAbi";
-import StrategyAbi from "../abi/StrategyAbi";
-import ERC20Abi from "../abi/ERC20Abi";
-import tokensJson from "../stability.tokenlist.json";
-import type { Token, assetPrices } from "../types";
-import { formatUnits, parseUnits } from "viem";
-import { account, platformData } from "../state/StabilityStore";
-import { getTokenData } from "../utils";
+
+import {
+  vaultData,
+  assets,
+  assetsPrices,
+  assetsBalances,
+  account,
+  platformData,
+} from "@store";
+
+import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
+import tokensJson from "../../stability.tokenlist.json";
+import type { Token, assetPrices } from "../../types";
+import { getTokenData } from "src/utils";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -77,7 +77,7 @@ export function addAssetsPrice(data: any) {
   }
 }
 
-export default function Vault(props: Props) {
+function Vault(props: Props) {
   const vaultt: `0x${string}` | undefined = props.vault;
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
@@ -108,14 +108,14 @@ export default function Vault(props: Props) {
       if (vaultt) {
         let s: `0x${string}` | undefined = (await readContract(_publicClient, {
           address: vaultt,
-          abi: VaultAbi,
+          abi: VaultABI,
           functionName: "strategy",
         })) as `0x${string}` | undefined;
 
         if (typeof s === "string") {
           let ss: string[] = (await readContract(_publicClient, {
             address: s,
-            abi: StrategyAbi,
+            abi: StrategyABI,
             functionName: "assets",
           })) as string[];
 
@@ -175,7 +175,7 @@ export default function Vault(props: Props) {
       for (let i = 0; i < option.length; i++) {
         const alw = (await readContract(_publicClient, {
           address: option[i] as `0x${string}`,
-          abi: ERC20Abi,
+          abi: ERC20ABI,
           functionName: "allowance",
           args: [$account, vaultt],
         })) as bigint;
@@ -214,7 +214,7 @@ export default function Vault(props: Props) {
                 _publicClient,
                 {
                   address: vaultt,
-                  abi: StrategyAbi,
+                  abi: StrategyABI,
                   functionName: "previewDepositAssets",
                   args: [$assets, amounts],
                 }
@@ -1013,3 +1013,4 @@ export default function Vault(props: Props) {
     return <h1>Loading Vault..</h1>;
   }
 }
+export { Vault };
