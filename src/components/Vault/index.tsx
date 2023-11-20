@@ -256,6 +256,8 @@ function Vault(props: Props) {
   function checkInputsAllowance(input: bigint[]) {
     const apprDepo = [];
     let change = false;
+    console.log(input);
+    console.log(lastKeyPress.key2);
 
     for (let i = 0; i < input.length; i++) {
       if (
@@ -263,11 +265,14 @@ function Vault(props: Props) {
         $assetsBalances &&
         input[i] > $assetsBalances[$assets[i]].assetBalance &&
         lastKeyPress.key2 !== ""
-      )
+      ) {
         setApprove(0);
-      change = true;
+        change = true;
+      }
     }
-    if (change === false) {
+    console.log(change);
+
+    if (change !== true) {
       for (let i = 0; i < input.length; i++) {
         if (
           allowance &&
@@ -279,7 +284,9 @@ function Vault(props: Props) {
         ) {
           apprDepo.push(1);
         } else {
-          apprDepo.push(2);
+          if (lastKeyPress.key2 !== "") {
+            apprDepo.push(2);
+          }
         }
       }
       const button = checkButtonApproveDeposit(apprDepo);

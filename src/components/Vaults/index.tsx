@@ -12,6 +12,7 @@ function Vaults() {
   const $vaults = useStore(vaults);
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
+  console.log($vaultData);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
@@ -64,7 +65,7 @@ function Vaults() {
     const searchValue: any = search?.current?.value.toLowerCase();
     let sortedVaults: any = localVaults;
 
-    sortedVaults = localVaults.filter((vault) =>
+    sortedVaults = localVaults.filter(vault =>
       vault.symbol.toLowerCase().includes(searchValue)
     );
     table.forEach((state: any) => {
@@ -146,8 +147,7 @@ function Vaults() {
             {filteredVaults.map((vault: TLocalVault) => (
               <tr
                 className="border-t border-[#4f5158] text-center text-[18px]"
-                key={vault.name}
-              >
+                key={vault.name}>
                 <td className="px-4 py-2 flex items-center justify-center gap-1">
                   <div className="flex max-w-[300px]">
                     <img
