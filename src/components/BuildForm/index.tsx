@@ -26,6 +26,7 @@ function BuildForm(props: Props) {
   const p = useStore(platformData);
   const balance = useStore(userBalance);
   const _publicClient = usePublicClient();
+  console.log(p);
 
   // todo implement using
   const canUsePermitToken = false;
@@ -163,7 +164,7 @@ function BuildForm(props: Props) {
                     props.initParams.initVaultAddresses[0],
                     ...props.defaultBoostTokens,
                   ]),
-                ].map((addresss) => {
+                ].map(addresss => {
                   return <span>{getTokenData(addresss)?.symbol}</span>;
                 })}
               </div>
@@ -177,11 +178,15 @@ function BuildForm(props: Props) {
           {needCheckAllowance &&
           allowance !== undefined &&
           allowance < props.buildingPrice ? (
-            <button className="btn btn-primary" onClick={approve}>
+            <button
+              className="btn btn-primary"
+              onClick={approve}>
               Approve factory to spend {payPerVaultToken?.symbol}
             </button>
           ) : (
-            <button className="btn btn-primary" onClick={deploy}>
+            <button
+              className="btn btn-primary"
+              onClick={deploy}>
               Deploy
             </button>
           )}

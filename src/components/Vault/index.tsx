@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits, parseUnits } from "viem";
 import { readContract } from "viem/actions";
+import { writeContract } from "@wagmi/core";
 
 import {
   useAccount,
@@ -102,6 +103,7 @@ function Vault(props: Props) {
   const [approveIndex, setApproveIndex] = useState<number | undefined>();
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
+  console.log(defaultOptionSymbols);
 
   useEffect(() => {
     async function getStrategy() {
@@ -179,12 +181,16 @@ function Vault(props: Props) {
           functionName: "allowance",
           args: [$account, vaultt],
         })) as bigint;
+        console.log(alw);
 
         if (!allowanceResult[option[i]]) {
           allowanceResult[option[i]] = { allowance: [] };
         }
         allowanceResult[option[i]].allowance.push(alw);
       }
+      console.log(allowanceResult);
+      console.log(allowance);
+
       setAllowance(allowanceResult);
     }
     checkAllowance();
@@ -256,8 +262,6 @@ function Vault(props: Props) {
   function checkInputsAllowance(input: bigint[]) {
     const apprDepo = [];
     let change = false;
-    console.log(input);
-    console.log(lastKeyPress.key2);
 
     for (let i = 0; i < input.length; i++) {
       if (
@@ -375,6 +379,43 @@ function Vault(props: Props) {
     }
   }
 
+  async function approvee(asset: `0x${string}`) {
+    if (vaultt) {
+      console.log(allowance);
+
+      const allowanceResult: Allowance = {};
+      const maxUni = getTokenData(asset)?.decimals as number;
+      const maxUnits = parseUnits("1", getTokenData(asset)?.decimals as number);
+      const r = await writeContract({
+        address: asset,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: [vaultt, maxUnits],
+      });
+      console.log(r);
+
+      const transaction = await _publicClient.waitForTransactionReceipt(r);
+
+      if (transaction.status === "success") {
+        console.log("d");
+
+        const newAllowance = (await readContract(_publicClient, {
+          address: asset,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account, vaultt],
+        })) as bigint;
+
+        setAllowance(prevAllowance => ({
+          ...prevAllowance,
+          [asset]: {
+            allowance: [newAllowance],
+          },
+        }));
+      }
+    }
+  }
+
   if (props.vault && $vault[props.vault]) {
     return (
       <>
@@ -449,7 +490,7 @@ function Vault(props: Props) {
               justifyContent: "center",
               alignItems: "center",
               marginBottom: "18px",
-              height: "520px",
+              height: "auto",
             }}>
             <div
               style={{
@@ -750,7 +791,6 @@ function Vault(props: Props) {
               approve === 1 ? (
                 <button
                   type="button"
-                  onClick={() => setApproveIndex(1)}
                   style={{
                     margin: "auto",
                     fontSize: "35px",
@@ -763,21 +803,27 @@ function Vault(props: Props) {
                   Deposit
                 </button>
               ) : approve === 2 ? (
-                <button
-                  type="button"
-                  onClick={() => setApproveIndex(1)}
-                  disabled
-                  style={{
-                    margin: "auto",
-                    fontSize: "35px",
-                    width: "100%",
-                    height: "60px",
-                    cursor: "pointer",
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                  }}>
-                  Approve
-                </button>
+                <>
+                  {option.map(asset => (
+                    <button
+                      key={asset}
+                      type="button"
+                      onClick={() => approvee(asset as `0x${string}`)}
+                      style={{
+                        margin: "auto",
+                        fontSize: "35px",
+                        width: "100%",
+                        height: "60px",
+                        cursor: "pointer",
+                        borderStyle: "solid",
+                        borderWidth: "1px",
+                        marginTop: "5px",
+                        marginBottom: "5px",
+                      }}>
+                      Approve {getTokenData(asset)?.symbol}
+                    </button>
+                  ))}
+                </>
               ) : approve === 0 ? (
                 <div
                   style={{

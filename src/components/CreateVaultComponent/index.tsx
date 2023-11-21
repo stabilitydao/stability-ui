@@ -135,7 +135,7 @@ function CreateVaultComponent() {
   }, [_publicClient, p?.factory, lastTx.get()]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
-    (v) => v.vaultType === "Compounding"
+    v => v.vaultType === "Compounding"
   ).length;
 
   return (
@@ -164,8 +164,7 @@ function CreateVaultComponent() {
                         className="btn create-btn"
                         onClick={() => {
                           setBuildIndex(i);
-                        }}
-                      >
+                        }}>
                         Assemble
                       </button>
                     ) : (
@@ -195,11 +194,13 @@ function CreateVaultComponent() {
             For allowed buy-back tokens, the following number of rewarding
             vaults can be created:
             <div>
-              {Object.keys(allowedBBTokenVaults).map((t) => {
+              {Object.keys(allowedBBTokenVaults).map(t => {
                 const token = getTokenData(t);
 
                 return (
-                  <div key={t} className="allowed-bb-row">
+                  <div
+                    key={t}
+                    className="allowed-bb-row">
                     <span>
                       {token ? (
                         <img
@@ -253,8 +254,7 @@ function CreateVaultComponent() {
                       className="btn create-btn"
                       onClick={() => {
                         setBuildIndex(i);
-                      }}
-                    >
+                      }}>
                       Assemble
                     </button>
                   ) : (
@@ -287,15 +287,13 @@ function CreateVaultComponent() {
           className="overlay"
           onClick={() => {
             setBuildIndex(undefined);
-          }}
-        >
+          }}>
           <div
             className="modal"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               e.stopPropagation();
-            }}
-          >
+            }}>
             <div className="modal-title">Assembling</div>
             <BuildForm
               vaultType={buildVariants[buildIndex].vaultType}
