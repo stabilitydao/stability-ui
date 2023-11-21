@@ -103,7 +103,7 @@ function Vault(props: Props) {
   const [approveIndex, setApproveIndex] = useState<number | undefined>();
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
-  console.log(defaultOptionSymbols);
+  console.log(allowance);
 
   useEffect(() => {
     async function getStrategy() {
@@ -819,6 +819,10 @@ function Vault(props: Props) {
                         borderWidth: "1px",
                         marginTop: "5px",
                         marginBottom: "5px",
+                        display:
+                          allowance && allowance[asset].allowance > 0
+                            ? "none"
+                            : "block",
                       }}>
                       Approve {getTokenData(asset)?.symbol}
                     </button>
