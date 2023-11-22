@@ -1,7 +1,7 @@
-import type { TokenData } from "./types";
-import tokenlist from "./stability.tokenlist.json";
+import type { TTokenData } from "@types";
+import tokenlist from "../../stability.tokenlist.json";
 
-export function getTokenData(address: string): TokenData | undefined {
+export function getTokenData(address: string): TTokenData | undefined {
   for (const token of tokenlist.tokens) {
     if (token.address.toLowerCase() === address.toLowerCase()) {
       return {

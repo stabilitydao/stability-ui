@@ -2,21 +2,20 @@ import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { PlatformABI, FactoryABI } from "@web3";
+import { platform, PlatformABI, FactoryABI } from "@web3";
 import { platformData, publicClient, lastTx } from "@store";
 
 import { BuildForm } from "../BuildForm";
 
-import { platform } from "../../constants";
-import type { InitParams, AllowedBBTokenVaults } from "../../types";
-import { getTokenData } from "../../utils";
+import type { TInitParams, TAllowedBBTokenVaults } from "@types";
+import { getTokenData } from "@utils";
 
 type BuildVariant = {
   vaultType: string;
   strategyId: string;
   strategyDesc: string;
   canBuild: boolean;
-  initParams: InitParams;
+  initParams: TInitParams;
 };
 
 function CreateVaultComponent() {
@@ -25,7 +24,7 @@ function CreateVaultComponent() {
   const [buildVariants, setBuildVariants] = useState<BuildVariant[]>([]);
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
   const [allowedBBTokenVaults, setAllowedBBTokenVaults] = useState<
-    AllowedBBTokenVaults | undefined
+    TAllowedBBTokenVaults | undefined
   >();
   const [minInitialBoostPerDay, setMinInitialBoostPerDay] = useState<
     bigint | undefined
@@ -46,7 +45,7 @@ function CreateVaultComponent() {
         });
         if (Array.isArray(wtb)) {
           for (let i = 0; i < wtb[1].length; i++) {
-            const initParams: InitParams = {
+            const initParams: TInitParams = {
               initVaultAddresses: [],
               initVaultNums: [],
               initStrategyAddresses: [],
@@ -97,7 +96,7 @@ function CreateVaultComponent() {
         });
 
         if (r && Array.isArray(r)) {
-          const allowedBBTokenVaults_: AllowedBBTokenVaults = {};
+          const allowedBBTokenVaults_: TAllowedBBTokenVaults = {};
           for (let k = 0; k < r[0].length; ++k) {
             allowedBBTokenVaults_[r[0][k]] = Number(r[1][k]);
           }

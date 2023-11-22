@@ -22,7 +22,7 @@ import {
 
 import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
 import tokensJson from "../../stability.tokenlist.json";
-import type { Token, assetPrices } from "../../types";
+import type { TToken, TAssetPrices } from "@types";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -39,7 +39,7 @@ type AssetAllowance = {
 export function addAssetsPrice(data: any) {
   const tokenAdress = data[0];
   const tokenPrice = data[1];
-  const assetPrice: assetPrices = {};
+  const assetPrice: TAssetPrices = {};
   if (tokenAdress.length === tokenPrice.length) {
     for (let i = 0; i < tokenAdress.length; i++) {
       assetPrice[tokenAdress[i]] = {
@@ -862,7 +862,7 @@ function Vault(props: Props) {
           </h2>
           {$assets &&
             $assets.map((asset) => {
-              const assetData: Token | undefined = tokensJson.tokens.find(
+              const assetData: TToken | undefined = tokensJson.tokens.find(
                 (token) => token.address === asset
               );
 

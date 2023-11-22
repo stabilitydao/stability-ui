@@ -1,4 +1,4 @@
-export type PlatformData = {
+type TPlatformData = {
   platform: `0x${string}`;
   factory: `0x${string}`;
   buildingPermitToken: `0x${string}`;
@@ -6,13 +6,13 @@ export type PlatformData = {
   buildingPrices: { [vaultType: string]: bigint };
 };
 
-export type UserBalance = {
+type TUserBalance = {
   buildingPayPerVaultTokenBalance: bigint;
   erc20Balance: { [token: string]: bigint };
   erc721Balance: { [token: string]: bigint };
 };
 
-export type InitParams = {
+type TInitParams = {
   initVaultAddresses: string[];
   initVaultNums: bigint[];
   initStrategyAddresses: string[];
@@ -20,11 +20,11 @@ export type InitParams = {
   initStrategyTicks: number[];
 };
 
-export type AllowedBBTokenVaults = {
+type TAllowedBBTokenVaults = {
   [token: string]: number;
 };
 
-export type TokenData = {
+type TTokenData = {
   address: string;
   name: string;
   symbol: string;
@@ -35,16 +35,16 @@ export type TokenData = {
 
 //New types
 
-export type Vaults = {
-  [vaultAddress: string]: VaultData;
+type TVaults = {
+  [vaultAddress: string]: TVaultData;
 };
 
-export type VaultData = {
+type TVaultData = {
   vaultSharePrice: bigint;
   vaultUserBalance: bigint;
 };
 
-export type Token = {
+type TToken = {
   chainId: number;
   address: string;
   symbol: string;
@@ -54,20 +54,20 @@ export type Token = {
   tags?: string[];
 };
 
-export type assetPrices = {
+type TAssetPrices = {
   [address: string]: {
     tokenPrice: bigint;
   };
 };
 
-export type Balances = {
-  [balance: string]: AssetBalance;
+type TBalances = {
+  [balance: string]: TAssetBalance;
 };
 
-export type AssetBalance = {
+type TAssetBalance = {
   assetBalance: bigint;
 };
-export type TLocalVault = {
+type TLocalVault = {
   name: string;
   assets: { logo: string; symbol: string }[];
   symbol: string;
@@ -77,5 +77,40 @@ export type TLocalVault = {
   shareprice: string;
   tvl: string;
   apr: string;
+  strategyApr: string;
+  address: string;
 };
-export type TVaultAssets = [string, string];
+type TVaultAssets = [string, string];
+
+type TTableColumn = {
+  name: string;
+  keyName: string;
+  sortType: string;
+  dataType: string;
+};
+type TAPRModal = {
+  apr: string;
+  assetsWithApr: string;
+  assetsAprs: any;
+  lastHardWork: number;
+  strategyApr: number;
+  state: boolean;
+};
+
+export type {
+  TPlatformData,
+  TUserBalance,
+  TInitParams,
+  TAllowedBBTokenVaults,
+  TTokenData,
+  TVaults,
+  TVaultData,
+  TToken,
+  TAssetPrices,
+  TBalances,
+  TAssetBalance,
+  TLocalVault,
+  TVaultAssets,
+  TTableColumn,
+  TAPRModal,
+};

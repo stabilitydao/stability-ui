@@ -4,9 +4,7 @@ import { WagmiConfig } from "wagmi";
 
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { AppStore } from "@components";
-import { wagmiConfig, chains } from "@web3";
-
-import { walletConnectProjectId } from "../constants";
+import { walletConnectProjectId, wagmiConfig, chains } from "@web3";
 
 createWeb3Modal({ wagmiConfig, projectId: walletConnectProjectId, chains });
 

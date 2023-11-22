@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect } from "react";
+import { parseUnits } from "viem";
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -18,15 +19,19 @@ import {
   addVaultData,
   vaults,
   vaultAssets,
+  isVaultsLoaded,
 } from "@store";
-import { platform } from "../../constants";
-import { PlatformABI, IVaultManagerABI } from "@web3";
+import {
+  platform,
+  PlatformABI,
+  IVaultManagerABI,
+  ERC20MetadataUpgradeableABI,
+} from "@web3";
 
 const AppStore = (props: React.PropsWithChildren) => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
-
   const getData = async () => {
     if (address && chain?.id) {
       const contractData = await readContract(_publicClient, {
@@ -62,7 +67,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
         const erc20Balance: { [token: string]: bigint } = {};
         const erc721Balance: { [token: string]: bigint } = {};
-        console.log(contractBalance);
+
         //function -> .set vault/
         addVaultData(contractBalance);
         addAssetsPrice(contractBalance);
@@ -90,6 +95,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: IVaultManagerABI,
         functionName: "vaults",
       });
+
       const assets: any[] = await Promise.all(
         contractVaults[0].map(async (vault: string) => {
           const response: any = await readContract(_publicClient, {
@@ -98,10 +104,27 @@ const AppStore = (props: React.PropsWithChildren) => {
             functionName: "vaultInfo",
             args: [vault],
           });
-          return response[1];
+          return response;
+        })
+      );
+      const symbols: any[] = await Promise.all(
+        assets.map(async (asset, index) => {
+          const firstAsset: any = await readContract(_publicClient, {
+            address: asset[3][0],
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "symbol",
+          });
+          const secondAsset: any = await readContract(_publicClient, {
+            address: asset[3][1],
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "symbol",
+          });
+
+          assets[index][3] = [firstAsset, secondAsset];
         })
       );
 
+      isVaultsLoaded.set(true);
       if (contractVaults) {
         vaults.set(contractVaults);
       }

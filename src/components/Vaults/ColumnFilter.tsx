@@ -1,15 +1,10 @@
-type TableColumn = {
-  name: string;
-  keyName: string;
-  sortType: string;
-  dataType: string;
-};
+import type { TTableColumn } from "@types";
 
 type TProps = {
   index: number;
   value: string;
-  table: TableColumn[];
-  filter: (table: TableColumn[]) => void;
+  table: TTableColumn[];
+  filter: (table: TTableColumn[]) => void;
 };
 
 const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
@@ -30,7 +25,7 @@ const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
         break;
     }
 
-    const updatedTable: any = table.map((column: TableColumn, i: number) => {
+    const updatedTable: any = table.map((column: TTableColumn, i: number) => {
       if (index === i) {
         return { ...column, sortType: nextCase };
       } else {
