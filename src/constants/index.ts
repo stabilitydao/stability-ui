@@ -1,11 +1,18 @@
 const TABLE = [
   { name: "Name", keyName: "name", sortType: "none", dataType: "string" },
-  { name: "Type", keyName: "type", sortType: "none", dataType: "string" },
+  {
+    name: "Type", 
+    keyName: "type",
+    sortType: "none",
+    dataType: "string",
+    cssAdd: "hidden lg:table-cell",
+  },
   {
     name: "Strategy",
     keyName: "strategy",
     sortType: "none",
     dataType: "string",
+    cssAdd: "hidden md:table-cell",
   },
   {
     name: "Balance",
@@ -14,7 +21,7 @@ const TABLE = [
     dataType: "number",
   },
   {
-    name: "Share Price",
+    name: "Price",
     keyName: "shareprice",
     sortType: "none",
     dataType: "number",

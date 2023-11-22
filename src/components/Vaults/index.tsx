@@ -126,12 +126,13 @@ function Vaults() {
       setFilteredVaults(vaults);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
+  
   if (localVaults?.length) {
     return (
       <>
         <input
           type="text"
-          className="w-full bg-[#2c2f38] outline-none pl-3 py-3 rounded-[4px] border-[2px] border-[#3d404b]  focus:border-[#9baab4] transition-all duration-300"
+          className="w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
           placeholder="Search"
           ref={search}
           onChange={() => tableFilter(tableStates)}
@@ -146,6 +147,7 @@ function Vaults() {
                   value={value.name}
                   table={tableStates}
                   filter={tableFilter}
+                  cssAdd={value.cssAdd}
                 />
               ))}
             </tr>
@@ -153,47 +155,48 @@ function Vaults() {
           <tbody>
             {currentTabVaults.map((vault: TLocalVault, index: number) => (
               <tr
-                className="border-t border-[#4f5158] text-center text-[18px] transition delay-[40ms] hover:bg-[#3d404b] cursor-pointer"
+                className="border-t border-[#4f5158] text-center text-[15px] transition delay-[40ms] hover:bg-[#3d404b] cursor-pointer"
                 key={vault.name}
                 onClick={() => toVault(vault.address)}
               >
-                <td className="px-4 py-2 flex items-center justify-center gap-1">
-                  <div className="flex max-w-[300px]">
+                <td className="px-2 lg:px-4 py-2 lg:py-3 flex items-center justify-start">
+                  <div className="md:min-w-[50px] hidden md:flex">
                     <img
-                      className="w-8 h-8 rounded-full"
+                      className="w-6 h-6 rounded-full"
                       src={vault.assets[0].logo}
                       alt={vault.assets[0].symbol}
                     />
                     <img
-                      className="w-8 h-8 rounded-full ml-[-12px]"
+                      className="w-6 h-6 rounded-full ml-[-12px]"
                       src={vault.assets[1].logo}
                       alt={vault.assets[1].symbol}
                     />
                   </div>
-                  <div className="max-w-[250px]">
-                    <p>{vault.name}</p>
-                    <p>{vault.symbol}</p>
+                  <div className="max-w-[250px] flex items-start flex-col">
+                  <p className="md:whitespace-nowrap font-bold">{vault.symbol}</p>
+                  <p className="lg:hidden">{vault.type}</p>
+                  <p className="md:hidden">{getStrategyShortName(vault.symbol)}</p>
                   </div>
                 </td>
 
-                <td className="px-4 py-2">{vault.type}</td>
-                <td className="max-w-[150px] px-4 py-2">
+                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">{vault.type}</td>
+                <td className="max-w-[150px] px-4 py-2 hidden md:table-cell whitespace-nowrap">
                   {getStrategyShortName(vault.symbol)}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 lg:px-4 py-2">
                   {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
                 </td>
 
-                <td className="px-4 py-2">
+                <td className="px-2 lg:px-4 py-2">
                   ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 lg:px-4 py-2">
                   {formatNumber(
                     formatFromBigInt(vault.tvl, 18, "withFloor"),
                     "abbreviate"
                   )}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 lg:px-4 py-2">
                   <div className="flex">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -232,18 +235,13 @@ function Vaults() {
           tab={currentTab}
           setTab={setCurrentTab}
         />
-        <a href="/create-vault">
-          <button className="bg-[#2c2f38] px-3 py-2 rounded-md mt-3">
-            Create vault
-          </button>
-        </a>
         {aprModal.state && (
           <APRModal state={aprModal} setModalState={setAprModal} />
         )}
       </>
     );
   }
-  return <div>Loading...</div>;
+  return <div>No vaults</div>;
 }
 
 export { Vaults };
