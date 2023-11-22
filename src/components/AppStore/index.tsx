@@ -96,7 +96,17 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "vaults",
       });
 
-      const assets: any[] = await Promise.all(
+      /// debug visual
+      // if (contractVaults?.length) {
+      //   console.log('contractVaults', contractVaults)
+      //   contractVaults[5][0] = parseUnits('1.09343432', 18)
+      //   contractVaults[6][0] = parseUnits('814658.09343432', 18)
+      //   contractVaults[7][0] = parseUnits('24.682', 16)
+      //   contractVaults[8][0] = parseUnits('16.157', 16)
+      // }
+      ///////////////////////
+
+      const vaultInfoes: any[] = await Promise.all(
         contractVaults[0].map(async (vault: string) => {
           const response: any = await readContract(_publicClient, {
             address: contractBalance[6][1],
@@ -107,29 +117,43 @@ const AppStore = (props: React.PropsWithChildren) => {
           return response;
         })
       );
-      const symbols: any[] = await Promise.all(
-        assets.map(async (asset, index) => {
-          const firstAsset: any = await readContract(_publicClient, {
-            address: asset[3][0],
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "symbol",
-          });
-          const secondAsset: any = await readContract(_publicClient, {
-            address: asset[3][1],
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "symbol",
-          });
 
-          assets[index][3] = [firstAsset, secondAsset];
-        })
-      );
+      /// debug visual
+      // if (vaultInfoes?.length) {
+      //   console.log('vaultInfo', vaultInfoes[0])
+      //   vaultInfoes[0][3] = [
+      //     '0x45A3A657b834699f5cC902e796c547F826703b79',
+      //     '0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4',
+      //   ]
+      //   vaultInfoes[0][4] = [
+      //     parseUnits('9.6572445545', 16),
+      //     parseUnits('3.5355231352413', 16)
+      //   ]
+      //   vaultInfoes[0][5] = BigInt(1700574478)
+      //   console.log('vaultInfo test', vaultInfoes[0])
+      // }
+      ///////////////////////
+
+      vaultInfoes.forEach(async (vaultInfo, index) => {
+        if (vaultInfo[3]?.length) {
+          for (let i = 0; i < vaultInfo[3]?.length; i++) {
+            const assetWithApr = vaultInfo[3][i]
+            const symbol = await readContract(_publicClient, {
+              address: assetWithApr,
+              abi: ERC20MetadataUpgradeableABI,
+              functionName: "symbol",
+            })
+            vaultInfoes[index][3][i] = symbol
+          }
+        }
+      })
 
       isVaultsLoaded.set(true);
       if (contractVaults) {
         vaults.set(contractVaults);
       }
-      if (assets) {
-        vaultAssets.set(assets);
+      if (vaultInfoes) {
+        vaultAssets.set(vaultInfoes);
       }
     }
   };

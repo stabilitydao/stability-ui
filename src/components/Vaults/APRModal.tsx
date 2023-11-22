@@ -26,8 +26,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const APR = formatFromBigInt(state.apr, 16, "withDecimals").toFixed(2);
   const APY = calculateAPY(APR).toFixed(2);
   const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
-  const firstAssetAPR = formatFromBigInt(state.assetsAprs[0], 16).toFixed(2);
-  const secondAssetAPR = formatFromBigInt(state.assetsAprs[1], 16).toFixed(2);
+  const assetAprs = state.assetsAprs.map((a: string) => formatFromBigInt(a, 16).toFixed(2))
 
   const timeDifference = getTimeDifference(state.lastHardWork);
 
@@ -118,6 +117,27 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         </svg>
 
         <div className="p-10 flex items-start flex-col gap-4">
+          <p className="text-[18px] leading-[22px]">
+            The Annual Percentage Rate (APR) for the Vault is equal to the sum
+            of the Strategy APR and Underlying APRs
+          </p>
+
+          <div className="text-[16px]">
+            <p className="font-bold">
+              Total APR {APR}% ({APY}% APY)
+            </p>
+            <p>Strategy APR {strategyAPR}%</p>
+            <div>
+            {assetAprs.map((apr: string, index: number) => {
+              return (
+                <p>
+                  {state.assetsWithApr[index]} APR {apr}%
+                </p>
+              )
+            })}
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
             <p className="text-[16px]">Last Hard Work :</p>
             {timeDifference.days ? (
@@ -138,22 +158,8 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               </div>
             )}
           </div>
-          <div className="text-[16px]">
-            <p>
-              Total APR {APR}% ({APY}% APY)
-            </p>
-            <p>Strategy APR {strategyAPR}%</p>
-            <p>
-              {state.assetsWithApr[0]} APR {firstAssetAPR}%
-            </p>
-            <p>
-              {state.assetsWithApr[1]} APR {secondAssetAPR}%
-            </p>
-          </div>
-          <p className="text-[18px] leading-[22px] mb-[30px] text-center">
-            The Annual Percentage Rate (APR) for the Vault is equal to the sum
-            of the Strategy APR and Underlying APRs
-          </p>
+          
+
         </div>
       </div>
     </div>

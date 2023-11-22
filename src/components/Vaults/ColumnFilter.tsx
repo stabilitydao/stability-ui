@@ -5,9 +5,10 @@ type TProps = {
   value: string;
   table: TTableColumn[];
   filter: (table: TTableColumn[]) => void;
+  cssAdd?: string;
 };
 
-const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
+const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter, cssAdd }) => {
   const tabController = () => {
     let nextCase: string = "";
 
@@ -38,7 +39,7 @@ const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
   return (
     <th
       onClick={tabController}
-      className="px-4 py-2 text-center cursor-pointer"
+      className={`px-0 md:px-2 lg:px-4 py-2 text-center cursor-pointer ${cssAdd}`}
     >
       <p className="inline-block">{value}</p>
       <svg
@@ -47,7 +48,7 @@ const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
         height="7"
         viewBox="0 0 12 7"
         fill="none"
-        className={`inline-block ml-[10px] transition duration-300 ease-in-out ${
+        className={`inline-block ml-[3px] md:ml-[6px] lg:ml-[10px] transition duration-300 ease-in-out ${
           table[index].sortType === "ascendentic" && "rotate-[180deg]"
         }`}
       >
