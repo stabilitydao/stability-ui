@@ -22,5 +22,6 @@ const TABLE = [
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
   { name: "APR", keyName: "apr", sortType: "none", dataType: "number" },
 ];
+const PAGINATION_VAULTS = 20;
 
-export { TABLE };
+export { TABLE, PAGINATION_VAULTS };

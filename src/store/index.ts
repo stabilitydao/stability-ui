@@ -23,6 +23,7 @@ const vaultData = atom<TVaults>({});
 
 const vaults = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();
+const isVaultsLoaded = atom<boolean>(false);
 
 //Assets balances
 const addAssetBalance = (r: any[]) => {
@@ -78,4 +79,5 @@ export {
   addAssetBalance,
   addVaultData,
   vaultAssets,
+  isVaultsLoaded,
 };

@@ -7,7 +7,7 @@ import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { EIP6963Connector } from "@web3modal/wagmi";
 
 import ERC20ABI from "./abi/ERC20ABI.json";
-import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableAbi.json";
+import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.json";
 import FactoryABI from "./abi/FactoryABI.json";
 import IVaultManagerABI from "./abi/IVaultManagerABI.json";
 import PlatformABI from "./abi/PlatformABI.json";

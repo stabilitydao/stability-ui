@@ -77,6 +77,8 @@ type TLocalVault = {
   shareprice: string;
   tvl: string;
   apr: string;
+  strategyApr: string;
+  address: string;
 };
 type TVaultAssets = [string, string];
 
@@ -85,6 +87,14 @@ type TTableColumn = {
   keyName: string;
   sortType: string;
   dataType: string;
+};
+type TAPRModal = {
+  apr: string;
+  assetsWithApr: string;
+  assetsAprs: any;
+  lastHardWork: number;
+  strategyApr: number;
+  state: boolean;
 };
 
 export type {
@@ -102,4 +112,5 @@ export type {
   TLocalVault,
   TVaultAssets,
   TTableColumn,
+  TAPRModal,
 };

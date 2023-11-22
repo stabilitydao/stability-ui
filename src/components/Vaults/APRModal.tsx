@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 
+import { calculateAPY, formatFromBigInt, getTimeDifference } from "@utils";
+import type { TAPRModal } from "@types";
+
 interface IProps {
-  state: { name: string; state: boolean };
-  setModalState: React.Dispatch<
-    React.SetStateAction<{ name: string; state: boolean }>
-  >;
+  state: TAPRModal;
+  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
 const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
@@ -12,9 +13,24 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
-      setModalState({ name: "", state: false });
+      setModalState({
+        apr: "",
+        assetsWithApr: "",
+        assetsAprs: "",
+        lastHardWork: 0,
+        strategyApr: 0,
+        state: false,
+      });
     }
   };
+  const APR = formatFromBigInt(state.apr, 16, "withDecimals").toFixed(2);
+  const APY = calculateAPY(APR).toFixed(2);
+  const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
+  const firstAssetAPR = formatFromBigInt(state.assetsAprs[0], 16).toFixed(2);
+  const secondAssetAPR = formatFromBigInt(state.assetsAprs[1], 16).toFixed(2);
+
+  const timeDifference = getTimeDifference(state.lastHardWork);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     document.addEventListener("mousedown", handleClickOutside);
@@ -33,7 +49,14 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       >
         <svg
           onClick={() => {
-            setModalState({ name: "", state: false });
+            setModalState({
+              apr: "",
+              assetsWithApr: "",
+              assetsAprs: "",
+              lastHardWork: 0,
+              strategyApr: 0,
+              state: false,
+            });
           }}
           className="absolute right-5 top-5 cursor-pointer"
           xmlns="http://www.w3.org/2000/svg"
@@ -94,9 +117,42 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           </defs>
         </svg>
 
-        <div className="p-10 flex items-center flex-col">
-          <p className="inter-normal text-[20px] leading-[22px] mb-[30px]">
-            TVL:{state.name}
+        <div className="p-10 flex items-start flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <p className="text-[16px]">Last Hard Work :</p>
+            {timeDifference.days ? (
+              <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                {timeDifference.days}
+                {timeDifference.days > 1 ? "days" : "day"}{" "}
+                {timeDifference.hours}h ago
+              </div>
+            ) : (
+              <div
+                className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${
+                  timeDifference.hours > 4
+                    ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
+                    : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                }`}
+              >
+                {timeDifference.hours}h ago
+              </div>
+            )}
+          </div>
+          <div className="text-[16px]">
+            <p>
+              Total APR {APR}% ({APY}% APY)
+            </p>
+            <p>Strategy APR {strategyAPR}%</p>
+            <p>
+              {state.assetsWithApr[0]} APR {firstAssetAPR}%
+            </p>
+            <p>
+              {state.assetsWithApr[1]} APR {secondAssetAPR}%
+            </p>
+          </div>
+          <p className="text-[18px] leading-[22px] mb-[30px] text-center">
+            The Annual Percentage Rate (APR) for the Vault is equal to the sum
+            of the Strategy APR and Underlying APRs
           </p>
         </div>
       </div>

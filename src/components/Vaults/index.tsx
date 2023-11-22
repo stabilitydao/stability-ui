@@ -2,12 +2,18 @@ import { useState, useEffect, useRef } from "react";
 
 import { APRModal } from "./APRModal";
 import { ColumnFilter } from "./ColumnFilter";
+import { Pagination } from "./Pagination";
 
 import { useStore } from "@nanostores/react";
 import { vaultData, vaults, vaultAssets } from "@store";
 
-import { getTokenData } from "@utils";
-import { TABLE } from "@constants";
+import {
+  getTokenData,
+  formatNumber,
+  getStrategyShortName,
+  formatFromBigInt,
+} from "@utils";
+import { TABLE, PAGINATION_VAULTS } from "@constants";
 import type { TLocalVault } from "@types";
 
 function Vaults() {
@@ -17,11 +23,28 @@ function Vaults() {
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
-  const [aprModal, setAprModal] = useState({ name: "", state: false });
+  const [aprModal, setAprModal] = useState({
+    apr: "",
+    assetsWithApr: "",
+    assetsAprs: "",
+    lastHardWork: 0,
+    strategyApr: 0,
+    state: false,
+  });
+
+  const [currentTab, setCurrentTab] = useState(1);
+
+  const lastTabIndex = currentTab * PAGINATION_VAULTS;
+  const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
+  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   const [tableStates, setTableStates] = useState(TABLE);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
+
+  const toVault = (adress: string) => {
+    window.location.href = `/vault/${adress}`;
+  };
 
   const compareHandler = (
     a: any,
@@ -74,8 +97,9 @@ function Vaults() {
         .map((_: any, index: number) => {
           let assets;
           if ($vaultAssets.length) {
-            const token1 = getTokenData($vaultAssets[index][0]);
-            const token2 = getTokenData($vaultAssets[index][1]);
+            const token1 = getTokenData($vaultAssets[index][1][0]);
+            const token2 = getTokenData($vaultAssets[index][1][1]);
+
             assets = [
               { logo: token1?.logoURI, symbol: token1?.symbol },
               { logo: token2?.logoURI, symbol: token2?.symbol },
@@ -92,6 +116,8 @@ function Vaults() {
             shareprice: String($vaults[5][index]),
             tvl: String($vaults[6][index]),
             apr: String($vaults[7][index]),
+            strategyApr: $vaults[8][index],
+            address: $vaults[0][index],
           };
         })
         .sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
@@ -100,7 +126,6 @@ function Vaults() {
       setFilteredVaults(vaults);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
-
   if (localVaults?.length) {
     return (
       <>
@@ -111,8 +136,8 @@ function Vaults() {
           ref={search}
           onChange={() => tableFilter(tableStates)}
         />
-        <table className="table-auto w-full rounded-lg bg-[#2c2f38] mt-5">
-          <thead className="select-none">
+        <table className="table-auto w-full rounded-lg bg-[#2c2f38] mt-5 select-none">
+          <thead>
             <tr className="text-[18px]">
               {tableStates.map((value: any, index: number) => (
                 <ColumnFilter
@@ -126,10 +151,11 @@ function Vaults() {
             </tr>
           </thead>
           <tbody>
-            {filteredVaults.map((vault: TLocalVault) => (
+            {currentTabVaults.map((vault: TLocalVault, index: number) => (
               <tr
-                className="border-t border-[#4f5158] text-center text-[18px]"
+                className="border-t border-[#4f5158] text-center text-[18px] transition delay-[40ms] hover:bg-[#3d404b] cursor-pointer"
                 key={vault.name}
+                onClick={() => toVault(vault.address)}
               >
                 <td className="px-4 py-2 flex items-center justify-center gap-1">
                   <div className="flex max-w-[300px]">
@@ -151,10 +177,22 @@ function Vaults() {
                 </td>
 
                 <td className="px-4 py-2">{vault.type}</td>
-                <td className="max-w-[150px] px-4 py-2">{vault.strategy}</td>
-                <td className="px-4 py-2">{vault.balance}</td>
-                <td className="px-4 py-2">{vault.shareprice}</td>
-                <td className="px-4 py-2">{vault.tvl}</td>
+                <td className="max-w-[150px] px-4 py-2">
+                  {getStrategyShortName(vault.symbol)}
+                </td>
+                <td className="px-4 py-2">
+                  {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
+                </td>
+
+                <td className="px-4 py-2">
+                  ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+                </td>
+                <td className="px-4 py-2">
+                  {formatNumber(
+                    formatFromBigInt(vault.tvl, 18, "withFloor"),
+                    "abbreviate"
+                  )}
+                </td>
                 <td className="px-4 py-2">
                   <div className="flex">
                     <svg
@@ -163,10 +201,18 @@ function Vaults() {
                       height="16"
                       viewBox="0 0 16 16"
                       fill="none"
-                      className="mt-[6px] mr-1 cursor-pointer"
-                      onClick={() =>
-                        setAprModal({ name: vault.name, state: true })
-                      }
+                      className="mt-[6px] mr-1 cursor-pointer opacity-20 hover:opacity-100 transition delay-[40ms]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAprModal({
+                          apr: vault.apr,
+                          assetsWithApr: $vaultAssets[index][3],
+                          assetsAprs: $vaultAssets[index][4],
+                          lastHardWork: $vaultAssets[index][5],
+                          strategyApr: Number(vault.strategyApr),
+                          state: true,
+                        });
+                      }}
                     >
                       <circle cx="8" cy="8" r="7.5" stroke="white" />
                       <path
@@ -174,20 +220,30 @@ function Vaults() {
                         fill="white"
                       />
                     </svg>
-                    <p>{vault.apr}</p>
+                    <p>{formatFromBigInt(vault.apr, 16, "withDecimals")}%</p>
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <Pagination
+          vaults={filteredVaults}
+          tab={currentTab}
+          setTab={setCurrentTab}
+        />
+        <a href="/create-vault">
+          <button className="bg-[#2c2f38] px-3 py-2 rounded-md mt-3">
+            Create vault
+          </button>
+        </a>
         {aprModal.state && (
           <APRModal state={aprModal} setModalState={setAprModal} />
         )}
       </>
     );
   }
-  return <h1>Loading Vaults..</h1>;
+  return <div>Loading...</div>;
 }
 
 export { Vaults };
