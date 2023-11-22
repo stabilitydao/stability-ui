@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 
 import { calculateAPY, formatFromBigInt, getTimeDifference } from "@utils";
 import type { TAPRModal } from "@types";
-import type { bigint } from "astro/zod";
 
 interface IProps {
   state: TAPRModal;
@@ -10,8 +9,6 @@ interface IProps {
 }
 
 const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
-  console.log('start')
-  console.log('state', state)
   const modalRef: any = useRef(null);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
@@ -30,9 +27,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const APY = calculateAPY(APR).toFixed(2);
   const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
   const assetAprs = state.assetsAprs.map((a: string) => formatFromBigInt(a, 16).toFixed(2))
-  console.log('assetAprs', assetAprs)
-  // const firstAssetAPR = formatFromBigInt(state.assetsAprs[0], 16).toFixed(2);
-  // const secondAssetAPR = formatFromBigInt(state.assetsAprs[1], 16).toFixed(2);
 
   const timeDifference = getTimeDifference(state.lastHardWork);
 
@@ -45,8 +39,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-// console.log('state', state)
-// return (<></>)
   return (
     <div>
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>

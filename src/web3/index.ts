@@ -14,7 +14,9 @@ import PlatformABI from "./abi/PlatformABI.json";
 import StrategyABI from "./abi/StrategyABI.json";
 import VaultABI from "./abi/VaultABI.json";
 
+// address of platform proxy deplpyed by default foundry private key
 const platform = "0x8Bf18e85B2FB7B050343AB2560E497b3Df18a59c";
+
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
 const metadata = {
