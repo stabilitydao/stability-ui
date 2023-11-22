@@ -80,6 +80,7 @@ function BuildForm(props: Props) {
       }
     }
   }
+  console.log(p);
 
   async function approve() {
     if (p) {

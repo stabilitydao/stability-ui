@@ -100,10 +100,9 @@ function Vault(props: Props) {
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
-  const [approveIndex, setApproveIndex] = useState<number | undefined>();
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
-  console.log(allowance);
+  console.log(inputsPreviewDeposit);
 
   useEffect(() => {
     async function getStrategy() {
@@ -201,7 +200,6 @@ function Vault(props: Props) {
     async function previewDeposit() {
       if ($assets && lastKeyPress.key1) {
         const changedInput = $assets?.indexOf(lastKeyPress.key1);
-
         const preview: input = {};
 
         if ($assets && $assets.length > 0) {
@@ -226,6 +224,7 @@ function Vault(props: Props) {
                 }
               )) as (bigint | bigint[])[];
               checkInputsAllowance(t[0] as bigint[]);
+              console.log(t);
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
@@ -249,12 +248,14 @@ function Vault(props: Props) {
                 "Error: the asset balance is too low to convert.",
                 error
               );
+
               resetInputs(option);
               setApprove(undefined);
             }
           }
         }
       }
+      console.log(inputs);
     }
     previewDeposit();
   }, [lastKeyPress]);
@@ -350,31 +351,33 @@ function Vault(props: Props) {
     setOption(e);
   }
 
-  function handleInputChange(a: string, e: string) {
-    const decimals = getTokenData(e)?.decimals;
+  function handleInputChange(amount: string, asset: string) {
+    const decimals = getTokenData(asset)?.decimals;
+    console.log(asset);
+    console.log(amount);
 
     if (decimals) {
-      const _amount = parseUnits(a, decimals);
-      if (a === "") {
+      const _amount = parseUnits(amount, decimals);
+      if (amount === "") {
         resetInputs(option);
       } else {
         setInputs(prevInputs => ({
           ...prevInputs,
-          [e]: {
-            ammount: a,
+          [asset]: {
+            ammount: amount,
           },
         }));
 
         setinputsPreviewDeposit(prevInputs => ({
           ...prevInputs,
-          [e]: {
+          [asset]: {
             ammount: _amount,
           },
         }));
       }
 
       if (option.length > 1) {
-        setLastKeyPress({ key1: e, key2: a });
+        setLastKeyPress({ key1: asset, key2: amount });
       }
     }
   }
@@ -413,6 +416,38 @@ function Vault(props: Props) {
           },
         }));
       }
+    }
+  }
+
+  async function deposit() {
+    if (vaultt && $assets) {
+      let assets: string[] = [];
+      let input: bigint[] = [];
+      let amounts: any[][] = [];
+
+      for (let i = 0; i < $assets.length; i++) {
+        assets.push($assets[i]);
+        input
+          .push(
+            parseUnits(
+              inputs[$assets[i]].ammount,
+              tokensJson.tokens[i].decimals
+            )
+          )
+          .toString();
+      }
+
+      amounts.push(assets, input);
+      console.log(assets);
+      console.log(amounts);
+
+      const d = await writeContract({
+        address: $account,
+        abi: VaultABI,
+        functionName: "depositAssets",
+        args: [assets, input, vaultt],
+      });
+      console.log(d);
     }
   }
 
@@ -791,6 +826,7 @@ function Vault(props: Props) {
               approve === 1 ? (
                 <button
                   type="button"
+                  onClick={() => deposit()}
                   style={{
                     margin: "auto",
                     fontSize: "35px",
@@ -820,7 +856,7 @@ function Vault(props: Props) {
                         marginTop: "5px",
                         marginBottom: "5px",
                         display:
-                          allowance && allowance[asset].allowance > 0
+                          allowance && allowance[asset].allowance[0] > 0
                             ? "none"
                             : "block",
                       }}>

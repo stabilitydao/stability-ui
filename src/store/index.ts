@@ -18,9 +18,7 @@ const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
 const assetsPrices = atom<assetPrices | undefined>();
 const assetsBalances = atom<Balances | undefined>();
-
 const vaultData = atom<Vaults>({});
-
 const vaults = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();
 
