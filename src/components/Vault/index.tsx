@@ -268,7 +268,7 @@ function Vault(props: Props) {
                 error
               );
 
-              resetInputs(option);
+              // resetInputs(option);
               setApprove(undefined);
             }
           }
@@ -651,7 +651,7 @@ function Vault(props: Props) {
                       }
                       type="text"
                       onKeyDown={evt =>
-                        ["e", "E", "+", "-"].includes(evt.key) &&
+                        ["e", "E", "+", "-", " "].includes(evt.key) &&
                         evt.preventDefault()
                       }
                       style={{
@@ -783,7 +783,7 @@ function Vault(props: Props) {
                         handleInputChange(e.target.value, e.target.id)
                       }
                       onKeyDown={evt =>
-                        ["e", "E", "+", "-"].includes(evt.key) &&
+                        ["e", "E", "+", "-", " "].includes(evt.key) &&
                         evt.preventDefault()
                       }
                       style={{
