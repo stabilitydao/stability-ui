@@ -206,12 +206,12 @@ function Vaults() {
                           <span className="flex min-w-[42px] justify-center">
                             {vault.strategyInfo.protocols.map((p, i) => (
                               <img
+                                key={i}
                                 className={`h-6 w-6 rounded-full ${
                                   vault.strategyInfo.protocols.length > 1 && i
                                     ? "ml-[-6px]"
                                     : ""
                                 }`}
-                                key={i}
                                 src={p.logoSrc}
                                 alt={p.name}
                                 title={p.name}
@@ -221,6 +221,7 @@ function Vaults() {
                           <span className="flex">
                             {vault.strategyInfo.features.map((f, i) => (
                               <img
+                                key={i}
                                 title={f.name}
                                 alt={f.name}
                                 className="w-6 h-6 ml-1"
