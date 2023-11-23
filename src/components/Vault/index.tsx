@@ -103,8 +103,8 @@ function Vault(props: Props) {
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
   const [sharesOut, setSharesOut] = useState<bigint>();
-  console.log($vault);
-  console.log(vaultt);
+  console.log(inputs);
+  console.log(allowance);
 
   useEffect(() => {
     async function getStrategy() {
@@ -198,11 +198,18 @@ function Vault(props: Props) {
     loadAssetsBalances();
   }, [option, $assetsBalances]);
 
+  interface PreviewBigInt {
+    [key: string]: {
+      ammount: bigint;
+    };
+  }
+
   useEffect(() => {
     async function previewDeposit() {
       if ($assets && lastKeyPress.key1) {
         const changedInput = $assets?.indexOf(lastKeyPress.key1);
         const preview: input = {};
+        const previewBigInt: PreviewBigInt = {};
 
         if ($assets && $assets.length > 0) {
           let amounts: bigint[] = [];
@@ -227,21 +234,29 @@ function Vault(props: Props) {
               )) as (bigint | bigint[])[];
               console.log(t);
               console.log(allowance);
+              console.log(inputsPreviewDeposit);
 
               checkInputsAllowance(t[0] as bigint[]);
-              console.log(t);
               setSharesOut(((t[1] as bigint) * BigInt(1)) / BigInt(100));
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
+              const rr: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
               for (let i = 0; i < $assets.length; i++) {
                 const decimals = getTokenData($assets[i])?.decimals;
                 if (i !== changedInput && decimals) {
                   preview[$assets[i]] = {
-                    ammount: formatUnits(qq[i], decimals).toString(),
+                    ammount: formatUnits(qq[i], decimals),
                   };
                 }
               }
+
+              for (let i = 0; i < $assets.length; i++) {
+                previewBigInt[$assets[i]] = {
+                  ammount: rr[i],
+                };
+              }
+              setinputsPreviewDeposit(previewBigInt);
 
               if (lastKeyPress.key2 !== "") {
                 setInputs(prevInputs => ({
@@ -835,29 +850,33 @@ function Vault(props: Props) {
                 </button>
               ) : approve === 2 ? (
                 <>
-                  {option.map(asset => (
-                    <button
-                      key={asset}
-                      type="button"
-                      onClick={() => approvee(asset as `0x${string}`)}
-                      style={{
-                        margin: "auto",
-                        fontSize: "35px",
-                        width: "100%",
-                        height: "60px",
-                        cursor: "pointer",
-                        borderStyle: "solid",
-                        borderWidth: "1px",
-                        marginTop: "5px",
-                        marginBottom: "5px",
-                        // display:
-                        //   allowance && allowance[asset].allowance[0] > 0
-                        //     ? "none"
-                        //     : "block",
-                      }}>
-                      Approve {getTokenData(asset)?.symbol}
-                    </button>
-                  ))}
+                  {option.map(asset =>
+                    allowance &&
+                    formatUnits(
+                      allowance[asset].allowance[0],
+                      Number(getTokenData(asset)?.decimals)
+                    ) < inputs[asset].ammount ? (
+                      <button
+                        key={asset}
+                        type="button"
+                        onClick={() => approvee(asset as `0x${string}`)}
+                        style={{
+                          margin: "auto",
+                          fontSize: "35px",
+                          width: "100%",
+                          height: "60px",
+                          cursor: "pointer",
+                          borderStyle: "solid",
+                          borderWidth: "1px",
+                          marginTop: "5px",
+                          marginBottom: "5px",
+                        }}>
+                        Approve {getTokenData(asset)?.symbol}
+                      </button>
+                    ) : (
+                      ""
+                    )
+                  )}
                 </>
               ) : approve === 0 ? (
                 <div
