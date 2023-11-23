@@ -26,7 +26,6 @@ const AppStore = (props: React.PropsWithChildren) => {
   const { address } = useAccount();
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
-  console.log(address);
 
   const getData = async () => {
     if (address && chain?.id) {

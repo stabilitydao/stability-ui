@@ -102,7 +102,7 @@ function Vault(props: Props) {
   }>({ key1: undefined, key2: undefined });
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
-  console.log(inputsPreviewDeposit);
+  const [sharesOut, setSharesOut] = useState<bigint>();
 
   useEffect(() => {
     async function getStrategy() {
@@ -174,6 +174,8 @@ function Vault(props: Props) {
       const allowanceResult: Allowance = {};
 
       for (let i = 0; i < option.length; i++) {
+        console.log(option);
+
         const alw = (await readContract(_publicClient, {
           address: option[i] as `0x${string}`,
           abi: ERC20ABI,
@@ -187,10 +189,8 @@ function Vault(props: Props) {
         }
         allowanceResult[option[i]].allowance.push(alw);
       }
-      console.log(allowanceResult);
-      console.log(allowance);
-
       setAllowance(allowanceResult);
+      console.log(allowanceResult);
     }
     checkAllowance();
     loadAssetsBalances();
@@ -218,13 +218,17 @@ function Vault(props: Props) {
                 _publicClient,
                 {
                   address: vaultt,
-                  abi: StrategyABI,
+                  abi: VaultABI,
                   functionName: "previewDepositAssets",
                   args: [$assets, amounts],
                 }
               )) as (bigint | bigint[])[];
+              console.log(t);
+              console.log(allowance);
+
               checkInputsAllowance(t[0] as bigint[]);
               console.log(t);
+              setSharesOut(((t[1] as bigint) * BigInt(1)) / BigInt(100));
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
@@ -255,7 +259,6 @@ function Vault(props: Props) {
           }
         }
       }
-      console.log(inputs);
     }
     previewDeposit();
   }, [lastKeyPress]);
@@ -265,17 +268,22 @@ function Vault(props: Props) {
     let change = false;
 
     for (let i = 0; i < input.length; i++) {
+      console.log(input);
+      console.log(allowance);
+      console.log($assetsBalances);
+
       if (
         $assets &&
         $assetsBalances &&
         input[i] > $assetsBalances[$assets[i]].assetBalance &&
         lastKeyPress.key2 !== ""
       ) {
+        console.log("22");
+
         setApprove(0);
         change = true;
       }
     }
-    console.log(change);
 
     if (change !== true) {
       for (let i = 0; i < input.length; i++) {
@@ -297,9 +305,9 @@ function Vault(props: Props) {
       const button = checkButtonApproveDeposit(apprDepo);
 
       if (button === true) {
-        setApprove(apprDepo[0]);
+        setApprove(apprDepo[1]);
       } else {
-        setApprove(1);
+        setApprove(2);
       }
     }
   }
@@ -353,8 +361,6 @@ function Vault(props: Props) {
 
   function handleInputChange(amount: string, asset: string) {
     const decimals = getTokenData(asset)?.decimals;
-    console.log(asset);
-    console.log(amount);
 
     if (decimals) {
       const _amount = parseUnits(amount, decimals);
@@ -384,8 +390,6 @@ function Vault(props: Props) {
 
   async function approvee(asset: `0x${string}`) {
     if (vaultt) {
-      console.log(allowance);
-
       const allowanceResult: Allowance = {};
       const maxUni = getTokenData(asset)?.decimals as number;
       const maxUnits = parseUnits("1", getTokenData(asset)?.decimals as number);
@@ -400,8 +404,6 @@ function Vault(props: Props) {
       const transaction = await _publicClient.waitForTransactionReceipt(r);
 
       if (transaction.status === "success") {
-        console.log("d");
-
         const newAllowance = (await readContract(_publicClient, {
           address: asset,
           abi: ERC20ABI,
@@ -420,35 +422,27 @@ function Vault(props: Props) {
   }
 
   async function deposit() {
-    if (vaultt && $assets) {
-      let assets: string[] = [];
-      let input: bigint[] = [];
-      let amounts: any[][] = [];
+    let assets: string[] = [];
+    let input: bigint[] = [];
 
-      for (let i = 0; i < $assets.length; i++) {
-        assets.push($assets[i]);
-        input
-          .push(
-            parseUnits(
-              inputs[$assets[i]].ammount,
-              tokensJson.tokens[i].decimals
-            )
-          )
-          .toString();
-      }
-
-      amounts.push(assets, input);
-      console.log(assets);
-      console.log(amounts);
-
-      const d = await writeContract({
-        address: $account,
-        abi: VaultABI,
-        functionName: "depositAssets",
-        args: [assets, input, vaultt],
-      });
-      console.log(d);
+    for (let i = 0; i < option.length; i++) {
+      assets.push(option[i]);
+      input.push(
+        parseUnits(inputs[option[i]].ammount, tokensJson.tokens[i].decimals)
+      );
     }
+    console.log(assets);
+    console.log(input);
+    console.log(sharesOut);
+    const ammounnn = [800000n, 453043n];
+    const shares = [203062330179965963n];
+    const d = await writeContract({
+      address: vaultt as `0x${string}`,
+      abi: VaultABI,
+      functionName: "depositAssets",
+      args: [$assets, input, sharesOut],
+    });
+    console.log(d);
   }
 
   if (props.vault && $vault[props.vault]) {
@@ -855,10 +849,10 @@ function Vault(props: Props) {
                         borderWidth: "1px",
                         marginTop: "5px",
                         marginBottom: "5px",
-                        display:
-                          allowance && allowance[asset].allowance[0] > 0
-                            ? "none"
-                            : "block",
+                        // display:
+                        //   allowance && allowance[asset].allowance[0] > 0
+                        //     ? "none"
+                        //     : "block",
                       }}>
                       Approve {getTokenData(asset)?.symbol}
                     </button>
