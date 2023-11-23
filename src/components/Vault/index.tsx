@@ -103,6 +103,8 @@ function Vault(props: Props) {
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
   const [sharesOut, setSharesOut] = useState<bigint>();
+  console.log($vault);
+  console.log(vaultt);
 
   useEffect(() => {
     async function getStrategy() {
@@ -431,11 +433,7 @@ function Vault(props: Props) {
         parseUnits(inputs[option[i]].ammount, tokensJson.tokens[i].decimals)
       );
     }
-    console.log(assets);
-    console.log(input);
-    console.log(sharesOut);
-    const ammounnn = [800000n, 453043n];
-    const shares = [203062330179965963n];
+
     const d = await writeContract({
       address: vaultt as `0x${string}`,
       abi: VaultABI,
@@ -459,9 +457,12 @@ function Vault(props: Props) {
                 borderColor: "grey",
               }}>
               <td>Vault: {props.vault}</td>
-              <td>TVL: {$vault[props.vault].vaultSharePrice.toString()}</td>
               <td>
-                User Balance: {$vault[props.vault].vaultUserBalance.toString()}
+                TVL: {formatUnits($vault[props.vault].vaultSharePrice, 18)}
+              </td>
+              <td>
+                User Balance:{" "}
+                {formatUnits($vault[props.vault].vaultUserBalance, 18)}
               </td>
             </tr>
           </tbody>
