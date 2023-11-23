@@ -293,6 +293,8 @@ function Vault(props: Props) {
         change = true;
       }
     }
+    console.log(allowance);
+    console.log(input);
 
     if (change !== true) {
       for (let i = 0; i < input.length; i++) {
@@ -300,8 +302,8 @@ function Vault(props: Props) {
           allowance &&
           $assets &&
           $assetsBalances &&
-          input[i] < $assetsBalances[$assets[i]].assetBalance &&
-          allowance[$assets[i]].allowance[0] > input[i] &&
+          input[i] <= $assetsBalances[$assets[i]].assetBalance &&
+          allowance[$assets[i]].allowance[0] >= input[i] &&
           lastKeyPress.key2 !== ""
         ) {
           apprDepo.push(1);
