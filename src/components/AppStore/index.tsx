@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect } from "react";
-import { parseUnits } from "viem";
+// import { parseUnits } from "viem";
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -27,6 +27,7 @@ import {
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
+import type { TAddress } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -112,7 +113,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             address: contractBalance[6][1],
             abi: IVaultManagerABI,
             functionName: "vaultInfo",
-            args: [vault],
+            args: [vault as TAddress],
           });
           return response;
         })
@@ -137,16 +138,16 @@ const AppStore = (props: React.PropsWithChildren) => {
       vaultInfoes.forEach(async (vaultInfo, index) => {
         if (vaultInfo[3]?.length) {
           for (let i = 0; i < vaultInfo[3]?.length; i++) {
-            const assetWithApr = vaultInfo[3][i]
+            const assetWithApr = vaultInfo[3][i];
             const symbol = await readContract(_publicClient, {
               address: assetWithApr,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
-            })
-            vaultInfoes[index][3][i] = symbol
+            });
+            vaultInfoes[index][3][i] = symbol;
           }
         }
-      })
+      });
 
       isVaultsLoaded.set(true);
       if (contractVaults) {

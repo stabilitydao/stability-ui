@@ -126,7 +126,7 @@ function Vaults() {
       setFilteredVaults(vaults);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
-  
+
   if (localVaults?.length) {
     return (
       <>
@@ -147,7 +147,6 @@ function Vaults() {
                   value={value.name}
                   table={tableStates}
                   filter={tableFilter}
-                  cssAdd={value.cssAdd}
                 />
               ))}
             </tr>
@@ -173,13 +172,19 @@ function Vaults() {
                     />
                   </div>
                   <div className="max-w-[250px] flex items-start flex-col">
-                  <p className="md:whitespace-nowrap font-bold">{vault.symbol}</p>
-                  <p className="lg:hidden">{vault.type}</p>
-                  <p className="md:hidden">{getStrategyShortName(vault.symbol)}</p>
+                    <p className="md:whitespace-nowrap font-bold">
+                      {vault.symbol}
+                    </p>
+                    <p className="lg:hidden">{vault.type}</p>
+                    <p className="md:hidden">
+                      {getStrategyShortName(vault.symbol)}
+                    </p>
                   </div>
                 </td>
 
-                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">{vault.type}</td>
+                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">
+                  {vault.type}
+                </td>
                 <td className="max-w-[150px] px-4 py-2 hidden md:table-cell whitespace-nowrap">
                   {getStrategyShortName(vault.symbol)}
                 </td>

@@ -6,16 +6,16 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { EIP6963Connector } from "@web3modal/wagmi";
 
-import ERC20ABI from "./abi/ERC20ABI.json";
-import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.json";
-import FactoryABI from "./abi/FactoryABI.json";
-import IVaultManagerABI from "./abi/IVaultManagerABI.json";
-import PlatformABI from "./abi/PlatformABI.json";
-import StrategyABI from "./abi/StrategyABI.json";
-import VaultABI from "./abi/VaultABI.json";
+import ERC20ABI from "./abi/ERC20ABI.ts";
+import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.ts";
+import FactoryABI from "./abi/FactoryABI.ts";
+import IVaultManagerABI from "./abi/IVaultManagerABI.ts";
+import PlatformABI from "./abi/PlatformABI.ts";
+import StrategyABI from "./abi/StrategyABI.ts";
+import VaultABI from "./abi/VaultABI.ts";
 
 // address of platform proxy deplpyed by default foundry private key
-const platform = "0x8Bf18e85B2FB7B050343AB2560E497b3Df18a59c";
+const platform = "0x78667Ae8549415Fa1CA21E43eE8e6741a71EEDbE"; //"0x8Bf18e85B2FB7B050343AB2560E497b3Df18a59c";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 

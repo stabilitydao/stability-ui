@@ -9,22 +9,29 @@ import { readContract } from "viem/actions";
 import { FactoryABI, ERC20ABI } from "@web3";
 import { account, platformData, userBalance, lastTx } from "@store";
 
-import type { TInitParams } from "@types";
+import type { TInitParams, TAddress } from "@types";
 import { getTokenData } from "@utils";
 
-type Props = {
-  buildingPrice: bigint;
+interface IProps {
   vaultType: string;
   strategyId: string;
   strategyDesc: string;
   initParams: TInitParams;
+  buildingPrice: bigint;
   defaultBoostTokens: string[];
-};
+}
 
-function BuildForm(props: Props) {
-  const _account = useStore(account);
-  const p = useStore(platformData);
-  const balance = useStore(userBalance);
+const BuildForm = ({
+  vaultType,
+  strategyId,
+  strategyDesc,
+  initParams,
+  buildingPrice,
+  defaultBoostTokens,
+}: IProps) => {
+  const $account = useStore(account);
+  const $platformData = useStore(platformData);
+  const $balance = useStore(userBalance);
   const _publicClient = usePublicClient();
 
   // todo implement using
@@ -38,39 +45,38 @@ function BuildForm(props: Props) {
     {}
   );
 
-  useEffect(() => {
-    async function check() {
-      if (needCheckAllowance && p) {
-        const r = await readContract(_publicClient, {
-          address: p.buildingPayPerVaultToken,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [_account, p?.factory],
-        });
-        setAllowance(r as bigint);
-        // console.log('allowance', r)
-      }
+  const checkAllowance = async () => {
+    if (needCheckAllowance && $platformData) {
+      const allowance = await readContract(_publicClient, {
+        address: $platformData.buildingPayPerVaultToken,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, $platformData?.factory],
+      });
+      setAllowance(allowance as bigint);
     }
-    check();
-  }, [needCheckAllowance]);
-
-  async function deploy() {
-    if (p) {
-      const r = await writeContract({
-        address: p.factory,
+  };
+  const deploy = async () => {
+    if ($platformData) {
+      const deployVaultAndStrategy = await writeContract({
+        address: $platformData.factory,
         abi: FactoryABI,
         functionName: "deployVaultAndStrategy",
         args: [
-          props.vaultType,
-          props.strategyId,
-          props.initParams.initVaultAddresses,
-          props.initParams.initVaultNums,
-          props.initParams.initStrategyAddresses,
-          props.initParams.initStrategyNums,
-          props.initParams.initStrategyTicks,
+          vaultType,
+          strategyId,
+          initParams.initVaultAddresses as TAddress[],
+          initParams.initVaultNums,
+          initParams.initStrategyAddresses as TAddress[],
+          initParams.initStrategyNums,
+          initParams.initStrategyTicks,
         ],
       });
-      const transaction = await _publicClient.waitForTransactionReceipt(r);
+
+      const transaction = await _publicClient.waitForTransactionReceipt(
+        deployVaultAndStrategy
+      );
+
       if (transaction.status === "success") {
         lastTx.set(transaction.transactionHash);
         setBuildResult(true);
@@ -78,81 +84,85 @@ function BuildForm(props: Props) {
         setBuildResult(false);
       }
     }
-  }
+  };
 
-  async function approve() {
-    if (p) {
-      const r = await writeContract({
-        address: p.buildingPayPerVaultToken,
+  const approve = async () => {
+    if ($platformData) {
+      const approve = await writeContract({
+        address: $platformData.buildingPayPerVaultToken,
         abi: ERC20ABI,
         functionName: "approve",
-        args: [p.factory, props.buildingPrice],
+        args: [$platformData.factory, buildingPrice],
       });
-      const transaction = await _publicClient.waitForTransactionReceipt(r);
+      const transaction = await _publicClient.waitForTransactionReceipt(
+        approve
+      );
       if (transaction.status === "success") {
         setAllowance(
           (await readContract(_publicClient, {
-            address: p.buildingPayPerVaultToken,
+            address: $platformData.buildingPayPerVaultToken,
             abi: ERC20ABI,
             functionName: "allowance",
-            args: [_account, p?.factory],
+            args: [$account as TAddress, $platformData?.factory],
           })) as bigint
         );
       } else {
         // todo show error
       }
     }
-  }
+  };
 
-  const payPerVaultToken = p?.buildingPayPerVaultToken
-    ? getTokenData(p.buildingPayPerVaultToken)
-    : undefined;
+  const payPerVaultToken =
+    $platformData?.buildingPayPerVaultToken &&
+    getTokenData($platformData.buildingPayPerVaultToken);
 
+  useEffect(() => {
+    checkAllowance();
+  }, [needCheckAllowance]);
   return (
-    <div className="build-form">
-      {buildResult !== true && (
-        <>
-          <div className="group">
-            <span className="group-label">Vault type</span>
-            <span>{props.vaultType}</span>
+    <div className="flex flex-col">
+      {!buildResult && (
+        <div className="flex flex-col gap-2">
+          <div className="flex w-full justify-between">
+            <span className="w-[30%] text-[22px]">Vault type</span>
+            <span>{vaultType}</span>
           </div>
-          <div className="group">
-            <span className="group-label">Strategy logic</span>
-            <span>{props.strategyId}</span>
+          <div className="flex w-full justify-between">
+            <span className="w-[30%] text-[22px]">Strategy logic</span>
+            <span>{strategyId}</span>
           </div>
-          <div className="group">
-            <span className="group-label">Strategy description</span>
-            <span>{props.strategyDesc}</span>
+          <div className="flex w-full justify-between">
+            <p className="w-[30%] text-[22px]">Strategy description</p>
+            <p className="text-end text-[16px]">{strategyDesc}</p>
           </div>
-          <div className="group">
-            <span className="group-label">Build price</span>
+          <div className="flex w-full justify-between">
+            <span className="w-[30%] text-[22px]">Build price</span>
             <span>
-              {props.buildingPrice && payPerVaultToken
-                ? `${formatUnits(
-                    props.buildingPrice,
-                    payPerVaultToken.decimals
-                  )} ${payPerVaultToken.symbol}`
+              {buildingPrice && payPerVaultToken
+                ? `${formatUnits(buildingPrice, payPerVaultToken.decimals)} ${
+                    payPerVaultToken.symbol
+                  }`
                 : "-"}
             </span>
           </div>
-          <div className="group">
-            <span className="group-label">Your balance</span>
+          <div className="flex w-full justify-between">
+            <span className="w-[30%] text-[22px]">Your balance</span>
             <span>
-              {balance?.buildingPayPerVaultTokenBalance && payPerVaultToken
+              {$balance?.buildingPayPerVaultTokenBalance && payPerVaultToken
                 ? `${formatUnits(
-                    balance.buildingPayPerVaultTokenBalance,
+                    $balance.buildingPayPerVaultTokenBalance,
                     payPerVaultToken.decimals
                   )} ${payPerVaultToken.symbol}`
                 : "-"}
             </span>
           </div>
 
-          {props.vaultType === "Rewarding" && (
+          {vaultType === "Rewarding" && (
             <>
-              <div className="group">
-                <span className="group-label">Buy-back token</span>
+              <div className="flex w-full justify-between">
+                <span className="w-[30%] text-[22px]">Buy-back token</span>
                 <span>
-                  {getTokenData(props.initParams.initVaultAddresses[0])?.symbol}
+                  {getTokenData(initParams.initVaultAddresses[0])?.symbol}
                 </span>
               </div>
 
@@ -160,38 +170,46 @@ function BuildForm(props: Props) {
               <div>
                 {[
                   ...new Set([
-                    props.initParams.initVaultAddresses[0],
-                    ...props.defaultBoostTokens,
+                    initParams.initVaultAddresses[0],
+                    ...defaultBoostTokens,
                   ]),
-                ].map((addresss) => {
-                  return <span>{getTokenData(addresss)?.symbol}</span>;
+                ].map((address) => {
+                  return (
+                    <span key={address}>{getTokenData(address)?.symbol}</span>
+                  );
                 })}
               </div>
             </>
           )}
-        </>
+        </div>
       )}
 
       {buildResult === undefined && (
-        <div className="action">
-          {needCheckAllowance &&
-          allowance !== undefined &&
-          allowance < props.buildingPrice ? (
-            <button className="btn btn-primary" onClick={approve}>
+        <div className="mt-10 flex justify-center">
+          {needCheckAllowance && allowance && allowance < buildingPrice ? (
+            <button
+              className="bg-button px-5 py-1 rounded-md"
+              onClick={approve}
+            >
               Approve factory to spend {payPerVaultToken?.symbol}
             </button>
           ) : (
-            <button className="btn btn-primary" onClick={deploy}>
+            <button
+              className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
+              onClick={deploy}
+            >
               Deploy
             </button>
           )}
         </div>
       )}
 
-      {buildResult === true && (
-        <div className="success">The vault has beed deployed</div>
+      {buildResult && (
+        <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md flex justify-center py-4">
+          The vault has beed deployed
+        </div>
       )}
     </div>
   );
-}
+};
 export { BuildForm };

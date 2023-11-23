@@ -7,21 +7,14 @@ import { platformData, publicClient, lastTx } from "@store";
 
 import { BuildForm } from "../BuildForm";
 
-import type { TInitParams, TAllowedBBTokenVaults } from "@types";
+import type { TInitParams, TAllowedBBTokenVaults, TBuildVariant } from "@types";
 import { getTokenData } from "@utils";
 
-type BuildVariant = {
-  vaultType: string;
-  strategyId: string;
-  strategyDesc: string;
-  canBuild: boolean;
-  initParams: TInitParams;
-};
+const CreateVaultComponent = () => {
+  const $publicClient = useStore(publicClient);
+  const $platformData = useStore(platformData);
 
-function CreateVaultComponent() {
-  const _publicClient = useStore(publicClient);
-  const p = useStore(platformData);
-  const [buildVariants, setBuildVariants] = useState<BuildVariant[]>([]);
+  const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
   const [allowedBBTokenVaults, setAllowedBBTokenVaults] = useState<
     TAllowedBBTokenVaults | undefined
@@ -34,233 +27,251 @@ function CreateVaultComponent() {
   >();
   const [defaultBoostTokens, setDefaultBoostTokens] = useState<string[]>([]);
 
-  useEffect(() => {
-    async function read() {
-      if (_publicClient && p) {
-        const variants: BuildVariant[] = [];
-        const wtb = await _publicClient.readContract({
-          address: p.factory,
-          functionName: "whatToBuild",
-          abi: FactoryABI,
-        });
-        if (Array.isArray(wtb)) {
-          for (let i = 0; i < wtb[1].length; i++) {
-            const initParams: TInitParams = {
-              initVaultAddresses: [],
-              initVaultNums: [],
-              initStrategyAddresses: [],
-              initStrategyNums: [],
-              initStrategyTicks: [],
-            };
-            let paramsLen = wtb[3][i][1] - wtb[3][i][0];
-            for (let k = 0; k < paramsLen; ++k) {
-              initParams.initVaultAddresses[k] =
-                wtb[4][Number(wtb[3][i][0]) + k];
-            }
-            paramsLen = wtb[3][i][3] - wtb[3][i][2];
-            for (let k = 0; k < paramsLen; ++k) {
-              initParams.initVaultNums[k] = wtb[5][Number(wtb[3][i][2]) + k];
-            }
-            paramsLen = wtb[3][i][5] - wtb[3][i][4];
-            for (let k = 0; k < paramsLen; ++k) {
-              initParams.initStrategyAddresses[k] =
-                wtb[6][Number(wtb[3][i][4]) + k];
-            }
-            paramsLen = wtb[3][i][7] - wtb[3][i][6];
-            for (let k = 0; k < paramsLen; ++k) {
-              initParams.initStrategyNums[k] = BigInt(
-                wtb[7][Number(wtb[3][i][6]) + k]
-              );
-            }
-            paramsLen = wtb[3][i][9] - wtb[3][i][8];
-            for (let k = 0; k < paramsLen; ++k) {
-              initParams.initStrategyTicks[k] =
-                wtb[8][Number(wtb[3][i][8]) + k];
-            }
-
-            variants.push({
-              vaultType: wtb[1][i],
-              strategyId: wtb[2][i],
-              strategyDesc: wtb[0][i],
-              canBuild: true,
-              initParams,
-            });
+  const getData = async () => {
+    if ($publicClient && $platformData) {
+      const variants: TBuildVariant[] = [];
+      const whatToBuild = await $publicClient.readContract({
+        address: $platformData.factory,
+        functionName: "whatToBuild",
+        abi: FactoryABI,
+      });
+      if (whatToBuild?.length) {
+        for (let i = 0; i < whatToBuild[1].length; i++) {
+          const initParams: TInitParams = {
+            initVaultAddresses: [],
+            initVaultNums: [],
+            initStrategyAddresses: [],
+            initStrategyNums: [],
+            initStrategyTicks: [],
+          };
+          let paramsLength = whatToBuild[3][i][1] - whatToBuild[3][i][0];
+          for (let j = 0; j < paramsLength; ++j) {
+            initParams.initVaultAddresses[j] =
+              whatToBuild[4][Number(whatToBuild[3][i][0]) + j];
           }
-          setBuildVariants(variants);
-        }
-
-        let r = await _publicClient.readContract({
-          address: platform,
-          functionName: "allowedBBTokenVaults",
-          abi: PlatformABI,
-        });
-
-        if (r && Array.isArray(r)) {
-          const allowedBBTokenVaults_: TAllowedBBTokenVaults = {};
-          for (let k = 0; k < r[0].length; ++k) {
-            allowedBBTokenVaults_[r[0][k]] = Number(r[1][k]);
+          paramsLength = whatToBuild[3][i][3] - whatToBuild[3][i][2];
+          for (let j = 0; j < paramsLength; ++j) {
+            initParams.initVaultNums[j] =
+              whatToBuild[5][Number(whatToBuild[3][i][2]) + j];
           }
-          setAllowedBBTokenVaults(allowedBBTokenVaults_);
-        }
+          paramsLength = whatToBuild[3][i][5] - whatToBuild[3][i][4];
+          for (let j = 0; j < paramsLength; ++j) {
+            initParams.initStrategyAddresses[j] =
+              whatToBuild[6][Number(whatToBuild[3][i][4]) + j];
+          }
+          paramsLength = whatToBuild[3][i][7] - whatToBuild[3][i][6];
+          for (let j = 0; j < paramsLength; ++j) {
+            initParams.initStrategyNums[j] = BigInt(
+              whatToBuild[7][Number(whatToBuild[3][i][6]) + j]
+            );
+          }
+          paramsLength = whatToBuild[3][i][9] - whatToBuild[3][i][8];
+          for (let j = 0; j < paramsLength; ++j) {
+            initParams.initStrategyTicks[j] =
+              whatToBuild[8][Number(whatToBuild[3][i][8]) + j];
+          }
 
-        const minInitialBoostPerDayValue = await _publicClient.readContract({
-          address: platform,
-          functionName: "minInitialBoostPerDay",
-          abi: PlatformABI,
-        });
-        if (typeof minInitialBoostPerDayValue === "bigint") {
-          setMinInitialBoostPerDay(minInitialBoostPerDayValue);
+          variants.push({
+            vaultType: whatToBuild[1][i],
+            strategyId: whatToBuild[2][i],
+            strategyDesc: whatToBuild[0][i],
+            canBuild: true,
+            initParams,
+          });
         }
+        setBuildVariants(variants);
+      }
 
-        const minInitialBoostDurationValue = await _publicClient.readContract({
-          address: platform,
-          functionName: "minInitialBoostDuration",
-          abi: PlatformABI,
-        });
-        if (typeof minInitialBoostDurationValue === "bigint") {
-          setMinInitialBoostDuration(minInitialBoostDurationValue);
+      const allowedBBTokenVaults = await $publicClient.readContract({
+        address: platform,
+        functionName: "allowedBBTokenVaults",
+        abi: PlatformABI,
+      });
+      /////
+      const defaultBoostRewardTokens = await $publicClient.readContract({
+        address: platform,
+        functionName: "defaultBoostRewardTokens",
+        abi: PlatformABI,
+      });
+      console.log("defaultBoostRewardTokens", defaultBoostRewardTokens);
+      ///////
+      if (Array.isArray(allowedBBTokenVaults)) {
+        const allowedBBTokenVaults_: TAllowedBBTokenVaults = {};
+        for (let i = 0; i < allowedBBTokenVaults[0].length; ++i) {
+          allowedBBTokenVaults_[allowedBBTokenVaults[0][i]] = Number(
+            allowedBBTokenVaults[1][i]
+          );
         }
-        const defaultBoostTokensValue = await _publicClient.readContract({
-          address: platform,
-          functionName: "defaultBoostRewardTokens",
-          abi: PlatformABI,
-        });
-        if (Array.isArray(defaultBoostTokensValue)) {
-          setDefaultBoostTokens(defaultBoostTokensValue);
-        }
+        setAllowedBBTokenVaults(allowedBBTokenVaults_);
+      }
+
+      const minInitialBoostPerDayValue = await $publicClient.readContract({
+        address: platform,
+        functionName: "minInitialBoostPerDay",
+        abi: PlatformABI,
+      });
+      if (typeof minInitialBoostPerDayValue === "bigint") {
+        setMinInitialBoostPerDay(minInitialBoostPerDayValue);
+      }
+
+      const minInitialBoostDurationValue = await $publicClient.readContract({
+        address: platform,
+        functionName: "minInitialBoostDuration",
+        abi: PlatformABI,
+      });
+      if (typeof minInitialBoostDurationValue === "bigint") {
+        setMinInitialBoostDuration(minInitialBoostDurationValue);
+      }
+      const defaultBoostTokensValue = await $publicClient.readContract({
+        address: platform,
+        functionName: "defaultBoostRewardTokens",
+        abi: PlatformABI,
+      });
+      if (Array.isArray(defaultBoostTokensValue)) {
+        setDefaultBoostTokens(defaultBoostTokensValue);
       }
     }
-    read();
-  }, [_publicClient, p?.factory, lastTx.get()]);
+  };
+
+  useEffect(() => {
+    getData();
+  }, [$publicClient, $platformData?.factory, lastTx.get()]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
-    (v) => v.vaultType === "Compounding"
+    (variant) => variant.vaultType === "Compounding"
   ).length;
-
   return (
     <div>
-      <h2>Create compounding vault</h2>
+      <h2 className="text-[22px] mb-3">Compounding vault</h2>
       {compoundingVaultsForBuilding ? (
-        <table>
-          <thead>
-            <tr>
-              <td></td>
+        <table className="bg-[#2c2f38] rounded-lg mx-auto">
+          <thead className="h-[50px]">
+            <tr className="text-[18px]">
               <td>Strategy logic</td>
               <td>Strategy description</td>
+              <td></td>
             </tr>
           </thead>
-          <tbody>
-            {buildVariants.map((v, i) => {
-              if (v.vaultType !== "Compounding") {
+          <tbody className="text-[16px]">
+            {buildVariants.map((variant, i) => {
+              if (variant.vaultType !== "Compounding") {
                 return;
               }
-
               return (
-                <tr key={v.strategyDesc + v.vaultType + v.strategyId}>
+                <tr
+                  className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                  key={
+                    variant.strategyDesc +
+                    variant.vaultType +
+                    variant.strategyId
+                  }
+                >
+                  <td>{variant.strategyId}</td>
+                  <td>{variant.strategyDesc}</td>
                   <td>
-                    {v.canBuild ? (
+                    {variant.canBuild && (
                       <button
-                        className="btn create-btn"
+                        className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                         onClick={() => {
                           setBuildIndex(i);
                         }}
                       >
                         Assemble
                       </button>
-                    ) : (
-                      ""
                     )}
                   </td>
-                  <td>{v.strategyId}</td>
-                  <td>{v.strategyDesc}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       ) : (
-        <div className="msg">
-          All compounding vaults have already been created. <br />
-          New vaults can be created after developing new strategies.
+        <div className="bg-[#486556] border-[2px] border-[#488B57] max-w-[500px] flex items-center justify-center flex-col mx-auto py-3 px-5 text-center gap-2 rounded-md">
+          <p>All compounding vaults have already been created. </p>
+          <p>New vaults can be created after developing new strategies.</p>
         </div>
       )}
-
-      <br />
-      <br />
-      <h2>Create rewarding vault</h2>
-      <div className="rewarding-data">
-        {allowedBBTokenVaults !== undefined && (
-          <div>
-            For allowed buy-back tokens, the following number of rewarding
-            vaults can be created:
+      <h2 className="text-[22px] my-5">Rewarding vault</h2>
+      <div className="bg-[#2c2f38] rounded-md mb-5 max-w-[800px] mx-auto">
+        <div className="px-5 py-3">
+          {allowedBBTokenVaults && (
             <div>
-              {Object.keys(allowedBBTokenVaults).map((t) => {
-                const token = getTokenData(t);
+              <p className="text-center text-[18px] mb-2">
+                For allowed buy-back tokens, the following number of rewarding
+                vaults can be created:
+              </p>
+              <div>
+                {Object.keys(allowedBBTokenVaults).map((token) => {
+                  const tokenData = getTokenData(token);
+                  return (
+                    <div
+                      key={token}
+                      className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md"
+                    >
+                      <div className="flex items-center justify-center px-1 py-1">
+                        {tokenData && (
+                          <img
+                            src={tokenData.logoURI}
+                            alt={tokenData.name}
+                            className="max-w-[22px] mr-1"
+                          />
+                        )}
+                        {tokenData?.symbol || token}
+                      </div>
+                      <p>{allowedBBTokenVaults[token]}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-                return (
-                  <div key={t} className="allowed-bb-row">
-                    <span>
-                      {token ? (
-                        <img
-                          src={token.logoURI}
-                          alt={token.name}
-                          className="token-logo"
-                        />
-                      ) : (
-                        ""
-                      )}
-                      {token?.symbol || t}
-                    </span>
-                    <span>{allowedBBTokenVaults[t]}</span>
-                  </div>
-                );
-              })}
+          {minInitialBoostPerDay !== undefined && (
+            <div className="text-[18px] my-2 flex items-center">
+              <p>Minimal initial boost value per day: </p>
+              <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+                ${formatUnits(minInitialBoostPerDay, 18)}
+              </div>
+            </div>
+          )}
+          <div className="text-[18px] mb-2 flex items-center">
+            <p>Buy-back rewards vesting duration: </p>
+            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+              7 days
             </div>
           </div>
-        )}
-        {minInitialBoostPerDay !== undefined && (
-          <div>
-            Minimal initial boost value per day: $
-            {formatUnits(minInitialBoostPerDay, 18)}
+          <div className="text-[18px] flex items-center">
+            <p> Boost rewards vesting duration: </p>
+            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+              30 days
+            </div>
           </div>
-        )}
-        <div>Buy-back rewards vesting duration: 7 days</div>
-        <div>Boost rewards vesting duration: 30 days</div>
-        <br />
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <td></td>
+
+      <table className="bg-[#2c2f38] rounded-lg mx-auto">
+        <thead className="h-[70px]">
+          <tr className="text-[18px] whitespace-nowrap">
             <td>Vault type</td>
             <td>Buy-back token</td>
             <td>Strategy logic</td>
             <td>Strategy description</td>
+            <td></td>
           </tr>
         </thead>
-        <tbody>
-          {buildVariants.map((v, i) => {
-            if (v.vaultType !== "Rewarding") {
+        <tbody className="text-[16px]">
+          {buildVariants.map((variant, i) => {
+            if (variant.vaultType !== "Rewarding") {
               return;
             }
-
             return (
-              <tr key={v.strategyDesc + v.vaultType + v.strategyId}>
-                <td>
-                  {v.canBuild ? (
-                    <button
-                      className="btn create-btn"
-                      onClick={() => {
-                        setBuildIndex(i);
-                      }}
-                    >
-                      Assemble
-                    </button>
-                  ) : (
-                    ""
-                  )}
-                </td>
-                <td>{v.vaultType}</td>
+              <tr
+                key={
+                  variant.strategyDesc + variant.vaultType + variant.strategyId
+                }
+                className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+              >
+                <td>{variant.vaultType}</td>
                 <td>
                   {
                     getTokenData(
@@ -268,20 +279,30 @@ function CreateVaultComponent() {
                     )?.symbol
                   }
                 </td>
-                <td>{v.strategyId}</td>
-                <td>{v.strategyDesc}</td>
+                <td>{variant.strategyId}</td>
+                <td>{variant.strategyDesc}</td>
+                <td>
+                  {variant.canBuild && (
+                    <button
+                      className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
+                      onClick={() => {
+                        setBuildIndex(i);
+                      }}
+                    >
+                      Assemble
+                    </button>
+                  )}
+                </td>
               </tr>
             );
           })}
         </tbody>
       </table>
 
-      <br />
-      <br />
-      <h2>Create rewarding managed vault</h2>
-      <div style={{ textAlign: "center" }}>Coming soon</div>
+      <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
+      <div className="text-[22px] text-center">Coming soon</div>
 
-      {p && buildIndex !== undefined && (
+      {$platformData && buildIndex !== undefined && (
         <div
           className="overlay"
           onClick={() => {
@@ -289,20 +310,24 @@ function CreateVaultComponent() {
           }}
         >
           <div
-            className="modal"
+            className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[30px] rounded-md bg-modal mr-5 "
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
           >
-            <div className="modal-title">Assembling</div>
+            <div className="font-bold text-[1.5rem] flex justify-center">
+              Assembling
+            </div>
             <BuildForm
               vaultType={buildVariants[buildIndex].vaultType}
               strategyId={buildVariants[buildIndex].strategyId}
               strategyDesc={buildVariants[buildIndex].strategyDesc}
               initParams={buildVariants[buildIndex].initParams}
               buildingPrice={
-                p.buildingPrices[buildVariants[buildIndex].vaultType]
+                $platformData.buildingPrices[
+                  buildVariants[buildIndex].vaultType
+                ]
               }
               defaultBoostTokens={defaultBoostTokens}
             />
@@ -311,5 +336,5 @@ function CreateVaultComponent() {
       )}
     </div>
   );
-}
+};
 export { CreateVaultComponent };

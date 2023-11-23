@@ -3,25 +3,27 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { account, network } from "@store";
 
 function Wallet() {
-  const _account = useStore(account);
-  const _network = useStore(network);
+  const $account = useStore(account);
+  const $network = useStore(network);
 
   const { open } = useWeb3Modal();
 
   return (
-    <div id="account-block">
-      {!!_network && (
+    <div className="flex flex-nowrap justify-end whitespace-nowrap">
+      {$network && (
         <button
-          className="btn"
-          id="network"
+          className="bg-button py-1 px-2 rounded-md"
           onClick={() => open({ view: "Networks" })}
         >
-          {_network}
+          {$network}
         </button>
       )}
-      <button className="btn" onClick={() => open()}>
-        {_account
-          ? `${_account.slice(0, -36)}...${_account.substring(38)}`
+      <button
+        className="bg-button py-1 px-2 rounded-md mx-4"
+        onClick={() => open()}
+      >
+        {$account
+          ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
           : "Connect wallet"}
       </button>
     </div>

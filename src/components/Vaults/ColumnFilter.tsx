@@ -5,10 +5,14 @@ type TProps = {
   value: string;
   table: TTableColumn[];
   filter: (table: TTableColumn[]) => void;
-  cssAdd?: string;
 };
 
-const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter, cssAdd }) => {
+const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
+  const styles: Record<string, string> = {
+    Type: "hidden lg:table-cell",
+    Strategy: "hidden md:table-cell",
+  };
+
   const tabController = () => {
     let nextCase: string = "";
 
@@ -39,7 +43,9 @@ const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter, cssAdd })
   return (
     <th
       onClick={tabController}
-      className={`px-0 md:px-2 lg:px-4 py-2 text-center cursor-pointer ${cssAdd}`}
+      className={`px-0 md:px-2 lg:px-4 py-2 text-center cursor-pointer ${
+        styles[value] || ""
+      }`}
     >
       <p className="inline-block">{value}</p>
       <svg

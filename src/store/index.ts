@@ -76,8 +76,8 @@ export {
   assetsBalances,
   vaultData,
   vaults,
-  addAssetBalance,
-  addVaultData,
   vaultAssets,
   isVaultsLoaded,
+  addAssetBalance,
+  addVaultData,
 };

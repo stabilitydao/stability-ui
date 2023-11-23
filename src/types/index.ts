@@ -97,6 +97,16 @@ type TAPRModal = {
   state: boolean;
 };
 
+type TBuildVariant = {
+  vaultType: string;
+  strategyId: string;
+  strategyDesc: string;
+  canBuild: boolean;
+  initParams: TInitParams;
+};
+
+type TAddress = `0x${string}`;
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -113,4 +123,6 @@ export type {
   TVaultAssets,
   TTableColumn,
   TAPRModal,
+  TBuildVariant,
+  TAddress,
 };

@@ -2,11 +2,13 @@
 import Layout from '@layouts/Layout.astro';
 import {Vault} from "@components/Vault"
 
+import type { TAddress } from '@types';
+
 const { vault } = Astro.params;
 ---
   <Layout title="Vault">
     <div class="my-vault">
-      <Vault vault={vault as `0x${string}`} client:only="react" />
+      <Vault vault={vault as TAddress} client:only="react" />
     </div>
   </Layout>
 
