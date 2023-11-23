@@ -94,8 +94,8 @@ function Vault(props: Props) {
   const [tab, setTab] = useState("Deposit");
   const [balances, setBalances] = useState<Balance>({});
   const [inputs, setInputs] = useState<input>({});
-  const [inputsPreviewDeposit, setinputsPreviewDeposit] =
-    useState<inputPreview>({});
+  // const [inputsPreviewDeposit, setinputsPreviewDeposit] =
+  //   useState<inputPreview>({});
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
@@ -209,11 +209,17 @@ function Vault(props: Props) {
           let amounts: bigint[] = [];
           for (let i = 0; i < $assets.length; i++) {
             if (i === changedInput) {
-              amounts.push(inputsPreviewDeposit[lastKeyPress.key1].ammount);
+              amounts.push(
+                parseUnits(
+                  inputs[lastKeyPress.key1].ammount,
+                  Number(getTokenData(lastKeyPress.key1)?.decimals)
+                )
+              );
             } else {
               amounts.push(parseUnits("1", 36));
             }
           }
+          console.log(amounts);
 
           if (typeof vaultt === "string") {
             try {
@@ -376,12 +382,12 @@ function Vault(props: Props) {
           },
         }));
 
-        setinputsPreviewDeposit(prevInputs => ({
-          ...prevInputs,
-          [asset]: {
-            ammount: _amount,
-          },
-        }));
+        // setinputsPreviewDeposit(prevInputs => ({
+        //   ...prevInputs,
+        //   [asset]: {
+        //     ammount: _amount,
+        //   },
+        // }));
       }
 
       if (option.length > 1) {
