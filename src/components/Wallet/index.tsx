@@ -12,14 +12,14 @@ function Wallet() {
     <div id="account-block">
       {!!_network && (
         <button
-          className="btn"
+          className="btn px-3 rounded-3"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
           {_network}
         </button>
       )}
-      <button className="btn" onClick={() => open()}>
+      <button className="btn px-3" onClick={() => open()}>
         {_account
           ? `${_account.slice(0, -36)}...${_account.substring(38)}`
           : "Connect wallet"}
