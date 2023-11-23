@@ -1,3 +1,5 @@
+import type { IStrategyInfo } from "src/utils/StrategyInfo";
+
 type TPlatformData = {
   platform: `0x${string}`;
   factory: `0x${string}`;
@@ -79,6 +81,7 @@ type TLocalVault = {
   apr: string;
   strategyApr: string;
   address: string;
+  strategyInfo: IStrategyInfo;
 };
 type TVaultAssets = [string, string];
 
