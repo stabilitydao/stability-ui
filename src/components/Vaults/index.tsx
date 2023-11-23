@@ -12,8 +12,8 @@ import {
   formatNumber,
   getStrategyShortName,
   formatFromBigInt,
+  getStrategyInfo,
 } from "@utils";
-import { StrategyInfo } from "src/utils/StrategyInfo";
 import { TABLE, PAGINATION_VAULTS } from "@constants";
 import type { TLocalVault } from "@types";
 
@@ -119,7 +119,7 @@ function Vaults() {
             apr: String($vaults[7][index]),
             strategyApr: $vaults[8][index],
             address: $vaults[0][index],
-            strategyInfo: StrategyInfo.get($vaults[2][index]),
+            strategyInfo: getStrategyInfo($vaults[2][index]),
           };
         })
         .sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
@@ -204,7 +204,7 @@ function Vaults() {
                         </span>
                         <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[150px]">
                           <span className="flex min-w-[42px] justify-center">
-                            {vault.strategyInfo.protocols.map((p, i) => (
+                            {vault.strategyInfo.protocols.map((protocol, i) => (
                               <img
                                 key={i}
                                 className={`h-6 w-6 rounded-full ${
@@ -212,21 +212,23 @@ function Vaults() {
                                     ? "ml-[-6px]"
                                     : ""
                                 }`}
-                                src={p.logoSrc}
-                                alt={p.name}
-                                title={p.name}
+                                src={protocol.logoSrc}
+                                alt={protocol.name}
+                                title={protocol.name}
                               />
                             ))}
                           </span>
                           <span className="flex">
-                            {vault.strategyInfo.features.map((f, i) => (
+                            {vault.strategyInfo.features.map((feature, i) => (
                               <img
                                 key={i}
-                                title={f.name}
-                                alt={f.name}
+                                title={feature.name}
+                                alt={feature.name}
                                 className="w-6 h-6 ml-1"
                                 src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                  f.svg !== undefined ? f.svg.toString() : ""
+                                  feature.svg !== undefined
+                                    ? feature.svg.toString()
+                                    : ""
                                 )}`}
                               />
                             ))}

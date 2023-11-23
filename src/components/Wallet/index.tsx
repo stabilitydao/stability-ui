@@ -12,7 +12,7 @@ function Wallet() {
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
       {$network && (
         <button
-          className="btn px-3 rounded-3"
+          className="bg-button py-1 px-2 rounded-md mx-4"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >

@@ -1,5 +1,25 @@
-import type { IStrategyInfo } from "src/utils/StrategyInfo";
+// interfaces
+interface IProtocol {
+  name: string;
+  logoSrc: string;
+}
 
+interface IFeature {
+  name: string;
+  logoSrc?: string;
+  svg?: string | number | boolean;
+}
+
+interface IStrategyInfo {
+  shortName: string;
+  specific?: string;
+  protocols: IProtocol[];
+  features: IFeature[];
+  color: string;
+  bgColor: string;
+}
+
+// types
 type TPlatformData = {
   platform: `0x${string}`;
   factory: `0x${string}`;
@@ -128,4 +148,7 @@ export type {
   TAPRModal,
   TBuildVariant,
   TAddress,
+  IProtocol,
+  IFeature,
+  IStrategyInfo,
 };
