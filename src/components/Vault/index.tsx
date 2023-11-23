@@ -84,9 +84,9 @@ function Vault(props: Props) {
   const $assetsBalances = useStore(assetsBalances);
   const $vault = useStore(vaultData);
   const $assets = useStore(assets);
+  const $account = useStore(account);
   const _publicClient = usePublicClient();
   const p = useStore(platformData);
-  const $account = useStore(account);
 
   const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
@@ -237,7 +237,6 @@ function Vault(props: Props) {
               setSharesOut(((t[1] as bigint) * BigInt(1)) / BigInt(100));
 
               const qq: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
-              // const rr: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
               for (let i = 0; i < $assets.length; i++) {
                 const decimals = getTokenData($assets[i])?.decimals;
@@ -247,6 +246,8 @@ function Vault(props: Props) {
                   };
                 }
               }
+
+              // const rr: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
 
               // for (let i = 0; i < $assets.length; i++) {
               //   previewBigInt[$assets[i]] = {
