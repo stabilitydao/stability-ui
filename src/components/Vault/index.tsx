@@ -649,7 +649,7 @@ function Vault(props: Props) {
                       onChange={e =>
                         handleInputChange(e.target.value, e.target.id)
                       }
-                      type="number"
+                      type="text"
                       onKeyDown={evt =>
                         ["e", "E", "+", "-"].includes(evt.key) &&
                         evt.preventDefault()
@@ -777,7 +777,7 @@ function Vault(props: Props) {
                         inputs && inputs[option[0]] && inputs[option[0]].ammount
                       }
                       name="amount"
-                      type="number"
+                      type="text"
                       placeholder="0"
                       onChange={e =>
                         handleInputChange(e.target.value, e.target.id)
