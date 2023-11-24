@@ -23,8 +23,8 @@ import {
 
 import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
 import tokensJson from "../../stability.tokenlist.json";
-import type { Token, assetPrices } from "../../types";
-import { getTokenData } from "src/utils";
+import type { TToken, TAssetPrices } from "@types";
+import { getTokenData } from "@utils";
 
 type Props = {
   vault?: `0x${string}` | undefined;
@@ -65,7 +65,7 @@ type AssetAllowance = {
 export function addAssetsPrice(data: any) {
   const tokenAdress = data[0];
   const tokenPrice = data[1];
-  const assetPrice: assetPrices = {};
+  const assetPrice: TAssetPrices = {};
   if (tokenAdress.length === tokenPrice.length) {
     for (let i = 0; i < tokenAdress.length; i++) {
       assetPrice[tokenAdress[i]] = {
@@ -462,6 +462,7 @@ function Vault(props: Props) {
         <table style={{ display: "flex", justifyContent: "center" }}>
           <tbody style={{ display: "flex" }}>
             <tr
+              className="rounded-xl"
               style={{
                 display: "grid",
                 border: "1px",
@@ -481,6 +482,7 @@ function Vault(props: Props) {
           </tbody>
         </table>
         <div
+          className="rounded-xl"
           style={{
             width: "100%",
             display: "grid",
@@ -498,6 +500,7 @@ function Vault(props: Props) {
               padding: "0",
             }}>
             <button
+              className="border-b-2 border-r-2"
               style={{
                 width: "100%",
                 height: "65px",
@@ -505,13 +508,12 @@ function Vault(props: Props) {
                 cursor: "pointer",
                 padding: "0",
                 margin: "0",
-                borderStyle: "solid",
-                borderWidth: "1px",
               }}
               onClick={() => setTab("Deposit")}>
               Deposit
             </button>
             <button
+              className="border-b-2 border-l-2"
               style={{
                 width: "100%",
                 height: "65px",
@@ -519,8 +521,6 @@ function Vault(props: Props) {
                 cursor: "pointer",
                 padding: "0",
                 margin: "0",
-                borderStyle: "solid",
-                borderWidth: "1px",
               }}
               onClick={() => setTab("Withdraw")}>
               Withdraw
@@ -546,12 +546,12 @@ function Vault(props: Props) {
                 Select token
               </label>
               <select
+                className="rounded-xl bg-gray-600"
                 onChange={e => changeOption(e.target.value.split(", "))}
                 style={{
                   height: "50px",
                   width: "280px",
                   fontSize: "30px",
-                  color: "black",
                 }}>
                 <option
                   value={defaultOptionAssets}
@@ -582,6 +582,7 @@ function Vault(props: Props) {
                 }}>
                 {option.map(asset => (
                   <div
+                    className="rounded-xl"
                     key={asset}
                     style={{
                       display: "grid",
@@ -621,6 +622,7 @@ function Vault(props: Props) {
                               balances[asset].assetBalance}
                           </div>
                           <button
+                            className="rounded-md w-12"
                             type="button"
                             onClick={() =>
                               balances &&
@@ -711,6 +713,7 @@ function Vault(props: Props) {
                   width: "100%",
                 }}>
                 <div
+                  className="rounded-xl"
                   style={{
                     display: "grid",
                     margin: "auto",
@@ -757,6 +760,7 @@ function Vault(props: Props) {
                                 option[0]
                               )
                             }
+                            className="rounded-md w-12"
                             type="button"
                             style={{
                               color: "grey",
@@ -833,6 +837,7 @@ function Vault(props: Props) {
             {tab === "Deposit" ? (
               approve === 1 ? (
                 <button
+                  className="rounded-xl"
                   type="button"
                   onClick={() => deposit()}
                   style={{
@@ -855,6 +860,7 @@ function Vault(props: Props) {
                       Number(getTokenData(asset)?.decimals)
                     ) < inputs[asset].ammount ? (
                       <button
+                        className="rounded-xl"
                         key={asset}
                         type="button"
                         onClick={() => approvee(asset as `0x${string}`)}
@@ -897,6 +903,7 @@ function Vault(props: Props) {
               )
             ) : (
               <button
+                className="rounded-xl"
                 type="button"
                 style={{
                   margin: "auto",
@@ -913,12 +920,11 @@ function Vault(props: Props) {
           </form>
 
           <section
+            className="border-t-2"
             style={{
               padding: "25px",
 
               opacity: "50%",
-              borderStyle: "solid",
-              borderWidth: "1px",
             }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <p
@@ -990,7 +996,7 @@ function Vault(props: Props) {
         </div>
 
         <article
-          className="Strategy"
+          className="Strategy rounded-xl p-7"
           style={{
             borderStyle: "solid",
             paddingLeft: "25px",
@@ -1000,6 +1006,7 @@ function Vault(props: Props) {
             margin: "auto",
           }}>
           <h2
+            className="pb-5 text-2xl"
             style={{
               justifyContent: "start",
               display: "flex",
@@ -1008,11 +1015,12 @@ function Vault(props: Props) {
           </h2>
           {$assets &&
             $assets.map(asset => {
-              const assetData: Token | undefined = getTokenData(asset);
+              const assetData: TToken | undefined = getTokenData(asset);
 
               if (assetData && $assetsPrices) {
                 return (
                   <article
+                    className="rounded-xl"
                     key={asset}
                     style={{
                       padding: "15px",
@@ -1029,8 +1037,9 @@ function Vault(props: Props) {
                         alignItems: "center",
                         height: "40px",
                       }}>
-                      <h4>{assetData.name}</h4>
+                      <h4 className="pb-3">{assetData.name}</h4>
                       <div
+                        className="rounded-md"
                         style={{
                           backgroundColor: "#4B0082",
                           alignItems: "center",

@@ -7,6 +7,9 @@ interface IProps {
 }
 
 const { title } = Astro.props as IProps;
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1); // remove the first "/"
+
 ---
 
 <!doctype html>
@@ -22,10 +25,12 @@ const { title } = Astro.props as IProps;
 	<body>
 		<App client:load>
 			<header>
-				<span class="title"><img src="logo.svg" /></span>
+				<span class="title">
+					<a href="/" title="Stability"><img src="logo.svg" /><span>Stability</span></a>
+				</span>
 				<span class="menu">
-					<a href="/">Vaults</a>
-					<!-- <a href="/factory">Factory</a> -->
+					<a class={currentPath === "" ? "active" : ""} href="/">Vaults</a>
+					<a class={currentPath === "dao" ? "active" : ""} href="/dao">DAO</a>
 				</span>
 				<span class="bar"><Wallet client:only="react" /></span>
 			</header>
@@ -62,18 +67,27 @@ const { title } = Astro.props as IProps;
 		display: flex; 
 		justify-content: space-between;
 		align-items: center;
-		height: 50px;
+		height: 60px;
 	}
 	header > span {
 		width: 30%;
 	}
 	.title {
 		display: flex;
-		align-items: center
+		align-items: center;
+		/* padding-top: 2px; */
+	}
+	.title > a {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: nowrap;
+		font-size: 18px;
+		font-weight: bold;
+		text-transform: uppercase;
 	}
 	.title img {
-		margin: 0 10px;
-		height: 30px;
+		margin: 0 6px 0 10px;
+		height: 34px;
 	}
 	.menu {
 		display: flex;
@@ -83,19 +97,22 @@ const { title } = Astro.props as IProps;
 	.menu > a {
 		margin: 0;
 		min-width: 90px;
-		height: 50px;
+		height: 60px;
 		color: white;
 		display: flex;
 		align-self: center;
 		align-items: center;
 		justify-content: center;
 		text-decoration: none;
+		font-size: 17px;
+		border-bottom: 3px solid transparent;
+		padding-top: 3px;
 	}
 	.menu > a.active {
-		background-color: #431f5d;
+		border-bottom: 3px solid #ccb3f3;
 	}
 	.menu > a:hover {
-		background-color: #552874;
+		background-color: #3e294c;
 	}
 
 	.bar {
@@ -114,7 +131,7 @@ const { title } = Astro.props as IProps;
 
 	main {
 		margin: auto;
-		padding: 1rem;
+		padding: 1rem 0.5rem;
 		width: 1200px;
 		max-width: calc(100% - 2rem);
 		color: white;
@@ -145,7 +162,7 @@ const { title } = Astro.props as IProps;
 		min-width: 100px;
 		height: 30px;
 		color: white;
-		background-color: indigo;
+		background-color: #424658;
 		display: inline-flex;
 		margin: 10px;
 		align-self: center;

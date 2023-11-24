@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect } from "react";
+import { parseUnits } from "viem";
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -18,15 +19,19 @@ import {
   addVaultData,
   vaults,
   vaultAssets,
+  isVaultsLoaded,
 } from "@store";
-import { platform } from "../../constants";
-import { PlatformABI, IVaultManagerABI } from "@web3";
+import {
+  platform,
+  PlatformABI,
+  IVaultManagerABI,
+  ERC20MetadataUpgradeableABI,
+} from "@web3";
 
 const AppStore = (props: React.PropsWithChildren) => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
-
   const getData = async () => {
     if (address && chain?.id) {
       const contractData = await readContract(_publicClient, {
@@ -62,7 +67,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
         const erc20Balance: { [token: string]: bigint } = {};
         const erc721Balance: { [token: string]: bigint } = {};
-        console.log(contractBalance);
+
         //function -> .set vault/
         addVaultData(contractBalance);
         addAssetsPrice(contractBalance);
@@ -90,7 +95,18 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: IVaultManagerABI,
         functionName: "vaults",
       });
-      const assets: any[] = await Promise.all(
+
+      /// debug visual
+      // if (contractVaults?.length) {
+      //   console.log('contractVaults', contractVaults)
+      //   contractVaults[5][0] = parseUnits('1.09343432', 18)
+      //   contractVaults[6][0] = parseUnits('814658.09343432', 18)
+      //   contractVaults[7][0] = parseUnits('24.682', 16)
+      //   contractVaults[8][0] = parseUnits('16.157', 16)
+      // }
+      ///////////////////////
+
+      const vaultInfoes: any[] = await Promise.all(
         contractVaults[0].map(async (vault: string) => {
           const response: any = await readContract(_publicClient, {
             address: contractBalance[6][1],
@@ -98,15 +114,46 @@ const AppStore = (props: React.PropsWithChildren) => {
             functionName: "vaultInfo",
             args: [vault],
           });
-          return response[1];
+          return response;
         })
       );
 
+      /// debug visual
+      // if (vaultInfoes?.length) {
+      //   console.log('vaultInfo', vaultInfoes[0])
+      //   vaultInfoes[0][3] = [
+      //     '0x45A3A657b834699f5cC902e796c547F826703b79',
+      //     '0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4',
+      //   ]
+      //   vaultInfoes[0][4] = [
+      //     parseUnits('9.6572445545', 16),
+      //     parseUnits('3.5355231352413', 16)
+      //   ]
+      //   vaultInfoes[0][5] = BigInt(1700574478)
+      //   console.log('vaultInfo test', vaultInfoes[0])
+      // }
+      ///////////////////////
+
+      vaultInfoes.forEach(async (vaultInfo, index) => {
+        if (vaultInfo[3]?.length) {
+          for (let i = 0; i < vaultInfo[3]?.length; i++) {
+            const assetWithApr = vaultInfo[3][i];
+            const symbol = await readContract(_publicClient, {
+              address: assetWithApr,
+              abi: ERC20MetadataUpgradeableABI,
+              functionName: "symbol",
+            });
+            vaultInfoes[index][3][i] = symbol;
+          }
+        }
+      });
+
+      isVaultsLoaded.set(true);
       if (contractVaults) {
         vaults.set(contractVaults);
       }
-      if (assets) {
-        vaultAssets.set(assets);
+      if (vaultInfoes) {
+        vaultAssets.set(vaultInfoes);
       }
     }
   };

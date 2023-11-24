@@ -1,7 +1,7 @@
 const TABLE = [
   { name: "Name", keyName: "name", sortType: "none", dataType: "string" },
   {
-    name: "Type",
+    name: "Type", 
     keyName: "type",
     sortType: "none",
     dataType: "string",

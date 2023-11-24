@@ -1,32 +1,35 @@
 import { atom } from "nanostores";
 import type { PublicClient } from "wagmi";
 import type {
-  PlatformData,
-  UserBalance,
-  Vaults,
-  assetPrices,
-  Balances,
+  TPlatformData,
+  TUserBalance,
+  TVaults,
+  TAssetPrices,
+  TBalances,
   TVaultAssets,
-} from "../types";
+} from "@types";
 
 const account = atom<string | undefined>();
 const network = atom<string | undefined>();
 const publicClient = atom<PublicClient | undefined>();
-const platformData = atom<PlatformData | undefined>();
-const userBalance = atom<UserBalance | undefined>();
+const platformData = atom<TPlatformData | undefined>();
+const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
-const assetsPrices = atom<assetPrices | undefined>();
-const assetsBalances = atom<Balances | undefined>();
-const vaultData = atom<Vaults>({});
+const assetsPrices = atom<TAssetPrices | undefined>();
+const assetsBalances = atom<TBalances | undefined>();
+
+const vaultData = atom<TVaults>({});
+
 const vaults = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();
+const isVaultsLoaded = atom<boolean>(false);
 
 //Assets balances
 const addAssetBalance = (r: any[]) => {
   const assets = r[0];
   const _assetsBalances = r[2];
-  const balances: Balances = {};
+  const balances: TBalances = {};
   if (assets.length === _assetsBalances.length) {
     for (let i = 0; i < assets.length; i++) {
       balances[assets[i]] = {
@@ -44,7 +47,7 @@ const addVaultData = (data: any[]) => {
   const vaultAddress = data[3];
   const vaultSharePrice = data[4];
   const vaultUserBalance = data[5];
-  const vault: Vaults = {};
+  const vault: TVaults = {};
   if (
     vaultAddress.length === vaultSharePrice.length &&
     vaultAddress.length === vaultUserBalance.length
@@ -76,4 +79,5 @@ export {
   addAssetBalance,
   addVaultData,
   vaultAssets,
+  isVaultsLoaded,
 };

@@ -9,15 +9,15 @@ import { readContract } from "viem/actions";
 import { FactoryABI, ERC20ABI } from "@web3";
 import { account, platformData, userBalance, lastTx } from "@store";
 
-import type { InitParams } from "../../types";
-import { getTokenData } from "../../utils";
+import type { TInitParams } from "@types";
+import { getTokenData } from "@utils";
 
 type Props = {
   buildingPrice: bigint;
   vaultType: string;
   strategyId: string;
   strategyDesc: string;
-  initParams: InitParams;
+  initParams: TInitParams;
   defaultBoostTokens: string[];
 };
 
