@@ -100,11 +100,6 @@ type TAPRModal = {
   state: boolean;
 };
 
-type IFeature = {
-  name: string;
-  svg?: string;
-};
-
 export type {
   TPlatformData,
   TUserBalance,

@@ -103,6 +103,8 @@ function Vault(props: Props) {
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
   const [sharesOut, setSharesOut] = useState<bigint>();
+  console.log($assetsBalances);
+  console.log(inputs);
 
   useEffect(() => {
     async function getStrategy() {
@@ -205,7 +207,7 @@ function Vault(props: Props) {
         const preview: input = {};
         // const previewBigInt: PreviewBigInt = {};
 
-        if ($assets && $assets.length > 0) {
+        if ($assets && $assets.length > 0 && tab !== "Withdraw") {
           let amounts: bigint[] = [];
           for (let i = 0; i < $assets.length; i++) {
             if (i === changedInput) {
@@ -372,11 +374,14 @@ function Vault(props: Props) {
 
   function handleInputChange(amount: string, asset: string) {
     const decimals = getTokenData(asset)?.decimals;
+    console.log(amount);
 
     if (decimals) {
       const _amount = parseUnits(amount, decimals);
       if (amount === "") {
         resetInputs(option);
+        // } else if (amount === "0" || amount === "0.") {
+        //   resetInputs(option);
       } else {
         setInputs(prevInputs => ({
           ...prevInputs,
@@ -456,6 +461,8 @@ function Vault(props: Props) {
     console.log(d);
   }
 
+  async function withdraw() {}
+
   if (props.vault && $vault[props.vault]) {
     return (
       <>
@@ -509,7 +516,10 @@ function Vault(props: Props) {
                 padding: "0",
                 margin: "0",
               }}
-              onClick={() => setTab("Deposit")}>
+              onClick={() => {
+                setTab("Deposit");
+                resetInputs(option);
+              }}>
               Deposit
             </button>
             <button
@@ -522,7 +532,10 @@ function Vault(props: Props) {
                 padding: "0",
                 margin: "0",
               }}
-              onClick={() => setTab("Withdraw")}>
+              onClick={() => {
+                setTab("Withdraw");
+                resetInputs(option);
+              }}>
               Withdraw
             </button>
           </div>
@@ -571,19 +584,368 @@ function Vault(props: Props) {
                   })}
               </select>
             </div>
-            {option && option.length > 1 ? (
-              <div
-                style={{
-                  display: "grid",
-                  margin: "auto",
-                  marginTop: "15px",
-                  fontSize: "15px",
-                  width: "100%",
-                }}>
-                {option.map(asset => (
+
+            {tab === "Deposit" && (
+              <>
+                {option && option.length > 1 ? (
+                  <div
+                    style={{
+                      display: "grid",
+                      margin: "auto",
+                      marginTop: "15px",
+                      fontSize: "15px",
+                      width: "100%",
+                    }}>
+                    {option.map(asset => (
+                      <div
+                        className="rounded-xl"
+                        key={asset}
+                        style={{
+                          display: "grid",
+                          margin: "auto",
+                          position: "relative",
+                          height: "150px",
+                          borderStyle: "solid",
+                          borderWidth: "1px",
+                          borderColor: "grey",
+                          marginTop: "7px",
+                          marginBottom: "7px",
+                          paddingLeft: "10px",
+                        }}>
+                        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: "0",
+                              bottom: "0",
+                              padding: "15px",
+                              paddingRight: "12px",
+                              paddingBottom: "12px",
+                            }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}>
+                              <div
+                                style={{
+                                  textAlign: "left",
+                                  color: "grey",
+                                }}>
+                                Balance:{" "}
+                                {balances &&
+                                  balances[asset] &&
+                                  balances[asset].assetBalance}
+                              </div>
+                              <button
+                                className="rounded-md w-12"
+                                type="button"
+                                onClick={() =>
+                                  balances &&
+                                  balances[asset] &&
+                                  handleInputChange(
+                                    balances[asset].assetBalance,
+                                    asset
+                                  )
+                                }
+                                style={{
+                                  color: "grey",
+                                  border: "solid",
+                                  background: "none",
+                                  borderWidth: "1px",
+                                  marginLeft: "5px",
+                                  borderColor: "grey",
+                                }}>
+                                max
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <input
+                          list="amount"
+                          id={asset}
+                          name="amount"
+                          placeholder="0"
+                          value={
+                            inputs && inputs[asset] && inputs[asset].ammount
+                          }
+                          onChange={e =>
+                            handleInputChange(e.target.value, e.target.id)
+                          }
+                          type="text"
+                          onKeyDown={evt =>
+                            ["e", "E", "+", "-", " "].includes(evt.key) &&
+                            evt.preventDefault()
+                          }
+                          style={{
+                            width: "60%",
+                            height: "40px",
+                            fontSize: "30px",
+                            background: "none",
+                            borderStyle: "none",
+                            color: "white",
+                            marginBottom: "15px",
+                            paddingLeft: "15px",
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "32%",
+                            right: "13px",
+                          }}>
+                          {tokensJson.tokens.map(token => {
+                            if (token.address === asset) {
+                              return (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                  key={token.address}>
+                                  <p>{token.symbol}</p>
+                                  <img
+                                    style={{
+                                      width: "40px",
+                                      height: "40px",
+                                      borderRadius: "50%",
+                                      marginLeft: "8px",
+                                    }}
+                                    src={token.logoURI}
+                                    alt={token.name}
+                                  />
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "grid",
+                      margin: "auto",
+                      marginTop: "15px",
+                      fontSize: "15px",
+                      width: "100%",
+                    }}>
+                    <div
+                      className="rounded-xl"
+                      style={{
+                        display: "grid",
+                        margin: "auto",
+                        position: "relative",
+                        height: "150px",
+                        borderStyle: "solid",
+                        borderWidth: "1px",
+                        borderColor: "grey",
+                        marginTop: "7px",
+                        marginBottom: "7px",
+                        paddingLeft: "10px",
+                      }}>
+                      {balances && balances[option[0]] && (
+                        <div
+                          style={{
+                            marginTop: "5px",
+                            marginBottom: "5px",
+                          }}>
+                          <div
+                            style={{
+                              position: "absolute",
+                              right: "0",
+                              bottom: "0",
+                              padding: "15px",
+                              paddingRight: "12px",
+                              paddingBottom: "12px",
+                            }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}>
+                              <div
+                                style={{
+                                  textAlign: "left",
+                                  color: "grey",
+                                }}>
+                                Balance: {balances[option[0]].assetBalance}
+                              </div>
+                              <button
+                                onClick={() =>
+                                  handleInputChange(
+                                    balances[option[0]].assetBalance,
+                                    option[0]
+                                  )
+                                }
+                                className="rounded-md w-12"
+                                type="button"
+                                style={{
+                                  color: "grey",
+                                  border: "solid",
+                                  background: "none",
+                                  borderWidth: "1px",
+                                  marginLeft: "5px",
+                                  borderColor: "grey",
+                                }}>
+                                max
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {option && option.length === 1 && (
+                        <input
+                          list="amount"
+                          id={option[0]}
+                          value={
+                            inputs &&
+                            inputs[option[0]] &&
+                            inputs[option[0]].ammount
+                          }
+                          name="amount"
+                          type="text"
+                          placeholder="0"
+                          onChange={e =>
+                            handleInputChange(e.target.value, e.target.id)
+                          }
+                          onKeyDown={evt =>
+                            ["e", "E", "+", "-", " "].includes(evt.key) &&
+                            evt.preventDefault()
+                          }
+                          style={{
+                            width: "60%",
+                            height: "40px",
+                            fontSize: "30px",
+                            background: "none",
+                            borderStyle: "none",
+                            color: "white",
+                            marginBottom: "15px",
+                            paddingLeft: "15px",
+                          }}
+                        />
+                      )}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "32%",
+                          right: "13px",
+                        }}>
+                        {tokensJson.tokens.map(token => {
+                          if (token.address === option[0]) {
+                            return (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                                key={token.address}>
+                                <p>{token.symbol}</p>
+                                <img
+                                  style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    borderRadius: "50%",
+                                    marginLeft: "8px",
+                                  }}
+                                  src={token.logoURI}
+                                  alt={token.name}
+                                />
+                              </div>
+                            );
+                          }
+                          return null;
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {approve === 1 ? (
+                  <button
+                    className="rounded-xl"
+                    type="button"
+                    onClick={() => deposit()}
+                    style={{
+                      margin: "auto",
+                      fontSize: "35px",
+                      width: "100%",
+                      height: "60px",
+                      cursor: "pointer",
+                      borderStyle: "solid",
+                      borderWidth: "1px",
+                    }}>
+                    Deposit
+                  </button>
+                ) : approve === 2 ? (
+                  <>
+                    {option.map(asset =>
+                      allowance &&
+                      formatUnits(
+                        allowance[asset].allowance[0],
+                        Number(getTokenData(asset)?.decimals)
+                      ) < inputs[asset].ammount ? (
+                        <button
+                          className="rounded-xl"
+                          key={asset}
+                          type="button"
+                          onClick={() => approvee(asset as `0x${string}`)}
+                          style={{
+                            margin: "auto",
+                            fontSize: "35px",
+                            width: "100%",
+                            height: "60px",
+                            cursor: "pointer",
+                            borderStyle: "solid",
+                            borderWidth: "1px",
+                            marginTop: "5px",
+                            marginBottom: "5px",
+                          }}>
+                          Approve {getTokenData(asset)?.symbol}
+                        </button>
+                      ) : (
+                        <></>
+                      )
+                    )}
+                  </>
+                ) : approve === 0 ? (
                   <div
                     className="rounded-xl"
-                    key={asset}
+                    style={{
+                      display: "flex",
+                      margin: "auto",
+                      color: "grey",
+                      borderStyle: "solid",
+                      borderWidth: "1px",
+                      width: "367px",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "60px",
+                      fontSize: "25px",
+                    }}>
+                    INSUFICCIENT BALANCE
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </>
+            )}
+
+            {tab === "Withdraw" && (
+              <>
+                <div
+                  style={{
+                    display: "grid",
+                    margin: "auto",
+                    marginTop: "15px",
+                    fontSize: "15px",
+                    width: "100%",
+                  }}>
+                  <div
+                    className="rounded-xl"
                     style={{
                       display: "grid",
                       margin: "auto",
@@ -596,326 +958,169 @@ function Vault(props: Props) {
                       marginBottom: "7px",
                       paddingLeft: "10px",
                     }}>
-                    <div style={{ marginTop: "5px", marginBottom: "5px" }}>
+                    {balances && balances[option[0]] && (
                       <div
                         style={{
-                          position: "absolute",
-                          right: "0",
-                          bottom: "0",
-                          padding: "15px",
-                          paddingRight: "12px",
-                          paddingBottom: "12px",
-                        }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                          }}>
-                          <div
-                            style={{
-                              textAlign: "left",
-                              color: "grey",
-                            }}>
-                            Balance:{" "}
-                            {balances &&
-                              balances[asset] &&
-                              balances[asset].assetBalance}
-                          </div>
-                          <button
-                            className="rounded-md w-12"
-                            type="button"
-                            onClick={() =>
-                              balances &&
-                              balances[asset] &&
-                              handleInputChange(
-                                balances[asset].assetBalance,
-                                asset
-                              )
-                            }
-                            style={{
-                              color: "grey",
-                              border: "solid",
-                              background: "none",
-                              borderWidth: "1px",
-                              marginLeft: "5px",
-                              borderColor: "grey",
-                            }}>
-                            max
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <input
-                      list="amount"
-                      id={asset}
-                      name="amount"
-                      placeholder="0"
-                      value={inputs && inputs[asset] && inputs[asset].ammount}
-                      onChange={e =>
-                        handleInputChange(e.target.value, e.target.id)
-                      }
-                      type="text"
-                      onKeyDown={evt =>
-                        ["e", "E", "+", "-", " "].includes(evt.key) &&
-                        evt.preventDefault()
-                      }
-                      style={{
-                        width: "60%",
-                        height: "40px",
-                        fontSize: "30px",
-                        background: "none",
-                        borderStyle: "none",
-                        color: "white",
-                        marginBottom: "15px",
-                        paddingLeft: "15px",
-                      }}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "27%",
-                        right: "13px",
-                      }}>
-                      {tokensJson.tokens.map(token => {
-                        if (token.address === asset) {
-                          return (
-                            <div
-                              style={{ display: "flex", alignItems: "center" }}
-                              key={token.address}>
-                              <p>{token.symbol}</p>
-                              <img
-                                style={{
-                                  width: "40px",
-                                  height: "40px",
-                                  borderRadius: "50%",
-                                  marginLeft: "8px",
-                                }}
-                                src={token.logoURI}
-                                alt={token.name}
-                              />
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div
-                style={{
-                  display: "grid",
-                  margin: "auto",
-                  marginTop: "15px",
-                  fontSize: "15px",
-                  width: "100%",
-                }}>
-                <div
-                  className="rounded-xl"
-                  style={{
-                    display: "grid",
-                    margin: "auto",
-                    position: "relative",
-                    height: "150px",
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                    borderColor: "grey",
-                    marginTop: "7px",
-                    marginBottom: "7px",
-                    paddingLeft: "10px",
-                  }}>
-                  {balances && balances[option[0]] && (
-                    <div
-                      style={{
-                        marginTop: "5px",
-                        marginBottom: "5px",
-                      }}>
-                      <div
-                        style={{
-                          position: "absolute",
-                          right: "0",
-                          bottom: "0",
-                          padding: "15px",
-                          paddingRight: "12px",
-                          paddingBottom: "12px",
-                        }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                          }}>
-                          <div
-                            style={{
-                              textAlign: "left",
-                              color: "grey",
-                            }}>
-                            Balance: {balances[option[0]].assetBalance}
-                          </div>
-                          <button
-                            onClick={() =>
-                              handleInputChange(
-                                balances[option[0]].assetBalance,
-                                option[0]
-                              )
-                            }
-                            className="rounded-md w-12"
-                            type="button"
-                            style={{
-                              color: "grey",
-                              border: "solid",
-                              background: "none",
-                              borderWidth: "1px",
-                              marginLeft: "5px",
-                              borderColor: "grey",
-                            }}>
-                            max
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {option && option.length === 1 && (
-                    <input
-                      list="amount"
-                      id={option[0]}
-                      value={
-                        inputs && inputs[option[0]] && inputs[option[0]].ammount
-                      }
-                      name="amount"
-                      type="text"
-                      placeholder="0"
-                      onChange={e =>
-                        handleInputChange(e.target.value, e.target.id)
-                      }
-                      onKeyDown={evt =>
-                        ["e", "E", "+", "-", " "].includes(evt.key) &&
-                        evt.preventDefault()
-                      }
-                      style={{
-                        width: "60%",
-                        height: "40px",
-                        fontSize: "30px",
-                        background: "none",
-                        borderStyle: "none",
-                        color: "white",
-                        marginBottom: "15px",
-                        paddingLeft: "15px",
-                      }}
-                    />
-                  )}
-                  <div
-                    style={{ position: "absolute", top: "27%", right: "13px" }}>
-                    {tokensJson.tokens.map(token => {
-                      if (token.address === option[0]) {
-                        return (
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                            key={token.address}>
-                            <p>{token.symbol}</p>
-                            <img
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "50%",
-                                marginLeft: "8px",
-                              }}
-                              src={token.logoURI}
-                              alt={token.name}
-                            />
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-            {tab === "Deposit" ? (
-              approve === 1 ? (
-                <button
-                  className="rounded-xl"
-                  type="button"
-                  onClick={() => deposit()}
-                  style={{
-                    margin: "auto",
-                    fontSize: "35px",
-                    width: "100%",
-                    height: "60px",
-                    cursor: "pointer",
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                  }}>
-                  Deposit
-                </button>
-              ) : approve === 2 ? (
-                <>
-                  {option.map(asset =>
-                    allowance &&
-                    formatUnits(
-                      allowance[asset].allowance[0],
-                      Number(getTokenData(asset)?.decimals)
-                    ) < inputs[asset].ammount ? (
-                      <button
-                        className="rounded-xl"
-                        key={asset}
-                        type="button"
-                        onClick={() => approvee(asset as `0x${string}`)}
-                        style={{
-                          margin: "auto",
-                          fontSize: "35px",
-                          width: "100%",
-                          height: "60px",
-                          cursor: "pointer",
-                          borderStyle: "solid",
-                          borderWidth: "1px",
                           marginTop: "5px",
                           marginBottom: "5px",
                         }}>
-                        Approve {getTokenData(asset)?.symbol}
-                      </button>
-                    ) : (
-                      ""
-                    )
-                  )}
-                </>
-              ) : approve === 0 ? (
-                <div
-                  style={{
-                    display: "flex",
-                    margin: "auto",
-                    color: "grey",
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                    width: "367px",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "60px",
-                    fontSize: "25px",
-                  }}>
-                  INSUFICCIENT BALANCE
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "0",
+                            bottom: "0",
+                            padding: "15px",
+                            paddingRight: "12px",
+                            paddingBottom: "12px",
+                          }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                            }}>
+                            <div
+                              style={{
+                                textAlign: "left",
+                                color: "grey",
+                              }}>
+                              Balance:{" "}
+                              {formatUnits(
+                                $vault[props.vault].vaultUserBalance,
+                                18
+                              )}
+                            </div>
+                            <button
+                              // onClick={() =>
+                              //   handleInputChange(
+                              //     formatUnits(
+                              //       $vault[props.vault].vaultUserBalance,
+                              //       18
+                              //     )
+                              //   )
+                              // }
+                              className="rounded-md w-12"
+                              type="button"
+                              style={{
+                                color: "grey",
+                                border: "solid",
+                                background: "none",
+                                borderWidth: "1px",
+                                marginLeft: "5px",
+                                borderColor: "grey",
+                              }}>
+                              max
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {option && (
+                      <input
+                        list="amount"
+                        id={option[0]}
+                        value={
+                          inputs &&
+                          inputs[option[0]] &&
+                          inputs[option[0]].ammount
+                        }
+                        name="amount"
+                        type="text"
+                        placeholder="0"
+                        onChange={e =>
+                          handleInputChange(e.target.value, e.target.id)
+                        }
+                        onKeyDown={evt =>
+                          ["e", "E", "+", "-", " "].includes(evt.key) &&
+                          evt.preventDefault()
+                        }
+                        style={{
+                          width: "60%",
+                          height: "40px",
+                          fontSize: "30px",
+                          background: "none",
+                          borderStyle: "none",
+                          color: "white",
+                          marginBottom: "15px",
+                          paddingLeft: "15px",
+                        }}
+                      />
+                    )}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "32%",
+                        right: "13px",
+                      }}>
+                      {option.length === 1 ? (
+                        <>
+                          {tokensJson.tokens.map(token => {
+                            if (token.address === option[0]) {
+                              return (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                  key={token.address}>
+                                  <p>{token.symbol}</p>
+                                  <img
+                                    style={{
+                                      width: "40px",
+                                      height: "40px",
+                                      borderRadius: "50%",
+                                      marginLeft: "8px",
+                                    }}
+                                    src={token.logoURI}
+                                    alt={token.name}
+                                  />
+                                </div>
+                              );
+                            }
+                          })}
+                        </>
+                      ) : (
+                        <div
+                          style={{
+                            display: "flex",
+                            height: "45px",
+                          }}>
+                          <div
+                            style={{
+                              alignItems: "center",
+                              margin: "auto",
+                              marginRight: "5px",
+                            }}>
+                            <p>{defaultOptionSymbols}</p>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              width: "60px",
+                              position: "relative",
+                            }}>
+                            {option.map((token, i) => (
+                              <img
+                                key={token}
+                                style={{
+                                  zIndex: i + 1,
+                                  position: "absolute",
+                                  width: "40px",
+                                  height: "40px",
+                                  borderRadius: "50%",
+                                  left: `${i * 25}px`,
+                                }}
+                                src={getTokenData(token)?.logoURI}
+                                alt={getTokenData(token)?.name}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div></div>
-              )
-            ) : (
-              <button
-                className="rounded-xl"
-                type="button"
-                style={{
-                  margin: "auto",
-                  fontSize: "35px",
-                  width: "100%",
-                  height: "60px",
-                  cursor: "pointer",
-                  borderStyle: "solid",
-                  borderWidth: "1px",
-                }}>
-                Withdraw
-              </button>
+              </>
             )}
           </form>
 
@@ -1117,7 +1322,6 @@ function Vault(props: Props) {
                   </article>
                 );
               }
-
               return null;
             })}
         </article>
