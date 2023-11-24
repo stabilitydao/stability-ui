@@ -402,13 +402,17 @@ function Vault(props: Props) {
   async function approvee(asset: `0x${string}`) {
     if (vaultt) {
       const allowanceResult: Allowance = {};
-      const maxUni = getTokenData(asset)?.decimals as number;
-      const maxUnits = parseUnits("1", getTokenData(asset)?.decimals as number);
+      const maxUni = parseUnits(
+        inputs[asset].ammount,
+        getTokenData(asset)?.decimals as number
+      );
+      // const maxUnits = parseUnits("1", 36);
+
       const r = await writeContract({
         address: asset,
         abi: ERC20ABI,
         functionName: "approve",
-        args: [vaultt, maxUnits],
+        args: [vaultt, maxUni],
       });
       console.log(r);
 
