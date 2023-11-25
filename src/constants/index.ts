@@ -1,5 +1,5 @@
 const TABLE = [
-  { name: "Name", keyName: "name", sortType: "none", dataType: "string" },
+  { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
   {
     name: "Type",
     keyName: "type",
