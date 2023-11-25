@@ -19,6 +19,7 @@ import {
   assetsBalances,
   account,
   platformData,
+  vaults,
 } from "@store";
 
 import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
@@ -62,6 +63,14 @@ type AssetAllowance = {
   allowance: bigint[];
 };
 
+type Vaults = {
+  [vaultAddress: string]: VaultsData;
+};
+
+type VaultsData = {
+  symbol: string;
+};
+
 export function addAssetsPrice(data: any) {
   const tokenAdress = data[0];
   const tokenPrice = data[1];
@@ -79,13 +88,15 @@ export function addAssetsPrice(data: any) {
 }
 
 function Vault(props: Props) {
-  const vaultt: `0x${string}` | undefined = props.vault;
+  const vaultt: `0x${string}` = props.vault as `0x${string}`;
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
   const $vault = useStore(vaultData);
   const $assets = useStore(assets);
   const $account = useStore(account);
+  const $vaults = useStore(vaults);
   const _publicClient = usePublicClient();
+
   const p = useStore(platformData);
 
   const [option, setOption] = useState<string[]>([]);
@@ -94,8 +105,6 @@ function Vault(props: Props) {
   const [tab, setTab] = useState("Deposit");
   const [balances, setBalances] = useState<Balance>({});
   const [inputs, setInputs] = useState<input>({});
-  // const [inputsPreviewDeposit, setinputsPreviewDeposit] =
-  //   useState<inputPreview>({});
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
@@ -103,8 +112,12 @@ function Vault(props: Props) {
   const [allowance, setAllowance] = useState<Allowance | undefined>({});
   const [approve, setApprove] = useState<number | undefined>();
   const [sharesOut, setSharesOut] = useState<bigint>();
+  const [symbols, setSymbols] = useState<Vaults>({});
+  const [withdrawBalance, setWithdrawBalance] = useState<bigint>();
+
   console.log($assetsBalances);
   console.log(inputs);
+  console.log(symbols);
 
   useEffect(() => {
     async function getStrategy() {
@@ -133,6 +146,7 @@ function Vault(props: Props) {
       }
     }
     getStrategy();
+    loadSymbols();
   }, [props]);
 
   useEffect(() => {
@@ -202,14 +216,13 @@ function Vault(props: Props) {
 
   useEffect(() => {
     async function previewDeposit() {
-      if ($assets && lastKeyPress.key1) {
+      if ($assets && lastKeyPress.key1 && tab === "Deposit") {
         const changedInput = $assets?.indexOf(lastKeyPress.key1);
         const preview: input = {};
-        // const previewBigInt: PreviewBigInt = {};
 
-        if ($assets && $assets.length > 0 && tab !== "Withdraw") {
+        if (option && option.length > 0) {
           let amounts: bigint[] = [];
-          for (let i = 0; i < $assets.length; i++) {
+          for (let i = 0; i < option.length; i++) {
             if (i === changedInput) {
               amounts.push(
                 parseUnits(
@@ -234,6 +247,7 @@ function Vault(props: Props) {
                   args: [$assets, amounts],
                 }
               )) as (bigint | bigint[])[];
+              console.log(t);
 
               checkInputsAllowance(t[0] as bigint[]);
               setSharesOut(((t[1] as bigint) * BigInt(1)) / BigInt(100));
@@ -248,16 +262,6 @@ function Vault(props: Props) {
                   };
                 }
               }
-
-              // const rr: bigint[] = Array.isArray(t[0]) ? t[0] : [t[0]];
-
-              // for (let i = 0; i < $assets.length; i++) {
-              //   previewBigInt[$assets[i]] = {
-              //     ammount: rr[i],
-              //   };
-              // }
-              // setinputsPreviewDeposit(previewBigInt);
-
               if (lastKeyPress.key2 !== "") {
                 setInputs(prevInputs => ({
                   ...prevInputs,
@@ -269,16 +273,42 @@ function Vault(props: Props) {
                 "Error: the asset balance is too low to convert.",
                 error
               );
-
-              // resetInputs(option);
               setApprove(undefined);
             }
           }
+        }
+      } else {
+        const preview: input = {};
+        if ($assets) {
+          for (let i = 0; i < $assets.length; i++) {
+            preview[$assets[i]] = {
+              ammount: lastKeyPress.key2 as string,
+            };
+          }
+
+          if (lastKeyPress.key2 !== "") {
+            setInputs(prevInputs => ({
+              ...preview,
+            }));
+          }
+          console.log(preview);
         }
       }
     }
     previewDeposit();
   }, [lastKeyPress]);
+
+  function loadSymbols() {
+    if ($vaults) {
+      const vaultData: Vaults = {};
+      for (let i = 0; i < $vaults[0].length; i++) {
+        vaultData[$vaults[0][i]] = {
+          symbol: $vaults[2][i],
+        };
+        setSymbols(vaultData);
+      }
+    }
+  }
 
   function checkInputsAllowance(input: bigint[]) {
     const apprDepo = [];
@@ -373,34 +403,20 @@ function Vault(props: Props) {
   }
 
   function handleInputChange(amount: string, asset: string) {
-    const decimals = getTokenData(asset)?.decimals;
-    console.log(amount);
+    if (amount === "") {
+      resetInputs(option);
+    } else {
+      setInputs(prevInputs => ({
+        ...prevInputs,
+        [asset]: {
+          ammount: amount,
+        },
+      }));
+    }
 
-    if (decimals) {
-      const _amount = parseUnits(amount, decimals);
-      if (amount === "") {
-        resetInputs(option);
-        // } else if (amount === "0" || amount === "0.") {
-        //   resetInputs(option);
-      } else {
-        setInputs(prevInputs => ({
-          ...prevInputs,
-          [asset]: {
-            ammount: amount,
-          },
-        }));
-
-        // setinputsPreviewDeposit(prevInputs => ({
-        //   ...prevInputs,
-        //   [asset]: {
-        //     ammount: _amount,
-        //   },
-        // }));
-      }
-
-      if (option.length > 1) {
-        setLastKeyPress({ key1: asset, key2: amount });
-      }
+    setWithdrawBalance;
+    if (option.length > 1) {
+      setLastKeyPress({ key1: asset, key2: amount });
     }
   }
 
@@ -451,6 +467,7 @@ function Vault(props: Props) {
         parseUnits(inputs[option[i]].ammount, tokensJson.tokens[i].decimals)
       );
     }
+    console.log(input);
 
     const d = await writeContract({
       address: vaultt as `0x${string}`,
@@ -461,7 +478,21 @@ function Vault(props: Props) {
     console.log(d);
   }
 
-  async function withdraw() {}
+  async function withdraw() {
+    const value = $vault[vaultt].vaultUserBalance;
+    // const valuee = (value * BigInt(99)) / BigInt(100);
+
+    console.log($account);
+    console.log($assets);
+    console.log(value);
+
+    const w = await writeContract({
+      address: vaultt as `0x${string}`,
+      abi: VaultABI,
+      functionName: "withdrawAssets",
+      args: [$assets, value, [0n, 0n]],
+    });
+  }
 
   if (props.vault && $vault[props.vault]) {
     return (
@@ -984,20 +1015,18 @@ function Vault(props: Props) {
                                 color: "grey",
                               }}>
                               Balance:{" "}
-                              {formatUnits(
-                                $vault[props.vault].vaultUserBalance,
-                                18
-                              )}
+                              {formatUnits($vault[vaultt].vaultUserBalance, 18)}
                             </div>
                             <button
-                              // onClick={() =>
-                              //   handleInputChange(
-                              //     formatUnits(
-                              //       $vault[props.vault].vaultUserBalance,
-                              //       18
-                              //     )
-                              //   )
-                              // }
+                              onClick={() =>
+                                handleInputChange(
+                                  formatUnits(
+                                    $vault[vaultt].vaultUserBalance,
+                                    18
+                                  ),
+                                  option[0]
+                                )
+                              }
                               className="rounded-md w-12"
                               type="button"
                               style={{
@@ -1020,9 +1049,9 @@ function Vault(props: Props) {
                         list="amount"
                         id={option[0]}
                         value={
-                          inputs &&
-                          inputs[option[0]] &&
-                          inputs[option[0]].ammount
+                          $assets && inputs && option.length > 1
+                            ? inputs[$assets[0]] && inputs[$assets[0]].ammount
+                            : inputs[option[0]] && inputs[option[0]].ammount
                         }
                         name="amount"
                         type="text"
@@ -1091,35 +1120,40 @@ function Vault(props: Props) {
                               margin: "auto",
                               marginRight: "5px",
                             }}>
-                            <p>{defaultOptionSymbols}</p>
-                          </div>
-                          <div
-                            style={{
-                              display: "flex",
-                              width: "60px",
-                              position: "relative",
-                            }}>
-                            {option.map((token, i) => (
-                              <img
-                                key={token}
-                                style={{
-                                  zIndex: i + 1,
-                                  position: "absolute",
-                                  width: "40px",
-                                  height: "40px",
-                                  borderRadius: "50%",
-                                  left: `${i * 25}px`,
-                                }}
-                                src={getTokenData(token)?.logoURI}
-                                alt={getTokenData(token)?.name}
-                              />
-                            ))}
+                            <p>
+                              {symbols &&
+                                symbols[vaultt] &&
+                                symbols[vaultt].symbol}
+                            </p>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
+                {$assets &&
+                inputs &&
+                inputs[option[0]] &&
+                inputs[option[0]].ammount !== "" &&
+                $vault[vaultt]?.vaultUserBalance !== undefined &&
+                inputs[option[0]].ammount <
+                  formatUnits($vault[vaultt]?.vaultUserBalance, 18) ? (
+                  <button
+                    type="button"
+                    className="rounded-xl"
+                    style={{
+                      margin: "auto",
+                      fontSize: "35px",
+                      width: "100%",
+                      height: "60px",
+                      cursor: "pointer",
+                      borderStyle: "solid",
+                      borderWidth: "1px",
+                    }}
+                    onClick={() => withdraw()}>
+                    WITHDRAW
+                  </button>
+                ) : null}
               </>
             )}
           </form>
