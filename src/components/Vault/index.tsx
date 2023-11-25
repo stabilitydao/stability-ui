@@ -96,7 +96,6 @@ function Vault(props: Props) {
   const $account = useStore(account);
   const $vaults = useStore(vaults);
   const _publicClient = usePublicClient();
-
   const p = useStore(platformData);
 
   const [option, setOption] = useState<string[]>([]);
@@ -114,6 +113,9 @@ function Vault(props: Props) {
   const [sharesOut, setSharesOut] = useState<bigint>();
   const [symbols, setSymbols] = useState<Vaults>({});
   const [withdrawBalance, setWithdrawBalance] = useState<bigint>();
+
+  console.log(option);
+  console.log($assets);
 
   console.log($assetsBalances);
   console.log(inputs);
@@ -247,7 +249,6 @@ function Vault(props: Props) {
                   args: [$assets, amounts],
                 }
               )) as (bigint | bigint[])[];
-              console.log(t);
 
               checkInputsAllowance(t[0] as bigint[]);
               setSharesOut(((t[1] as bigint) * BigInt(1)) / BigInt(100));
@@ -276,22 +277,6 @@ function Vault(props: Props) {
               setApprove(undefined);
             }
           }
-        }
-      } else {
-        const preview: input = {};
-        if ($assets) {
-          for (let i = 0; i < $assets.length; i++) {
-            preview[$assets[i]] = {
-              ammount: lastKeyPress.key2 as string,
-            };
-          }
-
-          if (lastKeyPress.key2 !== "") {
-            setInputs(prevInputs => ({
-              ...preview,
-            }));
-          }
-          console.log(preview);
         }
       }
     }
@@ -406,17 +391,27 @@ function Vault(props: Props) {
     if (amount === "") {
       resetInputs(option);
     } else {
-      setInputs(prevInputs => ({
-        ...prevInputs,
-        [asset]: {
-          ammount: amount,
-        },
-      }));
-    }
+      if (tab === "Deposit") {
+        setInputs(prevInputs => ({
+          ...prevInputs,
+          [asset]: {
+            ammount: amount,
+          },
+        }));
 
-    setWithdrawBalance;
-    if (option.length > 1) {
-      setLastKeyPress({ key1: asset, key2: amount });
+        if (option.length > 1) {
+          setLastKeyPress({ key1: asset, key2: amount });
+        }
+      } else {
+        const preview: input = {};
+        for (let i = 0; i < option.length; i++) {
+          preview[option[i]] = {
+            ammount: amount as string,
+          };
+        }
+        setInputs(preview);
+        console.log(inputs);
+      }
     }
   }
 
@@ -494,6 +489,17 @@ function Vault(props: Props) {
     });
   }
 
+  function resetOptions() {
+    if ($assets) {
+      setOption($assets);
+      let select = document.getElementById("selectOption") as HTMLSelectElement;
+
+      if (select) {
+        select.value = select.options[0].value;
+      }
+    }
+  }
+
   if (props.vault && $vault[props.vault]) {
     return (
       <>
@@ -550,6 +556,7 @@ function Vault(props: Props) {
               onClick={() => {
                 setTab("Deposit");
                 resetInputs(option);
+                resetOptions();
               }}>
               Deposit
             </button>
@@ -565,6 +572,7 @@ function Vault(props: Props) {
               }}
               onClick={() => {
                 setTab("Withdraw");
+                resetOptions();
                 resetInputs(option);
               }}>
               Withdraw
@@ -590,6 +598,7 @@ function Vault(props: Props) {
                 Select token
               </label>
               <select
+                id="selectOption"
                 className="rounded-xl bg-gray-600"
                 onChange={e => changeOption(e.target.value.split(", "))}
                 style={{
@@ -666,7 +675,9 @@ function Vault(props: Props) {
                                 Balance:{" "}
                                 {balances &&
                                   balances[asset] &&
-                                  balances[asset].assetBalance}
+                                  parseFloat(
+                                    balances[asset].assetBalance
+                                  ).toFixed(3)}
                               </div>
                               <button
                                 className="rounded-md w-12"
@@ -803,7 +814,10 @@ function Vault(props: Props) {
                                   textAlign: "left",
                                   color: "grey",
                                 }}>
-                                Balance: {balances[option[0]].assetBalance}
+                                Balance:{" "}
+                                {parseFloat(
+                                  balances[option[0]].assetBalance
+                                ).toFixed(3)}
                               </div>
                               <button
                                 onClick={() =>
@@ -1015,15 +1029,19 @@ function Vault(props: Props) {
                                 color: "grey",
                               }}>
                               Balance:{" "}
-                              {formatUnits($vault[vaultt].vaultUserBalance, 18)}
+                              {parseFloat(
+                                formatUnits($vault[vaultt].vaultUserBalance, 18)
+                              ).toFixed(3)}
                             </div>
                             <button
                               onClick={() =>
                                 handleInputChange(
-                                  formatUnits(
-                                    $vault[vaultt].vaultUserBalance,
-                                    18
-                                  ),
+                                  parseFloat(
+                                    formatUnits(
+                                      $vault[vaultt].vaultUserBalance,
+                                      18
+                                    )
+                                  ).toFixed(8),
                                   option[0]
                                 )
                               }
@@ -1044,37 +1062,31 @@ function Vault(props: Props) {
                       </div>
                     )}
 
-                    {option && (
-                      <input
-                        list="amount"
-                        id={option[0]}
-                        value={
-                          $assets && inputs && option.length > 1
-                            ? inputs[$assets[0]] && inputs[$assets[0]].ammount
-                            : inputs[option[0]] && inputs[option[0]].ammount
-                        }
-                        name="amount"
-                        type="text"
-                        placeholder="0"
-                        onChange={e =>
-                          handleInputChange(e.target.value, e.target.id)
-                        }
-                        onKeyDown={evt =>
-                          ["e", "E", "+", "-", " "].includes(evt.key) &&
-                          evt.preventDefault()
-                        }
-                        style={{
-                          width: "60%",
-                          height: "40px",
-                          fontSize: "30px",
-                          background: "none",
-                          borderStyle: "none",
-                          color: "white",
-                          marginBottom: "15px",
-                          paddingLeft: "15px",
-                        }}
-                      />
-                    )}
+                    <input
+                      list="amount"
+                      id={option.join(", ")}
+                      value={
+                        inputs && inputs[option[0]] && inputs[option[0]].ammount
+                      }
+                      name="amount"
+                      placeholder="0"
+                      onChange={e =>
+                        handleInputChange(e.target.value, e.target.id)
+                      }
+                      pattern="^[0-9]*[.,]?[0-9]*$"
+                      inputMode="decimal"
+                      style={{
+                        width: "60%",
+                        height: "40px",
+                        fontSize: "30px",
+                        background: "none",
+                        borderStyle: "none",
+                        color: "white",
+                        marginBottom: "15px",
+                        paddingLeft: "15px",
+                      }}
+                    />
+
                     <div
                       style={{
                         position: "absolute",
