@@ -87,14 +87,6 @@ const CreateVaultComponent = () => {
         functionName: "allowedBBTokenVaults",
         abi: PlatformABI,
       });
-      /////
-      const defaultBoostRewardTokens = await $publicClient.readContract({
-        address: platform,
-        functionName: "defaultBoostRewardTokens",
-        abi: PlatformABI,
-      });
-      console.log("defaultBoostRewardTokens", defaultBoostRewardTokens);
-      ///////
       if (Array.isArray(allowedBBTokenVaults)) {
         const allowedBBTokenVaults_: TAllowedBBTokenVaults = {};
         for (let i = 0; i < allowedBBTokenVaults[0].length; ++i) {
@@ -200,7 +192,7 @@ const CreateVaultComponent = () => {
                 For allowed buy-back tokens, the following number of rewarding
                 vaults can be created:
               </p>
-              <div>
+              <div className="flex flex-col">
                 {Object.keys(allowedBBTokenVaults).map((token) => {
                   const tokenData = getTokenData(token);
                   return (
@@ -330,6 +322,10 @@ const CreateVaultComponent = () => {
                 ]
               }
               defaultBoostTokens={defaultBoostTokens}
+              minInitialBoostPerDay={formatUnits(
+                minInitialBoostPerDay as bigint,
+                18
+              )}
             />
           </div>
         </div>

@@ -129,6 +129,10 @@ type TBuildVariant = {
 };
 
 type TAddress = `0x${string}`;
+type TInputItem = {
+  inputValue: string | number;
+  valuePerDay: string;
+};
 
 export type {
   TPlatformData,
@@ -151,4 +155,5 @@ export type {
   IProtocol,
   IFeature,
   IStrategyInfo,
+  TInputItem,
 };
