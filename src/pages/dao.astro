@@ -1,11 +1,10 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import {DAO} from "@components/DAO/DAO"
 ---
 
 <Layout title="DAO">
-    <div class="dao">
-        Under construction
-    </div>
+    <DAO client:load />
 </Layout>
 
 <style is:global>
