@@ -102,8 +102,8 @@ function Vaults() {
             const token2 = getTokenData($vaultAssets[index][1][1]);
 
             assets = [
-              { logo: token1?.logoURI, symbol: token1?.symbol },
-              { logo: token2?.logoURI, symbol: token2?.symbol },
+              { logo: token1?.logoURI, symbol: token1?.symbol, name: token1.name, },
+              { logo: token2?.logoURI, symbol: token2?.symbol, name: token2.name, },
             ];
           }
 
@@ -120,6 +120,7 @@ function Vaults() {
             strategyApr: $vaults[8][index],
             address: $vaults[0][index],
             strategyInfo: StrategyInfo.get($vaults[2][index]),
+            strategySpecific: $vaults[9][index],
           };
         })
         .sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
@@ -134,7 +135,7 @@ function Vaults() {
       <>
         <input
           type="text"
-          className="w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
+          className="mt-1 w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
           placeholder="Search"
           ref={search}
           onChange={() => tableFilter(tableStates)}
@@ -168,15 +169,17 @@ function Vaults() {
                       className="w-6 h-6 rounded-full"
                       src={vault.assets[0].logo}
                       alt={vault.assets[0].symbol}
+                      title={vault.assets[0].name}
                     />
                     <img
-                      className="w-6 h-6 rounded-full ml-[-12px]"
+                      className="w-6 h-6 rounded-full ml-[-8px]"
                       src={vault.assets[1].logo}
                       alt={vault.assets[1].symbol}
+                      title={vault.assets[1].name}
                     />
                   </div>
                   <div className="max-w-[250px] flex items-start flex-col">
-                  <p className="md:whitespace-nowrap font-bold">{vault.symbol}</p>
+                  <p title={vault.name} className="md:whitespace-nowrap font-bold">{vault.symbol}</p>
                   <p className="lg:hidden">{vault.type}</p>
                   <p className="md:hidden">
                   {getStrategyShortName(vault.symbol)}
@@ -185,19 +188,33 @@ function Vaults() {
                   </div>
                 </td>
 
-                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">{vault.type}</td>
-                <td className="max-w-[180px] pl-2 py-2 hidden md:table-cell whitespace-nowrap">
+                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">
+                  {vault.type === 'Compounding' && (
+                    <span title="Compounding vault" className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#00bb99] bg-[#00110a]">C</span>
+                  )}
+                  {vault.type === 'Rewarding' && (
+                    <span title="Rewarding vault" className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#6052ff] bg-[#090816]">R</span>
+                  )}
+                  {vault.type === 'Rewarding Managed' && (
+                    <span title="Rewarding Managed vault" className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#d45a1d] bg-[#170a03]">RM</span>
+                  )}
+                </td>
+                <td className=" pl-2 py-2 hidden md:table-cell whitespace-nowrap">
                   <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                   {vault.strategyInfo && (
                     <>
-                    <span style={{
-                      backgroundColor: vault.strategyInfo.bgColor,
-                      color: vault.strategyInfo.color,
-                    }}  className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center w-[48px]">{vault.strategyInfo.shortName}</span>
-                    <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[150px]">
+                    <span
+                      style={{
+                        backgroundColor: vault.strategyInfo.bgColor,
+                        color: vault.strategyInfo.color,
+                      }}
+                      className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center w-[48px]"
+                      title={vault.strategyInfo.name}
+                    >{vault.strategyInfo.shortName}</span>
+                    <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[170px]">
                       <span className="flex min-w-[42px] justify-center">
                         {vault.strategyInfo.protocols.map((p,i) => (
-                          <img className={`h-6 w-6 rounded-full ${vault.strategyInfo.protocols.length > 1 && i ? 'ml-[-6px]' : ''}`} key={i} src={p.logoSrc} alt={p.name} title={p.name} />
+                          <img className={`h-6 w-6 rounded-full ${vault.strategyInfo.protocols.length > 1 && i ? 'ml-[-8px]' : ''}`} key={i} src={p.logoSrc} alt={p.name} title={p.name} />
                         ))}
                       </span>
                       <span className="flex">
@@ -205,8 +222,8 @@ function Vaults() {
                         <img title={f.name} alt={f.name} className="w-6 h-6 ml-1" src={`data:image/svg+xml;utf8,${encodeURIComponent(f.svg)}`} />
                       ))}
                       </span>
-                      {vault.strategyInfo.specific && 
-                        <span className="ml-0.5 lowercase font-bold text-[12px] px-[6px] rounded-[4px]">{vault.strategyInfo.specific}</span>
+                      {vault.strategySpecific && 
+                        <span className={vault.strategySpecific.length > 10 ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px]` : `ml-0.5 uppercase font-bold text-[12px] px-[6px] rounded-[4px]`}>{vault.strategySpecific}</span>
                       }
                       </span>
                       </>
