@@ -148,7 +148,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
         }
       });
-
       isVaultsLoaded.set(true);
       if (contractVaults) {
         vaults.set(contractVaults);

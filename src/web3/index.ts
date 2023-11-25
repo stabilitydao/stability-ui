@@ -15,7 +15,7 @@ import StrategyABI from "./abi/StrategyABI.ts";
 import VaultABI from "./abi/VaultABI.ts";
 
 // address of platform proxy deplpyed by default foundry private key
-const platform = "0x4B84c0F64cF2a14B6bE07f475e90a80eeC005cc4"; //"0x8Bf18e85B2FB7B050343AB2560E497b3Df18a59c";
+const platform = "0x5A279450Fd303447bACE7D3AdcE81C54FdF4d8c4"; //"0x8Bf18e85B2FB7B050343AB2560E497b3Df18a59c";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 

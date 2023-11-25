@@ -7,10 +7,11 @@ interface IProtocol {
 interface IFeature {
   name: string;
   logoSrc?: string;
-  svg?: string | number | boolean;
+  svg?: any;
 }
 
 interface IStrategyInfo {
+  name: string;
   shortName: string;
   specific?: string;
   protocols: IProtocol[];
@@ -91,7 +92,7 @@ type TAssetBalance = {
 };
 type TLocalVault = {
   name: string;
-  assets: { logo: string; symbol: string; name: string; }[];
+  assets: { logo: string; symbol: string; name: string }[];
   symbol: string;
   type: string;
   strategy: string;
@@ -102,6 +103,7 @@ type TLocalVault = {
   strategyApr: string;
   address: string;
   strategyInfo: IStrategyInfo;
+  strategySpecific: any;
 };
 type TVaultAssets = [string, string];
 

@@ -21,7 +21,6 @@ function Vaults() {
   const $vaults = useStore(vaults);
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
-  console.log($vaults);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
@@ -258,13 +257,14 @@ function Vaults() {
                             ))}
                           </span>
                           <span className="flex">
-                            {vault.strategyInfo.features.map((f, i) => (
+                            {vault.strategyInfo.features.map((feature, i) => (
                               <img
-                                title={f.name}
-                                alt={f.name}
+                                key={i}
+                                title={feature.name}
+                                alt={feature.name}
                                 className="w-6 h-6 ml-1"
                                 src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                  f.svg
+                                  feature.svg
                                 )}`}
                               />
                             ))}

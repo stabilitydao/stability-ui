@@ -1,224 +1,5 @@
 export default [
   {
-    inputs: [],
-    name: "AlreadyExist",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "ERC721EnumerableForbiddenBatchMint",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "ERC721IncorrectOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "ERC721InsufficientApproval",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "approver",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidApprover",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidOperator",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "receiver",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidReceiver",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidSender",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "ERC721NonexistentToken",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "index",
-        type: "uint256",
-      },
-    ],
-    name: "ERC721OutOfBoundsIndex",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "ETHTransferFailed",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "IncorrectArrayLength",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "IncorrectInitParams",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "IncorrectMsgSender",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "IncorrectZeroArgument",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "InvalidInitialization",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotExist",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotFactory",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotGovernance",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotGovernanceAndNotMultisig",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotInitializing",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotMultisig",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotOperator",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotPlatform",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotTheOwner",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotVault",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "RewardIsTooBig",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "RewardIsTooSmall",
-    type: "error",
-  },
-  {
     anonymous: false,
     inputs: [
       {
@@ -298,44 +79,6 @@ export default [
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "platform",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "ts",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "block",
-        type: "uint256",
-      },
-    ],
-    name: "ContractInitialized",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint64",
-        name: "version",
-        type: "uint64",
-      },
-    ],
-    name: "Initialized",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
         internalType: "uint256",
         name: "tokenId",
         type: "uint256",
@@ -376,32 +119,6 @@ export default [
     type: "event",
   },
   {
-    inputs: [],
-    name: "CONTROLLABLE_VERSION",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "VERSION",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
@@ -431,7 +148,7 @@ export default [
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "balance",
         type: "uint256",
       },
     ],
@@ -462,19 +179,6 @@ export default [
     type: "function",
   },
   {
-    inputs: [],
-    name: "createdBlock",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "uint256",
@@ -486,7 +190,7 @@ export default [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "operator",
         type: "address",
       },
     ],
@@ -510,19 +214,6 @@ export default [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "platform_",
-        type: "address",
-      },
-    ],
-    name: "init",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -598,20 +289,7 @@ export default [
     outputs: [
       {
         internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "platform",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
+        name: "owner",
         type: "address",
       },
     ],
@@ -741,49 +419,6 @@ export default [
     inputs: [
       {
         internalType: "uint256",
-        name: "index",
-        type: "uint256",
-      },
-    ],
-    name: "tokenByIndex",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "index",
-        type: "uint256",
-      },
-    ],
-    name: "tokenOfOwnerByIndex",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
         name: "tokenId",
         type: "uint256",
       },
@@ -813,19 +448,6 @@ export default [
         internalType: "address",
         name: "vault",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "totalSupply",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -959,6 +581,11 @@ export default [
         internalType: "uint256[]",
         name: "strategyApr",
         type: "uint256[]",
+      },
+      {
+        internalType: "string[]",
+        name: "strategySpecific",
+        type: "string[]",
       },
     ],
     stateMutability: "view",

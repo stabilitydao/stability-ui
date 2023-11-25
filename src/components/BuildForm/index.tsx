@@ -383,7 +383,9 @@ const BuildForm = ({
 
       {buildResult === undefined && vaultType === "Compounding" && (
         <div className="mt-10 flex justify-center">
-          {needCheckAllowance && allowance && allowance < buildingPrice ? (
+          {needCheckAllowance &&
+          allowance !== undefined &&
+          allowance < buildingPrice ? (
             <button
               className="bg-button px-5 py-1 rounded-md"
               onClick={approve}
