@@ -478,17 +478,10 @@ function Vault(props: Props) {
 
   if (props.vault && $vault[props.vault]) {
     return (
-      <main className="w-full">
-        <table style={{ display: "flex", justifyContent: "center" }}>
-          <tbody style={{ display: "flex" }}>
-            <tr
-              className="rounded-xl p-2"
-              style={{
-                display: "grid",
-                border: "1px",
-                borderStyle: "solid",
-                borderColor: "grey",
-              }}>
+      <main className="w-full p-0 m-0 mx-auto">
+        <table className="m-auto w-full my-4 ring-purple-950 hover:ring-1 shadow-sm rounded-xl">
+          <tbody>
+            <tr className="rounded-xl p-3 grid border-purple-950 border text-2xl ">
               <td>Vault: {props.vault}</td>
               <td>
                 TVL: {formatUnits($vault[props.vault].vaultSharePrice, 18)}
@@ -500,33 +493,14 @@ function Vault(props: Props) {
             </tr>
           </tbody>
         </table>
-        <div
-          className="rounded-xl p-2 w-full"
-          style={{
-            display: "grid",
-            margin: "auto",
-            marginBottom: "50px",
-            borderStyle: "solid",
-            borderWidth: "1px",
-            height: "auto",
-            marginTop: "20px",
-          }}>
-          <div
-            style={{
-              display: "flex",
-              width: "100%",
-              padding: "0",
-            }}>
+        <div className="rounded-xl mt-5 border-l border-r border-b border-gray-950 shadow-lg mb-12">
+          <div className="border-0 flex">
             <button
-              className="border-b-2 border-r-2"
-              style={{
-                width: "100%",
-                height: "65px",
-                fontSize: "30px",
-                cursor: "pointer",
-                padding: "0",
-                margin: "0",
-              }}
+              className={` h-[65px] rounded-t-xl cursor-pointer border-l-2 border-t-2 border-r-2 text-3xl w-full hover:bg-purple-950 ${
+                tab === "Deposit"
+                  ? "bg-purple-950 border-purple-600 "
+                  : "bg-black-400 text-gray-500 border-gray-600"
+              }`}
               onClick={() => {
                 setTab("Deposit");
                 resetInputs(option);
@@ -535,14 +509,13 @@ function Vault(props: Props) {
               Deposit
             </button>
             <button
-              className="border-b-2 border-l-2"
+              className={`rounded-t-xl cursor-pointer border-l-2 border-t-2 border-r-2  text-3xl w-full hover:bg-purple-950  ${
+                tab === "Withdraw"
+                  ? "bg-purple-950 border-purple-600"
+                  : "bg-black-400 text-gray-500 border-gray-600 "
+              }`}
               style={{
-                width: "100%",
                 height: "65px",
-                fontSize: "30px",
-                cursor: "pointer",
-                padding: "0",
-                margin: "0",
               }}
               onClick={() => {
                 setTab("Withdraw");
@@ -553,35 +526,20 @@ function Vault(props: Props) {
               Withdraw
             </button>
           </div>
-          <form
-            className="p-5 w-[400px] m-auto"
-            style={{
-              display: "grid",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: "18px",
-              height: "auto",
-            }}>
-            <div
-              style={{
-                display: "grid",
-                width: "auto",
-                margin: "auto",
-                marginTop: "10px",
-              }}>
-              <label style={{ color: "grey", width: "120px" }}>
+          <form className="w-[400px] m-auto grid mb-10">
+            <div className="my-4 m-auto grid">
+              <label className="text-gray-600 text-2xl py-2">
                 Select token
               </label>
               <select
+                className="rounded-xl bg-gradient-to-r from-purple-700 to-purple-950 text-2xl h-[50px]"
                 id="selectOption"
-                className="rounded-xl bg-gray-600"
                 onChange={e => changeOption(e.target.value.split(", "))}
                 style={{
-                  height: "50px",
                   width: "280px",
-                  fontSize: "30px",
                 }}>
                 <option
+                  className="bg-gray-600"
                   value={defaultOptionAssets}
                   style={{ textAlign: "center" }}>
                   {defaultOptionSymbols}
@@ -590,6 +548,7 @@ function Vault(props: Props) {
                   tokensJson.tokens.slice(0, -2).map(token => {
                     return (
                       <option
+                        className="bg-gray-600"
                         key={token.address}
                         value={token.address}
                         style={{ textAlign: "center" }}>
@@ -603,83 +562,39 @@ function Vault(props: Props) {
             {tab === "Deposit" && (
               <>
                 {option && option.length > 1 ? (
-                  <div
-                    style={{
-                      display: "grid",
-                      margin: "auto",
-                      marginTop: "15px",
-                      fontSize: "15px",
-                      width: "100%",
-                    }}>
+                  <div className="grid pt-2">
                     {option.map(asset => (
                       <div
-                        className="rounded-xl"
-                        key={asset}
-                        style={{
-                          display: "grid",
-                          margin: "auto",
-                          position: "relative",
-                          height: "150px",
-                          borderStyle: "solid",
-                          borderWidth: "1px",
-                          borderColor: "grey",
-                          marginTop: "7px",
-                          marginBottom: "7px",
-                          paddingLeft: "10px",
-                        }}>
-                        <div style={{ marginTop: "5px", marginBottom: "5px" }}>
-                          <div
-                            style={{
-                              position: "absolute",
-                              right: "0",
-                              bottom: "0",
-                              padding: "15px",
-                              paddingRight: "12px",
-                              paddingBottom: "12px",
-                            }}>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                              }}>
-                              <div
-                                style={{
-                                  textAlign: "left",
-                                  color: "grey",
-                                }}>
-                                Balance:{" "}
-                                {balances &&
-                                  balances[asset] &&
-                                  parseFloat(
-                                    balances[asset].assetBalance
-                                  ).toFixed(3)}
-                              </div>
-                              <button
-                                className="rounded-md w-12"
-                                type="button"
-                                onClick={() =>
-                                  balances &&
-                                  balances[asset] &&
-                                  handleInputChange(
-                                    balances[asset].assetBalance,
-                                    asset
-                                  )
-                                }
-                                style={{
-                                  color: "grey",
-                                  border: "solid",
-                                  background: "none",
-                                  borderWidth: "1px",
-                                  marginLeft: "5px",
-                                  borderColor: "grey",
-                                }}>
-                                max
-                              </button>
+                        className="rounded-xl grid relative h-[150px] border border-gray-600 mb-3 ps-2"
+                        key={asset}>
+                        <div className="absolute end-5 bottom-4">
+                          <div className="flex items-center">
+                            <div className="text-gray-500 me-2">
+                              Balance:{" "}
+                              {balances &&
+                                balances[asset] &&
+                                parseFloat(
+                                  balances[asset].assetBalance
+                                ).toFixed(3)}
                             </div>
+                            <button
+                              className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                              type="button"
+                              onClick={() =>
+                                balances &&
+                                balances[asset] &&
+                                handleInputChange(
+                                  balances[asset].assetBalance,
+                                  asset
+                                )
+                              }>
+                              max
+                            </button>
                           </div>
                         </div>
 
                         <input
+                          className="w-[70%] ps-5 my-auto flex items-center h-full focus:outline-none text-4xl bg-transparent"
                           list="amount"
                           id={asset}
                           name="amount"
@@ -695,40 +610,17 @@ function Vault(props: Props) {
                             ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                             evt.preventDefault()
                           }
-                          style={{
-                            width: "60%",
-                            height: "40px",
-                            fontSize: "30px",
-                            background: "none",
-                            borderStyle: "none",
-                            color: "white",
-                            marginBottom: "15px",
-                            paddingLeft: "15px",
-                          }}
                         />
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: "32%",
-                            right: "13px",
-                          }}>
+                        <div className="absolute end-5 top-8 bg-gray-800 rounded-xl p-2">
                           {tokensJson.tokens.map(token => {
                             if (token.address === asset) {
                               return (
                                 <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                  }}
+                                  className="flex"
                                   key={token.address}>
-                                  <p>{token.symbol}</p>
+                                  <p className="my-auto">{token.symbol}</p>
                                   <img
-                                    style={{
-                                      width: "40px",
-                                      height: "40px",
-                                      borderRadius: "50%",
-                                      marginLeft: "8px",
-                                    }}
+                                    className="rounded-full w-[45px] h-[45px] ms-2"
                                     src={token.logoURI}
                                     alt={token.name}
                                   />
@@ -886,18 +778,9 @@ function Vault(props: Props) {
                 )}
                 {approve === 1 ? (
                   <button
-                    className="rounded-xl"
+                    className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
                     type="button"
-                    onClick={() => deposit()}
-                    style={{
-                      margin: "auto",
-                      fontSize: "35px",
-                      width: "100%",
-                      height: "60px",
-                      cursor: "pointer",
-                      borderStyle: "solid",
-                      borderWidth: "1px",
-                    }}>
+                    onClick={() => deposit()}>
                     Deposit
                   </button>
                 ) : approve === 2 ? (
@@ -909,21 +792,10 @@ function Vault(props: Props) {
                         Number(getTokenData(asset)?.decimals)
                       ) < inputs[asset].ammount ? (
                         <button
-                          className="rounded-xl"
+                          className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
                           key={asset}
                           type="button"
-                          onClick={() => approvee(asset as `0x${string}`)}
-                          style={{
-                            margin: "auto",
-                            fontSize: "35px",
-                            width: "100%",
-                            height: "60px",
-                            cursor: "pointer",
-                            borderStyle: "solid",
-                            borderWidth: "1px",
-                            marginTop: "5px",
-                            marginBottom: "5px",
-                          }}>
+                          onClick={() => approvee(asset as `0x${string}`)}>
                           Approve {getTokenData(asset)?.symbol}
                         </button>
                       ) : (
@@ -932,22 +804,11 @@ function Vault(props: Props) {
                     )}
                   </>
                 ) : approve === 0 ? (
-                  <div
-                    className="rounded-xl"
-                    style={{
-                      display: "flex",
-                      margin: "auto",
-                      color: "grey",
-                      borderStyle: "solid",
-                      borderWidth: "1px",
-                      width: "367px",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: "60px",
-                      fontSize: "25px",
-                    }}>
+                  <button
+                    disabled
+                    className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center">
                     INSUFICCIENT BALANCE
-                  </div>
+                  </button>
                 ) : (
                   <></>
                 )}
@@ -1166,21 +1027,9 @@ function Vault(props: Props) {
             )}
           </form>
 
-          <section
-            className="border-t-2"
-            style={{
-              padding: "25px",
-
-              opacity: "50%",
-            }}>
+          <section className="p-7 border-t border-gray-600 text-2xl text-gray-500">
             <div style={{ display: "flex", alignItems: "center" }}>
-              <p
-                style={{
-                  padding: "0px",
-                  margin: "0px",
-                }}>
-                DEPOSIT FEE
-              </p>
+              <p>DEPOSIT FEE</p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="icon icon-tabler icon-tabler-help-octagon"
@@ -1237,27 +1086,13 @@ function Vault(props: Props) {
             </div>
             <p>
               The displayed APY accounts for performance fee that is deducted
-              from the generated yield only
+              from..
             </p>
           </section>
         </div>
 
-        <article
-          className="Strategy rounded-xl p-7"
-          style={{
-            borderStyle: "solid",
-            paddingLeft: "25px",
-            paddingRight: "25px",
-            marginTop: "50px",
-            borderWidth: "1px",
-            margin: "auto",
-          }}>
-          <h2
-            className="pb-5 text-2xl"
-            style={{
-              justifyContent: "start",
-              display: "flex",
-            }}>
+        <article className="rounded-xl p-7 border border-gray-950 shadow-lg">
+          <h2 className="mb-7 text-4xl text-gray-300 text-start">
             Strategy assets
           </h2>
           {$assets &&
@@ -1267,17 +1102,8 @@ function Vault(props: Props) {
               if (assetData && $assetsPrices) {
                 return (
                   <article
-                    className="rounded-xl"
-                    key={asset}
-                    style={{
-                      padding: "15px",
-                      paddingLeft: "20px",
-                      paddingRight: "20px",
-                      borderStyle: "solid",
-                      borderWidth: "1px",
-                      borderColor: "grey",
-                      marginBottom: "10px",
-                    }}>
+                    className="rounded-xl p-5 border border-[#620c9f85] mb-4"
+                    key={asset}>
                     <div
                       style={{
                         display: "flex",
