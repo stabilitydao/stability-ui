@@ -10,6 +10,7 @@ export interface IFeature {
 }
 
 export interface IStrategyInfo {
+  name?: string;
   shortName: string;
   specific?: string;
   protocols: IProtocol[];

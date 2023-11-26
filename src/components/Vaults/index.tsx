@@ -106,12 +106,12 @@ function Vaults() {
               {
                 logo: token1?.logoURI,
                 symbol: token1?.symbol,
-                name: token1.name,
+                name: token1?.name,
               },
               {
                 logo: token2?.logoURI,
                 symbol: token2?.symbol,
-                name: token2.name,
+                name: token2?.name,
               },
             ];
           }
@@ -253,16 +253,20 @@ function Vaults() {
                             ))}
                           </span>
                           <span className="flex">
-                            {vault.strategyInfo.features.map((f, i) => (
-                              <img
-                                title={f.name}
-                                alt={f.name}
-                                className="w-6 h-6 ml-1"
-                                src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                  f.svg
-                                )}`}
-                              />
-                            ))}
+                            {vault.strategyInfo.features.map(
+                              (f, i) =>
+                                f.svg && (
+                                  <img
+                                    key={i}
+                                    title={f.name}
+                                    alt={f.name}
+                                    className="w-6 h-6 ml-1"
+                                    src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                                      f.svg
+                                    )}`}
+                                  />
+                                )
+                            )}
                           </span>
                           {vault.strategySpecific && (
                             <span
