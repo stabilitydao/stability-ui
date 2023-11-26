@@ -404,7 +404,6 @@ function Vault(props: Props) {
         inputs[asset].ammount,
         getTokenData(asset)?.decimals as number
       );
-      // const maxUnits = parseUnits("1", 36);
 
       const r = await writeContract({
         address: asset,
@@ -1106,7 +1105,7 @@ function Vault(props: Props) {
                     key={asset}>
                     <div className="flex items-center w-full">
                       <div className="grid w-[125px] text-center">
-                        <h4 className="pb-3 text-2xl">{assetData.name}</h4>
+                        <h4 className="pb-3 text-2xl ">{assetData.name}</h4>
 
                         <img
                           className="rounded-full w-[70px] m-auto"
@@ -1114,7 +1113,7 @@ function Vault(props: Props) {
                         />
                       </div>
 
-                      <div className="grid mt-auto ps-2">
+                      <div className="grid mt-auto ps-2 text-gray-400 ">
                         <h5>{assetData.symbol}</h5>
                         <p>
                           Price: $
