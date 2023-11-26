@@ -531,7 +531,7 @@ function Vault(props: Props) {
                 Select token
               </label>
               <select
-                className="rounded-xl bg-gradient-to-r from-purple-700 to-purple-950 text-2xl h-[50px]"
+                className="rounded-xl bg-gradient-to-r from-purple-700 to-purple-950 text-2xl h-[50px] focus:outline-0"
                 id="selectOption"
                 onChange={e => changeOption(e.target.value.split(", "))}
                 style={{
