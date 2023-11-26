@@ -594,7 +594,7 @@ function Vault(props: Props) {
                         </div>
 
                         <input
-                          className="w-[70%] ps-5 my-auto flex items-center h-full focus:outline-none text-4xl bg-transparent"
+                          className="w-[58%] ps-5 my-auto flex items-center h-full focus:outline-none text-4xl bg-transparent"
                           list="amount"
                           id={asset}
                           name="amount"
@@ -611,7 +611,7 @@ function Vault(props: Props) {
                             evt.preventDefault()
                           }
                         />
-                        <div className="absolute end-5 top-8 bg-gray-800 rounded-xl p-2">
+                        <div className="absolute end-5 top-8 bg-[#4e46e521] rounded-xl p-2">
                           {tokensJson.tokens.map(token => {
                             if (token.address === asset) {
                               return (
