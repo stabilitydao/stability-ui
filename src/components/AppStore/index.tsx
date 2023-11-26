@@ -137,16 +137,16 @@ const AppStore = (props: React.PropsWithChildren) => {
       vaultInfoes.forEach(async (vaultInfo, index) => {
         if (vaultInfo[3]?.length) {
           for (let i = 0; i < vaultInfo[3]?.length; i++) {
-            const assetWithApr = vaultInfo[3][i]
+            const assetWithApr = vaultInfo[3][i];
             const symbol = await readContract(_publicClient, {
               address: assetWithApr,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
-            })
-            vaultInfoes[index][3][i] = symbol
+            });
+            vaultInfoes[index][3][i] = symbol;
           }
         }
-      })
+      });
 
       isVaultsLoaded.set(true);
       if (contractVaults) {
