@@ -2,17 +2,24 @@ import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { platform, PlatformABI, FactoryABI } from "@web3";
-import { platformData, publicClient, lastTx } from "@store";
+import { platform, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
+import { platformData, publicClient, lastTx, balances, account } from "@store";
 
 import { BuildForm } from "../BuildForm";
 
-import type { TInitParams, TAllowedBBTokenVaults, TBuildVariant } from "@types";
+import type {
+  TInitParams,
+  TAllowedBBTokenVaults,
+  TBuildVariant,
+  TAddress,
+} from "@types";
 import { getTokenData } from "@utils";
 
 const CreateVaultComponent = () => {
   const $publicClient = useStore(publicClient);
   const $platformData = useStore(platformData);
+  const $balances = useStore(balances);
+  const $account = useStore(account);
 
   const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
@@ -26,6 +33,7 @@ const CreateVaultComponent = () => {
     bigint | undefined
   >();
   const [defaultBoostTokens, setDefaultBoostTokens] = useState<string[]>([]);
+  const [freeVaults, setFreeVaults]: any = useState();
 
   const getData = async () => {
     if ($publicClient && $platformData) {
@@ -35,6 +43,7 @@ const CreateVaultComponent = () => {
         functionName: "whatToBuild",
         abi: FactoryABI,
       });
+
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[1].length; i++) {
           const initParams: TInitParams = {
@@ -124,10 +133,73 @@ const CreateVaultComponent = () => {
       }
     }
   };
+  const freeVaultsHandler = async () => {
+    if ($publicClient && $balances && $balances[7][0]) {
+      const epoch = Math.floor(new Date().getTime() / 1000);
+      const nextEpoch = epoch + 7 * 24 * 60 * 60;
 
+      const week = Math.floor(epoch / (86400 * 7));
+      const nextWeek = Math.floor(nextEpoch / (86400 * 7)) * 604800;
+
+      const date = new Date(nextWeek * 1000);
+
+      const [day, month, hours, minutes] = [
+        date.getDate(),
+        date.toLocaleString("en-US", { month: "long" }),
+        date.getHours(),
+        date.getMinutes(),
+      ];
+
+      const formattedDate = `${day} ${month} ${hours}:${
+        minutes < 10 ? "0" : ""
+      }${minutes}`;
+
+      const tokensOfOwner: bigint[] = [];
+      for (let i = 0; i < $balances[7][0]; i++) {
+        const tokenOfOwnerByIndex = await $publicClient.readContract({
+          address: $balances[6][0],
+          functionName: "tokenOfOwnerByIndex",
+          abi: IERC721Enumerable,
+          args: [$account as TAddress, BigInt(i)],
+        });
+        tokensOfOwner.push(tokenOfOwnerByIndex);
+      }
+
+      if (tokensOfOwner && $platformData) {
+        const vaultsBuiltByPermitTokenIdPromises: Promise<any>[] =
+          tokensOfOwner.map(async (tokenID: bigint) => {
+            const vaultsBuiltByPermitTokenId = await $publicClient.readContract(
+              {
+                address: $platformData.factory,
+                functionName: "vaultsBuiltByPermitTokenId",
+                abi: FactoryABI,
+                args: [BigInt(week), tokenID],
+              }
+            );
+            return vaultsBuiltByPermitTokenId;
+          });
+
+        try {
+          const vaultsPermitTokenId = await Promise.all(
+            vaultsBuiltByPermitTokenIdPromises
+          );
+          // todo for multiple nft
+          setFreeVaults({
+            freeVaults: Number(vaultsPermitTokenId[0]),
+            nextUpdate: formattedDate,
+          });
+        } catch (error) {
+          console.error("Error fetching NFT data:", error);
+        }
+      }
+    }
+  };
   useEffect(() => {
     getData();
   }, [$publicClient, $platformData?.factory, lastTx.get()]);
+  useEffect(() => {
+    freeVaultsHandler();
+  }, [$balances]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
     (variant) => variant.vaultType === "Compounding"
@@ -326,6 +398,7 @@ const CreateVaultComponent = () => {
                 minInitialBoostPerDay as bigint,
                 18
               )}
+              nftData={freeVaults}
             />
           </div>
         </div>

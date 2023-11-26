@@ -20,6 +20,7 @@ import {
   vaults,
   vaultAssets,
   isVaultsLoaded,
+  balances,
 } from "@store";
 import {
   platform,
@@ -149,6 +150,9 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
       });
       isVaultsLoaded.set(true);
+      if (contractBalance) {
+        balances.set(contractBalance);
+      }
       if (contractVaults) {
         vaults.set(contractVaults);
       }

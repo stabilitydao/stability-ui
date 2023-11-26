@@ -28,6 +28,7 @@ interface IProps {
   buildingPrice: bigint;
   defaultBoostTokens: string[];
   minInitialBoostPerDay: string | number;
+  nftData: { freeVaults: number; nextUpdate: string } | undefined;
 }
 
 const BuildForm = ({
@@ -38,6 +39,7 @@ const BuildForm = ({
   buildingPrice,
   defaultBoostTokens,
   minInitialBoostPerDay,
+  nftData,
 }: IProps) => {
   const $account = useStore(account);
   const $platformData = useStore(platformData);
@@ -49,7 +51,6 @@ const BuildForm = ({
   const canUsePermitToken = false;
 
   const needCheckAllowance = !canUsePermitToken;
-
   const BRT = [
     ...new Set([initParams.initVaultAddresses[0], ...defaultBoostTokens]),
   ].map((addr) => ({
@@ -316,6 +317,15 @@ const BuildForm = ({
             <p className="w-[30%] text-[22px]">Strategy description</p>
             <p className="text-end text-[16px]">{strategyDesc}</p>
           </div>
+          {nftData && (
+            <div className="flex w-full justify-between">
+              <span className="w-[40%] text-[18px]">
+                Free vaults by PM used until <br />
+                {nftData.nextUpdate}
+              </span>
+              <span>{nftData.freeVaults} of 1</span>
+            </div>
+          )}
           <div className="flex w-full justify-between">
             <span className="w-[30%] text-[22px]">Build price</span>
             <span>
@@ -385,7 +395,8 @@ const BuildForm = ({
         <div className="mt-10 flex justify-center">
           {needCheckAllowance &&
           allowance !== undefined &&
-          allowance < buildingPrice ? (
+          allowance < buildingPrice &&
+          (nftData === undefined || nftData?.freeVaults !== 0) ? (
             <button
               className="bg-button px-5 py-1 rounded-md"
               onClick={approve}
@@ -403,31 +414,42 @@ const BuildForm = ({
         </div>
       )}
       {buildResult === undefined &&
+      vaultType === "Rewarding" &&
+      needCheckAllowance &&
+      allowance !== undefined &&
+      allowance < buildingPrice &&
+      (nftData === undefined || nftData?.freeVaults !== 0) ? (
+        <button className="bg-button px-5 py-1 rounded-md" onClick={approve}>
+          Approve factory to spend {payPerVaultToken?.symbol}
+        </button>
+      ) : buildResult === undefined &&
         vaultType === "Rewarding" &&
-        (rewardingVaultApprove || rewardingVaultDeploy) && (
-          <div className="mt-10 flex justify-center">
-            {rewardingVaultApprove && (
-              <button
-                className="bg-button px-5 py-1 rounded-md"
-                onClick={approveRewardingVaultTokens}
-              >
-                Approve factory to spend {rewardingVaultApprove[0].symbol}
-              </button>
-            )}
-            {rewardingVaultDeploy && (
-              <button
-                className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
-                onClick={deployRewardingVault}
-              >
-                Deploy
-              </button>
-            )}
-          </div>
-        )}
+        (rewardingVaultApprove || rewardingVaultDeploy) ? (
+        <div className="mt-10 flex justify-center">
+          {rewardingVaultApprove && (
+            <button
+              className="bg-button px-5 py-1 rounded-md"
+              onClick={approveRewardingVaultTokens}
+            >
+              Approve factory to spend {rewardingVaultApprove[0].symbol}
+            </button>
+          )}
+          {rewardingVaultDeploy && (
+            <button
+              className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
+              onClick={deployRewardingVault}
+            >
+              Deploy
+            </button>
+          )}
+        </div>
+      ) : (
+        ""
+      )}
 
       {buildResult && (
         <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md flex justify-center py-4 mt-4">
-          The vault has beed deployed
+          The vault has been deployed
         </div>
       )}
     </div>

@@ -1,40 +1,136 @@
 export default [
   {
-    anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: "address",
-        name: "platform",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "ts",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "block",
-        type: "uint256",
+        internalType: "bytes32",
+        name: "_hash",
+        type: "bytes32",
       },
     ],
-    name: "ContractInitialized",
-    type: "event",
+    name: "AlreadyLastVersion",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotActiveVault",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotStrategy",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "StrategyImplementationIsNotAvailable",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "StrategyLogicNotAllowedToDeploy",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "key",
+        type: "bytes32",
+      },
+    ],
+    name: "SuchVaultAlreadyDeployed",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_hash",
+        type: "bytes32",
+      },
+    ],
+    name: "UpgradeDenied",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VaultImplementationIsNotAvailable",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "VaultNotAllowedToDeploy",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "userBalance",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "requireBalance",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "payToken",
+        type: "address",
+      },
+    ],
+    name: "YouDontHaveEnoughTokens",
+    type: "error",
   },
   {
     anonymous: false,
     inputs: [
       {
+        components: [
+          {
+            internalType: "uint256",
+            name: "status",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "pool",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "strategyLogicId",
+            type: "string",
+          },
+          {
+            internalType: "address[]",
+            name: "rewardAssets",
+            type: "address[]",
+          },
+          {
+            internalType: "address[]",
+            name: "addresses",
+            type: "address[]",
+          },
+          {
+            internalType: "uint256[]",
+            name: "nums",
+            type: "uint256[]",
+          },
+          {
+            internalType: "int24[]",
+            name: "ticks",
+            type: "int24[]",
+          },
+        ],
         indexed: false,
-        internalType: "uint8",
-        name: "version",
-        type: "uint8",
+        internalType: "struct IFactory.Farm[]",
+        name: "farms",
+        type: "tuple[]",
       },
     ],
-    name: "Initialized",
+    name: "NewFarm",
     type: "event",
   },
   {
@@ -64,6 +160,12 @@ export default [
         name: "upgradeAllowed",
         type: "bool",
       },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "newStrategy",
+        type: "bool",
+      },
     ],
     name: "StrategyLogicConfigChanged",
     type: "event",
@@ -91,6 +193,62 @@ export default [
       },
     ],
     name: "StrategyProxyUpgraded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "status",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "pool",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "strategyLogicId",
+            type: "string",
+          },
+          {
+            internalType: "address[]",
+            name: "rewardAssets",
+            type: "address[]",
+          },
+          {
+            internalType: "address[]",
+            name: "addresses",
+            type: "address[]",
+          },
+          {
+            internalType: "uint256[]",
+            name: "nums",
+            type: "uint256[]",
+          },
+          {
+            internalType: "int24[]",
+            name: "ticks",
+            type: "int24[]",
+          },
+        ],
+        indexed: false,
+        internalType: "struct IFactory.Farm",
+        name: "farm",
+        type: "tuple",
+      },
+    ],
+    name: "UpdateFarm",
     type: "event",
   },
   {
@@ -187,6 +345,12 @@ export default [
         name: "upgradeAllowed",
         type: "bool",
       },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "newVaultType",
+        type: "bool",
+      },
     ],
     name: "VaultConfigChanged",
     type: "event",
@@ -217,30 +381,23 @@ export default [
     type: "event",
   },
   {
-    inputs: [],
-    name: "CONTROLLABLE_VERSION",
-    outputs: [
+    anonymous: false,
+    inputs: [
       {
-        internalType: "string",
-        name: "",
-        type: "string",
+        indexed: true,
+        internalType: "address",
+        name: "vault",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newStatus",
+        type: "uint256",
       },
     ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "FACTORY_VERSION",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    name: "VaultStatus",
+    type: "event",
   },
   {
     inputs: [
@@ -282,27 +439,14 @@ export default [
             type: "int24[]",
           },
         ],
-        internalType: "struct IFactory.Farm",
-        name: "farm_",
-        type: "tuple",
+        internalType: "struct IFactory.Farm[]",
+        name: "farms_",
+        type: "tuple[]",
       },
     ],
-    name: "addFarm",
+    name: "addFarms",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "createdBlock",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -408,7 +552,7 @@ export default [
     inputs: [
       {
         internalType: "bytes32",
-        name: "deploymentKey",
+        name: "deploymentKey_",
         type: "bytes32",
       },
     ],
@@ -416,7 +560,7 @@ export default [
     outputs: [
       {
         internalType: "address",
-        name: "vaultProxy",
+        name: "",
         type: "address",
       },
     ],
@@ -556,27 +700,27 @@ export default [
       },
       {
         internalType: "address[]",
-        name: "initVaultAddresses",
+        name: "vaultInitAddresses",
         type: "address[]",
       },
       {
         internalType: "uint256[]",
-        name: "initVaultNums",
+        name: "vaultInitNums",
         type: "uint256[]",
       },
       {
         internalType: "address[]",
-        name: "initStrategyAddresses",
+        name: "strategyInitAddresses",
         type: "address[]",
       },
       {
         internalType: "uint256[]",
-        name: "initStrategyNums",
+        name: "strategyInitNums",
         type: "uint256[]",
       },
       {
         internalType: "int24[]",
-        name: "initStrategyTicks",
+        name: "strategyInitTicks",
         type: "int24[]",
       },
     ],
@@ -588,7 +732,7 @@ export default [
         type: "bytes32",
       },
     ],
-    stateMutability: "pure",
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -663,19 +807,6 @@ export default [
     inputs: [
       {
         internalType: "address",
-        name: "platform_",
-        type: "address",
-      },
-    ],
-    name: "initialize",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "address_",
         type: "address",
       },
@@ -684,21 +815,8 @@ export default [
     outputs: [
       {
         internalType: "bool",
-        name: "isStrategy_",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "platform",
-    outputs: [
-      {
-        internalType: "address",
         name: "",
-        type: "address",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -757,12 +875,12 @@ export default [
   {
     inputs: [
       {
-        internalType: "string",
-        name: "type_",
-        type: "string",
-      },
-      {
         components: [
+          {
+            internalType: "string",
+            name: "vaultType",
+            type: "string",
+          },
           {
             internalType: "address",
             name: "implementation",
@@ -813,6 +931,49 @@ export default [
     type: "function",
   },
   {
+    inputs: [],
+    name: "strategies",
+    outputs: [
+      {
+        internalType: "string[]",
+        name: "id",
+        type: "string[]",
+      },
+      {
+        internalType: "bool[]",
+        name: "deployAllowed",
+        type: "bool[]",
+      },
+      {
+        internalType: "bool[]",
+        name: "upgradeAllowed",
+        type: "bool[]",
+      },
+      {
+        internalType: "bool[]",
+        name: "farming",
+        type: "bool[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "tokenId",
+        type: "uint256[]",
+      },
+      {
+        internalType: "string[]",
+        name: "tokenURI",
+        type: "string[]",
+      },
+      {
+        internalType: "bytes32[]",
+        name: "extra",
+        type: "bytes32[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "bytes32",
@@ -823,34 +984,41 @@ export default [
     name: "strategyLogicConfig",
     outputs: [
       {
-        internalType: "string",
-        name: "id",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "implementation",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "deployAllowed",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "upgradeAllowed",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
-        name: "farming",
-        type: "bool",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
+        components: [
+          {
+            internalType: "string",
+            name: "id",
+            type: "string",
+          },
+          {
+            internalType: "address",
+            name: "implementation",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "deployAllowed",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
+            name: "upgradeAllowed",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
+            name: "farming",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenId",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IFactory.StrategyLogicConfig",
+        name: "config",
+        type: "tuple",
       },
     ],
     stateMutability: "view",
@@ -928,7 +1096,7 @@ export default [
     inputs: [
       {
         internalType: "address",
-        name: "strategyProxy",
+        name: "strategy",
         type: "address",
       },
     ],
@@ -960,6 +1128,11 @@ export default [
     ],
     name: "vaultConfig",
     outputs: [
+      {
+        internalType: "string",
+        name: "vaultType",
+        type: "string",
+      },
       {
         internalType: "address",
         name: "implementation",
@@ -997,6 +1170,68 @@ export default [
       {
         internalType: "uint256",
         name: "status",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "vaultTypes",
+    outputs: [
+      {
+        internalType: "string[]",
+        name: "vaultType",
+        type: "string[]",
+      },
+      {
+        internalType: "address[]",
+        name: "implementation",
+        type: "address[]",
+      },
+      {
+        internalType: "bool[]",
+        name: "deployAllowed",
+        type: "bool[]",
+      },
+      {
+        internalType: "bool[]",
+        name: "upgradeAllowed",
+        type: "bool[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "buildingPrice",
+        type: "uint256[]",
+      },
+      {
+        internalType: "bytes32[]",
+        name: "extra",
+        type: "bytes32[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "week",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "builderPermitTokenId",
+        type: "uint256",
+      },
+    ],
+    name: "vaultsBuiltByPermitTokenId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "vaultsBuilt",
         type: "uint256",
       },
     ],
