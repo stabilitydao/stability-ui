@@ -1102,40 +1102,35 @@ function Vault(props: Props) {
               if (assetData && $assetsPrices) {
                 return (
                   <article
-                    className="rounded-xl p-5 border border-[#620c9f85] mb-4"
+                    className="rounded-xl p-5 border border-[#620c9f85] mb-4 flex"
                     key={asset}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "40px",
-                      }}>
-                      <h4 className="pb-3">{assetData.name}</h4>
-                      <div
-                        className="rounded-md"
-                        style={{
-                          backgroundColor: "#4B0082",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          display: "flex",
-                          marginLeft: "auto",
-                          width: "150px",
-                          padding: "1px",
-                        }}>
-                        <a
-                          href={`https://polygonscan.com/token/${asset}`}
-                          style={{
-                            textDecoration: "none",
-                            color: "white",
-                            display: "felx",
-                            marginRight: "5px",
-                            alignItems: "center",
-                          }}>
-                          Contract
-                        </a>
+                    <div className="flex items-center w-full">
+                      <div className="grid w-[125px] text-center">
+                        <h4 className="pb-3 text-2xl">{assetData.name}</h4>
+
+                        <img
+                          className="rounded-full w-[70px] m-auto"
+                          src={assetData.logoURI}
+                        />
+                      </div>
+
+                      <div className="grid mt-auto ps-2">
+                        <h5>{assetData.symbol}</h5>
+                        <p>
+                          Price: $
+                          {formatUnits($assetsPrices[asset].tokenPrice, 18)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-md bg-purple-950 flex justify-center ms-auto w-[140px] p-1 h-10">
+                      <a
+                        className="flex items-center"
+                        href={`https://polygonscan.com/token/${asset}`}>
+                        Contract{" "}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-external-link"
+                          className="icon icon-tabler icon-tabler-external-link ms-1"
                           width="24"
                           height="24"
                           viewBox="0 0 24 24"
@@ -1152,40 +1147,7 @@ function Vault(props: Props) {
                           <path d="M11 13l9 -9"></path>
                           <path d="M15 4h5v5"></path>
                         </svg>
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}>
-                      <img
-                        src={assetData.logoURI}
-                        style={{
-                          borderRadius: "50%",
-                          height: "70px",
-                          marginLeft: "10px",
-                          marginRight: "10px",
-                        }}
-                      />
-                      <div style={{ display: "inline-block" }}>
-                        <h5 style={{ marginLeft: "18px" }}>
-                          {assetData.symbol}
-                        </h5>
-                        <p style={{ marginLeft: "18px" }}>
-                          Price: $
-                          {formatUnits($assetsPrices[asset].tokenPrice, 18)}
-                        </p>
-                      </div>
-                      <section
-                        style={{ paddingLeft: "100px", paddingRight: "50px" }}>
-                        <p style={{ color: "grey" }}></p>
-                      </section>
-                    </div>
-                    <div>
-                      <p></p>
+                      </a>
                     </div>
                   </article>
                 );
