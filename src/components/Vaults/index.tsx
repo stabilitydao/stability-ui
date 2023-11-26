@@ -21,6 +21,7 @@ function Vaults() {
   const $vaults = useStore(vaults);
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
+  console.log($vaultData);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
