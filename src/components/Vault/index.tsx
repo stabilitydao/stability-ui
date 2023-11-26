@@ -112,14 +112,6 @@ function Vault(props: Props) {
   const [approve, setApprove] = useState<number | undefined>();
   const [sharesOut, setSharesOut] = useState<bigint>();
   const [symbols, setSymbols] = useState<Vaults>({});
-  const [withdrawBalance, setWithdrawBalance] = useState<bigint>();
-
-  console.log(option);
-  console.log($assets);
-
-  console.log($assetsBalances);
-  console.log(inputs);
-  console.log(symbols);
 
   useEffect(() => {
     async function getStrategy() {
@@ -148,7 +140,6 @@ function Vault(props: Props) {
       }
     }
     getStrategy();
-    loadSymbols();
   }, [props]);
 
   useEffect(() => {
@@ -210,12 +201,6 @@ function Vault(props: Props) {
     loadAssetsBalances();
   }, [option, $assetsBalances]);
 
-  // interface PreviewBigInt {
-  //   [key: string]: {
-  //     ammount: bigint;
-  //   };
-  // }
-
   useEffect(() => {
     async function previewDeposit() {
       if ($assets && lastKeyPress.key1 && tab === "Deposit") {
@@ -236,7 +221,6 @@ function Vault(props: Props) {
               amounts.push(parseUnits("1", 36));
             }
           }
-          console.log(amounts);
 
           if (typeof vaultt === "string") {
             try {
@@ -291,6 +275,7 @@ function Vault(props: Props) {
           symbol: $vaults[2][i],
         };
         setSymbols(vaultData);
+        console.log($vaults);
       }
     }
   }
@@ -310,8 +295,6 @@ function Vault(props: Props) {
         change = true;
       }
     }
-    console.log(allowance);
-    console.log(input);
 
     if (change !== true) {
       for (let i = 0; i < input.length; i++) {
@@ -410,7 +393,6 @@ function Vault(props: Props) {
           };
         }
         setInputs(preview);
-        console.log(inputs);
       }
     }
   }
@@ -462,7 +444,6 @@ function Vault(props: Props) {
         parseUnits(inputs[option[i]].ammount, tokensJson.tokens[i].decimals)
       );
     }
-    console.log(input);
 
     const d = await writeContract({
       address: vaultt as `0x${string}`,
@@ -475,11 +456,6 @@ function Vault(props: Props) {
 
   async function withdraw() {
     const value = $vault[vaultt].vaultUserBalance;
-    // const valuee = (value * BigInt(99)) / BigInt(100);
-
-    console.log($account);
-    console.log($assets);
-    console.log(value);
 
     const w = await writeContract({
       address: vaultt as `0x${string}`,
@@ -502,16 +478,15 @@ function Vault(props: Props) {
 
   if (props.vault && $vault[props.vault]) {
     return (
-      <>
+      <main className="w-full">
         <table style={{ display: "flex", justifyContent: "center" }}>
           <tbody style={{ display: "flex" }}>
             <tr
-              className="rounded-xl"
+              className="rounded-xl p-2"
               style={{
                 display: "grid",
                 border: "1px",
                 borderStyle: "solid",
-                padding: "10px",
                 borderColor: "grey",
               }}>
               <td>Vault: {props.vault}</td>
@@ -526,9 +501,8 @@ function Vault(props: Props) {
           </tbody>
         </table>
         <div
-          className="rounded-xl"
+          className="rounded-xl p-2 w-full"
           style={{
-            width: "100%",
             display: "grid",
             margin: "auto",
             marginBottom: "50px",
@@ -574,13 +548,14 @@ function Vault(props: Props) {
                 setTab("Withdraw");
                 resetOptions();
                 resetInputs(option);
+                loadSymbols();
               }}>
               Withdraw
             </button>
           </div>
           <form
+            className="p-5 w-[400px] m-auto"
             style={{
-              width: "100%",
               display: "grid",
               justifyContent: "center",
               alignItems: "center",
@@ -717,7 +692,7 @@ function Vault(props: Props) {
                           }
                           type="text"
                           onKeyDown={evt =>
-                            ["e", "E", "+", "-", " "].includes(evt.key) &&
+                            ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                             evt.preventDefault()
                           }
                           style={{
@@ -859,7 +834,7 @@ function Vault(props: Props) {
                             handleInputChange(e.target.value, e.target.id)
                           }
                           onKeyDown={evt =>
-                            ["e", "E", "+", "-", " "].includes(evt.key) &&
+                            ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                             evt.preventDefault()
                           }
                           style={{
@@ -1036,12 +1011,10 @@ function Vault(props: Props) {
                             <button
                               onClick={() =>
                                 handleInputChange(
-                                  parseFloat(
-                                    formatUnits(
-                                      $vault[vaultt].vaultUserBalance,
-                                      18
-                                    )
-                                  ).toFixed(8),
+                                  formatUnits(
+                                    $vault[vaultt]?.vaultUserBalance,
+                                    18
+                                  ),
                                   option[0]
                                 )
                               }
@@ -1072,6 +1045,10 @@ function Vault(props: Props) {
                       placeholder="0"
                       onChange={e =>
                         handleInputChange(e.target.value, e.target.id)
+                      }
+                      onKeyDown={evt =>
+                        ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
+                        evt.preventDefault()
                       }
                       pattern="^[0-9]*[.,]?[0-9]*$"
                       inputMode="decimal"
@@ -1134,8 +1111,9 @@ function Vault(props: Props) {
                             }}>
                             <p>
                               {symbols &&
+                                vaultt &&
                                 symbols[vaultt] &&
-                                symbols[vaultt].symbol}
+                                symbols[vaultt]?.symbol}
                             </p>
                           </div>
                         </div>
@@ -1148,8 +1126,8 @@ function Vault(props: Props) {
                 inputs[option[0]] &&
                 inputs[option[0]].ammount !== "" &&
                 $vault[vaultt]?.vaultUserBalance !== undefined &&
-                inputs[option[0]].ammount <
-                  formatUnits($vault[vaultt]?.vaultUserBalance, 18) ? (
+                Number(inputs[option[0]].ammount) <=
+                  Number(formatUnits($vault[vaultt]?.vaultUserBalance, 18)) ? (
                   <button
                     type="button"
                     className="rounded-xl"
@@ -1165,6 +1143,24 @@ function Vault(props: Props) {
                     onClick={() => withdraw()}>
                     WITHDRAW
                   </button>
+                ) : Number(inputs[option[0]]?.ammount) >
+                  Number(formatUnits($vault[vaultt]?.vaultUserBalance, 18)) ? (
+                  <div
+                    className="rounded-xl"
+                    style={{
+                      display: "flex",
+                      margin: "auto",
+                      color: "grey",
+                      borderStyle: "solid",
+                      borderWidth: "1px",
+                      width: "367px",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "60px",
+                      fontSize: "25px",
+                    }}>
+                    INSUFICCIENT BALANCE
+                  </div>
                 ) : null}
               </>
             )}
@@ -1371,7 +1367,7 @@ function Vault(props: Props) {
               return null;
             })}
         </article>
-      </>
+      </main>
     );
   } else {
     return <h1>Loading Vault..</h1>;
