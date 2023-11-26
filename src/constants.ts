@@ -5,14 +5,12 @@ const TABLE = [
     keyName: "type",
     sortType: "none",
     dataType: "string",
-    cssAdd: "hidden lg:table-cell",
   },
   {
     name: "Strategy",
     keyName: "strategy",
     sortType: "none",
     dataType: "string",
-    cssAdd: "hidden md:table-cell",
   },
   {
     name: "Balance",

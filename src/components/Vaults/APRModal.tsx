@@ -26,7 +26,9 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const APR = formatFromBigInt(state.apr, 16, "withDecimals").toFixed(2);
   const APY = calculateAPY(APR).toFixed(2);
   const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
-  const assetAprs = state.assetsAprs.map((a: string) => formatFromBigInt(a, 16).toFixed(2))
+  const assetAprs = state.assetsAprs.map((a: string) =>
+    formatFromBigInt(a, 16).toFixed(2)
+  );
 
   const timeDifference = getTimeDifference(state.lastHardWork);
 
@@ -44,7 +46,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] max-w-[500px] w-full bg-[#1C1D2D] rounded-[10px] h-[300px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] max-w-[500px] w-full bg-modal rounded-[10px] h-[300px]"
       >
         <svg
           onClick={() => {
@@ -128,13 +130,13 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             </p>
             <p>Strategy APR {strategyAPR}%</p>
             <div>
-            {assetAprs.map((apr: string, index: number) => {
-              return (
-                <p>
-                  {state.assetsWithApr[index]} APR {apr}%
-                </p>
-              )
-            })}
+              {assetAprs.map((apr: string, index: number) => {
+                return (
+                  <p>
+                    {state.assetsWithApr[index]} APR {apr}%
+                  </p>
+                );
+              })}
             </div>
           </div>
 
@@ -158,8 +160,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               </div>
             )}
           </div>
-          
-
         </div>
       </div>
     </div>

@@ -1,5 +1,26 @@
-import type { IStrategyInfo } from "src/utils/StrategyInfo";
+// interfaces
+interface IProtocol {
+  name: string;
+  logoSrc: string;
+}
 
+interface IFeature {
+  name: string;
+  logoSrc?: string;
+  svg?: any;
+}
+
+interface IStrategyInfo {
+  name: string;
+  shortName: string;
+  specific?: string;
+  protocols: IProtocol[];
+  features: IFeature[];
+  color: string;
+  bgColor: string;
+}
+
+// types
 type TPlatformData = {
   platform: `0x${string}`;
   factory: `0x${string}`;
@@ -71,7 +92,7 @@ type TAssetBalance = {
 };
 type TLocalVault = {
   name: string;
-  assets: { logo: string; symbol: string; name: string; }[];
+  assets: { logo: string; symbol: string; name: string }[];
   symbol: string;
   type: string;
   strategy: string;
@@ -82,6 +103,7 @@ type TLocalVault = {
   strategyApr: string;
   address: string;
   strategyInfo: IStrategyInfo;
+  strategySpecific: any;
 };
 type TVaultAssets = [string, string];
 
@@ -100,6 +122,20 @@ type TAPRModal = {
   state: boolean;
 };
 
+type TBuildVariant = {
+  vaultType: string;
+  strategyId: string;
+  strategyDesc: string;
+  canBuild: boolean;
+  initParams: TInitParams;
+};
+
+type TAddress = `0x${string}`;
+type TInputItem = {
+  inputValue: string | number;
+  valuePerDay: string;
+};
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -116,4 +152,10 @@ export type {
   TVaultAssets,
   TTableColumn,
   TAPRModal,
+  TBuildVariant,
+  TAddress,
+  IProtocol,
+  IFeature,
+  IStrategyInfo,
+  TInputItem,
 };
