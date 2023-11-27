@@ -3,10 +3,6 @@ import type { IProtocol, IFeature, IStrategyInfo } from "@types";
 export const getStrategyInfo = (
   vaultSymbol: string
 ): IStrategyInfo | undefined => {
-  const gqfColor = "#de43ff";
-  const gqfBgColor = "#140414";
-  const qsfColor = "#558ac5";
-  const qsfBgColor = "#121319";
 
   const quickSWap: IProtocol = {
     name: "QuickSwap",
@@ -23,44 +19,37 @@ export const getStrategyInfo = (
     svg: farmSvg,
   };
 
-  if (vaultSymbol.match(/GQFS$/)) {
+  if (vaultSymbol.match(/GQF(S|N|W)$/)) {
     return {
       name: "Gamma QuickSwap Farm",
       shortName: "GQF",
       protocols: [gamma, quickSWap],
       features: [farm],
-      color: gqfColor,
-      bgColor: gqfBgColor,
+      color: "#de43ff",
+      bgColor: "#140414",
+      baseStrategies: [
+        "Liquidity providing",
+        "Farming",
+      ],
+      ammAdapter: "Algebra",
+      sourceCode: "https://github.com/stabilitydao/stability-contracts/blob/main/src/strategies/GammaQuickSwapFarmStrategy.sol",
     };
   }
-  if (vaultSymbol.match(/GQFN$/)) {
-    return {
-      name: "Gamma QuickSwap Farm",
-      shortName: "GQF",
-      protocols: [gamma, quickSWap],
-      features: [farm],
-      color: gqfColor,
-      bgColor: gqfBgColor,
-    };
-  }
-  if (vaultSymbol.match(/GQFW$/)) {
-    return {
-      name: "Gamma QuickSwap Farm",
-      shortName: "GQF",
-      protocols: [gamma, quickSWap],
-      features: [farm],
-      color: gqfColor,
-      bgColor: gqfBgColor,
-    };
-  }
+  
   if (vaultSymbol.match(/QSF$/)) {
     return {
       name: "QuickSwap Static Farm",
       shortName: "QSF",
       protocols: [quickSWap],
       features: [farm],
-      color: qsfColor,
-      bgColor: qsfBgColor,
+      color: "#558ac5",
+      bgColor: "#121319",
+      baseStrategies: [
+        "Liquidity providing",
+        "Farming",
+      ],
+      ammAdapter: "Algebra",
+      sourceCode: "https://github.com/stabilitydao/stability-contracts/blob/main/src/strategies/QuickswapV3StaticFarmStrategy.sol",
     };
   }
 

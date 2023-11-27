@@ -18,6 +18,9 @@ interface IStrategyInfo {
   features: IFeature[];
   color: string;
   bgColor: string;
+  baseStrategies: string[];
+  ammAdapter: string;
+  sourceCode: string;
 }
 
 // types
