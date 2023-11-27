@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect } from "react";
-import { parseUnits } from "viem";
+// import { parseUnits } from "viem";
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -8,7 +8,6 @@ import {
   useNetwork,
   // useWalletClient,
 } from "wagmi";
-import { addAssetsPrice } from "../Vault";
 import {
   account,
   network,
@@ -20,6 +19,7 @@ import {
   vaults,
   vaultAssets,
   isVaultsLoaded,
+  balances,
 } from "@store";
 import {
   platform,
@@ -27,6 +27,10 @@ import {
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
+
+import { addAssetsPrice } from "@utils";
+
+import type { TAddress } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -112,7 +116,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             address: contractBalance[6][1],
             abi: IVaultManagerABI,
             functionName: "vaultInfo",
-            args: [vault],
+            args: [vault as TAddress],
           });
           return response;
         })
@@ -147,8 +151,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
         }
       });
-
       isVaultsLoaded.set(true);
+      if (contractBalance) {
+        balances.set(contractBalance);
+      }
       if (contractVaults) {
         vaults.set(contractVaults);
       }

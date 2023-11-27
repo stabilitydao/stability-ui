@@ -4,6 +4,8 @@ import { getStrategyShortName } from "./functions/getStrategyShortName";
 import { formatFromBigInt } from "./functions/formatFromBigInt";
 import { calculateAPY } from "./functions/calculateAPY";
 import { getTimeDifference } from "./functions/getTimeDifference";
+import { getStrategyInfo } from "./functions/getStrategyInfo";
+import { addAssetsPrice } from "./functions/addAssetsPrice";
 
 export {
   getTokenData,
@@ -12,4 +14,6 @@ export {
   formatFromBigInt,
   calculateAPY,
   getTimeDifference,
+  getStrategyInfo,
+  addAssetsPrice,
 };

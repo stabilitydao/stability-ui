@@ -1,5 +1,26 @@
-import type { IStrategyInfo } from "src/utils/StrategyInfo";
+// interfaces
+interface IProtocol {
+  name: string;
+  logoSrc: string;
+}
 
+interface IFeature {
+  name: string;
+  logoSrc?: string;
+  svg?: any;
+}
+
+interface IStrategyInfo {
+  name: string;
+  shortName: string;
+  specific?: string;
+  protocols: IProtocol[];
+  features: IFeature[];
+  color: string;
+  bgColor: string;
+}
+
+// types
 type TPlatformData = {
   platform: `0x${string}`;
   factory: `0x${string}`;
@@ -82,6 +103,7 @@ type TLocalVault = {
   strategyApr: string;
   address: string;
   strategyInfo: IStrategyInfo;
+  strategySpecific: any;
 };
 type TVaultAssets = [string, string];
 
@@ -100,6 +122,40 @@ type TAPRModal = {
   state: boolean;
 };
 
+type TBuildVariant = {
+  vaultType: string;
+  strategyId: string;
+  strategyDesc: string;
+  canBuild: boolean;
+  initParams: TInitParams;
+};
+
+type TAddress = `0x${string}`;
+type TInputItem = {
+  inputValue: string | number;
+  valuePerDay: string;
+};
+
+////          VAULT
+
+type TVaultBalance = {
+  [balance: string]: string;
+};
+
+type TVaultInput = {
+  [assetAdress: string]: string;
+};
+
+type TVaultAllowance = {
+  [asset: string]: bigint[];
+};
+
+type TVaultsAddress = {
+  [vaultAddress: string]: string | any;
+};
+
+////
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -116,4 +172,14 @@ export type {
   TVaultAssets,
   TTableColumn,
   TAPRModal,
+  TBuildVariant,
+  TAddress,
+  IProtocol,
+  IFeature,
+  IStrategyInfo,
+  TInputItem,
+  TVaultsAddress,
+  TVaultAllowance,
+  TVaultInput,
+  TVaultBalance,
 };
