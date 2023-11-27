@@ -7,6 +7,7 @@ import type {
   TAssetPrices,
   TBalances,
   TVaultAssets,
+  TLocalVault,
 } from "@types";
 
 const account = atom<string | undefined>();
