@@ -227,20 +227,21 @@ function Vault({ vault }: IProps) {
 
   const deposit = async () => {
     let assets: string[] = [];
-    let input: bigint[] = [];
+    let input: any = [];
 
     for (let i = 0; i < option.length; i++) {
       assets.push(option[i]);
-      input.push(
-        parseUnits(inputs[option[i]].amount, tokensJson.tokens[i].decimals)
-      );
+
+      const token: any = getTokenData(option[i]);
+
+      input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
 
     const depositAssets = await writeContract({
       address: vault as TAddress,
       abi: VaultABI,
       functionName: "depositAssets",
-      args: [$assets as TAddress[], input, sharesOut],
+      args: [$assets as TAddress[], input, sharesOut, $account as TAddress],
     });
   };
 
@@ -353,7 +354,6 @@ function Vault({ vault }: IProps) {
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
-
       if (option) {
         let amounts: bigint[] = [];
         for (let i = 0; i < option.length; i++) {
@@ -378,7 +378,6 @@ function Vault({ vault }: IProps) {
                 functionName: "previewDepositAssets",
                 args: [$assets as TAddress[], amounts],
               })) as any;
-
             checkInputsAllowance(previewDepositAssets[0] as bigint[]);
             setSharesOut(
               ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -567,7 +566,6 @@ function Vault({ vault }: IProps) {
                               </div>
                             );
                           }
-                          return null;
                         })}
                       </div>
                     </div>
@@ -677,15 +675,15 @@ function Vault({ vault }: IProps) {
                     )
                   )}
                 </>
+              ) : isApprove === 0 ? (
+                <button
+                  disabled
+                  className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center"
+                >
+                  INSUFICCIENT BALANCE
+                </button>
               ) : (
-                !isApprove && (
-                  <button
-                    disabled
-                    className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center"
-                  >
-                    INSUFICCIENT BALANCE
-                  </button>
-                )
+                <></>
               )}
             </>
           )}

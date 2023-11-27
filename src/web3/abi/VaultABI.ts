@@ -1,5 +1,84 @@
 export default [
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "maxSupply",
+        type: "uint256",
+      },
+    ],
+    name: "ExceedMaxSupply",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "mintToUser",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minToMint",
+        type: "uint256",
+      },
+    ],
+    name: "ExceedSlippage",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "asset",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "mintToUser",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minToMint",
+        type: "uint256",
+      },
+    ],
+    name: "ExceedSlippageExactAsset",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "FuseTrigger",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "mintAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "initialShares",
+        type: "uint256",
+      },
+    ],
+    name: "NotEnoughAmountToInitSupply",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotEnoughBalanceToPay",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "WaitAFewBlocks",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -119,21 +198,27 @@ export default [
     type: "event",
   },
   {
-    inputs: [],
-    name: "VAULT_TYPE",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
+      {
+        internalType: "address[]",
+        name: "assets_",
+        type: "address[]",
+      },
       {
         internalType: "uint256[]",
         name: "amountsMax",
         type: "uint256[]",
       },
-      { internalType: "uint256", name: "minSharesOut", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "minSharesOut",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
     ],
     name: "depositAssets",
     outputs: [],
@@ -149,8 +234,27 @@ export default [
   },
   {
     inputs: [],
+    name: "doHardWorkOnDeposit",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "extra",
-    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
@@ -158,34 +262,91 @@ export default [
     inputs: [],
     name: "getApr",
     outputs: [
-      { internalType: "uint256", name: "totalApr", type: "uint256" },
-      { internalType: "uint256", name: "strategyApr", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "totalApr",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "strategyApr",
+        type: "uint256",
+      },
       {
         internalType: "address[]",
         name: "assetsWithApr",
         type: "address[]",
       },
-      { internalType: "uint256[]", name: "assetsAprs", type: "uint256[]" },
+      {
+        internalType: "uint256[]",
+        name: "assetsAprs",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getUniqueInitParamLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "uniqueInitAddresses",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "uniqueInitNums",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "platform_", type: "address" },
-      { internalType: "address", name: "strategy_", type: "address" },
-      { internalType: "string", name: "name_", type: "string" },
-      { internalType: "string", name: "symbol_", type: "string" },
-      { internalType: "uint256", name: "tokenId_", type: "uint256" },
       {
-        internalType: "address[]",
-        name: "vaultInitAddresses",
-        type: "address[]",
-      },
-      {
-        internalType: "uint256[]",
-        name: "vaultInitNums",
-        type: "uint256[]",
+        components: [
+          {
+            internalType: "address",
+            name: "platform",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "strategy",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "name",
+            type: "string",
+          },
+          {
+            internalType: "string",
+            name: "symbol",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenId",
+            type: "uint256",
+          },
+          {
+            internalType: "address[]",
+            name: "vaultInitAddresses",
+            type: "address[]",
+          },
+          {
+            internalType: "uint256[]",
+            name: "vaultInitNums",
+            type: "uint256[]",
+          },
+        ],
+        internalType: "struct IVault.VaultInitializationData",
+        name: "vaultInitializationData",
+        type: "tuple",
       },
     ],
     name: "initialize",
@@ -196,14 +357,28 @@ export default [
   {
     inputs: [],
     name: "maxSupply",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
-      { internalType: "uint256[]", name: "amountsMax", type: "uint256[]" },
+      {
+        internalType: "address[]",
+        name: "assets_",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256[]",
+        name: "amountsMax",
+        type: "uint256[]",
+      },
     ],
     name: "previewDepositAssets",
     outputs: [
@@ -212,8 +387,35 @@ export default [
         name: "amountsConsumed",
         type: "uint256[]",
       },
-      { internalType: "uint256", name: "sharesOut", type: "uint256" },
-      { internalType: "uint256", name: "valueOut", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "sharesOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "valueOut",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "sharesToBurn",
+        type: "uint256",
+      },
+    ],
+    name: "previewWithdraw",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "amountsOut",
+        type: "uint256[]",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -222,21 +424,41 @@ export default [
     inputs: [],
     name: "price",
     outputs: [
-      { internalType: "uint256", name: "price", type: "uint256" },
-      { internalType: "bool", name: "trusted", type: "bool" },
+      {
+        internalType: "uint256",
+        name: "price_",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "trusted",
+        type: "bool",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ internalType: "bool", name: "value", type: "bool" }],
+    inputs: [
+      {
+        internalType: "bool",
+        name: "value",
+        type: "bool",
+      },
+    ],
     name: "setDoHardWorkOnDeposit",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [{ internalType: "uint256", name: "maxShares", type: "uint256" }],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "maxShares",
+        type: "uint256",
+      },
+    ],
     name: "setMaxSupply",
     outputs: [],
     stateMutability: "nonpayable",
@@ -246,7 +468,30 @@ export default [
     inputs: [],
     name: "strategy",
     outputs: [
-      { internalType: "contract IStrategy", name: "", type: "address" },
+      {
+        internalType: "contract IStrategy",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -254,7 +499,13 @@ export default [
   {
     inputs: [],
     name: "tokenId",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
@@ -262,16 +513,45 @@ export default [
     inputs: [],
     name: "tvl",
     outputs: [
-      { internalType: "uint256", name: "tvl_", type: "uint256" },
-      { internalType: "bool", name: "trusted", type: "bool" },
+      {
+        internalType: "uint256",
+        name: "tvl_",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "trusted",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "vaultType",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
-      { internalType: "uint256", name: "amountShares", type: "uint256" },
+      {
+        internalType: "address[]",
+        name: "assets_",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256",
+        name: "amountShares",
+        type: "uint256",
+      },
       {
         internalType: "uint256[]",
         name: "minAssetAmountsOut",
