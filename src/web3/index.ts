@@ -16,7 +16,7 @@ import VaultABI from "./abi/VaultABI.ts";
 import IERC721Enumerable from "./abi/IERC721Enumerable.js";
 
 // address of platform proxy deplpyed by default foundry private key
-const platform = "0x81aAF52E125D2CE16E8c406Cd7ED6f57961628A2";
+const platform = "0x78CE0CF811ecEeEA77B9fA148A59d544ec3e0845"; //"0x81aAF52E125D2CE16E8c406Cd7ED6f57961628A2";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 

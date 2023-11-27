@@ -136,6 +136,26 @@ type TInputItem = {
   valuePerDay: string;
 };
 
+////          VAULT
+
+type TVaultBalance = {
+  [balance: string]: string;
+};
+
+type TVaultInput = {
+  [assetAdress: string]: string;
+};
+
+type TVaultAllowance = {
+  [asset: string]: bigint[];
+};
+
+type TVaultsAddress = {
+  [vaultAddress: string]: string | any;
+};
+
+////
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -158,4 +178,8 @@ export type {
   IFeature,
   IStrategyInfo,
   TInputItem,
+  TVaultsAddress,
+  TVaultAllowance,
+  TVaultInput,
+  TVaultBalance,
 };

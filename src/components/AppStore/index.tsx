@@ -8,7 +8,6 @@ import {
   useNetwork,
   // useWalletClient,
 } from "wagmi";
-import { addAssetsPrice } from "../Vault";
 import {
   account,
   network,
@@ -28,6 +27,9 @@ import {
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
+
+import { addAssetsPrice } from "@utils";
+
 import type { TAddress } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
