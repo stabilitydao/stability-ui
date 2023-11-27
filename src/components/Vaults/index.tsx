@@ -21,7 +21,6 @@ function Vaults() {
   const $vaults = useStore(vaults);
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
-  console.log($vaultData);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
@@ -44,8 +43,8 @@ function Vaults() {
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
-  const toVault = (adress: string) => {
-    window.location.href = `/vault/${adress}`;
+  const toVault = (address: string) => {
+    window.location.href = `/vault/${address}`;
   };
 
   const compareHandler = (

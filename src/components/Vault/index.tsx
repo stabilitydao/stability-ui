@@ -19,6 +19,7 @@ import {
   assetsBalances,
   account,
   vaults,
+  vaultAssets,
 } from "@store";
 
 import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
@@ -40,12 +41,13 @@ interface IProps {
 }
 
 function Vault({ vault }: IProps) {
-  const $vault = useStore(vaultData);
+  const $vaultData = useStore(vaultData);
   const $assets = useStore(assets);
   const $account = useStore(account);
   const $vaults = useStore(vaults);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
+  const $vaultAssets: any = useStore(vaultAssets);
 
   const _publicClient = usePublicClient();
 
@@ -68,6 +70,8 @@ function Vault({ vault }: IProps) {
   }>({ key1: undefined, key2: undefined });
 
   const [sharesOut, setSharesOut] = useState<bigint | any>();
+
+  const [localVault, setLocalVault] = useState<any>();
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -247,7 +251,7 @@ function Vault({ vault }: IProps) {
 
   const withdraw = async () => {
     if (vault) {
-      const value = $vault[vault].vaultUserBalance;
+      const value = $vaultData[vault].vaultUserBalance;
 
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
@@ -426,15 +430,83 @@ function Vault({ vault }: IProps) {
     previewDeposit();
   }, [lastKeyPress]);
 
-  return vault && $vault[vault] ? (
+  useEffect(() => {
+    if ($vaults?.length && $vaultData) {
+      const vaults = $vaults[0].map((_: any, index: number) => {
+        let assets;
+        if ($vaultAssets.length) {
+          const token1 = getTokenData($vaultAssets[index][1][0]);
+          const token2 = getTokenData($vaultAssets[index][1][1]);
+
+          assets = [
+            {
+              logo: token1?.logoURI,
+              symbol: token1?.symbol,
+              name: token1?.name,
+            },
+            {
+              logo: token2?.logoURI,
+              symbol: token2?.symbol,
+              name: token2?.name,
+            },
+          ];
+        }
+
+        return {
+          name: $vaults[1][index],
+          assets: assets,
+          symbol: $vaults[2][index],
+          address: $vaults[0][index],
+        };
+      });
+
+      setLocalVault(
+        vaults.filter((thisVault: any) => thisVault.address === vault)[0]
+      );
+    }
+  }, [$vaults, $vaultData, $vaultAssets]);
+
+  return vault && $vaultData[vault] ? (
     <main className="w-full p-0 m-0 mx-auto">
+      {localVault && (
+        <div className="flex justify-between items-center py-5 bg-button px-5 rounded-md  border-[2px] border-[#6376AF]">
+          <div className="flex items-center gap-4">
+            <div className="flex">
+              <img
+                className="w-8 h-8 rounded-full"
+                src={localVault?.assets[0].logo}
+                alt={localVault?.assets[0].symbol}
+                title={localVault?.assets[0].name}
+              />
+              <img
+                className="w-8 h-8 rounded-full ml-[-8px]"
+                src={localVault?.assets[1].logo}
+                alt={localVault?.assets[1].symbol}
+                title={localVault?.assets[1].name}
+              />
+            </div>
+
+            <p className="flex flex-col items-start">
+              <span className="text-[24px]">{localVault.name}</span>
+
+              <span className="text-[18px]">{localVault.symbol}</span>
+            </p>
+          </div>
+
+          <p className="bg-[#485069] text-[#B4BFDF] border-[#6376AF] p-2 rounded-md ">
+            CHAIN: {_publicClient.chain.name}
+          </p>
+        </div>
+      )}
+
       <table className="m-auto w-full my-4 ring-purple-950 hover:ring-1 shadow-sm rounded-xl">
         <tbody>
           <tr className="rounded-xl p-3 grid border-purple-950 border text-2xl ">
             <td>Vault: {vault}</td>
-            <td>TVL: {formatUnits($vault[vault].vaultSharePrice, 18)}</td>
+            <td>TVL: {formatUnits($vaultData[vault].vaultSharePrice, 18)}</td>
             <td>
-              User Balance: {formatUnits($vault[vault].vaultUserBalance, 18)}
+              User Balance:{" "}
+              {formatUnits($vaultData[vault].vaultUserBalance, 18)}
             </td>
           </tr>
         </tbody>
@@ -699,14 +771,17 @@ function Vault({ vault }: IProps) {
                           <div className="text-left text-[gray]">
                             Balance:{" "}
                             {parseFloat(
-                              formatUnits($vault[vault].vaultUserBalance, 18)
+                              formatUnits(
+                                $vaultData[vault].vaultUserBalance,
+                                18
+                              )
                             ).toFixed(3)}
                           </div>
                           <button
                             onClick={() =>
                               handleInputChange(
                                 formatUnits(
-                                  $vault[vault]?.vaultUserBalance,
+                                  $vaultData[vault]?.vaultUserBalance,
                                   18
                                 ),
                                 option[0]
@@ -782,9 +857,9 @@ function Vault({ vault }: IProps) {
               inputs &&
               inputs[option[0]] &&
               inputs[option[0]].amount !== "" &&
-              $vault[vault]?.vaultUserBalance !== undefined &&
+              $vaultData[vault]?.vaultUserBalance !== undefined &&
               Number(inputs[option[0]].amount) <=
-                Number(formatUnits($vault[vault]?.vaultUserBalance, 18)) ? (
+                Number(formatUnits($vaultData[vault]?.vaultUserBalance, 18)) ? (
                 <button
                   type="button"
                   className="text-[35px] w-full h-[60px] cursor-pointer border-[1px] rounded-xl"
@@ -793,7 +868,7 @@ function Vault({ vault }: IProps) {
                   WITHDRAW
                 </button>
               ) : Number(inputs[option[0]]?.amount) >
-                Number(formatUnits($vault[vault]?.vaultUserBalance, 18)) ? (
+                Number(formatUnits($vaultData[vault]?.vaultUserBalance, 18)) ? (
                 <div className="rounded-xl flex text-[gray] border-[1px] w-[367px] items-center justify-center h-[60px] text-[25px]">
                   INSUFICCIENT BALANCE
                 </div>
