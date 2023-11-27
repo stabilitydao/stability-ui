@@ -154,7 +154,10 @@ type TVaultsAddress = {
   [vaultAddress: string]: string | any;
 };
 
-////
+//// DAO
+type PlatformData = {
+  platformVersion: string;
+};
 
 export type {
   TPlatformData,
@@ -182,4 +185,5 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
+  PlatformData,
 };

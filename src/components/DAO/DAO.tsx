@@ -18,29 +18,47 @@ import {
   platformData,
   vaults,
 } from "@store";
-import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
+import { VaultABI, StrategyABI, ERC20ABI, PlatformABI, platform } from "@web3";
 import tokensJson from "../../stability.tokenlist.json";
 import { getTokenData } from "@utils";
 
+import type {
+  TToken,
+  TAddress,
+  TVaultsAddress,
+  TVaultAllowance,
+  TVaultInput,
+  TVaultBalance,
+  PlatformData,
+} from "@types";
+
 function DAO() {
-  const $vault = useStore(vaultData);
+  const [platformData, setPlatformData] = useState<PlatformData | undefined>(
+    undefined
+  );
+  const _publicClient = usePublicClient();
 
   useEffect(() => {
-    async function getStrategy() {
-      if ($vault) {
-        let v: `0x${string}` | undefined = (await readContract(_publicClient, {
-          address: vaultt,
-          abi: VaultABI,
-          functionName: "strategy",
-        })) as `0x${string}` | undefined;
-      }
-    }
+    platformVersion();
   }, []);
+
+  const platformVersion = async () => {
+    try {
+      const v: string = (await readContract(_publicClient, {
+        address: platform,
+        abi: PlatformABI,
+        functionName: "platformVersion",
+      })) as string;
+      setPlatformData({ platformVersion: v });
+    } catch (error) {
+      console.error("Error fetching platform version:", error);
+    }
+  };
 
   return (
     <div className="dao pt-2">
       <h1 className="text-xxl text-gradient mb-3">Platform</h1>
-      <div></div>
+      <h2>Version: {platformData?.platformVersion}</h2>
       <br />
 
       <h1 className="text-xxl text-gradient mb-3">Tokenomics</h1>

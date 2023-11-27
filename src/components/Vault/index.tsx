@@ -59,14 +59,11 @@ function Vault({ vault }: IProps) {
   const [isApprove, setIsApprove] = useState<number | undefined>();
   const [symbols, setSymbols] = useState<TVaultsAddress>({});
   const [balances, setBalances] = useState<TVaultBalance | any>({});
-
   const [inputs, setInputs] = useState<TVaultInput | any>({});
-
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
-
   const [sharesOut, setSharesOut] = useState<bigint | any>();
 
   const loadSymbols = () => {
@@ -85,7 +82,7 @@ function Vault({ vault }: IProps) {
     if (apprDepo.length < 2) {
       return true;
     }
-    return apprDepo.every((element) => element === apprDepo[0]);
+    return apprDepo.every(element => element === apprDepo[0]);
   };
 
   const checkInputsAllowance = (input: bigint[]) => {
@@ -451,8 +448,7 @@ function Vault({ vault }: IProps) {
               setTab("Deposit");
               resetInputs(option);
               resetOptions();
-            }}
-          >
+            }}>
             Deposit
           </button>
           <button
@@ -466,8 +462,7 @@ function Vault({ vault }: IProps) {
               resetOptions();
               resetInputs(option);
               loadSymbols();
-            }}
-          >
+            }}>
             Withdraw
           </button>
         </div>
@@ -477,22 +472,19 @@ function Vault({ vault }: IProps) {
             <select
               className="w-[280px] rounded-xl bg-gradient-to-r from-purple-700 to-purple-950 text-2xl h-[50px] focus:outline-0 cursor-pointer"
               id="selectOption"
-              onChange={(e) => changeOption(e.target.value.split(", "))}
-            >
+              onChange={e => changeOption(e.target.value.split(", "))}>
               <option
                 className="bg-gray-600 text-center"
-                value={defaultOptionAssets}
-              >
+                value={defaultOptionAssets}>
                 {defaultOptionSymbols}
               </option>
               {tokensJson.tokens &&
-                tokensJson.tokens.slice(0, -2).map((token) => {
+                tokensJson.tokens.slice(0, -2).map(token => {
                   return (
                     <option
                       className="bg-gray-600 text-center"
                       key={token.address}
-                      value={token.address}
-                    >
+                      value={token.address}>
                       {token.symbol}
                     </option>
                   );
@@ -507,8 +499,7 @@ function Vault({ vault }: IProps) {
                   {option.map((asset: any) => (
                     <div
                       className="rounded-xl grid relative h-[150px] border border-gray-600 mb-3 ps-2"
-                      key={asset}
-                    >
+                      key={asset}>
                       <div className="absolute end-5 bottom-4">
                         <div className="flex items-center">
                           <div className="text-gray-500 me-2">
@@ -529,8 +520,7 @@ function Vault({ vault }: IProps) {
                                 balances[asset].assetBalance,
                                 asset
                               )
-                            }
-                          >
+                            }>
                             max
                           </button>
                         </div>
@@ -543,20 +533,22 @@ function Vault({ vault }: IProps) {
                         name="amount"
                         placeholder="0"
                         value={inputs && inputs[asset] && inputs[asset].amount}
-                        onChange={(e) =>
+                        onChange={e =>
                           handleInputChange(e.target.value, e.target.id)
                         }
                         type="text"
-                        onKeyDown={(evt) =>
+                        onKeyDown={evt =>
                           ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                           evt.preventDefault()
                         }
                       />
                       <div className="absolute end-5 top-8 bg-[#4e46e521] rounded-xl p-2">
-                        {tokensJson.tokens.map((token) => {
+                        {tokensJson.tokens.map(token => {
                           if (token.address === asset) {
                             return (
-                              <div className="flex" key={token.address}>
+                              <div
+                                className="flex"
+                                key={token.address}>
                                 <p className="my-auto">{token.symbol}</p>
                                 <img
                                   className="rounded-full w-[45px] h-[45px] ms-2"
@@ -592,8 +584,7 @@ function Vault({ vault }: IProps) {
                                 )
                               }
                               className="rounded-md w-12 text-[gray] border-[1px] ml-[5px] border-[gray]"
-                              type="button"
-                            >
+                              type="button">
                               max
                             </button>
                           </div>
@@ -613,10 +604,10 @@ function Vault({ vault }: IProps) {
                         name="amount"
                         type="text"
                         placeholder="0"
-                        onChange={(e) =>
+                        onChange={e =>
                           handleInputChange(e.target.value, e.target.id)
                         }
-                        onKeyDown={(evt) =>
+                        onKeyDown={evt =>
                           ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                           evt.preventDefault()
                         }
@@ -624,13 +615,12 @@ function Vault({ vault }: IProps) {
                       />
                     )}
                     <div className="absolute top-[32%] right-[13px]">
-                      {tokensJson.tokens.map((token) => {
+                      {tokensJson.tokens.map(token => {
                         if (token.address === option[0]) {
                           return (
                             <div
                               className="flex items-center"
-                              key={token.address}
-                            >
+                              key={token.address}>
                               <p>{token.symbol}</p>
                               <img
                                 className="w-10 h-10 rounded-[50%] ml-2"
@@ -650,8 +640,7 @@ function Vault({ vault }: IProps) {
                 <button
                   className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
                   type="button"
-                  onClick={() => deposit()}
-                >
+                  onClick={() => deposit()}>
                   Deposit
                 </button>
               ) : isApprove === 2 ? (
@@ -666,8 +655,7 @@ function Vault({ vault }: IProps) {
                         className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
                         key={asset}
                         type="button"
-                        onClick={() => approve(asset as TAddress)}
-                      >
+                        onClick={() => approve(asset as TAddress)}>
                         Approve {getTokenData(asset)?.symbol}
                       </button>
                     ) : (
@@ -678,8 +666,7 @@ function Vault({ vault }: IProps) {
               ) : isApprove === 0 ? (
                 <button
                   disabled
-                  className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center"
-                >
+                  className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center">
                   INSUFICCIENT BALANCE
                 </button>
               ) : (
@@ -713,8 +700,7 @@ function Vault({ vault }: IProps) {
                               )
                             }
                             type="button"
-                            className="text-[gray] border-[1px] ml-[5px] border-[gray] rounded-md w-12"
-                          >
+                            className="text-[gray] border-[1px] ml-[5px] border-[gray] rounded-md w-12">
                             max
                           </button>
                         </div>
@@ -730,10 +716,10 @@ function Vault({ vault }: IProps) {
                     }
                     name="amount"
                     placeholder="0"
-                    onChange={(e) =>
+                    onChange={e =>
                       handleInputChange(e.target.value, e.target.id)
                     }
-                    onKeyDown={(evt) =>
+                    onKeyDown={evt =>
                       ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                       evt.preventDefault()
                     }
@@ -745,13 +731,12 @@ function Vault({ vault }: IProps) {
                   <div className="absolute top-[32%] right-[13px]">
                     {option.length === 1 ? (
                       <>
-                        {tokensJson.tokens.map((token) => {
+                        {tokensJson.tokens.map(token => {
                           if (token.address === option[0]) {
                             return (
                               <div
                                 className="flex items-center"
-                                key={token.address}
-                              >
+                                key={token.address}>
                                 <p>{token.symbol}</p>
                                 <img
                                   className="w-10 h-10 rounded-[50%] ml-2"
@@ -788,8 +773,7 @@ function Vault({ vault }: IProps) {
                 <button
                   type="button"
                   className="text-[35px] w-full h-[60px] cursor-pointer border-[1px] rounded-xl"
-                  onClick={() => withdraw()}
-                >
+                  onClick={() => withdraw()}>
                   WITHDRAW
                 </button>
               ) : Number(inputs[option[0]]?.amount) >
@@ -815,9 +799,11 @@ function Vault({ vault }: IProps) {
               stroke="currentColor"
               fill="none"
               strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              strokeLinejoin="round">
+              <path
+                stroke="none"
+                d="M0 0h24v24H0z"
+                fill="none"></path>
               <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
               <path d="M12 16v.01"></path>
               <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
@@ -837,9 +823,11 @@ function Vault({ vault }: IProps) {
               stroke="currentColor"
               fill="none"
               strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              strokeLinejoin="round">
+              <path
+                stroke="none"
+                d="M0 0h24v24H0z"
+                fill="none"></path>
               <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
               <path d="M12 16v.01"></path>
               <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
@@ -857,15 +845,14 @@ function Vault({ vault }: IProps) {
           Strategy assets
         </h2>
         {$assets &&
-          $assets.map((asset) => {
+          $assets.map(asset => {
             const assetData: TToken | undefined = getTokenData(asset);
 
             if (assetData && $assetsPrices) {
               return (
                 <article
                   className="rounded-xl p-5 border border-[#620c9f85] mb-4 flex"
-                  key={asset}
-                >
+                  key={asset}>
                   <div className="flex items-center w-full">
                     <div className="grid w-[125px] text-center">
                       <h4 className="pb-3 text-2xl ">{assetData.name}</h4>
@@ -888,8 +875,7 @@ function Vault({ vault }: IProps) {
                   <div className="rounded-md bg-purple-950 flex justify-center ms-auto w-[140px] p-1 h-10">
                     <a
                       className="flex items-center"
-                      href={`https://polygonscan.com/token/${asset}`}
-                    >
+                      href={`https://polygonscan.com/token/${asset}`}>
                       Contract{" "}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -901,13 +887,11 @@ function Vault({ vault }: IProps) {
                         stroke="currentColor"
                         fill="none"
                         strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
+                        strokeLinejoin="round">
                         <path
                           stroke="none"
                           d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
+                          fill="none"></path>
                         <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                         <path d="M11 13l9 -9"></path>
                         <path d="M15 4h5v5"></path>

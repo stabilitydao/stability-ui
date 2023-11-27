@@ -299,6 +299,25 @@ export default [
     inputs: [
       {
         indexed: false,
+        internalType: "uint256",
+        name: "oldValue",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newValue",
+        type: "uint256",
+      },
+    ],
+    name: "MinTvlForFreeHardWorkChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: "string",
         name: "id",
         type: "string",
@@ -496,19 +515,6 @@ export default [
     ],
     name: "UpgradeAnnounce",
     type: "event",
-  },
-  {
-    inputs: [],
-    name: "PLATFORM_VERSION",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
   },
   {
     inputs: [],
@@ -1173,6 +1179,19 @@ export default [
   },
   {
     inputs: [],
+    name: "minTvlForFreeHardWork",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "multisig",
     outputs: [
       {
@@ -1235,6 +1254,32 @@ export default [
         internalType: "struct IPlatform.PlatformUpgrade",
         name: "",
         type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "platformUpgradeTimelock",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "platformVersion",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
       },
     ],
     stateMutability: "view",
@@ -1324,6 +1369,37 @@ export default [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "minInitialBoostPerDay_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minInitialBoostDuration_",
+        type: "uint256",
+      },
+    ],
+    name: "setInitialBoost",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "setMinTvlForFreeHardWork",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "strategyLogic",
     outputs: [
@@ -1408,4 +1484,4 @@ export default [
     stateMutability: "view",
     type: "function",
   },
-]as const;
+];
