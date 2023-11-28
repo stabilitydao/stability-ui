@@ -380,6 +380,7 @@ function Vault({ vault }: IProps) {
   };
 
   const previewDeposit = async () => {
+    if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -593,7 +594,6 @@ function Vault({ vault }: IProps) {
             {$assets &&
               $assets.map((asset) => {
                 const assetData: TToken | undefined = getTokenData(asset);
-
                 if (assetData && $assetsPrices) {
                   return (
                     <article
@@ -910,7 +910,7 @@ function Vault({ vault }: IProps) {
                 Withdraw
               </button>
             </div>
-            <form className="max-w-[400px] px-4 mb-10">
+            <form autoComplete="off" className="max-w-[400px] px-4 mb-10">
               <div className="flex flex-col items-start">
                 <label className=" text-[18px] py-2">Select token</label>
                 <select
@@ -994,6 +994,7 @@ function Vault({ vault }: IProps) {
                                 ) && evt.preventDefault()
                               }
                             />
+
                             <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
                               {tokensJson.tokens.map((token) => {
                                 if (token.address === asset) {
@@ -1014,6 +1015,20 @@ function Vault({ vault }: IProps) {
                               })}
                             </div>
                           </div>
+                          {$assetsPrices[asset] &&
+                            inputs[asset]?.amount > 0 && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>
+                                  $
+                                  {(
+                                    formatUnits(
+                                      $assetsPrices[asset].tokenPrice,
+                                      18
+                                    ) * inputs[asset].amount
+                                  ).toFixed(2)}
+                                </p>
+                              </div>
+                            )}
                         </div>
                       ))}
                     </div>
@@ -1093,6 +1108,20 @@ function Vault({ vault }: IProps) {
                           />
                         )}
                       </div>
+                      {$assetsPrices[option[0]] &&
+                        inputs[option[0]].amount > 0 && (
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>
+                              $
+                              {(
+                                formatUnits(
+                                  $assetsPrices[option[0]].tokenPrice,
+                                  18
+                                ) * inputs[option[0]].amount
+                              ).toFixed(2)}{" "}
+                            </p>
+                          </div>
+                        )}
                     </div>
                   )}
                   {isApprove === 1 ? (
@@ -1105,23 +1134,22 @@ function Vault({ vault }: IProps) {
                     </button>
                   ) : isApprove === 2 ? (
                     <>
-                      {option.map((asset: any) =>
-                        allowance &&
-                        formatUnits(
-                          allowance[asset].allowance[0],
-                          Number(getTokenData(asset)?.decimals)
-                        ) < inputs[asset].amount ? (
-                          <button
-                            className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                            key={asset}
-                            type="button"
-                            onClick={() => approve(asset as TAddress)}
-                          >
-                            Approve {getTokenData(asset)?.symbol}
-                          </button>
-                        ) : (
-                          <></>
-                        )
+                      {option.map(
+                        (asset: any) =>
+                          allowance &&
+                          formatUnits(
+                            allowance[asset].allowance[0],
+                            Number(getTokenData(asset)?.decimals)
+                          ) < inputs[asset].amount && (
+                            <button
+                              className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                              key={asset}
+                              type="button"
+                              onClick={() => approve(asset as TAddress)}
+                            >
+                              Approve {getTokenData(asset)?.symbol}
+                            </button>
+                          )
                       )}
                     </>
                   ) : (
@@ -1228,12 +1256,24 @@ function Vault({ vault }: IProps) {
                         )}
                       </div>
                     </div>
+                    {$assetsPrices[option[0]] &&
+                      inputs[option[0]].amount > 0 && (
+                        <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                          <p>
+                            $
+                            {(
+                              formatUnits(
+                                $assetsPrices[option[0]].tokenPrice,
+                                18
+                              ) * inputs[option[0]].amount
+                            ).toFixed(2)}{" "}
+                          </p>
+                        </div>
+                      )}
                   </div>
                   {$assets &&
-                  inputs &&
-                  inputs[option[0]] &&
-                  inputs[option[0]].amount !== "" &&
-                  $vaultData[vault]?.vaultUserBalance !== undefined &&
+                  inputs[option[0]].amount &&
+                  $vaultData[vault]?.vaultUserBalance &&
                   Number(inputs[option[0]].amount) <=
                     Number(
                       formatUnits($vaultData[vault]?.vaultUserBalance, 18)
