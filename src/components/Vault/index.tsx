@@ -559,10 +559,8 @@ function Vault({ vault }: IProps) {
             </div>
           )}
 
-          <article className="rounded-xl p-7 border border-gray-950 shadow-lg mt-5">
-            <h2 className="mb-7 text-4xl text-gray-300 text-start">
-              Strategy assets
-            </h2>
+          <article className="rounded-md p-7 border-[2px] border-[#6376AF] mt-5 bg-button">
+            <h2 className="mb-7 text-[24px] text-start">Strategy assets</h2>
             {$assets &&
               $assets.map((asset) => {
                 const assetData: TToken | undefined = getTokenData(asset);
@@ -570,15 +568,14 @@ function Vault({ vault }: IProps) {
                 if (assetData && $assetsPrices) {
                   return (
                     <article
-                      className="rounded-xl p-5 border border-[#620c9f85] mb-4 flex"
+                      className="rounded-md p-2 border-[2px] border-[#6376AF] mb-4 flex bg-[#13141f]"
                       key={asset}
                     >
-                      <div className="flex items-center w-full">
+                      <div className="flex items-center w-full gap-3">
                         <div className="grid w-[125px] text-center">
-                          <h4 className="pb-3 text-2xl ">{assetData.name}</h4>
-
+                          <h4 className="pb-3 text-[18px]">{assetData.name}</h4>
                           <img
-                            className="rounded-full w-[70px] m-auto"
+                            className="rounded-full w-[35px] m-auto"
                             src={assetData.logoURI}
                           />
                         </div>
@@ -592,12 +589,12 @@ function Vault({ vault }: IProps) {
                         </div>
                       </div>
 
-                      <div className="rounded-md bg-purple-950 flex justify-center ms-auto w-[140px] p-1 h-10">
+                      <div className="rounded-md bg-button flex justify-center ms-auto w-[140px] p-1 h-10">
                         <a
                           className="flex items-center"
                           href={`https://polygonscan.com/token/${asset}`}
                         >
-                          Contract{" "}
+                          Contract
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-external-link ms-1"
@@ -700,7 +697,7 @@ function Vault({ vault }: IProps) {
                 Withdraw
               </button>
             </div>
-            <form className="w-[400px] px-4 mb-10">
+            <form className="max-w-[400px] px-4 mb-10">
               <div className="flex flex-col items-start">
                 <label className=" text-[18px] py-2">Select token</label>
                 <select
@@ -732,93 +729,116 @@ function Vault({ vault }: IProps) {
               {tab === "Deposit" && (
                 <>
                   {option && option.length > 1 ? (
-                    <div className="mt-2 flex flex-col items-center justify-center gap-3">
+                    <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
                       {option.map((asset: any) => (
-                        <div
-                          className="rounded-xl  relative h-[150px] border-[2px] border-[#6376AF] max-w-[350px]"
-                          key={asset}
-                        >
-                          <div className="absolute end-5 bottom-4">
-                            <div className="flex items-center">
-                              <div className="text-gray-500 me-2">
-                                Balance:{" "}
-                                {balances &&
-                                  balances[asset] &&
-                                  parseFloat(
-                                    balances[asset].assetBalance
-                                  ).toFixed(3)}
-                              </div>
-                              <button
-                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                type="button"
-                                onClick={() =>
-                                  balances &&
-                                  balances[asset] &&
-                                  handleInputChange(
-                                    balances[asset].assetBalance,
-                                    asset
-                                  )
-                                }
-                              >
-                                MAX
-                              </button>
-                            </div>
+                        <div key={asset}>
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>Balance:</p>
+                            <p>
+                              {balances &&
+                                balances[asset] &&
+                                parseFloat(
+                                  balances[asset].assetBalance
+                                ).toFixed(3)}
+                            </p>
                           </div>
+                          <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                            <div className="absolute end-5 bottom-4">
+                              <div className="flex items-center">
+                                <button
+                                  className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                  type="button"
+                                  onClick={() =>
+                                    balances &&
+                                    balances[asset] &&
+                                    handleInputChange(
+                                      balances[asset].assetBalance,
+                                      asset
+                                    )
+                                  }
+                                >
+                                  MAX
+                                </button>
+                              </div>
+                            </div>
 
-                          <input
-                            className="w-[58%] ps-5 my-auto flex items-center h-full focus:outline-none text-4xl bg-transparent"
-                            list="amount"
-                            id={asset}
-                            name="amount"
-                            placeholder="0"
-                            value={
-                              inputs && inputs[asset] && inputs[asset].amount
-                            }
-                            onChange={(e) =>
-                              handleInputChange(e.target.value, e.target.id)
-                            }
-                            type="text"
-                            onKeyDown={(evt) =>
-                              ["e", "E", "+", "-", " ", ","].includes(
-                                evt.key
-                              ) && evt.preventDefault()
-                            }
-                          />
-                          <div className="absolute end-5 top-8 bg-[#4e46e521] rounded-xl p-2">
-                            {tokensJson.tokens.map((token) => {
-                              if (token.address === asset) {
-                                return (
-                                  <div
-                                    className="flex items-center gap-2"
-                                    key={token.address}
-                                  >
-                                    <p className="my-auto">{token.symbol}</p>
-                                    <img
-                                      className="rounded-full w-[25px] h-[25px] "
-                                      src={token.logoURI}
-                                      alt={token.name}
-                                    />
-                                  </div>
-                                );
+                            <input
+                              className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                              list="amount"
+                              id={asset}
+                              name="amount"
+                              placeholder="0"
+                              value={
+                                inputs && inputs[asset] && inputs[asset].amount
                               }
-                            })}
+                              onChange={(e) =>
+                                handleInputChange(e.target.value, e.target.id)
+                              }
+                              type="text"
+                              onKeyDown={(evt) =>
+                                ["e", "E", "+", "-", " ", ","].includes(
+                                  evt.key
+                                ) && evt.preventDefault()
+                              }
+                            />
+                            <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
+                              {tokensJson.tokens.map((token) => {
+                                if (token.address === asset) {
+                                  return (
+                                    <div
+                                      className="flex items-center gap-2"
+                                      key={token.address}
+                                    >
+                                      {/* <p className="my-auto">{token.symbol}</p> */}
+                                      <img
+                                        className="rounded-full w-[25px] h-[25px] "
+                                        src={token.logoURI}
+                                        alt={token.name}
+                                      />
+                                    </div>
+                                  );
+                                }
+                              })}
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="flex mt-[15px] text-[15px] w-full">
-                      <div className="rounded-xl grid relative h-[150px] border-[1px] border-[gray] my-[7px] pl-[10px]">
+                    <div className="flex flex-col mt-[15px] text-[15px] w-full">
+                      {balances && balances[option[0]] && (
+                        <div className="text-left text-[gray] ml-2">
+                          Balance:{" "}
+                          {parseFloat(balances[option[0]].assetBalance).toFixed(
+                            3
+                          )}
+                        </div>
+                      )}
+
+                      <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                        <div className="absolute top-[35%] left-[5%]">
+                          {tokensJson.tokens.map((token) => {
+                            if (token.address === option[0]) {
+                              return (
+                                <div
+                                  className="flex items-center"
+                                  key={token.address}
+                                >
+                                  {/* <p>{token.symbol}</p> */}
+                                  <img
+                                    className="w-[25px] h-[25px] rounded-full"
+                                    src={token.logoURI}
+                                    alt={token.name}
+                                  />
+                                </div>
+                              );
+                            }
+                          })}
+                        </div>
                         {balances && balances[option[0]] && (
-                          <div className="my-[5px]">
+                          <div>
                             <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pr-3 pb-3">
                               <div className="flex items-center">
-                                <div className="text-left text-[gray]">
-                                  Balance:{" "}
-                                  {parseFloat(
-                                    balances[option[0]].assetBalance
-                                  ).toFixed(3)}
-                                </div>
                                 <button
                                   onClick={() =>
                                     handleInputChange(
@@ -826,10 +846,10 @@ function Vault({ vault }: IProps) {
                                       option[0]
                                     )
                                   }
-                                  className="rounded-md w-12 text-[gray] border-[1px] ml-[5px] border-[gray]"
+                                  className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
                                   type="button"
                                 >
-                                  max
+                                  MAX
                                 </button>
                               </div>
                             </div>
@@ -856,35 +876,15 @@ function Vault({ vault }: IProps) {
                                 evt.key
                               ) && evt.preventDefault()
                             }
-                            className="w-[60%] h-10 text-[30px] text-[#fff] mb-[15px] pl-[15px]"
+                            className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
                           />
                         )}
-                        <div className="absolute top-[32%] right-[13px]">
-                          {tokensJson.tokens.map((token) => {
-                            if (token.address === option[0]) {
-                              return (
-                                <div
-                                  className="flex items-center"
-                                  key={token.address}
-                                >
-                                  <p>{token.symbol}</p>
-                                  <img
-                                    className="w-10 h-10 rounded-[50%] ml-2"
-                                    src={token.logoURI}
-                                    alt={token.name}
-                                  />
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
-                        </div>
                       </div>
                     </div>
                   )}
                   {isApprove === 1 ? (
                     <button
-                      className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
+                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                       type="button"
                       onClick={() => deposit()}
                     >
@@ -899,7 +899,7 @@ function Vault({ vault }: IProps) {
                           Number(getTokenData(asset)?.decimals)
                         ) < inputs[asset].amount ? (
                           <button
-                            className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
+                            className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                             key={asset}
                             type="button"
                             onClick={() => approve(asset as TAddress)}
@@ -911,15 +911,15 @@ function Vault({ vault }: IProps) {
                         )
                       )}
                     </>
-                  ) : isApprove === 0 ? (
-                    <button
-                      disabled
-                      className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center"
-                    >
-                      INSUFICCIENT BALANCE
-                    </button>
                   ) : (
-                    <></>
+                    isApprove === 0 && (
+                      <button
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                      >
+                        INSUFICCIENT BALANCE
+                      </button>
+                    )
                   )}
                 </>
               )}
@@ -927,36 +927,33 @@ function Vault({ vault }: IProps) {
               {tab === "Withdraw" && (
                 <>
                   <div className="grid mt-[15px] text-[15px] w-full">
-                    <div className="rounded-xl grid relative h-[150px] border-[1px] border-[gray] my-[7px] pl-[10px]">
+                    {balances && balances[option[0]] && (
+                      <div className="text-left text-[gray] ml-2">
+                        Balance:{" "}
+                        {parseFloat(
+                          formatUnits($vaultData[vault].vaultUserBalance, 18)
+                        ).toFixed(3)}
+                      </div>
+                    )}
+                    <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
                       {balances && balances[option[0]] && (
-                        <div className="my-[5px]">
-                          <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pb-3 pr-3">
-                            <div className="flex items-center">
-                              <div className="text-left text-[gray]">
-                                Balance:{" "}
-                                {parseFloat(
+                        <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pb-3 pr-3">
+                          <div className="flex items-center">
+                            <button
+                              onClick={() =>
+                                handleInputChange(
                                   formatUnits(
-                                    $vaultData[vault].vaultUserBalance,
+                                    $vaultData[vault]?.vaultUserBalance,
                                     18
-                                  )
-                                ).toFixed(3)}
-                              </div>
-                              <button
-                                onClick={() =>
-                                  handleInputChange(
-                                    formatUnits(
-                                      $vaultData[vault]?.vaultUserBalance,
-                                      18
-                                    ),
-                                    option[0]
-                                  )
-                                }
-                                type="button"
-                                className="text-[gray] border-[1px] ml-[5px] border-[gray] rounded-md w-12"
-                              >
-                                max
-                              </button>
-                            </div>
+                                  ),
+                                  option[0]
+                                )
+                              }
+                              type="button"
+                              className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                            >
+                              MAX
+                            </button>
                           </div>
                         </div>
                       )}
@@ -980,10 +977,10 @@ function Vault({ vault }: IProps) {
                         }
                         pattern="^[0-9]*[.,]?[0-9]*$"
                         inputMode="decimal"
-                        className="w-[60%] h-10 text-[30px] mb-[15px] pl-[15px]"
+                        className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
                       />
 
-                      <div className="absolute top-[32%] right-[13px]">
+                      <div className="absolute top-[30%] left-[5%]">
                         {option.length === 1 ? (
                           <>
                             {tokensJson.tokens.map((token) => {
@@ -993,9 +990,9 @@ function Vault({ vault }: IProps) {
                                     className="flex items-center"
                                     key={token.address}
                                   >
-                                    <p>{token.symbol}</p>
+                                    {/* <p>{token.symbol}</p>  */}
                                     <img
-                                      className="w-10 h-10 rounded-[50%] ml-2"
+                                      className="w-[25px] h-[25px] rounded-full"
                                       src={token.logoURI}
                                       alt={token.name}
                                     />
@@ -1007,12 +1004,12 @@ function Vault({ vault }: IProps) {
                         ) : (
                           <div className="flex h-[45px]">
                             <div className="items-center mr-[5px]">
-                              <p>
+                              {/* <p>
                                 {symbols &&
                                   vault &&
                                   symbols[vault] &&
                                   symbols[vault]?.symbol}
-                              </p>
+                              </p> */}
                             </div>
                           </div>
                         )}
@@ -1030,19 +1027,24 @@ function Vault({ vault }: IProps) {
                     ) ? (
                     <button
                       type="button"
-                      className="text-[35px] w-full h-[60px] cursor-pointer border-[1px] rounded-xl"
+                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                       onClick={() => withdraw()}
                     >
                       WITHDRAW
                     </button>
-                  ) : Number(inputs[option[0]]?.amount) >
-                    Number(
-                      formatUnits($vaultData[vault]?.vaultUserBalance, 18)
-                    ) ? (
-                    <div className="rounded-xl flex text-[gray] border-[1px] w-[367px] items-center justify-center h-[60px] text-[25px]">
-                      INSUFICCIENT BALANCE
-                    </div>
-                  ) : null}
+                  ) : (
+                    Number(inputs[option[0]]?.amount) >
+                      Number(
+                        formatUnits($vaultData[vault]?.vaultUserBalance, 18)
+                      ) && (
+                      <button
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                      >
+                        INSUFICCIENT BALANCE
+                      </button>
+                    )
+                  )}
                 </>
               )}
             </form>
