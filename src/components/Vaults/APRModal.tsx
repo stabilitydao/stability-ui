@@ -26,8 +26,8 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const APR = formatFromBigInt(state.apr, 16, "withDecimals").toFixed(2);
   const APY = calculateAPY(APR).toFixed(2);
   const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
-  const assetAprs = state.assetsAprs.map((a: string) =>
-    formatFromBigInt(a, 16).toFixed(2)
+  const assetAprs = state.assetsAprs.map((apr: string) =>
+    formatFromBigInt(apr, 16).toFixed(2)
   );
 
   const timeDifference = getTimeDifference(state.lastHardWork);
@@ -143,11 +143,20 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           <div className="flex items-center gap-3">
             <p className="text-[16px]">Last Hard Work :</p>
             {timeDifference.days ? (
-              <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
-                {timeDifference.days}
-                {timeDifference.days > 1 ? "days" : "day"}{" "}
-                {timeDifference.hours}h ago
-              </div>
+              <>
+                {timeDifference?.days < 1000 ? (
+                  <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                    {timeDifference?.days ? "yes" : "no"}
+                    {timeDifference.days}
+                    {timeDifference.days > 1 ? "days" : "day"}{" "}
+                    {timeDifference.hours}h ago
+                  </div>
+                ) : (
+                  <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                    None
+                  </div>
+                )}
+              </>
             ) : (
               <div
                 className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${

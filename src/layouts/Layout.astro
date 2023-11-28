@@ -10,6 +10,7 @@ const { title } = Astro.props as IProps;
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.slice(1); // remove the first "/"
 
+
 ---
 
 <!doctype html>
@@ -26,7 +27,7 @@ const currentPath = pathname.slice(1); // remove the first "/"
 		<App client:load>
 			<header>
 				<span class="title">
-					<a href="/" title="Stability"><img src="logo.svg" /><span>Stability</span></a>
+					<a href="/" title="Stability"><img src="../../public/logo.svg" /><span>Stability</span></a>
 				</span>
 				<span class="menu">
 					<a class={currentPath === "" ? "active" : ""} href="/">Vaults</a>
