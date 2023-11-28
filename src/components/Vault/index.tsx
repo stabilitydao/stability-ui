@@ -29,6 +29,7 @@ import {
   formatFromBigInt,
   calculateAPY,
   getTimeDifference,
+  getStrategyInfo,
 } from "@utils";
 
 import tokensJson from "../../stability.tokenlist.json";
@@ -79,6 +80,13 @@ function Vault({ vault }: IProps) {
 
   const [localVault, setLocalVault] = useState<any>();
   const [timeDifference, setTimeDifference] = useState<any>();
+  const [strategyAddress, setStrategyAddress] = useState<
+    TAddress | undefined
+  >();
+  const [strategyDescription, setStrategyDescription] = useState<
+    string | undefined
+  >();
+  const [assetsAPR, setAssetsAPR] = useState<any>();
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -291,11 +299,21 @@ function Vault({ vault }: IProps) {
       )) as TAddress | undefined;
 
       if (typeof strategy === "string") {
+        setStrategyAddress(strategy);
         const assetsData: string[] = (await readContract(_publicClient, {
           address: strategy,
           abi: StrategyABI,
           functionName: "assets",
         })) as string[];
+
+        const description = await readContract(_publicClient, {
+          address: strategy,
+          abi: StrategyABI,
+          functionName: "description",
+        });
+        if (description) {
+          setStrategyDescription(description);
+        }
 
         if (Array.isArray(assetsData)) {
           assets.set(assetsData);
@@ -468,18 +486,22 @@ function Vault({ vault }: IProps) {
           "withDecimals"
         ).toFixed(2);
         const APY = calculateAPY(tempAPR).toFixed(2);
-
         return {
-          name: $vaults[1][index],
-          assets: assets,
-          symbol: $vaults[2][index],
           address: $vaults[0][index],
-          balance: vaultUserBalances[index],
-          tvl: String($vaults[6][index]),
+          name: $vaults[1][index],
+          symbol: $vaults[2][index],
+          assetsWithApr: $vaultAssets[index][3],
+          assetsAprs: $vaultAssets[index][4],
           lastHardWork: $vaultAssets[index][5],
+          tvl: String($vaults[6][index]),
           apr: String($vaults[7][index]),
+          strategyApr: $vaults[8][index],
+          strategySpecific: $vaults[9][index],
           apy: APY,
+          balance: vaultUserBalances[index],
           daily: Number(tempAPR) / 365,
+          assets: assets,
+          strategyInfo: getStrategyInfo($vaults[2][index]),
         };
       });
 
@@ -493,7 +515,14 @@ function Vault({ vault }: IProps) {
     if (localVault) {
       const TD = getTimeDifference(localVault.lastHardWork);
       setTimeDifference(TD);
+
+      setAssetsAPR(
+        localVault.assetsAprs.map((apr: string) =>
+          formatFromBigInt(apr, 16).toFixed(2)
+        )
+      );
     }
+    console.log(localVault);
   }, [localVault]);
 
   return vault && $vaultData[vault] ? (
@@ -559,8 +588,8 @@ function Vault({ vault }: IProps) {
             </div>
           )}
 
-          <article className="rounded-md p-7 border-[2px] border-[#6376AF] mt-5 bg-button">
-            <h2 className="mb-7 text-[24px] text-start">Strategy assets</h2>
+          <article className="rounded-md p-3 border-[2px] border-[#6376AF] mt-5 bg-button">
+            <h2 className="mb-2 text-[24px] text-start">Assets</h2>
             {$assets &&
               $assets.map((asset) => {
                 const assetData: TToken | undefined = getTokenData(asset);
@@ -623,6 +652,181 @@ function Vault({ vault }: IProps) {
                 }
               })}
           </article>
+          {localVault?.strategyInfo && (
+            <div className="rounded-md border-[2px] border-[#6376AF] mt-5 bg-button">
+              <div className="bg-[#13141f] rounded-t-md flex justify-between items-center h-[60px]">
+                <h2 className=" text-[24px] text-start ml-3">Strategy</h2>
+                <div className="flex items-center gap-5 mr-3 ">
+                  <button className="rounded-md bg-button flex justify-center items-center w-[140px]">
+                    <a
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={`https://polygonscan.com/token/${strategyAddress}`}
+                    >
+                      Strategy address
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </button>
+                  <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
+                    <a
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={`https://polygonscan.com/token/${localVault.address}`}
+                    >
+                      Vault address
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </button>
+                  <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
+                    <a
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={localVault.strategyInfo.sourceCode}
+                    >
+                      Github
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-3 p-3">
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    NAME
+                  </p>
+                  <p>{localVault.strategyInfo.name}</p>
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    SPECIFIC
+                  </p>
+                  <p>{localVault.strategySpecific}</p>
+                </div>
+                {strategyDescription && (
+                  <div>
+                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                      DESCRIPTION
+                    </p>
+                    <p>{strategyDescription}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    Total APR
+                  </p>
+                  <p>
+                    {localVault.apr}% {localVault.apy}% APY
+                  </p>
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    Strategy APR
+                  </p>
+                  <p>
+                    {formatFromBigInt(localVault.strategyApr, 16).toFixed(2)}%
+                  </p>
+                </div>
+
+                <div>
+                  {assetsAPR && (
+                    <div className="flex items-center gap-3 flex-wrap mt-2">
+                      {assetsAPR.map((apr: string, index: number) => {
+                        return (
+                          <p
+                            key={apr}
+                            className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                          >
+                            {localVault.assetsWithApr[index]} APR {apr}%
+                          </p>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    BASE STRATEGY NAMES
+                  </p>
+                  <div className="flex items-center gap-3 flex-wrap mt-2">
+                    {localVault.strategyInfo.baseStrategies.map(
+                      (strategy: string) => (
+                        <p
+                          className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                          key={strategy}
+                        >
+                          {strategy}
+                        </p>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    ADAPTER
+                  </p>
+                  <p>{localVault.strategyInfo.ammAdapter}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="w-1/3">
           {localVault && (
@@ -647,11 +851,20 @@ function Vault({ vault }: IProps) {
                       Last Hard Work
                     </p>
                     {timeDifference?.days ? (
-                      <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
-                        {timeDifference.days}
-                        {timeDifference.days > 1 ? "days" : "day"}{" "}
-                        {timeDifference.hours}h ago
-                      </div>
+                      <>
+                        {timeDifference?.days < 1000 ? (
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                            {timeDifference?.days ? "yes" : "no"}
+                            {timeDifference.days}
+                            {timeDifference.days > 1 ? "days" : "day"}{" "}
+                            {timeDifference.hours}h ago
+                          </div>
+                        ) : (
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                            None
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div
                         className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${
