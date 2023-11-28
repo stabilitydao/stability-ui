@@ -527,10 +527,12 @@ function Vault({ vault }: IProps) {
 
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
-      <div className="flex justify-between items-center p-5 bg-button  rounded-md  border-[2px] border-[#6376AF]">
+      <div className="flex justify-between items-center p-4 bg-button rounded-md">
         {localVault && (
-          <div className="flex items-center gap-4">
-            <div className="flex">
+          <div className="flex flex-col w-full">
+
+            <div className="flex items-center gap-4 w-full justify-between flex-wrap">
+            <div className="flex  items-center">
               <img
                 className="w-8 h-8 rounded-full"
                 src={localVault?.assets[0].logo}
@@ -543,24 +545,33 @@ function Vault({ vault }: IProps) {
                 alt={localVault?.assets[1].symbol}
                 title={localVault?.assets[1].name}
               />
+
+              <span className="inline-flex ml-2 text-[18px] font-bold whitespace-nowrap">{localVault.symbol}</span>
             </div>
 
-            <p className="flex flex-col items-start">
-              <span className="text-[20px]">{localVault.name}</span>
+            <div className="flex items-center">
+            
+          
+            <span className="text-[18px] lg:text-[20px]">{localVault.name}</span>
+              
 
-              <span className="text-[16px]">{localVault.symbol}</span>
-            </p>
-          </div>
-        )}
+            </div>
 
-        <p className="bg-[#485069] text-[#B4BFDF] border-[#6376AF] p-2 rounded-md text-[16px] ">
+            <p className="bg-[#485069] text-[#B4BFDF] px-2 py-1 rounded-md text-[15px]">
           CHAIN: {_publicClient.chain.name}
         </p>
+          </div>
+          
+          </div>
+          
+        )}
+
+        
       </div>
       <div className="flex items-start gap-5 mt-6">
         <div className="w-2/3">
           {localVault && (
-            <div className="flex justify-between items-center bg-button p-5 rounded-md border-[2px] border-[#6376AF] h-[80px]">
+            <div className="flex justify-between items-center bg-button p-5 rounded-md h-[80px]">
               <div>
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   TVL
@@ -588,73 +599,9 @@ function Vault({ vault }: IProps) {
             </div>
           )}
 
-          <article className="rounded-md p-3 border-[2px] border-[#6376AF] mt-5 bg-button">
-            <h2 className="mb-2 text-[24px] text-start">Assets</h2>
-            {$assets &&
-              $assets.map((asset) => {
-                const assetData: TToken | undefined = getTokenData(asset);
-
-                if (assetData && $assetsPrices) {
-                  return (
-                    <article
-                      className="rounded-md p-2 border-[2px] border-[#6376AF] mb-4 flex bg-[#13141f]"
-                      key={asset}
-                    >
-                      <div className="flex items-center w-full gap-3">
-                        <div className="grid w-[125px] text-center">
-                          <h4 className="pb-3 text-[18px]">{assetData.name}</h4>
-                          <img
-                            className="rounded-full w-[35px] m-auto"
-                            src={assetData.logoURI}
-                          />
-                        </div>
-
-                        <div className="grid mt-auto ps-2 text-gray-400 ">
-                          <h5>{assetData.symbol}</h5>
-                          <p>
-                            Price: $
-                            {formatUnits($assetsPrices[asset].tokenPrice, 18)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="rounded-md bg-button flex justify-center ms-auto w-[140px] p-1 h-10">
-                        <a
-                          className="flex items-center"
-                          href={`https://polygonscan.com/token/${asset}`}
-                        >
-                          Contract
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="icon icon-tabler icon-tabler-external-link ms-1"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            strokeWidth="2"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path
-                              stroke="none"
-                              d="M0 0h24v24H0z"
-                              fill="none"
-                            ></path>
-                            <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                            <path d="M11 13l9 -9"></path>
-                            <path d="M15 4h5v5"></path>
-                          </svg>
-                        </a>
-                      </div>
-                    </article>
-                  );
-                }
-              })}
-          </article>
           {localVault?.strategyInfo && (
-            <div className="rounded-md border-[2px] border-[#6376AF] mt-5 bg-button">
-              <div className="bg-[#13141f] rounded-t-md flex justify-between items-center h-[60px]">
+            <div className="rounded-md mt-5 bg-button">
+              <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
                 <h2 className=" text-[24px] text-start ml-3">Strategy</h2>
                 <div className="flex items-center gap-5 mr-3 ">
                   <button className="rounded-md bg-button flex justify-center items-center w-[140px]">
@@ -715,7 +662,7 @@ function Vault({ vault }: IProps) {
                       </svg>
                     </a>
                   </button>
-                  <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
+                  <button className="rounded-md bg-button flex justify-center items-center w-[140px] hidden">
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={localVault.strategyInfo.sourceCode}
@@ -803,13 +750,13 @@ function Vault({ vault }: IProps) {
                 </div>
                 <div>
                   <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                    BASE STRATEGY NAMES
+                    BASE STRATEGIES
                   </p>
-                  <div className="flex items-center gap-3 flex-wrap mt-2">
+                  <div className="flex items-center gap-3 flex-wrap mt-3">
                     {localVault.strategyInfo.baseStrategies.map(
                       (strategy: string) => (
                         <p
-                          className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                          className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57]"
                           key={strategy}
                         >
                           {strategy}
@@ -818,19 +765,89 @@ function Vault({ vault }: IProps) {
                     )}
                   </div>
                 </div>
-                <div>
+                <div className="mt-4">
                   <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                    ADAPTER
+                    AMM ADAPTER
                   </p>
                   <p>{localVault.strategyInfo.ammAdapter}</p>
                 </div>
               </div>
             </div>
           )}
+
+          <article className="rounded-md p-3 mt-5 bg-button">
+            <h2 className="mb-2 text-[24px] text-start">Assets</h2>
+            {$assets &&
+              $assets.map((asset) => {
+                const assetData: TToken | undefined = getTokenData(asset);
+
+                if (assetData && $assetsPrices) {
+                  return (
+                    <article
+                      className="rounded-md p-3 mb-4 flex bg-[#32343f]"
+                      key={asset}
+                    >
+                      <div className="flex w-full flex-col gap-3">
+                        <div className="flex w-full justify-between items-center ">
+
+                          <div className="inline-flex items-center">
+                          <img
+                            className="rounded-full w-[30px] m-auto mr-2"
+                            src={assetData.logoURI}
+                          />
+                          <span className="mr-5 font-bold text-[18px]">{assetData.symbol}</span>
+                          <span className="text-[18px]">{assetData.name}</span>
+                          </div>
+                          <div className="inline-flex">
+                          <div className="rounded-md bg-[#404353] flex justify-center ms-auto w-[140px] p-1 h-8 text-[16px]">
+                        <a
+                          className="flex items-center"
+                          href={`https://polygonscan.com/token/${asset}`}
+                        >
+                          Contract
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="icon icon-tabler icon-tabler-external-link ms-1"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path
+                              stroke="none"
+                              d="M0 0h24v24H0z"
+                              fill="none"
+                            ></path>
+                            <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                            <path d="M11 13l9 -9"></path>
+                            <path d="M15 4h5v5"></path>
+                          </svg>
+                        </a>
+                      </div>
+                          </div>
+                        
+                        </div>
+
+                        <div className="flex justify-start items-center text-[15px]">
+                        <p>
+                            Price: ${formatUnits($assetsPrices[asset].tokenPrice, 18)}
+                        </p>
+                          
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+              })}
+          </article>
         </div>
         <div className="w-1/3">
           {localVault && (
-            <div className="flex justify-between items-center bg-button p-5 rounded-md border-[2px] border-[#6376AF] h-[80px]">
+            <div className="flex justify-between items-center bg-button p-5 rounded-md h-[80px]">
               <div className="flex flex-col gap-2">
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   User Balance
@@ -882,10 +899,10 @@ function Vault({ vault }: IProps) {
             </div>
           )}
 
-          <div className="mt-5 bg-button rounded-md border-[2px] border-[#6376AF]">
+          <div className="mt-5 bg-button rounded-md">
             <div className="flex">
               <button
-                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#13141f] ${
+                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
                   tab === "Deposit" && "border-b-[2px] border-[#6376AF]"
                 }`}
                 onClick={() => {
@@ -897,7 +914,7 @@ function Vault({ vault }: IProps) {
                 Deposit
               </button>
               <button
-                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tr-md  bg-[#13141f]  ${
+                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tr-md  bg-[#1c1c23]  ${
                   tab === "Withdraw" && "border-b-[2px] border-[#6376AF]"
                 }`}
                 onClick={() => {
