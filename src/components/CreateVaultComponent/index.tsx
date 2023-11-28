@@ -43,6 +43,8 @@ const CreateVaultComponent = () => {
         functionName: "whatToBuild",
         abi: FactoryABI,
       });
+      console.log(whatToBuild);
+      console.log($platformData);
 
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[1].length; i++) {
@@ -202,7 +204,7 @@ const CreateVaultComponent = () => {
   }, [$balances]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
-    (variant) => variant.vaultType === "Compounding"
+    variant => variant.vaultType === "Compounding"
   ).length;
   return (
     <div>
@@ -228,8 +230,7 @@ const CreateVaultComponent = () => {
                     variant.strategyDesc +
                     variant.vaultType +
                     variant.strategyId
-                  }
-                >
+                  }>
                   <td>{variant.strategyId}</td>
                   <td>{variant.strategyDesc}</td>
                   <td>
@@ -238,8 +239,7 @@ const CreateVaultComponent = () => {
                         className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                         onClick={() => {
                           setBuildIndex(i);
-                        }}
-                      >
+                        }}>
                         Assemble
                       </button>
                     )}
@@ -265,13 +265,12 @@ const CreateVaultComponent = () => {
                 vaults can be created:
               </p>
               <div className="flex flex-col">
-                {Object.keys(allowedBBTokenVaults).map((token) => {
+                {Object.keys(allowedBBTokenVaults).map(token => {
                   const tokenData = getTokenData(token);
                   return (
                     <div
                       key={token}
-                      className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md"
-                    >
+                      className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md">
                       <div className="flex items-center justify-center px-1 py-1">
                         {tokenData && (
                           <img
@@ -333,8 +332,7 @@ const CreateVaultComponent = () => {
                 key={
                   variant.strategyDesc + variant.vaultType + variant.strategyId
                 }
-                className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
-              >
+                className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]">
                 <td>{variant.vaultType}</td>
                 <td>
                   {
@@ -351,8 +349,7 @@ const CreateVaultComponent = () => {
                       className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                       onClick={() => {
                         setBuildIndex(i);
-                      }}
-                    >
+                      }}>
                       Assemble
                     </button>
                   )}
@@ -371,15 +368,13 @@ const CreateVaultComponent = () => {
           className="overlay"
           onClick={() => {
             setBuildIndex(undefined);
-          }}
-        >
+          }}>
           <div
             className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[30px] rounded-md bg-modal mr-5 "
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               e.stopPropagation();
-            }}
-          >
+            }}>
             <div className="font-bold text-[1.5rem] flex justify-center">
               Assembling
             </div>

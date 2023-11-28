@@ -36,6 +36,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
+
   const getData = async () => {
     if (address && chain?.id) {
       const contractData = await readContract(_publicClient, {

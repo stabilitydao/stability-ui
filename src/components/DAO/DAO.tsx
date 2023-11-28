@@ -17,8 +17,18 @@ import {
   account,
   platformData,
   vaults,
+  publicClient,
 } from "@store";
-import { VaultABI, StrategyABI, ERC20ABI, PlatformABI, platform } from "@web3";
+import {
+  VaultABI,
+  StrategyABI,
+  ERC20ABI,
+  PlatformABI,
+  platform,
+  VaultManager,
+  FactoryABI,
+  IVaultManagerABI,
+} from "@web3";
 import tokensJson from "../../stability.tokenlist.json";
 import { getTokenData } from "@utils";
 
@@ -33,32 +43,61 @@ import type {
 } from "@types";
 
 function DAO() {
-  const [platformData, setPlatformData] = useState<PlatformData | undefined>(
+  const [_platformData, setPlatformData] = useState<PlatformData | undefined>(
     undefined
   );
-  const _publicClient = usePublicClient();
+  const $publicClient = useStore(publicClient);
+  const $platformData = useStore(platformData);
+  console.log(platform);
+  console.log($platformData);
 
   useEffect(() => {
-    platformVersion();
-  }, []);
+    fetchData();
+  }, [$platformData]);
 
-  const platformVersion = async () => {
-    try {
-      const v: string = (await readContract(_publicClient, {
-        address: platform,
-        abi: PlatformABI,
-        functionName: "platformVersion",
-      })) as string;
-      setPlatformData({ platformVersion: v });
-    } catch (error) {
-      console.error("Error fetching platform version:", error);
+  const fetchData = async () => {
+    if ($publicClient && $platformData) {
+      const platformData: PlatformData[] = [];
+      try {
+        const platformVersion: string = (await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "platformVersion",
+        })) as string;
+        console.log(platformVersion);
+
+        const deployedVaults = await $publicClient.readContract({
+          address: VaultManager,
+          functionName: "vaults",
+          abi: IVaultManagerABI,
+        });
+        console.log(deployedVaults);
+
+        const deployedVaultss = await $publicClient.readContract({
+          address: $platformData.factory,
+          functionName: "deployedVaults",
+          abi: FactoryABI,
+        });
+
+        console.log(deployedVaultss);
+
+        const whatToBuild = await $publicClient.readContract({
+          address: $platformData.factory,
+          functionName: "whatToBuild",
+          abi: FactoryABI,
+        });
+
+        console.log(whatToBuild);
+      } catch (error) {
+        console.error("Error fetching platform data:", error);
+      }
     }
   };
 
   return (
     <div className="dao pt-2">
       <h1 className="text-xxl text-gradient mb-3">Platform</h1>
-      <h2>Version: {platformData?.platformVersion}</h2>
+      <h2>Version: {_platformData?.platformVersion}</h2>
       <br />
 
       <h1 className="text-xxl text-gradient mb-3">Tokenomics</h1>

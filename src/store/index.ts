@@ -8,6 +8,7 @@ import type {
   TBalances,
   TVaultAssets,
 } from "@types";
+import { platform } from "@web3";
 
 const account = atom<string | undefined>();
 const network = atom<string | undefined>();
@@ -18,9 +19,7 @@ const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
 const assetsPrices = atom<TAssetPrices | undefined>();
 const assetsBalances = atom<TBalances | undefined>();
-
 const vaultData = atom<TVaults>({});
-
 const vaults = atom<any>();
 const balances = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();

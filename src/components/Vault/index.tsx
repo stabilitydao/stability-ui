@@ -46,9 +46,7 @@ function Vault({ vault }: IProps) {
   const $vaults = useStore(vaults);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
-
   const _publicClient = usePublicClient();
-
   const [tab, setTab] = useState("Deposit");
   const [option, setOption] = useState<string[] | any>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
@@ -65,6 +63,7 @@ function Vault({ vault }: IProps) {
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
   const [sharesOut, setSharesOut] = useState<bigint | any>();
+  console.log($vault);
 
   const loadSymbols = () => {
     if ($vaults) {
