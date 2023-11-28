@@ -34,13 +34,10 @@ function Vaults() {
   });
 
   const [currentTab, setCurrentTab] = useState(1);
-
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   const [tableStates, setTableStates] = useState(TABLE);
-
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const toVault = (adress: string) => {

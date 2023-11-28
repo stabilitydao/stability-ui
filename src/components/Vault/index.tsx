@@ -63,7 +63,6 @@ function Vault({ vault }: IProps) {
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
   const [sharesOut, setSharesOut] = useState<bigint | any>();
-  console.log($vault);
 
   const loadSymbols = () => {
     if ($vaults) {
