@@ -11,6 +11,7 @@ export const getTokenData = (address: string): TTokenData | undefined => {
         name: token.name,
         symbol: token.symbol,
         logoURI: token.logoURI,
+        tags: token?.tags,
       };
     }
   }
