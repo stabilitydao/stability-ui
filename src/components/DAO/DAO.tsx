@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { formatUnits } from "viem";
-import { vaults, publicClient, balances } from "@store";
+import { formatUnits, parseUnits } from "viem";
+import { vaults, publicClient, balances, platformData } from "@store";
 import { PlatformABI, platform } from "@web3";
 import type { PlatformData } from "@types";
 
@@ -32,20 +32,34 @@ function DAO() {
           functionName: "getFees",
         })) as bigint[];
 
+        const contractData: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "getData",
+        });
+
+        const strategieNames: string = contractData[6];
+
         const sumShareBalances = $vaults[5].reduce(
           (total: bigint, numero: bigint) => total + numero,
           BigInt(0)
         );
 
+        const percentageFees = platformFees.map(valor =>
+          valor !== 0n ? (valor / 1000n).toString() + " %" : "0 %"
+        );
+
+        console.log(percentageFees);
+
         const platformData: PlatformData = {
           platformVersion: platformVersion,
           numberOfTotalVaults: $balances[3].length,
           totalTvl: formatUnits(sumShareBalances, 18),
-          strategieNames: $vaults[2],
-          platformFee: formatUnits(platformFees[0], 18),
-          vaultManagerFee: formatUnits(platformFees[1], 18),
-          strategyLogicFee: formatUnits(platformFees[2], 18),
-          ecosystemFee: formatUnits(platformFees[3], 18),
+          strategieNames: strategieNames,
+          platformFee: percentageFees[0],
+          vaultManagerFee: percentageFees[1],
+          strategyLogicFee: percentageFees[2],
+          ecosystemFee: percentageFees[3],
         };
         setPlatformData(platformData);
       } catch (error) {
@@ -64,7 +78,7 @@ function DAO() {
         <h2>Total TVL: {_platformData?.totalTvl}</h2>
       </article>
 
-      <table className="w-96 m-auto border my-5 h-[239px] p-0">
+      <table className="w-96 m-auto border my-5 p-0">
         <thead>
           <tr>
             <th>Strategies:</th>
