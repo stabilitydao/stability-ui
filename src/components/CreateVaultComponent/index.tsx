@@ -43,7 +43,6 @@ const CreateVaultComponent = () => {
         functionName: "whatToBuild",
         abi: FactoryABI,
       });
-      console.log($platformData);
 
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[1].length; i++) {

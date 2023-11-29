@@ -12,7 +12,6 @@ function DAO() {
   const $publicClient = useStore(publicClient);
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
-  console.log($vaults);
 
   useEffect(() => {
     fetchData();
@@ -26,7 +25,6 @@ function DAO() {
           abi: PlatformABI,
           functionName: "platformVersion",
         })) as string;
-        console.log("asd");
 
         const platformFees: bigint[] = (await $publicClient.readContract({
           address: platform,
@@ -38,7 +36,6 @@ function DAO() {
           (total: bigint, numero: bigint) => total + numero,
           BigInt(0)
         );
-        console.log("asd");
 
         const platformData: PlatformData = {
           platformVersion: platformVersion,

@@ -44,7 +44,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: PlatformABI,
         functionName: "getData",
       });
-      console.log("getData", contractData);
 
       if (contractData && Array.isArray(contractData)) {
         const buildingPrices: { [vaultType: string]: bigint } = {};

@@ -32,8 +32,6 @@ import {
   getStrategyInfo,
 } from "@utils";
 
-import tokensJson from "../../stability.tokenlist.json";
-
 import type {
   TToken,
   TAddress,
@@ -41,7 +39,12 @@ import type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
+  TTokenData,
 } from "@types";
+
+import { TOKENS_ASSETS } from "@constants";
+
+import tokensJson from "../../stability.tokenlist.json";
 
 interface IProps {
   vault?: TAddress | undefined;
@@ -49,10 +52,10 @@ interface IProps {
 
 function Vault({ vault }: IProps) {
   const $vaultData = useStore(vaultData);
-  const $assets = useStore(assets);
+  const $assets: any = useStore(assets);
   const $account = useStore(account);
   const $vaults = useStore(vaults);
-  const $assetsPrices = useStore(assetsPrices);
+  const $assetsPrices: any = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
   const $vaultAssets: any = useStore(vaultAssets);
 
@@ -87,6 +90,7 @@ function Vault({ vault }: IProps) {
     string | undefined
   >();
   const [assetsAPR, setAssetsAPR] = useState<any>();
+  const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -240,6 +244,7 @@ function Vault({ vault }: IProps) {
             allowance: [newAllowance],
           },
         }));
+        previewDeposit();
       }
     }
   };
@@ -265,9 +270,8 @@ function Vault({ vault }: IProps) {
   };
 
   const withdraw = async () => {
-    if (vault) {
-      const value = $vaultData[vault].vaultUserBalance;
-
+    const value = parseUnits(inputs[option[0]]?.amount, 18);
+    if (value) {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -339,25 +343,48 @@ function Vault({ vault }: IProps) {
           };
         }
       }
-    } else {
-      if (
-        $assetsBalances &&
-        $assetsBalances[option[0]] &&
-        option &&
-        option.length === 1
-      ) {
-        const decimals = getTokenData(option[0])?.decimals;
-        if (decimals !== undefined) {
-          balance[option[0]] = {
-            assetBalance: formatUnits(
-              $assetsBalances[option[0]].assetBalance,
-              decimals
-            ),
-          };
-        }
+    } else if (
+      $assetsBalances &&
+      $assetsBalances[option[0]] &&
+      option.length === 1
+    ) {
+      const decimals = getTokenData(option[0])?.decimals;
+      if (decimals !== undefined) {
+        balance[option[0]] = {
+          assetBalance: formatUnits(
+            $assetsBalances[option[0]].assetBalance,
+            decimals
+          ),
+        };
       }
     }
     setBalances(balance);
+  };
+
+  const previewWithdraw = async (value: string) => {
+    const balance = Number(
+      formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+    );
+
+    if (Number(value) > balance || !Number(value)) {
+      setWithdrawAmount(false);
+      return;
+    }
+
+    let preview: any = await readContract(_publicClient, {
+      address: localVault.address as TAddress,
+      abi: VaultABI,
+      functionName: "previewWithdraw",
+      args: [parseUnits(value, 18)],
+    });
+    preview = preview.map((amount: any, index: number) => {
+      const tokenData: TTokenData | any = getTokenData($assets[index]);
+      return {
+        symbol: tokenData?.symbol,
+        amount: formatUnits(amount, tokenData?.decimals),
+      };
+    });
+    setWithdrawAmount(preview);
   };
 
   const checkAllowance = async () => {
@@ -380,7 +407,7 @@ function Vault({ vault }: IProps) {
   };
 
   const previewDeposit = async () => {
-    if (!Number(lastKeyPress.key2)) return;
+    //if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -523,7 +550,6 @@ function Vault({ vault }: IProps) {
         )
       );
     }
-    console.log(localVault);
   }, [localVault]);
 
   return vault && $vaultData[vault] ? (
@@ -652,7 +678,7 @@ function Vault({ vault }: IProps) {
                       </svg>
                     </a>
                   </button>
-                  <button className="rounded-md bg-button flex justify-center items-center w-[140px] hidden">
+                  <button className="rounded-md bg-button justify-center items-center w-[140px] hidden">
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={localVault.strategyInfo.sourceCode}>
@@ -763,8 +789,12 @@ function Vault({ vault }: IProps) {
           <article className="rounded-md p-3 mt-5 bg-button">
             <h2 className="mb-2 text-[24px] text-start">Assets</h2>
             {$assets &&
-              $assets.map(asset => {
-                const assetData: TToken | undefined = getTokenData(asset);
+              $assets.map((asset: TAddress) => {
+                const assetData: TToken | any = getTokenData(asset);
+
+                const tokenAssets = TOKENS_ASSETS.find(tokenAsset => {
+                  return tokenAsset.addresses.includes(assetData?.address);
+                });
 
                 if (assetData && $assetsPrices) {
                   return (
@@ -785,8 +815,36 @@ function Vault({ vault }: IProps) {
                               {assetData.name}
                             </span>
                           </div>
-                          <div className="inline-flex">
-                            <div className="rounded-md bg-[#404353] flex justify-center ms-auto w-[140px] p-1 h-8 text-[16px]">
+                          <div className="flex gap-3">
+                            {tokenAssets?.website && (
+                              <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
+                                <a
+                                  className="flex items-center"
+                                  href={tokenAssets?.website}>
+                                  Website
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="icon icon-tabler icon-tabler-external-link ms-1"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round">
+                                    <path
+                                      stroke="none"
+                                      d="M0 0h24v24H0z"
+                                      fill="none"></path>
+                                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                                    <path d="M11 13l9 -9"></path>
+                                    <path d="M15 4h5v5"></path>
+                                  </svg>
+                                </a>
+                              </div>
+                            )}
+                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                               <a
                                 className="flex items-center"
                                 href={`https://polygonscan.com/token/${asset}`}>
@@ -812,6 +870,34 @@ function Vault({ vault }: IProps) {
                                 </svg>
                               </a>
                             </div>
+                            {tokenAssets?.docs && (
+                              <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
+                                <a
+                                  className="flex items-center"
+                                  href={tokenAssets?.docs}>
+                                  Docs
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="icon icon-tabler icon-tabler-external-link ms-1"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="2"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round">
+                                    <path
+                                      stroke="none"
+                                      d="M0 0h24v24H0z"
+                                      fill="none"></path>
+                                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                                    <path d="M11 13l9 -9"></path>
+                                    <path d="M15 4h5v5"></path>
+                                  </svg>
+                                </a>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -821,6 +907,21 @@ function Vault({ vault }: IProps) {
                             {formatUnits($assetsPrices[asset].tokenPrice, 18)}
                           </p>
                         </div>
+
+                        <p className="text-[18px]">
+                          {tokenAssets?.description}
+                        </p>
+                        {assetData?.tags && (
+                          <div className="flex items-center gap-3 flex-wrap">
+                            {assetData.tags.map((tag: string) => (
+                              <p
+                                className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
+                                key={tag}>
+                                {tag}
+                              </p>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </article>
                   );
@@ -844,7 +945,6 @@ function Vault({ vault }: IProps) {
                 </p>
               </div>
               <div>
-                {" "}
                 {timeDifference && (
                   <div className="flex flex-col gap-2">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
@@ -853,21 +953,20 @@ function Vault({ vault }: IProps) {
                     {timeDifference?.days ? (
                       <>
                         {timeDifference?.days < 1000 ? (
-                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
-                            {timeDifference?.days ? "yes" : "no"}
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E] text-center">
                             {timeDifference.days}
                             {timeDifference.days > 1 ? "days" : "day"}{" "}
                             {timeDifference.hours}h ago
                           </div>
                         ) : (
-                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E] text-center">
                             None
                           </div>
                         )}
                       </>
                     ) : (
                       <div
-                        className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${
+                        className={`text-[14px] px-2 py-1 rounded-lg border-[2px] text-center  ${
                           timeDifference.hours > 4
                             ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
                             : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
@@ -909,7 +1008,7 @@ function Vault({ vault }: IProps) {
             </div>
             <form
               autoComplete="off"
-              className="max-w-[400px] px-4 mb-10">
+              className="max-w-[400px] px-4 mb-10 pb-5">
               <div className="flex flex-col items-start">
                 <label className=" text-[18px] py-2">Select token</label>
                 <select
@@ -1015,9 +1114,11 @@ function Vault({ vault }: IProps) {
                                 <p>
                                   $
                                   {(
-                                    formatUnits(
-                                      $assetsPrices[asset].tokenPrice,
-                                      18
+                                    Number(
+                                      formatUnits(
+                                        $assetsPrices[asset].tokenPrice,
+                                        18
+                                      )
                                     ) * inputs[asset].amount
                                   ).toFixed(2)}
                                 </p>
@@ -1080,11 +1181,7 @@ function Vault({ vault }: IProps) {
                           <input
                             list="amount"
                             id={option[0]}
-                            value={
-                              inputs &&
-                              inputs[option[0]] &&
-                              inputs[option[0]].amount
-                            }
+                            value={inputs[option[0]]?.amount}
                             name="amount"
                             type="text"
                             placeholder="0"
@@ -1106,9 +1203,11 @@ function Vault({ vault }: IProps) {
                             <p>
                               $
                               {(
-                                formatUnits(
-                                  $assetsPrices[option[0]].tokenPrice,
-                                  18
+                                Number(
+                                  formatUnits(
+                                    $assetsPrices[option[0]].tokenPrice,
+                                    18
+                                  )
                                 ) * inputs[option[0]].amount
                               ).toFixed(2)}{" "}
                             </p>
@@ -1190,16 +1289,13 @@ function Vault({ vault }: IProps) {
                       <input
                         list="amount"
                         id={option.join(", ")}
-                        value={
-                          inputs &&
-                          inputs[option[0]] &&
-                          inputs[option[0]].amount
-                        }
+                        value={inputs[option[0]]?.amount}
                         name="amount"
                         placeholder="0"
-                        onChange={e =>
-                          handleInputChange(e.target.value, e.target.id)
-                        }
+                        onChange={e => {
+                          handleInputChange(e.target.value, e.target.id);
+                          previewWithdraw(e.target.value);
+                        }}
                         onKeyDown={evt =>
                           ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                           evt.preventDefault()
@@ -1243,34 +1339,51 @@ function Vault({ vault }: IProps) {
                         )}
                       </div>
                     </div>
+
                     {$assetsPrices[option[0]] &&
                       inputs[option[0]].amount > 0 && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                           <p>
                             $
                             {(
-                              formatUnits(
-                                $assetsPrices[option[0]].tokenPrice,
-                                18
+                              Number(
+                                formatUnits(
+                                  $assetsPrices[option[0]].tokenPrice,
+                                  18
+                                )
                               ) * inputs[option[0]].amount
-                            ).toFixed(2)}{" "}
+                            ).toFixed(2)}
                           </p>
                         </div>
                       )}
                   </div>
-                  {$assets &&
-                  inputs[option[0]].amount &&
-                  $vaultData[vault]?.vaultUserBalance &&
-                  Number(inputs[option[0]].amount) <=
-                    Number(
-                      formatUnits($vaultData[vault]?.vaultUserBalance, 18)
-                    ) ? (
-                    <button
-                      type="button"
-                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                      onClick={() => withdraw()}>
-                      WITHDRAW
-                    </button>
+                  {withdrawAmount ? (
+                    <div>
+                      <div className="my-2 ml-2 flex flex-col gap-2">
+                        {withdrawAmount?.map(
+                          ({
+                            symbol,
+                            amount,
+                          }: {
+                            symbol: string;
+                            amount: string;
+                          }) => (
+                            <div key={symbol}>
+                              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                                {symbol}
+                              </p>
+                              <p>{amount}</p>
+                            </div>
+                          )
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                        onClick={() => withdraw()}>
+                        WITHDRAW
+                      </button>
+                    </div>
                   ) : (
                     Number(inputs[option[0]]?.amount) >
                       Number(
