@@ -40,8 +40,8 @@ function Vaults() {
   const [tableStates, setTableStates] = useState(TABLE);
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
-  const toVault = (adress: string) => {
-    window.location.href = `/vault/${adress}`;
+  const toVault = (address: string) => {
+    window.location.href = `/vault/${address}`;
   };
 
   const compareHandler = (

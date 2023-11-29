@@ -1,16 +1,83 @@
 export default [
   {
-    inputs: [],
-    name: "STRATEGY_LOGIC_ID",
-    outputs: [
+    anonymous: false,
+    inputs: [
       {
-        internalType: "string",
-        name: "",
-        type: "string",
+        indexed: false,
+        internalType: "uint256",
+        name: "vaultManagerReceiverFee",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "strategyLogicReceiverFee",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "ecosystemRevenueReceiverFee",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "multisigReceiverFee",
+        type: "uint256",
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    name: "ExtractFees",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "apr",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "compoundApr",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "earned",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tvl",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "duration",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "sharePrice",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256[]",
+        name: "assetPrices",
+        type: "uint256[]",
+      },
+    ],
+    name: "HardWork",
+    type: "event",
   },
   {
     inputs: [],
@@ -83,6 +150,19 @@ export default [
   },
   {
     inputs: [],
+    name: "description",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "doHardWork",
     outputs: [],
     stateMutability: "nonpayable",
@@ -120,7 +200,7 @@ export default [
     outputs: [
       {
         internalType: "address[]",
-        name: "__assets",
+        name: "assets_",
         type: "address[]",
       },
       {
@@ -138,8 +218,13 @@ export default [
     outputs: [
       {
         internalType: "string",
-        name: "",
+        name: "name",
         type: "string",
+      },
+      {
+        internalType: "bool",
+        name: "showInVaultSymbol",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -272,12 +357,44 @@ export default [
   },
   {
     inputs: [],
+    name: "strategyLogicId",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "supportedVaultTypes",
     outputs: [
       {
         internalType: "string[]",
         name: "types",
         type: "string[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -305,7 +422,7 @@ export default [
       },
       {
         internalType: "uint256",
-        name: "total",
+        name: "totalAmount",
         type: "uint256",
       },
       {
@@ -398,4 +515,4 @@ export default [
     stateMutability: "nonpayable",
     type: "function",
   },
-]as const;
+] as const;

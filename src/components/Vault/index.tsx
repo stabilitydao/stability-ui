@@ -19,10 +19,18 @@ import {
   assetsBalances,
   account,
   vaults,
+  vaultAssets,
 } from "@store";
 
 import { VaultABI, StrategyABI, ERC20ABI } from "@web3";
-import { getTokenData } from "@utils";
+import {
+  getTokenData,
+  formatNumber,
+  formatFromBigInt,
+  calculateAPY,
+  getTimeDifference,
+  getStrategyInfo,
+} from "@utils";
 
 import tokensJson from "../../stability.tokenlist.json";
 
@@ -40,13 +48,16 @@ interface IProps {
 }
 
 function Vault({ vault }: IProps) {
-  const $vault = useStore(vaultData);
+  const $vaultData = useStore(vaultData);
   const $assets = useStore(assets);
   const $account = useStore(account);
   const $vaults = useStore(vaults);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
+  const $vaultAssets: any = useStore(vaultAssets);
+
   const _publicClient = usePublicClient();
+
   const [tab, setTab] = useState("Deposit");
   const [option, setOption] = useState<string[] | any>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
@@ -57,12 +68,25 @@ function Vault({ vault }: IProps) {
   const [isApprove, setIsApprove] = useState<number | undefined>();
   const [symbols, setSymbols] = useState<TVaultsAddress>({});
   const [balances, setBalances] = useState<TVaultBalance | any>({});
+
   const [inputs, setInputs] = useState<TVaultInput | any>({});
+
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
+
   const [sharesOut, setSharesOut] = useState<bigint | any>();
+
+  const [localVault, setLocalVault] = useState<any>();
+  const [timeDifference, setTimeDifference] = useState<any>();
+  const [strategyAddress, setStrategyAddress] = useState<
+    TAddress | undefined
+  >();
+  const [strategyDescription, setStrategyDescription] = useState<
+    string | undefined
+  >();
+  const [assetsAPR, setAssetsAPR] = useState<any>();
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -242,7 +266,7 @@ function Vault({ vault }: IProps) {
 
   const withdraw = async () => {
     if (vault) {
-      const value = $vault[vault].vaultUserBalance;
+      const value = $vaultData[vault].vaultUserBalance;
 
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
@@ -275,11 +299,21 @@ function Vault({ vault }: IProps) {
       )) as TAddress | undefined;
 
       if (typeof strategy === "string") {
+        setStrategyAddress(strategy);
         const assetsData: string[] = (await readContract(_publicClient, {
           address: strategy,
           abi: StrategyABI,
           functionName: "assets",
         })) as string[];
+
+        const description = await readContract(_publicClient, {
+          address: strategy,
+          abi: StrategyABI,
+          functionName: "description",
+        });
+        if (description) {
+          setStrategyDescription(description);
+        }
 
         if (Array.isArray(assetsData)) {
           assets.set(assetsData);
@@ -346,6 +380,7 @@ function Vault({ vault }: IProps) {
   };
 
   const previewDeposit = async () => {
+    if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -421,465 +456,160 @@ function Vault({ vault }: IProps) {
     previewDeposit();
   }, [lastKeyPress]);
 
-  return vault && $vault[vault] ? (
-    <main className="w-full p-0 m-0 mx-auto">
-      <table className="m-auto w-full my-4 ring-purple-950 hover:ring-1 shadow-sm rounded-xl">
-        <tbody>
-          <tr className="rounded-xl p-3 grid border-purple-950 border text-2xl ">
-            <td>Vault: {vault}</td>
-            <td>TVL: {formatUnits($vault[vault].vaultSharePrice, 18)}</td>
-            <td>
-              User Balance: {formatUnits($vault[vault].vaultUserBalance, 18)}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="rounded-xl mt-5 border-l border-r border-b border-gray-950 shadow-lg mb-12">
-        <div className="border-0 flex">
-          <button
-            className={` h-[65px] rounded-t-xl cursor-pointer border-l-2 border-t-2 border-r-2 text-3xl w-full hover:bg-purple-950 ${
-              tab === "Deposit"
-                ? "bg-purple-950 border-purple-600 "
-                : "bg-black-400 text-gray-500 border-gray-600"
-            }`}
-            onClick={() => {
-              setTab("Deposit");
-              resetInputs(option);
-              resetOptions();
-            }}>
-            Deposit
-          </button>
-          <button
-            className={`rounded-t-xl h-[65px] cursor-pointer border-l-2 border-t-2 border-r-2  text-3xl w-full hover:bg-purple-950  ${
-              tab === "Withdraw"
-                ? "bg-purple-950 border-purple-600"
-                : "bg-black-400 text-gray-500 border-gray-600 "
-            }`}
-            onClick={() => {
-              setTab("Withdraw");
-              resetOptions();
-              resetInputs(option);
-              loadSymbols();
-            }}>
-            Withdraw
-          </button>
-        </div>
-        <form className="w-[400px] m-auto grid mb-10">
-          <div className="my-4 m-auto grid">
-            <label className="text-gray-600 text-2xl py-2">Select token</label>
-            <select
-              className="w-[280px] rounded-xl bg-gradient-to-r from-purple-700 to-purple-950 text-2xl h-[50px] focus:outline-0 cursor-pointer"
-              id="selectOption"
-              onChange={e => changeOption(e.target.value.split(", "))}>
-              <option
-                className="bg-gray-600 text-center"
-                value={defaultOptionAssets}>
-                {defaultOptionSymbols}
-              </option>
-              {tokensJson.tokens &&
-                tokensJson.tokens.slice(0, -2).map(token => {
-                  return (
-                    <option
-                      className="bg-gray-600 text-center"
-                      key={token.address}
-                      value={token.address}>
-                      {token.symbol}
-                    </option>
-                  );
-                })}
-            </select>
-          </div>
+  useEffect(() => {
+    if ($vaults?.length && $vaultData) {
+      const vaultUserBalances = Object.values($vaultData).map(
+        ({ vaultUserBalance }) => String(vaultUserBalance)
+      );
+      const vaults = $vaults[0].map((_: any, index: number) => {
+        let assets;
+        if ($vaultAssets.length) {
+          const token1 = getTokenData($vaultAssets[index][1][0]);
+          const token2 = getTokenData($vaultAssets[index][1][1]);
 
-          {tab === "Deposit" && (
-            <>
-              {option && option.length > 1 ? (
-                <div className="grid pt-2">
-                  {option.map((asset: any) => (
-                    <div
-                      className="rounded-xl grid relative h-[150px] border border-gray-600 mb-3 ps-2"
-                      key={asset}>
-                      <div className="absolute end-5 bottom-4">
-                        <div className="flex items-center">
-                          <div className="text-gray-500 me-2">
-                            Balance:{" "}
-                            {balances &&
-                              balances[asset] &&
-                              parseFloat(balances[asset].assetBalance).toFixed(
-                                3
-                              )}
-                          </div>
-                          <button
-                            className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                            type="button"
-                            onClick={() =>
-                              balances &&
-                              balances[asset] &&
-                              handleInputChange(
-                                balances[asset].assetBalance,
-                                asset
-                              )
-                            }>
-                            max
-                          </button>
-                        </div>
-                      </div>
+          assets = [
+            {
+              logo: token1?.logoURI,
+              symbol: token1?.symbol,
+              name: token1?.name,
+            },
+            {
+              logo: token2?.logoURI,
+              symbol: token2?.symbol,
+              name: token2?.name,
+            },
+          ];
+        }
 
-                      <input
-                        className="w-[58%] ps-5 my-auto flex items-center h-full focus:outline-none text-4xl bg-transparent"
-                        list="amount"
-                        id={asset}
-                        name="amount"
-                        placeholder="0"
-                        value={inputs && inputs[asset] && inputs[asset].amount}
-                        onChange={e =>
-                          handleInputChange(e.target.value, e.target.id)
-                        }
-                        type="text"
-                        onKeyDown={evt =>
-                          ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
-                          evt.preventDefault()
-                        }
-                      />
-                      <div className="absolute end-5 top-8 bg-[#4e46e521] rounded-xl p-2">
-                        {tokensJson.tokens.map(token => {
-                          if (token.address === asset) {
-                            return (
-                              <div
-                                className="flex"
-                                key={token.address}>
-                                <p className="my-auto">{token.symbol}</p>
-                                <img
-                                  className="rounded-full w-[45px] h-[45px] ms-2"
-                                  src={token.logoURI}
-                                  alt={token.name}
-                                />
-                              </div>
-                            );
-                          }
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex mt-[15px] text-[15px] w-full">
-                  <div className="rounded-xl grid relative h-[150px] border-[1px] border-[gray] my-[7px] pl-[10px]">
-                    {balances && balances[option[0]] && (
-                      <div className="my-[5px]">
-                        <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pr-3 pb-3">
-                          <div className="flex items-center">
-                            <div className="text-left text-[gray]">
-                              Balance:{" "}
-                              {parseFloat(
-                                balances[option[0]].assetBalance
-                              ).toFixed(3)}
-                            </div>
-                            <button
-                              onClick={() =>
-                                handleInputChange(
-                                  balances[option[0]].assetBalance,
-                                  option[0]
-                                )
-                              }
-                              className="rounded-md w-12 text-[gray] border-[1px] ml-[5px] border-[gray]"
-                              type="button">
-                              max
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+        const tempAPR = formatFromBigInt(
+          String($vaults[7][index]),
+          16,
+          "withDecimals"
+        ).toFixed(2);
+        const APY = calculateAPY(tempAPR).toFixed(2);
+        return {
+          address: $vaults[0][index],
+          name: $vaults[1][index],
+          symbol: $vaults[2][index],
+          assetsWithApr: $vaultAssets[index][3],
+          assetsAprs: $vaultAssets[index][4],
+          lastHardWork: $vaultAssets[index][5],
+          tvl: String($vaults[6][index]),
+          apr: String($vaults[7][index]),
+          strategyApr: $vaults[8][index],
+          strategySpecific: $vaults[9][index],
+          apy: APY,
+          balance: vaultUserBalances[index],
+          daily: Number(tempAPR) / 365,
+          assets: assets,
+          strategyInfo: getStrategyInfo($vaults[2][index]),
+        };
+      });
 
-                    {option && (
-                      <input
-                        list="amount"
-                        id={option[0]}
-                        value={
-                          inputs &&
-                          inputs[option[0]] &&
-                          inputs[option[0]].amount
-                        }
-                        name="amount"
-                        type="text"
-                        placeholder="0"
-                        onChange={e =>
-                          handleInputChange(e.target.value, e.target.id)
-                        }
-                        onKeyDown={evt =>
-                          ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
-                          evt.preventDefault()
-                        }
-                        className="w-[60%] h-10 text-[30px] text-[#fff] mb-[15px] pl-[15px]"
-                      />
-                    )}
-                    <div className="absolute top-[32%] right-[13px]">
-                      {tokensJson.tokens.map(token => {
-                        if (token.address === option[0]) {
-                          return (
-                            <div
-                              className="flex items-center"
-                              key={token.address}>
-                              <p>{token.symbol}</p>
-                              <img
-                                className="w-10 h-10 rounded-[50%] ml-2"
-                                src={token.logoURI}
-                                alt={token.name}
-                              />
-                            </div>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {isApprove === 1 ? (
-                <button
-                  className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
-                  type="button"
-                  onClick={() => deposit()}>
-                  Deposit
-                </button>
-              ) : isApprove === 2 ? (
-                <>
-                  {option.map((asset: any) =>
-                    allowance &&
-                    formatUnits(
-                      allowance[asset].allowance[0],
-                      Number(getTokenData(asset)?.decimals)
-                    ) < inputs[asset].amount ? (
-                      <button
-                        className="rounded-xl w-full flex text-gray-400 border-gray-400 border h-[60px] text-3xl items-center justify-center"
-                        key={asset}
-                        type="button"
-                        onClick={() => approve(asset as TAddress)}>
-                        Approve {getTokenData(asset)?.symbol}
-                      </button>
-                    ) : (
-                      <></>
-                    )
-                  )}
-                </>
-              ) : isApprove === 0 ? (
-                <button
-                  disabled
-                  className="rounded-xl w-full flex text-gray-600 border-gray-600 border h-[60px] text-3xl items-center justify-center">
-                  INSUFICCIENT BALANCE
-                </button>
-              ) : (
-                <></>
-              )}
-            </>
-          )}
+      setLocalVault(
+        vaults.filter((thisVault: any) => thisVault.address === vault)[0]
+      );
+    }
+  }, [$vaults, $vaultData, $vaultAssets]);
 
-          {tab === "Withdraw" && (
-            <>
-              <div className="grid mt-[15px] text-[15px] w-full">
-                <div className="rounded-xl grid relative h-[150px] border-[1px] border-[gray] my-[7px] pl-[10px]">
-                  {balances && balances[option[0]] && (
-                    <div className="my-[5px]">
-                      <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pb-3 pr-3">
-                        <div className="flex items-center">
-                          <div className="text-left text-[gray]">
-                            Balance:{" "}
-                            {parseFloat(
-                              formatUnits($vault[vault].vaultUserBalance, 18)
-                            ).toFixed(3)}
-                          </div>
-                          <button
-                            onClick={() =>
-                              handleInputChange(
-                                formatUnits(
-                                  $vault[vault]?.vaultUserBalance,
-                                  18
-                                ),
-                                option[0]
-                              )
-                            }
-                            type="button"
-                            className="text-[gray] border-[1px] ml-[5px] border-[gray] rounded-md w-12">
-                            max
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+  useEffect(() => {
+    if (localVault) {
+      const TD = getTimeDifference(localVault.lastHardWork);
+      setTimeDifference(TD);
 
-                  <input
-                    list="amount"
-                    id={option.join(", ")}
-                    value={
-                      inputs && inputs[option[0]] && inputs[option[0]].amount
-                    }
-                    name="amount"
-                    placeholder="0"
-                    onChange={e =>
-                      handleInputChange(e.target.value, e.target.id)
-                    }
-                    onKeyDown={evt =>
-                      ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
-                      evt.preventDefault()
-                    }
-                    pattern="^[0-9]*[.,]?[0-9]*$"
-                    inputMode="decimal"
-                    className="w-[60%] h-10 text-[30px] mb-[15px] pl-[15px]"
-                  />
+      setAssetsAPR(
+        localVault.assetsAprs.map((apr: string) =>
+          formatFromBigInt(apr, 16).toFixed(2)
+        )
+      );
+    }
+    console.log(localVault);
+  }, [localVault]);
 
-                  <div className="absolute top-[32%] right-[13px]">
-                    {option.length === 1 ? (
-                      <>
-                        {tokensJson.tokens.map(token => {
-                          if (token.address === option[0]) {
-                            return (
-                              <div
-                                className="flex items-center"
-                                key={token.address}>
-                                <p>{token.symbol}</p>
-                                <img
-                                  className="w-10 h-10 rounded-[50%] ml-2"
-                                  src={token.logoURI}
-                                  alt={token.name}
-                                />
-                              </div>
-                            );
-                          }
-                        })}
-                      </>
-                    ) : (
-                      <div className="flex h-[45px]">
-                        <div className="items-center mr-[5px]">
-                          <p>
-                            {symbols &&
-                              vault &&
-                              symbols[vault] &&
-                              symbols[vault]?.symbol}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+  return vault && $vaultData[vault] ? (
+    <main className="w-full mx-auto">
+      <div className="flex justify-between items-center p-4 bg-button rounded-md">
+        {localVault && (
+          <div className="flex flex-col w-full">
+            <div className="flex items-center gap-4 w-full justify-between flex-wrap">
+              <div className="flex  items-center">
+                <img
+                  className="w-8 h-8 rounded-full"
+                  src={localVault?.assets[0].logo}
+                  alt={localVault?.assets[0].symbol}
+                  title={localVault?.assets[0].name}
+                />
+                <img
+                  className="w-8 h-8 rounded-full ml-[-8px]"
+                  src={localVault?.assets[1].logo}
+                  alt={localVault?.assets[1].symbol}
+                  title={localVault?.assets[1].name}
+                />
+
+                <span className="inline-flex ml-2 text-[18px] font-bold whitespace-nowrap">
+                  {localVault.symbol}
+                </span>
               </div>
-              {$assets &&
-              inputs &&
-              inputs[option[0]] &&
-              inputs[option[0]].amount !== "" &&
-              $vault[vault]?.vaultUserBalance !== undefined &&
-              Number(inputs[option[0]].amount) <=
-                Number(formatUnits($vault[vault]?.vaultUserBalance, 18)) ? (
-                <button
-                  type="button"
-                  className="text-[35px] w-full h-[60px] cursor-pointer border-[1px] rounded-xl"
-                  onClick={() => withdraw()}>
-                  WITHDRAW
-                </button>
-              ) : Number(inputs[option[0]]?.amount) >
-                Number(formatUnits($vault[vault]?.vaultUserBalance, 18)) ? (
-                <div className="rounded-xl flex text-[gray] border-[1px] w-[367px] items-center justify-center h-[60px] text-[25px]">
-                  INSUFICCIENT BALANCE
-                </div>
-              ) : null}
-            </>
-          )}
-        </form>
 
-        <section className="p-7 border-t border-gray-600 text-2xl text-gray-500">
-          <div className="flex items-center">
-            <p>DEPOSIT FEE</p>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-help-octagon"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <path
-                stroke="none"
-                d="M0 0h24v24H0z"
-                fill="none"></path>
-              <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
-              <path d="M12 16v.01"></path>
-              <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
-            </svg>
+              <div className="flex items-center">
+                <span className="text-[18px] lg:text-[20px]">
+                  {localVault.name}
+                </span>
+              </div>
+
+              <p className="bg-[#485069] text-[#B4BFDF] px-2 py-1 rounded-md text-[15px]">
+                CHAIN: {_publicClient.chain.name}
+              </p>
+            </div>
           </div>
-
-          <div className="flex items-center">
-            <p>WITHDRAWAL FEE</p>
-
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="icon icon-tabler icon-tabler-help-octagon"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <path
-                stroke="none"
-                d="M0 0h24v24H0z"
-                fill="none"></path>
-              <path d="M12.802 2.165l5.575 2.389c.48 .206 .863 .589 1.07 1.07l2.388 5.574c.22 .512 .22 1.092 0 1.604l-2.389 5.575c-.206 .48 -.589 .863 -1.07 1.07l-5.574 2.388c-.512 .22 -1.092 .22 -1.604 0l-5.575 -2.389a2.036 2.036 0 0 1 -1.07 -1.07l-2.388 -5.574a2.036 2.036 0 0 1 0 -1.604l2.389 -5.575c.206 -.48 .589 -.863 1.07 -1.07l5.574 -2.388a2.036 2.036 0 0 1 1.604 0z"></path>
-              <path d="M12 16v.01"></path>
-              <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483"></path>
-            </svg>
-          </div>
-          <p>
-            The displayed APY accounts for performance fee that is deducted
-            from..
-          </p>
-        </section>
+        )}
       </div>
+      <div className="flex items-start gap-5 mt-6">
+        <div className="w-2/3">
+          {localVault && (
+            <div className="flex justify-between items-center bg-button p-5 rounded-md h-[80px]">
+              <div>
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                  TVL
+                </p>
+                <p>
+                  {" "}
+                  {formatNumber(
+                    formatFromBigInt(localVault.tvl, 18, "withFloor"),
+                    "abbreviate"
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                  APY
+                </p>
+                <p>{localVault.apy}</p>
+              </div>
+              <div>
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                  Daily
+                </p>
+                <p>{localVault.daily}</p>
+              </div>
+            </div>
+          )}
 
-      <article className="rounded-xl p-7 border border-gray-950 shadow-lg">
-        <h2 className="mb-7 text-4xl text-gray-300 text-start">
-          Strategy assets
-        </h2>
-        {$assets &&
-          $assets.map(asset => {
-            const assetData: TToken | undefined = getTokenData(asset);
-
-            if (assetData && $assetsPrices) {
-              return (
-                <article
-                  className="rounded-xl p-5 border border-[#620c9f85] mb-4 flex"
-                  key={asset}>
-                  <div className="flex items-center w-full">
-                    <div className="grid w-[125px] text-center">
-                      <h4 className="pb-3 text-2xl ">{assetData.name}</h4>
-
-                      <img
-                        className="rounded-full w-[70px] m-auto"
-                        src={assetData.logoURI}
-                      />
-                    </div>
-
-                    <div className="grid mt-auto ps-2 text-gray-400 ">
-                      <h5>{assetData.symbol}</h5>
-                      <p>
-                        Price: $
-                        {formatUnits($assetsPrices[asset].tokenPrice, 18)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-md bg-purple-950 flex justify-center ms-auto w-[140px] p-1 h-10">
+          {localVault?.strategyInfo && (
+            <div className="rounded-md mt-5 bg-button">
+              <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
+                <h2 className=" text-[24px] text-start ml-3">Strategy</h2>
+                <div className="flex items-center gap-5 mr-3 ">
+                  <button className="rounded-md bg-button flex justify-center items-center w-[140px]">
                     <a
-                      className="flex items-center"
-                      href={`https://polygonscan.com/token/${asset}`}>
-                      Contract{" "}
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={`https://polygonscan.com/token/${strategyAddress}`}>
+                      Strategy address
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-external-link ms-1"
-                        width="24"
-                        height="24"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
                         strokeWidth="2"
                         stroke="currentColor"
@@ -895,12 +625,670 @@ function Vault({ vault }: IProps) {
                         <path d="M15 4h5v5"></path>
                       </svg>
                     </a>
+                  </button>
+                  <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
+                    <a
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={`https://polygonscan.com/token/${localVault.address}`}>
+                      Vault address
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </button>
+                  <button className="rounded-md bg-button flex justify-center items-center w-[140px] hidden">
+                    <a
+                      className="flex items-center text-[15px] py-2 px-1"
+                      href={localVault.strategyInfo.sourceCode}>
+                      Github
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-3 p-3">
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    NAME
+                  </p>
+                  <p>{localVault.strategyInfo.name}</p>
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    SPECIFIC
+                  </p>
+                  <p>{localVault.strategySpecific}</p>
+                </div>
+                {strategyDescription && (
+                  <div>
+                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                      DESCRIPTION
+                    </p>
+                    <p>{strategyDescription}</p>
                   </div>
-                </article>
-              );
-            }
-          })}
-      </article>
+                )}
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    Total APR
+                  </p>
+                  <p>
+                    {localVault.apr}% {localVault.apy}% APY
+                  </p>
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    Strategy APR
+                  </p>
+                  <p>
+                    {formatFromBigInt(localVault.strategyApr, 16).toFixed(2)}%
+                  </p>
+                </div>
+
+                <div>
+                  {assetsAPR && (
+                    <div className="flex items-center gap-3 flex-wrap mt-2">
+                      {assetsAPR.map((apr: string, index: number) => {
+                        return (
+                          <p
+                            key={apr}
+                            className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]">
+                            {localVault.assetsWithApr[index]} APR {apr}%
+                          </p>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    BASE STRATEGIES
+                  </p>
+                  <div className="flex items-center gap-3 flex-wrap mt-3">
+                    {localVault.strategyInfo.baseStrategies.map(
+                      (strategy: string) => (
+                        <p
+                          className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57]"
+                          key={strategy}>
+                          {strategy}
+                        </p>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    AMM ADAPTER
+                  </p>
+                  <p>{localVault.strategyInfo.ammAdapter}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <article className="rounded-md p-3 mt-5 bg-button">
+            <h2 className="mb-2 text-[24px] text-start">Assets</h2>
+            {$assets &&
+              $assets.map(asset => {
+                const assetData: TToken | undefined = getTokenData(asset);
+
+                if (assetData && $assetsPrices) {
+                  return (
+                    <article
+                      className="rounded-md p-3 mb-4 flex bg-[#32343f]"
+                      key={asset}>
+                      <div className="flex w-full flex-col gap-3">
+                        <div className="flex w-full justify-between items-center ">
+                          <div className="inline-flex items-center">
+                            <img
+                              className="rounded-full w-[30px] m-auto mr-2"
+                              src={assetData.logoURI}
+                            />
+                            <span className="mr-5 font-bold text-[18px]">
+                              {assetData.symbol}
+                            </span>
+                            <span className="text-[18px]">
+                              {assetData.name}
+                            </span>
+                          </div>
+                          <div className="inline-flex">
+                            <div className="rounded-md bg-[#404353] flex justify-center ms-auto w-[140px] p-1 h-8 text-[16px]">
+                              <a
+                                className="flex items-center"
+                                href={`https://polygonscan.com/token/${asset}`}>
+                                Contract
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="icon icon-tabler icon-tabler-external-link ms-1"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round">
+                                  <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"></path>
+                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                                  <path d="M11 13l9 -9"></path>
+                                  <path d="M15 4h5v5"></path>
+                                </svg>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-start items-center text-[15px]">
+                          <p>
+                            Price: $
+                            {formatUnits($assetsPrices[asset].tokenPrice, 18)}
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                }
+              })}
+          </article>
+        </div>
+        <div className="w-1/3">
+          {localVault && (
+            <div className="flex justify-between items-center bg-button p-5 rounded-md h-[80px]">
+              <div className="flex flex-col gap-2">
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                  User Balance
+                </p>
+                <p className="text-[18px]">
+                  $
+                  {formatNumber(
+                    formatFromBigInt(localVault.balance, 18),
+                    "format"
+                  )}
+                </p>
+              </div>
+              <div>
+                {" "}
+                {timeDifference && (
+                  <div className="flex flex-col gap-2">
+                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                      Last Hard Work
+                    </p>
+                    {timeDifference?.days ? (
+                      <>
+                        {timeDifference?.days < 1000 ? (
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                            {timeDifference?.days ? "yes" : "no"}
+                            {timeDifference.days}
+                            {timeDifference.days > 1 ? "days" : "day"}{" "}
+                            {timeDifference.hours}h ago
+                          </div>
+                        ) : (
+                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+                            None
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div
+                        className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${
+                          timeDifference.hours > 4
+                            ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
+                            : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                        }`}>
+                        {timeDifference.hours}h ago
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-5 bg-button rounded-md">
+            <div className="flex">
+              <button
+                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
+                  tab === "Deposit" && "border-b-[2px] border-[#6376AF]"
+                }`}
+                onClick={() => {
+                  setTab("Deposit");
+                  resetInputs(option);
+                  resetOptions();
+                }}>
+                Deposit
+              </button>
+              <button
+                className={`h-[55px] cursor-pointer text-[16px] w-full rounded-tr-md  bg-[#1c1c23]  ${
+                  tab === "Withdraw" && "border-b-[2px] border-[#6376AF]"
+                }`}
+                onClick={() => {
+                  setTab("Withdraw");
+                  resetOptions();
+                  resetInputs(option);
+                  loadSymbols();
+                }}>
+                Withdraw
+              </button>
+            </div>
+            <form
+              autoComplete="off"
+              className="max-w-[400px] px-4 mb-10">
+              <div className="flex flex-col items-start">
+                <label className=" text-[18px] py-2">Select token</label>
+                <select
+                  className="rounded-sm px-3 py-2 bg-[#13141f]  text-[20px] cursor-pointer"
+                  id="selectOption"
+                  onChange={e => changeOption(e.target.value.split(", "))}>
+                  <option
+                    className="bg-button text-center"
+                    value={defaultOptionAssets}>
+                    {defaultOptionSymbols}
+                  </option>
+                  {tokensJson.tokens &&
+                    tokensJson.tokens.slice(0, -2).map(token => {
+                      return (
+                        <option
+                          className="bg-button text-center "
+                          key={token.address}
+                          value={token.address}>
+                          {token.symbol}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+
+              {tab === "Deposit" && (
+                <>
+                  {option && option.length > 1 ? (
+                    <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
+                      {option.map((asset: any) => (
+                        <div key={asset}>
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>Balance:</p>
+                            <p>
+                              {balances &&
+                                balances[asset] &&
+                                parseFloat(
+                                  balances[asset].assetBalance
+                                ).toFixed(3)}
+                            </p>
+                          </div>
+                          <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                            <div className="absolute end-5 bottom-4">
+                              <div className="flex items-center">
+                                <button
+                                  className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                  type="button"
+                                  onClick={() =>
+                                    balances &&
+                                    balances[asset] &&
+                                    handleInputChange(
+                                      balances[asset].assetBalance,
+                                      asset
+                                    )
+                                  }>
+                                  MAX
+                                </button>
+                              </div>
+                            </div>
+
+                            <input
+                              className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                              list="amount"
+                              id={asset}
+                              name="amount"
+                              placeholder="0"
+                              value={
+                                inputs && inputs[asset] && inputs[asset].amount
+                              }
+                              onChange={e =>
+                                handleInputChange(e.target.value, e.target.id)
+                              }
+                              type="text"
+                              onKeyDown={evt =>
+                                ["e", "E", "+", "-", " ", ","].includes(
+                                  evt.key
+                                ) && evt.preventDefault()
+                              }
+                            />
+
+                            <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
+                              {tokensJson.tokens.map(token => {
+                                if (token.address === asset) {
+                                  return (
+                                    <div
+                                      className="flex items-center gap-2"
+                                      key={token.address}>
+                                      {/* <p className="my-auto">{token.symbol}</p> */}
+                                      <img
+                                        className="rounded-full w-[25px] h-[25px] "
+                                        src={token.logoURI}
+                                        alt={token.name}
+                                      />
+                                    </div>
+                                  );
+                                }
+                              })}
+                            </div>
+                          </div>
+                          {$assetsPrices[asset] &&
+                            inputs[asset]?.amount > 0 && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>
+                                  $
+                                  {(
+                                    formatUnits(
+                                      $assetsPrices[asset].tokenPrice,
+                                      18
+                                    ) * inputs[asset].amount
+                                  ).toFixed(2)}
+                                </p>
+                              </div>
+                            )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col mt-[15px] text-[15px] w-full">
+                      {balances && balances[option[0]] && (
+                        <div className="text-left text-[gray] ml-2">
+                          Balance:{" "}
+                          {parseFloat(balances[option[0]].assetBalance).toFixed(
+                            3
+                          )}
+                        </div>
+                      )}
+
+                      <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                        <div className="absolute top-[35%] left-[5%]">
+                          {tokensJson.tokens.map(token => {
+                            if (token.address === option[0]) {
+                              return (
+                                <div
+                                  className="flex items-center"
+                                  key={token.address}>
+                                  {/* <p>{token.symbol}</p> */}
+                                  <img
+                                    className="w-[25px] h-[25px] rounded-full"
+                                    src={token.logoURI}
+                                    alt={token.name}
+                                  />
+                                </div>
+                              );
+                            }
+                          })}
+                        </div>
+                        {balances && balances[option[0]] && (
+                          <div>
+                            <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pr-3 pb-3">
+                              <div className="flex items-center">
+                                <button
+                                  onClick={() =>
+                                    handleInputChange(
+                                      balances[option[0]].assetBalance,
+                                      option[0]
+                                    )
+                                  }
+                                  className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                  type="button">
+                                  MAX
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {option && (
+                          <input
+                            list="amount"
+                            id={option[0]}
+                            value={
+                              inputs &&
+                              inputs[option[0]] &&
+                              inputs[option[0]].amount
+                            }
+                            name="amount"
+                            type="text"
+                            placeholder="0"
+                            onChange={e =>
+                              handleInputChange(e.target.value, e.target.id)
+                            }
+                            onKeyDown={evt =>
+                              ["e", "E", "+", "-", " ", ","].includes(
+                                evt.key
+                              ) && evt.preventDefault()
+                            }
+                            className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                          />
+                        )}
+                      </div>
+                      {$assetsPrices[option[0]] &&
+                        inputs[option[0]].amount > 0 && (
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>
+                              $
+                              {(
+                                formatUnits(
+                                  $assetsPrices[option[0]].tokenPrice,
+                                  18
+                                ) * inputs[option[0]].amount
+                              ).toFixed(2)}{" "}
+                            </p>
+                          </div>
+                        )}
+                    </div>
+                  )}
+                  {isApprove === 1 ? (
+                    <button
+                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                      type="button"
+                      onClick={() => deposit()}>
+                      Deposit
+                    </button>
+                  ) : isApprove === 2 ? (
+                    <>
+                      {option.map(
+                        (asset: any) =>
+                          allowance &&
+                          formatUnits(
+                            allowance[asset].allowance[0],
+                            Number(getTokenData(asset)?.decimals)
+                          ) < inputs[asset].amount && (
+                            <button
+                              className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                              key={asset}
+                              type="button"
+                              onClick={() => approve(asset as TAddress)}>
+                              Approve {getTokenData(asset)?.symbol}
+                            </button>
+                          )
+                      )}
+                    </>
+                  ) : (
+                    isApprove === 0 && (
+                      <button
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md">
+                        INSUFICCIENT BALANCE
+                      </button>
+                    )
+                  )}
+                </>
+              )}
+
+              {tab === "Withdraw" && (
+                <>
+                  <div className="grid mt-[15px] text-[15px] w-full">
+                    {balances && balances[option[0]] && (
+                      <div className="text-left text-[gray] ml-2">
+                        Balance:{" "}
+                        {parseFloat(
+                          formatUnits($vaultData[vault].vaultUserBalance, 18)
+                        ).toFixed(3)}
+                      </div>
+                    )}
+                    <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                      {balances && balances[option[0]] && (
+                        <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pb-3 pr-3">
+                          <div className="flex items-center">
+                            <button
+                              onClick={() =>
+                                handleInputChange(
+                                  formatUnits(
+                                    $vaultData[vault]?.vaultUserBalance,
+                                    18
+                                  ),
+                                  option[0]
+                                )
+                              }
+                              type="button"
+                              className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg">
+                              MAX
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <input
+                        list="amount"
+                        id={option.join(", ")}
+                        value={
+                          inputs &&
+                          inputs[option[0]] &&
+                          inputs[option[0]].amount
+                        }
+                        name="amount"
+                        placeholder="0"
+                        onChange={e =>
+                          handleInputChange(e.target.value, e.target.id)
+                        }
+                        onKeyDown={evt =>
+                          ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
+                          evt.preventDefault()
+                        }
+                        pattern="^[0-9]*[.,]?[0-9]*$"
+                        inputMode="decimal"
+                        className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                      />
+
+                      <div className="absolute top-[30%] left-[5%]">
+                        {option.length === 1 ? (
+                          <>
+                            {tokensJson.tokens.map(token => {
+                              if (token.address === option[0]) {
+                                return (
+                                  <div
+                                    className="flex items-center"
+                                    key={token.address}>
+                                    {/* <p>{token.symbol}</p>  */}
+                                    <img
+                                      className="w-[25px] h-[25px] rounded-full"
+                                      src={token.logoURI}
+                                      alt={token.name}
+                                    />
+                                  </div>
+                                );
+                              }
+                            })}
+                          </>
+                        ) : (
+                          <div className="flex h-[45px]">
+                            <div className="items-center mr-[5px]">
+                              {/* <p>
+                                {symbols &&
+                                  vault &&
+                                  symbols[vault] &&
+                                  symbols[vault]?.symbol}
+                              </p> */}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {$assetsPrices[option[0]] &&
+                      inputs[option[0]].amount > 0 && (
+                        <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                          <p>
+                            $
+                            {(
+                              formatUnits(
+                                $assetsPrices[option[0]].tokenPrice,
+                                18
+                              ) * inputs[option[0]].amount
+                            ).toFixed(2)}{" "}
+                          </p>
+                        </div>
+                      )}
+                  </div>
+                  {$assets &&
+                  inputs[option[0]].amount &&
+                  $vaultData[vault]?.vaultUserBalance &&
+                  Number(inputs[option[0]].amount) <=
+                    Number(
+                      formatUnits($vaultData[vault]?.vaultUserBalance, 18)
+                    ) ? (
+                    <button
+                      type="button"
+                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                      onClick={() => withdraw()}>
+                      WITHDRAW
+                    </button>
+                  ) : (
+                    Number(inputs[option[0]]?.amount) >
+                      Number(
+                        formatUnits($vaultData[vault]?.vaultUserBalance, 18)
+                      ) && (
+                      <button
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md">
+                        INSUFICCIENT BALANCE
+                      </button>
+                    )
+                  )}
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
     </main>
   ) : (
     <h1>Loading Vault..</h1>
