@@ -39,6 +39,7 @@ import type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
+  TTokenData,
 } from "@types";
 
 import { TOKENS_ASSETS } from "@constants";
@@ -51,7 +52,7 @@ interface IProps {
 
 function Vault({ vault }: IProps) {
   const $vaultData = useStore(vaultData);
-  const $assets = useStore(assets);
+  const $assets: any = useStore(assets);
   const $account = useStore(account);
   const $vaults = useStore(vaults);
   const $assetsPrices: any = useStore(assetsPrices);
@@ -89,6 +90,7 @@ function Vault({ vault }: IProps) {
     string | undefined
   >();
   const [assetsAPR, setAssetsAPR] = useState<any>();
+  const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -242,6 +244,7 @@ function Vault({ vault }: IProps) {
             allowance: [newAllowance],
           },
         }));
+        previewDeposit();
       }
     }
   };
@@ -267,9 +270,8 @@ function Vault({ vault }: IProps) {
   };
 
   const withdraw = async () => {
-    if (vault) {
-      const value = $vaultData[vault].vaultUserBalance;
-
+    const value = parseUnits(inputs[option[0]]?.amount, 18);
+    if (value) {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -341,35 +343,49 @@ function Vault({ vault }: IProps) {
           };
         }
       }
-    } else {
-      if (
-        $assetsBalances &&
-        $assetsBalances[option[0]] &&
-        option &&
-        option.length === 1
-      ) {
-        const decimals = getTokenData(option[0])?.decimals;
-        if (decimals !== undefined) {
-          balance[option[0]] = {
-            assetBalance: formatUnits(
-              $assetsBalances[option[0]].assetBalance,
-              decimals
-            ),
-          };
-        }
+    } else if (
+      $assetsBalances &&
+      $assetsBalances[option[0]] &&
+      option.length === 1
+    ) {
+      const decimals = getTokenData(option[0])?.decimals;
+      if (decimals !== undefined) {
+        balance[option[0]] = {
+          assetBalance: formatUnits(
+            $assetsBalances[option[0]].assetBalance,
+            decimals
+          ),
+        };
       }
     }
     setBalances(balance);
   };
 
-  // const previewWithdraw = async (value: string) => {
-  //   const preview = await readContract(_publicClient, {
-  //     address: localVault.address as TAddress,
-  //     abi: VaultABI,
-  //     functionName: "previewWithdraw",
-  //     args: [parseUnits(value, 18)],
-  //   });
-  // };
+  const previewWithdraw = async (value: string) => {
+    const balance = Number(
+      formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+    );
+
+    if (Number(value) > balance || !Number(value)) {
+      setWithdrawAmount(false);
+      return;
+    }
+
+    let preview: any = await readContract(_publicClient, {
+      address: localVault.address as TAddress,
+      abi: VaultABI,
+      functionName: "previewWithdraw",
+      args: [parseUnits(value, 18)],
+    });
+    preview = preview.map((amount: any, index: number) => {
+      const tokenData: TTokenData | any = getTokenData($assets[index]);
+      return {
+        symbol: tokenData?.symbol,
+        amount: formatUnits(amount, tokenData?.decimals),
+      };
+    });
+    setWithdrawAmount(preview);
+  };
 
   const checkAllowance = async () => {
     const allowanceResult: TVaultAllowance | any = {};
@@ -391,7 +407,7 @@ function Vault({ vault }: IProps) {
   };
 
   const previewDeposit = async () => {
-    if (!Number(lastKeyPress.key2)) return;
+    //if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -784,7 +800,7 @@ function Vault({ vault }: IProps) {
           <article className="rounded-md p-3 mt-5 bg-button">
             <h2 className="mb-2 text-[24px] text-start">Assets</h2>
             {$assets &&
-              $assets.map((asset) => {
+              $assets.map((asset: TAddress) => {
                 const assetData: TToken | any = getTokenData(asset);
 
                 const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
@@ -1195,11 +1211,7 @@ function Vault({ vault }: IProps) {
                           <input
                             list="amount"
                             id={option[0]}
-                            value={
-                              inputs &&
-                              inputs[option[0]] &&
-                              inputs[option[0]].amount
-                            }
+                            value={inputs[option[0]]?.amount}
                             name="amount"
                             type="text"
                             placeholder="0"
@@ -1311,16 +1323,12 @@ function Vault({ vault }: IProps) {
                       <input
                         list="amount"
                         id={option.join(", ")}
-                        value={
-                          inputs &&
-                          inputs[option[0]] &&
-                          inputs[option[0]].amount
-                        }
+                        value={inputs[option[0]]?.amount}
                         name="amount"
                         placeholder="0"
                         onChange={(e) => {
                           handleInputChange(e.target.value, e.target.id);
-                          //previewWithdraw(e.target.value);
+                          previewWithdraw(e.target.value);
                         }}
                         onKeyDown={(evt) =>
                           ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
@@ -1366,6 +1374,7 @@ function Vault({ vault }: IProps) {
                         )}
                       </div>
                     </div>
+
                     {$assetsPrices[option[0]] &&
                       inputs[option[0]].amount > 0 && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
@@ -1383,20 +1392,34 @@ function Vault({ vault }: IProps) {
                         </div>
                       )}
                   </div>
-                  {$assets &&
-                  inputs[option[0]].amount &&
-                  $vaultData[vault]?.vaultUserBalance &&
-                  Number(inputs[option[0]].amount) <=
-                    Number(
-                      formatUnits($vaultData[vault]?.vaultUserBalance, 18)
-                    ) ? (
-                    <button
-                      type="button"
-                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                      onClick={() => withdraw()}
-                    >
-                      WITHDRAW
-                    </button>
+                  {withdrawAmount ? (
+                    <div>
+                      <div className="my-2 ml-2 flex flex-col gap-2">
+                        {withdrawAmount?.map(
+                          ({
+                            symbol,
+                            amount,
+                          }: {
+                            symbol: string;
+                            amount: string;
+                          }) => (
+                            <div key={symbol}>
+                              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                                {symbol}
+                              </p>
+                              <p>{amount}</p>
+                            </div>
+                          )
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                        onClick={() => withdraw()}
+                      >
+                        WITHDRAW
+                      </button>
+                    </div>
                   ) : (
                     Number(inputs[option[0]]?.amount) >
                       Number(
