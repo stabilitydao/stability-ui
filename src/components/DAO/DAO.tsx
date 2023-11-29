@@ -40,21 +40,22 @@ function DAO() {
 
         const strategieNames: string = contractData[6];
 
-        const sumShareBalances = $vaults[5].reduce(
-          (total: bigint, numero: bigint) => total + numero,
-          BigInt(0)
+        const sumShareBalances = formatUnits(
+          $vaults[5].reduce(
+            (total: bigint, numero: bigint) => total + numero,
+            BigInt(0)
+          ),
+          18
         );
 
         const percentageFees = platformFees.map(valor =>
           valor !== 0n ? (valor / 1000n).toString() + " %" : "0 %"
         );
 
-        console.log(percentageFees);
-
         const platformData: PlatformData = {
           platformVersion: platformVersion,
           numberOfTotalVaults: $balances[3].length,
-          totalTvl: formatUnits(sumShareBalances, 18),
+          totalTvl: sumShareBalances,
           strategieNames: strategieNames,
           platformFee: percentageFees[0],
           vaultManagerFee: percentageFees[1],
