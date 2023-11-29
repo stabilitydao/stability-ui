@@ -57,6 +57,7 @@ type TTokenData = {
   chainId: number;
   decimals: number;
   logoURI: string;
+  tags?: string[];
 };
 
 //New types
