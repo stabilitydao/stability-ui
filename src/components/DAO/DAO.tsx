@@ -26,36 +26,49 @@ function DAO() {
   const fetchPlatformData = async () => {
     if ($publicClient && $balances) {
       try {
-        const platformVersion: string = (await $publicClient.readContract({
+        const platformVersionPromise: any = $publicClient.readContract({
           address: platform,
           abi: PlatformABI,
           functionName: "platformVersion",
-        })) as string;
+        });
 
-        const platformFees: bigint[] = (await $publicClient.readContract({
+        const platformFeesPromise: any = $publicClient.readContract({
           address: platform,
           abi: PlatformABI,
           functionName: "getFees",
-        })) as bigint[];
+        });
 
-        const contractData: any = await $publicClient.readContract({
+        const contractDataPromise: any = $publicClient.readContract({
           address: platform,
           abi: PlatformABI,
           functionName: "getData",
         });
 
-        const profitTotalSupply: bigint = await $publicClient.readContract({
+        const profitTotalSupplyPromise = $publicClient.readContract({
           address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
-        const _sdivTotalSupply: bigint = await $publicClient.readContract({
+        const _sdivTotalSupplyPromise = $publicClient.readContract({
           address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB",
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
-        console.log($vaults);
+
+        const [
+          platformVersion,
+          platformFees,
+          contractData,
+          profitTotalSupply,
+          _sdivTotalSupply,
+        ] = await Promise.all([
+          platformVersionPromise,
+          platformFeesPromise,
+          contractDataPromise,
+          profitTotalSupplyPromise,
+          _sdivTotalSupplyPromise,
+        ]);
 
         //Profit Token
         const totalTvl: bigint = $vaults[5].reduce(
@@ -75,10 +88,11 @@ function DAO() {
 
         setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
         //platformData
-        const _totalTvl = formatUnits(totalTvl, 18);
-        const strategieNames: string = contractData[6];
 
-        const percentageFees = platformFees.map(fee =>
+        const _totalTvl = formatUnits(totalTvl, 18);
+        const strategieNames = contractData[6];
+
+        const percentageFees: string[] = platformFees.map((fee: bigint) =>
           fee !== 0n ? (fee / 1000n).toString() + " %" : "0 %"
         );
 
@@ -102,7 +116,7 @@ function DAO() {
   return (
     <main className="p-0 w-full m-auto">
       <div className="dao pt-2 flex">
-        <div className="grid mb-auto w-full">
+        <div className="grid mb-auto w-[500px]">
           <h1 className="text-xxl text-gradient mb-3 ">Platform</h1>
           <article className="m-0 p-0">
             <article className="mb-2">
@@ -164,8 +178,8 @@ function DAO() {
           </table>
         </div>
         <br />
-        <section className="p-5 border-gray-600 w-full">
-          <h1 className="text-xxl text-gradient mb-3 p-0">Tokenomics</h1>
+        <section className="grid p-0 w-full">
+          <h1 className="text-xxl text-gradient mb-3 p-0 w-full">Tokenomics</h1>
 
           {(() => {
             const profitTokenData = tokenlist.tokens.find(
@@ -174,10 +188,10 @@ function DAO() {
             );
             return (
               profitTokenData && (
-                <div className="m-auto justify-center grid w-full p-0">
-                  <div className="flex justify-between p-0 w-full">
-                    <table>
-                      <tbody className="p-0 w-full">
+                <div className="m-auto grid w-full p-0">
+                  <div className="flex p-0 w-full">
+                    <table className=" whitespace-nowrap">
+                      <tbody className="p-0 ">
                         <tr>
                           <td>Name: </td>
                           <td>{profitTokenData.name} </td>
@@ -186,10 +200,7 @@ function DAO() {
                           <td>Symbol: </td>
                           <td>{profitTokenData.symbol} </td>
                         </tr>
-                        <tr>
-                          <td>Address: </td>
-                          <td>{profitTokenData.address} </td>
-                        </tr>
+
                         <tr>
                           <td>Price: </td>
                           <td>{profitTokenPrice} </td>
@@ -202,17 +213,42 @@ function DAO() {
                           <td>Market Cap: </td>
                           <td>{marketCap} </td>
                         </tr>
+                        <tr>
+                          <td>Address: </td>
+                          <td>{profitTokenData.address} </td>
+                        </tr>
                       </tbody>
                     </table>
-                    <img
-                      className="rounded-full w-52 p-0 m-0"
-                      src={profitTokenData.logoURI}
-                      alt={profitTokenData.logoURI}
-                    />
+                    <div className="w-full p-0 m-auto align-middle">
+                      <img
+                        className="rounded-full p-0 ms-auto flex justify-center align-middle w-full"
+                        src={profitTokenData.logoURI}
+                        alt={profitTokenData.logoURI}
+                      />
+                    </div>
                   </div>
-                  <iframe
-                    className="w-[800px] h-[500px] m-auto mt-5"
-                    src="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0"></iframe>
+                  <div className="grid mt-5 ">
+                    <div className="flex">
+                      <a
+                        className="rounded-sm text-start p-1 me-3"
+                        href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
+                        Chart
+                      </a>
+                      <div className="border"></div>
+
+                      <a
+                        className="rounded-sm text-start p-1 mx-3 "
+                        href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
+                        Swap by 1inch
+                      </a>
+                      <div className="border"></div>
+                      <a
+                        className="rounded-sm text-start p-0 ms-3"
+                        href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
+                        Swap by Uniswap V3
+                      </a>
+                    </div>
+                  </div>
                 </div>
               )
             );
@@ -224,9 +260,9 @@ function DAO() {
             );
             return (
               sdivTokenData && (
-                <div className="m-auto justify-between flex w-full p-0 mt-5">
-                  <table>
-                    <tbody className="p-0 w-full">
+                <div className="m-auto justify-between flex w-full p-0 mt-12">
+                  <table className="whitespace-nowrap">
+                    <tbody className="p-0 ">
                       <tr>
                         <td>Name: </td>
                         <td>{sdivTokenData.name} </td>
@@ -245,11 +281,13 @@ function DAO() {
                       </tr>
                     </tbody>
                   </table>
-                  <img
-                    className="rounded-full w-52 p-0  flex"
-                    src={sdivTokenData.logoURI}
-                    alt={sdivTokenData.logoURI}
-                  />
+                  <div className="w-full p-0 m-auto align-middle">
+                    <img
+                      className="rounded-full w-40 p-0 ms-auto"
+                      src={sdivTokenData.logoURI}
+                      alt={sdivTokenData.logoURI}
+                    />
+                  </div>
                 </div>
               )
             );
@@ -257,7 +295,7 @@ function DAO() {
 
           <div className="m-auto justify-between flex w-full p-0 mt-16">
             <table>
-              <tbody className="p-0 w-full">
+              <tbody className="p-0 w-full gap-3">
                 <tr>
                   <td>Name: </td>
                   <td>Profit Maker </td>
@@ -292,9 +330,17 @@ function DAO() {
               </tbody>
             </table>
             <img
-              alt="ADD IMG"
+              alt="Profit maker"
+              src="https://stabilitydao.org/pm.png"
               className="rounded-full w-52 p-0 flex"
             />
+          </div>
+          <div className="flex">
+            <a
+              className="rounded-sm text-start p-1 me-3"
+              href="https://opensea.io/collection/profit-maker">
+              Market
+            </a>
           </div>
         </section>
       </div>
