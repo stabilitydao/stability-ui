@@ -104,14 +104,19 @@ function DAO() {
       <div className="dao pt-2 flex">
         <div className="grid mb-auto w-full">
           <h1 className="text-xxl text-gradient mb-3 ">Platform</h1>
-
-          <article className="m-auto w-full">
-            <h2>Version: {_platformData?.platformVersion}</h2>
-            <h2>Total Vaults: {_platformData?.numberOfTotalVaults}</h2>
-            <h2>
-              Total TVL:
-              <br></br>$ {_platformData?.totalTvl}
-            </h2>
+          <article className="m-0 p-0">
+            <article className="mb-2">
+              <h2>Version: </h2>
+              <h2>{_platformData?.platformVersion}</h2>
+            </article>
+            <article className="mb-2">
+              <h2>Total Vaults:</h2>
+              <h2>{_platformData?.numberOfTotalVaults}</h2>
+            </article>
+            <article>
+              <h2>Total TVL:</h2>
+              <h2>$ {_platformData?.totalTvl}</h2>
+            </article>
           </article>
 
           <table className="m-auto my-5 grid p-0 w-full">
@@ -241,7 +246,7 @@ function DAO() {
                     </tbody>
                   </table>
                   <img
-                    className="rounded-full w-52 p-0 ms-auto flex"
+                    className="rounded-full w-52 p-0  flex"
                     src={sdivTokenData.logoURI}
                     alt={sdivTokenData.logoURI}
                   />
@@ -249,6 +254,48 @@ function DAO() {
               )
             );
           })()}
+
+          <div className="m-auto justify-between flex w-full p-0 mt-16">
+            <table>
+              <tbody className="p-0 w-full">
+                <tr>
+                  <td>Name: </td>
+                  <td>Profit Maker </td>
+                </tr>
+                <tr>
+                  <td>Symbol: </td>
+                  <td>PM </td>
+                </tr>
+                <tr>
+                  <td>Address: </td>
+                  <td>0xAA3e3709C79a133e56C17a7ded87802adF23083B </td>
+                </tr>
+                <tr>
+                  <td>Total supply: </td>
+                  <td>
+                    <span className="font-bold text-red-600">
+                      {" "}
+                      ADD TOTAL SUPPLY
+                    </span>{" "}
+                  </td>
+                </tr>
+                <tr>
+                  <td>To mint: </td>
+                  <td>
+                    {" "}
+                    <span className="font-bold text-red-600 ">
+                      {" "}
+                      ADD TO MINT
+                    </span>{" "}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <img
+              alt="ADD IMG"
+              className="rounded-full w-52 p-0 flex"
+            />
+          </div>
         </section>
       </div>
       <br />
