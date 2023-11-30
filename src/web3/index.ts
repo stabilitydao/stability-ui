@@ -17,8 +17,6 @@ import IERC721Enumerable from "./abi/IERC721Enumerable.js";
 
 // address of platform proxy deplpyed by default foundry private key
 const platform = "0x50BFAc1BBb6af45DdC2F3278dc189AB975aeB063";
-// address of VaultManager proxy deplpyed by default foundry private key
-const VaultManager = "0xA3c5E24dCE36ABa080eBc9c4444dad7E578A17EF";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
@@ -79,7 +77,6 @@ const wagmiConfig = createConfig({
 
 export {
   platform,
-  VaultManager,
   walletConnectProjectId,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,
