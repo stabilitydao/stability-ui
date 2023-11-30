@@ -13,7 +13,8 @@ import IVaultManagerABI from "./abi/IVaultManagerABI.ts";
 import PlatformABI from "./abi/PlatformABI.ts";
 import StrategyABI from "./abi/StrategyABI.ts";
 import VaultABI from "./abi/VaultABI.ts";
-import IERC721Enumerable from "./abi/IERC721Enumerable.js";
+import IERC721Enumerable from "./abi/IERC721Enumerable.ts";
+import ZapABI from "./abi/ZapABI.ts";
 
 // address of platform proxy deplpyed by default foundry private key
 const platform = "0x81aAF52E125D2CE16E8c406Cd7ED6f57961628A2";
@@ -90,4 +91,5 @@ export {
   publicClient,
   wagmiConfig,
   IERC721Enumerable,
+  ZapABI,
 };
