@@ -100,9 +100,9 @@ function DAO() {
   };
 
   return (
-    <main className="p-0 m-0">
+    <main className="p-0 w-full m-auto">
       <div className="dao pt-2 flex">
-        <div className="grid mb-auto">
+        <div className="grid mb-auto w-full">
           <h1 className="text-xxl text-gradient mb-3 ">Platform</h1>
 
           <article className="m-auto w-full">
@@ -159,7 +159,7 @@ function DAO() {
           </table>
         </div>
         <br />
-        <section className="p-5 border-gray-600">
+        <section className="p-5 border-gray-600 w-full">
           <h1 className="text-xxl text-gradient mb-3 p-0">Tokenomics</h1>
 
           {(() => {
@@ -169,42 +169,42 @@ function DAO() {
             );
             return (
               profitTokenData && (
-                <div className="m-auto justify-center grid">
-                  <div className="w-52 pe-5">
+                <div className="m-auto justify-center grid w-full p-0">
+                  <div className="flex justify-between p-0 w-full">
+                    <table>
+                      <tbody className="p-0 w-full">
+                        <tr>
+                          <td>Name: </td>
+                          <td>{profitTokenData.name} </td>
+                        </tr>
+                        <tr>
+                          <td>Symbol: </td>
+                          <td>{profitTokenData.symbol} </td>
+                        </tr>
+                        <tr>
+                          <td>Address: </td>
+                          <td>{profitTokenData.address} </td>
+                        </tr>
+                        <tr>
+                          <td>Price: </td>
+                          <td>{profitTokenPrice} </td>
+                        </tr>
+                        <tr>
+                          <td>Total supply: </td>
+                          <td>{profitTotalSupply} </td>
+                        </tr>
+                        <tr>
+                          <td>Market Cap: </td>
+                          <td>{marketCap} </td>
+                        </tr>
+                      </tbody>
+                    </table>
                     <img
-                      className="h-auto rounded-full"
+                      className="rounded-full w-52 p-0 m-0"
                       src={profitTokenData.logoURI}
                       alt={profitTokenData.logoURI}
                     />
                   </div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td>Name: </td>
-                        <td>{profitTokenData.name} </td>
-                      </tr>
-                      <tr>
-                        <td>Symbol: </td>
-                        <td>{profitTokenData.symbol} </td>
-                      </tr>
-                      <tr>
-                        <td>Address: </td>
-                        <td>{profitTokenData.address} </td>
-                      </tr>
-                      <tr>
-                        <td>Price: </td>
-                        <td>{profitTokenPrice} </td>
-                      </tr>
-                      <tr>
-                        <td>Total supply: </td>
-                        <td>{profitTotalSupply} </td>
-                      </tr>
-                      <tr>
-                        <td>Market Cap: </td>
-                        <td>{marketCap} </td>
-                      </tr>
-                    </tbody>
-                  </table>
                   <iframe
                     className="w-[800px] h-[500px] m-auto mt-5"
                     src="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0"></iframe>
@@ -213,44 +213,38 @@ function DAO() {
             );
           })()}
           {(() => {
-            const profitTokenData = tokenlist.tokens.find(
+            const sdivTokenData = tokenlist.tokens.find(
               token =>
                 token.address === "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB"
             );
             return (
-              profitTokenData && (
-                <div className="m-auto grid">
-                  <div className="w-52 pe-5">
-                    <img
-                      className="h-auto rounded-full"
-                      src={profitTokenData.logoURI}
-                      alt={profitTokenData.logoURI}
-                    />
-                  </div>
+              sdivTokenData && (
+                <div className="m-auto justify-between flex w-full p-0 mt-5">
                   <table>
-                    <tbody>
+                    <tbody className="p-0 w-full">
                       <tr>
                         <td>Name: </td>
-                        <td>{profitTokenData.name} </td>
+                        <td>{sdivTokenData.name} </td>
                       </tr>
                       <tr>
                         <td>Symbol: </td>
-                        <td>{profitTokenData.symbol} </td>
+                        <td>{sdivTokenData.symbol} </td>
                       </tr>
                       <tr>
                         <td>Address: </td>
-                        <td>{profitTokenData.address} </td>
+                        <td>{sdivTokenData.address} </td>
                       </tr>
                       <tr>
                         <td>Total supply: </td>
                         <td>{sdivTotalSupply} </td>
                       </tr>
-                      <tr>
-                        <td>Market Cap: </td>
-                        <td>{marketCap} </td>
-                      </tr>
                     </tbody>
                   </table>
+                  <img
+                    className="rounded-full w-52 p-0 ms-auto flex"
+                    src={sdivTokenData.logoURI}
+                    alt={sdivTokenData.logoURI}
+                  />
                 </div>
               )
             );
