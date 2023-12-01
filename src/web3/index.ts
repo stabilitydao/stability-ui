@@ -16,8 +16,7 @@ import VaultABI from "./abi/VaultABI.ts";
 import IERC721Enumerable from "./abi/IERC721Enumerable.ts";
 import ZapABI from "./abi/ZapABI.ts";
 
-// address of platform proxy deplpyed by default foundry private key
-const platform = "0x81aAF52E125D2CE16E8c406Cd7ED6f57961628A2";
+const platform = "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
@@ -28,9 +27,9 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const polygonForking = defineChain({
+const polygon = defineChain({
   id: 137,
-  name: "Polygon Forking",
+  name: "Polygon",
   network: "polygon",
   nativeCurrency: {
     decimals: 18,
@@ -39,18 +38,18 @@ const polygonForking = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["http://127.0.0.1:8545"],
-      webSocket: ["ws://127.0.0.1:8545"],
+      http: ["https://polygon-rpc.com/"],
+      webSocket: ["wss://polygon-rpc.com/"],
     },
     public: {
-      http: ["http://127.0.0.1:8545"],
-      webSocket: ["ws://127.0.0.1:8545"],
+      http: ["https://polygon-rpc.com/"],
+      webSocket: ["wss://polygon-rpc.com/"],
     },
   },
 });
 
 const { chains, publicClient } = configureChains(
-  [polygonForking],
+  [polygon],
   //   [walletConnectProvider({ projectId: walletConnectProjectId }), publicProvider()]
   [publicProvider()]
 );
@@ -86,7 +85,7 @@ export {
   PlatformABI,
   StrategyABI,
   VaultABI,
-  polygonForking,
+  polygon,
   chains,
   publicClient,
   wagmiConfig,

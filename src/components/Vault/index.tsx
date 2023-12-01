@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { readContract } from "viem/actions";
 import { writeContract } from "@wagmi/core";
 import axios from "axios";
@@ -22,9 +22,16 @@ import {
   vaults,
   vaultAssets,
   platformData,
+  tokens,
 } from "@store";
 
-import { VaultABI, StrategyABI, ERC20ABI, ZapABI } from "@web3";
+import {
+  VaultABI,
+  StrategyABI,
+  ERC20ABI,
+  ZapABI,
+  ERC20MetadataUpgradeableABI,
+} from "@web3";
 import {
   getTokenData,
   formatNumber,
@@ -62,6 +69,7 @@ function Vault({ vault }: IProps) {
   const $assetsBalances = useStore(assetsBalances);
   const $vaultAssets: any = useStore(vaultAssets);
   const $platformData: TPlatformData | any = useStore(platformData);
+  const $tokens: TAddress[] | any = useStore(tokens);
 
   const _publicClient = usePublicClient();
 
@@ -96,6 +104,7 @@ function Vault({ vault }: IProps) {
   const [assetsAPR, setAssetsAPR] = useState<any>();
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
   const [zapButton, setZapButton] = useState<string>("none");
+  const [optionTokens, setOptionTokens] = useState<any>();
 
   const loadSymbols = () => {
     if ($vaults) {
@@ -217,6 +226,46 @@ function Vault({ vault }: IProps) {
     }
   };
 
+  /////   SELECT TOKENS
+  const selectTokensHandler = async () => {
+    if (!$tokens) return;
+
+    const filtredTokens = tokensJson.tokens
+      .filter((token) => $tokens.includes(token.address))
+      .map(({ address, symbol }) => ({ address, symbol }));
+
+    try {
+      const strategy = await readContract(_publicClient, {
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "strategy",
+      });
+
+      const underlying = await readContract(_publicClient, {
+        address: strategy,
+        abi: StrategyABI,
+        functionName: "underlying",
+      });
+      if (underlying != zeroAddress) {
+        const symbolUnder = await readContract(_publicClient, {
+          address: underlying,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "symbol",
+        });
+        setOptionTokens([
+          { address: underlying, symbol: symbolUnder },
+          ...filtredTokens,
+        ]);
+      } else {
+        setOptionTokens(filtredTokens);
+      }
+    } catch (error) {
+      setOptionTokens(filtredTokens);
+      console.log("UNDERLYING TOKEN ERROR:", error);
+    }
+  };
+
+  /////
   /////         ZAP
   const zapInputHandler = async (amount: string, asset: string) => {
     setInputs(
@@ -278,7 +327,7 @@ function Vault({ vault }: IProps) {
 
     const config = {
       headers: {
-        Authorization: process.env.INCH_APY_KEY,
+        Authorization: "Bearer AYWPCLwsq375CnVOAzaTgK8K7z4hIvPu",
       },
       params: {
         src: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
@@ -308,7 +357,6 @@ function Vault({ vault }: IProps) {
     });
     await get1InchTokensSwap();
   };
-
   /////
 
   const approve = async (asset: TAddress) => {
@@ -656,6 +704,10 @@ function Vault({ vault }: IProps) {
     setZapButton("none");
   }, [option]);
 
+  useEffect(() => {
+    selectTokensHandler();
+  }, [$tokens, defaultOptionSymbols]);
+
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
       <div className="flex justify-between items-center p-4 bg-button rounded-md">
@@ -821,6 +873,29 @@ function Vault({ vault }: IProps) {
               </div>
 
               <div className="flex flex-col items-start gap-3 p-3">
+                <div>
+                  <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    PROTOCOLS
+                  </p>
+                  <div className="flex py-1">
+                    {localVault.strategyInfo.protocols.map(
+                      ({
+                        name,
+                        logoSrc,
+                      }: {
+                        name: string;
+                        logoSrc: string;
+                      }) => (
+                        <img
+                          key={name}
+                          src={logoSrc}
+                          alt={name}
+                          className="h-6 w-6 rounded-full"
+                        />
+                      )
+                    )}
+                  </div>
+                </div>
                 <div>
                   <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                     NAME
@@ -1138,30 +1213,39 @@ function Vault({ vault }: IProps) {
             <form autoComplete="off" className="max-w-[400px] px-4 mb-10 pb-5">
               <div className="flex flex-col items-start">
                 <label className=" text-[18px] py-2">Select token</label>
-                <select
-                  className="rounded-sm px-3 py-2 bg-[#13141f]  text-[20px] cursor-pointer"
-                  id="selectOption"
-                  onChange={(e) => changeOption(e.target.value.split(", "))}
-                >
-                  <option
-                    className="bg-button text-center"
-                    value={defaultOptionAssets}
+                {optionTokens && (
+                  <select
+                    className="rounded-sm px-3 py-2 bg-[#13141f]  text-[20px] cursor-pointer"
+                    id="selectOption"
+                    onChange={(e) => changeOption(e.target.value.split(", "))}
                   >
-                    {defaultOptionSymbols}
-                  </option>
-                  {tokensJson.tokens &&
-                    tokensJson.tokens.slice(0, -2).map((token) => {
-                      return (
-                        <option
-                          className="bg-button text-center "
-                          key={token.address}
-                          value={token.address}
-                        >
-                          {token.symbol}
-                        </option>
-                      );
-                    })}
-                </select>
+                    <option
+                      className="bg-button text-center"
+                      value={defaultOptionAssets}
+                    >
+                      {defaultOptionSymbols}
+                    </option>
+                    {optionTokens.map(
+                      ({
+                        address,
+                        symbol,
+                      }: {
+                        address: TAddress;
+                        symbol: string;
+                      }) => {
+                        return (
+                          <option
+                            className="bg-button text-center "
+                            key={address}
+                            value={address}
+                          >
+                            {symbol}
+                          </option>
+                        );
+                      }
+                    )}
+                  </select>
+                )}
               </div>
 
               {tab === "Deposit" && (
@@ -1332,7 +1416,7 @@ function Vault({ vault }: IProps) {
                           )}
                         </div>
                         {$assetsPrices[option[0]] &&
-                          inputs[option[0]].amount > 0 && (
+                          inputs[option[0]]?.amount > 0 && (
                             <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                               <p>
                                 $
@@ -1342,7 +1426,7 @@ function Vault({ vault }: IProps) {
                                       $assetsPrices[option[0]].tokenPrice,
                                       18
                                     )
-                                  ) * inputs[option[0]].amount
+                                  ) * inputs[option[0]]?.amount
                                 ).toFixed(2)}{" "}
                               </p>
                             </div>
@@ -1499,7 +1583,7 @@ function Vault({ vault }: IProps) {
                     </div>
 
                     {$assetsPrices[option[0]] &&
-                      inputs[option[0]].amount > 0 && (
+                      inputs[option[0]]?.amount > 0 && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                           <p>
                             $
@@ -1509,7 +1593,7 @@ function Vault({ vault }: IProps) {
                                   $assetsPrices[option[0]].tokenPrice,
                                   18
                                 )
-                              ) * inputs[option[0]].amount
+                              ) * inputs[option[0]]?.amount
                             ).toFixed(2)}
                           </p>
                         </div>

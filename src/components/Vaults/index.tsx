@@ -242,19 +242,21 @@ function Vaults() {
                         </span>
                         <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[170px]">
                           <span className="flex min-w-[42px] justify-center">
-                            {vault.strategyInfo.protocols.map((p, i) => (
-                              <img
-                                className={`h-6 w-6 rounded-full ${
-                                  vault.strategyInfo.protocols.length > 1 && i
-                                    ? "ml-[-8px]"
-                                    : ""
-                                }`}
-                                key={i}
-                                src={p.logoSrc}
-                                alt={p.name}
-                                title={p.name}
-                              />
-                            ))}
+                            {vault.strategyInfo.protocols.map(
+                              (protocol, index) => (
+                                <img
+                                  className={`h-6 w-6 rounded-full ${
+                                    vault.strategyInfo.protocols.length > 1 &&
+                                    index &&
+                                    "ml-[-8px]"
+                                  }`}
+                                  key={index}
+                                  src={protocol.logoSrc}
+                                  alt={protocol.name}
+                                  title={protocol.name}
+                                />
+                              )
+                            )}
                           </span>
                           <span className="flex">
                             {vault.strategyInfo.features.map((feature, i) => (

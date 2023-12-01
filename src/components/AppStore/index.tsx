@@ -20,6 +20,7 @@ import {
   vaultAssets,
   isVaultsLoaded,
   balances,
+  tokens,
 } from "@store";
 import {
   platform,
@@ -45,7 +46,8 @@ const AppStore = (props: React.PropsWithChildren) => {
       });
       console.log("getData", contractData);
 
-      if (contractData[7][0]) {
+      if (contractData[1]) {
+        tokens.set(contractData[1] as TAddress[]);
       }
 
       if (contractData && Array.isArray(contractData)) {
