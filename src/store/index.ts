@@ -8,6 +8,7 @@ import type {
   TBalances,
   TVaultAssets,
   TLocalVault,
+  TAddress,
 } from "@types";
 
 const account = atom<string | undefined>();
@@ -26,6 +27,8 @@ const vaults = atom<any>();
 const balances = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();
 const isVaultsLoaded = atom<boolean>(false);
+
+const tokens = atom<TAddress[] | undefined>();
 
 //Assets balances
 const addAssetBalance = (r: any[]) => {
@@ -83,4 +86,5 @@ export {
   addAssetBalance,
   addVaultData,
   balances,
+  tokens,
 };
