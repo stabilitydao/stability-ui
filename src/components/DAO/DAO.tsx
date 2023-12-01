@@ -360,8 +360,34 @@ function DAO() {
                     </tr>
                   </tbody>
                 </table>
-
                 <p>Total balance: {_platformData?.treasuryBalance}</p>
+              </section>
+            </section>
+            <section className="text-start">
+              <section>
+                <table>
+                  <thead>
+                    <tr>
+                      <td>
+                        <h1 className="text-start">Gov</h1>
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Address:</td>
+                      <td>
+                        <a>{_platformData?.platformGovernance}</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <a
+                  className="bg-gray-600 p-2"
+                  href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
+                  {" "}
+                  Tally governance app
+                </a>
               </section>
             </section>
           </section>
