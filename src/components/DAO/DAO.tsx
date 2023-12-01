@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances } from "@store";
-import { PlatformABI, platform, ERC20ABI } from "@web3";
+import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
 import type { PlatformData, GitHubUser } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
@@ -67,7 +67,7 @@ function DAO() {
 
         const _prTotalSupply = await $publicClient.readContract({
           address: "0xAA3e3709C79a133e56C17a7ded87802adF23083B",
-          abi: ERC20ABI,
+          abi: IERC721Enumerable,
           functionName: "totalSupply",
         });
 
