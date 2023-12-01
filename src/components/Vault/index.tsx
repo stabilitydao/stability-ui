@@ -140,6 +140,7 @@ function Vault({ vault }: IProps) {
         change = true;
       }
     }
+
     if (!change) {
       for (let i = 0; i < input.length; i++) {
         if (
@@ -150,12 +151,11 @@ function Vault({ vault }: IProps) {
           allowance[$assets[i]]?.allowance[0] >= input[i]
         ) {
           apprDepo.push(1);
-        } else if (lastKeyPress.key2) {
+        } else {
           apprDepo.push(2);
         }
       }
       const button = checkButtonApproveDeposit(apprDepo);
-
       if (button) {
         setIsApprove(apprDepo[1]);
       } else {
@@ -327,13 +327,13 @@ function Vault({ vault }: IProps) {
 
     const config = {
       headers: {
-        Authorization: "Bearer AYWPCLwsq375CnVOAzaTgK8K7z4hIvPu",
+        Authorization: "secret_key",
       },
       params: {
         src: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         dst: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
         amount: "100000",
-        from: "0xF2Bc8850E4a0e35bc039C0a06fe3cD941a75dB56",
+        from: "from_address",
         slippage: "1",
         disableEstimate: "true",
       },
@@ -355,7 +355,7 @@ function Vault({ vault }: IProps) {
       functionName: "getDepositSwapAmounts",
       args: [vault as TAddress, option[0], parseUnits(amount, decimals)],
     });
-    await get1InchTokensSwap();
+    //await get1InchTokensSwap();
   };
   /////
 
@@ -392,7 +392,15 @@ function Vault({ vault }: IProps) {
             allowance: [newAllowance],
           },
         }));
-        previewDeposit();
+
+        // const depositAssets = tokensJson.tokens
+        //   .filter((token) => Object.keys(inputs).includes(token.address))
+        //   .map(({ address, decimals }) =>
+        //     parseUnits(inputs[address]?.amount, decimals)
+        //   );
+
+        // previewDeposit();
+        // checkInputsAllowance(depositAssets);
       }
     }
   };
@@ -553,7 +561,6 @@ function Vault({ vault }: IProps) {
     }
     setAllowance(allowanceResult);
   };
-
   const previewDeposit = async () => {
     //if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
@@ -656,12 +663,9 @@ function Vault({ vault }: IProps) {
           ];
         }
 
-        const tempAPR = formatFromBigInt(
-          String($vaults[7][index]),
-          16,
-          "withDecimals"
-        ).toFixed(2);
-        const APY = calculateAPY(tempAPR).toFixed(2);
+        const tempAPR = Number(formatUnits($vaults[7][index], 3)).toFixed(4);
+        const APY = calculateAPY(tempAPR).toFixed(4);
+
         return {
           address: $vaults[0][index],
           name: $vaults[1][index],
@@ -670,8 +674,8 @@ function Vault({ vault }: IProps) {
           assetsAprs: $vaultAssets[index][4],
           lastHardWork: $vaultAssets[index][5],
           tvl: String($vaults[6][index]),
-          apr: String($vaults[7][index]),
-          strategyApr: $vaults[8][index],
+          apr: tempAPR,
+          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(4),
           strategySpecific: $vaults[9][index],
           apy: APY,
           balance: vaultUserBalances[index],
@@ -707,6 +711,18 @@ function Vault({ vault }: IProps) {
   useEffect(() => {
     selectTokensHandler();
   }, [$tokens, defaultOptionSymbols]);
+
+  // useEffect(() => {
+  //   if (allowance && inputs) {
+  //     const depositAssets = tokensJson.tokens
+  //       .filter((token) => Object.keys(inputs).includes(token.address))
+  //       .map(({ address, decimals }) =>
+  //         parseUnits(inputs[address]?.amount, decimals)
+  //       );
+
+  //     checkInputsAllowance(depositAssets);
+  //   }
+  // }, [inputs, allowance, option, isApprove]);
 
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
@@ -786,6 +802,7 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={`https://polygonscan.com/token/${strategyAddress}`}
+                      target="_blank"
                     >
                       Strategy address
                       <svg
@@ -815,6 +832,7 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={`https://polygonscan.com/token/${localVault.address}`}
+                      target="_blank"
                     >
                       Vault address
                       <svg
@@ -844,6 +862,7 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={localVault.strategyInfo.sourceCode}
+                      target="_blank"
                     >
                       Github
                       <svg
@@ -928,9 +947,7 @@ function Vault({ vault }: IProps) {
                   <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                     Strategy APR
                   </p>
-                  <p>
-                    {formatFromBigInt(localVault.strategyApr, 16).toFixed(2)}%
-                  </p>
+                  <p>{localVault.strategyApr}%</p>
                 </div>
 
                 <div>
@@ -1012,6 +1029,7 @@ function Vault({ vault }: IProps) {
                                 <a
                                   className="flex items-center"
                                   href={tokenAssets?.website}
+                                  target="_blank"
                                 >
                                   Website
                                   <svg
@@ -1042,6 +1060,7 @@ function Vault({ vault }: IProps) {
                               <a
                                 className="flex items-center"
                                 href={`https://polygonscan.com/token/${asset}`}
+                                target="_blank"
                               >
                                 Contract
                                 <svg
@@ -1072,6 +1091,7 @@ function Vault({ vault }: IProps) {
                                 <a
                                   className="flex items-center"
                                   href={tokenAssets?.docs}
+                                  target="_blank"
                                 >
                                   Docs
                                   <svg
@@ -1173,7 +1193,9 @@ function Vault({ vault }: IProps) {
                             : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
                         }`}
                       >
-                        {timeDifference.hours}h ago
+                        {timeDifference?.hours
+                          ? `${timeDifference.hours}h ago`
+                          : "<1h ago"}
                       </div>
                     )}
                   </div>

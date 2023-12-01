@@ -30,6 +30,8 @@ const isVaultsLoaded = atom<boolean>(false);
 
 const tokens = atom<TAddress[] | undefined>();
 
+const connected = atom<boolean | undefined>();
+
 //Assets balances
 const addAssetBalance = (r: any[]) => {
   const assets = r[0];
@@ -87,4 +89,5 @@ export {
   addVaultData,
   balances,
   tokens,
+  connected,
 };
