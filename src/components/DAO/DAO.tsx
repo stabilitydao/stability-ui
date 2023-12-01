@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { vaults, publicClient, balances, platformData } from "@store";
-import { PlatformABI, platform, ERC20ABI, VaultABI } from "@web3";
+import { vaults, publicClient, balances } from "@store";
+import { PlatformABI, platform, ERC20ABI } from "@web3";
 import type { PlatformData, GitHubUser } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
@@ -84,7 +84,7 @@ function DAO() {
           args: ["0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E"],
         });
 
-        const multisig = await $publicClient.readContract({
+        const multisigBalance = await $publicClient.readContract({
           address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
           abi: ERC20ABI,
           functionName: "balanceOf",
@@ -121,7 +121,7 @@ function DAO() {
         ).toFixed(2);
 
         //team
-        const _multisig = Number(formatUnits(multisig, 18)).toFixed(2);
+        const _multisig = Number(formatUnits(multisigBalance, 18)).toFixed(2);
 
         const platformData: PlatformData = {
           platformVersion: platformVersion,
@@ -371,7 +371,7 @@ function DAO() {
 
             <h1 className="text-xxl text-gradient mb-3">Governance</h1>
 
-            <section className="text-start">
+            <section className="text-start p-3 bg-gray-900 rounded-md">
               <section>
                 <table>
                   <thead>
@@ -393,7 +393,7 @@ function DAO() {
                 <p>Total balance: {_platformData?.treasuryBalance}</p>
               </section>
             </section>
-            <section className="text-start">
+            <section className="text-start p-3 bg-gray-900 rounded-md mt-5">
               <section>
                 <table>
                   <thead>
@@ -424,7 +424,7 @@ function DAO() {
             </section>
             <h1 className="text-xxl text-gradient mb-3">Team</h1>
 
-            <section className="text-start">
+            <section className="text-start p-3 bg-gray-900 rounded-md">
               <section>
                 <table>
                   <thead>
