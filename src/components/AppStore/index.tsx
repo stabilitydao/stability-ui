@@ -20,6 +20,7 @@ import {
   vaultAssets,
   isVaultsLoaded,
   balances,
+  tokens,
 } from "@store";
 import {
   platform,
@@ -45,6 +46,10 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "getData",
       });
 
+      if (contractData[1]) {
+        tokens.set(contractData[1] as TAddress[]);
+      }
+
       if (contractData && Array.isArray(contractData)) {
         const buildingPrices: { [vaultType: string]: bigint } = {};
         for (let i = 0; i < contractData[1].length; i++) {
@@ -55,6 +60,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           factory: contractData[0][0],
           buildingPermitToken: contractData[0][3],
           buildingPayPerVaultToken: contractData[0][4],
+          zap: contractData[0][7],
           buildingPrices,
         });
       }

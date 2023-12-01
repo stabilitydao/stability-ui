@@ -25,10 +25,11 @@ interface IStrategyInfo {
 
 // types
 type TPlatformData = {
-  platform: `0x${string}`;
-  factory: `0x${string}`;
-  buildingPermitToken: `0x${string}`;
-  buildingPayPerVaultToken: `0x${string}`;
+  platform: TAddress;
+  factory: TAddress;
+  buildingPermitToken: TAddress;
+  buildingPayPerVaultToken: TAddress;
+  zap: TAddress;
   buildingPrices: { [vaultType: string]: bigint };
 };
 
