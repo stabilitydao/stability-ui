@@ -3,8 +3,7 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances, platformData } from "@store";
 import { PlatformABI, platform, ERC20ABI, VaultABI } from "@web3";
-import type { PlatformData, TTokenData } from "@types";
-import { getTokenData } from "@utils";
+import type { PlatformData, GitHubUser } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
 function DAO() {
@@ -15,14 +14,28 @@ function DAO() {
   const [profitTotalSupply, setProfitTotalSupply] = useState("");
   const [marketCap, setMarketCap] = useState("");
   const [sdivTotalSupply, setSdivTotalSupply] = useState("");
+  const [members, setMembers] = useState<GitHubUser[]>([]);
+
   const $publicClient = useStore(publicClient);
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
-  const $platformData = useStore(platformData);
 
   useEffect(() => {
     fetchPlatformData();
+    getTeamData();
   }, [$balances]);
+
+  async function getTeamData() {
+    try {
+      const membersData = await fetch(
+        "https://api.github.com/orgs/stabilitydao/public_members"
+      );
+      const dataJson = await membersData.json();
+      setMembers(dataJson);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const fetchPlatformData = async () => {
     if ($publicClient && $balances) {
@@ -99,6 +112,7 @@ function DAO() {
 
         //team
         const _multisig = Number(formatUnits(multisig, 18)).toFixed(2);
+
         const platformData: PlatformData = {
           platformVersion: platformVersion,
           platformGovernance: contractData[0][5],
@@ -342,7 +356,7 @@ function DAO() {
                 className="rounded-full w-52 p-0 flex"
               />
             </div>
-            <div className="flex">
+            <div className="flex mt-5">
               <a
                 className="rounded-sm text-start p-1 me-3  text-gray-500 bg-gray-800"
                 href="https://opensea.io/collection/profit-maker">
@@ -393,12 +407,14 @@ function DAO() {
                     </tr>
                   </tbody>
                 </table>
-                <a
-                  className="rounded-sm text-start p-1 me-3 text-gray-500 bg-gray-800"
-                  href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
-                  {" "}
-                  Tally governance app
-                </a>
+                <div className="flex mt-5">
+                  <a
+                    className="rounded-sm text-start p-1 me-3 text-gray-500 bg-gray-800"
+                    href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
+                    {" "}
+                    Tally governance app
+                  </a>
+                </div>
               </section>
             </section>
             <h1 className="text-xxl text-gradient mb-3">Team</h1>
@@ -425,6 +441,23 @@ function DAO() {
                 <p>Total balance: {_platformData?.treasuryBalance}</p>
               </section>
             </section>
+            <div className="mt-5 flex flex-wrap p-0 m-0 justify-center">
+              {members.map(member => {
+                return (
+                  <a
+                    href={member.html_url}
+                    key={member.id}
+                    className="m-4 p-2 w-40 "
+                    target="blank">
+                    <img
+                      className="rounded-full mb-4"
+                      src={member.avatar_url}
+                    />
+                    <p className="font-bold">{member.login}</p>
+                  </a>
+                );
+              })}
+            </div>
           </section>
         </div>
       </div>
