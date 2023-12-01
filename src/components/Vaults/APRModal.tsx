@@ -23,11 +23,11 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       });
     }
   };
-  const APR = formatFromBigInt(state.apr, 16, "withDecimals").toFixed(2);
+  const APR = formatFromBigInt(state.apr, 3, "withDecimals").toFixed(2);
   const APY = calculateAPY(APR).toFixed(2);
-  const strategyAPR = formatFromBigInt(state.strategyApr, 16).toFixed(2);
+  const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
   const assetAprs = state.assetsAprs.map((apr: string) =>
-    formatFromBigInt(apr, 16).toFixed(2)
+    formatFromBigInt(apr, 3).toFixed(2)
   );
 
   const timeDifference = getTimeDifference(state.lastHardWork);

@@ -4,10 +4,5 @@ import {Vaults} from "@components/Vaults"
 ---
 
 <Layout title="Vaults">
-  <Vaults client:load/>
-  <a href="/create-vault">
-    <button class="bg-button px-3 py-2 rounded-md mt-3">
-      Create vault
-    </button>
-  </a>
+  <Vaults client:only="react"/>
 </Layout>
