@@ -12,6 +12,7 @@ function DAO() {
   );
   const [profitTokenPrice, setProfitTokenPrice] = useState("");
   const [profitTotalSupply, setProfitTotalSupply] = useState("");
+  const [prTotalSupply, setPrTotalSupply] = useState("");
   const [marketCap, setMarketCap] = useState("");
   const [sdivTotalSupply, setSdivTotalSupply] = useState("");
   const [members, setMembers] = useState<GitHubUser[]>([]);
@@ -64,6 +65,12 @@ function DAO() {
           functionName: "totalSupply",
         });
 
+        const _prTotalSupply = await $publicClient.readContract({
+          address: "0xAA3e3709C79a133e56C17a7ded87802adF23083B",
+          abi: ERC20ABI,
+          functionName: "totalSupply",
+        });
+
         const _sdivTotalSupply = await $publicClient.readContract({
           address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB",
           abi: ERC20ABI,
@@ -98,6 +105,9 @@ function DAO() {
 
         //sdiv token
         setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
+
+        //pm
+        setPrTotalSupply(formatUnits(_prTotalSupply, 18));
 
         //platformData
         const _totalTvl = formatUnits(totalTvl, 18);
@@ -331,12 +341,7 @@ function DAO() {
                   </tr>
                   <tr>
                     <td>Total supply: </td>
-                    <td>
-                      <span className="font-bold text-red-600">
-                        {" "}
-                        ADD TOTAL SUPPLY
-                      </span>{" "}
-                    </td>
+                    <td>{prTotalSupply}</td>
                   </tr>
                   <tr>
                     <td>To mint: </td>
