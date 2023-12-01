@@ -161,6 +161,7 @@ type TVaultsAddress = {
 //// DAO
 type PlatformData = {
   platformVersion: string;
+  platformGovernance: string;
   numberOfTotalVaults: string;
   totalTvl: string;
   strategieNames: string;
@@ -168,6 +169,7 @@ type PlatformData = {
   vaultManagerFee: string;
   strategyLogicFee: string;
   ecosystemFee: string;
+  treasuryBalance: string;
 };
 
 export type {
