@@ -64,6 +64,13 @@ function DAO() {
           args: ["0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E"],
         });
 
+        const multisig = await $publicClient.readContract({
+          address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
+          abi: ERC20ABI,
+          functionName: "balanceOf",
+          args: [contractData[0][6]],
+        });
+
         //profit Token
         const totalTvl: bigint = $vaults[5].reduce(
           (total: bigint, numero: bigint) => total + numero,
@@ -76,7 +83,7 @@ function DAO() {
         setProfitTotalSupply(_profitTotalSupply);
         setMarketCap(formatUnits(totalTvl, 18));
 
-        //sdiv Token
+        //sdiv token
         setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
 
         //platformData
@@ -90,9 +97,13 @@ function DAO() {
           formatUnits(treasuryBalance, 18)
         ).toFixed(2);
 
+        //team
+        const _multisig = Number(formatUnits(multisig, 18)).toFixed(2);
         const platformData: PlatformData = {
           platformVersion: platformVersion,
           platformGovernance: contractData[0][5],
+          multisig: contractData[0][6],
+          multisigBalance: _multisig,
           numberOfTotalVaults: $balances[3].length,
           totalTvl: _totalTvl,
           strategieNames: contractData[6],
@@ -383,21 +394,40 @@ function DAO() {
                   </tbody>
                 </table>
                 <a
-                  className="bg-gray-600 p-2"
+                  className="rounded-sm text-start p-1 me-3 text-gray-500 bg-gray-800"
                   href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
                   {" "}
                   Tally governance app
                 </a>
               </section>
             </section>
+            <h1 className="text-xxl text-gradient mb-3">Team</h1>
+
+            <section className="text-start">
+              <section>
+                <table>
+                  <thead>
+                    <tr>
+                      <td>
+                        <h1 className="text-start">Multisig</h1>
+                      </td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Address:</td>
+                      <td>
+                        <a>{_platformData?.multisig}</a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>Total balance: {_platformData?.treasuryBalance}</p>
+              </section>
+            </section>
           </section>
         </div>
       </div>
-      <br />
-
-      <br />
-      <h1 className="text-xxl text-gradient mb-3">Team</h1>
-      <div></div>
       <br />
     </main>
   );

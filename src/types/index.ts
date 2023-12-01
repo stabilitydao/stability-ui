@@ -162,6 +162,8 @@ type TVaultsAddress = {
 type PlatformData = {
   platformVersion: string;
   platformGovernance: string;
+  multisig: string;
+  multisigBalance: string;
   numberOfTotalVaults: string;
   totalTvl: string;
   strategieNames: string;
