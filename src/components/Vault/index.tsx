@@ -109,6 +109,13 @@ function Vault({ vault }: IProps) {
 
   const [currentChain, setCurrentChain] = useState<any>();
 
+  const [tokenSelector, setTokenSelector] = useState<boolean>(false);
+  const [activeOptionToken, setActiveOptionToken] = useState<any>({
+    symbol: "",
+    address: "",
+  });
+  const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
+
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
       return true;
@@ -154,36 +161,24 @@ function Vault({ vault }: IProps) {
       }
     }
   };
+  ///// INPUTS & OPTIONS
+  const optionHandler = (
+    option: any,
+    symbol: string,
+    address: string | TAddress,
+    logoURI: string | string[]
+  ) => {
+    setTokenSelector((prevState) => !prevState);
 
-  const resetInputs = (options: string[]) => {
-    const reset: TVaultInput | any = {};
-
-    for (let i = 0; i < options.length; i++) {
-      reset[options[i]] = {
-        amount: "",
-      };
-    }
-    setInputs(reset);
-    setIsApprove(undefined);
-  };
-
-  const defaultAssetsOption = (assets: string[]) => {
-    const defaultOptionAssets: string[] = [];
-    for (let i = 0; i < assets.length; i++) {
-      const token = getTokenData(assets[i]);
-      if (token) {
-        defaultOptionAssets[i] = token.symbol;
-      } else {
-        defaultOptionAssets[i] = "Token not found.";
-      }
-    }
-    setDefaultOptionSymbols(defaultOptionAssets.join(" + "));
-    setDefaultOptionAssets(assets.join(", "));
-  };
-
-  const changeOption = (option: string[]) => {
+    ///// Option change
     resetInputs(option);
     setOption(option);
+    ///// Active option
+    setActiveOptionToken({
+      symbol: symbol,
+      address: address,
+      logoURI: logoURI,
+    });
   };
 
   const handleInputChange = (amount: string, asset: string) => {
@@ -216,14 +211,61 @@ function Vault({ vault }: IProps) {
       setInputs(preview);
     }
   };
+  const resetOptions = () => {
+    if ($assets) {
+      const logos = defaultOptionAssets.split(", ").map((address) => {
+        const token = optionTokens.find(
+          (token: any) => token.address === address
+        );
+        return token && token.logoURI;
+      });
+
+      setOption($assets);
+      setActiveOptionToken({
+        symbol: defaultOptionSymbols,
+        address: defaultOptionAssets,
+        logoURI: logos,
+      });
+    }
+  };
+  const resetInputs = (options: string[]) => {
+    const reset: TVaultInput | any = {};
+
+    for (let i = 0; i < options.length; i++) {
+      reset[options[i]] = {
+        amount: "",
+      };
+    }
+    setInputs(reset);
+    setIsApprove(undefined);
+  };
+
+  const defaultAssetsOption = (assets: string[]) => {
+    const defaultOptionAssets: string[] = [];
+    const logoURIs: string[] = [];
+    for (let i = 0; i < assets.length; i++) {
+      const token = getTokenData(assets[i]);
+
+      if (token) {
+        defaultOptionAssets[i] = token.symbol;
+        logoURIs.push(token?.logoURI);
+      } else {
+        defaultOptionAssets[i] = "Token not found.";
+      }
+    }
+    setDefaultOptionSymbols(defaultOptionAssets.join(" + "));
+    setDefaultOptionAssets(assets.join(", "));
+    setDefaultOptionImages(logoURIs);
+  };
+
+  /////
 
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
     if (!$tokens) return;
-
     const filtredTokens = tokensJson.tokens
       .filter((token) => $tokens.includes(token.address))
-      .map(({ address, symbol }) => ({ address, symbol }));
+      .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     ///// GET UNDERLYING TOKEN
     try {
@@ -271,6 +313,7 @@ function Vault({ vault }: IProps) {
           decimals: underlyingDecimals,
           balance: formatUnits(underlyingBalance, underlyingDecimals),
           allowance: formatUnits(underlyingAllowance, underlyingDecimals),
+          logoURI: "/protocols/Gamma.png",
         });
 
         setOptionTokens(filtredTokens);
@@ -462,16 +505,6 @@ function Vault({ vault }: IProps) {
     }
   };
 
-  const resetOptions = () => {
-    if ($assets) {
-      setOption($assets);
-      let select = document.getElementById("selectOption") as HTMLSelectElement;
-      // todo fix this with ref ^
-      if (select) {
-        select.value = select.options[0].value;
-      }
-    }
-  };
   const getStrategy = async () => {
     if (vault) {
       const strategy: TAddress | undefined = (await readContract(
@@ -743,6 +776,25 @@ function Vault({ vault }: IProps) {
       );
     }
   }, [_publicClient]);
+  useEffect(() => {
+    if (
+      (!activeOptionToken.symbol || !activeOptionToken.address) &&
+      optionTokens
+    ) {
+      const logos = defaultOptionAssets.split(", ").map((address) => {
+        const token = optionTokens.find(
+          (token: any) => token.address === address
+        );
+        return token && token.logoURI;
+      });
+
+      setActiveOptionToken({
+        symbol: defaultOptionSymbols,
+        address: defaultOptionAssets,
+        logoURI: logos,
+      });
+    }
+  }, [defaultOptionAssets, defaultOptionSymbols, optionTokens]);
 
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
@@ -1015,7 +1067,7 @@ function Vault({ vault }: IProps) {
                   <p>{localVault.strategyApr}%</p>
                 </div>
 
-                {assetsAPR && assetsAPR.length > 0 && (
+                {assetsAPR?.length && (
                   <div>
                     <div className="flex items-center gap-3 flex-wrap mt-2">
                       {assetsAPR.map((apr: string, index: number) => {
@@ -1050,7 +1102,7 @@ function Vault({ vault }: IProps) {
                       )}
                     </div>
                   </div>
-                  <div className="">
+                  <div>
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                       AMM ADAPTER
                     </p>
@@ -1064,7 +1116,9 @@ function Vault({ vault }: IProps) {
           )}
 
           <article className="rounded-md p-3 mt-5 bg-button">
-            <h2 className="mb-2 text-[24px] text-start">Assets</h2>
+            <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
+              Assets
+            </h2>
             {$assets &&
               $assets.map((asset: TAddress) => {
                 const assetData: TToken | any = getTokenData(asset);
@@ -1191,14 +1245,14 @@ function Vault({ vault }: IProps) {
                           </div>
                         </div>
 
-                        <div className="flex justify-start items-center text-[15px]">
+                        <div className="flex justify-start items-center text-[16px]">
                           <p>
                             Price: $
                             {formatUnits($assetsPrices[asset].tokenPrice, 18)}
                           </p>
                         </div>
 
-                        <p className="text-[18px]">
+                        <p className="text-[16px]">
                           {tokenAssets?.description}
                         </p>
                         {assetData?.tags && (
@@ -1225,7 +1279,7 @@ function Vault({ vault }: IProps) {
             <div className="flex justify-between items-center bg-button px-5 py-4 rounded-md h-[80px]">
               <div className="flex flex-col">
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  User Balance
+                  Your Balance
                 </p>
                 <p className="text-[18px]">
                   $
@@ -1235,16 +1289,16 @@ function Vault({ vault }: IProps) {
                   )}
                 </p>
               </div>
-              <div>
+              <div className="flex flex-col">
                 {timeDifference && (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col justify-between">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                       Last Hard Work
                     </p>
                     {timeDifference?.days ? (
                       <>
                         {timeDifference?.days < 1000 ? (
-                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
+                          <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
                             {timeDifference.days}
                             {timeDifference.days > 1 ? "days" : "day"}{" "}
                             {timeDifference.hours}h ago
@@ -1304,46 +1358,143 @@ function Vault({ vault }: IProps) {
             <form autoComplete="off" className="max-w-[400px] px-4 mb-10 pb-5">
               <div className="flex flex-col items-start mt-4">
                 {optionTokens && (
-                  <select
-                    className="rounded-sm px-3 py-2 bg-[#13141f]  text-[20px] cursor-pointer"
-                    id="selectOption"
-                    onChange={(e) => changeOption(e.target.value.split(", "))}
-                  >
-                    <option
-                      className="bg-button text-center"
-                      value={defaultOptionAssets}
+                  <div className="relative select-none max-w-[250px] w-full">
+                    <div
+                      onClick={() => {
+                        setTokenSelector((prevState) => !prevState);
+                      }}
+                      className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer"
                     >
-                      {defaultOptionSymbols}
-                    </option>
-                    {underlyingToken && (
-                      <option
-                        className="bg-button text-center"
-                        value={underlyingToken?.address}
-                      >
-                        {underlyingToken.symbol}
-                      </option>
-                    )}
+                      <div className="flex items-center gap-2">
+                        {activeOptionToken?.logoURI &&
+                        Array.isArray(activeOptionToken?.logoURI) ? (
+                          <div className="flex items-center">
+                            {activeOptionToken?.logoURI.map((logo: string) => (
+                              <img
+                                key={Math.random()}
+                                className="max-w-6 max-h-6 rounded-full"
+                                src={logo}
+                                alt="logo"
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          activeOptionToken?.logoURI && (
+                            <img
+                              className="max-w-6 max-h-6 rounded-full"
+                              src={activeOptionToken?.logoURI}
+                              alt="logo"
+                            />
+                          )
+                        )}
+                        <p>{activeOptionToken?.symbol}</p>
+                      </div>
 
-                    {optionTokens.map(
-                      ({
-                        address,
-                        symbol,
-                      }: {
-                        address: TAddress;
-                        symbol: string;
-                      }) => {
-                        return (
-                          <option
-                            className="bg-button text-center "
-                            key={address}
-                            value={address}
-                          >
-                            {symbol}
-                          </option>
-                        );
-                      }
-                    )}
-                  </select>
+                      <svg
+                        width="15"
+                        height="9"
+                        viewBox="0 0 15 9"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`transition delay-[50ms] ${
+                          tokenSelector ? "rotate-[180deg]" : "rotate-[0deg]"
+                        }`}
+                      >
+                        <path d="M1 1L7.5 7.5L14 1" stroke="white" />
+                      </svg>
+                    </div>
+
+                    <div
+                      className={`bg-[#13141f] mt-1 rounded-md w-full z-10 ${
+                        tokenSelector
+                          ? "absolute transition delay-[50ms]"
+                          : "hidden"
+                      } `}
+                    >
+                      <div
+                        onClick={() => {
+                          optionHandler(
+                            defaultOptionAssets.split(", "),
+                            defaultOptionSymbols,
+                            defaultOptionAssets,
+                            defaultOptionImages
+                          );
+                        }}
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                      >
+                        {defaultOptionImages?.length && (
+                          <div className="flex items-center">
+                            {defaultOptionImages.map((logo: string) => (
+                              <img
+                                key={Math.random()}
+                                className="max-w-6 max-h-6 rounded-full"
+                                src={logo}
+                                alt="logo"
+                              />
+                            ))}
+                          </div>
+                        )}
+                        <p> {defaultOptionSymbols}</p>
+                      </div>
+                      {underlyingToken && (
+                        <div
+                          onClick={() => {
+                            optionHandler(
+                              [underlyingToken?.address],
+                              underlyingToken?.symbol,
+                              underlyingToken?.address,
+                              "/protocols/Gamma.png"
+                            );
+                          }}
+                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                        >
+                          {underlyingToken?.logoURI && (
+                            <img
+                              className="max-w-6 max-h-6 rounded-full"
+                              src={underlyingToken.logoURI}
+                              alt="logo"
+                            />
+                          )}
+                          <p> {underlyingToken.symbol}</p>
+                        </div>
+                      )}
+                      {optionTokens.map(
+                        ({
+                          address,
+                          symbol,
+                          logoURI,
+                        }: {
+                          address: TAddress;
+                          symbol: string;
+                          logoURI: string;
+                        }) => {
+                          return (
+                            <div
+                              className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                              key={address}
+                              onClick={() => {
+                                optionHandler(
+                                  [address],
+                                  symbol,
+                                  address,
+                                  logoURI
+                                );
+                              }}
+                            >
+                              {logoURI && (
+                                <img
+                                  className="max-w-6 max-h-6 rounded-full"
+                                  src={logoURI}
+                                  alt="logo"
+                                />
+                              )}
+                              <p> {symbol}</p>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
 
