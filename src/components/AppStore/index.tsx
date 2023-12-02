@@ -21,6 +21,7 @@ import {
   isVaultsLoaded,
   balances,
   tokens,
+  connected,
 } from "@store";
 import {
   platform,
@@ -71,6 +72,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "getBalance",
         args: [address],
       });
+      console.log(contractBalance);
 
       console.log("Platform.getBalance", contractBalance);
       if (contractBalance?.length) {
@@ -174,8 +176,9 @@ const AppStore = (props: React.PropsWithChildren) => {
     account.set(address);
     publicClient.set(_publicClient);
     network.set(chain?.name);
+    connected.set(isConnected);
     getData();
-  }, [address, chain?.id]);
+  }, [address, chain?.id, isConnected]);
 
   return <>{props.children}</>;
 };

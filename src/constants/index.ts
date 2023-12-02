@@ -98,4 +98,12 @@ const TOKENS_ASSETS = [
   },
 ];
 
-export { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS };
+const CHAINS = [
+  {
+    name: "Polygon",
+    logoURI:
+      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+  },
+];
+
+export { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS, CHAINS };
