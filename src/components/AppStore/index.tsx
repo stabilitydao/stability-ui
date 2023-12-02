@@ -72,6 +72,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "getBalance",
         args: [address],
       });
+      console.log(contractBalance);
 
       console.log("Platform.getBalance", contractBalance);
       if (contractBalance?.length) {
