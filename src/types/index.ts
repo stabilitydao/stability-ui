@@ -196,6 +196,12 @@ type GitHubUser = {
   site_admin: boolean;
 };
 
+type ProfitTokenData = {
+  price: number;
+  totalSupply: string;
+  marketCap: number;
+};
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -224,4 +230,5 @@ export type {
   TVaultBalance,
   PlatformData,
   GitHubUser,
+  ProfitTokenData,
 };

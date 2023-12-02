@@ -3,17 +3,15 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances } from "@store";
 import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
-import type { PlatformData, GitHubUser } from "@types";
+import type { PlatformData, GitHubUser, ProfitTokenData } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
 function DAO() {
   const [_platformData, setPlatformData] = useState<PlatformData | undefined>(
     undefined
   );
-  const [profitTokenPrice, setProfitTokenPrice] = useState("");
-  const [profitTotalSupply, setProfitTotalSupply] = useState("");
+  const [profitTokenData, setProfitTokenData] = useState<ProfitTokenData>();
   const [prTotalSupply, setPrTotalSupply] = useState("");
-  const [marketCap, setMarketCap] = useState("");
   const [sdivTotalSupply, setSdivTotalSupply] = useState("");
   const [members, setMembers] = useState<GitHubUser[]>([]);
 
@@ -22,21 +20,22 @@ function DAO() {
   const $balances = useStore(balances);
 
   useEffect(() => {
-    fetchPlatformData();
     getTeamData();
+    fetchPlatformData();
   }, [$balances]);
 
-  async function getTeamData() {
+  const getTeamData = async () => {
     try {
       const membersData = await fetch(
         "https://api.github.com/orgs/stabilitydao/public_members"
       );
       const dataJson = await membersData.json();
       setMembers(dataJson);
+      console.log(dataJson);
     } catch (error) {
-      console.log(error);
+      console.log("Fetching getTeamData", error);
     }
-  }
+  };
 
   const fetchPlatformData = async () => {
     if ($publicClient && $balances) {
@@ -91,17 +90,26 @@ function DAO() {
           args: [contractData[0][6]],
         });
 
-        //profit Token
-        const totalTvl: bigint = $vaults[5].reduce(
+        //tvl
+        const totalTvl: bigint = $vaults[6].reduce(
           (total: bigint, numero: bigint) => total + numero,
           BigInt(0)
         );
-        const _profitTokenPrice =
-          "$ " + formatUnits(totalTvl / profitTotalSupply, 18);
+        const _totalTvl = formatUnits(totalTvl, 18);
+
+        //profit Token
         const _profitTotalSupply = formatUnits(profitTotalSupply, 18);
-        setProfitTokenPrice(_profitTokenPrice);
-        setProfitTotalSupply(_profitTotalSupply);
-        setMarketCap(formatUnits(totalTvl, 18));
+        const _profitTokenPrice = Number(totalTvl) / Number(profitTotalSupply);
+        const profitMarketCap =
+          Number(_profitTokenPrice) * Number(_profitTotalSupply);
+
+        const profitToken: ProfitTokenData = {
+          price: _profitTokenPrice,
+          totalSupply: _profitTotalSupply,
+          marketCap: profitMarketCap,
+        };
+
+        setProfitTokenData(profitToken);
 
         //sdiv token
         setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
@@ -110,7 +118,7 @@ function DAO() {
         setPrTotalSupply(formatUnits(_prTotalSupply, 18));
 
         //platformData
-        const _totalTvl = formatUnits(totalTvl, 18);
+
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
           fee !== 0n ? (fee / 1000n).toString() + " %" : "0 %"
         );
@@ -216,48 +224,51 @@ function DAO() {
             </h1>
 
             {(() => {
-              const profitTokenData = tokenlist.tokens.find(
+              const profitToken = tokenlist.tokens.find(
                 token =>
                   token.address === "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
               );
               return (
-                profitTokenData && (
+                profitToken && (
                   <div className="m-auto grid w-full p-0">
                     <div className="flex p-0 w-full">
                       <table className=" whitespace-nowrap">
                         <tbody className="p-0 ">
                           <tr>
                             <td>Name: </td>
-                            <td>{profitTokenData.name} </td>
+                            <td>{profitToken.name} </td>
                           </tr>
                           <tr>
                             <td>Symbol: </td>
-                            <td>{profitTokenData.symbol} </td>
+                            <td>{profitToken.symbol} </td>
                           </tr>
 
                           <tr>
                             <td>Price: </td>
-                            <td>{profitTokenPrice} </td>
+                            <td>
+                              {"$ "}
+                              {profitTokenData?.price}{" "}
+                            </td>
                           </tr>
                           <tr>
                             <td>Total supply: </td>
-                            <td>{profitTotalSupply} </td>
+                            <td>{profitTokenData?.totalSupply} </td>
                           </tr>
                           <tr>
                             <td>Market Cap: </td>
-                            <td>{marketCap} </td>
+                            <td>{profitTokenData?.marketCap} </td>
                           </tr>
                           <tr>
                             <td>Address: </td>
-                            <td>{profitTokenData.address} </td>
+                            <td>{profitToken.address} </td>
                           </tr>
                         </tbody>
                       </table>
                       <div className="w-full p-0 m-auto align-middle">
                         <img
                           className="rounded-full p-0 ms-auto flex justify-center align-middle w-full"
-                          src={profitTokenData.logoURI}
-                          alt={profitTokenData.logoURI}
+                          src={profitToken.logoURI}
+                          alt={profitToken.logoURI}
                         />
                       </div>
                     </div>
@@ -447,21 +458,25 @@ function DAO() {
               </section>
             </section>
             <div className="mt-5 flex flex-wrap p-0 m-0 justify-center">
-              {members.map(member => {
-                return (
+              {Array.isArray(members) ? (
+                members.map(member => (
                   <a
                     href={member.html_url}
                     key={member.id}
                     className="m-4 p-2 w-40 "
-                    target="blank">
+                    target="_blank"
+                    rel="noopener noreferrer">
                     <img
                       className="rounded-full mb-4"
                       src={member.avatar_url}
+                      alt={`Avatar de ${member.login}`}
                     />
                     <p className="font-bold">{member.login}</p>
                   </a>
-                );
-              })}
+                ))
+              ) : (
+                <p>Loading team..</p>
+              )}
             </div>
           </section>
         </div>
