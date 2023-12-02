@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import { APRModal } from "./APRModal";
 import { ColumnFilter } from "./ColumnFilter";
 import { Pagination } from "./Pagination";
-import { Wallet } from "@components/Wallet";
+import { Wallet, VaultType } from "@components";
 
 import {
   vaultData,
@@ -216,30 +216,7 @@ function Vaults() {
               </td>
 
               <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">
-                {vault.type === "Compounding" && (
-                  <span
-                    title="Compounding vault"
-                    className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#00bb99] bg-[#00110a]"
-                  >
-                    C
-                  </span>
-                )}
-                {vault.type === "Rewarding" && (
-                  <span
-                    title="Rewarding vault"
-                    className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#6052ff] bg-[#090816]"
-                  >
-                    R
-                  </span>
-                )}
-                {vault.type === "Rewarding Managed" && (
-                  <span
-                    title="Rewarding Managed vault"
-                    className="text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full text-[#d45a1d] bg-[#170a03]"
-                  >
-                    RM
-                  </span>
-                )}
+                <VaultType type={vault.type} />
               </td>
               <td className=" pl-2 py-2 hidden md:table-cell whitespace-nowrap">
                 <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">

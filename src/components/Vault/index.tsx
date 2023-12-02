@@ -13,6 +13,8 @@ import {
   // useFeeData,
 } from "wagmi";
 
+import { VaultType } from "@components";
+
 import {
   vaultData,
   assets,
@@ -44,7 +46,6 @@ import {
 import type {
   TToken,
   TAddress,
-  TVaultsAddress,
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
@@ -52,7 +53,7 @@ import type {
   TPlatformData,
 } from "@types";
 
-import { TOKENS_ASSETS } from "@constants";
+import { TOKENS_ASSETS, CHAINS } from "@constants";
 
 import tokensJson from "../../stability.tokenlist.json";
 
@@ -81,7 +82,6 @@ function Vault({ vault }: IProps) {
     {}
   );
   const [isApprove, setIsApprove] = useState<number | undefined>();
-  const [symbols, setSymbols] = useState<TVaultsAddress>({});
   const [balances, setBalances] = useState<TVaultBalance | any>({});
 
   const [inputs, setInputs] = useState<TVaultInput | any>({});
@@ -103,20 +103,11 @@ function Vault({ vault }: IProps) {
   >();
   const [assetsAPR, setAssetsAPR] = useState<any>();
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
+  const [underlyingToken, setUnderlyingToken] = useState<any>();
   const [zapButton, setZapButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<any>();
 
-  const loadSymbols = () => {
-    if ($vaults) {
-      const vaultData: TVaultsAddress = {};
-      for (let i = 0; i < $vaults[0].length; i++) {
-        vaultData[$vaults[0][i]] = {
-          symbol: String($vaults[2][i]),
-        };
-        setSymbols(vaultData);
-      }
-    }
-  };
+  const [currentChain, setCurrentChain] = useState<any>();
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
@@ -234,6 +225,7 @@ function Vault({ vault }: IProps) {
       .filter((token) => $tokens.includes(token.address))
       .map(({ address, symbol }) => ({ address, symbol }));
 
+    ///// GET UNDERLYING TOKEN
     try {
       const strategy = await readContract(_publicClient, {
         address: vault as TAddress,
@@ -247,21 +239,54 @@ function Vault({ vault }: IProps) {
         functionName: "underlying",
       });
       if (underlying != zeroAddress) {
-        const symbolUnder = await readContract(_publicClient, {
+        const underlyingSymbol = await readContract(_publicClient, {
           address: underlying,
           abi: ERC20MetadataUpgradeableABI,
           functionName: "symbol",
         });
-        setOptionTokens([
-          { address: underlying, symbol: symbolUnder },
-          ...filtredTokens,
-        ]);
+
+        const underlyingDecimals = await readContract(_publicClient, {
+          address: underlying,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "decimals",
+        });
+
+        const underlyingAllowance = await readContract(_publicClient, {
+          address: underlying,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault as TAddress],
+        });
+
+        const underlyingBalance = await readContract(_publicClient, {
+          address: underlying,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        });
+
+        setUnderlyingToken({
+          address: underlying,
+          symbol: underlyingSymbol,
+          decimals: underlyingDecimals,
+          balance: formatUnits(underlyingBalance, underlyingDecimals),
+          allowance: formatUnits(underlyingAllowance, underlyingDecimals),
+        });
+
+        setOptionTokens(filtredTokens);
       } else {
         setOptionTokens(filtredTokens);
       }
     } catch (error) {
       setOptionTokens(filtredTokens);
       console.log("UNDERLYING TOKEN ERROR:", error);
+    }
+  };
+  /////
+  /////         UNDERLYING
+  const underlyingInputHandler = async (amount: string, asset: string) => {};
+  const underlyingApprove = async () => {
+    if (underlyingToken) {
     }
   };
 
@@ -487,7 +512,7 @@ function Vault({ vault }: IProps) {
   const loadAssetsBalances = () => {
     const balance: TVaultBalance | any = {};
 
-    if ($assetsBalances && option && option.length > 1) {
+    if ($assetsBalances && option.length > 1) {
       for (let i = 0; i < option.length; i++) {
         const decimals = getTokenData(option[i])?.decimals;
         if (decimals !== undefined) {
@@ -499,11 +524,7 @@ function Vault({ vault }: IProps) {
           };
         }
       }
-    } else if (
-      $assetsBalances &&
-      $assetsBalances[option[0]] &&
-      option.length === 1
-    ) {
+    } else if ($assetsBalances?.[option[0]] && option.length === 1) {
       const decimals = getTokenData(option[0])?.decimals;
       if (decimals !== undefined) {
         balance[option[0]] = {
@@ -513,6 +534,7 @@ function Vault({ vault }: IProps) {
           ),
         };
       }
+    } else if (underlyingToken && option.length === 1) {
     }
     setBalances(balance);
   };
@@ -670,16 +692,18 @@ function Vault({ vault }: IProps) {
           address: $vaults[0][index],
           name: $vaults[1][index],
           symbol: $vaults[2][index],
+          type: $vaults[3][index],
           assetsWithApr: $vaultAssets[index][3],
           assetsAprs: $vaultAssets[index][4],
           lastHardWork: $vaultAssets[index][5],
+          shareprice: String($vaults[5][index]),
           tvl: String($vaults[6][index]),
           apr: tempAPR,
           strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(4),
           strategySpecific: $vaults[9][index],
           apy: APY,
           balance: vaultUserBalances[index],
-          daily: Number(tempAPR) / 365,
+          daily: (Number(tempAPR) / 365).toFixed(4),
           assets: assets,
           strategyInfo: getStrategyInfo($vaults[2][index]),
         };
@@ -712,17 +736,13 @@ function Vault({ vault }: IProps) {
     selectTokensHandler();
   }, [$tokens, defaultOptionSymbols]);
 
-  // useEffect(() => {
-  //   if (allowance && inputs) {
-  //     const depositAssets = tokensJson.tokens
-  //       .filter((token) => Object.keys(inputs).includes(token.address))
-  //       .map(({ address, decimals }) =>
-  //         parseUnits(inputs[address]?.amount, decimals)
-  //       );
-
-  //     checkInputsAllowance(depositAssets);
-  //   }
-  // }, [inputs, allowance, option, isApprove]);
+  useEffect(() => {
+    if (_publicClient) {
+      setCurrentChain(
+        CHAINS.find((item) => item.name === _publicClient.chain.name)
+      );
+    }
+  }, [_publicClient]);
 
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
@@ -754,10 +774,15 @@ function Vault({ vault }: IProps) {
                   {localVault.name}
                 </span>
               </div>
-
-              <p className="bg-[#485069] text-[#B4BFDF] px-2 py-1 rounded-md text-[15px]">
-                CHAIN: {_publicClient.chain.name}
-              </p>
+              <div className="bg-[#485069] text-[#B4BFDF] px-2 py-1 rounded-md text-[15px] flex">
+                CHAIN:
+                <img
+                  className="w-6 h-6 rounded-full mx-1"
+                  src={currentChain?.logoURI}
+                  alt={currentChain?.name}
+                />
+                {currentChain?.name}
+              </div>
             </div>
           </div>
         )}
@@ -766,12 +791,12 @@ function Vault({ vault }: IProps) {
         <div className="w-2/3">
           {localVault && (
             <div className="flex justify-between items-center bg-button p-5 rounded-md h-[80px]">
+              <VaultType type={localVault.type} />
               <div>
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   TVL
                 </p>
                 <p>
-                  {" "}
                   {formatNumber(
                     formatFromBigInt(localVault.tvl, 18, "withFloor"),
                     "abbreviate"
@@ -782,13 +807,21 @@ function Vault({ vault }: IProps) {
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   APY
                 </p>
-                <p>{localVault.apy}</p>
+                <p>{localVault.apy}%</p>
               </div>
               <div>
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   Daily
                 </p>
-                <p>{localVault.daily}</p>
+                <p>{localVault.daily}%</p>
+              </div>
+              <div>
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                  SHARE PRICE
+                </p>
+                <p>
+                  ${formatFromBigInt(localVault.shareprice, 18, "withDecimals")}
+                </p>
               </div>
             </div>
           )}
@@ -1226,15 +1259,13 @@ function Vault({ vault }: IProps) {
                   setTab("Withdraw");
                   resetOptions();
                   resetInputs(option);
-                  loadSymbols();
                 }}
               >
                 Withdraw
               </button>
             </div>
             <form autoComplete="off" className="max-w-[400px] px-4 mb-10 pb-5">
-              <div className="flex flex-col items-start">
-                <label className=" text-[18px] py-2">Select token</label>
+              <div className="flex flex-col items-start mt-4">
                 {optionTokens && (
                   <select
                     className="rounded-sm px-3 py-2 bg-[#13141f]  text-[20px] cursor-pointer"
@@ -1247,6 +1278,15 @@ function Vault({ vault }: IProps) {
                     >
                       {defaultOptionSymbols}
                     </option>
+                    {underlyingToken && (
+                      <option
+                        className="bg-button text-center"
+                        value={underlyingToken?.address}
+                      >
+                        {underlyingToken.symbol}
+                      </option>
+                    )}
+
                     {optionTokens.map(
                       ({
                         address,
@@ -1272,12 +1312,13 @@ function Vault({ vault }: IProps) {
 
               {tab === "Deposit" && (
                 <>
-                  {option && option.length > 1 ? (
+                  {option?.length > 1 ? (
                     <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
                       {option.map((asset: any) => (
                         <div key={asset}>
                           <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                             <p>Balance:</p>
+
                             <p>
                               {balances &&
                                 balances[asset] &&
