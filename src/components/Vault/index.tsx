@@ -354,7 +354,7 @@ function Vault({ vault }: IProps) {
           address: vault as TAddress,
           abi: VaultABI,
           functionName: "previewDepositAssets",
-          args: [[asset], [parseUnits(amount, 18)]],
+          args: [[asset as TAddress], [parseUnits(amount, 18)]],
         });
 
         setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
@@ -363,7 +363,7 @@ function Vault({ vault }: IProps) {
           address: option[0] as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
-          args: [$account as TAddress, vault],
+          args: [$account as TAddress, vault as TAddress],
         })) as bigint;
 
         if (Number(formatUnits(allowanceData, 18)) < Number(amount)) {
@@ -444,7 +444,7 @@ function Vault({ vault }: IProps) {
         );
 
         if (transaction.status === "success") {
-          const allowance = formatUnits(getZapAllowance(), 18);
+          const allowance = formatUnits(await getZapAllowance(), 18);
           if (Number(allowance) >= Number(amount)) {
             setZapButton("deposit");
           }
@@ -462,7 +462,7 @@ function Vault({ vault }: IProps) {
         abi: VaultABI,
         functionName: "depositAssets",
         args: [
-          [option[0]] as TAddress[],
+          option as TAddress[],
           [parseUnits(inputs[option[0]]?.amount, 18)],
           parseUnits(underlyingShares, 18),
           $account as TAddress,
@@ -576,7 +576,17 @@ function Vault({ vault }: IProps) {
 
   const withdraw = async () => {
     const value = parseUnits(inputs[option[0]]?.amount, 18);
-    if (value) {
+
+    if (!value) return;
+    ///// UNDERLYING TOKEN
+    if (underlyingToken?.address === option[0]) {
+      const withdrawAssets = await writeContract({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "withdrawAssets",
+        args: [option as TAddress[], value, [0n]],
+      });
+    } else {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -665,21 +675,43 @@ function Vault({ vault }: IProps) {
       setWithdrawAmount(false);
       return;
     }
+    ///// UNDERLYING TOKEN
+    if (underlyingToken?.address === option[0]) {
+      // this code is valid also for ZAP tokens
+      const currentValue = parseUnits(value, 18);
 
-    let preview: any = await readContract(_publicClient, {
-      address: localVault.address as TAddress,
-      abi: VaultABI,
-      functionName: "previewWithdraw",
-      args: [parseUnits(value, 18)],
-    });
-    preview = preview.map((amount: any, index: number) => {
-      const tokenData: TTokenData | any = getTokenData($assets[index]);
-      return {
-        symbol: tokenData?.symbol,
-        amount: formatUnits(amount, tokenData?.decimals),
-      };
-    });
-    setWithdrawAmount(preview);
+      if (currentValue) {
+        const { result } = await _publicClient.simulateContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [option as TAddress[], currentValue, [0n]],
+          account: $account as TAddress,
+        });
+
+        setWithdrawAmount([
+          {
+            symbol: underlyingToken?.symbol,
+            amount: formatUnits(result[0], 18),
+          },
+        ]);
+      }
+    } else {
+      // let preview: any = await readContract(_publicClient, {
+      //   address: localVault.address as TAddress,
+      //   abi: VaultABI,
+      //   functionName: "previewWithdraw",
+      //   args: [parseUnits(value, 18)],
+      // });
+      // preview = preview.map((amount: any, index: number) => {
+      //   const tokenData: TTokenData | any = getTokenData($assets[index]);
+      //   return {
+      //     symbol: tokenData?.symbol,
+      //     amount: formatUnits(amount, tokenData?.decimals),
+      //   };
+      // });
+      // setWithdrawAmount(preview);
+    }
   };
 
   const checkAllowance = async () => {
@@ -1150,7 +1182,7 @@ function Vault({ vault }: IProps) {
                   <p>{localVault.strategyApr}%</p>
                 </div>
 
-                {assetsAPR?.length && (
+                {!!assetsAPR?.length && (
                   <div>
                     <div className="flex items-center gap-3 flex-wrap mt-2">
                       {assetsAPR.map((apr: string, index: number) => {
@@ -1364,7 +1396,7 @@ function Vault({ vault }: IProps) {
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   Your Balance
                 </p>
-                <p className="text-[18px]">
+                <p className="text-[18px] h-8">
                   $
                   {formatNumber(
                     formatFromBigInt(localVault.balance, 18),
@@ -1375,7 +1407,7 @@ function Vault({ vault }: IProps) {
               <div className="flex flex-col">
                 {timeDifference && (
                   <div className="flex flex-col justify-between">
-                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
                       Last Hard Work
                     </p>
                     {timeDifference?.days ? (
@@ -1862,15 +1894,21 @@ function Vault({ vault }: IProps) {
                         <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pb-3 pr-3">
                           <div className="flex items-center">
                             <button
-                              onClick={() =>
+                              onClick={() => {
                                 handleInputChange(
                                   formatUnits(
                                     $vaultData[vault]?.vaultUserBalance,
                                     18
                                   ),
                                   option[0]
-                                )
-                              }
+                                );
+                                previewWithdraw(
+                                  formatUnits(
+                                    $vaultData[vault]?.vaultUserBalance,
+                                    18
+                                  )
+                                );
+                              }}
                               type="button"
                               className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
                             >
