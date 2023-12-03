@@ -237,8 +237,8 @@ function DAO() {
             );
             return (
               profitToken && (
-                <div className="grid bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
-                  <div className="flex p-0">
+                <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
+                  <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
                     <table>
                       <tbody>
                         <tr>
@@ -291,13 +291,9 @@ function DAO() {
                             </div>
                           </td>
                         </tr>
-                        <tr>
-                          <td> </td>
-                          <td></td>
-                        </tr>
                       </tbody>
                     </table>
-                    <div className="w-52 p-0 flex m-auto">
+                    <div className="w-52 p-0 ms-auto">
                       <img
                         className="rounded-full p-0 ms-auto flex w-full"
                         src={profitToken.logoURI}
@@ -353,6 +349,23 @@ function DAO() {
                         <td>Total supply: </td>
                         <td>{sdivTotalSupply} </td>
                       </tr>
+                      <tr>
+                        <td>Wallet: </td>
+                        <td>
+                          <span className="text-red-600">ADD WALLET</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Earned: </td>
+                        <td className="gap-3 flex">
+                          <span className="text-red-600 my-auto">
+                            ADD EARNED
+                          </span>
+                          <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                            Claim
+                          </button>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                   <div className="w-52 p-0">
@@ -367,8 +380,8 @@ function DAO() {
             );
           })()}
 
-          <div className="m-auto grid bg-[#1c1c23] rounded-md p-3 mt-5">
-            <div className="flex justify-between w-full m-auto ">
+          <div className="m-auto  bg-[#1c1c23] rounded-md p-3 mt-5">
+            <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
               <table>
                 <tbody className="p-0 w-full gap-3">
                   <tr>
@@ -405,7 +418,7 @@ function DAO() {
                 <img
                   alt="Profit maker"
                   src="https://stabilitydao.org/pm.png"
-                  className="rounded-full w-52 p-0 flex"
+                  className="rounded-full w-full p-0 flex"
                 />
               </div>
             </div>
