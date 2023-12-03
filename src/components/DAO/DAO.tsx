@@ -11,7 +11,7 @@ function DAO() {
     undefined
   );
   const [profitTokenData, setProfitTokenData] = useState<ProfitTokenData>();
-  const [prTotalSupply, setPrTotalSupply] = useState("");
+  const [prTotalSupply, setPmTotalSupply] = useState("");
   const [sdivTotalSupply, setSdivTotalSupply] = useState("");
   const [members, setMembers] = useState<GitHubUser[]>([]);
 
@@ -64,7 +64,7 @@ function DAO() {
           functionName: "totalSupply",
         });
 
-        const _prTotalSupply = await $publicClient.readContract({
+        const _pmTotalSupply = await $publicClient.readContract({
           address: "0xAA3e3709C79a133e56C17a7ded87802adF23083B",
           abi: IERC721Enumerable,
           functionName: "totalSupply",
@@ -115,7 +115,7 @@ function DAO() {
         setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
 
         //pm
-        setPrTotalSupply(formatUnits(_prTotalSupply, 18));
+        setPmTotalSupply(formatUnits(_pmTotalSupply, 18));
 
         //platformData
 
@@ -153,56 +153,62 @@ function DAO() {
   };
 
   return (
-    <main className="p-0 w-full m-0">
-      <div className="grid">
-        <div className="dao flex">
-          <div className="grid mb-auto w-[500px]">
-            <h1 className="text-xxl text-gradient mb-3 ">Platform</h1>
-            <article className="m-0 p-0">
-              <article className="mb-2">
-                <h2>Version: </h2>
-                <h2>{_platformData?.platformVersion}</h2>
+    <main className="p-0 w-full m-auto">
+      <section className="w-4/5 m-auto">
+        <article className="m-auto p-2 bg-button rounded-md w-full">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-3 p-0">
+            <article className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
+              <article className="mb-3">
+                <h2 className="text-left font-bold">Version </h2>
+                <h2 className="text-left">{_platformData?.platformVersion}</h2>
               </article>
-              <article className="mb-2">
-                <h2>Total Vaults:</h2>
-                <h2>{_platformData?.numberOfTotalVaults}</h2>
+              <article className="mb-3">
+                <h2 className="text-left font-bold">Total Vaults</h2>
+                <h2 className="text-left">
+                  {_platformData?.numberOfTotalVaults}
+                </h2>
               </article>
               <article>
-                <h2>Total TVL:</h2>
-                <h2>$ {_platformData?.totalTvl}</h2>
+                <h2 className="text-left font-bold">Total TVL</h2>
+                <h2 className="text-left">$ {_platformData?.totalTvl}</h2>
               </article>
             </article>
 
-            <table className="my-5 grid p-0 w-full">
+            <table className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
               <thead>
                 <tr>
-                  <th>Platform fees:</th>
+                  <th className="text-left">Fees:</th>
                 </tr>
               </thead>
-              <tbody className="grid">
-                <tr className="items-center">
-                  <td>Platform fee:</td>
-                  <td>{_platformData?.platformFee}</td>
+              <tbody>
+                <tr>
+                  <td className="w-48">Platform fee:</td>
+                  <td className="text-right">{_platformData?.platformFee}</td>
                 </tr>
                 <tr>
                   <td>Vault manager fee:</td>
-                  <td>{_platformData?.vaultManagerFee}</td>
+                  <td className="text-right">
+                    {_platformData?.vaultManagerFee}
+                  </td>
                 </tr>
                 <tr>
                   <td>Strategy logic fee:</td>
-                  <td>{_platformData?.strategyLogicFee}</td>
+                  <td className="text-right">
+                    {_platformData?.strategyLogicFee}
+                  </td>
                 </tr>
                 <tr>
                   <td>Ecosystem fee:</td>
-                  <td>{_platformData?.ecosystemFee}</td>
+                  <td className="text-right">{_platformData?.ecosystemFee}</td>
                 </tr>
               </tbody>
             </table>
 
-            <table className="grid my-5 p-0 w-full">
+            <table className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
               <thead>
                 <tr>
-                  <th>Strategies:</th>
+                  <th className="text-left">Strategies:</th>
                 </tr>
               </thead>
               <tbody className="grid">
@@ -217,129 +223,156 @@ function DAO() {
               </tbody>
             </table>
           </div>
-          <br />
-          <section className="grid p-0 m-0 w-full">
-            <h1 className="text-xxl text-gradient mb-3 p-0 w-full">
-              Tokenomics
-            </h1>
+        </article>
+      </section>
 
-            {(() => {
-              const profitToken = tokenlist.tokens.find(
-                token =>
-                  token.address === "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
-              );
-              return (
-                profitToken && (
-                  <div className="m-auto grid w-full p-0">
-                    <div className="flex p-0 w-full">
-                      <table className=" whitespace-nowrap">
-                        <tbody className="p-0 ">
-                          <tr>
-                            <td>Name: </td>
-                            <td>{profitToken.name} </td>
-                          </tr>
-                          <tr>
-                            <td>Symbol: </td>
-                            <td>{profitToken.symbol} </td>
-                          </tr>
+      <section className="p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
+        <article className="m-auto p-3 w-full">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Tokenomics</h1>
 
-                          <tr>
-                            <td>Price: </td>
-                            <td>
-                              {"$ "}
-                              {profitTokenData?.price}{" "}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Total supply: </td>
-                            <td>{profitTokenData?.totalSupply} </td>
-                          </tr>
-                          <tr>
-                            <td>Market Cap: </td>
-                            <td>{profitTokenData?.marketCap} </td>
-                          </tr>
-                          <tr>
-                            <td>Address: </td>
-                            <td>{profitToken.address} </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div className="w-full p-0 m-auto align-middle">
-                        <img
-                          className="rounded-full p-0 ms-auto flex justify-center align-middle w-full"
-                          src={profitToken.logoURI}
-                          alt={profitToken.logoURI}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid mt-5 ">
-                      <div className="flex">
-                        <a
-                          className="rounded-sm text-start p-1 me-3 text-gray-500 bg-gray-800"
-                          href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
-                          Chart
-                        </a>
-                        <a
-                          className="rounded-sm text-start p-1 mx-3 text-gray-500 bg-gray-800"
-                          href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
-                          Swap by 1inch
-                        </a>
-                        <a
-                          className="rounded-sm text-start p-0 ms-3 text-gray-500 bg-gray-800"
-                          href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
-                          Swap by Uniswap V3
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )
-              );
-            })()}
-            {(() => {
-              const sdivTokenData = tokenlist.tokens.find(
-                token =>
-                  token.address === "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB"
-              );
-              return (
-                sdivTokenData && (
-                  <div className="m-auto justify-between flex w-full p-0 mt-12">
-                    <table className="whitespace-nowrap">
-                      <tbody className="p-0 ">
+          {(() => {
+            const profitToken = tokenlist.tokens.find(
+              token =>
+                token.address === "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
+            );
+            return (
+              profitToken && (
+                <div className="grid bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
+                  <div className="flex p-0">
+                    <table>
+                      <tbody>
                         <tr>
                           <td>Name: </td>
-                          <td>{sdivTokenData.name} </td>
+                          <td>{profitToken.name} </td>
                         </tr>
                         <tr>
                           <td>Symbol: </td>
-                          <td>{sdivTokenData.symbol} </td>
+                          <td>{profitToken.symbol} </td>
                         </tr>
+
                         <tr>
-                          <td>Address: </td>
-                          <td>{sdivTokenData.address} </td>
+                          <td>Price: </td>
+                          <td>
+                            {"$ "}
+                            {profitTokenData?.price}{" "}
+                          </td>
                         </tr>
                         <tr>
                           <td>Total supply: </td>
-                          <td>{sdivTotalSupply} </td>
+                          <td>{profitTokenData?.totalSupply} </td>
+                        </tr>
+                        <tr>
+                          <td>Market Cap: </td>
+                          <td>{profitTokenData?.marketCap} </td>
+                        </tr>
+                        <tr>
+                          <td>Address: </td>
+                          <td>{profitToken.address} </td>
+                        </tr>
+                        <tr>
+                          <td>Wallet: </td>
+                          <td>
+                            <span className="text-red-600">ADD WALLET</span>{" "}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Staked: </td>
+                          <td className="flex gap-3">
+                            <span className="text-red-600 me-3 my-auto">
+                              ADD STAKED
+                            </span>{" "}
+                            <div className="flex">
+                              <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                                Stake
+                              </button>
+                              <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                                Unstake
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td> </td>
+                          <td></td>
                         </tr>
                       </tbody>
                     </table>
-                    <div className="w-full p-0 m-auto align-middle">
+                    <div className="w-52 p-0 flex m-auto">
                       <img
-                        className="rounded-full w-40 p-0 ms-auto"
-                        src={sdivTokenData.logoURI}
-                        alt={sdivTokenData.logoURI}
+                        className="rounded-full p-0 ms-auto flex w-full"
+                        src={profitToken.logoURI}
+                        alt={profitToken.logoURI}
                       />
                     </div>
                   </div>
-                )
-              );
-            })()}
 
-            <div className="m-auto justify-between flex w-full p-0 mt-16">
+                  <div className="flex gap-3  mt-3 justify-start">
+                    <a
+                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                      href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
+                      Chart
+                    </a>
+                    <a
+                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                      href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
+                      Swap by 1inch
+                    </a>
+                    <a
+                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                      href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
+                      Swap by Uniswap V3
+                    </a>
+                  </div>
+                </div>
+              )
+            );
+          })()}
+          {(() => {
+            const sdivTokenData = tokenlist.tokens.find(
+              token =>
+                token.address === "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB"
+            );
+            return (
+              sdivTokenData && (
+                <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
+                  <table>
+                    <tbody className="p-0 ">
+                      <tr>
+                        <td className="w-32">Name: </td>
+                        <td>{sdivTokenData.name} </td>
+                      </tr>
+                      <tr>
+                        <td>Symbol: </td>
+                        <td>{sdivTokenData.symbol} </td>
+                      </tr>
+                      <tr>
+                        <td>Address: </td>
+                        <td>{sdivTokenData.address} </td>
+                      </tr>
+                      <tr>
+                        <td>Total supply: </td>
+                        <td>{sdivTotalSupply} </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="w-52 p-0">
+                    <img
+                      className="rounded-full p-0 ms-auto flex w-full"
+                      src={sdivTokenData.logoURI}
+                      alt={sdivTokenData.logoURI}
+                    />
+                  </div>
+                </div>
+              )
+            );
+          })()}
+
+          <div className="m-auto grid bg-[#1c1c23] rounded-md p-3 mt-5">
+            <div className="flex justify-between w-full m-auto ">
               <table>
                 <tbody className="p-0 w-full gap-3">
                   <tr>
-                    <td>Name: </td>
+                    <td className="w-32">Name: </td>
                     <td>Profit Maker </td>
                   </tr>
                   <tr>
@@ -357,131 +390,137 @@ function DAO() {
                   <tr>
                     <td>To mint: </td>
                     <td>
-                      {" "}
-                      <span className="font-bold text-red-600 ">
-                        {" "}
-                        ADD TO MINT
-                      </span>{" "}
+                      <span className="text-red-600 "> ADD TO MINT</span>{" "}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Mint:</td>
+                    <td>
+                      <span className="text-red-600 ">ADD MINT</span>{" "}
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <img
-                alt="Profit maker"
-                src="https://stabilitydao.org/pm.png"
-                className="rounded-full w-52 p-0 flex"
-              />
+              <div className="w-52 p-0 ms-auto ">
+                <img
+                  alt="Profit maker"
+                  src="https://stabilitydao.org/pm.png"
+                  className="rounded-full w-52 p-0 flex"
+                />
+              </div>
             </div>
-            <div className="flex mt-5">
+
+            <div className="flex pt-3">
               <a
-                className="rounded-sm text-start p-1 me-3  text-gray-500 bg-gray-800"
+                className="rounded-sm text-start p-2 me-3 text-gray-400 bg-button"
                 href="https://opensea.io/collection/profit-maker">
                 Marketplace
               </a>
             </div>
+          </div>
+        </article>
+      </section>
 
-            <h1 className="text-xxl text-gradient mb-3">Governance</h1>
+      <section className=" p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
+        <article className="p-3">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Governance</h1>
+          <article className="p-3 bg-[#1c1c23] rounded-md">
+            <table>
+              <thead>
+                <tr>
+                  <td>
+                    <h2 className="text-start text-2xl py-4">Treasury</h2>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="w-32">Address:</td>
+                  <td>0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E</td>
+                </tr>
+                <tr>
+                  <td>Total balance: </td>
+                  <td>{_platformData?.treasuryBalance}</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
 
-            <section className="text-start p-3 bg-gray-900 rounded-md">
-              <section>
-                <table>
-                  <thead>
-                    <tr>
-                      <td>
-                        <h1 className="text-start">Treasury</h1>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Address:</td>
-                      <td>
-                        <a>0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E</a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>Total balance: {_platformData?.treasuryBalance}</p>
-              </section>
-            </section>
-            <section className="text-start p-3 bg-gray-900 rounded-md mt-5">
-              <section>
-                <table>
-                  <thead>
-                    <tr>
-                      <td>
-                        <h1 className="text-start">Gov</h1>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Address:</td>
-                      <td>
-                        <a>{_platformData?.platformGovernance}</a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div className="flex mt-5">
-                  <a
-                    className="rounded-sm text-start p-1 me-3 text-gray-500 bg-gray-800"
-                    href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
-                    {" "}
-                    Tally governance app
-                  </a>
-                </div>
-              </section>
-            </section>
-            <h1 className="text-xxl text-gradient mb-3">Team</h1>
-
-            <section className="text-start p-3 bg-gray-900 rounded-md">
-              <section>
-                <table>
-                  <thead>
-                    <tr>
-                      <td>
-                        <h1 className="text-start">Multisig</h1>
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Address:</td>
-                      <td>
-                        <a>{_platformData?.multisig}</a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>Total balance: {_platformData?.treasuryBalance}</p>
-              </section>
-            </section>
-            <div className="mt-5 flex flex-wrap p-0 m-0 justify-center">
-              {Array.isArray(members) ? (
-                members.map(member => (
-                  <a
-                    href={member.html_url}
-                    key={member.id}
-                    className="m-4 p-2 w-40 "
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    <img
-                      className="rounded-full mb-4"
-                      src={member.avatar_url}
-                      alt={`Avatar de ${member.login}`}
-                    />
-                    <p className="font-bold">{member.login}</p>
-                  </a>
-                ))
-              ) : (
-                <p>Loading team..</p>
-              )}
+          <article className="p-3 bg-[#1c1c23] rounded-md mt-5">
+            <table>
+              <thead>
+                <tr>
+                  <td>
+                    <h2 className="text-start text-2xl py-4">Governance</h2>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="w-32">Address:</td>
+                  <td>{_platformData?.platformGovernance}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="flex mt-5">
+              <a
+                className="rounded-sm text-start p-2 me-3 text-gray-400 bg-button"
+                href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
+                {" "}
+                Tally governance app
+              </a>
             </div>
-          </section>
+          </article>
+        </article>
+      </section>
+
+      <section className="p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
+        <article className="p-3">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
+          <article className="p-3 bg-[#1c1c23] rounded-md">
+            <table>
+              <thead>
+                <tr>
+                  <td>
+                    <h2 className="text-start text-2xl py-4">Multisig</h2>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Address:</td>
+                  <td>{_platformData?.multisig}</td>
+                </tr>
+                <tr>
+                  <td>Total balance:</td>
+                  <td>{_platformData?.treasuryBalance}</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        </article>
+
+        <div className="mt-5 flex flex-wrap p-0 m-0 justify-center">
+          {Array.isArray(members) ? (
+            members.map(member => (
+              <a
+                href={member.html_url}
+                key={member.id}
+                className="p-2"
+                target="_blank">
+                <img
+                  className="rounded-full m-auto mb-4 w-[80px]"
+                  src={member.avatar_url}
+                  alt={`Avatar de ${member.login}`}
+                />
+                <p className="font-bold">{member.login}</p>
+              </a>
+            ))
+          ) : (
+            <p>Loading team..</p>
+          )}
         </div>
-      </div>
-      <br />
+      </section>
     </main>
   );
 }
