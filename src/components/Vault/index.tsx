@@ -103,6 +103,7 @@ function Vault({ vault }: IProps) {
   const [assetsAPR, setAssetsAPR] = useState<any>();
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
   const [underlyingToken, setUnderlyingToken] = useState<any>();
+  const [underlyingShares, setUnderlyingShares] = useState<any>();
   const [zapButton, setZapButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<any>();
 
@@ -344,6 +345,28 @@ function Vault({ vault }: IProps) {
       setZapButton("insuficcientBalance");
       return;
     }
+
+    ///// UNDERLYING & ZAP TOKENS
+    if (asset === underlyingToken?.address) {
+      try {
+        const previewDepositAssets = await readContract(_publicClient, {
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "previewDepositAssets",
+          args: [[asset], [parseUnits(amount, 18)]],
+        });
+
+        setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
+
+        // checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+        // setSharesOut(
+        //   ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+        // );
+      } catch (error) {
+        console.log("UNDERLYING SHARES ERROR:", error);
+      }
+    }
+
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
@@ -433,7 +456,6 @@ function Vault({ vault }: IProps) {
   /////
 
   const approve = async (asset: TAddress) => {
-    console.log("here");
     if (vault) {
       //const allowanceResult: TVaultAllowance = {};
       const maxUnits = parseUnits(
@@ -447,7 +469,6 @@ function Vault({ vault }: IProps) {
         functionName: "approve",
         args: [vault, maxUnits],
       });
-      console.log("asset", assetApprove);
 
       const transaction = await _publicClient.waitForTransactionReceipt(
         assetApprove
@@ -645,7 +666,6 @@ function Vault({ vault }: IProps) {
             amounts.push(parseUnits("1", 36));
           }
         }
-
         try {
           const previewDepositAssets: (bigint | bigint[] | any)[] =
             (await readContract(_publicClient, {
@@ -654,6 +674,7 @@ function Vault({ vault }: IProps) {
               functionName: "previewDepositAssets",
               args: [$assets as TAddress[], amounts],
             })) as any;
+
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -771,6 +792,7 @@ function Vault({ vault }: IProps) {
 
   useEffect(() => {
     setZapButton("none");
+    setUnderlyingShares("");
   }, [option]);
 
   useEffect(() => {
@@ -1442,7 +1464,7 @@ function Vault({ vault }: IProps) {
                             ))}
                           </div>
                         )}
-                        <p> {defaultOptionSymbols}</p>
+                        <p className="ml-[-4px]"> {defaultOptionSymbols}</p>
                       </div>
                       {underlyingToken && (
                         <div
@@ -1454,16 +1476,16 @@ function Vault({ vault }: IProps) {
                               "/protocols/Gamma.png"
                             );
                           }}
-                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3 ml-3"
                         >
                           {underlyingToken?.logoURI && (
                             <img
-                              className="max-w-6 max-h-6 rounded-full"
+                              className="max-w-6 max-h-6 rounded-full "
                               src={underlyingToken.logoURI}
                               alt="logo"
                             />
                           )}
-                          <p> {underlyingToken.symbol}</p>
+                          <p className="ml-2"> {underlyingToken.symbol}</p>
                         </div>
                       )}
                       {optionTokens.map(
@@ -1478,7 +1500,7 @@ function Vault({ vault }: IProps) {
                         }) => {
                           return (
                             <div
-                              className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                              className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3 ml-3"
                               key={address}
                               onClick={() => {
                                 optionHandler(
@@ -1496,7 +1518,7 @@ function Vault({ vault }: IProps) {
                                   alt="logo"
                                 />
                               )}
-                              <p> {symbol}</p>
+                              <p className="ml-2"> {symbol}</p>
                             </div>
                           );
                         }
@@ -1626,7 +1648,13 @@ function Vault({ vault }: IProps) {
                           </div>
                           {balances && balances[option[0]] && (
                             <div>
-                              <div className="absolute right-0 bottom-0 pt-[15px] pl-[15px] pr-3 pb-3">
+                              <div
+                                className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
+                                  underlyingToken.address === option[0]
+                                    ? "bottom-[-9%]"
+                                    : "bottom-0"
+                                }`}
+                              >
                                 <div className="flex items-center">
                                   <button
                                     onClick={() =>
@@ -1661,10 +1689,21 @@ function Vault({ vault }: IProps) {
                                   evt.key
                                 ) && evt.preventDefault()
                               }
-                              className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                              className={` py-3 flex items-center h-full   bg-transparent ${
+                                underlyingToken.address === option[0]
+                                  ? "text-[16px] w-[70%] pl-[10px]"
+                                  : "text-[25px] w-[58%] pl-[50px]"
+                              } `}
                             />
                           )}
                         </div>
+                        {underlyingShares &&
+                          inputs[option[0]]?.amount > 0 &&
+                          zapButton !== "insuficcientBalance" && (
+                            <p className="text-left text-[gray] ml-2 mt-3 text-[18px]">
+                              Shares: {underlyingShares}
+                            </p>
+                          )}
                         {$assetsPrices[option[0]] &&
                           inputs[option[0]]?.amount > 0 && (
                             <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
