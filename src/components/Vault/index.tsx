@@ -113,6 +113,7 @@ function Vault({ vault }: IProps) {
   const [activeOptionToken, setActiveOptionToken] = useState<any>({
     symbol: "",
     address: "",
+    logoURI: "",
   });
   const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
 
@@ -358,6 +359,19 @@ function Vault({ vault }: IProps) {
 
         setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
 
+        const allowanceData = (await readContract(_publicClient, {
+          address: option[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault],
+        })) as bigint;
+
+        if (Number(formatUnits(allowanceData, 18)) < Number(amount)) {
+          setZapButton("needApprove");
+        } else {
+          setZapButton("deposit");
+        }
+
         // checkInputsAllowance(previewDepositAssets[0] as bigint[]);
         // setSharesOut(
         //   ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -365,26 +379,35 @@ function Vault({ vault }: IProps) {
       } catch (error) {
         console.log("UNDERLYING SHARES ERROR:", error);
       }
-    }
+    } else {
+      try {
+        const decimals = Number(getTokenData(option[0])?.decimals);
 
-    try {
-      const decimals = Number(getTokenData(option[0])?.decimals);
+        const allowanceData = (await readContract(_publicClient, {
+          address: option[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, $platformData.zap as TAddress],
+        })) as bigint;
 
-      const allowanceData = (await readContract(_publicClient, {
-        address: option[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, $platformData.zap as TAddress],
-      })) as bigint;
-
-      if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
-        setZapButton("needApprove");
-      } else {
-        getZapDepositSwapAmounts();
+        if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
+          setZapButton("needApprove");
+        } else {
+          getZapDepositSwapAmounts();
+        }
+      } catch (error) {
+        console.log("ZAP ERROR:", error);
       }
-    } catch (error) {
-      console.log("ZAP ERROR:", error);
     }
+  };
+  const getZapAllowance = async () => {
+    const allowanceData = (await readContract(_publicClient, {
+      address: option[0] as TAddress,
+      abi: ERC20ABI,
+      functionName: "allowance",
+      args: [$account as TAddress, vault as TAddress],
+    })) as bigint;
+    return allowanceData;
   };
   const zapApprove = async () => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
@@ -401,6 +424,8 @@ function Vault({ vault }: IProps) {
             functionName: "approve",
             args: [$platformData.zap as TAddress, parseUnits(amount, decimals)],
           });
+          // todo: after 1inch allowance check and deposit state
+          //setZapButton("deposit");
         } catch (error) {
           console.log("APPROVE ERROR:", error);
         }
@@ -413,9 +438,38 @@ function Vault({ vault }: IProps) {
           functionName: "approve",
           args: [vault as TAddress, maxUint256],
         });
+
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          assetApprove
+        );
+
+        if (transaction.status === "success") {
+          const allowance = formatUnits(getZapAllowance(), 18);
+          if (Number(allowance) >= Number(amount)) {
+            setZapButton("deposit");
+          }
+        }
       } catch (error) {
         console.log("APPROVE ERROR:", error);
       }
+    }
+  };
+  const zapDeposit = async () => {
+    ///// UNDERLYING
+    try {
+      const depositAssets = await writeContract({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "depositAssets",
+        args: [
+          [option[0]] as TAddress[],
+          [parseUnits(inputs[option[0]]?.amount, 18)],
+          parseUnits(underlyingShares, 18),
+          $account as TAddress,
+        ],
+      });
+    } catch (error) {
+      console.log("UNDERLYING DEPOSIT ERROR:", error);
     }
   };
   const get1InchTokensSwap = async () => {
@@ -512,7 +566,6 @@ function Vault({ vault }: IProps) {
 
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
-
     const depositAssets = await writeContract({
       address: vault as TAddress,
       abi: VaultABI,
@@ -1738,6 +1791,14 @@ function Vault({ vault }: IProps) {
                           {underlyingToken.address === option[0]
                             ? underlyingToken.symbol
                             : getTokenData(option[0])?.symbol}
+                        </button>
+                      ) : zapButton === "deposit" ? (
+                        <button
+                          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                          type="button"
+                          onClick={zapDeposit}
+                        >
+                          Deposit
                         </button>
                       ) : (
                         <></>
