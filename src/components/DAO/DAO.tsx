@@ -239,7 +239,7 @@ function DAO() {
               profitToken && (
                 <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
                   <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
-                    <table>
+                    <table className="w-full">
                       <tbody>
                         <tr>
                           <td>Name: </td>
@@ -331,7 +331,7 @@ function DAO() {
             return (
               sdivTokenData && (
                 <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
-                  <table>
+                  <table className="w-full">
                     <tbody className="p-0 ">
                       <tr>
                         <td className="w-32">Name: </td>
@@ -382,7 +382,7 @@ function DAO() {
 
           <div className="m-auto  bg-[#1c1c23] rounded-md p-3 mt-5">
             <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
-              <table>
+              <table className="w-full">
                 <tbody className="p-0 w-full gap-3">
                   <tr>
                     <td className="w-32">Name: </td>
@@ -438,7 +438,7 @@ function DAO() {
         <article className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Governance</h1>
           <article className="p-3 bg-[#1c1c23] rounded-md">
-            <table>
+            <table className="w-full">
               <thead>
                 <tr>
                   <td>
@@ -460,7 +460,7 @@ function DAO() {
           </article>
 
           <article className="p-3 bg-[#1c1c23] rounded-md mt-5">
-            <table>
+            <table className="w-full">
               <thead>
                 <tr>
                   <td>
@@ -491,7 +491,7 @@ function DAO() {
         <article className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
           <article className="p-3 bg-[#1c1c23] rounded-md">
-            <table>
+            <table className="w-full">
               <thead>
                 <tr>
                   <td>
