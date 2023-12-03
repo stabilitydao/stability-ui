@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
 import { writeContract } from "@wagmi/core";
 import axios from "axios";
@@ -85,7 +85,6 @@ function Vault({ vault }: IProps) {
   const [balances, setBalances] = useState<TVaultBalance | any>({});
 
   const [inputs, setInputs] = useState<TVaultInput | any>({});
-
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
@@ -306,7 +305,6 @@ function Vault({ vault }: IProps) {
           functionName: "balanceOf",
           args: [$account as TAddress],
         });
-
         setUnderlyingToken({
           address: underlying,
           symbol: underlyingSymbol,
@@ -325,14 +323,6 @@ function Vault({ vault }: IProps) {
       console.log("UNDERLYING TOKEN ERROR:", error);
     }
   };
-  /////
-  /////         UNDERLYING
-  const underlyingInputHandler = async (amount: string, asset: string) => {};
-  const underlyingApprove = async () => {
-    if (underlyingToken) {
-    }
-  };
-
   /////
   /////         ZAP
   const zapInputHandler = async (amount: string, asset: string) => {
@@ -374,16 +364,31 @@ function Vault({ vault }: IProps) {
     }
   };
   const zapApprove = async () => {
+    ///// ZAP TOKENS & UNDERLYING TOKENS
     const amount = inputs[option[0]]?.amount;
-    const decimals = getTokenData(option[0])?.decimals;
 
-    if (amount && decimals) {
+    if (option[0] !== underlyingToken.address) {
+      const decimals = getTokenData(option[0])?.decimals;
+
+      if (amount && decimals) {
+        try {
+          const assetApprove = await writeContract({
+            address: option[0],
+            abi: ERC20ABI,
+            functionName: "approve",
+            args: [$platformData.zap as TAddress, parseUnits(amount, decimals)],
+          });
+        } catch (error) {
+          console.log("APPROVE ERROR:", error);
+        }
+      }
+    } else {
       try {
         const assetApprove = await writeContract({
-          address: option[0],
+          address: underlyingToken.address,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [$platformData.zap as TAddress, parseUnits(amount, decimals)],
+          args: [vault as TAddress, maxUint256],
         });
       } catch (error) {
         console.log("APPROVE ERROR:", error);
@@ -428,6 +433,7 @@ function Vault({ vault }: IProps) {
   /////
 
   const approve = async (asset: TAddress) => {
+    console.log("here");
     if (vault) {
       //const allowanceResult: TVaultAllowance = {};
       const maxUnits = parseUnits(
@@ -441,6 +447,7 @@ function Vault({ vault }: IProps) {
         functionName: "approve",
         args: [vault, maxUnits],
       });
+      console.log("asset", assetApprove);
 
       const transaction = await _publicClient.waitForTransactionReceipt(
         assetApprove
@@ -568,6 +575,9 @@ function Vault({ vault }: IProps) {
         };
       }
     } else if (underlyingToken && option.length === 1) {
+      balance[option[0]] = {
+        assetBalance: underlyingToken.balance,
+      };
     }
     setBalances(balance);
   };
@@ -636,45 +646,43 @@ function Vault({ vault }: IProps) {
           }
         }
 
-        if (typeof vault === "string") {
-          try {
-            const previewDepositAssets: (bigint | bigint[] | any)[] =
-              (await readContract(_publicClient, {
-                address: vault as TAddress,
-                abi: VaultABI,
-                functionName: "previewDepositAssets",
-                args: [$assets as TAddress[], amounts],
-              })) as any;
-            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
-            setSharesOut(
-              ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
-            );
+        try {
+          const previewDepositAssets: (bigint | bigint[] | any)[] =
+            (await readContract(_publicClient, {
+              address: vault as TAddress,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [$assets as TAddress[], amounts],
+            })) as any;
+          checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+          setSharesOut(
+            ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+          );
 
-            const previewDepositAssetsArray: bigint[] = [
-              ...previewDepositAssets[0],
-            ];
+          const previewDepositAssetsArray: bigint[] = [
+            ...previewDepositAssets[0],
+          ];
 
-            for (let i = 0; i < $assets.length; i++) {
-              const decimals = getTokenData($assets[i])?.decimals;
-              if (i !== changedInput && decimals) {
-                preview[$assets[i]] = {
-                  amount: formatUnits(previewDepositAssetsArray[i], decimals),
-                };
-              }
+          for (let i = 0; i < $assets.length; i++) {
+            const decimals = getTokenData($assets[i])?.decimals;
+            if (i !== changedInput && decimals) {
+              preview[$assets[i]] = {
+                amount: formatUnits(previewDepositAssetsArray[i], decimals),
+              };
             }
-            if (lastKeyPress.key2 !== "") {
-              setInputs((prevInputs: any) => ({
-                ...prevInputs,
-                ...preview,
-              }));
-            }
-          } catch (error) {
-            console.error(
-              "Error: the asset balance is too low to convert.",
-              error
-            );
-            setIsApprove(undefined);
           }
+          if (lastKeyPress.key2 !== "") {
+            setInputs((prevInputs: any) => ({
+              ...prevInputs,
+              ...preview,
+            }));
+          }
+        } catch (error) {
+          console.error(
+            "Error: the asset balance is too low to convert.",
+            error
+          );
+          setIsApprove(undefined);
         }
       }
     }
@@ -1507,13 +1515,7 @@ function Vault({ vault }: IProps) {
                           <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                             <p>Balance:</p>
 
-                            <p>
-                              {balances &&
-                                balances[asset] &&
-                                parseFloat(
-                                  balances[asset].assetBalance
-                                ).toFixed(3)}
-                            </p>
+                            <p>{balances[asset]?.assetBalance}</p>
                           </div>
                           <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
                             <div className="absolute end-5 bottom-4">
@@ -1598,10 +1600,7 @@ function Vault({ vault }: IProps) {
                       <div className="flex flex-col mt-[15px] text-[15px] w-full">
                         {balances[option[0]] && (
                           <div className="text-left text-[gray] ml-2">
-                            Balance:{" "}
-                            {parseFloat(
-                              balances[option[0]].assetBalance
-                            ).toFixed(3)}
+                            Balance: {balances[option[0]].assetBalance}
                           </div>
                         )}
 
@@ -1678,7 +1677,7 @@ function Vault({ vault }: IProps) {
                                       18
                                     )
                                   ) * inputs[option[0]]?.amount
-                                ).toFixed(2)}{" "}
+                                ).toFixed(2)}
                               </p>
                             </div>
                           )}
@@ -1696,7 +1695,10 @@ function Vault({ vault }: IProps) {
                           type="button"
                           onClick={zapApprove}
                         >
-                          Approve {getTokenData(option[0])?.symbol}
+                          Approve{" "}
+                          {underlyingToken.address === option[0]
+                            ? underlyingToken.symbol
+                            : getTokenData(option[0])?.symbol}
                         </button>
                       ) : (
                         <></>
@@ -1752,7 +1754,7 @@ function Vault({ vault }: IProps) {
                         Balance:{" "}
                         {parseFloat(
                           formatUnits($vaultData[vault].vaultUserBalance, 18)
-                        ).toFixed(3)}
+                        )}
                       </div>
                     )}
                     <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
@@ -1837,7 +1839,6 @@ function Vault({ vault }: IProps) {
                       inputs[option[0]]?.amount > 0 && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                           <p>
-                            $
                             {(
                               Number(
                                 formatUnits(
