@@ -676,41 +676,40 @@ function Vault({ vault }: IProps) {
       return;
     }
     ///// UNDERLYING TOKEN
+    const currentValue = parseUnits(value, 18);
     if (underlyingToken?.address === option[0]) {
       // this code is valid also for ZAP tokens
-      const currentValue = parseUnits(value, 18);
 
-      if (currentValue) {
-        const { result } = await _publicClient.simulateContract({
-          address: vault as TAddress,
-          abi: VaultABI,
-          functionName: "withdrawAssets",
-          args: [option as TAddress[], currentValue, [0n]],
-          account: $account as TAddress,
-        });
+      const { result } = await _publicClient.simulateContract({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "withdrawAssets",
+        args: [option as TAddress[], currentValue, [0n]],
+        account: $account as TAddress,
+      });
 
-        setWithdrawAmount([
-          {
-            symbol: underlyingToken?.symbol,
-            amount: formatUnits(result[0], 18),
-          },
-        ]);
-      }
+      setWithdrawAmount([
+        {
+          symbol: underlyingToken?.symbol,
+          amount: formatUnits(result[0], 18),
+        },
+      ]);
     } else {
-      // let preview: any = await readContract(_publicClient, {
-      //   address: localVault.address as TAddress,
-      //   abi: VaultABI,
-      //   functionName: "previewWithdraw",
-      //   args: [parseUnits(value, 18)],
-      // });
-      // preview = preview.map((amount: any, index: number) => {
-      //   const tokenData: TTokenData | any = getTokenData($assets[index]);
-      //   return {
-      //     symbol: tokenData?.symbol,
-      //     amount: formatUnits(amount, tokenData?.decimals),
-      //   };
-      // });
-      // setWithdrawAmount(preview);
+      const { result } = await _publicClient.simulateContract({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "withdrawAssets",
+        args: [option as TAddress[], currentValue, [0n, 0n]],
+        account: $account as TAddress,
+      });
+      const preview = result.map((amount: any, index: number) => {
+        const tokenData: TTokenData | any = getTokenData($assets[index]);
+        return {
+          symbol: tokenData?.symbol,
+          amount: formatUnits(amount, tokenData?.decimals),
+        };
+      });
+      setWithdrawAmount(preview);
     }
   };
 
@@ -877,6 +876,7 @@ function Vault({ vault }: IProps) {
 
   useEffect(() => {
     setZapButton("none");
+    setWithdrawAmount(false);
     setUnderlyingShares("");
   }, [option]);
 
@@ -1977,6 +1977,7 @@ function Vault({ vault }: IProps) {
                       inputs[option[0]]?.amount > 0 && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                           <p>
+                            $
                             {(
                               Number(
                                 formatUnits(
