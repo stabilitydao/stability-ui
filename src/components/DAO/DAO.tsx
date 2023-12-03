@@ -3,37 +3,37 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances } from "@store";
 import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
-import type { PlatformData, GitHubUser, ProfitTokenData } from "@types";
+import type { TTPlatformData, TGitHubUser, TProfitTokenData } from "@types";
+import { SDIV, PROFIT, PM } from "../../constants/tokens";
+import { profitToken } from "../../utils/functions/profitTokenData";
+import { sdivToken } from "../../utils/functions/sdivTokenData";
+
+import axios from "axios";
 import tokenlist from "../../stability.tokenlist.json";
 
 function DAO() {
-  const [_platformData, setPlatformData] = useState<PlatformData | undefined>(
-    undefined
-  );
-  const [profitTokenData, setProfitTokenData] = useState<ProfitTokenData>();
-  const [prTotalSupply, setPmTotalSupply] = useState("");
-  const [sdivTotalSupply, setSdivTotalSupply] = useState("");
-  const [members, setMembers] = useState<GitHubUser[]>([]);
+  const [_platformData, setPlatformData] = useState<TTPlatformData>();
+  const [profitTokenData, setProfitTokenData] = useState<TProfitTokenData>();
+  const [members, setMembers] = useState<TGitHubUser[]>([]);
+  const [tokensTotalSupply, setTokensTotalSupply] = useState({
+    pm: "",
+    sdiv: "",
+  });
 
   const $publicClient = useStore(publicClient);
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
 
-  useEffect(() => {
-    getTeamData();
-    fetchPlatformData();
-  }, [$balances]);
-
   const getTeamData = async () => {
     try {
-      const membersData = await fetch(
+      const response = await axios.get(
         "https://api.github.com/orgs/stabilitydao/public_members"
       );
-      const dataJson = await membersData.json();
-      setMembers(dataJson);
-      console.log(dataJson);
+
+      setMembers(response.data);
+      console.log(response.data);
     } catch (error) {
-      console.log("Fetching getTeamData", error);
+      console.error("Fetching getTeamData", error);
     }
   };
 
@@ -59,32 +59,32 @@ function DAO() {
         });
 
         const profitTotalSupply = await $publicClient.readContract({
-          address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
+          address: PROFIT[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
         const _pmTotalSupply = await $publicClient.readContract({
-          address: "0xAA3e3709C79a133e56C17a7ded87802adF23083B",
+          address: PM[0] as `0x${string}`,
           abi: IERC721Enumerable,
           functionName: "totalSupply",
         });
 
         const _sdivTotalSupply = await $publicClient.readContract({
-          address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB",
+          address: SDIV[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
         const treasuryBalance = await $publicClient.readContract({
-          address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
+          address: PROFIT[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: ["0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E"],
+          args: [PM[0] as `0x${string}`],
         });
 
         const multisigBalance = await $publicClient.readContract({
-          address: "0x48469a0481254d5945E7E56c1Eb9861429c02f44",
+          address: PROFIT[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "balanceOf",
           args: [contractData[0][6]],
@@ -92,7 +92,7 @@ function DAO() {
 
         //tvl
         const totalTvl: bigint = $vaults[6].reduce(
-          (total: bigint, numero: bigint) => total + numero,
+          (total: bigint, number: bigint) => total + number,
           BigInt(0)
         );
         const _totalTvl = formatUnits(totalTvl, 18);
@@ -103,7 +103,7 @@ function DAO() {
         const profitMarketCap =
           Number(_profitTokenPrice) * Number(_profitTotalSupply);
 
-        const profitToken: ProfitTokenData = {
+        const profitToken: TProfitTokenData = {
           price: _profitTokenPrice,
           totalSupply: _profitTotalSupply,
           marketCap: profitMarketCap,
@@ -111,11 +111,12 @@ function DAO() {
 
         setProfitTokenData(profitToken);
 
-        //sdiv token
-        setSdivTotalSupply(formatUnits(_sdivTotalSupply, 18));
-
-        //pm
-        setPmTotalSupply(formatUnits(_pmTotalSupply, 18));
+        //tokens total supply
+        const _tokensTotalSupply = {
+          pm: formatUnits(_pmTotalSupply, 18),
+          sdiv: formatUnits(_sdivTotalSupply, 18),
+        };
+        setTokensTotalSupply(_tokensTotalSupply);
 
         //platformData
 
@@ -131,7 +132,7 @@ function DAO() {
         //team
         const _multisig = Number(formatUnits(multisigBalance, 18)).toFixed(2);
 
-        const platformData: PlatformData = {
+        const platformData: TTPlatformData = {
           platformVersion: platformVersion,
           platformGovernance: contractData[0][5],
           multisig: contractData[0][6],
@@ -152,33 +153,36 @@ function DAO() {
     }
   };
 
-  return (
-    <main className="p-0 w-full m-auto">
-      <section className="w-4/5 m-auto">
-        <article className="m-auto p-2 bg-button rounded-md w-full">
-          <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-3 p-0">
-            <article className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
-              <article className="mb-3">
-                <h2 className="text-left font-bold">Version </h2>
-                <h2 className="text-left">{_platformData?.platformVersion}</h2>
-              </article>
-              <article className="mb-3">
-                <h2 className="text-left font-bold">Total Vaults</h2>
-                <h2 className="text-left">
-                  {_platformData?.numberOfTotalVaults}
-                </h2>
-              </article>
-              <article>
-                <h2 className="text-left font-bold">Total TVL</h2>
-                <h2 className="text-left">$ {_platformData?.totalTvl}</h2>
-              </article>
-            </article>
+  useEffect(() => {
+    getTeamData();
+    fetchPlatformData();
+  }, [$balances]);
 
-            <table className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
+  return (
+    <main className="w-full m-auto">
+      <div className="w-4/5 m-auto">
+        <div className="m-auto p-2 bg-button rounded-md w-full">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-3 ">
+            <div className="p-2 rounded-md text-left grid bg-[#1c1c23]">
+              <div className="mb-3">
+                <h2 className="font-bold">Version </h2>
+                <h2 className="">{_platformData?.platformVersion}</h2>
+              </div>
+              <div className="mb-3">
+                <h2 className=" font-bold">Total Vaults</h2>
+                <h2>{_platformData?.numberOfTotalVaults}</h2>
+              </div>
+              <div>
+                <h2 className="font-bold">Total TVL</h2>
+                <h2>$ {_platformData?.totalTvl}</h2>
+              </div>
+            </div>
+
+            <table className="p-2 rounded-md text-left grid bg-[#1c1c23]">
               <thead>
                 <tr>
-                  <th className="text-left">Fees:</th>
+                  <th>Fees:</th>
                 </tr>
               </thead>
               <tbody>
@@ -205,7 +209,7 @@ function DAO() {
               </tbody>
             </table>
 
-            <table className="m-0 p-2 rounded-md text-left grid bg-[#1c1c23]">
+            <table className=" p-2 rounded-md text-left grid bg-[#1c1c23]">
               <thead>
                 <tr>
                   <th className="text-left">Strategies:</th>
@@ -223,167 +227,149 @@ function DAO() {
               </tbody>
             </table>
           </div>
-        </article>
-      </section>
+        </div>
+      </div>
 
-      <section className="p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
-        <article className="m-auto p-3 w-full">
+      <div className=" m-auto w-4/5 mt-5 bg-button rounded-md">
+        <div className="m-auto p-3 w-full">
           <h1 className="text-xxl text-gradient mb-3 text-left">Tokenomics</h1>
 
-          {(() => {
-            const profitToken = tokenlist.tokens.find(
-              token =>
-                token.address === "0x48469a0481254d5945E7E56c1Eb9861429c02f44"
-            );
-            return (
-              profitToken && (
-                <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
-                  <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
-                    <table className="w-full">
-                      <tbody>
-                        <tr>
-                          <td>Name: </td>
-                          <td>{profitToken.name} </td>
-                        </tr>
-                        <tr>
-                          <td>Symbol: </td>
-                          <td>{profitToken.symbol} </td>
-                        </tr>
+          {profitToken && (
+            <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
+              <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
+                <table className="w-full">
+                  <tbody>
+                    <tr>
+                      <td>Name: </td>
+                      <td>{profitToken.name} </td>
+                    </tr>
+                    <tr>
+                      <td>Symbol: </td>
+                      <td>{profitToken.symbol} </td>
+                    </tr>
 
-                        <tr>
-                          <td>Price: </td>
-                          <td>
-                            {"$ "}
-                            {profitTokenData?.price}{" "}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Total supply: </td>
-                          <td>{profitTokenData?.totalSupply} </td>
-                        </tr>
-                        <tr>
-                          <td>Market Cap: </td>
-                          <td>{profitTokenData?.marketCap} </td>
-                        </tr>
-                        <tr>
-                          <td>Address: </td>
-                          <td>{profitToken.address} </td>
-                        </tr>
-                        <tr>
-                          <td>Wallet: </td>
-                          <td>
-                            <span className="text-red-600">ADD WALLET</span>{" "}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>Staked: </td>
-                          <td className="flex gap-3">
-                            <span className="text-red-600 me-3 my-auto">
-                              ADD STAKED
-                            </span>{" "}
-                            <div className="flex">
-                              <button className="bg-button me-3 rounded-sm p-2 text-red-600">
-                                Stake
-                              </button>
-                              <button className="bg-button me-3 rounded-sm p-2 text-red-600">
-                                Unstake
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div className="w-52 p-0 ms-auto">
-                      <img
-                        className="rounded-full p-0 ms-auto flex w-full"
-                        src={profitToken.logoURI}
-                        alt={profitToken.logoURI}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3  mt-3 justify-start">
-                    <a
-                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
-                      href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
-                      Chart
-                    </a>
-                    <a
-                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
-                      href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
-                      Swap by 1inch
-                    </a>
-                    <a
-                      className="rounded-sm text-start p-2 text-gray-400 bg-button "
-                      href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
-                      Swap by Uniswap V3
-                    </a>
-                  </div>
-                </div>
-              )
-            );
-          })()}
-          {(() => {
-            const sdivTokenData = tokenlist.tokens.find(
-              token =>
-                token.address === "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB"
-            );
-            return (
-              sdivTokenData && (
-                <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
-                  <table className="w-full">
-                    <tbody className="p-0 ">
-                      <tr>
-                        <td className="w-32">Name: </td>
-                        <td>{sdivTokenData.name} </td>
-                      </tr>
-                      <tr>
-                        <td>Symbol: </td>
-                        <td>{sdivTokenData.symbol} </td>
-                      </tr>
-                      <tr>
-                        <td>Address: </td>
-                        <td>{sdivTokenData.address} </td>
-                      </tr>
-                      <tr>
-                        <td>Total supply: </td>
-                        <td>{sdivTotalSupply} </td>
-                      </tr>
-                      <tr>
-                        <td>Wallet: </td>
-                        <td>
-                          <span className="text-red-600">ADD WALLET</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Earned: </td>
-                        <td className="gap-3 flex">
-                          <span className="text-red-600 my-auto">
-                            ADD EARNED
-                          </span>
+                    <tr>
+                      <td>Price: </td>
+                      <td>
+                        {"$ "}
+                        {profitTokenData?.price}{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Total supply: </td>
+                      <td>{profitTokenData?.totalSupply} </td>
+                    </tr>
+                    <tr>
+                      <td>Market Cap: </td>
+                      <td>{profitTokenData?.marketCap} </td>
+                    </tr>
+                    <tr>
+                      <td>Address: </td>
+                      <td>{profitToken.address} </td>
+                    </tr>
+                    <tr>
+                      <td>Wallet: </td>
+                      <td>
+                        <span className="text-red-600">ADD WALLET</span>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Staked: </td>
+                      <td className="flex gap-3">
+                        <span className="text-red-600 me-3 my-auto">
+                          ADD STAKED
+                        </span>{" "}
+                        <div className="flex">
                           <button className="bg-button me-3 rounded-sm p-2 text-red-600">
-                            Claim
+                            Stake
                           </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div className="w-52 p-0">
-                    <img
-                      className="rounded-full p-0 ms-auto flex w-full"
-                      src={sdivTokenData.logoURI}
-                      alt={sdivTokenData.logoURI}
-                    />
-                  </div>
+                          <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                            Unstake
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className="w-52  ms-auto">
+                  <img
+                    className="rounded-full  ms-auto flex w-full"
+                    src={profitToken.logoURI}
+                    alt={profitToken.logoURI}
+                  />
                 </div>
-              )
-            );
-          })()}
+              </div>
+
+              <div className="flex gap-3  mt-3 justify-start">
+                <a
+                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
+                  Chart
+                </a>
+                <a
+                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
+                  Swap by 1inch
+                </a>
+                <a
+                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
+                  Swap by Uniswap V3
+                </a>
+              </div>
+            </div>
+          )}
+          {sdivToken && (
+            <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
+              <table className="w-full">
+                <tbody className=" ">
+                  <tr>
+                    <td className="w-32">Name: </td>
+                    <td>{sdivToken.name} </td>
+                  </tr>
+                  <tr>
+                    <td>Symbol: </td>
+                    <td>{sdivToken.symbol} </td>
+                  </tr>
+                  <tr>
+                    <td>Address: </td>
+                    <td>{sdivToken.address} </td>
+                  </tr>
+                  <tr>
+                    <td>Total supply: </td>
+                    <td>{tokensTotalSupply.sdiv} </td>
+                  </tr>
+                  <tr>
+                    <td>Wallet: </td>
+                    <td>
+                      <span className="text-red-600">ADD WALLET</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Earned: </td>
+                    <td className="gap-3 flex">
+                      <span className="text-red-600 my-auto">ADD EARNED</span>
+                      <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                        Claim
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="w-52 ">
+                <img
+                  className="rounded-full  ms-auto flex w-full"
+                  src={sdivToken.logoURI}
+                  alt={sdivToken.logoURI}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="m-auto  bg-[#1c1c23] rounded-md p-3 mt-5">
             <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
               <table className="w-full">
-                <tbody className="p-0 w-full gap-3">
+                <tbody className=" w-full gap-3">
                   <tr>
                     <td className="w-32">Name: </td>
                     <td>Profit Maker </td>
@@ -398,7 +384,7 @@ function DAO() {
                   </tr>
                   <tr>
                     <td>Total supply: </td>
-                    <td>{prTotalSupply}</td>
+                    <td>{tokensTotalSupply.pm}</td>
                   </tr>
                   <tr>
                     <td>To mint: </td>
@@ -414,11 +400,11 @@ function DAO() {
                   </tr>
                 </tbody>
               </table>
-              <div className="w-52 p-0 ms-auto ">
+              <div className="w-52  ms-auto ">
                 <img
                   alt="Profit maker"
                   src="https://stabilitydao.org/pm.png"
-                  className="rounded-full w-full p-0 flex"
+                  className="rounded-full w-full  flex"
                 />
               </div>
             </div>
@@ -431,13 +417,13 @@ function DAO() {
               </a>
             </div>
           </div>
-        </article>
-      </section>
+        </div>
+      </div>
 
-      <section className=" p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
-        <article className="p-3">
+      <div className="  m-auto w-4/5 mt-5 bg-button rounded-md">
+        <div className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Governance</h1>
-          <article className="p-3 bg-[#1c1c23] rounded-md">
+          <div className="p-3 bg-[#1c1c23] rounded-md">
             <table className="w-full">
               <thead>
                 <tr>
@@ -457,9 +443,9 @@ function DAO() {
                 </tr>
               </tbody>
             </table>
-          </article>
+          </div>
 
-          <article className="p-3 bg-[#1c1c23] rounded-md mt-5">
+          <div className="p-3 bg-[#1c1c23] rounded-md mt-5">
             <table className="w-full">
               <thead>
                 <tr>
@@ -483,14 +469,14 @@ function DAO() {
                 Tally governance app
               </a>
             </div>
-          </article>
-        </article>
-      </section>
+          </div>
+        </div>
+      </div>
 
-      <section className="p-0 m-auto w-4/5 mt-5 bg-button rounded-md">
-        <article className="p-3">
+      <div className=" m-auto w-4/5 mt-5 bg-button rounded-md">
+        <div className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
-          <article className="p-3 bg-[#1c1c23] rounded-md">
+          <div className="p-3 bg-[#1c1c23] rounded-md">
             <table className="w-full">
               <thead>
                 <tr>
@@ -510,10 +496,10 @@ function DAO() {
                 </tr>
               </tbody>
             </table>
-          </article>
-        </article>
+          </div>
+        </div>
 
-        <div className="mt-5 flex flex-wrap p-0 m-0 justify-center">
+        <div className="mt-5 flex flex-wrap   justify-center">
           {Array.isArray(members) ? (
             members.map(member => (
               <a
@@ -533,7 +519,7 @@ function DAO() {
             <p>Loading team..</p>
           )}
         </div>
-      </section>
+      </div>
     </main>
   );
 }

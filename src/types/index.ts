@@ -160,7 +160,7 @@ type TVaultsAddress = {
 };
 
 //// DAO
-type PlatformData = {
+type TTPlatformData = {
   platformVersion: string;
   platformGovernance: string;
   multisig: string;
@@ -175,7 +175,7 @@ type PlatformData = {
   treasuryBalance: string;
 };
 
-type GitHubUser = {
+type TGitHubUser = {
   login: string;
   id: number;
   node_id: string;
@@ -196,7 +196,7 @@ type GitHubUser = {
   site_admin: boolean;
 };
 
-type ProfitTokenData = {
+type TProfitTokenData = {
   price: number;
   totalSupply: string;
   marketCap: number;
@@ -228,7 +228,7 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
-  PlatformData,
-  GitHubUser,
-  ProfitTokenData,
+  TTPlatformData,
+  TGitHubUser,
+  TProfitTokenData,
 };
