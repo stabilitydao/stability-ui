@@ -390,7 +390,7 @@ function Vault({ vault }: IProps) {
     ///// ZAP TOKENS & UNDERLYING TOKENS
     const amount = inputs[option[0]]?.amount;
 
-    if (option[0] !== underlyingToken.address) {
+    if (option[0] !== underlyingToken?.address) {
       const decimals = getTokenData(option[0])?.decimals;
 
       if (amount && decimals) {
@@ -408,7 +408,7 @@ function Vault({ vault }: IProps) {
     } else {
       try {
         const assetApprove = await writeContract({
-          address: underlyingToken.address,
+          address: underlyingToken?.address,
           abi: ERC20ABI,
           functionName: "approve",
           args: [vault as TAddress, maxUint256],
@@ -1650,7 +1650,7 @@ function Vault({ vault }: IProps) {
                             <div>
                               <div
                                 className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
-                                  underlyingToken.address === option[0]
+                                  underlyingToken?.address === option[0]
                                     ? "bottom-[-9%]"
                                     : "bottom-0"
                                 }`}
@@ -1690,7 +1690,7 @@ function Vault({ vault }: IProps) {
                                 ) && evt.preventDefault()
                               }
                               className={` py-3 flex items-center h-full   bg-transparent ${
-                                underlyingToken.address === option[0]
+                                underlyingToken?.address === option[0]
                                   ? "text-[16px] w-[70%] pl-[10px]"
                                   : "text-[25px] w-[58%] pl-[50px]"
                               } `}
