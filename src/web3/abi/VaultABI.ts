@@ -172,7 +172,13 @@ export default [
       {
         indexed: true,
         internalType: "address",
-        name: "account",
+        name: "sender",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
         type: "address",
       },
       {
@@ -402,25 +408,6 @@ export default [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "sharesToBurn",
-        type: "uint256",
-      },
-    ],
-    name: "previewWithdraw",
-    outputs: [
-      {
-        internalType: "uint256[]",
-        name: "amountsOut",
-        type: "uint256[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "price",
     outputs: [
@@ -559,7 +546,52 @@ export default [
       },
     ],
     name: "withdrawAssets",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "assets_",
+        type: "address[]",
+      },
+      {
+        internalType: "uint256",
+        name: "amountShares",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "minAssetAmountsOut",
+        type: "uint256[]",
+      },
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "withdrawAssets",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
