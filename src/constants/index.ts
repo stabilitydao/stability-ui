@@ -1,4 +1,14 @@
-import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
+import {
+  USDC,
+  USDT,
+  DAI,
+  WMATIC,
+  WETH,
+  WBTC,
+  PROFIT,
+  SDIV,
+  PM,
+} from "./tokens";
 
 const TABLE = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
@@ -106,4 +116,18 @@ const CHAINS = [
   },
 ];
 
-export { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS, CHAINS };
+export {
+  TABLE,
+  PAGINATION_VAULTS,
+  TOKENS_ASSETS,
+  CHAINS,
+  USDC,
+  USDT,
+  DAI,
+  WMATIC,
+  WETH,
+  WBTC,
+  PROFIT,
+  SDIV,
+  PM,
+};

@@ -4,9 +4,9 @@ import { formatUnits } from "viem";
 import { vaults, publicClient, balances } from "@store";
 import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
 import type { TDAOData, TGitHubUser, TProfitTokenData } from "@types";
-import { SDIV, PROFIT, PM } from "../../constants/tokens";
-import { profitToken } from "../../utils/functions/getProfitTokenData";
-import { sdivToken } from "../../utils/functions/getSdivTokenData";
+import { SDIV, PROFIT, PM } from "@constants";
+import { getProfitToken } from "../../utils/functions/getProfitTokenData";
+import { getSdivToken } from "../../utils/functions/getSdivTokenData";
 import axios from "axios";
 
 function DAO() {
@@ -29,7 +29,6 @@ function DAO() {
       );
 
       const members = response.data;
-      console.log(members);
 
       const membersAdditionalInfo: TGitHubUser[] = await Promise.all(
         members.map(async (member: any) => {
@@ -45,7 +44,6 @@ function DAO() {
               avatar_url: memberInfoResponse.data.avatar_url,
               html_url: memberInfoResponse.data.html_url,
             };
-            console.log(updatedMember);
 
             return updatedMember;
           } catch (error) {
@@ -190,8 +188,8 @@ function DAO() {
       <div className="w-4/5 m-auto">
         <div className="m-auto p-2 bg-button rounded-md w-full">
           <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
-            <div className="p-2 rounded-md text-left grid bg-[#1c1c23]">
+          <div className="flex gap-3 text-sm justify-evenly">
+            <div className="p-2 rounded-md text-left bg-[#1c1c23]">
               <div className="mb-3">
                 <h2 className="font-bold">Version</h2>
                 <h2 className="">{daoData?.platformVersion}</h2>
@@ -257,18 +255,18 @@ function DAO() {
         <div className="m-auto p-3 w-full">
           <h1 className="text-xxl text-gradient mb-3 text-left">Tokenomics</h1>
 
-          {profitToken && (
+          {getProfitToken && (
             <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
               <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
                 <table className="text-sm">
                   <tbody>
                     <tr>
                       <td className="w-[100px]">Name: </td>
-                      <td>{profitToken.name} </td>
+                      <td>{getProfitToken.name} </td>
                     </tr>
                     <tr>
                       <td>Symbol: </td>
-                      <td>{profitToken.symbol} </td>
+                      <td>{getProfitToken.symbol} </td>
                     </tr>
 
                     <tr>
@@ -288,7 +286,7 @@ function DAO() {
                     </tr>
                     <tr>
                       <td>Address: </td>
-                      <td>{profitToken.address} </td>
+                      <td>{getProfitToken.address} </td>
                     </tr>
                     <tr>
                       <td>Wallet: </td>
@@ -317,8 +315,8 @@ function DAO() {
                 <div className="w-52  ms-auto">
                   <img
                     className="rounded-full  ms-auto flex w-full"
-                    src={profitToken.logoURI}
-                    alt={profitToken.logoURI}
+                    src={getProfitToken.logoURI}
+                    alt={getProfitToken.logoURI}
                   />
                 </div>
               </div>
@@ -342,21 +340,21 @@ function DAO() {
               </div>
             </div>
           )}
-          {sdivToken && (
+          {getSdivToken && (
             <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
               <table className="text-sm mt-5">
                 <tbody>
                   <tr>
                     <td className="w-[100px]">Name: </td>
-                    <td>{sdivToken.name} </td>
+                    <td>{getSdivToken.name} </td>
                   </tr>
                   <tr>
                     <td>Symbol: </td>
-                    <td>{sdivToken.symbol} </td>
+                    <td>{getSdivToken.symbol} </td>
                   </tr>
                   <tr>
                     <td>Address: </td>
-                    <td>{sdivToken.address} </td>
+                    <td>{getSdivToken.address} </td>
                   </tr>
                   <tr>
                     <td>Total supply: </td>
@@ -382,8 +380,8 @@ function DAO() {
               <div className="w-52">
                 <img
                   className="rounded-full  ms-auto flex w-full"
-                  src={sdivToken.logoURI}
-                  alt={sdivToken.logoURI}
+                  src={getSdivToken.logoURI}
+                  alt={getSdivToken.logoURI}
                 />
               </div>
             </div>
@@ -500,7 +498,7 @@ function DAO() {
         <div className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
           <div className="p-3 bg-[#1c1c23] rounded-md text-sm">
-            <table className="w-full">
+            <table>
               <thead>
                 <tr>
                   <td>
