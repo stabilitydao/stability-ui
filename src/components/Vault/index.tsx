@@ -760,7 +760,7 @@ function Vault({ vault }: IProps) {
     setAllowance(allowanceResult);
   };
   const previewDeposit = async () => {
-    //if (!Number(lastKeyPress.key2)) return;
+    // if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -775,17 +775,22 @@ function Vault({ vault }: IProps) {
               )
             );
           } else {
-            amounts.push(parseUnits("1", 36));
+            const token = tokensJson.tokens.find(
+              (token) => token.address === option[0]
+            );
+
+            const decimals = token ? token.decimals + 18 : 24;
+
+            amounts.push(parseUnits("1", decimals));
           }
         }
         try {
-          const previewDepositAssets: (bigint | bigint[] | any)[] =
-            (await readContract(_publicClient, {
-              address: vault as TAddress,
-              abi: VaultABI,
-              functionName: "previewDepositAssets",
-              args: [$assets as TAddress[], amounts],
-            })) as any;
+          const previewDepositAssets = await readContract(_publicClient, {
+            address: vault as TAddress,
+            abi: VaultABI,
+            functionName: "previewDepositAssets",
+            args: [$assets as TAddress[], amounts],
+          });
 
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
@@ -795,7 +800,6 @@ function Vault({ vault }: IProps) {
           const previewDepositAssetsArray: bigint[] = [
             ...previewDepositAssets[0],
           ];
-
           for (let i = 0; i < $assets.length; i++) {
             const decimals = getTokenData($assets[i])?.decimals;
             if (i !== changedInput && decimals) {
@@ -1118,7 +1122,11 @@ function Vault({ vault }: IProps) {
 
               <div className={`flex flex-col items-start gap-3 p-4`}>
                 <div className="flex">
-                  <div className="flex py-1 pl-[8px] mr-3">
+                  <div
+                    className={`flex py-1 ${
+                      localVault.strategyInfo.protocols.length > 1 && "pl-[8px]"
+                    } mr-3`}
+                  >
                     {localVault.strategyInfo.protocols.map(
                       ({
                         name,
@@ -1132,7 +1140,10 @@ function Vault({ vault }: IProps) {
                           key={name}
                           src={logoSrc}
                           alt={name}
-                          className="h-8 w-8 rounded-full ml-[-8px]"
+                          className={`h-8 w-8 rounded-full ${
+                            localVault.strategyInfo.protocols.length > 1 &&
+                            "ml-[-8px]"
+                          }`}
                         />
                       )
                     )}
@@ -1435,10 +1446,7 @@ function Vault({ vault }: IProps) {
                         "withDecimals"
                       ) *
                       Number(
-                        formatNumber(
-                          formatFromBigInt(localVault.balance, 18),
-                          "format"
-                        )
+                        formatFromBigInt(localVault.balance, 18, "withDecimals")
                       )
                     ).toFixed(2)}
                   </p>
@@ -1510,10 +1518,10 @@ function Vault({ vault }: IProps) {
                 Withdraw
               </button>
             </div>
-            <form autoComplete="off" className="max-w-[400px] px-4 mb-10 pb-5">
+            <form autoComplete="off" className="max-w-[450px] px-4 mb-10 pb-5">
               <div className="flex flex-col items-start mt-4">
                 {optionTokens && (
-                  <div className="relative select-none max-w-[250px] w-full">
+                  <div className="relative select-none w-full">
                     <div
                       onClick={() => {
                         setTokenSelector((prevState) => !prevState);

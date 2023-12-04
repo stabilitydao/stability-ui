@@ -21,6 +21,7 @@ import {
   getStrategyShortName,
   formatFromBigInt,
   getStrategyInfo,
+  calculateAPY,
 } from "@utils";
 import { TABLE, PAGINATION_VAULTS } from "@constants";
 import type { TLocalVault } from "@types";
@@ -319,7 +320,12 @@ function Vaults() {
                       fill="white"
                     />
                   </svg>
-                  <p>{formatFromBigInt(vault.apr, 3, "withDecimals")}%</p>
+                  <p>
+                    {calculateAPY(
+                      formatFromBigInt(vault.apr, 3, "withDecimals")
+                    ).toFixed(2)}
+                    %
+                  </p>
                 </div>
               </td>
             </tr>
