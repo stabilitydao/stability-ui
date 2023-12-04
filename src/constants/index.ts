@@ -27,7 +27,7 @@ const TABLE = [
     dataType: "number",
   },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  { name: "APR", keyName: "apr", sortType: "none", dataType: "number" },
+  { name: "APY", keyName: "apr", sortType: "none", dataType: "number" },
 ];
 const PAGINATION_VAULTS = 20;
 
