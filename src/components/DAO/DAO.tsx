@@ -146,7 +146,7 @@ function DAO() {
         //platformData
 
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
-          fee !== 0n ? (fee / 1000n).toString() + " %" : "0 %"
+          (fee / 1000n).toString()
         );
 
         //treasury
@@ -213,19 +213,31 @@ function DAO() {
               <tbody>
                 <tr>
                   <td>Platform fee:</td>
-                  <td className="text-right">{daoData?.platformFee}</td>
+                  <td className="text-right">
+                    {daoData?.platformFee}
+                    {" %"}
+                  </td>
                 </tr>
                 <tr>
                   <td>Vault manager fee:</td>
-                  <td className="text-right">{daoData?.vaultManagerFee}</td>
+                  <td className="text-right">
+                    {daoData?.vaultManagerFee}
+                    {" %"}
+                  </td>
                 </tr>
                 <tr>
                   <td>Strategy logic fee:</td>
-                  <td className="text-right">{daoData?.strategyLogicFee}</td>
+                  <td className="text-right">
+                    {daoData?.strategyLogicFee}
+                    {" %"}
+                  </td>
                 </tr>
                 <tr>
                   <td>Ecosystem fee:</td>
-                  <td className="text-right">{daoData?.ecosystemFee}</td>
+                  <td className="text-right">
+                    {daoData?.ecosystemFee}
+                    {" %"}
+                  </td>
                 </tr>
               </tbody>
             </table>
