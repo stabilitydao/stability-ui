@@ -3,18 +3,16 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances } from "@store";
 import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
-import type { TTPlatformData, TGitHubUser, TProfitTokenData } from "@types";
+import type { TDAOData, TGitHubUser, TProfitTokenData } from "@types";
 import { SDIV, PROFIT, PM } from "../../constants/tokens";
-import { profitToken } from "../../utils/functions/profitTokenData";
-import { sdivToken } from "../../utils/functions/sdivTokenData";
-
+import { profitToken } from "../../utils/functions/getProfitTokenData";
+import { sdivToken } from "../../utils/functions/getSdivTokenData";
 import axios from "axios";
-import tokenlist from "../../stability.tokenlist.json";
 
 function DAO() {
-  const [_platformData, setPlatformData] = useState<TTPlatformData>();
+  const [daoData, setDaoData] = useState<TDAOData>();
   const [profitTokenData, setProfitTokenData] = useState<TProfitTokenData>();
-  const [members, setMembers] = useState<TGitHubUser[]>([]);
+  const [members, setMembers] = useState<TGitHubUser[]>();
   const [tokensTotalSupply, setTokensTotalSupply] = useState({
     pm: "",
     sdiv: "",
@@ -30,14 +28,43 @@ function DAO() {
         "https://api.github.com/orgs/stabilitydao/public_members"
       );
 
-      setMembers(response.data);
-      console.log(response.data);
+      const members = response.data;
+      console.log(members);
+
+      const membersAdditionalInfo: TGitHubUser[] = await Promise.all(
+        members.map(async (member: any) => {
+          try {
+            const memberInfoResponse = await axios.get(
+              `https://api.github.com/users/${member.login}`
+            );
+
+            const updatedMember: TGitHubUser = {
+              bio: memberInfoResponse.data.bio,
+              location: memberInfoResponse.data.location,
+              name: memberInfoResponse.data.name,
+              avatar_url: memberInfoResponse.data.avatar_url,
+              html_url: memberInfoResponse.data.html_url,
+            };
+            console.log(updatedMember);
+
+            return updatedMember;
+          } catch (error) {
+            console.error(
+              `Error fetching member info for ${member.login}`,
+              error
+            );
+            return member;
+          }
+        })
+      );
+
+      setMembers(membersAdditionalInfo);
     } catch (error) {
       console.error("Fetching getTeamData", error);
     }
   };
 
-  const fetchPlatformData = async () => {
+  const fetchDaoData = async () => {
     if ($publicClient && $balances) {
       try {
         const platformVersion: any = await $publicClient.readContract({
@@ -132,7 +159,7 @@ function DAO() {
         //team
         const _multisig = Number(formatUnits(multisigBalance, 18)).toFixed(2);
 
-        const platformData: TTPlatformData = {
+        const daoData: TDAOData = {
           platformVersion: platformVersion,
           platformGovernance: contractData[0][5],
           multisig: contractData[0][6],
@@ -146,7 +173,7 @@ function DAO() {
           ecosystemFee: percentageFees[3],
           treasuryBalance: _treasuryBalance,
         };
-        setPlatformData(platformData);
+        setDaoData(daoData);
       } catch (error) {
         console.error("Error fetching platform data:", error);
       }
@@ -155,7 +182,7 @@ function DAO() {
 
   useEffect(() => {
     getTeamData();
-    fetchPlatformData();
+    fetchDaoData();
   }, [$balances]);
 
   return (
@@ -163,23 +190,23 @@ function DAO() {
       <div className="w-4/5 m-auto">
         <div className="m-auto p-2 bg-button rounded-md w-full">
           <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-3 ">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
             <div className="p-2 rounded-md text-left grid bg-[#1c1c23]">
               <div className="mb-3">
-                <h2 className="font-bold">Version </h2>
-                <h2 className="">{_platformData?.platformVersion}</h2>
+                <h2 className="font-bold">Version</h2>
+                <h2 className="">{daoData?.platformVersion}</h2>
               </div>
               <div className="mb-3">
-                <h2 className=" font-bold">Total Vaults</h2>
-                <h2>{_platformData?.numberOfTotalVaults}</h2>
+                <h2 className="font-bold">Total Vaults</h2>
+                <h2>{daoData?.numberOfTotalVaults}</h2>
               </div>
               <div>
                 <h2 className="font-bold">Total TVL</h2>
-                <h2>$ {_platformData?.totalTvl}</h2>
+                <h2>$ {daoData?.totalTvl}</h2>
               </div>
             </div>
 
-            <table className="p-2 rounded-md text-left grid bg-[#1c1c23]">
+            <table className="p-2 rounded-md text-left  bg-[#1c1c23]">
               <thead>
                 <tr>
                   <th>Fees:</th>
@@ -187,24 +214,20 @@ function DAO() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="w-48">Platform fee:</td>
-                  <td className="text-right">{_platformData?.platformFee}</td>
+                  <td>Platform fee:</td>
+                  <td className="text-right">{daoData?.platformFee}</td>
                 </tr>
                 <tr>
                   <td>Vault manager fee:</td>
-                  <td className="text-right">
-                    {_platformData?.vaultManagerFee}
-                  </td>
+                  <td className="text-right">{daoData?.vaultManagerFee}</td>
                 </tr>
                 <tr>
                   <td>Strategy logic fee:</td>
-                  <td className="text-right">
-                    {_platformData?.strategyLogicFee}
-                  </td>
+                  <td className="text-right">{daoData?.strategyLogicFee}</td>
                 </tr>
                 <tr>
                   <td>Ecosystem fee:</td>
-                  <td className="text-right">{_platformData?.ecosystemFee}</td>
+                  <td className="text-right">{daoData?.ecosystemFee}</td>
                 </tr>
               </tbody>
             </table>
@@ -216,8 +239,8 @@ function DAO() {
                 </tr>
               </thead>
               <tbody className="grid">
-                {Array.isArray(_platformData?.strategieNames) &&
-                  _platformData?.strategieNames.map(
+                {Array.isArray(daoData?.strategieNames) &&
+                  daoData?.strategieNames.map(
                     (strategyName: string, index: number) => (
                       <tr key={index}>
                         <td>{strategyName}</td>
@@ -237,10 +260,10 @@ function DAO() {
           {profitToken && (
             <div className=" bg-[#1c1c23] rounded-md p-3 mt-5 w-full ">
               <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
-                <table className="w-full">
+                <table className="text-sm">
                   <tbody>
                     <tr>
-                      <td>Name: </td>
+                      <td className="w-[100px]">Name: </td>
                       <td>{profitToken.name} </td>
                     </tr>
                     <tr>
@@ -300,19 +323,19 @@ function DAO() {
                 </div>
               </div>
 
-              <div className="flex gap-3  mt-3 justify-start">
+              <div className="grid sm:grid-cols-1 md:flex gap-3 mt-3">
                 <a
-                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
                   href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
                   Chart
                 </a>
                 <a
-                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
                   href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
                   Swap by 1inch
                 </a>
                 <a
-                  className="rounded-sm text-start p-2 text-gray-400 bg-button "
+                  className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
                   href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
                   Swap by Uniswap V3
                 </a>
@@ -321,10 +344,10 @@ function DAO() {
           )}
           {sdivToken && (
             <div className="flex bg-[#1c1c23] rounded-md p-3 mt-5 w-full justify-between">
-              <table className="w-full">
-                <tbody className=" ">
+              <table className="text-sm mt-5">
+                <tbody>
                   <tr>
-                    <td className="w-32">Name: </td>
+                    <td className="w-[100px]">Name: </td>
                     <td>{sdivToken.name} </td>
                   </tr>
                   <tr>
@@ -356,7 +379,7 @@ function DAO() {
                   </tr>
                 </tbody>
               </table>
-              <div className="w-52 ">
+              <div className="w-52">
                 <img
                   className="rounded-full  ms-auto flex w-full"
                   src={sdivToken.logoURI}
@@ -368,10 +391,10 @@ function DAO() {
 
           <div className="m-auto  bg-[#1c1c23] rounded-md p-3 mt-5">
             <div className="flex bg-[#1c1c23] rounded-md mt-5 w-full justify-between">
-              <table className="w-full">
+              <table className="text-sm">
                 <tbody className=" w-full gap-3">
                   <tr>
-                    <td className="w-32">Name: </td>
+                    <td className="w-[100px]">Name: </td>
                     <td>Profit Maker </td>
                   </tr>
                   <tr>
@@ -423,8 +446,8 @@ function DAO() {
       <div className="  m-auto w-4/5 mt-5 bg-button rounded-md">
         <div className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Governance</h1>
-          <div className="p-3 bg-[#1c1c23] rounded-md">
-            <table className="w-full">
+          <div className="p-3 bg-[#1c1c23] rounded-md text-sm">
+            <table>
               <thead>
                 <tr>
                   <td>
@@ -434,19 +457,19 @@ function DAO() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="w-32">Address:</td>
+                  <td>Address:</td>
                   <td>0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E</td>
                 </tr>
                 <tr>
                   <td>Total balance: </td>
-                  <td>{_platformData?.treasuryBalance}</td>
+                  <td>{daoData?.treasuryBalance}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div className="p-3 bg-[#1c1c23] rounded-md mt-5">
-            <table className="w-full">
+          <div className="p-3 bg-[#1c1c23] rounded-md mt-5 text-sm">
+            <table>
               <thead>
                 <tr>
                   <td>
@@ -456,8 +479,8 @@ function DAO() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="w-32">Address:</td>
-                  <td>{_platformData?.platformGovernance}</td>
+                  <td>Address:</td>
+                  <td>{daoData?.platformGovernance}</td>
                 </tr>
               </tbody>
             </table>
@@ -476,7 +499,7 @@ function DAO() {
       <div className=" m-auto w-4/5 mt-5 bg-button rounded-md">
         <div className="p-3">
           <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
-          <div className="p-3 bg-[#1c1c23] rounded-md">
+          <div className="p-3 bg-[#1c1c23] rounded-md text-sm">
             <table className="w-full">
               <thead>
                 <tr>
@@ -488,31 +511,34 @@ function DAO() {
               <tbody>
                 <tr>
                   <td>Address:</td>
-                  <td>{_platformData?.multisig}</td>
+                  <td>{daoData?.multisig}</td>
                 </tr>
                 <tr>
                   <td>Total balance:</td>
-                  <td>{_platformData?.treasuryBalance}</td>
+                  <td>{daoData?.treasuryBalance}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap   justify-center">
-          {Array.isArray(members) ? (
+        <div className="mt-5 flex flex-wrap justify-center align-top">
+          {members ? (
             members.map(member => (
               <a
                 href={member.html_url}
-                key={member.id}
-                className="p-2"
+                key={member.name}
+                className="p-2 text-sm m-auto w-[180px]"
                 target="_blank">
                 <img
                   className="rounded-full m-auto mb-4 w-[80px]"
                   src={member.avatar_url}
-                  alt={`Avatar de ${member.login}`}
+                  alt={`Avatar de ${member.name}`}
                 />
-                <p className="font-bold">{member.login}</p>
+                <p className="font-bold">{member.name}</p>
+
+                <p> {member.location}</p>
+                <p>{member.bio}</p>
               </a>
             ))
           ) : (
