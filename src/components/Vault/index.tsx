@@ -512,10 +512,11 @@ function Vault({ vault }: IProps) {
   const approve = async (asset: TAddress) => {
     if (vault) {
       //const allowanceResult: TVaultAllowance = {};
-      const maxUnits = parseUnits(
-        inputs[asset].amount,
-        getTokenData(asset)?.decimals as number
-      );
+      // const maxUnits = parseUnits(
+      //   inputs[asset].amount,
+      //   getTokenData(asset)?.decimals as number
+      // );
+      const maxUnits = maxUint256
 
       const assetApprove = await writeContract({
         address: asset,
