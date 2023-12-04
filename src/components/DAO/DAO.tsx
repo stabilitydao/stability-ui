@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { vaults, publicClient, balances } from "@store";
+import {
+  vaults,
+  publicClient,
+  balances,
+  vaultData,
+  assetsPrices,
+} from "@store";
 import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
 import type { TDAOData, TGitHubUser, TProfitTokenData } from "@types";
 import { SDIV, PROFIT, PM } from "@constants";
@@ -17,10 +23,10 @@ function DAO() {
     pm: "",
     sdiv: "",
   });
-
   const $publicClient = useStore(publicClient);
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
+  const $assetsPrices = useStore(assetsPrices);
 
   const getTeamData = async () => {
     try {
@@ -63,7 +69,7 @@ function DAO() {
   };
 
   const fetchDaoData = async () => {
-    if ($publicClient && $balances) {
+    if ($publicClient && $balances && $assetsPrices) {
       try {
         const platformVersion: any = await $publicClient.readContract({
           address: platform,
@@ -89,13 +95,13 @@ function DAO() {
           functionName: "totalSupply",
         });
 
-        const _pmTotalSupply = await $publicClient.readContract({
+        const pmTotalSupply = await $publicClient.readContract({
           address: PM[0] as `0x${string}`,
-          abi: IERC721Enumerable,
+          abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
-        const _sdivTotalSupply = await $publicClient.readContract({
+        const sdivTotalSupply = await $publicClient.readContract({
           address: SDIV[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "totalSupply",
@@ -120,26 +126,42 @@ function DAO() {
           (total: bigint, number: bigint) => total + number,
           BigInt(0)
         );
-        const _totalTvl = formatUnits(totalTvl, 18);
+        const _totalTvl = Number(formatUnits(totalTvl, 18)).toFixed(2);
 
         //profit Token
-        const _profitTotalSupply = formatUnits(profitTotalSupply, 18);
-        const _profitTokenPrice = Number(totalTvl) / Number(profitTotalSupply);
-        const profitMarketCap =
-          Number(_profitTokenPrice) * Number(_profitTotalSupply);
+        const _profitTokenPrice = Number(
+          formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)
+        ).toFixed(2);
+
+        const _profitTotalSupply = Number(
+          formatUnits(profitTotalSupply, 18)
+        ).toLocaleString("es-ES");
+
+        const _profitMarketCap = (
+          Number(_profitTokenPrice) * Number(formatUnits(profitTotalSupply, 18))
+        ).toLocaleString("es-ES");
 
         const profitToken: TProfitTokenData = {
           price: _profitTokenPrice,
           totalSupply: _profitTotalSupply,
-          marketCap: profitMarketCap,
+          marketCap: _profitMarketCap,
         };
 
         setProfitTokenData(profitToken);
 
-        //tokens total supply
+        //sdiv && pm total supply
+
+        const _pmTotalSupply = Number(
+          formatUnits(pmTotalSupply, 12)
+        ).toLocaleString("es-ES");
+
+        const _sdivTotalSupply = Number(
+          formatUnits(sdivTotalSupply, 18)
+        ).toLocaleString("es-ES");
+
         const _tokensTotalSupply = {
-          pm: formatUnits(_pmTotalSupply, 18),
-          sdiv: formatUnits(_sdivTotalSupply, 18),
+          pm: _pmTotalSupply,
+          sdiv: _sdivTotalSupply,
         };
         setTokensTotalSupply(_tokensTotalSupply);
 
@@ -294,7 +316,10 @@ function DAO() {
                     </tr>
                     <tr>
                       <td>Market Cap: </td>
-                      <td>{profitTokenData?.marketCap} </td>
+                      <td>
+                        {"$ "}
+                        {profitTokenData?.marketCap}{" "}
+                      </td>
                     </tr>
                     <tr>
                       <td>Address: </td>

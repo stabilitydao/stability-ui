@@ -184,9 +184,9 @@ type TGitHubUser = {
 };
 
 type TProfitTokenData = {
-  price: number;
+  price: string;
   totalSupply: string;
-  marketCap: number;
+  marketCap: string;
 };
 
 export type {
