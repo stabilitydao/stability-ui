@@ -197,7 +197,6 @@ function Vault({ vault }: IProps) {
             },
           } as TVaultInput)
       );
-
       if (option.length > 1) {
         setLastKeyPress({ key1: asset, key2: amount });
       }
@@ -510,26 +509,55 @@ function Vault({ vault }: IProps) {
   /////
 
   const approve = async (asset: TAddress) => {
+    const needApprove = option.filter(
+      (asset: TAddress) =>
+        allowance &&
+        formatUnits(
+          allowance[asset].allowance[0],
+          Number(getTokenData(asset)?.decimals)
+        ) < inputs[asset].amount
+    );
     if (vault) {
       //const allowanceResult: TVaultAllowance = {};
-      // const maxUnits = parseUnits(
-      //   inputs[asset].amount,
-      //   getTokenData(asset)?.decimals as number
-      // );
-      const maxUnits = maxUint256
 
-      const assetApprove = await writeContract({
-        address: asset,
-        abi: ERC20ABI,
-        functionName: "approve",
-        args: [vault, maxUnits],
-      });
+      const maxUnits = maxUint256;
+      try {
+        const assetApprove = await writeContract({
+          address: asset,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [vault, maxUnits],
+        });
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 3,
+          hash: assetApprove?.hash,
+        });
 
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        assetApprove
-      );
+        if (transaction.status === "success") {
+          const newAllowance = (await readContract(_publicClient, {
+            address: asset,
+            abi: ERC20ABI,
+            functionName: "allowance",
+            args: [$account as TAddress, vault],
+          })) as bigint;
 
-      if (transaction.status === "success") {
+          setAllowance((prevAllowance: any) => ({
+            ...prevAllowance,
+            [asset]: {
+              allowance: [newAllowance],
+            },
+          }));
+
+          // this is a temp condition before rewrite
+          if (
+            needApprove.length == 1 &&
+            formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
+              inputs[asset].amount
+          ) {
+            setIsApprove(1);
+          }
+        }
+      } catch (error) {
         const newAllowance = (await readContract(_publicClient, {
           address: asset,
           abi: ERC20ABI,
@@ -543,15 +571,14 @@ function Vault({ vault }: IProps) {
             allowance: [newAllowance],
           },
         }));
-
-        // const depositAssets = tokensJson.tokens
-        //   .filter((token) => Object.keys(inputs).includes(token.address))
-        //   .map(({ address, decimals }) =>
-        //     parseUnits(inputs[address]?.amount, decimals)
-        //   );
-
-        // previewDeposit();
-        // checkInputsAllowance(depositAssets);
+        // this is a temp condition before rewrite
+        if (
+          needApprove.length == 1 &&
+          formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
+            inputs[asset].amount
+        ) {
+          setIsApprove(1);
+        }
       }
     }
   };
@@ -1629,91 +1656,133 @@ function Vault({ vault }: IProps) {
               {tab === "Deposit" && (
                 <>
                   {option?.length > 1 ? (
-                    <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
-                      {option.map((asset: any) => (
-                        <div key={asset}>
-                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                            <p>Balance:</p>
+                    <>
+                      <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
+                        {option.map((asset: any) => (
+                          <div key={asset}>
+                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                              <p>Balance:</p>
 
-                            <p>{balances[asset]?.assetBalance}</p>
-                          </div>
-                          <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
-                            <div className="absolute end-5 bottom-4">
-                              <div className="flex items-center">
-                                <button
-                                  className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                  type="button"
-                                  onClick={() =>
-                                    balances[asset] &&
-                                    handleInputChange(
-                                      balances[asset].assetBalance,
-                                      asset
-                                    )
-                                  }
-                                >
-                                  MAX
-                                </button>
-                              </div>
+                              <p>{balances[asset]?.assetBalance}</p>
                             </div>
-                            <input
-                              className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
-                              list="amount"
-                              id={asset}
-                              name="amount"
-                              placeholder="0"
-                              value={
-                                inputs && inputs[asset] && inputs[asset].amount
-                              }
-                              onChange={(e) =>
-                                handleInputChange(e.target.value, e.target.id)
-                              }
-                              type="text"
-                              onKeyDown={(evt) =>
-                                ["e", "E", "+", "-", " ", ","].includes(
-                                  evt.key
-                                ) && evt.preventDefault()
-                              }
-                            />
-
-                            <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
-                              {tokensJson.tokens.map((token) => {
-                                if (token.address === asset) {
-                                  return (
-                                    <div
-                                      className="flex items-center gap-2"
-                                      key={token.address}
-                                    >
-                                      {/* <p className="my-auto">{token.symbol}</p> */}
-                                      <img
-                                        className="rounded-full w-[25px] h-[25px] "
-                                        src={token.logoURI}
-                                        alt={token.name}
-                                      />
-                                    </div>
-                                  );
-                                }
-                              })}
-                            </div>
-                          </div>
-                          {$assetsPrices[asset] &&
-                            inputs[asset]?.amount > 0 && (
-                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                <p>
-                                  $
-                                  {(
-                                    Number(
-                                      formatUnits(
-                                        $assetsPrices[asset].tokenPrice,
-                                        18
+                            <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                              <div className="absolute end-5 bottom-4">
+                                <div className="flex items-center">
+                                  <button
+                                    className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                    type="button"
+                                    onClick={() =>
+                                      balances[asset] &&
+                                      handleInputChange(
+                                        balances[asset].assetBalance,
+                                        asset
                                       )
-                                    ) * inputs[asset].amount
-                                  ).toFixed(2)}
-                                </p>
+                                    }
+                                  >
+                                    MAX
+                                  </button>
+                                </div>
                               </div>
-                            )}
-                        </div>
-                      ))}
-                    </div>
+                              <input
+                                className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                                list="amount"
+                                id={asset}
+                                name="amount"
+                                placeholder="0"
+                                value={
+                                  inputs &&
+                                  inputs[asset] &&
+                                  inputs[asset].amount
+                                }
+                                onChange={(e) =>
+                                  handleInputChange(e.target.value, e.target.id)
+                                }
+                                type="text"
+                                onKeyDown={(evt) =>
+                                  ["e", "E", "+", "-", " ", ","].includes(
+                                    evt.key
+                                  ) && evt.preventDefault()
+                                }
+                              />
+
+                              <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
+                                {tokensJson.tokens.map((token) => {
+                                  if (token.address === asset) {
+                                    return (
+                                      <div
+                                        className="flex items-center gap-2"
+                                        key={token.address}
+                                      >
+                                        {/* <p className="my-auto">{token.symbol}</p> */}
+                                        <img
+                                          className="rounded-full w-[25px] h-[25px] "
+                                          src={token.logoURI}
+                                          alt={token.name}
+                                        />
+                                      </div>
+                                    );
+                                  }
+                                })}
+                              </div>
+                            </div>
+                            {$assetsPrices[asset] &&
+                              inputs[asset]?.amount > 0 && (
+                                <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                  <p>
+                                    $
+                                    {(
+                                      Number(
+                                        formatUnits(
+                                          $assetsPrices[asset].tokenPrice,
+                                          18
+                                        )
+                                      ) * inputs[asset].amount
+                                    ).toFixed(2)}
+                                  </p>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                      {isApprove === 1 ? (
+                        <button
+                          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                          type="button"
+                          onClick={deposit}
+                        >
+                          Deposit
+                        </button>
+                      ) : isApprove === 2 ? (
+                        <>
+                          {option.map(
+                            (asset: any) =>
+                              allowance &&
+                              formatUnits(
+                                allowance[asset].allowance[0],
+                                Number(getTokenData(asset)?.decimals)
+                              ) < inputs[asset].amount && (
+                                <button
+                                  className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                                  key={asset}
+                                  type="button"
+                                  onClick={() => approve(asset as TAddress)}
+                                >
+                                  Approve {getTokenData(asset)?.symbol}
+                                </button>
+                              )
+                          )}
+                        </>
+                      ) : (
+                        isApprove === 0 && (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                          >
+                            INSUFICCIENT BALANCE
+                          </button>
+                        )
+                      )}
+                    </>
                   ) : (
                     <div>
                       {option[0] === underlyingToken?.address ? (
@@ -1856,44 +1925,6 @@ function Vault({ vault }: IProps) {
                         </p>
                       )}
                     </div>
-                  )}
-                  {isApprove === 1 ? (
-                    <button
-                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                      type="button"
-                      onClick={() => deposit()}
-                    >
-                      Deposit
-                    </button>
-                  ) : isApprove === 2 ? (
-                    <>
-                      {option.map(
-                        (asset: any) =>
-                          allowance &&
-                          formatUnits(
-                            allowance[asset].allowance[0],
-                            Number(getTokenData(asset)?.decimals)
-                          ) < inputs[asset].amount && (
-                            <button
-                              className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                              key={asset}
-                              type="button"
-                              onClick={() => approve(asset as TAddress)}
-                            >
-                              Approve {getTokenData(asset)?.symbol}
-                            </button>
-                          )
-                      )}
-                    </>
-                  ) : (
-                    isApprove === 0 && (
-                      <button
-                        disabled
-                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                      >
-                        INSUFICCIENT BALANCE
-                      </button>
-                    )
                   )}
                 </>
               )}
