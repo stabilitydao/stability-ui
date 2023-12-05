@@ -33,7 +33,7 @@ const SettingsModal: React.FC<IProps> = ({
 
     const validInputRegex = /^[0-9.]*$/;
 
-    if (validInputRegex.test(inputValue)) {
+    if (validInputRegex.test(inputValue) && Number(inputValue) <= 100) {
       setSlippageState(inputValue);
     }
   };

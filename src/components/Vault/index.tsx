@@ -459,6 +459,11 @@ function Vault({ vault }: IProps) {
   const zapDeposit = async () => {
     ///// UNDERLYING
     try {
+      const shares = parseUnits(underlyingShares, 18);
+      const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+      const out = shares - (shares * decimalPercent) / 100n;
+
       const depositAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -466,7 +471,7 @@ function Vault({ vault }: IProps) {
         args: [
           option as TAddress[],
           [parseUnits(inputs[option[0]]?.amount, 18)],
-          parseUnits(underlyingShares, 18),
+          out,
           $account as TAddress,
         ],
       });
@@ -597,11 +602,16 @@ function Vault({ vault }: IProps) {
 
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
+
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = sharesOut - (sharesOut * decimalPercent) / 100n;
+
     const depositAssets = await writeContract({
       address: vault as TAddress,
       abi: VaultABI,
       functionName: "depositAssets",
-      args: [$assets as TAddress[], input, sharesOut, $account as TAddress],
+      args: [$assets as TAddress[], input, out, $account as TAddress],
     });
   };
 
@@ -610,19 +620,23 @@ function Vault({ vault }: IProps) {
 
     if (!value) return;
     ///// UNDERLYING TOKEN
+
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = value - (value * decimalPercent) / 100n;
     if (underlyingToken?.address === option[0]) {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], value, [0n]],
+        args: [option as TAddress[], out, [0n]],
       });
     } else {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [$assets as TAddress[], value, [0n, 0n]],
+        args: [$assets as TAddress[], out, [0n, 0n]],
       });
     }
   };
@@ -708,6 +722,9 @@ function Vault({ vault }: IProps) {
     }
     ///// UNDERLYING TOKEN
     const currentValue = parseUnits(value, 18);
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = currentValue - (currentValue * decimalPercent) / 100n;
     if (underlyingToken?.address === option[0]) {
       // this code is valid also for ZAP tokens
 
@@ -715,7 +732,7 @@ function Vault({ vault }: IProps) {
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n]],
+        args: [option as TAddress[], out, [0n]],
         account: $account as TAddress,
       });
 
@@ -730,7 +747,7 @@ function Vault({ vault }: IProps) {
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n, 0n]],
+        args: [option as TAddress[], out, [0n, 0n]],
         account: $account as TAddress,
       });
       const preview = result.map((amount: any, index: number) => {
