@@ -163,7 +163,7 @@ function Vaults() {
 
           let monthlyApr = 0;
           if (data) {
-            monthlyApr = data.apr.monthly.feeApr;
+            monthlyApr = data.apr.daily.feeApr;
           }
           /////
 
