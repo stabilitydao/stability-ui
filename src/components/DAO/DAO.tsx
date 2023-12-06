@@ -35,23 +35,25 @@ function DAO() {
       );
 
       const members = response.data;
-
       const membersAdditionalInfo: TGitHubUser[] = await Promise.all(
         members.map(async (member: any) => {
           try {
             const memberInfoResponse = await axios.get(
               `https://api.github.com/users/${member.login}`
             );
-
             const updatedMember: TGitHubUser = {
               bio: memberInfoResponse.data.bio,
               location: memberInfoResponse.data.location,
               name: memberInfoResponse.data.name,
               avatar_url: memberInfoResponse.data.avatar_url,
               html_url: memberInfoResponse.data.html_url,
+              followers: memberInfoResponse.data.followers,
             };
-
-            return updatedMember;
+            console.log(memberInfoResponse);
+            const sortMembers = members.sort(
+              (a, b) => b.followers - a.followers
+            );
+            return sortMembers;
           } catch (error) {
             console.error(
               `Error fetching member info for ${member.login}`,
@@ -78,7 +80,6 @@ function DAO() {
     const resultado = initials.join("");
     if (resultado === "GQF") {
       color = getStrategyInfo(resultado + "S");
-      console.log(color);
     } else {
       color = getStrategyInfo(resultado);
     }
@@ -240,10 +241,15 @@ function DAO() {
 
   return (
     <main className="w-full m-auto">
-      <div className="m-auto p-2 pb-3 border border-gray-800  bg-button rounded-md w-4/5">
-        <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
+      <div className="m-auto p-2 pb-3 bg-button rounded-md w-6/7">
+        <div className="flex">
+          <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
+          <p className="align-middle flex ms-auto my-auto text-sm pe-2 text-[#8D8E96]">
+            v{daoData?.platformVersion}
+          </p>
+        </div>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm m-auto">
-          <div className="p-3 rounded-md text-left  bg-[#1c1c23] border border-gray-800 shadow-md w-full">
+          <div className="p-3 rounded-md text-left  bg-[#1c1c23] text-[#8D8E96] shadow-md w-full">
             <div className="mb-3">
               <h2 className="font-bold">Version</h2>
               <h2 className="">{daoData?.platformVersion}</h2>
@@ -259,7 +265,7 @@ function DAO() {
           </div>
 
           <div className="p-3 bg-[#3d404b] rounded-md">
-            <table className="w-full h-full">
+            <table className="w-full h-full text-[#8D8E96]">
               <thead>
                 <tr>
                   <th className="text-left text-xl">Fees:</th>
@@ -300,7 +306,9 @@ function DAO() {
 
           <div className="p-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
             <div className="w-full h-full grid m-auto">
-              <h2 className="text-xl font-medium text-left">Strategies:</h2>
+              <h2 className="text-xl font-medium text-left text-[#8D8E96]">
+                Strategies:
+              </h2>
               {Array.isArray(daoData?.strategieNames) &&
                 daoData?.strategieNames.map(
                   (strategyName: string, index: number) => (
@@ -323,320 +331,341 @@ function DAO() {
         </div>
       </div>
 
-      <div className="m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
-        <div className="m-auto p-3 w-full">
-          <h1 className="text-xxl text-gradient mb-3 text-left">Tokenomics</h1>
+      <div className="bg-[#262830] pt-1 mt-5 rounded-md">
+        <div className="m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+          <div className="m-auto p-3 w-full">
+            <h1 className="text-xxl text-gradient mb-3 text-left">
+              Tokenomics
+            </h1>
 
-          <div className="bg-[#2c2f38] rounded-md p-3 mt-5 w-full">
-            <div className="flex bg-[#2c2f38] rounded-md mt-5 w-full justify-between">
-              <table className="text-sm table-auto">
-                <tbody>
-                  <tr>
-                    <td className="min-w-[85px]">Name: </td>
-                    <td>{getTokenData(PROFIT[0])?.name} </td>
-                  </tr>
-                  <tr>
-                    <td>Symbol: </td>
-                    <td>{getTokenData(PROFIT[0])?.symbol} </td>
-                  </tr>
+            <div className="bg-[#2c2f38] rounded-md p-3 mt-5 w-full">
+              <div className="flex bg-[#2c2f38] rounded-md mt-5 w-full justify-between">
+                <table className="text-sm table-auto text-[#8D8E96]">
+                  <tbody>
+                    <tr>
+                      <td className="min-w-[85px]">Name: </td>
+                      <td>{getTokenData(PROFIT[0])?.name} </td>
+                    </tr>
+                    <tr>
+                      <td>Symbol: </td>
+                      <td>{getTokenData(PROFIT[0])?.symbol} </td>
+                    </tr>
 
-                  <tr>
-                    <td>Price: </td>
-                    <td>
-                      {"$ "}
-                      {profitTokenData?.price}{" "}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Total supply: </td>
-                    <td>{profitTokenData?.totalSupply} </td>
-                  </tr>
-                  <tr>
-                    <td>Market Cap: </td>
-                    <td>
-                      {"$ "}
-                      {profitTokenData?.marketCap}{" "}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Address: </td>
-                    <td>{getTokenData(PROFIT[0])?.address} </td>
-                  </tr>
-                  <tr>
-                    <td>Wallet: </td>
-                    <td>
-                      <span className="text-red-600">ADD WALLET</span>{" "}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Staked: </td>
-                    <td className="flex gap-3">
-                      <span className="text-red-600 my-auto">ADD STAKED</span>{" "}
-                      <div className="flex">
-                        <button className="bg-button me-3 rounded-sm p-2 text-red-600">
-                          Stake
-                        </button>
-                        <button className="bg-button me-3 rounded-sm p-2 text-red-600">
-                          Unstake
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="w-52 ms-auto">
-                <img
-                  className="rounded-full ms-auto "
-                  src={getTokenData(PROFIT[0])?.logoURI}
-                  alt={getTokenData(PROFIT[0])?.logoURI}
-                />
+                    <tr>
+                      <td>Price: </td>
+                      <td>
+                        {"$ "}
+                        {profitTokenData?.price}{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Total supply: </td>
+                      <td>{profitTokenData?.totalSupply} </td>
+                    </tr>
+                    <tr>
+                      <td>Market Cap: </td>
+                      <td>
+                        {"$ "}
+                        {profitTokenData?.marketCap}{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Address: </td>
+                      <td>{getTokenData(PROFIT[0])?.address} </td>
+                    </tr>
+                    <tr>
+                      <td>Wallet: </td>
+                      <td>
+                        <span className="text-red-600">ADD WALLET</span>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="mb-auto align-top">Staked: </td>
+                      <td className=" gap-3">
+                        <p className="text-red-600 my-auto ">ADD STAKED</p>{" "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div className="w-52 ms-auto">
+                  <img
+                    className="rounded-full ms-auto "
+                    src={getTokenData(PROFIT[0])?.logoURI}
+                    alt={getTokenData(PROFIT[0])?.logoURI}
+                  />
+                </div>
+              </div>
+
+              <div className="flex mt-3 text-sm">
+                <button className="bg-button me-3 rounded-sm p-2 text-red-600">
+                  Stake
+                </button>
+                <button className="bg-button rounded-sm p-2 text-red-600">
+                  Unstake
+                </button>
+              </div>
+
+              <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                <a
+                  className="rounded-sm text-start p-2 text-sm my-auto flex text-[#8D8E96] bg-button "
+                  href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
+                  Chart
+                </a>
+                <a
+                  className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
+                  href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
+                  Swap by 1inch
+                </a>
+                <a
+                  className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
+                  href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
+                  Swap by Uniswap V3
+                </a>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-1 md:flex gap-3 mt-3">
-              <a
-                className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
-                href="https://dexscreener.com/polygon/0xd3B1f11f0ff29Add929941095C696D464D6961FC?embed=1&amp;theme=dark&amp;trades=0&amp;info=0">
-                Chart
-              </a>
-              <a
-                className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
-                href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
-                Swap by 1inch
-              </a>
-              <a
-                className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
-                href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44">
-                Swap by Uniswap V3
-              </a>
-            </div>
-          </div>
+            <div className="grid bg-[#2c2f38] rounded-md p-3 mt-5 w-full justify-between">
+              <div className="flex  mt-5 m-auto w-full">
+                <table className="text-sm h-52">
+                  <tbody>
+                    <tr>
+                      <td className="min-w-[85px]">Name: </td>
+                      <td>{getTokenData(SDIV[0])?.name} </td>
+                    </tr>
+                    <tr>
+                      <td>Symbol: </td>
+                      <td>{getTokenData(SDIV[0])?.symbol} </td>
+                    </tr>
+                    <tr>
+                      <td>Address: </td>
+                      <td>{getTokenData(SDIV[0])?.address} </td>
+                    </tr>
+                    <tr>
+                      <td>Total supply: </td>
+                      <td>{tokensTotalSupply.sdiv} </td>
+                    </tr>
+                    <tr>
+                      <td>Wallet: </td>
+                      <td className=" my-auto">
+                        <span className="text-red-600">ADD WALLET</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Earned: </td>
+                      <td>
+                        <span className="text-red-600 me-3 my-auto">
+                          ADD EARNED
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
-          <div className="flex bg-[#2c2f38] rounded-md p-3 mt-5 w-full justify-between">
-            <table className="text-sm h-52">
-              <tbody>
-                <tr>
-                  <td className="min-w-[85px]">Name: </td>
-                  <td>{getTokenData(SDIV[0])?.name} </td>
-                </tr>
-                <tr>
-                  <td>Symbol: </td>
-                  <td>{getTokenData(SDIV[0])?.symbol} </td>
-                </tr>
-                <tr>
-                  <td>Address: </td>
-                  <td>{getTokenData(SDIV[0])?.address} </td>
-                </tr>
-                <tr>
-                  <td>Total supply: </td>
-                  <td>{tokensTotalSupply.sdiv} </td>
-                </tr>
-                <tr>
-                  <td>Wallet: </td>
-                  <td className=" my-auto">
-                    <span className="text-red-600">ADD WALLET</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Earned: </td>
-                  <td>
-                    <span className="text-red-600 me-3 my-auto">
-                      ADD EARNED
-                    </span>
-                    <button className="bg-button rounded-sm p-2 text-red-600">
-                      Claim
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="w-52 ms-auto">
-              <img
-                className="rounded-full ms-auto"
-                src={getTokenData(SDIV[0])?.logoURI}
-                alt={getTokenData(SDIV[0])?.logoURI}
-              />
-            </div>
-          </div>
-
-          <div className="m-auto  bg-[#2c2f38] rounded-md p-3 mt-5">
-            <div className="flex bg-[#2c2f38] rounded-md mt-5 w-full justify-between">
-              <table className="text-sm">
-                <tbody>
-                  <tr>
-                    <td className="min-w-[85px]">Name: </td>
-                    <td>Profit Maker </td>
-                  </tr>
-                  <tr>
-                    <td>Symbol: </td>
-                    <td>PM </td>
-                  </tr>
-                  <tr>
-                    <td>Address: </td>
-                    <td>0xAA3e3709C79a133e56C17a7ded87802adF23083B </td>
-                  </tr>
-                  <tr>
-                    <td>Total supply: </td>
-                    <td>{tokensTotalSupply.pm}</td>
-                  </tr>
-                  <tr>
-                    <td>To mint: </td>
-                    <td>
-                      <span className="text-red-600 "> ADD TO MINT</span>{" "}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Mint:</td>
-                    <td>
-                      <span className="text-red-600 ">ADD MINT</span>{" "}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="w-52 ms-auto ">
-                <img
-                  alt="Profit maker"
-                  src="https://stabilitydao.org/pm.png"
-                  className="rounded-full ms-auto"
-                />
+                <div className="w-52 ms-auto">
+                  <img
+                    className="rounded-full ms-auto"
+                    src={getTokenData(SDIV[0])?.logoURI}
+                    alt={getTokenData(SDIV[0])?.logoURI}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="flex pt-3">
-              <a
-                className="rounded-sm text-start p-2 text-sm my-auto flex text-gray-400 bg-button "
-                href="https://opensea.io/collection/profit-maker">
-                Marketplace
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="  m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
-        <div className="p-3">
-          <h1 className="text-xxl text-gradient mb-3 text-left">Governance</h1>
-          <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h2 className="text-start text-2xl py-4">Treasury</h2>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="min-w-[85px]">Address:</td>
-                  <td>{TREASURY[0]}</td>
-                </tr>
-                <tr>
-                  <td>Total balance: </td>
-                  <td>{daoData?.treasuryBalance}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="p-3 bg-[#2c2f38] rounded-md mt-5 text-sm">
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h2 className="text-start text-2xl py-4">Governance</h2>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="min-w-[85px]">Address:</td>
-                  {/* <td>{daoData?.platformGovernance}</td> */}
-                </tr>
-              </tbody>
-            </table>
-            <div className="flex mt-5">
-              <a
-                className="rounded-sm text-start p-2 me-3 text-gray-400 bg-button"
-                href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
+              <div className="flex mt-3 text-sm">
                 {" "}
-                Tally governance app
-              </a>
+                <button className="bg-button rounded-sm p-2 text-red-600">
+                  Claim
+                </button>
+              </div>
+            </div>
+
+            <div className="m-auto  bg-[#2c2f38] rounded-md p-3 mt-5">
+              <div className="flex bg-[#2c2f38] rounded-md mt-5 w-full justify-between">
+                <table className="text-sm">
+                  <tbody>
+                    <tr>
+                      <td className="min-w-[85px]">Name: </td>
+                      <td>Profit Maker </td>
+                    </tr>
+                    <tr>
+                      <td>Symbol: </td>
+                      <td>PM </td>
+                    </tr>
+                    <tr>
+                      <td>Address: </td>
+                      <td>0xAA3e3709C79a133e56C17a7ded87802adF23083B </td>
+                    </tr>
+                    <tr>
+                      <td>Total supply: </td>
+                      <td>{tokensTotalSupply.pm}</td>
+                    </tr>
+                    <tr>
+                      <td>To mint: </td>
+                      <td>
+                        <span className="text-red-600 "> ADD TO MINT</span>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Mint:</td>
+                      <td>
+                        <span className="text-red-600 ">ADD MINT</span>{" "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div className="w-52 ms-auto ">
+                  <img
+                    alt="Profit maker"
+                    src="https://stabilitydao.org/pm.png"
+                    className="rounded-full ms-auto"
+                  />
+                </div>
+              </div>
+
+              <div className="flex pt-3">
+                <a
+                  className="rounded-sm text-start p-2 text-sm my-auto flex text-[#8D8E96] bg-button "
+                  href="https://opensea.io/collection/profit-maker">
+                  Marketplace
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className=" m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
-        <div className="p-3">
-          <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
-          <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
-            <table>
-              <thead>
-                <tr>
-                  <td>
-                    <h2 className="text-start text-2xl py-4">Multisig</h2>
-                  </td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Address:</td>
-                  <td>{daoData?.multisigAddress}</td>
-                </tr>
-                <tr>
-                  <td>Balance:</td>
-                </tr>
-              </tbody>
-            </table>
-            <div className="flex flex-wrap justify-evenly w-full gap-4 mt-5">
-              {_multisigBalance &&
-                $assetsPrices &&
-                Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
-                  <div
-                    className="bg-button p-3 rounded-md w-[120px] m-auto"
-                    key={address}>
-                    <div className="grid justify-center">
-                      <img
-                        className="w-[28px] rounded-full m-auto mb-2"
-                        src={getTokenData(address)?.logoURI}
-                      />
-                      <p className="my-auto font-medium">
-                        {getTokenData(address)?.symbol}
-                      </p>
-                    </div>
-                    <p className="text-center font-medium">
-                      {tokenInfo.balance}
-                    </p>
-                    <p className="text-center text-gray-400 font-thin">
-                      ≈${tokenInfo.priceBalance}
-                    </p>
-                  </div>
-                ))}
+        <div className="m-auto w-1/2 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+          <div className="p-3">
+            <h1 className="text-xxl text-gradient mb-3 text-left">
+              Governance
+            </h1>
+            <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
+              <table>
+                <thead>
+                  <tr>
+                    <td>
+                      <h2 className="text-start text-2xl py-4">Treasury</h2>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="min-w-[85px]">Address:</td>
+                    <td>{TREASURY[0]}</td>
+                  </tr>
+                  <tr>
+                    <td>Total balance: </td>
+                    <td>{daoData?.treasuryBalance}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-3 bg-[#2c2f38] rounded-md mt-5 text-sm">
+              <table>
+                <thead>
+                  <tr>
+                    <td>
+                      <h2 className="text-start text-2xl py-4">Governance</h2>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="min-w-[85px]">Address:</td>
+                    {/* <td>{daoData?.platformGovernance}</td> */}
+                  </tr>
+                </tbody>
+              </table>
+              <div className="flex mt-5">
+                <a
+                  className="rounded-sm text-start p-2 me-3 text-[#8D8E96] bg-button"
+                  href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226">
+                  {" "}
+                  Tally governance app
+                </a>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap justify-center align-top w-full m-auto mb-auto">
-          {members ? (
-            members.map(member => (
-              <a
-                href={member.html_url}
-                key={member.name}
-                className="p-2 text-sm w-[150px] h-[230px] mb-auto"
-                target="_blank">
-                <img
-                  className="rounded-full m-auto p-3 w-[90px]"
-                  src={member.avatar_url}
-                  alt={`Avatar de ${member.name}`}
-                />
-                <p className="font-medium text-lg text-center">{member.name}</p>
-                <p className="font-medium text-sm mt-1"> {member.location}</p>
-                <p className="font-light text-sm line-clamp-3">{member.bio}</p>
-              </a>
-            ))
-          ) : (
-            <p>Loading team..</p>
-          )}
+        <div className=" m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+          <div className="p-3">
+            <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
+            <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
+              <table>
+                <thead>
+                  <tr>
+                    <td>
+                      <h2 className="text-start text-2xl py-4">Multisig</h2>
+                    </td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Address:</td>
+                    <td>{daoData?.multisigAddress}</td>
+                  </tr>
+                  <tr>
+                    <td>Balance:</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="flex flex-wrap justify-evenly w-full gap-4 mt-5 mb-5">
+                {_multisigBalance &&
+                  $assetsPrices &&
+                  Object.entries(_multisigBalance).map(
+                    ([address, tokenInfo]) => (
+                      <div
+                        className="bg-button p-3 rounded-md w-[120px] m-auto"
+                        key={address}>
+                        <div className="grid justify-center">
+                          <img
+                            className="w-[28px] rounded-full m-auto mb-2"
+                            src={getTokenData(address)?.logoURI}
+                          />
+                          <p className="my-auto font-medium">
+                            {getTokenData(address)?.symbol}
+                          </p>
+                        </div>
+                        <p className="text-center font-medium">
+                          {tokenInfo.balance}
+                        </p>
+                        <p className="text-center text-gray-400 font-thin">
+                          ≈${tokenInfo.priceBalance}
+                        </p>
+                      </div>
+                    )
+                  )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 p-3 flex flex-wrap justify-center align-top w-full m-auto">
+            {members ? (
+              members.map(member => (
+                <a
+                  href={member.html_url}
+                  key={member.name}
+                  className="p-2 text-sm w-[150px] h-[230px] mb-auto"
+                  target="_blank">
+                  <img
+                    className="rounded-full m-auto p-3 w-[90px]"
+                    src={member.avatar_url}
+                    alt={`Avatar de ${member.name}`}
+                  />
+                  <p className="font-medium text-lg text-center">
+                    {member.name}
+                  </p>
+                  <p className="font-medium text-sm mt-1"> {member.location}</p>
+                  <p className="font-light text-sm line-clamp-3">
+                    {member.bio}
+                  </p>
+                </a>
+              ))
+            ) : (
+              <p>Loading team..</p>
+            )}
+          </div>
         </div>
       </div>
     </main>

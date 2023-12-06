@@ -180,6 +180,7 @@ type TGitHubUser = {
   name: string;
   avatar_url: string;
   html_url: string;
+  followers: string;
 };
 
 type TProfitTokenData = {
