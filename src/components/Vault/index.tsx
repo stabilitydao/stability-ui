@@ -26,6 +26,7 @@ import {
   vaultAssets,
   platformData,
   tokens,
+  apiData,
 } from "@store";
 
 import {
@@ -73,6 +74,7 @@ function Vault({ vault }: IProps) {
   const $vaultAssets: any = useStore(vaultAssets);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
+  const $apiData = useStore(apiData);
 
   const _publicClient = usePublicClient();
 
@@ -882,25 +884,37 @@ function Vault({ vault }: IProps) {
           ];
         }
 
-        const tempAPR = Number(formatUnits($vaults[7][index], 3)).toFixed(4);
-        const APY = calculateAPY(tempAPR).toFixed(4);
+        const assetsWithApr:string[] = []
+        const assetsAprs:string[] = []
+        let totalAPR = Number(formatUnits($vaults[7][index], 3));
+        const data = $apiData?.underlyings?.["137"]?.[underlyingToken?.address.toLowerCase()];
+        if (data) {
+          const gammaApr = data.apr.daily.feeApr;
+          if (gammaApr) {
+            assetsWithApr.push('Pool swap fees')
+            assetsAprs.push((Number(gammaApr) * 100).toFixed(2))
+            totalAPR += Number(gammaApr) * 100
+          }
+        }
+        
+        const APY = calculateAPY(totalAPR).toFixed(2);
 
         return {
           address: $vaults[0][index],
           name: $vaults[1][index],
           symbol: $vaults[2][index],
           type: $vaults[3][index],
-          assetsWithApr: $vaultAssets[index][3],
-          assetsAprs: $vaultAssets[index][4],
+          assetsWithApr,
+          assetsAprs,
           lastHardWork: $vaultAssets[index][5],
           shareprice: String($vaults[5][index]),
           tvl: String($vaults[6][index]),
-          apr: tempAPR,
-          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(4),
+          apr: totalAPR.toFixed(2),
+          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(2),
           strategySpecific: $vaults[9][index],
           apy: APY,
           balance: vaultUserBalances[index],
-          daily: (Number(tempAPR) / 365).toFixed(4),
+          daily: (Number(totalAPR) / 365).toFixed(2),
           assets: assets,
           strategyInfo: getStrategyInfo($vaults[2][index]),
         };
@@ -910,18 +924,18 @@ function Vault({ vault }: IProps) {
         vaults.filter((thisVault: any) => thisVault.address === vault)[0]
       );
     }
-  }, [$vaults, $vaultData, $vaultAssets]);
+  }, [$vaults, $vaultData, $vaultAssets, underlyingToken]);
 
   useEffect(() => {
     if (localVault) {
       const TD = getTimeDifference(localVault.lastHardWork);
       setTimeDifference(TD);
 
-      setAssetsAPR(
-        localVault.assetsAprs.map((apr: string) =>
-          formatFromBigInt(apr, 16).toFixed(2)
-        )
-      );
+      // setAssetsAPR(
+      //   localVault.assetsAprs.map((apr: string) =>
+      //     formatFromBigInt(apr, 16).toFixed(2)
+      //   )
+      // );
     }
   }, [localVault]);
 
@@ -1230,29 +1244,26 @@ function Vault({ vault }: IProps) {
                     {localVault.apr}% / {localVault.apy}%
                   </p>
                 </div>
+                {!!localVault.assetsWithApr?.length && (
+                  <div>
+                    {localVault.assetsAprs.map((apr: string, index: number) => {
+                        return (
+                          <div className="mt-2" key={index}>
+                            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                              {localVault.assetsWithApr[index]} APR
+                            </p>
+                            <p>{apr}%</p>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
                 <div className="mt-2">
                   <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                     Strategy APR
                   </p>
                   <p>{localVault.strategyApr}%</p>
                 </div>
-
-                {!!assetsAPR?.length && (
-                  <div>
-                    <div className="flex items-center gap-3 flex-wrap mt-2">
-                      {assetsAPR.map((apr: string, index: number) => {
-                        return (
-                          <p
-                            key={apr}
-                            className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                          >
-                            {localVault.assetsWithApr[index]} APR {apr}%
-                          </p>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
 
                 <div className="hidden mt-2">
                   <div className="mr-5">
