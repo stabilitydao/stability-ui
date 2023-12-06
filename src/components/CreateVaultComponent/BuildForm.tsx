@@ -6,6 +6,8 @@ import { writeContract } from "@wagmi/core";
 import { formatUnits, parseUnits } from "viem";
 import { readContract } from "viem/actions";
 
+import { Loader } from "@components";
+
 import { FactoryABI, ERC20ABI } from "@web3";
 import {
   account,
@@ -20,6 +22,7 @@ import type { TInitParams, TAddress, TInputItem } from "@types";
 import { getTokenData } from "@utils";
 
 import tokensJson from "../../stability.tokenlist.json";
+
 interface IProps {
   vaultType: string;
   strategyId: string;
@@ -82,6 +85,9 @@ const BuildForm = ({
   const refArray = Array.from({ length: boostRewardsTokens.length }).map(() =>
     useRef<HTMLInputElement | null>(null)
   );
+
+  const [loader, setLoader] = useState<boolean>(false);
+
   //// rewarding
   const handleInput = (
     tokenPrice: string,
@@ -267,26 +273,30 @@ const BuildForm = ({
 
   const approve = async () => {
     if ($platformData) {
-      const approve = await writeContract({
-        address: $platformData.buildingPayPerVaultToken,
-        abi: ERC20ABI,
-        functionName: "approve",
-        args: [$platformData.factory, buildingPrice],
-      });
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        approve
-      );
-      if (transaction.status === "success") {
-        setAllowance(
-          (await readContract(_publicClient, {
-            address: $platformData.buildingPayPerVaultToken,
-            abi: ERC20ABI,
-            functionName: "allowance",
-            args: [$account as TAddress, $platformData?.factory],
-          })) as bigint
+      try {
+        const approve = await writeContract({
+          address: $platformData.buildingPayPerVaultToken,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [$platformData.factory, buildingPrice],
+        });
+        setLoader(true);
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          approve
         );
-      } else {
-        // todo show error
+        if (transaction.status === "success") {
+          setAllowance(
+            (await readContract(_publicClient, {
+              address: $platformData.buildingPayPerVaultToken,
+              abi: ERC20ABI,
+              functionName: "allowance",
+              args: [$account as TAddress, $platformData?.factory],
+            })) as bigint
+          );
+          setLoader(false);
+        }
+      } catch (error) {
+        setLoader(false);
       }
     }
   };
@@ -391,9 +401,41 @@ const BuildForm = ({
         </div>
       )}
 
-      {buildResult === undefined && vaultType === "Compounding" && (
-        <div className="mt-10 flex justify-center">
-          {needCheckAllowance &&
+      {!loader ? (
+        <>
+          {buildResult === undefined && vaultType === "Compounding" && (
+            <div className="mt-10 flex justify-center">
+              {needCheckAllowance &&
+              allowance !== undefined &&
+              allowance < buildingPrice &&
+              (nftData === undefined || nftData?.freeVaults !== 0) ? (
+                <button
+                  className="bg-button px-5 py-1 rounded-md"
+                  onClick={approve}
+                >
+                  Approve factory to spend {payPerVaultToken?.symbol}
+                </button>
+              ) : (
+                <button
+                  className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
+                  onClick={deploy}
+                >
+                  Deploy
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <Loader />
+      )}
+      {loader ? (
+        <Loader />
+      ) : (
+        <>
+          {buildResult === undefined &&
+          vaultType === "Rewarding" &&
+          needCheckAllowance &&
           allowance !== undefined &&
           allowance < buildingPrice &&
           (nftData === undefined || nftData?.freeVaults !== 0) ? (
@@ -404,47 +446,30 @@ const BuildForm = ({
               Approve factory to spend {payPerVaultToken?.symbol}
             </button>
           ) : (
-            <button
-              className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
-              onClick={deploy}
-            >
-              Deploy
-            </button>
+            buildResult === undefined &&
+            vaultType === "Rewarding" &&
+            (rewardingVaultApprove || rewardingVaultDeploy) && (
+              <div className="mt-10 flex justify-center">
+                {rewardingVaultApprove && (
+                  <button
+                    className="bg-button px-5 py-1 rounded-md"
+                    onClick={approveRewardingVaultTokens}
+                  >
+                    Approve factory to spend {rewardingVaultApprove[0].symbol}
+                  </button>
+                )}
+                {rewardingVaultDeploy && (
+                  <button
+                    className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
+                    onClick={deployRewardingVault}
+                  >
+                    Deploy
+                  </button>
+                )}
+              </div>
+            )
           )}
-        </div>
-      )}
-      {buildResult === undefined &&
-      vaultType === "Rewarding" &&
-      needCheckAllowance &&
-      allowance !== undefined &&
-      allowance < buildingPrice &&
-      (nftData === undefined || nftData?.freeVaults !== 0) ? (
-        <button className="bg-button px-5 py-1 rounded-md" onClick={approve}>
-          Approve factory to spend {payPerVaultToken?.symbol}
-        </button>
-      ) : buildResult === undefined &&
-        vaultType === "Rewarding" &&
-        (rewardingVaultApprove || rewardingVaultDeploy) ? (
-        <div className="mt-10 flex justify-center">
-          {rewardingVaultApprove && (
-            <button
-              className="bg-button px-5 py-1 rounded-md"
-              onClick={approveRewardingVaultTokens}
-            >
-              Approve factory to spend {rewardingVaultApprove[0].symbol}
-            </button>
-          )}
-          {rewardingVaultDeploy && (
-            <button
-              className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] px-6 py-1 rounded-md"
-              onClick={deployRewardingVault}
-            >
-              Deploy
-            </button>
-          )}
-        </div>
-      ) : (
-        ""
+        </>
       )}
 
       {buildResult && (
