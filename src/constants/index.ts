@@ -8,6 +8,7 @@ import {
   PROFIT,
   SDIV,
   PM,
+  TREASURY,
 } from "./tokens";
 
 const TABLE = [
@@ -130,4 +131,5 @@ export {
   PROFIT,
   SDIV,
   PM,
+  TREASURY,
 };

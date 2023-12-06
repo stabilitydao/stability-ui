@@ -94,7 +94,7 @@ function Vaults() {
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
-
+  console.log($vaults);
   useEffect(() => {
     if ($vaults?.length && $vaultData) {
       const balances = Object.values($vaultData).map(({ vaultUserBalance }) =>

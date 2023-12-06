@@ -163,8 +163,7 @@ type TVaultsAddress = {
 type TDAOData = {
   platformVersion: string;
   platformGovernance: string;
-  multisig: string;
-  multisigBalance: string;
+  multisigAddress: string;
   numberOfTotalVaults: string;
   totalTvl: string;
   strategieNames: string;
@@ -188,6 +187,13 @@ type TProfitTokenData = {
   totalSupply: string;
   marketCap: string;
 };
+
+type TmultiTokenData = {
+  balance: string;
+  priceBalance: number;
+};
+
+type TmultisigBalance = Record<string, TmultiTokenData>;
 
 export type {
   TPlatformData,
@@ -218,4 +224,6 @@ export type {
   TDAOData,
   TGitHubUser,
   TProfitTokenData,
+  TmultisigBalance,
+  TmultiTokenData,
 };
