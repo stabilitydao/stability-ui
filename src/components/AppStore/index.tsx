@@ -1,6 +1,8 @@
 import type React from "react";
 import { useEffect } from "react";
 // import { parseUnits } from "viem";
+import axios from "axios";
+
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -22,6 +24,7 @@ import {
   balances,
   tokens,
   connected,
+  apiData,
 } from "@store";
 import {
   platform,
@@ -171,12 +174,21 @@ const AppStore = (props: React.PropsWithChildren) => {
       }
     }
   };
+  const getDataFromStabilityAPI = async () => {
+    try {
+      const response = await axios.get("https://api.stabilitydao.org/");
+      apiData.set(response.data);
+    } catch (error) {
+      console.log("API ERROR:", error);
+    }
+  };
 
   useEffect(() => {
     account.set(address);
     publicClient.set(_publicClient);
     network.set(chain?.name);
     connected.set(isConnected);
+    getDataFromStabilityAPI();
     getData();
   }, [address, chain?.id, isConnected]);
 

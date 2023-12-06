@@ -35,6 +35,7 @@ import {
   ZapABI,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
+
 import {
   getTokenData,
   formatNumber,
@@ -277,7 +278,6 @@ function Vault({ vault }: IProps) {
         abi: VaultABI,
         functionName: "strategy",
       });
-
       const underlying = await readContract(_publicClient, {
         address: strategy,
         abi: StrategyABI,
@@ -710,7 +710,6 @@ function Vault({ vault }: IProps) {
     }
     setBalances(balance);
   };
-
   const previewWithdraw = async (value: string) => {
     const balance = Number(
       formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
