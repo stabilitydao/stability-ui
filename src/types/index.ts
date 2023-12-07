@@ -169,9 +169,12 @@ type TDAOData = {
   strategieNames: string;
   platformFee: string;
   vaultManagerFee: string;
+  typesOfVaults: string;
   strategyLogicFee: string;
   ecosystemFee: string;
   treasuryBalance: string;
+  network: string;
+  farmsLength: string;
 };
 
 type TGitHubUser = {

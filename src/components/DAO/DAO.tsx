@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances, assetsPrices } from "@store";
-import { PlatformABI, platform, ERC20ABI, IERC721Enumerable } from "@web3";
+import {
+  PlatformABI,
+  FactoryABI,
+  platform,
+  ERC20ABI,
+  IERC721Enumerable,
+} from "@web3";
 import type {
   TDAOData,
   TGitHubUser,
@@ -49,11 +55,7 @@ function DAO() {
               html_url: memberInfoResponse.data.html_url,
               followers: memberInfoResponse.data.followers,
             };
-            console.log(memberInfoResponse);
-            const sortMembers = members.sort(
-              (a, b) => b.followers - a.followers
-            );
-            return sortMembers;
+            return updatedMember;
           } catch (error) {
             console.error(
               `Error fetching member info for ${member.login}`,
@@ -64,7 +66,11 @@ function DAO() {
         })
       );
 
-      setMembers(membersAdditionalInfo);
+      const sortedMembers = membersAdditionalInfo.sort(
+        (a, b) => b.followers - a.followers
+      );
+
+      setMembers(sortedMembers);
     } catch (error) {
       console.error("Fetching getTeamData", error);
     }
@@ -100,6 +106,7 @@ function DAO() {
           abi: PlatformABI,
           functionName: "getFees",
         });
+        console.log(platformFees);
 
         const contractData: any = await $publicClient.readContract({
           address: platform,
@@ -131,6 +138,21 @@ function DAO() {
           functionName: "balanceOf",
           args: [TREASURY[0] as `0x${string}`],
         });
+
+        const network = await $publicClient.readContract({
+          address: platform as `0x${string}`,
+          abi: PlatformABI,
+          functionName: "getPlatformSettings",
+        });
+
+        const farmsLength = await $publicClient.readContract({
+          address: contractData[0][0] as `0x${string}`,
+          abi: FactoryABI,
+          functionName: "farmsLength",
+        });
+
+        //vault types
+        const vaultType = contractData[3];
 
         //multisig asset balance
         const _balances: TmultisigBalance = {};
@@ -203,7 +225,7 @@ function DAO() {
 
         setTokensTotalSupply(_tokensTotalSupply);
 
-        //platformData
+        //fees
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
           (fee / 1000n).toString()
         );
@@ -222,9 +244,12 @@ function DAO() {
           strategieNames: contractData[6],
           platformFee: percentageFees[0],
           vaultManagerFee: percentageFees[1],
+          typesOfVaults: contractData[3],
           strategyLogicFee: percentageFees[2],
           ecosystemFee: percentageFees[3],
           treasuryBalance: _treasuryBalance,
+          network: network,
+          farmsLength: Number(farmsLength),
         };
 
         setDaoData(daoData);
@@ -240,19 +265,20 @@ function DAO() {
   }, [$balances]);
 
   return (
-    <main className="w-full m-auto">
-      <div className="m-auto p-2 pb-3 bg-button rounded-md w-6/7">
+    <main className="w-full p-o">
+      <div className="m-auto pb-3 p-7 bg-button border border-gray-950 shadow-md rounded-md w-full">
         <div className="flex">
-          <h1 className="text-xxl text-gradient mb-3 text-left">Platform</h1>
+          <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">Platform</h1>
+
           <p className="align-middle flex ms-auto my-auto text-sm pe-2 text-[#8D8E96]">
             v{daoData?.platformVersion}
           </p>
         </div>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm m-auto">
-          <div className="p-3 rounded-md text-left  bg-[#1c1c23] text-[#8D8E96] shadow-md w-full">
+          <div className="p-3 rounded-md border border-gray-950  bg-[#1c1c23]  shadow-md w-full">
             <div className="mb-3">
-              <h2 className="font-bold">Version</h2>
-              <h2 className="">{daoData?.platformVersion}</h2>
+              <h2 className="font-bold">Network</h2>
+              <h2>{daoData?.network.networkName}</h2>
             </div>
             <div className="mb-3">
               <h2 className="font-bold">Total Vaults</h2>
@@ -328,19 +354,37 @@ function DAO() {
                 )}
             </div>
           </div>
+
+          <div className="p-3 flex bg-[#3d404b] shadow-md rounded-md">
+            <div>
+              <h2 className="font-bold">Vault Types</h2>
+              {daoData?.typesOfVaults &&
+                daoData.typesOfVaults.map((vaultType, index) => {
+                  return <h2 key={index}>{vaultType}</h2>;
+                })}
+            </div>
+          </div>
+          <div className="p-3 rounded-md bg-[#2c2f38] shadow-md  bg-opacity-75">
+            <div className="w-full h-full grid m-auto">
+              <h2 className="text-xl font-medium text-left text-[#8D8E96]">
+                Total farms
+              </h2>
+              {daoData?.farmsLength}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="bg-[#262830] pt-1 mt-5 rounded-md">
-        <div className="m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+      <div className="bg-[#262830] pt-1 mt-5 mb-5 rounded-md">
+        <div className="m-auto w-5/6 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
           <div className="m-auto p-3 w-full">
-            <h1 className="text-xxl text-gradient mb-3 text-left">
+            <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">
               Tokenomics
             </h1>
 
             <div className="bg-[#2c2f38] rounded-md p-3 mt-5 w-full">
-              <div className="flex bg-[#2c2f38] rounded-md mt-5 w-full justify-between">
-                <table className="text-sm table-auto text-[#8D8E96]">
+              <div className="flex bg-[#2c2f38] m-auto mt-5 w-full">
+                <table className="text-sm text-[#8D8E96]">
                   <tbody>
                     <tr>
                       <td className="min-w-[85px]">Name: </td>
@@ -425,8 +469,8 @@ function DAO() {
               </div>
             </div>
 
-            <div className="grid bg-[#2c2f38] rounded-md p-3 mt-5 w-full justify-between">
-              <div className="flex  mt-5 m-auto w-full">
+            <div className="bg-[#2c2f38] rounded-md p-3 mt-5 w-full">
+              <div className="flex mt-5 m-auto w-full">
                 <table className="text-sm h-52">
                   <tbody>
                     <tr>
@@ -533,9 +577,9 @@ function DAO() {
           </div>
         </div>
 
-        <div className="m-auto w-1/2 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+        <div className="w-4/5 md:w-2/3 m-auto  mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
           <div className="p-3">
-            <h1 className="text-xxl text-gradient mb-3 text-left">
+            <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">
               Governance
             </h1>
             <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
@@ -588,9 +632,9 @@ function DAO() {
           </div>
         </div>
 
-        <div className=" m-auto w-4/5 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+        <div className="m-auto mb-5 w-5/6 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
           <div className="p-3">
-            <h1 className="text-xxl text-gradient mb-3 text-left">Team</h1>
+            <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">Team</h1>
             <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
               <table>
                 <thead>
@@ -640,23 +684,42 @@ function DAO() {
             </div>
           </div>
 
-          <div className="mt-5 p-3 flex flex-wrap justify-center align-top w-full m-auto">
+          <div className="mt-5 mb-5 flex flex-wrap justify-center align-top w-full m-auto">
             {members ? (
               members.map(member => (
                 <a
                   href={member.html_url}
                   key={member.name}
-                  className="p-2 text-sm w-[150px] h-[230px] mb-auto"
+                  className="text-sm p-2 w-[150px] h-[230px] mb-auto hover:bg-button rounded-md"
                   target="_blank">
                   <img
-                    className="rounded-full m-auto p-3 w-[90px]"
+                    className="rounded-full m-auto w-[100px]"
                     src={member.avatar_url}
                     alt={`Avatar de ${member.name}`}
                   />
-                  <p className="font-medium text-lg text-center">
+                  <p className="font-medium text-lg text-center mt-1">
                     {member.name}
                   </p>
-                  <p className="font-medium text-sm mt-1"> {member.location}</p>
+                  {member.location !== "" ? (
+                    <p className="text-sm mt-1 flex text-left">
+                      <svg
+                        stroke="currentColor"
+                        fill="currentColor"
+                        stroke-width="0"
+                        viewBox="0 0 12 16"
+                        class="mt-1"
+                        height="1em"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          fill-rule="evenodd"
+                          d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
+                      </svg>{" "}
+                      {member.location}
+                    </p>
+                  ) : (
+                    ""
+                  )}
                   <p className="font-light text-sm line-clamp-3">
                     {member.bio}
                   </p>
