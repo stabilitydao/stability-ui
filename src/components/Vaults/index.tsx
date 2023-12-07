@@ -290,7 +290,7 @@ function Vaults() {
                         >
                           {vault.strategyInfo.shortName}
                         </span>
-                        <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[170px]">
+                        <span className="px-2 rounded-r-[10px] bg-[#41465a] d-none md:flex h-8 items-center min-w-[100px] lg:min-w-[170px]">
                           <span className="flex min-w-[42px] justify-center">
                             {vault.strategyInfo.protocols.map(
                               (protocol, index) => (
@@ -325,8 +325,8 @@ function Vaults() {
                             <span
                               className={
                                 vault.strategySpecific.length > 10
-                                  ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px]`
-                                  : `ml-0.5 uppercase font-bold text-[12px] px-[6px] rounded-[4px]`
+                                  ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
+                                  : `ml-0.5 uppercase font-bold text-[11px] px-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
                               }
                             >
                               {vault.strategySpecific}
@@ -338,27 +338,15 @@ function Vaults() {
                   </div>
                 </td>
                 <td className="px-2 lg:px-4 py-2">
-                  {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
-                </td>
-
-                <td className="px-2 lg:px-4 py-2">
-                  ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
-                </td>
-                <td className="px-2 lg:px-4 py-2">
-                  {formatNumber(
-                    formatFromBigInt(vault.tvl, 18, "withFloor"),
-                    "abbreviate"
-                  )}
-                </td>
-                <td className="px-2 lg:px-4 py-2">
-                  <div className="flex">
+                  <div className="flex w-[80px] justify-end">
+                    <p>{APY}%</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 16 16"
                       fill="none"
-                      className="mt-[6px] mr-1 cursor-pointer opacity-20 hover:opacity-100 transition delay-[40ms]"
+                      className="mt-[4px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
                       onClick={(e) => {
                         e.stopPropagation();
                         setAprModal({
@@ -377,8 +365,19 @@ function Vaults() {
                         fill="white"
                       />
                     </svg>
-                    <p>{APY}%</p>
                   </div>
+                </td>
+                <td className="px-2 lg:px-4 py-2">
+                  ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+                </td>
+                <td className="px-2 lg:px-4 py-2 text-right">
+                  {formatNumber(
+                    formatFromBigInt(vault.tvl, 18, "withFloor"),
+                    "abbreviate"
+                  )}
+                </td>
+                <td className="pr-2 md:pr-3 lg:pr-5 py-2 text-right">
+                  {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
                 </td>
               </tr>
             );

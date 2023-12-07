@@ -14,12 +14,7 @@ const TABLE = [
     sortType: "none",
     dataType: "string",
   },
-  {
-    name: "Balance",
-    keyName: "balance",
-    sortType: "none",
-    dataType: "number",
-  },
+  { name: "APY", keyName: "apr", sortType: "none", dataType: "number" },
   {
     name: "Price",
     keyName: "shareprice",
@@ -27,7 +22,12 @@ const TABLE = [
     dataType: "number",
   },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  { name: "APY", keyName: "apr", sortType: "none", dataType: "number" },
+  {
+    name: "Balance",
+    keyName: "balance",
+    sortType: "none",
+    dataType: "number",
+  },
 ];
 const PAGINATION_VAULTS = 20;
 
