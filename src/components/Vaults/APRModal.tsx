@@ -16,19 +16,22 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       setModalState({
         apr: "",
         assetsWithApr: "",
-        assetsAprs: "",
+        assetsAprs: 0,
         lastHardWork: 0,
         strategyApr: 0,
         state: false,
       });
     }
   };
-  const APR = formatFromBigInt(state.apr, 3, "withDecimals").toFixed(2);
+
+  const APR = (
+    formatFromBigInt(state.apr, 3, "withDecimals") +
+    Number(state.assetsAprs) * 100
+  ).toFixed(2);
+
   const APY = calculateAPY(APR).toFixed(2);
+
   const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
-  const assetAprs = state.assetsAprs.map((apr: string) =>
-    formatFromBigInt(apr, 3).toFixed(2)
-  );
 
   const timeDifference = getTimeDifference(state.lastHardWork);
 
@@ -53,7 +56,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             setModalState({
               apr: "",
               assetsWithApr: "",
-              assetsAprs: "",
+              assetsAprs: 0,
               lastHardWork: 0,
               strategyApr: 0,
               state: false,
@@ -128,16 +131,10 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             <p className="font-bold">
               Total APR {APR}% ({APY}% APY)
             </p>
+            {!!state.assetsAprs && (
+              <p>Fee APR {(state.assetsAprs * 100).toFixed(2)}%</p>
+            )}
             <p>Strategy APR {strategyAPR}%</p>
-            <div>
-              {assetAprs.map((apr: string, index: number) => {
-                return (
-                  <p>
-                    {state.assetsWithApr[index]} APR {apr}%
-                  </p>
-                );
-              })}
-            </div>
           </div>
 
           <div className="flex items-center gap-3">

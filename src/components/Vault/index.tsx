@@ -13,6 +13,7 @@ import {
   // useFeeData,
 } from "wagmi";
 
+import { SettingsModal } from "./SettingsModal";
 import { VaultType } from "@components";
 
 import {
@@ -25,6 +26,7 @@ import {
   vaultAssets,
   platformData,
   tokens,
+  apiData,
 } from "@store";
 
 import {
@@ -34,6 +36,7 @@ import {
   ZapABI,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
+
 import {
   getTokenData,
   formatNumber,
@@ -71,6 +74,7 @@ function Vault({ vault }: IProps) {
   const $vaultAssets: any = useStore(vaultAssets);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
+  const $apiData = useStore(apiData);
 
   const _publicClient = usePublicClient();
 
@@ -116,6 +120,8 @@ function Vault({ vault }: IProps) {
     logoURI: "",
   });
   const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
+  const [settingsModal, setSettingsModal] = useState(false);
+  const [slippage, setSlippage] = useState("1");
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
@@ -274,7 +280,6 @@ function Vault({ vault }: IProps) {
         abi: VaultABI,
         functionName: "strategy",
       });
-
       const underlying = await readContract(_publicClient, {
         address: strategy,
         abi: StrategyABI,
@@ -456,6 +461,11 @@ function Vault({ vault }: IProps) {
   const zapDeposit = async () => {
     ///// UNDERLYING
     try {
+      const shares = parseUnits(underlyingShares, 18);
+      const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+      const out = shares - (shares * decimalPercent) / 100n;
+
       const depositAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -463,7 +473,7 @@ function Vault({ vault }: IProps) {
         args: [
           option as TAddress[],
           [parseUnits(inputs[option[0]]?.amount, 18)],
-          parseUnits(underlyingShares, 18),
+          out,
           $account as TAddress,
         ],
       });
@@ -594,11 +604,16 @@ function Vault({ vault }: IProps) {
 
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
+
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = sharesOut - (sharesOut * decimalPercent) / 100n;
+
     const depositAssets = await writeContract({
       address: vault as TAddress,
       abi: VaultABI,
       functionName: "depositAssets",
-      args: [$assets as TAddress[], input, sharesOut, $account as TAddress],
+      args: [$assets as TAddress[], input, out, $account as TAddress],
     });
   };
 
@@ -607,19 +622,23 @@ function Vault({ vault }: IProps) {
 
     if (!value) return;
     ///// UNDERLYING TOKEN
+
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = value - (value * decimalPercent) / 100n;
     if (underlyingToken?.address === option[0]) {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], value, [0n]],
+        args: [option as TAddress[], out, [0n]],
       });
     } else {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [$assets as TAddress[], value, [0n, 0n]],
+        args: [$assets as TAddress[], out, [0n, 0n]],
       });
     }
   };
@@ -693,7 +712,6 @@ function Vault({ vault }: IProps) {
     }
     setBalances(balance);
   };
-
   const previewWithdraw = async (value: string) => {
     const balance = Number(
       formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
@@ -705,6 +723,9 @@ function Vault({ vault }: IProps) {
     }
     ///// UNDERLYING TOKEN
     const currentValue = parseUnits(value, 18);
+    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+    const out = currentValue - (currentValue * decimalPercent) / 100n;
     if (underlyingToken?.address === option[0]) {
       // this code is valid also for ZAP tokens
 
@@ -712,7 +733,7 @@ function Vault({ vault }: IProps) {
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n]],
+        args: [option as TAddress[], out, [0n]],
         account: $account as TAddress,
       });
 
@@ -727,7 +748,7 @@ function Vault({ vault }: IProps) {
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n, 0n]],
+        args: [option as TAddress[], out, [0n, 0n]],
         account: $account as TAddress,
       });
       const preview = result.map((amount: any, index: number) => {
@@ -760,7 +781,7 @@ function Vault({ vault }: IProps) {
     setAllowance(allowanceResult);
   };
   const previewDeposit = async () => {
-    //if (!Number(lastKeyPress.key2)) return;
+    // if (!Number(lastKeyPress.key2)) return;
     if ($assets && lastKeyPress.key1 && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -775,17 +796,22 @@ function Vault({ vault }: IProps) {
               )
             );
           } else {
-            amounts.push(parseUnits("1", 36));
+            const token = tokensJson.tokens.find(
+              token => token.address === option[0]
+            );
+
+            const decimals = token ? token.decimals + 18 : 24;
+
+            amounts.push(parseUnits("1", decimals));
           }
         }
         try {
-          const previewDepositAssets: (bigint | bigint[] | any)[] =
-            (await readContract(_publicClient, {
-              address: vault as TAddress,
-              abi: VaultABI,
-              functionName: "previewDepositAssets",
-              args: [$assets as TAddress[], amounts],
-            })) as any;
+          const previewDepositAssets = await readContract(_publicClient, {
+            address: vault as TAddress,
+            abi: VaultABI,
+            functionName: "previewDepositAssets",
+            args: [$assets as TAddress[], amounts],
+          });
 
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
@@ -795,7 +821,6 @@ function Vault({ vault }: IProps) {
           const previewDepositAssetsArray: bigint[] = [
             ...previewDepositAssets[0],
           ];
-
           for (let i = 0; i < $assets.length; i++) {
             const decimals = getTokenData($assets[i])?.decimals;
             if (i !== changedInput && decimals) {
@@ -859,25 +884,40 @@ function Vault({ vault }: IProps) {
           ];
         }
 
-        const tempAPR = Number(formatUnits($vaults[7][index], 3)).toFixed(4);
-        const APY = calculateAPY(tempAPR).toFixed(4);
+        const assetsWithApr: string[] = [];
+        const assetsAprs: string[] = [];
+        let totalAPR = Number(formatUnits($vaults[7][index], 3));
+        const data =
+          $apiData?.underlyings?.["137"]?.[
+            underlyingToken?.address.toLowerCase()
+          ];
+        if (data) {
+          const gammaApr = data.apr.daily.feeApr;
+          if (gammaApr) {
+            assetsWithApr.push("Pool swap fees");
+            assetsAprs.push((Number(gammaApr) * 100).toFixed(2));
+            totalAPR += Number(gammaApr) * 100;
+          }
+        }
+
+        const APY = calculateAPY(totalAPR).toFixed(2);
 
         return {
           address: $vaults[0][index],
           name: $vaults[1][index],
           symbol: $vaults[2][index],
           type: $vaults[3][index],
-          assetsWithApr: $vaultAssets[index][3],
-          assetsAprs: $vaultAssets[index][4],
+          assetsWithApr,
+          assetsAprs,
           lastHardWork: $vaultAssets[index][5],
           shareprice: String($vaults[5][index]),
           tvl: String($vaults[6][index]),
-          apr: tempAPR,
-          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(4),
+          apr: totalAPR.toFixed(2),
+          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(2),
           strategySpecific: $vaults[9][index],
           apy: APY,
           balance: vaultUserBalances[index],
-          daily: (Number(tempAPR) / 365).toFixed(4),
+          daily: (Number(totalAPR) / 365).toFixed(2),
           assets: assets,
           strategyInfo: getStrategyInfo($vaults[2][index]),
         };
@@ -887,18 +927,18 @@ function Vault({ vault }: IProps) {
         vaults.filter((thisVault: any) => thisVault.address === vault)[0]
       );
     }
-  }, [$vaults, $vaultData, $vaultAssets]);
+  }, [$vaults, $vaultData, $vaultAssets, underlyingToken]);
 
   useEffect(() => {
     if (localVault) {
       const TD = getTimeDifference(localVault.lastHardWork);
       setTimeDifference(TD);
 
-      setAssetsAPR(
-        localVault.assetsAprs.map((apr: string) =>
-          formatFromBigInt(apr, 16).toFixed(2)
-        )
-      );
+      // setAssetsAPR(
+      //   localVault.assetsAprs.map((apr: string) =>
+      //     formatFromBigInt(apr, 16).toFixed(2)
+      //   )
+      // );
     }
   }, [localVault]);
 
@@ -1109,7 +1149,10 @@ function Vault({ vault }: IProps) {
 
               <div className={`flex flex-col items-start gap-3 p-4`}>
                 <div className="flex">
-                  <div className="flex py-1 pl-[8px] mr-3">
+                  <div
+                    className={`flex py-1 ${
+                      localVault.strategyInfo.protocols.length > 1 && "pl-[8px]"
+                    } mr-3`}>
                     {localVault.strategyInfo.protocols.map(
                       ({
                         name,
@@ -1123,7 +1166,10 @@ function Vault({ vault }: IProps) {
                           key={name}
                           src={logoSrc}
                           alt={name}
-                          className="h-8 w-8 rounded-full ml-[-8px]"
+                          className={`h-8 w-8 rounded-full ${
+                            localVault.strategyInfo.protocols.length > 1 &&
+                            "ml-[-8px]"
+                          }`}
                         />
                       )
                     )}
@@ -1218,28 +1264,28 @@ function Vault({ vault }: IProps) {
                     {localVault.apr}% / {localVault.apy}%
                   </p>
                 </div>
+                {!!localVault.assetsWithApr?.length && (
+                  <div>
+                    {localVault.assetsAprs.map((apr: string, index: number) => {
+                      return (
+                        <div
+                          className="mt-2"
+                          key={index}>
+                          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                            {localVault.assetsWithApr[index]} APR
+                          </p>
+                          <p>{apr}%</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 <div className="mt-2">
                   <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                     Strategy APR
                   </p>
                   <p>{localVault.strategyApr}%</p>
                 </div>
-
-                {!!assetsAPR?.length && (
-                  <div>
-                    <div className="flex items-center gap-3 flex-wrap mt-2">
-                      {assetsAPR.map((apr: string, index: number) => {
-                        return (
-                          <p
-                            key={apr}
-                            className="text-[14px] px-2 py-1 rounded-lg border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57]">
-                            {localVault.assetsWithApr[index]} APR {apr}%
-                          </p>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
 
                 <div className="hidden mt-2">
                   <div className="mr-5">
@@ -1440,10 +1486,7 @@ function Vault({ vault }: IProps) {
                         "withDecimals"
                       ) *
                       Number(
-                        formatNumber(
-                          formatFromBigInt(localVault.balance, 18),
-                          "format"
-                        )
+                        formatFromBigInt(localVault.balance, 18, "withDecimals")
                       )
                     ).toFixed(2)}
                   </p>
@@ -1514,10 +1557,10 @@ function Vault({ vault }: IProps) {
             </div>
             <form
               autoComplete="off"
-              className="max-w-[400px] px-4 mb-10 pb-5">
-              <div className="flex flex-col items-start mt-4">
+              className="max-w-[450px] px-4 mb-10 pb-5">
+              <div className="flex items-center mt-4 gap-3 relative">
                 {optionTokens && (
-                  <div className="relative select-none max-w-[250px] w-full">
+                  <div className="relative select-none w-full">
                     <div
                       onClick={() => {
                         setTokenSelector(prevState => !prevState);
@@ -1651,6 +1694,28 @@ function Vault({ vault }: IProps) {
                       )}
                     </div>
                   </div>
+                )}
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`settingsModal cursor-pointer transition-transform transform ${
+                    settingsModal ? "rotate-180" : "rotate-0"
+                  }`}
+                  onClick={() => setSettingsModal(prev => !prev)}>
+                  <path
+                    className="settingsModal"
+                    d="M20.83 14.6C19.9 14.06 19.33 13.07 19.33 12C19.33 10.93 19.9 9.93999 20.83 9.39999C20.99 9.29999 21.05 9.1 20.95 8.94L19.28 6.06C19.22 5.95 19.11 5.89001 19 5.89001C18.94 5.89001 18.88 5.91 18.83 5.94C18.37 6.2 17.85 6.34 17.33 6.34C16.8 6.34 16.28 6.19999 15.81 5.92999C14.88 5.38999 14.31 4.41 14.31 3.34C14.31 3.15 14.16 3 13.98 3H10.02C9.83999 3 9.69 3.15 9.69 3.34C9.69 4.41 9.12 5.38999 8.19 5.92999C7.72 6.19999 7.20001 6.34 6.67001 6.34C6.15001 6.34 5.63001 6.2 5.17001 5.94C5.01001 5.84 4.81 5.9 4.72 6.06L3.04001 8.94C3.01001 8.99 3 9.05001 3 9.10001C3 9.22001 3.06001 9.32999 3.17001 9.39999C4.10001 9.93999 4.67001 10.92 4.67001 11.99C4.67001 13.07 4.09999 14.06 3.17999 14.6H3.17001C3.01001 14.7 2.94999 14.9 3.04999 15.06L4.72 17.94C4.78 18.05 4.89 18.11 5 18.11C5.06 18.11 5.12001 18.09 5.17001 18.06C6.11001 17.53 7.26 17.53 8.19 18.07C9.11 18.61 9.67999 19.59 9.67999 20.66C9.67999 20.85 9.82999 21 10.02 21H13.98C14.16 21 14.31 20.85 14.31 20.66C14.31 19.59 14.88 18.61 15.81 18.07C16.28 17.8 16.8 17.66 17.33 17.66C17.85 17.66 18.37 17.8 18.83 18.06C18.99 18.16 19.19 18.1 19.28 17.94L20.96 15.06C20.99 15.01 21 14.95 21 14.9C21 14.78 20.94 14.67 20.83 14.6ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"
+                    fill="currentColor"></path>
+                </svg>
+                {settingsModal && (
+                  <SettingsModal
+                    slippageState={slippage}
+                    setSlippageState={setSlippage}
+                    setModalState={setSettingsModal}
+                  />
                 )}
               </div>
 

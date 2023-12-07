@@ -12,7 +12,8 @@ export const formatNumber = (value: string | number, type: string) => {
         suffixNum++;
       }
 
-      let roundedValue = value.toFixed(1);
+      const fixeds = !!suffixNum ? 2 : 0
+      let roundedValue = value.toFixed(fixeds);
 
       if (suffixNum > 0) {
         roundedValue += suffixes[suffixNum];

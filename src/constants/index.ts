@@ -25,12 +25,7 @@ const TABLE = [
     sortType: "none",
     dataType: "string",
   },
-  {
-    name: "Balance",
-    keyName: "balance",
-    sortType: "none",
-    dataType: "number",
-  },
+  { name: "APY", keyName: "apr", sortType: "none", dataType: "number" },
   {
     name: "Price",
     keyName: "shareprice",
@@ -38,7 +33,12 @@ const TABLE = [
     dataType: "number",
   },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  { name: "APR", keyName: "apr", sortType: "none", dataType: "number" },
+  {
+    name: "Balance",
+    keyName: "balance",
+    sortType: "none",
+    dataType: "number",
+  },
 ];
 const PAGINATION_VAULTS = 20;
 
@@ -117,6 +117,7 @@ const CHAINS = [
   },
 ];
 
+const SLIPPAGE_VALUES = ["0.5", "1", "2"];
 export {
   TABLE,
   PAGINATION_VAULTS,
@@ -132,4 +133,5 @@ export {
   SDIV,
   PM,
   TREASURY,
+  SLIPPAGE_VALUES,
 };

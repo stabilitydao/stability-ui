@@ -5,7 +5,7 @@ import { formatUnits } from "viem";
 import { platform, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
 import { platformData, publicClient, lastTx, balances, account } from "@store";
 
-import { BuildForm } from "../BuildForm";
+import { BuildForm } from "./BuildForm";
 
 import type {
   TInitParams,

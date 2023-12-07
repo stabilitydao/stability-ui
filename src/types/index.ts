@@ -109,6 +109,7 @@ type TLocalVault = {
   address: string;
   strategyInfo: IStrategyInfo;
   strategySpecific: any;
+  monthlyUnderlyingApr: number;
 };
 type TVaultAssets = [string, string];
 
@@ -121,7 +122,7 @@ type TTableColumn = {
 type TAPRModal = {
   apr: string;
   assetsWithApr: string;
-  assetsAprs: any;
+  assetsAprs: number;
   lastHardWork: number;
   strategyApr: number;
   state: boolean;
