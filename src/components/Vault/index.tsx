@@ -394,12 +394,7 @@ function Vault({ vault }: IProps) {
       try {
         const decimals = Number(getTokenData(option[0])?.decimals);
 
-        const allowanceData = (await readContract(_publicClient, {
-          address: option[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, $platformData.zap as TAddress],
-        })) as bigint;
+        const allowanceData = await getZapAllowance();
 
         if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
           setZapButton("needApprove");
@@ -412,12 +407,23 @@ function Vault({ vault }: IProps) {
     }
   };
   const getZapAllowance = async () => {
-    const allowanceData = (await readContract(_publicClient, {
-      address: option[0] as TAddress,
-      abi: ERC20ABI,
-      functionName: "allowance",
-      args: [$account as TAddress, vault as TAddress],
-    })) as bigint;
+    let allowanceData;
+    if (option[0] === underlyingToken?.address) {
+      allowanceData = await readContract(_publicClient, {
+        address: option[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, vault as TAddress],
+      });
+    } else {
+      allowanceData = await readContract(_publicClient, {
+        address: option[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, $platformData.zap as TAddress],
+      });
+    }
+
     return allowanceData;
   };
   const zapApprove = async () => {
@@ -435,8 +441,18 @@ function Vault({ vault }: IProps) {
             functionName: "approve",
             args: [$platformData.zap as TAddress, parseUnits(amount, decimals)],
           });
-          // todo: after 1inch allowance check and deposit state
-          //setZapButton("deposit");
+
+          const transaction = await _publicClient.waitForTransactionReceipt(
+            assetApprove
+          );
+
+          if (transaction.status === "success") {
+            const allowance = formatUnits(await getZapAllowance(), 18);
+            if (Number(allowance) >= Number(amount)) {
+              getZapDepositSwapAmounts(amount);
+              setZapButton("deposit");
+            }
+          }
         } catch (error) {
           console.log("APPROVE ERROR:", error);
         }
@@ -467,28 +483,62 @@ function Vault({ vault }: IProps) {
   };
   const zapDeposit = async () => {
     ///// UNDERLYING
-    try {
-      const shares = parseUnits(underlyingShares, 18);
-      const decimalPercent = BigInt(Math.floor(Number(slippage)));
+    if (underlyingToken?.address === option[0]) {
+      try {
+        const shares = parseUnits(underlyingShares, 18);
+        const decimalPercent = BigInt(Math.floor(Number(slippage)));
 
-      const out = shares - (shares * decimalPercent) / 100n;
+        const out = shares - (shares * decimalPercent) / 100n;
 
-      const depositAssets = await writeContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "depositAssets",
-        args: [
-          option as TAddress[],
-          [parseUnits(inputs[option[0]]?.amount, 18)],
-          out,
-          $account as TAddress,
-        ],
-      });
-    } catch (error) {
-      console.log("UNDERLYING DEPOSIT ERROR:", error);
+        const depositAssets = await writeContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [
+            option as TAddress[],
+            [parseUnits(inputs[option[0]]?.amount, 18)],
+            out,
+            $account as TAddress,
+          ],
+        });
+      } catch (error) {
+        console.log("UNDERLYING DEPOSIT ERROR:", error);
+      }
+    } else {
+      try {
+        const decimalPercent = BigInt(Math.floor(Number(slippage)));
+
+        const shares = parseUnits(zapShares, 18);
+
+        const out = shares - (shares * decimalPercent) / 100n;
+
+        const amountIn = parseUnits(
+          inputs[option[0]].amount,
+          getTokenData(option[0])?.decimals || 18
+        );
+
+        const router = zapTokens[0].router || zapTokens[1].router;
+
+        const zapDeposit = await writeContract({
+          address: $platformData.zap,
+          abi: ZapABI,
+          functionName: "deposit",
+          args: [
+            vault as TAddress,
+            option[0],
+            amountIn,
+            router,
+            [zapTokens[0].txData, zapTokens[1].txData],
+            out,
+            $account as TAddress,
+          ],
+        });
+      } catch (error) {
+        console.log("ZAP DEPOSIT ERROR:", error);
+      }
     }
   };
-  const getZapDepositSwapAmounts = async (amount) => {
+  const getZapDepositSwapAmounts = async (amount: string) => {
     const decimals = Number(getTokenData(option[0])?.decimals);
 
     const zapAmounts = await readContract(_publicClient, {
@@ -504,7 +554,7 @@ function Vault({ vault }: IProps) {
       const tokenDecimals = tokenData?.decimals || 18;
 
       const fromAddress = option[0];
-      const currentAmount = String(zapAmounts[1][index]);
+      const currentAmount: any = String(zapAmounts[1][index]);
 
       if (toAddress === option[0]) {
         return {
@@ -512,6 +562,8 @@ function Vault({ vault }: IProps) {
           amountIn: formatUnits(currentAmount, decimals),
           address: toAddress,
           amountOut: "0",
+          router: "",
+          txData: "",
           img: tokenData?.logoURI,
         };
       }
@@ -525,11 +577,14 @@ function Vault({ vault }: IProps) {
         try {
           const response = await axios.get(url);
           setZapError(false);
+          setZapButton("deposit");
           return {
             symbol: symbol,
             address: toAddress,
             amountIn: formatUnits(currentAmount, decimals),
             amountOut: formatUnits(response?.data[0].amountOut, tokenDecimals),
+            router: response?.data[0].router,
+            txData: response?.data[0].txData,
             img: tokenData?.logoURI,
           };
         } catch (error) {
@@ -546,6 +601,8 @@ function Vault({ vault }: IProps) {
               address: toAddress,
               amountIn: formatUnits(currentAmount, decimals),
               amountOut: "0",
+              router: "",
+              txData: "",
               img: tokenData?.logoURI,
             };
           }
@@ -554,15 +611,16 @@ function Vault({ vault }: IProps) {
     });
 
     const outData = await Promise.all(promises);
-
     setZapTokens(outData);
 
     try {
-      const addresses = outData.map((tokenOut) => tokenOut?.address);
+      const addresses: (TAddress | undefined)[] = outData.map(
+        (tokenOut) => tokenOut?.address
+      );
       const amounts = outData.map((tokenOut) =>
         parseUnits(
-          tokenOut?.amountOut,
-          getTokenData(tokenOut?.address)?.decimals
+          tokenOut?.amountOut as string,
+          getTokenData(tokenOut?.address as TAddress)?.decimals as number
         )
       );
 
@@ -570,7 +628,7 @@ function Vault({ vault }: IProps) {
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "previewDepositAssets",
-        args: [addresses, amounts],
+        args: [addresses as TAddress[], amounts],
       });
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
@@ -2010,9 +2068,9 @@ function Vault({ vault }: IProps) {
                               </div>
                             )}
 
-                          {zapTokens && (
+                          {zapTokens && zapButton !== "insuficcientBalance" && (
                             <>
-                              {zapTokens.map((token) => (
+                              {zapTokens.map((token: any) => (
                                 <div
                                   className="text-[18px]  flex items-center gap-1 ml-2"
                                   key={token.address}
