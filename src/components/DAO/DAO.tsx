@@ -280,7 +280,7 @@ function DAO() {
 
             <div className="mt-5 mb-2">
               <h2 className="text-3xl font-semibold">$ {daoData?.totalTvl}</h2>
-              <h2>Total TVL</h2>
+              <h2>TVL</h2>
             </div>
 
             <div className="flex w-full m-auto align-middle border border-t-1 border-x-0 border-b-0 border-gray-800">
@@ -288,18 +288,18 @@ function DAO() {
                 <h2 className="text-2xl font-semibold">
                   {daoData?.numberOfTotalVaults}
                 </h2>
-                <h2>Total Vaults</h2>
+                <h2>Vaults</h2>
               </div>
               <div className="m-auto">
                 <h2 className="text-2xl font-semibold">
                   {daoData?.farmsLength}
                 </h2>
-                <h2>Total farms</h2>
+                <h2>Farms</h2>
               </div>
             </div>
           </div>
 
-          <div className="p-8 bg-[#3d404b] rounded-md shadow-sm">
+          <div className="p-5 bg-[#3d404b] rounded-md shadow-sm">
             <table className="w-full h-full text-[#8D8E96]">
               <thead>
                 <tr>
@@ -376,13 +376,13 @@ function DAO() {
       </div>
       <div>
         <div className="m-auto flex mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
-          <div className="m-auto flex flex-wrap w-full p-3">
-            <h1 className="text-xxl text-right text-[#8D8E96] mb-3 w-full">
+          <div className="m-auto flex flex-wrap gap-3 w-full p-3">
+            <h1 className="text-xxl text-left text-[#8D8E96] mb-3 w-full">
               Tokenomics
             </h1>
 
-            <div className="bg-[#2c2f38] rounded-md p-3 mt-5 sm:w-full md:w-2/3 lg:w-1/3">
-              <div className="flex bg-[#2c2f38] m-auto w-full">
+            <div className="bg-[#2c2f38] rounded-md p-3 sm:w-auto md:w-2/3 lg:w-1/3">
+              <div className="flex">
                 <table className="text-sm text-[#8D8E96]">
                   <tbody>
                     <tr>
@@ -493,7 +493,7 @@ function DAO() {
               </div>
             </div>
 
-            <div className="bg-[#2c2f38] rounded-md p-3 mt-5 w-full sm:w-full md:w-1/3 lg:w-1/3">
+            <div className="bg-[#2c2f38] rounded-md p-3 mt-3 w-full sm:w-full md:w-1/3 lg:w-1/3">
               <div className="flex mt-5 m-auto w-full">
                 <table className="text-sm h-52">
                   <tbody>
@@ -547,7 +547,7 @@ function DAO() {
               </div>
             </div>
 
-            <div className="m-auto  bg-[#2c2f38] rounded-md p-3 mt-5 sm:w-full md:w-1/3 lg:w-1/3">
+            <div className="m-auto  bg-[#2c2f38] rounded-md p-3 mt-3 sm:w-full md:w-1/3 lg:w-1/3">
               <div className="flex rounded-md mt-5 w-full justify-between">
                 <table className="text-sm">
                   <tbody>
