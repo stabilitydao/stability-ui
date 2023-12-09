@@ -30,8 +30,9 @@ import {
 
 import { VaultABI, StrategyABI } from "@web3";
 
-import { TABLE, PAGINATION_VAULTS } from "@constants";
+import { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS } from "@constants";
 import type { TLocalVault, TAddress } from "@types";
+import { formatUnits } from "viem";
 
 function Vaults() {
   const $vaults = useStore(vaults);
@@ -120,19 +121,26 @@ function Vaults() {
           if ($vaultAssets.length) {
             const token1 = getTokenData($vaultAssets[index][1][0]);
             const token2 = getTokenData($vaultAssets[index][1][1]);
+            
+            if (token1 && token2) {
+              const token1Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token1.address));
+              const token2Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token2.address));
 
-            assets = [
-              {
-                logo: token1?.logoURI,
-                symbol: token1?.symbol,
-                name: token1?.name,
-              },
-              {
-                logo: token2?.logoURI,
-                symbol: token2?.symbol,
-                name: token2?.name,
-              },
-            ];
+              assets = [
+                {
+                  logo: token1?.logoURI,
+                  symbol: token1?.symbol,
+                  name: token1?.name,
+                  color: token1Extended?.color,
+                },
+                {
+                  logo: token2?.logoURI,
+                  symbol: token2?.symbol,
+                  name: token2?.name,
+                  color: token2Extended?.color,
+                },
+              ];
+            }
           }
 
           ///// before graph
@@ -155,6 +163,13 @@ function Vaults() {
             underlyingPromise,
           ]);
 
+          const assetsProportionsBI = await readContract(_publicClient, {
+            address: strategy,
+            abi: StrategyABI,
+            functionName: "getAssetsProportions",
+          })
+          const assetsProportions: number[] = assetsProportionsBI?.length ? assetsProportionsBI.map(a => Math.round(Number(formatUnits(a, 16)))) : []
+
           const data =
             $apiData?.underlyings?.["137"]?.[underlying.toLowerCase()];
 
@@ -166,7 +181,7 @@ function Vaults() {
 
           return {
             name: $vaults[1][index],
-            assets: assets,
+            assets,
             symbol: $vaults[2][index],
             type: $vaults[3][index],
             strategy: $vaults[4][index],
@@ -179,6 +194,7 @@ function Vaults() {
             strategyInfo: getStrategyInfo($vaults[2][index]),
             strategySpecific: $vaults[9][index],
             monthlyUnderlyingApr: monthlyApr,
+            assetsProportions,
           };
         })
       );
@@ -245,19 +261,23 @@ function Vaults() {
                 onClick={() => toVault(vault.address)}>
                 <td className="px-2 lg:px-4 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
-                    <div className="md:min-w-[50px] hidden md:flex">
+                    <div className="hidden md:flex w-[30px] h-6 ml-[12px] mr-5">
+                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[0] / 100 : 25}px`, backgroundColor: vault.assets[0].color,}} className="h-6">
                       <img
-                        className="w-6 h-6 rounded-full"
+                        className="absolute w-6 h-6 rounded-full ml-[-12px]"
                         src={vault.assets[0].logo}
                         alt={vault.assets[0].symbol}
                         title={vault.assets[0].name}
                       />
+                      </div>
+                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[1] / 100 : 25}px`, backgroundColor: vault.assets[1].color,}} className="h-6 flex justify-end">
                       <img
-                        className="w-6 h-6 rounded-full ml-[-8px]"
+                        className="absolute w-6 h-6 rounded-full mr-[-12px]"
                         src={vault.assets[1].logo}
                         alt={vault.assets[1].symbol}
                         title={vault.assets[1].name}
                       />
+                      </div>
                     </div>
                     <div className="max-w-[250px] flex items-start flex-col">
                       <p

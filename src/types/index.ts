@@ -97,7 +97,7 @@ type TAssetBalance = {
 };
 type TLocalVault = {
   name: string;
-  assets: { logo: string; symbol: string; name: string }[];
+  assets: { logo: string; symbol: string; name: string; color: string; }[];
   symbol: string;
   type: string;
   strategy: string;
@@ -110,6 +110,7 @@ type TLocalVault = {
   strategyInfo: IStrategyInfo;
   strategySpecific: any;
   monthlyUnderlyingApr: number;
+  assetsProportions?: number[];
 };
 type TVaultAssets = [string, string];
 
