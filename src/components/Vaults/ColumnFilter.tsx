@@ -43,7 +43,7 @@ const ColumnFilter: React.FC<TProps> = ({ index, value, table, filter }) => {
   return (
     <th
       onClick={tabController}
-      className={`px-0 md:px-2 lg:px-4 py-2 text-center cursor-pointer ${
+      className={`${index < 5 ? 'px-0 md:px-2 lg:px-4' : 'pl-0 md:px-2 lg:px-4 text-right'} py-2 text-center cursor-pointer ${
         styles[value] || ""
       }`}
     >

@@ -30,8 +30,9 @@ import {
 
 import { VaultABI, StrategyABI } from "@web3";
 
-import { TABLE, PAGINATION_VAULTS } from "@constants";
+import { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS } from "@constants";
 import type { TLocalVault, TAddress } from "@types";
+import { formatUnits } from "viem";
 
 function Vaults() {
   const $vaults = useStore(vaults);
@@ -123,19 +124,26 @@ function Vaults() {
           if ($vaultAssets.length) {
             const token1 = getTokenData($vaultAssets[index][1][0]);
             const token2 = getTokenData($vaultAssets[index][1][1]);
+            
+            if (token1 && token2) {
+              const token1Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token1.address));
+              const token2Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token2.address));
 
-            assets = [
-              {
-                logo: token1?.logoURI,
-                symbol: token1?.symbol,
-                name: token1?.name,
-              },
-              {
-                logo: token2?.logoURI,
-                symbol: token2?.symbol,
-                name: token2?.name,
-              },
-            ];
+              assets = [
+                {
+                  logo: token1?.logoURI,
+                  symbol: token1?.symbol,
+                  name: token1?.name,
+                  color: token1Extended?.color,
+                },
+                {
+                  logo: token2?.logoURI,
+                  symbol: token2?.symbol,
+                  name: token2?.name,
+                  color: token2Extended?.color,
+                },
+              ];
+            }
           }
 
           ///// before graph
@@ -158,6 +166,13 @@ function Vaults() {
             underlyingPromise,
           ]);
 
+          const assetsProportionsBI = await readContract(_publicClient, {
+            address: strategy,
+            abi: StrategyABI,
+            functionName: "getAssetsProportions",
+          })
+          const assetsProportions: number[] = assetsProportionsBI?.length ? assetsProportionsBI.map(a => Math.round(Number(formatUnits(a, 16)))) : []
+
           const data =
             $apiData?.underlyings?.["137"]?.[underlying.toLowerCase()];
 
@@ -169,7 +184,7 @@ function Vaults() {
 
           return {
             name: $vaults[1][index],
-            assets: assets,
+            assets,
             symbol: $vaults[2][index],
             type: $vaults[3][index],
             strategy: $vaults[4][index],
@@ -182,6 +197,7 @@ function Vaults() {
             strategyInfo: getStrategyInfo($vaults[2][index]),
             strategySpecific: $vaults[9][index],
             monthlyUnderlyingApr: monthlyApr,
+            assetsProportions,
           };
         })
       );
@@ -244,19 +260,23 @@ function Vaults() {
               >
                 <td className="px-2 lg:px-4 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
-                    <div className="md:min-w-[50px] hidden md:flex">
+                    <div className="hidden md:flex w-[30px] h-6 ml-[12px] mr-5">
+                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[0] / 100 : 25}px`, backgroundColor: vault.assets[0].color,}} className="h-6">
                       <img
-                        className="w-6 h-6 rounded-full"
+                        className="absolute w-6 h-6 rounded-full ml-[-12px]"
                         src={vault.assets[0].logo}
                         alt={vault.assets[0].symbol}
                         title={vault.assets[0].name}
                       />
+                      </div>
+                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[1] / 100 : 25}px`, backgroundColor: vault.assets[1].color,}} className="h-6 flex justify-end">
                       <img
-                        className="w-6 h-6 rounded-full ml-[-8px]"
+                        className="absolute w-6 h-6 rounded-full mr-[-12px]"
                         src={vault.assets[1].logo}
                         alt={vault.assets[1].symbol}
                         title={vault.assets[1].name}
                       />
+                      </div>
                     </div>
                     <div className="max-w-[250px] flex items-start flex-col">
                       <p
@@ -290,7 +310,7 @@ function Vaults() {
                         >
                           {vault.strategyInfo.shortName}
                         </span>
-                        <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[170px]">
+                        <span className="px-2 rounded-r-[10px] bg-[#41465a] d-none md:flex h-8 items-center min-w-[100px] lg:min-w-[170px]">
                           <span className="flex min-w-[42px] justify-center">
                             {vault.strategyInfo.protocols.map(
                               (protocol, index) => (
@@ -325,8 +345,8 @@ function Vaults() {
                             <span
                               className={
                                 vault.strategySpecific.length > 10
-                                  ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px]`
-                                  : `ml-0.5 uppercase font-bold text-[12px] px-[6px] rounded-[4px]`
+                                  ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
+                                  : `ml-0.5 uppercase font-bold text-[11px] px-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
                               }
                             >
                               {vault.strategySpecific}
@@ -338,27 +358,15 @@ function Vaults() {
                   </div>
                 </td>
                 <td className="px-2 lg:px-4 py-2">
-                  {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
-                </td>
-
-                <td className="px-2 lg:px-4 py-2">
-                  ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
-                </td>
-                <td className="px-2 lg:px-4 py-2">
-                  {formatNumber(
-                    formatFromBigInt(vault.tvl, 18, "withFloor"),
-                    "abbreviate"
-                  )}
-                </td>
-                <td className="px-2 lg:px-4 py-2">
-                  <div className="flex">
+                  <div className="flex w-[80px] justify-end">
+                    <p>{APY}%</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 16 16"
                       fill="none"
-                      className="mt-[6px] mr-1 cursor-pointer opacity-20 hover:opacity-100 transition delay-[40ms]"
+                      className="mt-[4px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
                       onClick={(e) => {
                         e.stopPropagation();
                         setAprModal({
@@ -377,8 +385,19 @@ function Vaults() {
                         fill="white"
                       />
                     </svg>
-                    <p>{APY}%</p>
                   </div>
+                </td>
+                <td className="px-2 lg:px-4 py-2">
+                  ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+                </td>
+                <td className="px-2 lg:px-4 py-2 text-right">
+                  {formatNumber(
+                    formatFromBigInt(vault.tvl, 18, "withFloor"),
+                    "abbreviate"
+                  )}
+                </td>
+                <td className="pr-2 md:pr-3 lg:pr-5 py-2 text-right">
+                  {formatNumber(formatFromBigInt(vault.balance, 18), "format")}
                 </td>
               </tr>
             );
