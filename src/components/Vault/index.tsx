@@ -332,11 +332,40 @@ function Vault({ vault }: IProps) {
       }
     } catch (error) {
       setOptionTokens(filtredTokens);
-      console.log("UNDERLYING TOKEN ERROR:", error);
+      console.error("UNDERLYING TOKEN ERROR:", error);
     }
   };
   /////
   /////         ZAP
+  const getZapAllowance = async () => {
+    let allowanceData;
+    if (tab === "Deposit") {
+      if (option[0] === underlyingToken?.address) {
+        allowanceData = await readContract(_publicClient, {
+          address: option[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault as TAddress],
+        });
+      } else {
+        allowanceData = await readContract(_publicClient, {
+          address: option[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, $platformData.zap as TAddress],
+        });
+      }
+    } else {
+      allowanceData = await readContract(_publicClient, {
+        address: vault as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, $platformData.zap as TAddress],
+      });
+    }
+
+    return allowanceData;
+  };
   const zapInputHandler = async (amount: string, asset: string) => {
     setInputs(
       (prevInputs: any) =>
@@ -353,8 +382,21 @@ function Vault({ vault }: IProps) {
       setZapTokens(false);
       return;
     }
-
-    if (Number(amount) > Number(balances[asset]?.assetBalance)) {
+    if (
+      tab === "Deposit" &&
+      Number(amount) > Number(balances[asset]?.assetBalance)
+    ) {
+      setZapButton("insuficcientBalance");
+      setZapTokens(false);
+      return;
+    }
+    if (
+      tab === "Withdraw" &&
+      Number(amount) >
+        parseFloat(
+          formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+        )
+    ) {
       setZapButton("insuficcientBalance");
       setZapTokens(false);
       return;
@@ -382,7 +424,7 @@ function Vault({ vault }: IProps) {
         if (Number(formatUnits(allowanceData, 18)) < Number(amount)) {
           setZapButton("needApprove");
         } else {
-          setZapButton("deposit");
+          setZapButton(tab.toLowerCase());
         }
 
         checkInputsAllowance(previewDepositAssets[0] as bigint[]);
@@ -390,7 +432,7 @@ function Vault({ vault }: IProps) {
           ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
         );
       } catch (error) {
-        console.log("UNDERLYING SHARES ERROR:", error);
+        console.error("UNDERLYING SHARES ERROR:", error);
       }
     } else {
       try {
@@ -404,30 +446,11 @@ function Vault({ vault }: IProps) {
           getZapDepositSwapAmounts(amount);
         }
       } catch (error) {
-        console.log("ZAP ERROR:", error);
+        console.error("ZAP ERROR:", error);
       }
     }
   };
-  const getZapAllowance = async () => {
-    let allowanceData;
-    if (option[0] === underlyingToken?.address) {
-      allowanceData = await readContract(_publicClient, {
-        address: option[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, vault as TAddress],
-      });
-    } else {
-      allowanceData = await readContract(_publicClient, {
-        address: option[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, $platformData.zap as TAddress],
-      });
-    }
 
-    return allowanceData;
-  };
   const zapApprove = async () => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
     const amount = inputs[option[0]]?.amount;
@@ -450,13 +473,14 @@ function Vault({ vault }: IProps) {
 
           if (transaction.status === "success") {
             const allowance = formatUnits(await getZapAllowance(), 18);
+
             if (Number(allowance) >= Number(amount)) {
               getZapDepositSwapAmounts(amount);
-              setZapButton("deposit");
+              setZapButton(tab.toLowerCase());
             }
           }
         } catch (error) {
-          console.log("APPROVE ERROR:", error);
+          console.error("APPROVE ERROR:", error);
         }
       }
     } else {
@@ -475,11 +499,11 @@ function Vault({ vault }: IProps) {
         if (transaction.status === "success") {
           const allowance = formatUnits(await getZapAllowance(), 18);
           if (Number(allowance) >= Number(amount)) {
-            setZapButton("deposit");
+            setZapButton(tab.toLowerCase());
           }
         }
       } catch (error) {
-        console.log("APPROVE ERROR:", error);
+        console.error("APPROVE ERROR:", error);
       }
     }
   };
@@ -504,7 +528,7 @@ function Vault({ vault }: IProps) {
           ],
         });
       } catch (error) {
-        console.log("UNDERLYING DEPOSIT ERROR:", error);
+        console.error("UNDERLYING DEPOSIT ERROR:", error);
       }
     } else {
       try {
@@ -536,7 +560,7 @@ function Vault({ vault }: IProps) {
           ],
         });
       } catch (error) {
-        console.log("ZAP DEPOSIT ERROR:", error);
+        console.error("ZAP DEPOSIT ERROR:", error);
       }
     }
   };
@@ -558,7 +582,8 @@ function Vault({ vault }: IProps) {
           decimals,
           String(zapAmounts[1][index]),
           setZapError,
-          setZapButton
+          setZapButton,
+          "deposit"
         )
     );
 
@@ -585,9 +610,41 @@ function Vault({ vault }: IProps) {
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
     } catch (error) {
-      console.log("ZAP SHARES ERROR", error);
+      console.error("ZAP SHARES ERROR", error);
     }
   };
+
+  const withdrawZapApprove = async () => {
+    const assetApprove = await writeContract({
+      address: vault as TAddress,
+      abi: ERC20ABI,
+      functionName: "approve",
+      args: [$platformData.zap, maxUint256],
+    });
+
+    const transaction = await _publicClient.waitForTransactionReceipt({
+      confirmations: 3,
+      hash: assetApprove?.hash,
+    });
+
+    if (transaction.status === "success") {
+      const newAllowance = await readContract(_publicClient, {
+        address: option[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, $platformData.zap as TAddress],
+      });
+
+      if (
+        Number(formatUnits(newAllowance, 18)) >=
+        Number(inputs[option[0]].amount)
+      ) {
+        getZapDepositSwapAmounts(inputs[option[0]].amount);
+        setZapButton("withdraw");
+      }
+    }
+  };
+
   /////
 
   const approve = async (asset: TAddress) => {
@@ -602,13 +659,12 @@ function Vault({ vault }: IProps) {
     if (vault) {
       //const allowanceResult: TVaultAllowance = {};
 
-      const maxUnits = maxUint256;
       try {
         const assetApprove = await writeContract({
           address: asset,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [vault, maxUnits],
+          args: [vault, maxUint256],
         });
         const transaction = await _publicClient.waitForTransactionReceipt({
           confirmations: 3,
@@ -698,7 +754,17 @@ function Vault({ vault }: IProps) {
     const decimalPercent = BigInt(Math.floor(Number(slippage)));
 
     const out = value - (value * decimalPercent) / 100n;
-    if (underlyingToken?.address === option[0]) {
+
+    ///// 2ASSETS -> UNDERLYING -> ZAP
+
+    if (option.length > 1) {
+      const withdrawAssets = await writeContract({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "withdrawAssets",
+        args: [$assets as TAddress[], out, [0n, 0n]],
+      });
+    } else if (underlyingToken?.address === option[0]) {
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
@@ -706,11 +772,20 @@ function Vault({ vault }: IProps) {
         args: [option as TAddress[], out, [0n]],
       });
     } else {
-      const withdrawAssets = await writeContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [$assets as TAddress[], out, [0n, 0n]],
+      const router =
+        zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
+      const zapWithdraw = await writeContract({
+        address: $platformData.zap,
+        abi: ZapABI,
+        functionName: "withdraw",
+        args: [
+          vault as TAddress,
+          option[0],
+          router,
+          [zapPreviewWithdraw[0].txData, zapPreviewWithdraw[1].txData],
+          value,
+          [0n, 0n],
+        ],
       });
     }
   };
@@ -834,20 +909,29 @@ function Vault({ vault }: IProps) {
         setWithdrawAmount(preview);
       } else {
         const decimals = Number(getTokenData(option[0])?.decimals);
+        const allowanceData: any = formatUnits(await getZapAllowance(), 18);
+
+        if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
+          setZapButton("needApprove");
+          return;
+        }
+
         const promises = result.map(
           async (amount, index) =>
             await get1InchRoutes(
               option[0],
               $assets[index],
               decimals,
-              String(amount),
+              formatUnits(amount, getTokenData($assets[index])?.decimals || 18),
               setZapError,
-              setZapButton
+              setZapButton,
+              "withdraw"
             )
         );
 
         const outData = await Promise.all(promises);
         setZapPreviewWithdraw(outData);
+        setZapButton("withdraw");
       }
     }
   };
@@ -2171,7 +2255,7 @@ function Vault({ vault }: IProps) {
                           <div className="flex items-center">
                             <button
                               onClick={() => {
-                                handleInputChange(
+                                zapInputHandler(
                                   formatUnits(
                                     $vaultData[vault]?.vaultUserBalance,
                                     18
@@ -2201,8 +2285,9 @@ function Vault({ vault }: IProps) {
                         name="amount"
                         placeholder="0"
                         onChange={(e) => {
-                          handleInputChange(e.target.value, e.target.id);
+                          zapInputHandler(e.target.value, e.target.id);
                           previewWithdraw(e.target.value);
+                          handleInputChange(e.target.value, e.target.id);
                         }}
                         onKeyDown={(evt) =>
                           ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
@@ -2220,19 +2305,17 @@ function Vault({ vault }: IProps) {
                           <p>
                             $
                             {(
-                              Number(
-                                formatUnits(
-                                  $assetsPrices[option[0]].tokenPrice,
-                                  18
-                                )
+                              formatFromBigInt(
+                                localVault.shareprice,
+                                18,
+                                "withDecimals"
                               ) * inputs[option[0]]?.amount
                             ).toFixed(2)}
                           </p>
                         </div>
                       )}
                   </div>
-
-                  {withdrawAmount || zapPreviewWithdraw ? (
+                  {(withdrawAmount || zapPreviewWithdraw) && (
                     <div>
                       <div className="my-2 ml-2 flex flex-col gap-2">
                         {withdrawAmount &&
@@ -2331,42 +2414,62 @@ function Vault({ vault }: IProps) {
                               />
                               <p>
                                 {(
-                                  Number(zapPreviewWithdraw[0].amountIn) +
-                                  Number(zapPreviewWithdraw[1].amountIn)
-                                ).toFixed(2)}
+                                  ((Number(zapPreviewWithdraw[0].amountIn) +
+                                    Number(zapPreviewWithdraw[1].amountIn)) *
+                                    Number(
+                                      formatFromBigInt(
+                                        localVault.shareprice,
+                                        18,
+                                        "withDecimals"
+                                      )
+                                    )) /
+                                  Number(
+                                    formatUnits(
+                                      $assetsPrices[option[0]].tokenPrice,
+                                      18
+                                    )
+                                  )
+                                ).toFixed(5)}
                               </p>
                               <p>{`($${(
                                 (Number(zapPreviewWithdraw[0].amountIn) +
                                   Number(zapPreviewWithdraw[1].amountIn)) *
-                                Number(
-                                  formatUnits(
-                                    $assetsPrices[option[0]].tokenPrice,
-                                    18
-                                  )
+                                formatFromBigInt(
+                                  localVault.shareprice,
+                                  18,
+                                  "withDecimals"
                                 )
                               ).toFixed(2)})`}</p>
                             </div>
                           </>
                         )}
                       </div>
+                    </div>
+                  )}
+
+                  {zapButton === "insuficcientBalance" ? (
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                    >
+                      INSUFICCIENT BALANCE
+                    </button>
+                  ) : zapButton === "needApprove" ? (
+                    <button
+                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                      type="button"
+                      onClick={withdrawZapApprove}
+                    >
+                      Approve
+                    </button>
+                  ) : (
+                    (zapButton === "withdraw" || zapButton === "deposit") && (
                       <button
                         type="button"
                         className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                        onClick={() => withdraw()}
+                        onClick={withdraw}
                       >
                         WITHDRAW
-                      </button>
-                    </div>
-                  ) : (
-                    Number(inputs[option[0]]?.amount) >
-                      Number(
-                        formatUnits($vaultData[vault]?.vaultUserBalance, 18)
-                      ) && (
-                      <button
-                        disabled
-                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                      >
-                        INSUFICCIENT BALANCE
                       </button>
                     )
                   )}

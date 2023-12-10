@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
 import { getTokenData } from "./getTokenData";
 
@@ -11,13 +11,16 @@ export const get1InchRoutes = async (
   fromAddress: TAddress,
   toAddress: TAddress,
   decimals: number,
-  amount: string,
+  amount: string | bigint,
   setError: React.Dispatch<React.SetStateAction<boolean>>,
-  setButton: React.Dispatch<React.SetStateAction<string>>
+  setButton: React.Dispatch<React.SetStateAction<string>>,
+  type: string
 ) => {
-  const tokenData = getTokenData(toAddress);
+  const tokenData = type === getTokenData(toAddress);
   const symbol = tokenData?.symbol;
   const tokenDecimals = tokenData?.decimals || 18;
+
+  amount = parseUnits(String(amount), decimals);
 
   if (fromAddress === toAddress) {
     return {
@@ -31,7 +34,19 @@ export const get1InchRoutes = async (
     };
   }
 
-  const url = `https://api.stabilitydao.org/swap/137/${fromAddress}/${toAddress}/${amount}`;
+  let url = "";
+
+  switch (type) {
+    case "deposit":
+      url = `https://api.stabilitydao.org/swap/137/${fromAddress}/${toAddress}/${amount}`;
+      break;
+    case "withdraw":
+      url = `https://api.stabilitydao.org/swap/137/${toAddress}/${fromAddress}/${amount}`;
+      break;
+    default:
+      console.error("NO 1INCH ROUTE TYPE");
+      break;
+  }
 
   const maxRetries = 3;
   let currentRetry = 0;
@@ -41,6 +56,7 @@ export const get1InchRoutes = async (
       const response = await axios.get(url);
       setError(false);
       setButton("deposit");
+
       return {
         symbol: symbol as string,
         address: toAddress,
@@ -53,10 +69,10 @@ export const get1InchRoutes = async (
     } catch (error) {
       currentRetry++;
       if (currentRetry < maxRetries) {
-        console.log(`Retrying (${currentRetry}/${maxRetries})...`);
+        console.log(`Retrying (${currentRetry}/${maxRetries})...`, url);
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else {
-        console.log("1INCH API ERROR:", error);
+        console.error("1INCH API ERROR:", error);
         setError(true);
 
         return {
