@@ -2358,9 +2358,7 @@ function Vault({ vault }: IProps) {
                                       {!!amountOut ? (
                                         <>
                                           <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(amountOut).toFixed(2)}
-                                            </p>
+                                            <p>{Number(amountIn).toFixed(5)}</p>
                                             <img
                                               src={
                                                 getTokenData(address)?.logoURI
@@ -2376,7 +2374,10 @@ function Vault({ vault }: IProps) {
                                           </div>
                                           -&gt;
                                           <div className="flex items-center gap-1">
-                                            <p>{Number(amountIn).toFixed(2)}</p>
+                                            <p>
+                                              {Number(amountOut).toFixed(5)}
+                                            </p>
+
                                             <img
                                               src={
                                                 getTokenData(option[0])?.logoURI
