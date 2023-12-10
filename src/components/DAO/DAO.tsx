@@ -150,6 +150,14 @@ function DAO() {
         functionName: "farmsLength",
       });
 
+      const pendingPlatformUpgrade = await $publicClient.readContract({
+        address: platform,
+        abi: PlatformABI,
+        functionName: "pendingPlatformUpgrade",
+      });
+
+      console.log(pendingPlatformUpgrade);
+
       //vault types
       const vaultType = contractData[3];
 
@@ -236,6 +244,7 @@ function DAO() {
 
       const daoData: TDAOData = {
         platformVersion: platformVersion,
+        pendingPlatformUpgrade: pendingPlatformUpgrade,
         platformGovernance: contractData[0][5],
         multisigAddress: contractData[0][6],
         numberOfTotalVaults: $balances[3].length,
@@ -373,15 +382,47 @@ function DAO() {
             </div>
           </div>
         </div>
+        <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
+          <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
+            <em className="text-xl font-medium">New version:</em>{" "}
+            {daoData.pendingPlatformUpgrade?.newVersion}
+          </h2>
+
+          <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
+            <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+              <p>Proxies:</p>
+              {daoData?.pendingPlatformUpgrade &&
+                daoData?.pendingPlatformUpgrade.proxies.map(
+                  (proxy: string, index: number) => (
+                    <div key={index}>
+                      <p className="text-sm grid">{proxy}</p>
+                    </div>
+                  )
+                )}
+            </div>
+
+            <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+              <p>New implementations</p>
+              {daoData?.pendingPlatformUpgrade &&
+                daoData?.pendingPlatformUpgrade.newImplementations.map(
+                  (implement: string, index: number) => (
+                    <div key={index}>
+                      <p className="text-sm grid">{implement}</p>
+                    </div>
+                  )
+                )}
+            </div>
+          </div>
+        </div>
       </div>
       <div>
         <div className="m-auto flex mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
-          <div className="m-auto flex flex-wrap gap-3 w-full p-3">
+          <div className="m-auto p-3">
             <h1 className="text-xxl text-left text-[#8D8E96] mb-3 w-full">
               Tokenomics
             </h1>
 
-            <div className="bg-[#2c2f38] rounded-md p-3 sm:w-auto md:w-2/3 lg:w-1/3">
+            <div className="bg-[#2c2f38] grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 rounded-md p-3">
               <div className="flex">
                 <table className="text-sm text-[#8D8E96]">
                   <tbody>
