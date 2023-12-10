@@ -442,7 +442,7 @@ function Vault({ vault }: IProps) {
 
         if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
           setZapButton("needApprove");
-        } else {
+        } else if (tab === "Deposit") {
           getZapDepositSwapAmounts(amount);
         }
       } catch (error) {
@@ -2342,14 +2342,13 @@ function Vault({ vault }: IProps) {
                                 address,
                                 amountIn,
                                 amountOut,
-                                symbol,
                               }: {
                                 address: TAddress;
                                 amountIn: string;
                                 amountOut: string;
                                 symbol: string;
                               }) => (
-                                <div key={symbol}>
+                                <div key={amountIn}>
                                   {address !== option[0] && (
                                     <div className="flex">
                                       <img

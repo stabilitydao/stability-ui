@@ -97,7 +97,7 @@ type TAssetBalance = {
 };
 type TLocalVault = {
   name: string;
-  assets: { logo: string; symbol: string; name: string; color: string; }[];
+  assets: { logo: string; symbol: string; name: string; color: string }[];
   symbol: string;
   type: string;
   strategy: string;
@@ -105,6 +105,7 @@ type TLocalVault = {
   shareprice: string;
   tvl: string;
   apr: string;
+  apy: string;
   strategyApr: string;
   address: string;
   strategyInfo: IStrategyInfo;

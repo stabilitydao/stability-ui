@@ -16,7 +16,8 @@ export const get1InchRoutes = async (
   setButton: React.Dispatch<React.SetStateAction<string>>,
   type: string
 ) => {
-  const tokenData = type === getTokenData(toAddress);
+  const tokenData =
+    type === "deposit" ? getTokenData(toAddress) : getTokenData(fromAddress);
   const symbol = tokenData?.symbol;
   const tokenDecimals = tokenData?.decimals || 18;
 
@@ -47,7 +48,6 @@ export const get1InchRoutes = async (
       console.error("NO 1INCH ROUTE TYPE");
       break;
   }
-
   const maxRetries = 3;
   let currentRetry = 0;
 
