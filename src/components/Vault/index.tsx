@@ -908,7 +908,6 @@ function Vault({ vault }: IProps) {
         });
         setWithdrawAmount(preview);
       } else {
-        const decimals = Number(getTokenData(option[0])?.decimals);
         const allowanceData: any = formatUnits(await getZapAllowance(), 18);
 
         if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
@@ -919,10 +918,10 @@ function Vault({ vault }: IProps) {
         const promises = result.map(
           async (amount, index) =>
             await get1InchRoutes(
-              option[0],
               $assets[index],
-              decimals,
-              formatUnits(amount, getTokenData($assets[index])?.decimals || 18),
+              option[0],
+              Number(getTokenData($assets[index])?.decimals),
+              amount,
               setZapError,
               setZapButton,
               "withdraw"
