@@ -13,7 +13,6 @@ export const get1InchRoutes = async (
   decimals: number,
   amount: string | bigint,
   setError: React.Dispatch<React.SetStateAction<boolean>>,
-  setButton: React.Dispatch<React.SetStateAction<string>>,
   type: string
 ) => {
   const tokenData = getTokenData(toAddress);
@@ -43,7 +42,6 @@ export const get1InchRoutes = async (
     try {
       const response = await axios.get(url);
       setError(false);
-      setButton("deposit");
 
       return {
         symbol: symbol as string,

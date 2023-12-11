@@ -367,6 +367,10 @@ function Vault({ vault }: IProps) {
     return allowanceData;
   };
   const zapInputHandler = async (amount: string, asset: string) => {
+    setZapButton("none");
+    setZapTokens(false);
+    setZapPreviewWithdraw(false);
+
     setInputs(
       (prevInputs: any) =>
         ({
@@ -582,7 +586,6 @@ function Vault({ vault }: IProps) {
           decimals,
           String(zapAmounts[1][index]),
           setZapError,
-          setZapButton,
           "deposit"
         )
     );
@@ -609,6 +612,7 @@ function Vault({ vault }: IProps) {
       });
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
+      setZapButton("deposit");
     } catch (error) {
       console.error("ZAP SHARES ERROR", error);
     }
@@ -639,7 +643,6 @@ function Vault({ vault }: IProps) {
         Number(formatUnits(newAllowance, 18)) >=
         Number(inputs[option[0]].amount)
       ) {
-        getZapDepositSwapAmounts(inputs[option[0]].amount);
         setZapButton("withdraw");
       }
     }
@@ -923,7 +926,6 @@ function Vault({ vault }: IProps) {
               Number(getTokenData($assets[index])?.decimals),
               amount,
               setZapError,
-              setZapButton,
               "withdraw"
             )
         );
