@@ -97,7 +97,7 @@ type TAssetBalance = {
 };
 type TLocalVault = {
   name: string;
-  assets: { logo: string; symbol: string; name: string; color: string; }[];
+  assets: { logo: string; symbol: string; name: string; color: string }[];
   symbol: string;
   type: string;
   strategy: string;
@@ -164,6 +164,7 @@ type TVaultsAddress = {
 //// DAO
 type TDAOData = {
   platformVersion: string;
+  pendingPlatformUpgrade: TPendingPlatformUpgrade;
   platformGovernance: string;
   multisigAddress: string;
   numberOfTotalVaults: string;
@@ -179,13 +180,19 @@ type TDAOData = {
   farmsLength: string;
 };
 
+type TPendingPlatformUpgrade = {
+  newVersion: string;
+  proxies: string[];
+  newImplementations: string[];
+};
+
 type TGitHubUser = {
   bio: string;
   location: string;
   name: string;
   avatar_url: string;
   html_url: string;
-  followers: string;
+  followers: number;
 };
 
 type TProfitTokenData = {
@@ -194,12 +201,12 @@ type TProfitTokenData = {
   marketCap: string;
 };
 
-type TmultiTokenData = {
+type TMultiTokenData = {
   balance: string;
   priceBalance: number;
 };
 
-type TmultisigBalance = Record<string, TmultiTokenData>;
+type TMultisigBalance = Record<string, TMultiTokenData>;
 
 export type {
   TPlatformData,
@@ -230,6 +237,6 @@ export type {
   TDAOData,
   TGitHubUser,
   TProfitTokenData,
-  TmultisigBalance,
-  TmultiTokenData,
+  TMultisigBalance,
+  TMultiTokenData,
 };

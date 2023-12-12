@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { vaults, publicClient, balances, assetsPrices } from "@store";
+import { vaults, publicClient, balances, assetsPrices, account } from "@store";
 import {
   PlatformABI,
   FactoryABI,
@@ -13,8 +13,8 @@ import type {
   TDAOData,
   TGitHubUser,
   TProfitTokenData,
-  TmultisigBalance,
-  TmultiTokenData,
+  TMultisigBalance,
+  TMultiTokenData,
 } from "@types";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
 import { getStrategyInfo, getTokenData } from "@utils";
@@ -24,7 +24,7 @@ function DAO() {
   const [daoData, setDaoData] = useState<TDAOData>();
   const [profitTokenData, setProfitTokenData] = useState<TProfitTokenData>();
   const [members, setMembers] = useState<TGitHubUser[]>();
-  const [_multisigBalance, setMultisigBalance] = useState<TmultisigBalance>();
+  const [_multisigBalance, setMultisigBalance] = useState<TMultisigBalance>();
   const [tokensTotalSupply, setTokensTotalSupply] = useState({
     pm: "",
     sdiv: "",
@@ -33,6 +33,7 @@ function DAO() {
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
   const $assetsPrices = useStore(assetsPrices);
+  const $account = useStore(account);
 
   const getTeamData = async () => {
     try {
@@ -83,186 +84,187 @@ function DAO() {
     const initials = farm.map(function (initials: string) {
       return initials.charAt(0);
     });
-    const resultado = initials.join("");
-    if (resultado === "GQF") {
-      color = getStrategyInfo(resultado + "S");
+    const result = initials.join("");
+    if (result === "GQF") {
+      color = getStrategyInfo(result + "S");
     } else {
-      color = getStrategyInfo(resultado);
+      color = getStrategyInfo(result);
     }
     return color;
   }
 
   const fetchDaoData = async () => {
-    try {
-      const platformVersion = await $publicClient.readContract({
-        address: platform,
-        abi: PlatformABI,
-        functionName: "platformVersion",
-      });
+    if ($publicClient && $assetsPrices) {
+      try {
+        const platformVersion = (await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "platformVersion",
+        })) as string;
 
-      const platformFees = await $publicClient.readContract({
-        address: platform,
-        abi: PlatformABI,
-        functionName: "getFees",
-      });
-      console.log(platformFees);
+        const platformFees: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "getFees",
+        });
 
-      const contractData = await $publicClient.readContract({
-        address: platform,
-        abi: PlatformABI,
-        functionName: "getData",
-      });
+        const contractData: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "getData",
+        });
 
-      const profitTotalSupply = await $publicClient.readContract({
-        address: PROFIT[0],
-        abi: ERC20ABI,
-        functionName: "totalSupply",
-      });
+        const profitTotalSupply = await $publicClient.readContract({
+          address: PROFIT[0] as `0x${string}`,
+          abi: ERC20ABI,
+          functionName: "totalSupply",
+        });
 
-      const pmTotalSupply = await $publicClient.readContract({
-        address: PM[0],
-        abi: IERC721Enumerable,
-        functionName: "totalSupply",
-      });
+        const pmTotalSupply = await $publicClient.readContract({
+          address: PM[0] as `0x${string}`,
+          abi: IERC721Enumerable,
+          functionName: "totalSupply",
+        });
 
-      const sdivTotalSupply = await $publicClient.readContract({
-        address: SDIV[0],
-        abi: ERC20ABI,
-        functionName: "totalSupply",
-      });
+        const sdivTotalSupply = await $publicClient.readContract({
+          address: SDIV[0] as `0x${string}`,
+          abi: ERC20ABI,
+          functionName: "totalSupply",
+        });
 
-      const treasuryBalance = await $publicClient.readContract({
-        address: PROFIT[0],
-        abi: ERC20ABI,
-        functionName: "balanceOf",
-        args: [TREASURY[0]],
-      });
-
-      const network = await $publicClient.readContract({
-        address: platform,
-        abi: PlatformABI,
-        functionName: "getPlatformSettings",
-      });
-
-      const farmsLength = await $publicClient.readContract({
-        address: contractData[0][0],
-        abi: FactoryABI,
-        functionName: "farmsLength",
-      });
-
-      const pendingPlatformUpgrade = await $publicClient.readContract({
-        address: platform,
-        abi: PlatformABI,
-        functionName: "pendingPlatformUpgrade",
-      });
-
-      console.log(pendingPlatformUpgrade);
-
-      //vault types
-      const vaultType = contractData[3];
-
-      //multisig asset balance
-      const _balances: TmultisigBalance = {};
-
-      for (const address of $balances[0]) {
-        const balance = await $publicClient.readContract({
-          address: address as `0x${string}`,
+        const treasuryBalance = await $publicClient.readContract({
+          address: PROFIT[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [contractData[0][6]],
+          args: [TREASURY[0] as `0x${string}`],
         });
-        const decimals = getTokenData(address)?.decimals;
+        const network: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "getPlatformSettings",
+        });
+        console.log(network);
 
-        if (decimals && balance > 0n) {
-          const tokenInfo: TmultiTokenData = {
-            balance: Number(formatUnits(balance, decimals)).toFixed(2),
-            priceBalance: Number(
-              (
-                Number(formatUnits(balance, decimals)) *
-                Number(formatUnits($assetsPrices[address].tokenPrice, decimals))
-              ).toFixed(2)
-            ),
-          };
+        const farmsLength = await $publicClient.readContract({
+          address: contractData[0][0],
+          abi: FactoryABI,
+          functionName: "farmsLength",
+        });
 
-          _balances[address] = tokenInfo;
+        const pendingPlatformUpgrade: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "pendingPlatformUpgrade",
+        });
+
+        //vault types
+        const vaultType = contractData[3];
+
+        //multisig asset balance
+        const _balances: TMultisigBalance = {};
+
+        for (const address of $balances[0]) {
+          const balance = await $publicClient.readContract({
+            address: address as `0x${string}`,
+            abi: ERC20ABI,
+            functionName: "balanceOf",
+            args: [contractData[0][6] as `0x${string}`],
+          });
+          const decimals = getTokenData(address)?.decimals;
+
+          if (decimals && balance > 0n) {
+            const tokenInfo: TMultiTokenData = {
+              balance: Number(formatUnits(balance, decimals)).toFixed(2),
+              priceBalance: Number(
+                (
+                  Number(formatUnits(balance, decimals)) *
+                  Number(
+                    formatUnits($assetsPrices[address].tokenPrice, decimals)
+                  )
+                ).toFixed(2)
+              ),
+            };
+
+            _balances[address] = tokenInfo;
+          }
         }
+        setMultisigBalance(_balances);
+
+        //tvl
+        const totalTvl: bigint = $vaults[6].reduce(
+          (total: bigint, number: bigint) => total + number,
+          BigInt(0)
+        );
+        const _totalTvl = Number(formatUnits(totalTvl, 18))
+          .toFixed(2)
+          .toLocaleString();
+
+        //profit Token
+        const _profitTokenPrice = Number(
+          formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)
+        ).toFixed(2);
+
+        const _profitTotalSupply = Number(
+          formatUnits(profitTotalSupply, 18)
+        ).toLocaleString();
+
+        const _profitMarketCap = (
+          Number(_profitTokenPrice) * Number(formatUnits(profitTotalSupply, 18))
+        ).toLocaleString();
+
+        const profitToken: TProfitTokenData = {
+          price: _profitTokenPrice,
+          totalSupply: _profitTotalSupply,
+          marketCap: _profitMarketCap,
+        };
+        setProfitTokenData(profitToken);
+
+        //sdiv && pm total supply
+        const _pmTotalSupply = Number(pmTotalSupply).toLocaleString();
+
+        const _sdivTotalSupply = Number(
+          formatUnits(sdivTotalSupply, 18)
+        ).toLocaleString();
+
+        const _tokensTotalSupply = {
+          pm: _pmTotalSupply,
+          sdiv: _sdivTotalSupply,
+        };
+
+        setTokensTotalSupply(_tokensTotalSupply);
+
+        //fees
+        const percentageFees: string[] = platformFees.map((fee: bigint) =>
+          (fee / 1000n).toString()
+        );
+
+        //treasury
+        const _treasuryBalance = Number(
+          formatUnits(treasuryBalance, 18)
+        ).toFixed(2);
+
+        const daoData: TDAOData = {
+          platformVersion: platformVersion,
+          pendingPlatformUpgrade: pendingPlatformUpgrade,
+          platformGovernance: contractData[0][5],
+          multisigAddress: contractData[0][6],
+          numberOfTotalVaults: $balances[3].length,
+          totalTvl: _totalTvl,
+          strategieNames: contractData[6],
+          platformFee: percentageFees[0],
+          vaultManagerFee: percentageFees[1],
+          typesOfVaults: contractData[3],
+          strategyLogicFee: percentageFees[2],
+          ecosystemFee: percentageFees[3],
+          treasuryBalance: _treasuryBalance,
+          network: network.networkName,
+          farmsLength: Number(farmsLength).toString(),
+        };
+
+        setDaoData(daoData);
+      } catch (error) {
+        console.error("Error fetching platform data:", error);
       }
-      setMultisigBalance(_balances);
-
-      //tvl
-      const totalTvl: bigint = $vaults[6].reduce(
-        (total: bigint, number: bigint) => total + number,
-        BigInt(0)
-      );
-      const _totalTvl = Number(formatUnits(totalTvl, 18))
-        .toFixed(2)
-        .toLocaleString("es-ES");
-
-      //profit Token
-      const _profitTokenPrice = Number(
-        formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)
-      ).toFixed(2);
-
-      const _profitTotalSupply = Number(
-        formatUnits(profitTotalSupply, 18)
-      ).toLocaleString("es-ES");
-
-      const _profitMarketCap = (
-        Number(_profitTokenPrice) * Number(formatUnits(profitTotalSupply, 18))
-      ).toLocaleString("es-ES");
-
-      const profitToken: TProfitTokenData = {
-        price: _profitTokenPrice,
-        totalSupply: _profitTotalSupply,
-        marketCap: _profitMarketCap,
-      };
-      setProfitTokenData(profitToken);
-
-      //sdiv && pm total supply
-      const _pmTotalSupply = Number(pmTotalSupply).toLocaleString("es-ES");
-
-      const _sdivTotalSupply = Number(
-        formatUnits(sdivTotalSupply, 18)
-      ).toLocaleString("es-ES");
-
-      const _tokensTotalSupply = {
-        pm: _pmTotalSupply,
-        sdiv: _sdivTotalSupply,
-      };
-
-      setTokensTotalSupply(_tokensTotalSupply);
-
-      //fees
-      const percentageFees: string[] = platformFees.map((fee: bigint) =>
-        (fee / 1000n).toString()
-      );
-
-      //treasury
-      const _treasuryBalance = Number(formatUnits(treasuryBalance, 18)).toFixed(
-        2
-      );
-
-      const daoData: TDAOData = {
-        platformVersion: platformVersion,
-        pendingPlatformUpgrade: pendingPlatformUpgrade,
-        platformGovernance: contractData[0][5],
-        multisigAddress: contractData[0][6],
-        numberOfTotalVaults: $balances[3].length,
-        totalTvl: _totalTvl,
-        strategieNames: contractData[6],
-        platformFee: percentageFees[0],
-        vaultManagerFee: percentageFees[1],
-        typesOfVaults: contractData[3],
-        strategyLogicFee: percentageFees[2],
-        ecosystemFee: percentageFees[3],
-        treasuryBalance: _treasuryBalance,
-        network: network,
-        farmsLength: Number(farmsLength),
-      };
-
-      setDaoData(daoData);
-    } catch (error) {
-      console.error("Error fetching platform data:", error);
     }
   };
 
@@ -283,7 +285,7 @@ function DAO() {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 shadow-lg text-sm">
           <div className="grid h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
             <div className="m-auto">
-              <h2 className="text-2xl">{daoData?.network.networkName}</h2>
+              <h2 className="text-2xl">{daoData?.network}</h2>
               <h2 className="text-sm">Network</h2>
             </div>
 
@@ -373,47 +375,51 @@ function DAO() {
               <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
                 <div className="m-auto">
                   <h2 className="font-bold">Vault Types</h2>
-                  {daoData?.typesOfVaults &&
-                    daoData.typesOfVaults.map((vaultType, index) => {
-                      return <h2 key={index}>{vaultType}</h2>;
-                    })}
+                  {Array.isArray(daoData?.typesOfVaults) &&
+                    daoData.typesOfVaults.map(
+                      (vaultType: string, index: number) => (
+                        <h2 key={index}>{vaultType}</h2>
+                      )
+                    )}
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
-          <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
-            <em className="text-xl font-medium">New version:</em>{" "}
-            {daoData.pendingPlatformUpgrade?.newVersion}
-          </h2>
 
-          <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
-            <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-              <p>Proxies:</p>
-              {daoData?.pendingPlatformUpgrade &&
-                daoData?.pendingPlatformUpgrade.proxies.map(
+        {daoData?.pendingPlatformUpgrade &&
+        daoData?.pendingPlatformUpgrade.newVersion !== "" ? (
+          <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
+            <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
+              <em className="text-xl font-medium">New version:</em>{" "}
+              {daoData.pendingPlatformUpgrade.newVersion}
+            </h2>
+
+            <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
+              <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                <p>Proxies:</p>
+                {daoData?.pendingPlatformUpgrade.proxies.map(
                   (proxy: string, index: number) => (
                     <div key={index}>
                       <p className="text-xs grid">{proxy}</p>
                     </div>
                   )
                 )}
-            </div>
+              </div>
 
-            <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-              <p>New implementations:</p>
-              {daoData?.pendingPlatformUpgrade &&
-                daoData?.pendingPlatformUpgrade.newImplementations.map(
-                  (implement: string, index: number) => (
+              <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                <p>New implementations:</p>
+                {daoData?.pendingPlatformUpgrade.newImplementations.map(
+                  (implementation: string, index: number) => (
                     <div key={index}>
-                      <p className="text-xs grid">{implement}</p>
+                      <p className="text-xs grid">{implementation}</p>
                     </div>
                   )
                 )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
       <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md w-full">
         <h1 className="text-xxl text-left text-[#8D8E96] ps-4 pt-3 mb-0">
@@ -460,9 +466,7 @@ function DAO() {
 
                 <tr>
                   <td>Wallet: </td>
-                  <td>
-                    <span className="text-red-600">ADD WALLET</span>{" "}
-                  </td>
+                  <td>{$account}</td>
                 </tr>
                 <tr>
                   <td className="mb-auto align-top">Staked: </td>
@@ -740,13 +744,13 @@ function DAO() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto mt-5 p-2 justify-center align-top w-full ">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto mt-5 p-2 align-top w-full lg:w-3/4">
           {members ? (
             members.map(member => (
               <a
                 href={member.html_url}
                 key={member.name}
-                className="text-sm p-2 w-[160px] h-[200px] m-auto hover:bg-button rounded-md"
+                className="text-sm p-2 max-w-[150px] h-[200px] m-auto hover:bg-button rounded-md"
                 target="_blank">
                 <img
                   className="rounded-full m-auto w-[75px]"
