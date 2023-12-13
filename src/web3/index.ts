@@ -15,6 +15,7 @@ import StrategyABI from "./abi/StrategyABI.ts";
 import VaultABI from "./abi/VaultABI.ts";
 import IERC721Enumerable from "./abi/IERC721Enumerable.ts";
 import ZapABI from "./abi/ZapABI.ts";
+import DividendMinterABI from "./abi/DividendMinterABI.ts";
 
 const platform = "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60";
 
@@ -77,7 +78,6 @@ const wagmiConfig = createConfig({
 
 export {
   platform,
-  VaultManager,
   walletConnectProjectId,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,
@@ -92,4 +92,5 @@ export {
   wagmiConfig,
   IERC721Enumerable,
   ZapABI,
+  DividendMinterABI,
 };

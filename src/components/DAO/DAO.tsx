@@ -19,6 +19,7 @@ import type {
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
 import { getStrategyInfo, getTokenData } from "@utils";
 import axios from "axios";
+import Pool from "./Pool";
 
 function DAO() {
   const [daoData, setDaoData] = useState<TDAOData>();
@@ -113,6 +114,7 @@ function DAO() {
           abi: PlatformABI,
           functionName: "getData",
         });
+        console.log(contractData);
 
         const profitTotalSupply = await $publicClient.readContract({
           address: PROFIT[0] as `0x${string}`,
@@ -143,7 +145,6 @@ function DAO() {
           abi: PlatformABI,
           functionName: "getPlatformSettings",
         });
-        console.log(network);
 
         const farmsLength = await $publicClient.readContract({
           address: contractData[0][0],
@@ -469,9 +470,11 @@ function DAO() {
                   <td>{$account}</td>
                 </tr>
                 <tr>
-                  <td className="mb-auto align-top">Staked: </td>
-                  <td className="gap-3">
-                    <p className="text-red-600 my-auto ">ADD STAKED</p>{" "}
+                  <td>Staked:</td>
+                  <td>
+                    <p className="my-auto ">
+                      <Pool />
+                    </p>{" "}
                   </td>
                 </tr>
               </tbody>
@@ -560,9 +563,7 @@ function DAO() {
                   </tr>
                   <tr>
                     <td>Wallet: </td>
-                    <td className="my-auto">
-                      <span className="text-red-600">ADD WALLET</span>
-                    </td>
+                    <td>{$account}</td>
                   </tr>
                   <tr>
                     <td>Earned: </td>
