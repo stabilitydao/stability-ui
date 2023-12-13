@@ -22,6 +22,22 @@ export default [
     type: "error",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minAmountOut",
+        type: "uint256",
+      },
+    ],
+    name: "Slippage",
+    type: "error",
+  },
+  {
     inputs: [],
     name: "StrategyNotSupported",
     type: "error",
@@ -131,9 +147,9 @@ export default [
         type: "uint256",
       },
       {
-        internalType: "uint256[]",
-        name: "minAssetAmountsOut",
-        type: "uint256[]",
+        internalType: "uint256",
+        name: "minAmountOut",
+        type: "uint256",
       },
     ],
     name: "withdraw",

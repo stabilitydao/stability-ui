@@ -106,7 +106,6 @@ function Vault({ vault }: IProps) {
   const [strategyDescription, setStrategyDescription] = useState<
     string | undefined
   >();
-  const [assetsAPR, setAssetsAPR] = useState<any>();
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
   const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<any>();
   const [underlyingToken, setUnderlyingToken] = useState<any>();
@@ -128,6 +127,12 @@ function Vault({ vault }: IProps) {
   const [slippage, setSlippage] = useState("1");
   const [zapTokens, setZapTokens] = useState<any>(false);
   const [zapError, setZapError] = useState<boolean>(false);
+  const [rotation, setRotation] = useState<number>(0);
+
+  const [lastAmounts, setLastAmounts] = useState<any>({
+    deposit: "",
+    withdraw: "",
+  });
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
@@ -366,6 +371,7 @@ function Vault({ vault }: IProps) {
 
     return allowanceData;
   };
+
   const zapInputHandler = async (amount: string, asset: string) => {
     setZapButton("none");
     setZapTokens(false);
@@ -570,6 +576,11 @@ function Vault({ vault }: IProps) {
   };
 
   const getZapDepositSwapAmounts = async (amount: string) => {
+    setLastAmounts((prevAmounts: any) => ({
+      ...prevAmounts,
+      deposit: amount,
+    }));
+
     const decimals = Number(getTokenData(option[0])?.decimals);
 
     const zapAmounts = await readContract(_publicClient, {
@@ -578,6 +589,7 @@ function Vault({ vault }: IProps) {
       functionName: "getDepositSwapAmounts",
       args: [vault as TAddress, option[0], parseUnits(amount, decimals)],
     });
+
     const promises = zapAmounts[0].map(
       async (toAddress, index) =>
         await get1InchRoutes(
@@ -597,12 +609,19 @@ function Vault({ vault }: IProps) {
       const addresses: (TAddress | undefined)[] = outData.map(
         (tokenOut) => tokenOut?.address
       );
-      const amounts = outData.map((tokenOut) =>
+      let amounts = outData.map((tokenOut) =>
         parseUnits(
           tokenOut?.amountOut as string,
           getTokenData(tokenOut?.address as TAddress)?.decimals as number
         )
       );
+
+      ///// index ^ 1 --> XOR
+      amounts = amounts.map((thisAmount, index) => {
+        return !thisAmount
+          ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
+          : thisAmount;
+      });
 
       const previewDepositAssets = await readContract(_publicClient, {
         address: vault as TAddress,
@@ -650,6 +669,27 @@ function Vault({ vault }: IProps) {
 
   /////
 
+  ///// 1INCH DATA REFRESH
+  const refreshData = async () => {
+    setRotation(rotation + 360);
+
+    if (option.length > 1) {
+      return;
+    }
+    setZapButton("none");
+    setZapTokens(false);
+    setWithdrawAmount(false);
+    setZapPreviewWithdraw(false);
+
+    if (tab === "Deposit" && !!lastAmounts.deposit) {
+      getZapDepositSwapAmounts(lastAmounts.deposit);
+    }
+    if (tab === "Withdraw" && !!lastAmounts.withdraw) {
+      previewWithdraw(lastAmounts.withdraw);
+    }
+  };
+  /////
+
   const approve = async (asset: TAddress) => {
     const needApprove = option.filter(
       (asset: TAddress) =>
@@ -660,8 +700,6 @@ function Vault({ vault }: IProps) {
         ) < inputs[asset].amount
     );
     if (vault) {
-      //const allowanceResult: TVaultAllowance = {};
-
       try {
         const assetApprove = await writeContract({
           address: asset,
@@ -749,34 +787,38 @@ function Vault({ vault }: IProps) {
   };
 
   const withdraw = async () => {
-    const value = parseUnits(inputs[option[0]]?.amount, 18);
+    const sharesToBurn = parseUnits(inputs[option[0]]?.amount, 18);
 
-    if (!value) return;
-    ///// UNDERLYING TOKEN
-
-    const decimalPercent = BigInt(Math.floor(Number(slippage)));
-
-    const out = value - (value * decimalPercent) / 100n;
+    if (!sharesToBurn) return;
 
     ///// 2ASSETS -> UNDERLYING -> ZAP
 
-    if (option.length > 1) {
+    if (option.length > 1 || underlyingToken?.address === option[0]) {
+      const decimalPercent = BigInt(Math.floor(Number(slippage)));
+      const amountShares =
+        sharesToBurn - (sharesToBurn * decimalPercent) / 100n;
+
       const withdrawAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "withdrawAssets",
-        args: [$assets as TAddress[], out, [0n, 0n]],
-      });
-    } else if (underlyingToken?.address === option[0]) {
-      const withdrawAssets = await writeContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [option as TAddress[], out, [0n]],
+        args: [
+          $assets as TAddress[],
+          amountShares,
+          Array.from({ length: option.length }, () => 0n),
+        ],
       });
     } else {
+      const optionAmount = Number(inputs[option[0]]?.amount);
+      const calculatedValue =
+        optionAmount - (optionAmount * Math.floor(Number(slippage))) / 100;
+      const minAmountOut = parseUnits(
+        String(calculatedValue),
+        getTokenData(option[0])?.decimals
+      );
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
+
       const zapWithdraw = await writeContract({
         address: $platformData.zap,
         abi: ZapABI,
@@ -786,8 +828,8 @@ function Vault({ vault }: IProps) {
           option[0],
           router,
           [zapPreviewWithdraw[0].txData, zapPreviewWithdraw[1].txData],
-          value,
-          [0n, 0n],
+          sharesToBurn,
+          minAmountOut,
         ],
       });
     }
@@ -864,6 +906,13 @@ function Vault({ vault }: IProps) {
   };
 
   const previewWithdraw = async (value: string) => {
+    if (option.length < 2) {
+      setLastAmounts((prevAmounts: any) => ({
+        ...prevAmounts,
+        withdraw: value,
+      }));
+    }
+
     const balance = Number(
       formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
     );
@@ -910,6 +959,7 @@ function Vault({ vault }: IProps) {
           };
         });
         setWithdrawAmount(preview);
+        setZapButton("withdraw");
       } else {
         const allowanceData: any = formatUnits(await getZapAllowance(), 18);
 
@@ -1108,12 +1158,6 @@ function Vault({ vault }: IProps) {
     if (localVault) {
       const TD = getTimeDifference(localVault.lastHardWork);
       setTimeDifference(TD);
-
-      // setAssetsAPR(
-      //   localVault.assetsAprs.map((apr: string) =>
-      //     formatFromBigInt(apr, 16).toFixed(2)
-      //   )
-      // );
     }
   }, [localVault]);
 
@@ -1130,6 +1174,24 @@ function Vault({ vault }: IProps) {
   useEffect(() => {
     selectTokensHandler();
   }, [$tokens, defaultOptionSymbols]);
+
+  ///// interval refresh data
+  useEffect(() => {
+    if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
+      const reload = async () => {
+        if (tab === "Deposit" && !!lastAmounts.deposit) {
+          getZapDepositSwapAmounts(lastAmounts.deposit);
+        }
+        if (tab === "Withdraw" && !!lastAmounts.withdraw) {
+          previewWithdraw(lastAmounts.withdraw);
+        }
+      };
+
+      const intervalId = setInterval(reload, 10000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
 
   useEffect(() => {
     if (_publicClient) {
@@ -1871,6 +1933,31 @@ function Vault({ vault }: IProps) {
                     </div>
                   </div>
                 )}
+
+                <svg
+                  fill="#ffffff"
+                  height="22"
+                  width="22"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  viewBox="0 0 512 512"
+                  xmlSpace="preserve"
+                  className="cursor-pointer transition-transform duration-500"
+                  style={{ transform: `rotate(${rotation}deg)` }}
+                  onClick={refreshData}
+                >
+                  <g>
+                    <g>
+                      <path
+                        d="M511.957,185.214L512,15.045l-67.587,67.587l-7.574-7.574c-48.332-48.332-112.593-74.95-180.946-74.95
+			C114.792,0.107,0,114.901,0,256s114.792,255.893,255.893,255.893S511.785,397.099,511.785,256h-49.528
+			c0,113.79-92.575,206.365-206.365,206.365S49.528,369.79,49.528,256S142.103,49.635,255.893,49.635
+			c55.124,0,106.947,21.467,145.925,60.445l7.574,7.574l-67.58,67.58L511.957,185.214z"
+                      />
+                    </g>
+                  </g>
+                </svg>
                 <svg
                   width="28"
                   height="28"
@@ -1888,6 +1975,7 @@ function Vault({ vault }: IProps) {
                     fill="currentColor"
                   ></path>
                 </svg>
+
                 {settingsModal && (
                   <SettingsModal
                     slippageState={slippage}
