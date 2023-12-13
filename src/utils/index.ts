@@ -6,6 +6,7 @@ import { calculateAPY } from "./functions/calculateAPY";
 import { getTimeDifference } from "./functions/getTimeDifference";
 import { getStrategyInfo } from "./functions/getStrategyInfo";
 import { addAssetsPrice } from "./functions/addAssetsPrice";
+import { get1InchRoutes } from "./functions/get1InchRoutes";
 
 export {
   getTokenData,
@@ -16,4 +17,5 @@ export {
   getTimeDifference,
   getStrategyInfo,
   addAssetsPrice,
+  get1InchRoutes,
 };

@@ -14,7 +14,7 @@ const TABLE = [
     sortType: "none",
     dataType: "string",
   },
-  { name: "APY", keyName: "apr", sortType: "none", dataType: "number" },
+  { name: "APY", keyName: "apy", sortType: "none", dataType: "number" },
   {
     name: "Price",
     keyName: "shareprice",
