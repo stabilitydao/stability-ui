@@ -49,6 +49,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: PlatformABI,
         functionName: "getData",
       });
+      console.log(contractData);
 
       if (contractData[1]) {
         tokens.set(contractData[1] as TAddress[]);

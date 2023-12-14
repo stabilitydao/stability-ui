@@ -9,6 +9,7 @@ import {
   SDIV,
   PM,
   TREASURY,
+  MULTISIG,
 } from "./tokens";
 
 const TABLE = [
@@ -142,4 +143,5 @@ export {
   PM,
   TREASURY,
   SLIPPAGE_VALUES,
+  MULTISIG,
 };
