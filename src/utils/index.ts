@@ -7,6 +7,7 @@ import { getTimeDifference } from "./functions/getTimeDifference";
 import { getStrategyInfo } from "./functions/getStrategyInfo";
 import { addAssetsPrice } from "./functions/addAssetsPrice";
 import { get1InchRoutes } from "./functions/get1InchRoutes";
+import { debounce } from "./functions/debounce";
 
 export {
   getTokenData,
@@ -18,4 +19,5 @@ export {
   getStrategyInfo,
   addAssetsPrice,
   get1InchRoutes,
+  debounce,
 };
