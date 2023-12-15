@@ -29,16 +29,16 @@ import { writeContract } from "@wagmi/core";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
 
 function Tokenomics() {
-  const [poolData, setPoolData] = useState("");
-  const [inputStake, setInputStake] = useState("");
+  const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
   const $publicClient = useStore(publicClient);
+  const [poolData, setPoolData] = useState("");
+  const [inputStake, setInputStake] = useState("");
   const [profitTokenData, setProfitTokenData] = useState<TProfitTokenData>();
   const [tokensTotalSupply, setTokensTotalSupply] = useState({
     pm: "",
     sdiv: "",
   });
-  const $assetsPrices = useStore(assetsPrices);
 
   const fetchTokenomicsData = async () => {
     if ($publicClient && $account && $assetsPrices) {
@@ -61,6 +61,20 @@ function Tokenomics() {
           functionName: "totalSupply",
         });
 
+        const profitBalance = await $publicClient.readContract({
+          address: PROFIT[0] as `0x${string}`,
+          abi: ERC20ABI,
+          functionName: "balanceOf",
+          args: [$account],
+        });
+
+        const sdivBalance = await $publicClient.readContract({
+          address: SDIV[0] as `0x${string}`,
+          abi: ERC20ABI,
+          functionName: "balanceOf",
+          args: [$account],
+        });
+
         const profitStaked = (await $publicClient.readContract({
           address:
             "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
@@ -69,8 +83,22 @@ function Tokenomics() {
           args: [$account],
         })) as bigint[];
 
-        const totalProfitStaked = formatUnits(profitStaked[0], 18);
-        setPoolData(totalProfitStaked);
+        const earned = await $publicClient.readContract({
+          address:
+            "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+
+          abi: DividendMinterABI,
+          functionName: "pending",
+          args: [$account],
+        });
+
+        const _poolData = {
+          profitBalance: Number(formatUnits(profitBalance, 18)).toFixed(2),
+          sdivBalance: Number(formatUnits(sdivBalance, 18)).toFixed(2),
+          profitStaked: Number(formatUnits(profitStaked[0], 18)).toFixed(2),
+          earned: Number(formatUnits(earned, 18)).toFixed(2),
+        };
+        setPoolData(_poolData);
 
         //profit Token
         const _profitTokenPrice = Number(
@@ -112,26 +140,40 @@ function Tokenomics() {
   };
 
   const stake = async () => {
-    if ($publicClient) {
+    if ($publicClient && inputStake > 0) {
+      const ammount = parseUnits(inputStake, 18);
       const sdivTotalSupply = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
         abi: DividendMinterABI,
         functionName: "stake",
-        args: [inputStake],
+        args: [ammount],
       });
     }
   };
 
   const unStake = async () => {
-    if ($publicClient) {
+    if ($publicClient && inputStake > 0) {
+      const ammount = parseUnits(inputStake, 18);
       const sdivTotalSupply = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
         abi: DividendMinterABI,
         functionName: "unstake",
-        args: [inputStake],
+        args: [ammount],
       });
     }
   };
+
+  const harvest = async () => {
+    if ($publicClient) {
+      const harvest = await writeContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+        abi: DividendMinterABI,
+        functionName: "harvest",
+      });
+    }
+  };
+
+  console.log(harvest);
 
   useEffect(() => {
     fetchTokenomicsData();
@@ -183,12 +225,12 @@ function Tokenomics() {
 
               <tr>
                 <td>Wallet: </td>
-                <td>{$account}</td>
+                <td>{poolData.profitBalance} PROFIT</td>
               </tr>
               <tr>
                 <td>Staked:</td>
                 <td>
-                  <p className="my-auto ">{poolData} PROFIT</p>{" "}
+                  <p className="my-auto ">{poolData.profitStaked} PROFIT</p>{" "}
                 </td>
               </tr>
             </tbody>
@@ -214,7 +256,7 @@ function Tokenomics() {
             <input
               value={inputStake}
               onChange={e => setInputStake(e.target.value)}
-              className="p-2 rounded-sm w-[100px] text-gray-400 bg-transparent border border-gray-600"
+              className="p-2 rounded-sm w-[58px] text-gray-400 bg-transparent border border-gray-600"
             />{" "}
           </div>
 
@@ -244,7 +286,7 @@ function Tokenomics() {
             <a
               className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
               href="https://app.uniswap.org/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x48469a0481254d5945E7E56c1Eb9861429c02f44"
-              title="Swap by uniswap">
+              title="Swap by Uniswap">
               <svg
                 fill="white"
                 className="Icons__UniLogo-sc-dy67gv-0 iEwsPo w-[22px]"
@@ -286,15 +328,11 @@ function Tokenomics() {
                 </tr>
                 <tr>
                   <td>Wallet: </td>
-                  <td>{$account}</td>
+                  <td>{poolData.sdivBalance} SDIV</td>
                 </tr>
                 <tr>
                   <td>Earned: </td>
-                  <td>
-                    <span className="text-red-600 me-3 my-auto">
-                      ADD EARNED
-                    </span>
-                  </td>
+                  <td>{poolData.earned} SDIV</td>
                 </tr>
               </tbody>
             </table>
@@ -307,7 +345,11 @@ function Tokenomics() {
 
             <div className="flex mt-3 text-sm">
               {" "}
-              <button className="bg-button rounded-sm p-2 text-red-600">
+              <button
+                onClick={() => {
+                  harvest();
+                }}
+                className="bg-button rounded-sm p-2">
                 Claim
               </button>
             </div>
@@ -354,7 +396,7 @@ function Tokenomics() {
 
             <div className="flex mt-3">
               <a
-                className="rounded-sm text-start p-2 text-sm my-auto flex text-[#8D8E96] bg-button "
+                className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
                 href="https://opensea.io/collection/profit-maker">
                 Marketplace
               </a>

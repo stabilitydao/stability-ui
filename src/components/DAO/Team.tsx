@@ -116,12 +116,12 @@ function Team() {
   }, []);
 
   return (
-    <div className="m-auto mb-5 w-7/8 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+    <div className="m-auto w-7/8 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
       <div className="p-3">
         <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">Team</h1>
 
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
-          <table>
+          <table className="text-[#8D8E96]">
             <thead>
               <tr>
                 <td>
@@ -165,48 +165,50 @@ function Team() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto mt-5 p-2 align-top w-full lg:w-3/4">
-        {members ? (
-          members.map(member => (
-            <a
-              href={member.html_url}
-              key={member.name}
-              className="text-sm p-2 max-w-[150px] h-[200px] m-auto hover:bg-button rounded-md"
-              target="_blank">
-              <img
-                className="rounded-full m-auto w-[75px]"
-                src={member.avatar_url}
-                alt={`Avatar de ${member.name}`}
-              />
-              <p className="font-bold text-center mt-1">{member.name}</p>
-              {member.location !== null ? (
-                <p className="text-xs mt-1 flex text-left">
-                  <svg
-                    className="me-1 my-auto"
-                    stroke="currentColor"
-                    fill="currentColor"
-                    strokeWidth="0"
-                    viewBox="0 0 12 16"
-                    height="1em"
-                    width="1em"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      fillRule="evenodd"
-                      d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
-                  </svg>{" "}
-                  {member.location}
+      <div className="p-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto mt-5 p-2 align-top w-full lg:w-3/4 rounded-md">
+          {members ? (
+            members.map(member => (
+              <a
+                href={member.html_url}
+                key={member.name}
+                className="text-sm p-2 max-w-[150px] h-[200px] m-auto hover:bg-button rounded-md"
+                target="_blank">
+                <img
+                  className="rounded-full m-auto w-[75px]"
+                  src={member.avatar_url}
+                  alt={`Avatar de ${member.name}`}
+                />
+                <p className="font-bold text-center mt-1">{member.name}</p>
+                {member.location !== null ? (
+                  <p className="text-xs mt-1 flex text-left">
+                    <svg
+                      className="me-1 my-auto"
+                      stroke="currentColor"
+                      fill="currentColor"
+                      strokeWidth="0"
+                      viewBox="0 0 12 16"
+                      height="1em"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        fillRule="evenodd"
+                        d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
+                    </svg>{" "}
+                    {member.location}
+                  </p>
+                ) : (
+                  ""
+                )}
+                <p className="font-light text-xs line-clamp-3 mt-1">
+                  {member.bio}
                 </p>
-              ) : (
-                ""
-              )}
-              <p className="font-light text-sm line-clamp-3 mt-1">
-                {member.bio}
-              </p>
-            </a>
-          ))
-        ) : (
-          <p>Loading team..</p>
-        )}
+              </a>
+            ))
+          ) : (
+            <p>Loading team..</p>
+          )}
+        </div>
       </div>
     </div>
   );
