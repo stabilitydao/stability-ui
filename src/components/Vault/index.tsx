@@ -919,80 +919,88 @@ function Vault({ vault }: IProps) {
     }
     setBalances(balance);
   };
+  const debouncedPreviewWithdraw = useCallback(
+    debounce(async (value: string) => {
+      const balance = Number(
+        formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+      );
+      if (!Number(value)) {
+        setWithdrawAmount(false);
+        setZapPreviewWithdraw(false);
+        return;
+      }
+
+      if (Number(value) > balance) {
+        setZapButton("insuficcientBalance");
+        return;
+      }
+
+      ///// UNDERLYING TOKEN
+      const currentValue = parseUnits(value, 18);
+
+      if (underlyingToken?.address === option[0]) {
+        const { result } = await _publicClient.simulateContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [option as TAddress[], currentValue, [0n]],
+          account: $account as TAddress,
+        });
+
+        setWithdrawAmount([
+          {
+            symbol: underlyingToken?.symbol,
+            amount: formatUnits(result[0], 18),
+          },
+        ]);
+      } else {
+        const { result } = await _publicClient.simulateContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [$assets as TAddress[], currentValue, [0n, 0n]],
+          account: $account as TAddress,
+        });
+
+        if (option?.length > 1) {
+          const preview = result.map((amount: any, index: number) => {
+            const tokenData: TTokenData | any = getTokenData($assets[index]);
+            return {
+              symbol: tokenData?.symbol,
+              amount: formatUnits(amount, tokenData?.decimals),
+            };
+          });
+          setWithdrawAmount(preview);
+          setZapButton("withdraw");
+        } else {
+          const allowanceData: any = formatUnits(await getZapAllowance(), 18);
+          if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
+            setZapButton("needApprove");
+            return;
+          }
+          const promises = result.map(
+            async (amount, index) =>
+              await get1InchRoutes(
+                $assets[index],
+                option[0],
+                Number(getTokenData($assets[index])?.decimals),
+                amount,
+                setZapError,
+                "withdraw"
+              )
+          );
+          const outData = await Promise.all(promises);
+          setZapPreviewWithdraw(outData);
+          setZapButton("withdraw");
+        }
+      }
+    }, 1000),
+    [option, balances]
+  );
 
   const previewWithdraw = async (value: string) => {
-    const balance = Number(
-      formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
-    );
-
-    if (Number(value) > balance || !Number(value)) {
-      setWithdrawAmount(false);
-      setZapPreviewWithdraw(false);
-      return;
-    }
-
-    ///// UNDERLYING TOKEN
-    const currentValue = parseUnits(value, 18);
-
-    if (underlyingToken?.address === option[0]) {
-      const { result } = await _publicClient.simulateContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n]],
-        account: $account as TAddress,
-      });
-
-      setWithdrawAmount([
-        {
-          symbol: underlyingToken?.symbol,
-          amount: formatUnits(result[0], 18),
-        },
-      ]);
-    } else {
-      const { result } = await _publicClient.simulateContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [$assets as TAddress[], currentValue, [0n, 0n]],
-        account: $account as TAddress,
-      });
-
-      if (option?.length > 1) {
-        const preview = result.map((amount: any, index: number) => {
-          const tokenData: TTokenData | any = getTokenData($assets[index]);
-          return {
-            symbol: tokenData?.symbol,
-            amount: formatUnits(amount, tokenData?.decimals),
-          };
-        });
-        setWithdrawAmount(preview);
-        setZapButton("withdraw");
-      } else {
-        const allowanceData: any = formatUnits(await getZapAllowance(), 18);
-
-        if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
-          setZapButton("needApprove");
-          return;
-        }
-
-        const promises = result.map(
-          async (amount, index) =>
-            await get1InchRoutes(
-              $assets[index],
-              option[0],
-              Number(getTokenData($assets[index])?.decimals),
-              amount,
-              setZapError,
-              "withdraw"
-            )
-        );
-
-        const outData = await Promise.all(promises);
-        setZapPreviewWithdraw(outData);
-        setZapButton("withdraw");
-      }
-    }
+    //@ts-ignore
+    debouncedPreviewWithdraw(value);
   };
 
   const checkAllowance = async () => {
@@ -1182,6 +1190,11 @@ function Vault({ vault }: IProps) {
   useEffect(() => {
     selectTokensHandler();
   }, [$tokens, defaultOptionSymbols]);
+
+  // need tests
+  useEffect(() => {
+    setZapTokens(false);
+  }, [inputs]);
 
   ///// interval refresh data
   useEffect(() => {
