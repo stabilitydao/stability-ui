@@ -105,6 +105,7 @@ type TLocalVault = {
   shareprice: string;
   tvl: string;
   apr: string;
+  apy: string;
   strategyApr: string;
   address: string;
   strategyInfo: IStrategyInfo;

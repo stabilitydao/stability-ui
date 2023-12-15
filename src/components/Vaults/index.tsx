@@ -34,7 +34,7 @@ import { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS } from "@constants";
 import type { TLocalVault, TAddress } from "@types";
 import { formatUnits } from "viem";
 
-function Vaults() {
+const Vaults = () => {
   const $vaults = useStore(vaults);
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
@@ -121,10 +121,14 @@ function Vaults() {
           if ($vaultAssets.length) {
             const token1 = getTokenData($vaultAssets[index][1][0]);
             const token2 = getTokenData($vaultAssets[index][1][1]);
-            
+
             if (token1 && token2) {
-              const token1Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token1.address));
-              const token2Extended = TOKENS_ASSETS.find(tokenAsset => tokenAsset.addresses.includes(token2.address));
+              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token1.address)
+              );
+              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token2.address)
+              );
 
               assets = [
                 {
@@ -167,8 +171,12 @@ function Vaults() {
             address: strategy,
             abi: StrategyABI,
             functionName: "getAssetsProportions",
-          })
-          const assetsProportions: number[] = assetsProportionsBI?.length ? assetsProportionsBI.map(a => Math.round(Number(formatUnits(a, 16)))) : []
+          });
+          const assetsProportions: number[] = assetsProportionsBI?.length
+            ? assetsProportionsBI.map((a) =>
+                Math.round(Number(formatUnits(a, 16)))
+              )
+            : [];
 
           const data =
             $apiData?.underlyings?.["137"]?.[underlying.toLowerCase()];
@@ -178,6 +186,12 @@ function Vaults() {
             monthlyApr = data.apr.daily.feeApr;
           }
           /////
+          const APR = (
+            formatFromBigInt(String($vaults[7][index]), 3, "withDecimals") +
+            Number(monthlyApr) * 100
+          ).toFixed(2);
+
+          const APY = calculateAPY(APR).toFixed(2);
 
           return {
             name: $vaults[1][index],
@@ -189,6 +203,7 @@ function Vaults() {
             shareprice: String($vaults[5][index]),
             tvl: String($vaults[6][index]),
             apr: String($vaults[7][index]),
+            apy: APY,
             strategyApr: $vaults[8][index],
             address: $vaults[0][index],
             strategyInfo: getStrategyInfo($vaults[2][index]),
@@ -247,13 +262,6 @@ function Vaults() {
         </thead>
         <tbody>
           {currentTabVaults.map((vault: TLocalVault, index: number) => {
-            const APR = (
-              formatFromBigInt(vault.apr, 3, "withDecimals") +
-              Number(vault?.monthlyUnderlyingApr) * 100
-            ).toFixed(2);
-
-            const APY = calculateAPY(APR).toFixed(2);
-
             return (
               <tr
                 className="border-t border-[#4f5158] text-center text-[15px] transition delay-[40ms] hover:bg-[#3d404b] cursor-pointer"
@@ -262,21 +270,41 @@ function Vaults() {
                 <td className="px-2 lg:px-4 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
                     <div className="hidden md:flex w-[30px] h-6 ml-[12px] mr-5">
-                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[0] / 100 : 25}px`, backgroundColor: vault.assets[0].color,}} className="h-6">
-                      <img
-                        className="absolute w-6 h-6 rounded-full ml-[-12px]"
-                        src={vault.assets[0].logo}
-                        alt={vault.assets[0].symbol}
-                        title={vault.assets[0].name}
-                      />
+                      <div
+                        style={{
+                          width: `${
+                            vault.assetsProportions
+                              ? (30 * vault.assetsProportions[0]) / 100
+                              : 25
+                          }px`,
+                          backgroundColor: vault.assets[0].color,
+                        }}
+                        className="h-6"
+                      >
+                        <img
+                          className="absolute w-6 h-6 rounded-full ml-[-12px]"
+                          src={vault.assets[0].logo}
+                          alt={vault.assets[0].symbol}
+                          title={vault.assets[0].name}
+                        />
                       </div>
-                      <div style={{width: `${vault.assetsProportions ? 30 * vault.assetsProportions[1] / 100 : 25}px`, backgroundColor: vault.assets[1].color,}} className="h-6 flex justify-end">
-                      <img
-                        className="absolute w-6 h-6 rounded-full mr-[-12px]"
-                        src={vault.assets[1].logo}
-                        alt={vault.assets[1].symbol}
-                        title={vault.assets[1].name}
-                      />
+                      <div
+                        style={{
+                          width: `${
+                            vault.assetsProportions
+                              ? (30 * vault.assetsProportions[1]) / 100
+                              : 25
+                          }px`,
+                          backgroundColor: vault.assets[1].color,
+                        }}
+                        className="h-6 flex justify-end"
+                      >
+                        <img
+                          className="absolute w-6 h-6 rounded-full mr-[-12px]"
+                          src={vault.assets[1].logo}
+                          alt={vault.assets[1].symbol}
+                          title={vault.assets[1].name}
+                        />
                       </div>
                     </div>
                     <div className="max-w-[250px] flex items-start flex-col">
@@ -357,7 +385,7 @@ function Vaults() {
                 </td>
                 <td className="px-2 lg:px-4 py-2">
                   <div className="flex w-[80px] justify-end">
-                    <p>{APY}%</p>
+                    <p>{vault.apy}%</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -433,6 +461,6 @@ function Vaults() {
       </a>
     </div>
   );
-}
+};
 
 export { Vaults };
