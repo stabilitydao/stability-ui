@@ -1263,22 +1263,22 @@ function Vault({ vault }: IProps) {
       <div className="flex justify-between items-center p-4 bg-button rounded-md">
         {localVault && (
           <div className="flex flex-col w-full">
-            <div className="flex items-center gap-4 w-full justify-between flex-wrap">
-              <div className="flex  items-center">
+            <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
+              <div className="flex items-center">
                 <img
-                  className="w-8 h-8 rounded-full"
+                  className="w-8 h-8 rounded-full hidden md:flex"
                   src={localVault?.assets[0].logo}
                   alt={localVault?.assets[0].symbol}
                   title={localVault?.assets[0].name}
                 />
                 <img
-                  className="w-8 h-8 rounded-full ml-[-8px]"
+                  className="w-8 h-8 rounded-full ml-[-8px]  hidden md:flex"
                   src={localVault?.assets[1].logo}
                   alt={localVault?.assets[1].symbol}
                   title={localVault?.assets[1].name}
                 />
 
-                <span className="inline-flex ml-2 text-[18px] font-bold whitespace-nowrap">
+                <span className="inline-flex md:ml-2 text-[18px] font-bold whitespace-nowrap">
                   {localVault.symbol}
                 </span>
               </div>
@@ -1289,7 +1289,7 @@ function Vault({ vault }: IProps) {
                 </span>
               </div>
               <img
-                className="w-8 h-8 rounded-full mx-1"
+                className="w-8 h-8 rounded-full mx-1 hidden lg:flex"
                 src={currentChain?.logoURI}
                 alt={currentChain?.name}
                 title={currentChain?.name}
@@ -1298,10 +1298,10 @@ function Vault({ vault }: IProps) {
           </div>
         )}
       </div>
-      <div className="flex items-start gap-5 mt-6">
-        <div className="w-2/3">
+      <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
+        <div className="w-full md:w-1/2 lg:w-3/5 ">
           {localVault && (
-            <div className="flex justify-between items-center bg-button p-4 rounded-md h-[80px]">
+            <div className="flex flex-wrap justify-between items-center bg-button p-4 rounded-md md:h-[80px]">
               <VaultType type={localVault.type} />
               <div>
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
@@ -1320,7 +1320,7 @@ function Vault({ vault }: IProps) {
                 </p>
                 <p>{localVault.apy}%</p>
               </div>
-              <div>
+              <div className="hidden lg:block">
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   Daily
                 </p>
@@ -1341,14 +1341,14 @@ function Vault({ vault }: IProps) {
             <div className="rounded-md mt-5 bg-button">
               <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
                 <h2 className=" text-[24px] text-start ml-4">Strategy</h2>
-                <div className="flex items-center gap-5 mr-3 ">
-                  <button className="rounded-md bg-button flex justify-center items-center w-[140px]">
+                <div className="hidden lg:flex items-center gap-5 mr-3 ">
+                  <button className="rounded-md bg-button flex justify-center items-center min-w-[140px]">
                     <a
-                      className="flex items-center text-[15px] py-2 px-1"
+                      className="flex items-center text-[15px] py-2 px-4 whitespace-nowrap"
                       href={`https://polygonscan.com/address/${strategyAddress}`}
                       target="_blank"
                     >
-                      Strategy address
+                      Strategy contract
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-external-link ms-1"
@@ -1378,7 +1378,7 @@ function Vault({ vault }: IProps) {
                       href={`https://polygonscan.com/token/${localVault.address}`}
                       target="_blank"
                     >
-                      Vault address
+                      Vault contract
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-external-link ms-1"
@@ -1436,11 +1436,11 @@ function Vault({ vault }: IProps) {
               </div>
 
               <div className={`flex flex-col items-start gap-3 p-4`}>
-                <div className="flex">
+                <div className="flex-col md:flex">
                   <div
-                    className={`flex py-1 ${
+                    className={`flex md:hidden lg:flex py-1 ${
                       localVault.strategyInfo.protocols.length > 1 && "pl-[8px]"
-                    } mr-3`}
+                    } mr-3 mb-3 md:mb-0`}
                   >
                     {localVault.strategyInfo.protocols.map(
                       ({
@@ -1469,7 +1469,7 @@ function Vault({ vault }: IProps) {
                       backgroundColor: localVault.strategyInfo.bgColor,
                       color: localVault.strategyInfo.color,
                     }}
-                    className="px-3 rounded-[8px] flex items-center"
+                    className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
                   >
                     <p>
                       {localVault.strategyInfo.name}
@@ -1480,7 +1480,7 @@ function Vault({ vault }: IProps) {
                   </div>
 
                   <div
-                    className="flex items-center ml-3"
+                    className="flex md:hidden lg:flex items-center ml-3"
                     title="Farming strategy"
                   >
                     <svg
@@ -1597,7 +1597,7 @@ function Vault({ vault }: IProps) {
                       key={asset}
                     >
                       <div className="flex w-full flex-col gap-3">
-                        <div className="flex w-full justify-between items-center ">
+                        <div className="flex w-full justify-between items-center  flex-wrap">
                           <div className="inline-flex items-center">
                             <img
                               className="rounded-full w-[30px] m-auto mr-2"
@@ -1610,7 +1610,7 @@ function Vault({ vault }: IProps) {
                               {assetData.name}
                             </span>
                           </div>
-                          <div className="flex gap-3">
+                          <div className="flex flex-col md:flex-row gap-3">
                             {tokenAssets?.website && (
                               <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                                 <a
@@ -1737,19 +1737,20 @@ function Vault({ vault }: IProps) {
               })}
           </article>
         </div>
-        <div className="w-1/3">
+        <div className="w-full md:w-1/2 lg:w-2/5">
           {localVault && (
-            <div className="flex justify-between items-center bg-button px-5 py-4 rounded-md h-[80px]">
-              <div className="flex flex-col">
+            <div className="flex justify-between flex-wrap items-center bg-button px-5 py-2 md:py-4 rounded-md md:h-[80px]">
+              <div className="flex flex-col my-2 md:my-0">
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                   Your Balance
                 </p>
 
-                <div className="text-[18px] h-8 flex">
+                <div className="text-[20px] h-8 flex">
                   <p className="mr-1">
-                    {formatFromBigInt(localVault.balance, 18).toFixed(5)} /
+                    {formatFromBigInt(localVault.balance, 18).toFixed(5)}
                   </p>
-                  <p>
+                  <p className="whitespace-nowrap md:hidden lg:block">
+                  /
                     $
                     {(
                       formatFromBigInt(
@@ -1764,7 +1765,7 @@ function Vault({ vault }: IProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col my-2 md:my-0">
                 {timeDifference && (
                   <div className="flex flex-col justify-between">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
@@ -1862,7 +1863,7 @@ function Vault({ vault }: IProps) {
                             />
                           )
                         )}
-                        <p>{activeOptionToken?.symbol}</p>
+                        <p className="text-[16px] md:text-[15px] lg:text-[20px]">{activeOptionToken?.symbol}</p>
                       </div>
 
                       <svg
@@ -1895,7 +1896,7 @@ function Vault({ vault }: IProps) {
                             defaultOptionImages
                           );
                         }}
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3"
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
                       >
                         {defaultOptionImages?.length && (
                           <div className="flex items-center">
@@ -1909,7 +1910,7 @@ function Vault({ vault }: IProps) {
                             ))}
                           </div>
                         )}
-                        <p className="ml-[-4px]"> {defaultOptionSymbols}</p>
+                        <p className="ml-[-4px] text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0"> {defaultOptionSymbols}</p>
                       </div>
                       {underlyingToken && (
                         <div
@@ -1921,7 +1922,7 @@ function Vault({ vault }: IProps) {
                               "/protocols/Gamma.png"
                             );
                           }}
-                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3 ml-3"
+                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
                         >
                           {underlyingToken?.logoURI && (
                             <img
@@ -1930,7 +1931,7 @@ function Vault({ vault }: IProps) {
                               alt="logo"
                             />
                           )}
-                          <p className="ml-2"> {underlyingToken.symbol}</p>
+                          <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0"> {underlyingToken.symbol}</p>
                         </div>
                       )}
                       {optionTokens.map(
@@ -1945,7 +1946,7 @@ function Vault({ vault }: IProps) {
                         }) => {
                           return (
                             <div
-                              className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3 ml-3"
+                              className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
                               key={address}
                               onClick={() => {
                                 optionHandler(
@@ -1963,7 +1964,7 @@ function Vault({ vault }: IProps) {
                                   alt="logo"
                                 />
                               )}
-                              <p className="ml-2"> {symbol}</p>
+                              <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0"> {symbol}</p>
                             </div>
                           );
                         }
