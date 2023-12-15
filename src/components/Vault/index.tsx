@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
@@ -46,6 +46,7 @@ import {
   getTimeDifference,
   getStrategyInfo,
   get1InchRoutes,
+  debounce,
 } from "@utils";
 
 import type {
@@ -128,11 +129,7 @@ function Vault({ vault }: IProps) {
   const [zapTokens, setZapTokens] = useState<any>(false);
   const [zapError, setZapError] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
-
-  const [lastAmounts, setLastAmounts] = useState<any>({
-    deposit: "",
-    withdraw: "",
-  });
+  const [isRefresh, setIsRefresh] = useState(false);
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
@@ -342,19 +339,19 @@ function Vault({ vault }: IProps) {
   };
   /////
   /////         ZAP
-  const getZapAllowance = async () => {
+  const getZapAllowance = async (asset = option[0]) => {
     let allowanceData;
     if (tab === "Deposit") {
-      if (option[0] === underlyingToken?.address) {
+      if (asset === underlyingToken?.address) {
         allowanceData = await readContract(_publicClient, {
-          address: option[0] as TAddress,
+          address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, vault as TAddress],
         });
       } else {
         allowanceData = await readContract(_publicClient, {
-          address: option[0] as TAddress,
+          address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, $platformData.zap as TAddress],
@@ -372,7 +369,101 @@ function Vault({ vault }: IProps) {
     return allowanceData;
   };
 
-  const zapInputHandler = async (amount: string, asset: string) => {
+  const debouncedZap = useCallback(
+    debounce(async (amount: string, asset: string) => {
+      if (!Number(amount)) {
+        setZapButton("none");
+        setZapTokens(false);
+        return;
+      }
+
+      if (
+        tab === "Deposit" &&
+        Number(amount) > Number(balances[asset]?.assetBalance)
+      ) {
+        setZapButton("insuficcientBalance");
+      }
+
+      if (
+        tab === "Withdraw" &&
+        Number(amount) >
+          parseFloat(
+            formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+          )
+      ) {
+        setZapButton("insuficcientBalance");
+        setZapTokens(false);
+        return;
+      }
+
+      if (asset === underlyingToken?.address) {
+        try {
+          const previewDepositAssets = await readContract(_publicClient, {
+            address: vault as TAddress,
+            abi: VaultABI,
+            functionName: "previewDepositAssets",
+            args: [[asset as TAddress], [parseUnits(amount, 18)]],
+          });
+
+          setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
+
+          const allowanceData = (await readContract(_publicClient, {
+            address: option[0] as TAddress,
+            abi: ERC20ABI,
+            functionName: "allowance",
+            args: [$account as TAddress, vault as TAddress],
+          })) as bigint;
+
+          if (
+            Number(formatUnits(allowanceData, 18)) < Number(amount) &&
+            Number(amount) <= Number(balances[asset]?.assetBalance)
+          ) {
+            setZapButton("needApprove");
+          }
+
+          if (
+            Number(amount) <= Number(balances[asset]?.assetBalance) &&
+            Number(formatUnits(allowanceData, 18)) >= Number(amount)
+          ) {
+            setZapButton(tab.toLowerCase());
+          }
+
+          checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+          setSharesOut(
+            ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+          );
+        } catch (error) {
+          console.error("UNDERLYING SHARES ERROR:", error);
+        }
+      } else {
+        ///// DEPOSIT / WITHDRAW
+        try {
+          const decimals = Number(getTokenData(asset)?.decimals);
+
+          const allowanceData = await getZapAllowance(asset);
+
+          if (tab === "Withdraw") {
+            if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
+              setZapButton("needApprove");
+            }
+          }
+          if (tab === "Deposit") {
+            if (
+              Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
+              Number(amount) <= Number(balances[asset]?.assetBalance)
+            ) {
+              setZapButton("needApprove");
+            }
+            getZapDepositSwapAmounts(amount);
+          }
+        } catch (error) {
+          console.error("ZAP ERROR:", error);
+        }
+      }
+    }, 1000),
+    [option, balances]
+  );
+  const zapInputHandler = (amount: string, asset: string) => {
     setZapButton("none");
     setZapTokens(false);
     setZapPreviewWithdraw(false);
@@ -387,78 +478,8 @@ function Vault({ vault }: IProps) {
         } as TVaultInput)
     );
 
-    if (!Number(amount)) {
-      setZapButton("none");
-      setZapTokens(false);
-      return;
-    }
-    if (
-      tab === "Deposit" &&
-      Number(amount) > Number(balances[asset]?.assetBalance)
-    ) {
-      setZapButton("insuficcientBalance");
-      setZapTokens(false);
-      return;
-    }
-    if (
-      tab === "Withdraw" &&
-      Number(amount) >
-        parseFloat(
-          formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
-        )
-    ) {
-      setZapButton("insuficcientBalance");
-      setZapTokens(false);
-      return;
-    }
-
-    ///// UNDERLYING & ZAP TOKENS
-    if (asset === underlyingToken?.address) {
-      try {
-        const previewDepositAssets = await readContract(_publicClient, {
-          address: vault as TAddress,
-          abi: VaultABI,
-          functionName: "previewDepositAssets",
-          args: [[asset as TAddress], [parseUnits(amount, 18)]],
-        });
-
-        setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-
-        const allowanceData = (await readContract(_publicClient, {
-          address: option[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, vault as TAddress],
-        })) as bigint;
-
-        if (Number(formatUnits(allowanceData, 18)) < Number(amount)) {
-          setZapButton("needApprove");
-        } else {
-          setZapButton(tab.toLowerCase());
-        }
-
-        checkInputsAllowance(previewDepositAssets[0] as bigint[]);
-        setSharesOut(
-          ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
-        );
-      } catch (error) {
-        console.error("UNDERLYING SHARES ERROR:", error);
-      }
-    } else {
-      try {
-        const decimals = Number(getTokenData(option[0])?.decimals);
-
-        const allowanceData = await getZapAllowance();
-
-        if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
-          setZapButton("needApprove");
-        } else if (tab === "Deposit") {
-          getZapDepositSwapAmounts(amount);
-        }
-      } catch (error) {
-        console.error("ZAP ERROR:", error);
-      }
-    }
+    // @ts-ignore
+    debouncedZap(amount, asset);
   };
 
   const zapApprove = async () => {
@@ -576,13 +597,8 @@ function Vault({ vault }: IProps) {
   };
 
   const getZapDepositSwapAmounts = async (amount: string) => {
-    setLastAmounts((prevAmounts: any) => ({
-      ...prevAmounts,
-      deposit: amount,
-    }));
-
     const decimals = Number(getTokenData(option[0])?.decimals);
-
+    const allowanceData = await getZapAllowance(option[0]);
     const zapAmounts = await readContract(_publicClient, {
       address: $platformData.zap,
       abi: ZapABI,
@@ -631,7 +647,18 @@ function Vault({ vault }: IProps) {
       });
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
-      setZapButton("deposit");
+      if (
+        Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
+        Number(amount) <= Number(balances[option[0]]?.assetBalance)
+      ) {
+        setZapButton("needApprove");
+      }
+      if (
+        Number(formatUnits(allowanceData, decimals)) >= Number(amount) &&
+        Number(amount) <= Number(balances[option[0]]?.assetBalance)
+      ) {
+        setZapButton("deposit");
+      }
     } catch (error) {
       console.error("ZAP SHARES ERROR", error);
     }
@@ -671,22 +698,10 @@ function Vault({ vault }: IProps) {
 
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
+    if (!isRefresh) return;
+
     setRotation(rotation + 360);
-
-    if (option.length > 1) {
-      return;
-    }
-    setZapButton("none");
-    setZapTokens(false);
-    setWithdrawAmount(false);
-    setZapPreviewWithdraw(false);
-
-    if (tab === "Deposit" && !!lastAmounts.deposit) {
-      getZapDepositSwapAmounts(lastAmounts.deposit);
-    }
-    if (tab === "Withdraw" && !!lastAmounts.withdraw) {
-      previewWithdraw(lastAmounts.withdraw);
-    }
+    zapInputHandler(inputs[option[0]]?.amount, option[0]);
   };
   /////
 
@@ -814,7 +829,7 @@ function Vault({ vault }: IProps) {
         optionAmount - (optionAmount * Math.floor(Number(slippage))) / 100;
       const minAmountOut = parseUnits(
         String(calculatedValue),
-        getTokenData(option[0])?.decimals
+        getTokenData(option[0])?.decimals as number
       );
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
@@ -904,87 +919,88 @@ function Vault({ vault }: IProps) {
     }
     setBalances(balance);
   };
+  const debouncedPreviewWithdraw = useCallback(
+    debounce(async (value: string) => {
+      const balance = Number(
+        formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
+      );
+      if (!Number(value)) {
+        setWithdrawAmount(false);
+        setZapPreviewWithdraw(false);
+        return;
+      }
+
+      if (Number(value) > balance) {
+        setZapButton("insuficcientBalance");
+        return;
+      }
+
+      ///// UNDERLYING TOKEN
+      const currentValue = parseUnits(value, 18);
+
+      if (underlyingToken?.address === option[0]) {
+        const { result } = await _publicClient.simulateContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [option as TAddress[], currentValue, [0n]],
+          account: $account as TAddress,
+        });
+
+        setWithdrawAmount([
+          {
+            symbol: underlyingToken?.symbol,
+            amount: formatUnits(result[0], 18),
+          },
+        ]);
+      } else {
+        const { result } = await _publicClient.simulateContract({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [$assets as TAddress[], currentValue, [0n, 0n]],
+          account: $account as TAddress,
+        });
+
+        if (option?.length > 1) {
+          const preview = result.map((amount: any, index: number) => {
+            const tokenData: TTokenData | any = getTokenData($assets[index]);
+            return {
+              symbol: tokenData?.symbol,
+              amount: formatUnits(amount, tokenData?.decimals),
+            };
+          });
+          setWithdrawAmount(preview);
+          setZapButton("withdraw");
+        } else {
+          const allowanceData: any = formatUnits(await getZapAllowance(), 18);
+          if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
+            setZapButton("needApprove");
+            return;
+          }
+          const promises = result.map(
+            async (amount, index) =>
+              await get1InchRoutes(
+                $assets[index],
+                option[0],
+                Number(getTokenData($assets[index])?.decimals),
+                amount,
+                setZapError,
+                "withdraw"
+              )
+          );
+          const outData = await Promise.all(promises);
+          setZapPreviewWithdraw(outData);
+          setZapButton("withdraw");
+        }
+      }
+    }, 1000),
+    [option, balances]
+  );
 
   const previewWithdraw = async (value: string) => {
-    if (option.length < 2) {
-      setLastAmounts((prevAmounts: any) => ({
-        ...prevAmounts,
-        withdraw: value,
-      }));
-    }
-
-    const balance = Number(
-      formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
-    );
-
-    if (Number(value) > balance || !Number(value)) {
-      setWithdrawAmount(false);
-      setZapPreviewWithdraw(false);
-      return;
-    }
-
-    ///// UNDERLYING TOKEN
-    const currentValue = parseUnits(value, 18);
-
-    if (underlyingToken?.address === option[0]) {
-      const { result } = await _publicClient.simulateContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [option as TAddress[], currentValue, [0n]],
-        account: $account as TAddress,
-      });
-
-      setWithdrawAmount([
-        {
-          symbol: underlyingToken?.symbol,
-          amount: formatUnits(result[0], 18),
-        },
-      ]);
-    } else {
-      const { result } = await _publicClient.simulateContract({
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "withdrawAssets",
-        args: [$assets as TAddress[], currentValue, [0n, 0n]],
-        account: $account as TAddress,
-      });
-
-      if (option?.length > 1) {
-        const preview = result.map((amount: any, index: number) => {
-          const tokenData: TTokenData | any = getTokenData($assets[index]);
-          return {
-            symbol: tokenData?.symbol,
-            amount: formatUnits(amount, tokenData?.decimals),
-          };
-        });
-        setWithdrawAmount(preview);
-        setZapButton("withdraw");
-      } else {
-        const allowanceData: any = formatUnits(await getZapAllowance(), 18);
-
-        if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
-          setZapButton("needApprove");
-          return;
-        }
-
-        const promises = result.map(
-          async (amount, index) =>
-            await get1InchRoutes(
-              $assets[index],
-              option[0],
-              Number(getTokenData($assets[index])?.decimals),
-              amount,
-              setZapError,
-              "withdraw"
-            )
-        );
-
-        const outData = await Promise.all(promises);
-        setZapPreviewWithdraw(outData);
-        setZapButton("withdraw");
-      }
-    }
+    //@ts-ignore
+    debouncedPreviewWithdraw(value);
   };
 
   const checkAllowance = async () => {
@@ -1175,15 +1191,22 @@ function Vault({ vault }: IProps) {
     selectTokensHandler();
   }, [$tokens, defaultOptionSymbols]);
 
+  // need tests
+  useEffect(() => {
+    setZapTokens(false);
+  }, [inputs]);
+
   ///// interval refresh data
   useEffect(() => {
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
-        if (tab === "Deposit" && !!lastAmounts.deposit) {
-          getZapDepositSwapAmounts(lastAmounts.deposit);
-        }
-        if (tab === "Withdraw" && !!lastAmounts.withdraw) {
-          previewWithdraw(lastAmounts.withdraw);
+        if (inputs[option[0]]?.amount) {
+          if (tab === "Deposit") {
+            getZapDepositSwapAmounts(inputs[option[0]]?.amount);
+          }
+          if (tab === "Withdraw") {
+            previewWithdraw(inputs[option[0]]?.amount);
+          }
         }
       };
 
@@ -1192,6 +1215,21 @@ function Vault({ vault }: IProps) {
       return () => clearInterval(intervalId);
     }
   }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
+  useEffect(() => {
+    setSharesOut(false);
+    setUnderlyingShares(false);
+    setZapShares(false);
+    if (
+      option.length > 1 ||
+      option[0] === underlyingToken?.address ||
+      !inputs[option[0]]?.amount
+    ) {
+      setIsRefresh(false);
+      return;
+    }
+    setIsRefresh(true);
+  }, [option, inputs]);
+  /////
 
   useEffect(() => {
     if (_publicClient) {
@@ -1935,7 +1973,7 @@ function Vault({ vault }: IProps) {
                 )}
 
                 <svg
-                  fill="#ffffff"
+                  fill={isRefresh ? "#ffffff" : "#959595"}
                   height="22"
                   width="22"
                   version="1.1"
@@ -1943,7 +1981,9 @@ function Vault({ vault }: IProps) {
                   xmlnsXlink="http://www.w3.org/1999/xlink"
                   viewBox="0 0 512 512"
                   xmlSpace="preserve"
-                  className="cursor-pointer transition-transform duration-500"
+                  className={`${
+                    isRefresh ? "cursor-pointer" : "cursor-default"
+                  } transition-transform duration-500`}
                   style={{ transform: `rotate(${rotation}deg)` }}
                   onClick={refreshData}
                 >
@@ -2213,7 +2253,7 @@ function Vault({ vault }: IProps) {
                               </div>
                             )}
 
-                          {zapTokens && zapButton !== "insuficcientBalance" && (
+                          {zapTokens && (
                             <>
                               {zapTokens.map((token: any) => (
                                 <div
@@ -2278,19 +2318,16 @@ function Vault({ vault }: IProps) {
                           )}
 
                           {underlyingShares &&
-                            inputs[option[0]]?.amount > 0 &&
-                            zapButton !== "insuficcientBalance" && (
+                            inputs[option[0]]?.amount > 0 && (
                               <p className="text-left  ml-2 mt-3 text-[18px]">
                                 Shares: {underlyingShares}
                               </p>
                             )}
-                          {zapShares &&
-                            inputs[option[0]]?.amount > 0 &&
-                            zapButton !== "insuficcientBalance" && (
-                              <p className="text-left  ml-2 mt-3 text-[18px]">
-                                Shares: {zapShares}
-                              </p>
-                            )}
+                          {zapShares && inputs[option[0]]?.amount > 0 && (
+                            <p className="text-left  ml-2 mt-3 text-[18px]">
+                              Shares: {zapShares}
+                            </p>
+                          )}
                         </div>
                         {zapButton === "insuficcientBalance" ? (
                           <button
