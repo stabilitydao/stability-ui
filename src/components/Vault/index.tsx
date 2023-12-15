@@ -2158,8 +2158,7 @@ function Vault({ vault }: IProps) {
                     </>
                   ) : (
                     <div>
-                      <div>Coming soon</div>
-                      <div className="hidden">
+                      <div className="">
                         <div className="flex flex-col mt-[15px] text-[15px] w-full">
                           {balances[option[0]] && (
                             <div className="text-left text-[gray] ml-2">
