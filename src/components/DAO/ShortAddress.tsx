@@ -4,10 +4,26 @@ function ShortAddress(props) {
   const prefix = props.address.slice(0, 6);
   const suffix = props.address.slice(-4);
   const address = `${prefix}...${suffix}`;
+
+  const copyAddress = () => {
+    // Crea un elemento de texto oculto
+    const textArea = document.createElement("textarea");
+    textArea.value = props.address;
+    document.body.appendChild(textArea);
+
+    // Selecciona y copia el texto
+    textArea.select();
+    document.execCommand("copy");
+
+    // Elimina el elemento de texto oculto
+    document.body.removeChild(textArea);
+  };
   return (
     <div className="flex my-auto">
       <p className="m-auto">{address}</p>
-      <button className="mx-3">
+      <button
+        className="mx-3"
+        onClick={copyAddress}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-[18px] icon icon-tabler icon-tabler-copy my-auto"

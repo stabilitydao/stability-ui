@@ -97,7 +97,7 @@ function Team() {
   }, []);
 
   return (
-    <div className="m-auto w-7/8 mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+    <div className="m-auto w-7/8 my-5 bg-[#3d404b] border border-gray-600 rounded-md">
       <div className="p-3">
         <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">Team</h1>
 
@@ -122,7 +122,7 @@ function Team() {
               </tr>
             </tbody>
           </table>
-          <div className="flex flex-wrap justify-evenly w-full gap-3 mt-5 mb-5">
+          <div className="flex flex-wrap justify-evenly w-full gap-3 my-5">
             {_multisigBalance &&
               $assetsPrices &&
               Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
@@ -149,7 +149,7 @@ function Team() {
       </div>
 
       <div className="p-3">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto mt-5 p-2 align-top w-full lg:w-3/4 rounded-md">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto my-3 p-2 align-top w-full lg:w-3/4 rounded-md">
           {members ? (
             members.map(member => (
               <a

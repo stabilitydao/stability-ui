@@ -139,8 +139,9 @@ function DAO() {
           v{daoData?.platformVersion}
         </p>
       </div>
-      <div className="w-full p-4 m-auto bg-button shadow-lg rounded-md mt-2">
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 shadow-lg text-sm">
+
+      <div className="w-full p-3 m-auto bg-button shadow-lg rounded-md mt-2">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
           <div className="grid h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
             <div className="m-auto">
               <h2 className="text-2xl">{daoData?.network}</h2>
@@ -152,7 +153,7 @@ function DAO() {
               <h2>TVL</h2>
             </div>
 
-            <div className="flex w-full m-auto align-middle border border-t-1 border-x-0 border-b-0 border-gray-800">
+            <div className="flex w-full m-auto align-middle border border-t-1 border-x-0 border-b-0 border-gray-800 shadow-sm">
               <div className="m-auto">
                 <h2 className="text-2xl font-semibold">
                   {daoData?.numberOfTotalVaults}
