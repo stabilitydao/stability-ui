@@ -2,22 +2,10 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { vaults, publicClient, balances, assetsPrices, account } from "@store";
-import {
-  PlatformABI,
-  FactoryABI,
-  platform,
-  ERC20ABI,
-  IERC721Enumerable,
-} from "@web3";
-import type {
-  TDAOData,
-  TGitHubUser,
-  TProfitTokenData,
-  TMultisigBalance,
-  TMultiTokenData,
-} from "@types";
+import { PlatformABI, FactoryABI, platform, ERC20ABI } from "@web3";
+import type { TDAOData } from "@types";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
-import { getStrategyInfo, getTokenData } from "@utils";
+import { getStrategyInfo } from "@utils";
 import axios from "axios";
 import Tokenomics from "./Tokenomics";
 import Team from "./Team";
@@ -29,7 +17,6 @@ function DAO() {
   const $vaults = useStore(vaults);
   const $balances = useStore(balances);
   const $assetsPrices = useStore(assetsPrices);
-  const $account = useStore(account);
 
   //get strategie bg-col/color
   function getFarmColor(farmName: string) {

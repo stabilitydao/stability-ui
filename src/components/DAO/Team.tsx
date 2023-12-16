@@ -1,32 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { DividendMinterABI } from "@web3";
-import {
-  account,
-  publicClient,
-  platformData,
-  vaults,
-  balances,
-  assetsPrices,
-} from "@store";
+import { publicClient, platformData, balances, assetsPrices } from "@store";
 import { formatUnits } from "viem";
-import { getStrategyInfo, getTokenData } from "@utils";
-import type {
-  TDAOData,
-  TGitHubUser,
-  TProfitTokenData,
-  TMultisigBalance,
-  TMultiTokenData,
-} from "@types";
-import {
-  PlatformABI,
-  FactoryABI,
-  platform,
-  ERC20ABI,
-  IERC721Enumerable,
-} from "@web3";
-import { SDIV, PROFIT, PM, TREASURY, MULTISIG } from "@constants";
+import { getTokenData } from "@utils";
+import type { TGitHubUser, TMultisigBalance, TMultiTokenData } from "@types";
+import { ERC20ABI } from "@web3";
+import { MULTISIG } from "@constants";
 import axios from "axios";
+import ShortAddress from "./ShortAddress";
 
 function Team() {
   const $balances = useStore(balances);
@@ -132,7 +113,9 @@ function Team() {
             <tbody>
               <tr>
                 <td>Address:</td>
-                <td>{MULTISIG[0]}</td>
+                <td>
+                  <ShortAddress address={MULTISIG[0]} />
+                </td>
               </tr>
               <tr>
                 <td>Balance:</td>

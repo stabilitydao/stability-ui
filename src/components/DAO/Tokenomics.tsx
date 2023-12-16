@@ -1,32 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { DividendMinterABI } from "@web3";
-import {
-  account,
-  publicClient,
-  platformData,
-  vaults,
-  balances,
-  assetsPrices,
-} from "@store";
+import { account, publicClient, assetsPrices } from "@store";
 import { formatUnits, parseUnits } from "viem";
 import { getStrategyInfo, getTokenData } from "@utils";
-import type {
-  TDAOData,
-  TGitHubUser,
-  TProfitTokenData,
-  TMultisigBalance,
-  TMultiTokenData,
-} from "@types";
-import {
-  PlatformABI,
-  FactoryABI,
-  platform,
-  ERC20ABI,
-  IERC721Enumerable,
-} from "@web3";
+import type { TProfitTokenData } from "@types";
+import { ERC20ABI, IERC721Enumerable } from "@web3";
 import { writeContract } from "@wagmi/core";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
+import ShortAddress from "./ShortAddress";
 
 function Tokenomics() {
   const $assetsPrices = useStore(assetsPrices);
@@ -142,7 +124,7 @@ function Tokenomics() {
   const stake = async () => {
     if ($publicClient && inputStake > 0) {
       const ammount = parseUnits(inputStake, 18);
-      const sdivTotalSupply = await writeContract({
+      const stake = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
         abi: DividendMinterABI,
         functionName: "stake",
@@ -154,7 +136,7 @@ function Tokenomics() {
   const unStake = async () => {
     if ($publicClient && inputStake > 0) {
       const ammount = parseUnits(inputStake, 18);
-      const sdivTotalSupply = await writeContract({
+      const unStake = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
         abi: DividendMinterABI,
         functionName: "unstake",
@@ -172,8 +154,6 @@ function Tokenomics() {
       });
     }
   };
-
-  console.log(harvest);
 
   useEffect(() => {
     fetchTokenomicsData();
@@ -218,8 +198,8 @@ function Tokenomics() {
               </tr>
               <tr>
                 <td>Address: </td>
-                <td className="max-w-[120px] overflow-clip">
-                  {getTokenData(PROFIT[0])?.address}{" "}
+                <td className="overflow-clip">
+                  <ShortAddress address={getTokenData(PROFIT[0])?.address} />
                 </td>
               </tr>
 
@@ -318,8 +298,8 @@ function Tokenomics() {
                 </tr>
                 <tr>
                   <td>Address: </td>
-                  <td className="max-w-[120px] overflow-clip">
-                    {getTokenData(SDIV[0])?.address}{" "}
+                  <td className="overflow-clip">
+                    <ShortAddress address={getTokenData(SDIV[0])?.address} />
                   </td>
                 </tr>
                 <tr>
@@ -368,7 +348,9 @@ function Tokenomics() {
                 </tr>
                 <tr>
                   <td>Address: </td>
-                  <td>0xAA3...83B </td>
+                  <td>
+                    <ShortAddress address={PM[0]} />{" "}
+                  </td>
                 </tr>
                 <tr>
                   <td>Total supply: </td>

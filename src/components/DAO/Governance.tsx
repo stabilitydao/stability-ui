@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
+import ShortAddress from "./ShortAddress";
 
 function Governance(props) {
   return (
@@ -18,7 +19,9 @@ function Governance(props) {
             <tbody>
               <tr>
                 <td className="min-w-[85px]">Address:</td>
-                <td>{TREASURY[0]}</td>
+                <td>
+                  <ShortAddress address={TREASURY[0]} />
+                </td>
               </tr>
               <tr>
                 <td>Total balance: </td>
