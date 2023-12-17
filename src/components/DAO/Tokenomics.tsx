@@ -160,16 +160,14 @@ function Tokenomics() {
   }, []);
 
   return (
-    <div className="overflow-hidden p-0 m-auto mt-5">
-      <div className="flex h-[70px] bg-[#3d404b] border border-gray-600 rounded-md w-full shadow-lg">
-        <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
-          Tokenomics
-        </h1>
-      </div>
+    <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
+      <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
+        Tokenomics
+      </h1>
 
-      <div className="mt-2 bg-[#3d404b] border border-gray-600 rounded-md w-full">
+      <div className="mt-2  border border-gray-600 rounded-md w-full">
         <div className="p-3 grid lg:flex gap-2">
-          <div className="bg-[#2c2f38] rounded-md p-3 relative lg:w-1/3 shadow-sm">
+          <div className="bg-[#2c2f38] rounded-md p-3 relative lg:w-1/3 shadow-sm border border-gray-700">
             <table className="text-sm h-[215px] text-[#8D8E96]">
               <tbody>
                 <tr>
@@ -262,7 +260,8 @@ function Tokenomics() {
               </a>
               <a
                 className="rounded-sm text-start p-2 text-sm my-auto flex bg-button me-2"
-                href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT">
+                href="https://app.1inch.io/#/137/simple/swap/ETH/PROFIT"
+                title="Swap by 1inch">
                 Swap by 1inch
               </a>
               <a
@@ -287,7 +286,7 @@ function Tokenomics() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:w-2/3 gap-2 w-full">
-            <div className="w-full h-full bg-[#2c2f38] rounded-md p-3 relative shadow-sm">
+            <div className="w-full h-full bg-[#2c2f38] rounded-md p-3 relative shadow-sm border border-gray-700">
               <table className="text-sm h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
@@ -337,7 +336,7 @@ function Tokenomics() {
               </div>
             </div>
 
-            <div className="bg-[#2c2f38] rounded-md p-3 relative shadow-sm">
+            <div className="bg-[#2c2f38] rounded-md p-3 relative shadow-sm border border-gray-700">
               <table className="text-sm h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
@@ -381,7 +380,8 @@ function Tokenomics() {
               <div className="flex mt-3">
                 <a
                   className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
-                  href="https://opensea.io/collection/profit-maker">
+                  href="https://opensea.io/collection/profit-maker"
+                  title="Marketplace">
                   Marketplace
                 </a>
               </div>

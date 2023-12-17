@@ -97,11 +97,11 @@ function Team() {
   }, []);
 
   return (
-    <div className="m-auto w-7/8 my-5 bg-[#3d404b] border border-gray-600 rounded-md">
-      <div className="p-3">
-        <h1 className="text-xxl text-[#8D8E96] mb-3 text-left">Team</h1>
+    <div className="my-5 bg-[#3d404b] border border-gray-600 rounded-md">
+      <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
-        <div className="p-3 bg-[#2c2f38] rounded-md text-sm">
+      <div className="p-3 border border-gray-600 rounded-md mt-2">
+        <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
           <table className="text-[#8D8E96]">
             <thead>
               <tr>
