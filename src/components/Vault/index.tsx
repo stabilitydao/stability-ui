@@ -20,6 +20,7 @@ import {
   platformData,
   tokens,
   apiData,
+  lastTx,
 } from "@store";
 
 import {
@@ -495,6 +496,7 @@ function Vault({ vault }: IProps) {
           );
 
           if (transaction.status === "success") {
+            lastTx.set(transaction?.transactionHash);
             const allowance = formatUnits(await getZapAllowance(), 18);
 
             if (Number(allowance) >= Number(amount)) {
@@ -504,6 +506,7 @@ function Vault({ vault }: IProps) {
             setLoader(false);
           }
         } catch (error) {
+          lastTx.set("No approve hash...");
           setLoader(false);
           console.error("APPROVE ERROR:", error);
         }
@@ -523,6 +526,7 @@ function Vault({ vault }: IProps) {
         );
 
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           const allowance = formatUnits(await getZapAllowance(), 18);
           if (Number(allowance) >= Number(amount)) {
             setZapButton(tab.toLowerCase());
@@ -530,6 +534,7 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No approve hash...");
         setLoader(false);
         console.error("APPROVE ERROR:", error);
       }
@@ -561,9 +566,11 @@ function Vault({ vault }: IProps) {
           depositAssets
         );
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No depositAssets hash...");
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", error);
       }
@@ -602,9 +609,11 @@ function Vault({ vault }: IProps) {
           zapDeposit
         );
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No deposit hash...");
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", error);
       }
@@ -698,6 +707,7 @@ function Vault({ vault }: IProps) {
       });
 
       if (transaction.status === "success") {
+        lastTx.set(transaction?.transactionHash);
         const newAllowance = await readContract(_publicClient, {
           address: option[0] as TAddress,
           abi: ERC20ABI,
@@ -714,6 +724,7 @@ function Vault({ vault }: IProps) {
         setLoader(false);
       }
     } catch (error) {
+      lastTx.set("No approve hash...");
       setLoader(false);
       console.error("ZAP ERROR:", error);
     }
@@ -754,6 +765,7 @@ function Vault({ vault }: IProps) {
         });
 
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           const newAllowance = (await readContract(_publicClient, {
             address: asset,
             abi: ERC20ABI,
@@ -779,6 +791,7 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No approve hash...");
         const newAllowance = (await readContract(_publicClient, {
           address: asset,
           abi: ERC20ABI,
@@ -833,9 +846,11 @@ function Vault({ vault }: IProps) {
       );
 
       if (transaction.status === "success") {
+        lastTx.set(transaction?.transactionHash);
         setLoader(false);
       }
     } catch (error) {
+      lastTx.set("No depositAssets hash...");
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", error);
     }
@@ -870,9 +885,11 @@ function Vault({ vault }: IProps) {
         );
 
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No withdrawAssets hash...");
         setLoader(false);
         console.error("WITHDRAW ERROR:", error);
       }
@@ -907,9 +924,11 @@ function Vault({ vault }: IProps) {
         );
 
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No withdraw hash...");
         setLoader(false);
         console.error("WITHDRAW ERROR:", error);
       }
@@ -1375,7 +1394,7 @@ function Vault({ vault }: IProps) {
       <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
         <div className="w-full md:w-1/2 lg:w-3/5 ">
           {localVault && (
-            <div className="flex flex-wrap justify-between items-center bg-button p-4 rounded-md md:h-[80px]">
+            <div className="flex flex-wrap justify-between items-center bg-button p-4 rounded-md md:h-[80px] mt-[-40px] md:mt-0">
               <VaultType type={localVault.type} />
               <div>
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
@@ -1510,9 +1529,9 @@ function Vault({ vault }: IProps) {
               </div>
 
               <div className={`flex flex-col items-start gap-3 p-4`}>
-                <div className="flex-col md:flex">
+                <div className="md:flex">
                   <div
-                    className={`flex md:hidden lg:flex py-1 ${
+                    className={`hidden lg:flex py-1 ${
                       localVault.strategyInfo.protocols.length > 1 && "pl-[8px]"
                     } mr-3 mb-3 md:mb-0`}
                   >
@@ -1554,7 +1573,7 @@ function Vault({ vault }: IProps) {
                   </div>
 
                   <div
-                    className="flex md:hidden lg:flex items-center ml-3"
+                    className="hidden lg:flex items-center ml-3"
                     title="Farming strategy"
                   >
                     <svg
@@ -1684,7 +1703,7 @@ function Vault({ vault }: IProps) {
                               {assetData.name}
                             </span>
                           </div>
-                          <div className="flex flex-col md:flex-row gap-3">
+                          <div className="flex flex-row gap-1 md:gap-3 md:mt-0 mt-2">
                             {tokenAssets?.website && (
                               <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                                 <a
@@ -2114,7 +2133,7 @@ function Vault({ vault }: IProps) {
                 <>
                   {option?.length > 1 ? (
                     <>
-                      <div className="flex flex-col items-center justify-center gap-3 mt-2 max-w-[350px]">
+                      <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                         {option.map((asset: any) => (
                           <div key={asset}>
                             <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
@@ -2122,7 +2141,7 @@ function Vault({ vault }: IProps) {
 
                               <p>{balances[asset]?.assetBalance}</p>
                             </div>
-                            <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                            <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
                               <div className="absolute end-5 bottom-4">
                                 <div className="flex items-center">
                                   <button
@@ -2256,7 +2275,7 @@ function Vault({ vault }: IProps) {
                           </div>
                         )}
 
-                        <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                        <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
                           <div className="absolute top-[30%] left-[5%]">
                             {tokensJson.tokens.map((token) => {
                               if (token.address === option[0]) {
@@ -2478,7 +2497,7 @@ function Vault({ vault }: IProps) {
                       </div>
                     )}
 
-                    <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] max-w-[350px]">
+                    <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
                       {balances && balances[option[0]] && (
                         <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
                           <div className="flex items-center">
