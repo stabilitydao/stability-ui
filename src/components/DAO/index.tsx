@@ -144,13 +144,13 @@ function DAO() {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
           <div className="grid h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
             <div className="m-auto">
-              <h2 className="text-2xl">{daoData?.network}</h2>
-              <h2 className="text-sm">Network</h2>
+              <h2 className="text-3xl">{daoData?.network}</h2>
+              <h2 className="text-md">Network</h2>
             </div>
 
             <div className="mt-5 mb-2">
-              <h2 className="text-3xl font-semibold">$ {daoData?.totalTvl}</h2>
-              <h2>TVL</h2>
+              <h2 className="text-4xl font-semibold">$ {daoData?.totalTvl}</h2>
+              <h2 className="text-lg">TVL</h2>
             </div>
 
             <div className="flex w-full m-auto align-middle border border-t-1 border-x-0 border-b-0 border-gray-800 shadow-sm">
@@ -176,7 +176,7 @@ function DAO() {
                   <th className="text-left text-2xl pb-2">Fees:</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-md">
                 <tr>
                   <td>Platform fee:</td>
                   <td className="text-right">

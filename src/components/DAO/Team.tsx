@@ -106,7 +106,7 @@ function Team() {
             <thead>
               <tr>
                 <td>
-                  <h2 className="text-start text-2xl py-4">Multisig</h2>
+                  <h2 className="text-start text-2xl">Multisig</h2>
                 </td>
               </tr>
             </thead>
@@ -132,6 +132,7 @@ function Team() {
                   <div className="grid justify-center">
                     <img
                       className="w-[28px] rounded-full m-auto mb-2"
+                      alt={getTokenData(address)?.symbol}
                       src={getTokenData(address)?.logoURI}
                     />
                     <p className="my-auto font-medium">
@@ -155,18 +156,20 @@ function Team() {
               <a
                 href={member.html_url}
                 key={member.name}
-                className="text-sm p-2 max-w-[150px] h-[200px] m-auto hover:bg-button rounded-md"
+                className="text-sm p-2 max-w-[155px] h-auto m-auto hover:bg-button rounded-md"
                 target="_blank">
                 <img
                   className="rounded-full m-auto w-[75px]"
                   src={member.avatar_url}
                   alt={`Avatar de ${member.name}`}
                 />
-                <p className="font-bold text-center mt-1">{member.name}</p>
+                <p className="font-semibold text-center mt-1 text-gray-200">
+                  {member.name}
+                </p>
                 {member.location !== null ? (
-                  <p className="text-xs mt-1 flex text-left">
+                  <p className="flex sm:text text-xs mt-1 text-left font-thin text-gray-400 w-full">
                     <svg
-                      className="me-1 my-auto"
+                      className="pe-1 my-auto"
                       stroke="currentColor"
                       fill="currentColor"
                       strokeWidth="0"
@@ -177,13 +180,13 @@ function Team() {
                       <path
                         fillRule="evenodd"
                         d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
-                    </svg>{" "}
+                    </svg>
                     {member.location}
                   </p>
                 ) : (
                   ""
                 )}
-                <p className="font-light text-xs line-clamp-3 mt-1">
+                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300">
                   {member.bio}
                 </p>
               </a>

@@ -15,7 +15,7 @@ function Governance(props) {
             <thead>
               <tr>
                 <td>
-                  <h2 className="text-start text-2xl py-4">Treasury</h2>
+                  <h2 className="text-start text-2xl">Treasury</h2>
                 </td>
               </tr>
             </thead>
@@ -28,7 +28,7 @@ function Governance(props) {
               </tr>
               <tr>
                 <td>Total balance: </td>
-                <td>{props.daoData?.treasuryBalance}</td>
+                <td>{props.daoData?.treasuryBalance} PROFIT</td>
               </tr>
             </tbody>
           </table>
@@ -39,7 +39,7 @@ function Governance(props) {
             <thead>
               <tr>
                 <td>
-                  <h2 className="text-start text-2xl py-4">Governance</h2>
+                  <h2 className="text-start text-2xl">Governance</h2>
                 </td>
               </tr>
             </thead>
@@ -52,9 +52,9 @@ function Governance(props) {
               </tr>
             </tbody>
           </table>
-          <div className="flex mt-5">
+          <div className="flex mt-3">
             <a
-              className="rounded-sm text-start p-2 me-3 bg-button"
+              className="rounded-sm p-2 ms-auto bg-button"
               href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226"
               title="Tally governance app">
               {" "}
