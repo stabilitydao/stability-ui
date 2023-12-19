@@ -73,9 +73,6 @@ const BuildForm = ({
   const [boostRewardsTokens, setBoostRewardsTokens] = useState(BRT);
   const [allowance, setAllowance] = useState<bigint | undefined>();
   const [buildResult, setBuildResult] = useState<boolean | undefined>();
-  const [boostAmounts, setBoostAmounts] = useState<{ [token: string]: bigint }>(
-    {}
-  );
   const [inputValues, setInputValues] = useState<Array<TInputItem>>(
     Array(defaultBoostTokens.length).fill({ inputValue: "", valuePerDay: "" })
   );
@@ -166,8 +163,8 @@ const BuildForm = ({
     }
   };
   const approveRewardingVaultTokens = async () => {
-    if ($platformData) {
-      if (rewardingVaultApprove?.length) {
+    if ($platformData && rewardingVaultApprove?.length) {
+      try {
         rewardingVaultApprove.map(async (token: any) => {
           const approve = await writeContract({
             address: token.address,
@@ -182,16 +179,23 @@ const BuildForm = ({
               ),
             ],
           });
+          setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt(
             approve
           );
           if (transaction.status === "success") {
+            lastTx.set(transaction?.transactionHash);
+            setLoader(false);
             // it will be work only with one approve
             // todo fix approve state
             setRewardingVaultApprove(false);
             setRewardingVaultDeploy(true);
           }
         });
+      } catch (error) {
+        lastTx.set("No approve hash...");
+        setLoader(false);
+        console.error("APPROVE ERROR:", error);
       }
     }
   };
@@ -201,30 +205,36 @@ const BuildForm = ({
     );
 
     if ($platformData) {
-      const deployVaultAndStrategy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "deployVaultAndStrategy",
-        args: [
-          vaultType,
-          strategyId,
-          initParams.initVaultAddresses as TAddress[],
-          tokensToDeploy,
-          initParams.initStrategyAddresses as TAddress[],
-          initParams.initStrategyNums,
-          initParams.initStrategyTicks,
-        ],
-      });
+      try {
+        const deployVaultAndStrategy = await writeContract({
+          address: $platformData.factory,
+          abi: FactoryABI,
+          functionName: "deployVaultAndStrategy",
+          args: [
+            vaultType,
+            strategyId,
+            initParams.initVaultAddresses as TAddress[],
+            tokensToDeploy,
+            initParams.initStrategyAddresses as TAddress[],
+            initParams.initStrategyNums,
+            initParams.initStrategyTicks,
+          ],
+        });
+        setLoader(true);
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          deployVaultAndStrategy
+        );
 
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        deployVaultAndStrategy
-      );
-
-      if (transaction.status === "success") {
-        lastTx.set(transaction.transactionHash);
-        setBuildResult(true);
-      } else {
+        if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
+          setBuildResult(true);
+          setLoader(false);
+        }
+      } catch (error) {
+        lastTx.set("No deployVaultAndStrategy hash...");
         setBuildResult(false);
+        setLoader(false);
+        console.error("deployVaultAndStrategy ERROR:", error);
       }
     }
   };
@@ -242,31 +252,38 @@ const BuildForm = ({
     }
   };
   const deploy = async () => {
+    //todo combine deploy and deployRewardingVault
     if ($platformData) {
-      const deployVaultAndStrategy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "deployVaultAndStrategy",
-        args: [
-          vaultType,
-          strategyId,
-          initParams.initVaultAddresses as TAddress[],
-          initParams.initVaultNums,
-          initParams.initStrategyAddresses as TAddress[],
-          initParams.initStrategyNums,
-          initParams.initStrategyTicks,
-        ],
-      });
+      try {
+        const deployVaultAndStrategy = await writeContract({
+          address: $platformData.factory,
+          abi: FactoryABI,
+          functionName: "deployVaultAndStrategy",
+          args: [
+            vaultType,
+            strategyId,
+            initParams.initVaultAddresses as TAddress[],
+            initParams.initVaultNums,
+            initParams.initStrategyAddresses as TAddress[],
+            initParams.initStrategyNums,
+            initParams.initStrategyTicks,
+          ],
+        });
+        setLoader(true);
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          deployVaultAndStrategy
+        );
 
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        deployVaultAndStrategy
-      );
-
-      if (transaction.status === "success") {
-        lastTx.set(transaction.transactionHash);
-        setBuildResult(true);
-      } else {
+        if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
+          setBuildResult(true);
+          setLoader(false);
+        }
+      } catch (error) {
+        lastTx.set("No deployVaultAndStrategy hash...");
         setBuildResult(false);
+        setLoader(false);
+        console.error("deployVaultAndStrategy ERROR:", error);
       }
     }
   };
@@ -285,6 +302,7 @@ const BuildForm = ({
           approve
         );
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setAllowance(
             (await readContract(_publicClient, {
               address: $platformData.buildingPayPerVaultToken,
@@ -296,7 +314,9 @@ const BuildForm = ({
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No approve hash...");
         setLoader(false);
+        console.error("APPROVE ERROR:", error);
       }
     }
   };
@@ -429,9 +449,7 @@ const BuildForm = ({
       ) : (
         <Loader />
       )}
-      {loader ? (
-        <Loader />
-      ) : (
+      {!loader && (
         <>
           {buildResult === undefined &&
           vaultType === "Rewarding" &&
