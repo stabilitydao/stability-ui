@@ -42,6 +42,8 @@ import {
   debounce,
 } from "@utils";
 
+import { TOKENS_ASSETS, CHAINS } from "@constants";
+
 import type {
   TToken,
   TAddress,
@@ -51,8 +53,6 @@ import type {
   TTokenData,
   TPlatformData,
 } from "@types";
-
-import { TOKENS_ASSETS, CHAINS } from "@constants";
 
 import tokensJson from "../../stability.tokenlist.json";
 
@@ -1923,7 +1923,7 @@ function Vault({ vault }: IProps) {
                 Withdraw
               </button>
             </div>
-            <form autoComplete="off" className="max-w-[450px] px-4 mb-10 pb-5">
+            <form autoComplete="off" className="w-full px-4 mb-10 pb-5">
               <div className="flex items-center mt-4 gap-3 relative">
                 {optionTokens && (
                   <div className="relative select-none w-full">
