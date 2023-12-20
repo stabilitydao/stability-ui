@@ -10,6 +10,7 @@ import axios from "axios";
 import Tokenomics from "./Tokenomics";
 import Team from "./Team";
 import Governance from "./Governance";
+import ShortAddress from "./ShortAddress";
 
 function DAO() {
   const [daoData, setDaoData] = useState<TDAOData>();

@@ -197,7 +197,7 @@ type TGitHubUser = {
 };
 
 type TProfitTokenData = {
-  price: string;
+  price: number;
   totalSupply: string;
   marketCap: string;
 };
@@ -208,6 +208,17 @@ type TMultiTokenData = {
 };
 
 type TMultisigBalance = Record<string, TMultiTokenData>;
+
+type TTokenomics = {
+  profitBalance: string;
+  profitStaked: string;
+  sdivBalance: string;
+  sdivEarned: string;
+  pmToMint: string;
+  pmTotalSupply: string;
+  pmMintAllowance: string;
+  sdivTotalSupply: string;
+};
 
 export type {
   TPlatformData,
@@ -240,4 +251,5 @@ export type {
   TProfitTokenData,
   TMultisigBalance,
   TMultiTokenData,
+  TTokenomics,
 };

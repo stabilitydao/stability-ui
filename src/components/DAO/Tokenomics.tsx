@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { DividendMinterABI } from "@web3";
+
 import { account, publicClient, assetsPrices } from "@store";
 import { formatUnits, parseUnits } from "viem";
 import { getTokenData } from "@utils";
-import type { TProfitTokenData } from "@types";
-import { ERC20ABI, IERC721Enumerable } from "@web3";
+import type { TProfitTokenData, TTokenomics } from "@types";
 import { writeContract } from "@wagmi/core";
 import { SDIV, PROFIT, PM } from "@constants";
 import ShortAddress from "./ShortAddress";
+import {
+  DividendMinterABI,
+  DividendTokenABI,
+  ERC20ABI,
+  IERC721Enumerable,
+  ERC20MetadataUpgradeableABI,
+} from "@web3";
 
 function Tokenomics() {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
   const $publicClient = useStore(publicClient);
-  const [poolData, setPoolData] = useState("");
+  const [poolData, setPoolData] = useState<TTokenomics | any>("");
   const [inputStake, setInputStake] = useState("");
-  const [stakeModal, setStakeModal] = useState(false);
+  const [stakingAllowance, setStakingAllowance] = useState("");
+  const [showStakeModal, setShowshowStakeModal] = useState(false);
+  const [showMintModal, setShowshowMintModal] = useState(false);
   const [profitTokenData, setProfitTokenData] = useState<TProfitTokenData>();
-  const [tokensTotalSupply, setTokensTotalSupply] = useState({
-    pm: "",
-    sdiv: "",
-  });
 
   const fetchTokenomicsData = async () => {
     if ($publicClient && $account && $assetsPrices) {
@@ -48,14 +52,14 @@ function Tokenomics() {
           address: PROFIT[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [$account],
+          args: [$account as `0x${string}`],
         });
 
         const sdivBalance = await $publicClient.readContract({
           address: SDIV[0] as `0x${string}`,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [$account],
+          args: [$account as `0x${string}`],
         });
 
         const profitStaked = (await $publicClient.readContract({
@@ -66,64 +70,111 @@ function Tokenomics() {
           args: [$account],
         })) as bigint[];
 
-        const earned = await $publicClient.readContract({
+        const sdivEarned = (await $publicClient.readContract({
           address:
             "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
-
           abi: DividendMinterABI,
           functionName: "pending",
           args: [$account],
+        })) as bigint;
+
+        const profitStakingAllowance = await $publicClient.readContract({
+          address: PROFIT[0] as `0x${string}`,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "allowance",
+          args: [
+            $account as `0x${string}`,
+            "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
+          ],
+        });
+
+        const pmMintAllowance = await $publicClient.readContract({
+          address: PROFIT[0] as `0x${string}`,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "allowance",
+          args: [$account as `0x${string}`, PM[0] as `0x${string}`],
         });
 
         const _poolData = {
-          profitBalance: Number(formatUnits(profitBalance, 18)).toFixed(2),
-          sdivBalance: Number(formatUnits(sdivBalance, 18)).toFixed(2),
-          profitStaked: Number(formatUnits(profitStaked[0], 18)).toFixed(2),
-          earned: Number(formatUnits(earned, 18)).toFixed(2),
+          profitBalance:
+            Math.trunc(Number(formatUnits(profitBalance, 18)) * 1000) / 1000,
+          profitStaked:
+            Math.trunc(Number(formatUnits(profitStaked[0], 18)) * 100) / 100,
+          sdivBalance:
+            Math.trunc(Number(formatUnits(sdivBalance, 18)) * 100) / 100,
+          sdivEarned:
+            Math.trunc(Number(formatUnits(sdivEarned, 18)) * 100) / 100,
+          pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
+          pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
+          pmMintAllowance: formatUnits(pmMintAllowance, 18),
+          sdivTotalSupply: Number(
+            formatUnits(sdivTotalSupply, 18)
+          ).toLocaleString(),
         };
         setPoolData(_poolData);
 
-        //profit Token
-        const _profitTokenPrice = Number(
-          formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)
-        ).toFixed(2);
-
-        const _profitTotalSupply = Number(
-          formatUnits(profitTotalSupply, 18)
-        ).toLocaleString();
-
-        const _profitMarketCap = (
-          Number(_profitTokenPrice) * Number(formatUnits(profitTotalSupply, 18))
-        ).toLocaleString();
-
         const profitToken: TProfitTokenData = {
-          price: _profitTokenPrice,
-          totalSupply: _profitTotalSupply,
-          marketCap: _profitMarketCap,
+          price:
+            Math.trunc(
+              Number(formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)) * 100
+            ) / 100,
+          totalSupply: Number(
+            formatUnits(profitTotalSupply, 18)
+          ).toLocaleString(),
+          marketCap: (
+            Number(
+              Math.trunc(
+                Number(formatUnits($assetsPrices[PROFIT[0]].tokenPrice, 18)) *
+                  100
+              ) / 100
+            ) * Number(formatUnits(profitTotalSupply, 18))
+          ).toLocaleString(),
         };
+
+        setStakingAllowance(formatUnits(profitStakingAllowance, 18));
         setProfitTokenData(profitToken);
-
-        //sdiv && pm total supply
-        const _pmTotalSupply = Number(pmTotalSupply).toLocaleString();
-
-        const _sdivTotalSupply = Number(
-          formatUnits(sdivTotalSupply, 18)
-        ).toLocaleString();
-
-        const _tokensTotalSupply = {
-          pm: _pmTotalSupply,
-          sdiv: _sdivTotalSupply,
-        };
-
-        setTokensTotalSupply(_tokensTotalSupply);
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     }
   };
 
+  const aproveStaking = async () => {
+    console.log(inputStake);
+
+    const amount = parseUnits(inputStake, 18);
+    const aproveStaking = await writeContract({
+      address: PROFIT[0] as `0x${string}`,
+      abi: ERC20MetadataUpgradeableABI,
+      functionName: "approve",
+      args: [$account as `0x${string}`, amount],
+    });
+
+    const transaction = await $publicClient?.waitForTransactionReceipt(
+      aproveStaking
+    );
+
+    if (transaction?.status === "success") {
+      const profitStakingAllowance = await $publicClient?.readContract({
+        address: PROFIT[0] as `0x${string}`,
+        abi: ERC20MetadataUpgradeableABI,
+        functionName: "allowance",
+        args: [
+          $account as `0x${string}`,
+          "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
+        ],
+      });
+
+      if (profitStakingAllowance !== undefined) {
+        setStakingAllowance(formatUnits(profitStakingAllowance, 18));
+      } else {
+        console.error("Couldn't get new allowance");
+      }
+    }
+  };
+
   const stake = async () => {
-    if ($publicClient && inputStake > 0) {
+    if ($publicClient && Number(inputStake) > 0) {
       const ammount = parseUnits(inputStake, 18);
       const stake = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
@@ -135,7 +186,7 @@ function Tokenomics() {
   };
 
   const unStake = async () => {
-    if ($publicClient && inputStake > 0) {
+    if ($publicClient && inputStake != "") {
       const ammount = parseUnits(inputStake, 18);
       const unStake = await writeContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
@@ -156,6 +207,17 @@ function Tokenomics() {
     }
   };
 
+  const mint = async () => {
+    if ($publicClient) {
+      const harvest = await writeContract({
+        address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as `0x${string}`,
+        abi: DividendTokenABI,
+        functionName: "MINTER_ROLE",
+      });
+    }
+    console.log(harvest);
+  };
+  mint();
   useEffect(() => {
     fetchTokenomicsData();
   }, []);
@@ -172,7 +234,7 @@ function Tokenomics() {
             <table className="text-sm h-[215px] text-[#8D8E96]">
               <tbody>
                 <tr>
-                  <td className="min-w-[85px]">Name: </td>
+                  <td className="min-w-[95px]">Name: </td>
                   <td>{getTokenData(PROFIT[0])?.name} </td>
                 </tr>
                 <tr>
@@ -206,12 +268,12 @@ function Tokenomics() {
 
                 <tr>
                   <td>Wallet: </td>
-                  <td>{poolData.profitBalance} PROFIT</td>
+                  <td>{poolData?.profitBalance} PROFIT</td>
                 </tr>
                 <tr>
                   <td>Staked:</td>
                   <td>
-                    <p className="my-auto ">{poolData.profitStaked} PROFIT</p>{" "}
+                    <p className="my-auto ">{poolData?.profitStaked} PROFIT</p>{" "}
                   </td>
                 </tr>
               </tbody>
@@ -221,13 +283,17 @@ function Tokenomics() {
               className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
               src={getTokenData(PROFIT[0])?.logoURI}
               alt={getTokenData(PROFIT[0])?.logoURI}
+              title={getTokenData(PROFIT[0])?.symbol}
             />
 
             <div className="flex mt-3 text-sm me-auto  justify-between">
               <button
-                onClick={() => setStakeModal(true)}
+                onClick={() => {
+                  setShowshowStakeModal(true);
+                  setInputStake("");
+                }}
                 className="bg-button me-3 rounded-sm p-2 text-[#8D8E96]">
-                Stake
+                Stake | Unstake
               </button>
 
               <div className="flex">
@@ -301,7 +367,7 @@ function Tokenomics() {
               <table className="text-sm h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
-                    <td className="min-w-[85px]">Name: </td>
+                    <td className="min-w-[95px]">Name: </td>
                     <td>{getTokenData(SDIV[0])?.name} </td>
                   </tr>
                   <tr>
@@ -316,7 +382,7 @@ function Tokenomics() {
                   </tr>
                   <tr>
                     <td>Total supply: </td>
-                    <td>{tokensTotalSupply.sdiv} </td>
+                    <td>{poolData.sdivTotalSupply} </td>
                   </tr>
                   <tr>
                     <td>Wallet: </td>
@@ -324,7 +390,7 @@ function Tokenomics() {
                   </tr>
                   <tr>
                     <td>Earned: </td>
-                    <td>{poolData.earned} SDIV</td>
+                    <td>{poolData.sdivEarned} SDIV</td>
                   </tr>
                 </tbody>
               </table>
@@ -333,6 +399,7 @@ function Tokenomics() {
                 className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
                 src={getTokenData(SDIV[0])?.logoURI}
                 alt={getTokenData(SDIV[0])?.logoURI}
+                title={getTokenData(SDIV[0])?.symbol}
               />
 
               <div className="flex mt-3 text-sm">
@@ -351,7 +418,7 @@ function Tokenomics() {
               <table className="text-sm h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
-                    <td className="min-w-[85px]">Name: </td>
+                    <td className="min-w-[95px]">Name: </td>
                     <td>Profit Maker </td>
                   </tr>
                   <tr>
@@ -366,13 +433,15 @@ function Tokenomics() {
                   </tr>
                   <tr>
                     <td>Total supply: </td>
-                    <td>{tokensTotalSupply.pm}</td>
+                    <td>{poolData.pmTotalSupply} PM</td>
                   </tr>
                   <tr>
                     <td>To mint: </td>
-                    <td>
-                      <span className="text-red-600 "> ADD TO MINT</span>{" "}
-                    </td>
+                    <td>{poolData.pmToMint} PM</td>
+                  </tr>
+                  <tr>
+                    <td>Minted: </td>
+                    <td>0 PM</td>
                   </tr>
                 </tbody>
               </table>
@@ -380,7 +449,8 @@ function Tokenomics() {
               <div className="flex justify-between mt-3 text-sm">
                 <button
                   onClick={() => {
-                    harvest();
+                    setShowshowMintModal(true);
+                    setInputStake("");
                   }}
                   className="bg-button rounded-sm p-2 text-[#8D8E96]">
                   Mint
@@ -397,24 +467,26 @@ function Tokenomics() {
               </div>
 
               <img
+                className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
                 alt="Profit maker"
                 src="https://stabilitydao.org/pm.png"
-                className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
+                title={getTokenData(PM[0])?.symbol}
               />
             </div>
           </div>
         </div>
       </div>
-      {stakeModal === true && (
+
+      {showStakeModal === true && (
         <div
           className="overlay"
-          onClick={() => setStakeModal(false)}>
+          onClick={() => setShowshowStakeModal(false)}>
           <div
-            className="flex flex-col min-w-[270px] min-h-[100px] h-auto z-[120] p-[10px] px-[30px] rounded-md bg-modal mr-4 py-[20px]"
+            className="flex flex-col min-w-[270px] h-auto z-[120] p-4 rounded-md bg-modal"
             onClick={e => {
               e.stopPropagation();
             }}>
-            <h2 className="font-bold text-[1.5rem] flex justify-center">
+            <h2 className="font-bold text-[1.5rem] flex justify-center p-2">
               Staking
             </h2>
             <table>
@@ -431,22 +503,131 @@ function Tokenomics() {
                 </tr>
               </tbody>
             </table>
-            <div className="flex justify-between w-full mt-4">
+            <div className="flex items-center w-full relative  ">
               <input
                 value={inputStake}
                 onChange={e => setInputStake(e.target.value)}
                 onClick={e => e.stopPropagation()}
-                className="rounded-sm w-[120px] m-0 p-0 text-gray-400 bg-transparent border border-gray-600"
+                className="ps-2 rounded-sm w-full p-1 my-3 text-gray-400 bg-transparent border border-gray-600"
+                placeholder="0"
               />
+              <button
+                onClick={() => setInputStake(poolData.profitBalance)}
+                className="flex rounded-md w-10 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-sm absolute right-2 justify-center"
+                type="button">
+                MAX
+              </button>
+            </div>
+
+            {Number(inputStake) > 0 &&
+            Number(inputStake) <= Number(stakingAllowance) &&
+            Number(inputStake) <= Number(poolData.profitBalance) ? (
+              <div className="flex justify-between w-full">
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    stake();
+                  }}
+                  className="bg-button rounded-sm p-2 text-[#8D8E96] w-[100px]">
+                  Stake
+                </button>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    unStake();
+                  }}
+                  className="bg-button rounded-sm p-2 text-[#8D8E96] w-[100px]">
+                  Unstake
+                </button>
+              </div>
+            ) : inputStake > stakingAllowance &&
+              inputStake <= poolData.profitBalance ? (
               <button
                 onClick={e => {
                   e.stopPropagation();
-                  stake();
+                  aproveStaking();
                 }}
-                className="bg-button rounded-sm p-2 text-[#8D8E96] w-[70px]">
-                Stake
+                className="bg-button rounded-sm p-2 text-[#8D8E96] w-full">
+                Aprove
+              </button>
+            ) : inputStake >= poolData.profitBalance ? (
+              <button
+                className="bg-button rounded-sm p-2 text-[#8D8E96] w-full"
+                disabled>
+                INSUFICCIENT BALANCE
+              </button>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {showMintModal === true && (
+        <div
+          className="overlay"
+          onClick={() => setShowshowMintModal(false)}>
+          <div
+            className="flex flex-col min-w-[270px] h-auto z-[120] p-8 rounded-md bg-modal"
+            onClick={e => {
+              e.stopPropagation();
+            }}>
+            <h2 className="font-bold text-[1.5rem] flex justify-center p-2">
+              Minting
+            </h2>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Wallet: </td>
+                  <td>{poolData?.profitBalance} PROFIT</td>
+                </tr>
+                <tr>
+                  <td>Minted:</td>
+                  <td>
+                    <p className="my-auto ">0 PM</p>{" "}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="flex items-center w-full relative  ">
+              <input
+                value={inputStake}
+                onChange={e => setInputStake(e.target.value)}
+                onClick={e => e.stopPropagation()}
+                className="ps-2 rounded-sm w-full p-1 my-3 text-gray-400 bg-transparent border border-gray-600"
+                placeholder="0"
+              />
+              <button
+                onClick={() => setInputStake(poolData.profitBalance)}
+                className="flex rounded-md w-10 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-sm absolute right-2 justify-center"
+                type="button">
+                MAX
               </button>
             </div>
+
+            {Number(inputStake) > 0 &&
+            Number(inputStake) <= Number(poolData.pmMintAllowance) &&
+            Number(inputStake) < Number(poolData.profitBalance) ? (
+              <div className="flex justify-between w-full">
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    mint();
+                  }}
+                  className="bg-button rounded-sm p-2 text-[#8D8E96] w-full">
+                  Mint
+                </button>
+              </div>
+            ) : inputStake > poolData.pmMintAllowance ? (
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  unStake();
+                }}
+                className="bg-button rounded-sm p-2 text-[#8D8E96] w-full">
+                Aprove
+              </button>
+            ) : inputStake > poolData.profitBalance ? (
+              "NO BALANCE"
+            ) : null}
           </div>
         </div>
       )}

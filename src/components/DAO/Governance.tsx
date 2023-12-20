@@ -14,7 +14,7 @@ function Governance(props) {
           <table className="text-sm text-[#8D8E96]">
             <thead>
               <tr>
-                <td>
+                <td className="w-[100px]">
                   <h2 className="text-start text-2xl">Treasury</h2>
                 </td>
               </tr>

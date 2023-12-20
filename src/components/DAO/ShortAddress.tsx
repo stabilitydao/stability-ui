@@ -23,18 +23,19 @@ function ShortAddress(props) {
       <p className="m-auto">{address}</p>
       <button
         className="mx-3"
-        onClick={copyAddress}>
+        onClick={copyAddress}
+        title="Copy address">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-[18px] icon icon-tabler icon-tabler-copy my-auto"
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          stroke-width="2"
+          strokeWidth="2"
           stroke="currentColor"
           fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round">
+          strokeLinecap="round"
+          strokeLinejoin="round">
           <path
             stroke="none"
             d="M0 0h24v24H0z"
@@ -46,18 +47,19 @@ function ShortAddress(props) {
       </button>
       <a
         target="_blank"
-        href={`https://polygonscan.com/address/${props.address}`}>
+        href={`https://polygonscan.com/address/${props.address}`}
+        title="Go to polygonscan">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-[18px] icon icon-tabler icon-tabler-external-link my-auto"
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          stroke-width="2"
+          strokeWidth="2"
           stroke="currentColor"
           fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round">
+          strokeLinecap="round"
+          strokeLinejoin="round">
           <path
             stroke="none"
             d="M0 0h24v24H0z"

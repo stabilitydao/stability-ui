@@ -97,7 +97,7 @@ function Team() {
   }, []);
 
   return (
-    <div className="my-5 bg-[#3d404b] border border-gray-600 rounded-md">
+    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
       <div className="p-3 border border-gray-600 rounded-md mt-2">
@@ -106,7 +106,7 @@ function Team() {
             <thead>
               <tr>
                 <td>
-                  <h2 className="text-start text-2xl">Multisig</h2>
+                  <h2 className="text-start text-2xl min-w-[90px]">Multisig</h2>
                 </td>
               </tr>
             </thead>
@@ -122,7 +122,7 @@ function Team() {
               </tr>
             </tbody>
           </table>
-          <div className="flex flex-wrap justify-evenly w-full gap-3 my-5">
+          <div className="flex flex-wrap justify-evenly w-full gap-3 mt-4 mb-2">
             {_multisigBalance &&
               $assetsPrices &&
               Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
@@ -150,24 +150,24 @@ function Team() {
       </div>
 
       <div className="p-3">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 m-auto my-3 p-2 align-top w-full lg:w-3/4 rounded-md">
+        <div className="flex flex-wrap m-auto justify-evenly w-full gap-3 my-5 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-8">
           {members ? (
             members.map(member => (
               <a
                 href={member.html_url}
                 key={member.name}
-                className="text-sm p-2 max-w-[155px] h-auto m-auto hover:bg-button rounded-md"
+                className="text-sm p-2 h-auto  hover:bg-button rounded-md"
                 target="_blank">
                 <img
                   className="rounded-full m-auto w-[75px]"
                   src={member.avatar_url}
                   alt={`Avatar de ${member.name}`}
                 />
-                <p className="font-semibold text-center mt-1 text-gray-200">
+                <p className="font-semibold text-center mt-1 text-gray-200 w-[110px]">
                   {member.name}
                 </p>
                 {member.location !== null ? (
-                  <p className="flex sm:text text-xs mt-1 text-left font-thin text-gray-400 w-full">
+                  <p className="flex sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[110px]">
                     <svg
                       className="pe-1 my-auto"
                       stroke="currentColor"
@@ -186,7 +186,7 @@ function Team() {
                 ) : (
                   ""
                 )}
-                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300">
+                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[110px]">
                   {member.bio}
                 </p>
               </a>

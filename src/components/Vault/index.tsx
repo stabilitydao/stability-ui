@@ -293,6 +293,8 @@ function Vault({ vault }: IProps) {
         abi: StrategyABI,
         functionName: "underlying",
       });
+      console.log(underlying);
+
       if (underlying != zeroAddress) {
         const underlyingSymbol = await readContract(_publicClient, {
           address: underlying,
@@ -1931,8 +1933,7 @@ function Vault({ vault }: IProps) {
                               underlyingToken?.address,
                               "/protocols/Gamma.png"
                             );
-                          }}
-                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3">
+                          }}>
                           {underlyingToken?.logoURI && (
                             <img
                               className="max-w-6 max-h-6 rounded-full "

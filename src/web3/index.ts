@@ -16,6 +16,7 @@ import VaultABI from "./abi/VaultABI.ts";
 import IERC721Enumerable from "./abi/IERC721Enumerable.ts";
 import ZapABI from "./abi/ZapABI.ts";
 import DividendMinterABI from "./abi/DividendMinterABI.ts";
+import DividendTokenABI from "./abi/DividendTokenABI.ts";
 
 const platform = "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60";
 
@@ -93,4 +94,5 @@ export {
   IERC721Enumerable,
   ZapABI,
   DividendMinterABI,
+  DividendTokenABI,
 };
