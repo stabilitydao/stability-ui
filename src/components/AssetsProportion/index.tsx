@@ -4,7 +4,7 @@ interface IProps {
   type: string;
 }
 
-const AssetsProportion = ({ proportions, assets, type = "vaults" }: IProps) => {
+const AssetsProportion = ({ proportions, assets, type }: IProps) => {
   return (
     <div
       className={
