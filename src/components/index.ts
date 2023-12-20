@@ -6,6 +6,7 @@ import { Wallet } from "./Wallet";
 import { VaultType } from "./VaultType";
 import { Loader } from "./Loader";
 import { AssetsProportion } from "./AssetsProportion";
+import { Header } from "./Header";
 
 export {
   AppStore,
@@ -16,4 +17,5 @@ export {
   VaultType,
   Loader,
   AssetsProportion,
+  Header,
 };
