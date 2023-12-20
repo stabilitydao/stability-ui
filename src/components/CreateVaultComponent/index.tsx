@@ -291,22 +291,26 @@ const CreateVaultComponent = () => {
           )}
 
           {minInitialBoostPerDay !== undefined && (
-            <div className="text-[18px] my-2 flex items-center">
-              <p>Minimal initial boost value per day: </p>
+            <div className="text-[18px] my-2 flex items-start sm:items-center justify-between sm:justify-center">
+              <p className="w-3/4 sm:w-auto">
+                Minimal initial boost value per day:{" "}
+              </p>
               <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
                 ${formatUnits(minInitialBoostPerDay, 18)}
               </div>
             </div>
           )}
-          <div className="text-[18px] mb-2 flex items-center">
-            <p>Buy-back rewards vesting duration: </p>
+          <div className="text-[18px] mb-2 flex items-start sm:items-center justify-between sm:justify-center">
+            <p className="w-3/4 sm:w-auto">
+              Buy-back rewards vesting duration:{" "}
+            </p>
             <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
               7 days
             </div>
           </div>
-          <div className="text-[18px] flex items-center">
-            <p> Boost rewards vesting duration: </p>
-            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+          <div className="text-[18px] flex items-start sm:items-center justify-between sm:justify-center">
+            <p className="w-3/4 sm:w-auto">Boost rewards vesting duration: </p>
+            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-0 sm:ml-2 px-1 py-1">
               30 days
             </div>
           </div>

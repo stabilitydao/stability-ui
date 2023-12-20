@@ -7,7 +7,7 @@ import { writeContract } from "@wagmi/core";
 import { usePublicClient } from "wagmi";
 
 import { SettingsModal } from "./SettingsModal";
-import { VaultType, Loader } from "@components";
+import { VaultType, Loader, AssetsProportion } from "@components";
 
 import {
   vaultData,
@@ -1178,6 +1178,106 @@ function Vault({ vault }: IProps) {
       }
     }
   };
+  const initVault = async () => {
+    if ($vaults?.length && $vaultData) {
+      const vaultUserBalances = Object.values($vaultData).map(
+        ({ vaultUserBalance }) => String(vaultUserBalance)
+      );
+      const vaults = await Promise.all(
+        $vaults[0].map(async (_: any, index: number) => {
+          let assets;
+          if ($vaultAssets.length) {
+            const token1 = getTokenData($vaultAssets[index][1][0]);
+            const token2 = getTokenData($vaultAssets[index][1][1]);
+            if (token1 && token2) {
+              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token1.address)
+              );
+              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token2.address)
+              );
+
+              assets = [
+                {
+                  logo: token1?.logoURI,
+                  symbol: token1?.symbol,
+                  name: token1?.name,
+                  color: token1Extended?.color,
+                },
+                {
+                  logo: token2?.logoURI,
+                  symbol: token2?.symbol,
+                  name: token2?.name,
+                  color: token2Extended?.color,
+                },
+              ];
+            }
+          }
+
+          const assetsWithApr: string[] = [];
+          const assetsAprs: string[] = [];
+          let totalAPR = Number(formatUnits($vaults[7][index], 3));
+          const data =
+            $apiData?.underlyings?.["137"]?.[
+              underlyingToken?.address.toLowerCase()
+            ];
+          if (data) {
+            const gammaApr = data.apr.daily.feeApr;
+            if (gammaApr) {
+              assetsWithApr.push("Pool swap fees");
+              assetsAprs.push((Number(gammaApr) * 100).toFixed(2));
+              totalAPR += Number(gammaApr) * 100;
+            }
+          }
+
+          const APY = calculateAPY(totalAPR).toFixed(2);
+          /////
+          const strategy = await readContract(_publicClient, {
+            address: vault as TAddress,
+            abi: VaultABI,
+            functionName: "strategy",
+          });
+
+          const getAssetsProportions = await readContract(_publicClient, {
+            address: strategy,
+            abi: StrategyABI,
+            functionName: "getAssetsProportions",
+          });
+          const assetsProportions = getAssetsProportions
+            ? getAssetsProportions.map((proportion) =>
+                Math.round(Number(formatUnits(proportion, 16)))
+              )
+            : [];
+
+          /////
+          return {
+            address: $vaults[0][index],
+            name: $vaults[1][index],
+            symbol: $vaults[2][index],
+            type: $vaults[3][index],
+            assetsWithApr,
+            assetsAprs,
+            lastHardWork: $vaultAssets[index][5],
+            shareprice: String($vaults[5][index]),
+            tvl: String($vaults[6][index]),
+            apr: totalAPR.toFixed(2),
+            strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(2),
+            strategySpecific: $vaults[9][index],
+            apy: APY,
+            balance: vaultUserBalances[index],
+            daily: (Number(totalAPR) / 365).toFixed(2),
+            assets: assets,
+            strategyInfo: getStrategyInfo($vaults[2][index]),
+            assetsProportions,
+          };
+        })
+      );
+
+      setLocalVault(
+        vaults.filter((thisVault: any) => thisVault.address === vault)[0]
+      );
+    }
+  };
 
   useEffect(() => {
     getStrategy();
@@ -1193,73 +1293,7 @@ function Vault({ vault }: IProps) {
   }, [lastKeyPress]);
 
   useEffect(() => {
-    if ($vaults?.length && $vaultData) {
-      const vaultUserBalances = Object.values($vaultData).map(
-        ({ vaultUserBalance }) => String(vaultUserBalance)
-      );
-      const vaults = $vaults[0].map((_: any, index: number) => {
-        let assets;
-        if ($vaultAssets.length) {
-          const token1 = getTokenData($vaultAssets[index][1][0]);
-          const token2 = getTokenData($vaultAssets[index][1][1]);
-
-          assets = [
-            {
-              logo: token1?.logoURI,
-              symbol: token1?.symbol,
-              name: token1?.name,
-            },
-            {
-              logo: token2?.logoURI,
-              symbol: token2?.symbol,
-              name: token2?.name,
-            },
-          ];
-        }
-
-        const assetsWithApr: string[] = [];
-        const assetsAprs: string[] = [];
-        let totalAPR = Number(formatUnits($vaults[7][index], 3));
-        const data =
-          $apiData?.underlyings?.["137"]?.[
-            underlyingToken?.address.toLowerCase()
-          ];
-        if (data) {
-          const gammaApr = data.apr.daily.feeApr;
-          if (gammaApr) {
-            assetsWithApr.push("Pool swap fees");
-            assetsAprs.push((Number(gammaApr) * 100).toFixed(2));
-            totalAPR += Number(gammaApr) * 100;
-          }
-        }
-
-        const APY = calculateAPY(totalAPR).toFixed(2);
-
-        return {
-          address: $vaults[0][index],
-          name: $vaults[1][index],
-          symbol: $vaults[2][index],
-          type: $vaults[3][index],
-          assetsWithApr,
-          assetsAprs,
-          lastHardWork: $vaultAssets[index][5],
-          shareprice: String($vaults[5][index]),
-          tvl: String($vaults[6][index]),
-          apr: totalAPR.toFixed(2),
-          strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(2),
-          strategySpecific: $vaults[9][index],
-          apy: APY,
-          balance: vaultUserBalances[index],
-          daily: (Number(totalAPR) / 365).toFixed(2),
-          assets: assets,
-          strategyInfo: getStrategyInfo($vaults[2][index]),
-        };
-      });
-
-      setLocalVault(
-        vaults.filter((thisVault: any) => thisVault.address === vault)[0]
-      );
-    }
+    initVault();
   }, [$vaults, $vaultData, $vaultAssets, underlyingToken]);
 
   useEffect(() => {
@@ -1358,20 +1392,12 @@ function Vault({ vault }: IProps) {
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
               <div className="flex items-center">
-                <img
-                  className="w-8 h-8 rounded-full hidden md:flex"
-                  src={localVault?.assets[0].logo}
-                  alt={localVault?.assets[0].symbol}
-                  title={localVault?.assets[0].name}
+                <AssetsProportion
+                  proportions={localVault.assetsProportions}
+                  assets={localVault.assets}
+                  type="vault"
                 />
-                <img
-                  className="w-8 h-8 rounded-full ml-[-8px]  hidden md:flex"
-                  src={localVault?.assets[1].logo}
-                  alt={localVault?.assets[1].symbol}
-                  title={localVault?.assets[1].name}
-                />
-
-                <span className="inline-flex md:ml-2 text-[18px] font-bold whitespace-nowrap">
+                <span className="inline-flex text-[18px] font-bold whitespace-nowrap">
                   {localVault.symbol}
                 </span>
               </div>

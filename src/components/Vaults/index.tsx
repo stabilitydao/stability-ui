@@ -8,7 +8,7 @@ import { readContract } from "viem/actions";
 import { APRModal } from "./APRModal";
 import { ColumnFilter } from "./ColumnFilter";
 import { Pagination } from "./Pagination";
-import { Wallet, VaultType } from "@components";
+import { Wallet, VaultType, AssetsProportion } from "@components";
 
 import {
   vaultData,
@@ -156,7 +156,6 @@ const Vaults = () => {
             abi: VaultABI,
             functionName: "strategy",
           });
-
           const underlyingPromise = strategyPromise.then((strategy) =>
             readContract(_publicClient, {
               address: strategy,
@@ -170,14 +169,14 @@ const Vaults = () => {
             underlyingPromise,
           ]);
 
-          const assetsProportionsBI = await readContract(_publicClient, {
+          const getAssetsProportions = await readContract(_publicClient, {
             address: strategy,
             abi: StrategyABI,
             functionName: "getAssetsProportions",
           });
-          const assetsProportions: number[] = assetsProportionsBI?.length
-            ? assetsProportionsBI.map((a) =>
-                Math.round(Number(formatUnits(a, 16)))
+          const assetsProportions = getAssetsProportions
+            ? getAssetsProportions.map((proportion) =>
+                Math.round(Number(formatUnits(proportion, 16)))
               )
             : [];
 
@@ -268,44 +267,12 @@ const Vaults = () => {
               >
                 <td className="px-2 lg:px-4 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
-                    <div className="hidden md:flex w-[30px] h-6 ml-[12px] mr-5">
-                      <div
-                        style={{
-                          width: `${
-                            vault.assetsProportions
-                              ? (30 * vault.assetsProportions[0]) / 100
-                              : 25
-                          }px`,
-                          backgroundColor: vault.assets[0].color,
-                        }}
-                        className="h-6"
-                      >
-                        <img
-                          className="absolute w-6 h-6 rounded-full ml-[-12px]"
-                          src={vault.assets[0].logo}
-                          alt={vault.assets[0].symbol}
-                          title={vault.assets[0].name}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          width: `${
-                            vault.assetsProportions
-                              ? (30 * vault.assetsProportions[1]) / 100
-                              : 25
-                          }px`,
-                          backgroundColor: vault.assets[1].color,
-                        }}
-                        className="h-6 flex justify-end"
-                      >
-                        <img
-                          className="absolute w-6 h-6 rounded-full mr-[-12px]"
-                          src={vault.assets[1].logo}
-                          alt={vault.assets[1].symbol}
-                          title={vault.assets[1].name}
-                        />
-                      </div>
-                    </div>
+                    <AssetsProportion
+                      proportions={vault.assetsProportions as number[]}
+                      assets={vault.assets}
+                      type="vaults"
+                    />
+
                     <div className="max-w-[250px] flex items-start flex-col">
                       <p
                         title={vault.name}
