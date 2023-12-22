@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react";
 
 import { usePublicClient } from "wagmi";
 import { writeContract } from "@wagmi/core";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, parseUnits, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
 
 import { Loader } from "@components";
@@ -170,14 +170,7 @@ const BuildForm = ({
             address: token.address,
             abi: ERC20ABI,
             functionName: "approve",
-            args: [
-              $platformData.factory,
-              parseUnits(
-                token.sum,
-                tokensJson.tokens.find((tk) => tk.address === token.address)
-                  ?.decimals ?? 18
-              ),
-            ],
+            args: [$platformData.factory, maxUint256],
           });
           setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt(
@@ -295,7 +288,7 @@ const BuildForm = ({
           address: $platformData.buildingPayPerVaultToken,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [$platformData.factory, buildingPrice],
+          args: [$platformData.factory, maxUint256],
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt(

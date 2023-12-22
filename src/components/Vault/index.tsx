@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
@@ -124,6 +124,8 @@ function Vault({ vault }: IProps) {
   const [rotation, setRotation] = useState<number>(0);
   const [isRefresh, setIsRefresh] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
+
+  const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (apprDepo.length < 2) {
@@ -488,7 +490,7 @@ function Vault({ vault }: IProps) {
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
-            args: [$platformData.zap as TAddress, parseUnits(amount, decimals)],
+            args: [$platformData.zap as TAddress, maxUint256],
           });
           setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt(
@@ -1385,6 +1387,24 @@ function Vault({ vault }: IProps) {
     }
   }, [defaultOptionAssets, defaultOptionSymbols, optionTokens]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        tokenSelectorRef.current &&
+        event.target &&
+        !tokenSelectorRef.current.contains(event.target as Node)
+      ) {
+        setTokenSelector(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [tokenSelectorRef]);
+
   return vault && $vaultData[vault] ? (
     <main className="w-full mx-auto">
       <div className="flex justify-between items-center p-4 bg-button rounded-md">
@@ -1952,7 +1972,10 @@ function Vault({ vault }: IProps) {
             <form autoComplete="off" className="w-full px-4 mb-10 pb-5">
               <div className="flex items-center mt-4 gap-3 relative">
                 {optionTokens && (
-                  <div className="relative select-none w-full">
+                  <div
+                    className="relative select-none w-full"
+                    ref={tokenSelectorRef}
+                  >
                     <div
                       onClick={() => {
                         setTokenSelector((prevState) => !prevState);
@@ -2031,7 +2054,6 @@ function Vault({ vault }: IProps) {
                           </div>
                         )}
                         <p className="ml-[-4px] text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                          {" "}
                           {defaultOptionSymbols}
                         </p>
                       </div>
@@ -2055,7 +2077,6 @@ function Vault({ vault }: IProps) {
                             />
                           )}
                           <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                            {" "}
                             {underlyingToken.symbol}
                           </p>
                         </div>
@@ -2091,7 +2112,6 @@ function Vault({ vault }: IProps) {
                                 />
                               )}
                               <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                                {" "}
                                 {symbol}
                               </p>
                             </div>

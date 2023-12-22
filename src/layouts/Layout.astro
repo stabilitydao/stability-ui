@@ -61,9 +61,6 @@ const { title } = Astro.props as IProps;
 		align-items: center;
 		height: 60px;
 	}
-	header > span {
-		width: 30%;
-	}
 	.title {
 		display: flex;
 		align-items: center;
@@ -83,8 +80,10 @@ const { title } = Astro.props as IProps;
 	}
 	.menu {
 		display: flex;
-		flex-direction: row;
 		justify-content: center;
+	}
+	.menu-nav a {
+		width: 100%;
 	}
 	@media screen and (max-width: 600px) {
 		.menu {
@@ -110,10 +109,6 @@ const { title } = Astro.props as IProps;
 	}
 	.menu > a:hover {
 		background-color: #3e294c;
-	}
-
-	.bar {
-		text-align: right;
 	}
 
 	main {
