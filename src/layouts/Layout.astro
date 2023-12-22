@@ -1,14 +1,12 @@
 ---
 import App from "./App";
-import {Wallet} from "@components/Wallet"
+import {Header} from "@components/Header"
 
 interface IProps {
 	title: string;
 }
 
 const { title } = Astro.props as IProps;
-const pathname = new URL(Astro.request.url).pathname;
-const currentPath = pathname.slice(1); // remove the first "/"
 ---
 
 <!doctype html>
@@ -23,16 +21,7 @@ const currentPath = pathname.slice(1); // remove the first "/"
 	</head>
 	<body>
 		<App client:load>
-			<header>
-				<span class="title">
-					<a href="/" title="Stability"><img src="/logo.svg" /><span>Stability</span></a>
-				</span>
-				<span class="menu">
-					<a class={currentPath === "" ? "active" : ""} href="/">Vaults</a>
-					<!-- <a class={currentPath === "dao" ? "active" : ""} href="/dao">DAO</a> -->
-				</span>
-				<span class="bar"><Wallet client:only="react" /></span>
-			</header>
+			<Header client:only/>
 			<main>
 				<!-- <h1><span class="text-gradient">{title}</span></h1> -->
 				<slot />
@@ -72,9 +61,6 @@ const currentPath = pathname.slice(1); // remove the first "/"
 		align-items: center;
 		height: 60px;
 	}
-	header > span {
-		width: 30%;
-	}
 	.title {
 		display: flex;
 		align-items: center;
@@ -94,8 +80,15 @@ const currentPath = pathname.slice(1); // remove the first "/"
 	}
 	.menu {
 		display: flex;
-		flex-direction: row;
 		justify-content: center;
+	}
+	.menu-nav a {
+		width: 100%;
+	}
+	@media screen and (max-width: 600px) {
+		.menu {
+			display: none;
+		}
 	}
 	.menu > a {
 		margin: 0;
@@ -116,10 +109,6 @@ const currentPath = pathname.slice(1); // remove the first "/"
 	}
 	.menu > a:hover {
 		background-color: #3e294c;
-	}
-
-	.bar {
-		text-align: right;
 	}
 
 	main {
@@ -271,5 +260,4 @@ const currentPath = pathname.slice(1); // remove the first "/"
 		width: 32px;
 		height: 32px;
 	}
-
 </style>

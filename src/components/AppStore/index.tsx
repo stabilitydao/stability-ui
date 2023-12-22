@@ -3,6 +3,8 @@ import { useEffect } from "react";
 // import { parseUnits } from "viem";
 import axios from "axios";
 
+import { useStore } from "@nanostores/react";
+
 import { readContract } from "viem/actions";
 import {
   useAccount,
@@ -25,6 +27,7 @@ import {
   tokens,
   connected,
   apiData,
+  lastTx,
 } from "@store";
 import {
   platform,
@@ -41,7 +44,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
-
+  const $lastTx = useStore(lastTx);
   const getData = async () => {
     if (address && chain?.id) {
       const contractData = await readContract(_publicClient, {
@@ -190,7 +193,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     connected.set(isConnected);
     getDataFromStabilityAPI();
     getData();
-  }, [address, chain?.id, isConnected]);
+  }, [address, chain?.id, isConnected, $lastTx]);
 
   return <>{props.children}</>;
 };

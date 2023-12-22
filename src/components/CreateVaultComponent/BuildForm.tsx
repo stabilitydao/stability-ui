@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react";
 
 import { usePublicClient } from "wagmi";
 import { writeContract } from "@wagmi/core";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits, parseUnits, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
 
 import { Loader } from "@components";
@@ -73,9 +73,6 @@ const BuildForm = ({
   const [boostRewardsTokens, setBoostRewardsTokens] = useState(BRT);
   const [allowance, setAllowance] = useState<bigint | undefined>();
   const [buildResult, setBuildResult] = useState<boolean | undefined>();
-  const [boostAmounts, setBoostAmounts] = useState<{ [token: string]: bigint }>(
-    {}
-  );
   const [inputValues, setInputValues] = useState<Array<TInputItem>>(
     Array(defaultBoostTokens.length).fill({ inputValue: "", valuePerDay: "" })
   );
@@ -166,32 +163,32 @@ const BuildForm = ({
     }
   };
   const approveRewardingVaultTokens = async () => {
-    if ($platformData) {
-      if (rewardingVaultApprove?.length) {
+    if ($platformData && rewardingVaultApprove?.length) {
+      try {
         rewardingVaultApprove.map(async (token: any) => {
           const approve = await writeContract({
             address: token.address,
             abi: ERC20ABI,
             functionName: "approve",
-            args: [
-              $platformData.factory,
-              parseUnits(
-                token.sum,
-                tokensJson.tokens.find((tk) => tk.address === token.address)
-                  ?.decimals ?? 18
-              ),
-            ],
+            args: [$platformData.factory, maxUint256],
           });
+          setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt(
             approve
           );
           if (transaction.status === "success") {
+            lastTx.set(transaction?.transactionHash);
+            setLoader(false);
             // it will be work only with one approve
             // todo fix approve state
             setRewardingVaultApprove(false);
             setRewardingVaultDeploy(true);
           }
         });
+      } catch (error) {
+        lastTx.set("No approve hash...");
+        setLoader(false);
+        console.error("APPROVE ERROR:", error);
       }
     }
   };
@@ -201,30 +198,36 @@ const BuildForm = ({
     );
 
     if ($platformData) {
-      const deployVaultAndStrategy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "deployVaultAndStrategy",
-        args: [
-          vaultType,
-          strategyId,
-          initParams.initVaultAddresses as TAddress[],
-          tokensToDeploy,
-          initParams.initStrategyAddresses as TAddress[],
-          initParams.initStrategyNums,
-          initParams.initStrategyTicks,
-        ],
-      });
+      try {
+        const deployVaultAndStrategy = await writeContract({
+          address: $platformData.factory,
+          abi: FactoryABI,
+          functionName: "deployVaultAndStrategy",
+          args: [
+            vaultType,
+            strategyId,
+            initParams.initVaultAddresses as TAddress[],
+            tokensToDeploy,
+            initParams.initStrategyAddresses as TAddress[],
+            initParams.initStrategyNums,
+            initParams.initStrategyTicks,
+          ],
+        });
+        setLoader(true);
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          deployVaultAndStrategy
+        );
 
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        deployVaultAndStrategy
-      );
-
-      if (transaction.status === "success") {
-        lastTx.set(transaction.transactionHash);
-        setBuildResult(true);
-      } else {
+        if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
+          setBuildResult(true);
+          setLoader(false);
+        }
+      } catch (error) {
+        lastTx.set("No deployVaultAndStrategy hash...");
         setBuildResult(false);
+        setLoader(false);
+        console.error("deployVaultAndStrategy ERROR:", error);
       }
     }
   };
@@ -242,31 +245,38 @@ const BuildForm = ({
     }
   };
   const deploy = async () => {
+    //todo combine deploy and deployRewardingVault
     if ($platformData) {
-      const deployVaultAndStrategy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "deployVaultAndStrategy",
-        args: [
-          vaultType,
-          strategyId,
-          initParams.initVaultAddresses as TAddress[],
-          initParams.initVaultNums,
-          initParams.initStrategyAddresses as TAddress[],
-          initParams.initStrategyNums,
-          initParams.initStrategyTicks,
-        ],
-      });
+      try {
+        const deployVaultAndStrategy = await writeContract({
+          address: $platformData.factory,
+          abi: FactoryABI,
+          functionName: "deployVaultAndStrategy",
+          args: [
+            vaultType,
+            strategyId,
+            initParams.initVaultAddresses as TAddress[],
+            initParams.initVaultNums,
+            initParams.initStrategyAddresses as TAddress[],
+            initParams.initStrategyNums,
+            initParams.initStrategyTicks,
+          ],
+        });
+        setLoader(true);
+        const transaction = await _publicClient.waitForTransactionReceipt(
+          deployVaultAndStrategy
+        );
 
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        deployVaultAndStrategy
-      );
-
-      if (transaction.status === "success") {
-        lastTx.set(transaction.transactionHash);
-        setBuildResult(true);
-      } else {
+        if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
+          setBuildResult(true);
+          setLoader(false);
+        }
+      } catch (error) {
+        lastTx.set("No deployVaultAndStrategy hash...");
         setBuildResult(false);
+        setLoader(false);
+        console.error("deployVaultAndStrategy ERROR:", error);
       }
     }
   };
@@ -278,13 +288,14 @@ const BuildForm = ({
           address: $platformData.buildingPayPerVaultToken,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [$platformData.factory, buildingPrice],
+          args: [$platformData.factory, maxUint256],
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt(
           approve
         );
         if (transaction.status === "success") {
+          lastTx.set(transaction?.transactionHash);
           setAllowance(
             (await readContract(_publicClient, {
               address: $platformData.buildingPayPerVaultToken,
@@ -296,7 +307,9 @@ const BuildForm = ({
           setLoader(false);
         }
       } catch (error) {
+        lastTx.set("No approve hash...");
         setLoader(false);
+        console.error("APPROVE ERROR:", error);
       }
     }
   };
@@ -316,16 +329,24 @@ const BuildForm = ({
       {!buildResult && (
         <div className="flex flex-col gap-2 pb-5">
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Vault type</span>
-            <span>{vaultType}</span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Vault type
+            </span>
+            <span className="text-[14px] sm:text-[16px]">{vaultType}</span>
           </div>
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Strategy logic</span>
-            <span>{strategyId}</span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Strategy logic
+            </span>
+            <span className="text-[14px] sm:text-[16px]">{strategyId}</span>
           </div>
           <div className="flex w-full justify-between">
-            <p className="w-[30%] text-[22px]">Strategy description</p>
-            <p className="text-end text-[16px]">{strategyDesc}</p>
+            <p className="w-[30%] text-[16px] sm:text-[22px]">
+              Strategy description
+            </p>
+            <p className="text-end text-[12px] sm:text-[16px]">
+              {strategyDesc}
+            </p>
           </div>
           {nftData && (
             <div className="flex w-full justify-between">
@@ -333,12 +354,16 @@ const BuildForm = ({
                 Free vaults by PM used until <br />
                 {nftData.nextUpdate}
               </span>
-              <span>{nftData.freeVaults} of 1</span>
+              <span className="text-[14px] sm:text-[16px]">
+                {nftData.freeVaults} of 1
+              </span>
             </div>
           )}
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Build price</span>
-            <span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Build price
+            </span>
+            <span className="text-[14px] sm:text-[16px]">
               {buildingPrice && payPerVaultToken
                 ? `${formatUnits(buildingPrice, payPerVaultToken.decimals)} ${
                     payPerVaultToken.symbol
@@ -347,8 +372,10 @@ const BuildForm = ({
             </span>
           </div>
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Your balance</span>
-            <span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Your balance
+            </span>
+            <span className="text-[14px] sm:text-[16px]">
               {$balance?.buildingPayPerVaultTokenBalance && payPerVaultToken
                 ? `${formatUnits(
                     $balance.buildingPayPerVaultTokenBalance,
@@ -361,13 +388,17 @@ const BuildForm = ({
           {vaultType === "Rewarding" && (
             <>
               <div className="flex w-full justify-between">
-                <span className="w-[30%] text-[22px]">Buy-back token</span>
-                <span>
+                <span className="w-[30%] text-[16px] sm:text-[22px]">
+                  Buy-back token
+                </span>
+                <span className="text-[14px] sm:text-[16px]">
                   {getTokenData(initParams.initVaultAddresses[0])?.symbol}
                 </span>
               </div>
 
-              <p className="text-center text-[22px]">Initial boost rewards</p>
+              <p className="text-center text-[16px] sm:text-[22px]">
+                Initial boost rewards
+              </p>
               <div className="flex flex-col gap-2">
                 {boostRewardsTokens.map((token, index) => {
                   return (
@@ -429,9 +460,7 @@ const BuildForm = ({
       ) : (
         <Loader />
       )}
-      {loader ? (
-        <Loader />
-      ) : (
+      {!loader && (
         <>
           {buildResult === undefined &&
           vaultType === "Rewarding" &&

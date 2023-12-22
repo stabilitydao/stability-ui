@@ -288,29 +288,33 @@ const CreateVaultComponent = () => {
           )}
 
           {minInitialBoostPerDay !== undefined && (
-            <div className="text-[18px] my-2 flex items-center">
-              <p>Minimal initial boost value per day: </p>
+            <div className="text-[18px] my-2 flex items-start sm:items-center justify-between sm:justify-center">
+              <p className="w-3/4 sm:w-auto">
+                Minimal initial boost value per day:{" "}
+              </p>
               <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
                 ${formatUnits(minInitialBoostPerDay, 18)}
               </div>
             </div>
           )}
-          <div className="text-[18px] mb-2 flex items-center">
-            <p>Buy-back rewards vesting duration: </p>
+          <div className="text-[18px] mb-2 flex items-start sm:items-center justify-between sm:justify-center">
+            <p className="w-3/4 sm:w-auto">
+              Buy-back rewards vesting duration:{" "}
+            </p>
             <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
               7 days
             </div>
           </div>
-          <div className="text-[18px] flex items-center">
-            <p> Boost rewards vesting duration: </p>
-            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+          <div className="text-[18px] flex items-start sm:items-center justify-between sm:justify-center">
+            <p className="w-3/4 sm:w-auto">Boost rewards vesting duration: </p>
+            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-0 sm:ml-2 px-1 py-1">
               30 days
             </div>
           </div>
         </div>
       </div>
 
-      <table className="bg-[#2c2f38] rounded-lg mx-auto">
+      <table className="hidden md:table bg-[#2c2f38] rounded-lg mx-auto">
         <thead className="h-[70px]">
           <tr className="text-[18px] whitespace-nowrap">
             <td>Vault type</td>
@@ -357,6 +361,59 @@ const CreateVaultComponent = () => {
           })}
         </tbody>
       </table>
+      <div className="md:hidden flex flex-col justify-center items-center gap-3">
+        {buildVariants.map((variant, i) => {
+          if (variant.vaultType !== "Rewarding") {
+            return;
+          }
+          return (
+            <div
+              key={
+                variant.strategyDesc + variant.vaultType + variant.strategyId
+              }
+              className="flex flex-col items-center justify-center py-[10px] transition delay-[10ms] bg-[#2C2F38] w-full px-5 rounded-md">
+              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                <p className="w-1/2 border-r border-[#4f5158]">Vault type</p>
+                <p className="w-1/2 text-end">{variant.vaultType}</p>
+              </div>
+              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                <p className="w-1/2 border-r border-[#4f5158]">
+                  Buy-back token
+                </p>
+                <p className="w-1/2 text-end">
+                  {
+                    getTokenData(
+                      buildVariants[i].initParams.initVaultAddresses[0]
+                    )?.symbol
+                  }
+                </p>
+              </div>
+              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                <p className="w-1/2 border-r border-[#4f5158]">
+                  Strategy logic
+                </p>
+                <p className="w-1/2 text-end">{variant.strategyId}</p>
+              </div>
+              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                <p className="w-1/2 border-r border-[#4f5158]">
+                  Strategy description
+                </p>
+                <p className="w-1/2 text-end">{variant.strategyDesc}</p>
+              </div>
+
+              {variant.canBuild && (
+                <button
+                  className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
+                  onClick={() => {
+                    setBuildIndex(i);
+                  }}>
+                  Assemble
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
       <div className="text-[22px] text-center">Coming soon</div>
@@ -368,12 +425,12 @@ const CreateVaultComponent = () => {
             setBuildIndex(undefined);
           }}>
           <div
-            className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[30px] rounded-md bg-modal mr-5 "
+            className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[10px] sm:px-[30px] rounded-md bg-modal mr-0 md:mr-5 "
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
             }}>
-            <div className="font-bold text-[1.5rem] flex justify-center">
+            <div className="font-bold text-[1.2rem] sm:text-[1.5rem] flex justify-center">
               Assembling
             </div>
             <BuildForm
