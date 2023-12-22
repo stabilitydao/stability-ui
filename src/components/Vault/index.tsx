@@ -1729,7 +1729,7 @@ function Vault({ vault }: IProps) {
                               {assetData.name}
                             </span>
                           </div>
-                          <div className="flex flex-row gap-1 md:gap-3 md:mt-0 mt-2">
+                          <div className="flex flex-row flex-wrap gap-1 md:gap-3 md:mt-0 mt-2">
                             {tokenAssets?.website && (
                               <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                                 <a
