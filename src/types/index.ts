@@ -176,7 +176,7 @@ type TDAOData = {
   typesOfVaults: string;
   strategyLogicFee: string;
   ecosystemFee: string;
-  treasuryBalance: string;
+  treasuryBalance: number;
   network: string;
   farmsLength: string;
 };
@@ -197,27 +197,30 @@ type TGitHubUser = {
 };
 
 type TProfitTokenData = {
-  price: number;
+  price: string;
   totalSupply: string;
   marketCap: string;
 };
 
 type TMultiTokenData = {
-  balance: string;
+  balance: number;
   priceBalance: number;
 };
 
 type TMultisigBalance = Record<string, TMultiTokenData>;
 
 type TTokenomics = {
-  profitBalance: string;
-  profitStaked: string;
   sdivBalance: string;
   sdivEarned: string;
   pmToMint: string;
   pmTotalSupply: string;
   pmMintAllowance: string;
   sdivTotalSupply: string;
+};
+
+type TProfitTokenWallet = {
+  profitBalance: number;
+  profitStaked: number;
 };
 
 export type {
@@ -252,4 +255,5 @@ export type {
   TMultisigBalance,
   TMultiTokenData,
   TTokenomics,
+  TProfitTokenWallet,
 };

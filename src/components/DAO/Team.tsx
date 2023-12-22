@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { publicClient, platformData, balances, assetsPrices } from "@store";
+import { publicClient, balances, assetsPrices } from "@store";
 import { formatUnits } from "viem";
 import { getTokenData } from "@utils";
 import type { TGitHubUser, TMultisigBalance, TMultiTokenData } from "@types";
@@ -8,6 +8,7 @@ import { ERC20ABI } from "@web3";
 import { MULTISIG } from "@constants";
 import axios from "axios";
 import ShortAddress from "./ShortAddress";
+import { Loader } from "../Loader/index";
 
 function Team() {
   const $balances = useStore(balances);
@@ -16,7 +17,7 @@ function Team() {
   const [_multisigBalance, setMultisigBalance] = useState<TMultisigBalance>();
   const $assetsPrices = useStore(assetsPrices);
 
-  const getTeamData = async () => {
+  const fetchTeamData = async () => {
     try {
       const response = await axios.get(
         "https://api.github.com/orgs/stabilitydao/public_members"
@@ -54,13 +55,12 @@ function Team() {
 
       setMembers(sortedMembers);
     } catch (error) {
-      console.error("Fetching getTeamData", error);
+      console.error("Fetching team data", error);
     }
   };
 
-  const fetchTeamData = async () => {
+  const fetchMultiSig = async () => {
     if ($publicClient && $assetsPrices) {
-      //multisig asset balance
       const _balances: TMultisigBalance = {};
 
       for (const address of $balances[0]) {
@@ -74,29 +74,32 @@ function Team() {
 
         if (decimals && balance > 0n) {
           const tokenInfo: TMultiTokenData = {
-            balance: Number(formatUnits(balance, decimals)).toFixed(2),
+            balance:
+              Math.trunc(Number(formatUnits(balance, decimals)) * 100) / 100,
             priceBalance: Number(
-              (
+              Math.trunc(
                 Number(formatUnits(balance, decimals)) *
-                Number(formatUnits($assetsPrices[address].tokenPrice, decimals))
-              ).toFixed(2)
+                  Number(
+                    formatUnits($assetsPrices[address].tokenPrice, decimals)
+                  ) *
+                  100
+              ) / 100
             ),
           };
 
           _balances[address] = tokenInfo;
         }
       }
-
       setMultisigBalance(_balances);
     }
   };
 
   useEffect(() => {
-    getTeamData();
     fetchTeamData();
-  }, []);
+    fetchMultiSig();
+  }, [$balances]);
 
-  return (
+  return _multisigBalance ? (
     <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
@@ -196,6 +199,11 @@ function Team() {
           )}
         </div>
       </div>
+    </div>
+  ) : (
+    <div className="grid justify-center  min-h-[370px] m-auto mt-5 bg-[#3d404b] rounded-md border border-gray-600">
+      <h1 className="flex align-middle my-auto">Loading Team...</h1>
+      <Loader />
     </div>
   );
 }

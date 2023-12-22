@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { SDIV, PROFIT, PM, TREASURY } from "@constants";
 import ShortAddress from "./ShortAddress";
+import { Loader } from "../Loader/index";
 
-function Governance(props) {
-  return (
+function Governance(props: any) {
+  return props.daoData ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
         Governance
@@ -63,6 +64,11 @@ function Governance(props) {
           </div>
         </div>
       </div>
+    </div>
+  ) : (
+    <div className="grid justify-center min-h-[217px] m-auto mt-5 bg-[#3d404b] rounded-md border border-gray-600">
+      <h1 className="flex align-middle my-auto">Loading Governance...</h1>
+      <Loader />
     </div>
   );
 }
