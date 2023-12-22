@@ -3,7 +3,12 @@ import { useStore } from "@nanostores/react";
 import { account, publicClient, assetsPrices } from "@store";
 import { formatUnits, parseUnits } from "viem";
 import { getTokenData } from "@utils";
-import type { TProfitTokenData, TTokenomics, TProfitTokenWallet } from "@types";
+import type {
+  TProfitTokenData,
+  TTokenomics,
+  TProfitTokenWallet,
+  TAddress,
+} from "@types";
 import { writeContract } from "@wagmi/core";
 import { SDIV, PROFIT, PM } from "@constants";
 import ShortAddress from "./ShortAddress";
@@ -14,7 +19,7 @@ import {
   IERC721Enumerable,
   ERC20MetadataUpgradeableABI,
 } from "@web3";
-import { Loader } from "../Loader/index";
+import { Loader } from "@components";
 
 function Tokenomics() {
   const $assetsPrices = useStore(assetsPrices);
@@ -33,43 +38,42 @@ function Tokenomics() {
     if ($publicClient && $account) {
       try {
         const profitTotalSupply = await $publicClient.readContract({
-          address: PROFIT[0] as `0x${string}`,
+          address: PROFIT[0] as TAddress,
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
         const pmTotalSupply = await $publicClient.readContract({
-          address: PM[0] as `0x${string}`,
+          address: PM[0] as TAddress,
           abi: IERC721Enumerable,
           functionName: "totalSupply",
         });
 
         const sdivTotalSupply = await $publicClient.readContract({
-          address: SDIV[0] as `0x${string}`,
+          address: SDIV[0] as TAddress,
           abi: ERC20ABI,
           functionName: "totalSupply",
         });
 
         const sdivBalance = await $publicClient.readContract({
-          address: SDIV[0] as `0x${string}`,
+          address: SDIV[0] as TAddress,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [$account as `0x${string}`],
+          args: [$account as TAddress],
         });
 
         const sdivEarned = (await $publicClient.readContract({
-          address:
-            "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
           abi: DividendMinterABI,
           functionName: "pending",
           args: [$account],
         })) as bigint;
 
         const pmMintAllowance = await $publicClient.readContract({
-          address: PROFIT[0] as `0x${string}`,
+          address: PROFIT[0] as TAddress,
           abi: ERC20MetadataUpgradeableABI,
           functionName: "allowance",
-          args: [$account as `0x${string}`, PM[0] as `0x${string}`],
+          args: [$account as TAddress, PM[0] as TAddress],
         });
 
         const _poolData = {
@@ -124,22 +128,24 @@ function Tokenomics() {
   };
 
   const aproveStaking = async () => {
-    console.log(inputStake);
+    try {
+      const amount = parseUnits(inputStake.toString(), 18);
+      const aproveStaking = await writeContract({
+        address: PROFIT[0] as TAddress,
+        abi: ERC20MetadataUpgradeableABI,
+        functionName: "approve",
+        args: [$account as TAddress, amount],
+      });
 
-    const amount = parseUnits(inputStake.toString(), 18);
-    const aproveStaking = await writeContract({
-      address: PROFIT[0] as `0x${string}`,
-      abi: ERC20MetadataUpgradeableABI,
-      functionName: "approve",
-      args: [$account as `0x${string}`, amount],
-    });
+      const transaction = await $publicClient?.waitForTransactionReceipt(
+        aproveStaking
+      );
 
-    const transaction = await $publicClient?.waitForTransactionReceipt(
-      aproveStaking
-    );
-
-    if (transaction?.status === "success") {
-      profitStakingAllowance();
+      if (transaction?.status === "success") {
+        profitStakingAllowance();
+      }
+    } catch (error) {
+      console.error("Error in aproveStaking:", error);
     }
   };
 
@@ -152,7 +158,7 @@ function Tokenomics() {
       console.log(profitWallet?.profitBalance);
 
       const stake = await writeContract({
-        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
         abi: DividendMinterABI,
         functionName: "stake",
         args: [ammount],
@@ -172,7 +178,7 @@ function Tokenomics() {
     if ($publicClient && inputStake != "") {
       const ammount = parseUnits(inputStake.toString(), 18);
       const unStake = await writeContract({
-        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
         abi: DividendMinterABI,
         functionName: "unstake",
         args: [ammount],
@@ -192,7 +198,7 @@ function Tokenomics() {
   const harvest = async () => {
     if ($publicClient) {
       const harvest = await writeContract({
-        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
         abi: DividendMinterABI,
         functionName: "harvest",
       });
@@ -202,7 +208,7 @@ function Tokenomics() {
   const mint = async () => {
     if ($publicClient) {
       const harvest = await writeContract({
-        address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as `0x${string}`,
+        address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as TAddress,
         abi: DividendTokenABI,
         functionName: "MINTER_ROLE",
       });
@@ -212,24 +218,24 @@ function Tokenomics() {
 
   const profitStakingAllowance = async () => {
     const profitStakingAllowance = await $publicClient?.readContract({
-      address: PROFIT[0] as `0x${string}`,
+      address: PROFIT[0] as TAddress,
       abi: ERC20MetadataUpgradeableABI,
       functionName: "allowance",
       args: [
-        $account as `0x${string}`,
+        $account as TAddress,
         "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
       ],
     });
 
     const profitBalance = await $publicClient?.readContract({
-      address: PROFIT[0] as `0x${string}`,
+      address: PROFIT[0] as TAddress,
       abi: ERC20ABI,
       functionName: "balanceOf",
-      args: [$account as `0x${string}`],
+      args: [$account as TAddress],
     });
 
     const profitStaked = (await $publicClient?.readContract({
-      address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as `0x${string}`,
+      address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
       abi: DividendMinterABI,
       functionName: "userInfo",
       args: [$account],
@@ -248,8 +254,6 @@ function Tokenomics() {
       formatUnits(profitStakingAllowance as bigint, 18)
     );
   };
-
-  const poolDataa = async () => {};
 
   useEffect(() => {
     fetchTokenomicsData();
@@ -645,7 +649,7 @@ function Tokenomics() {
         </div>
       )}
 
-      {showMintModal === true && (
+      {showMintModal && (
         <div
           className="overlay"
           onClick={() => setShowMintModal(false)}>
@@ -715,11 +719,11 @@ function Tokenomics() {
       )}
     </div>
   ) : (
-    <div className="grid align-middle justify-center min-h-[376px] m-auto mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="m-auto text-top w-full inline-block">
-        Loading tokenomics...
-      </h1>
-      <Loader className="flex mb-auto" />
+    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[376px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+      <Loader
+        customHeight={100}
+        customWidth={100}
+      />
     </div>
   );
 }

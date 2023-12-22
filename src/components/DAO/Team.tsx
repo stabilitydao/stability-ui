@@ -3,7 +3,12 @@ import { useStore } from "@nanostores/react";
 import { publicClient, balances, assetsPrices } from "@store";
 import { formatUnits } from "viem";
 import { getTokenData } from "@utils";
-import type { TGitHubUser, TMultisigBalance, TMultiTokenData } from "@types";
+import type {
+  TAddress,
+  TGitHubUser,
+  TMultisigBalance,
+  TMultiTokenData,
+} from "@types";
 import { ERC20ABI } from "@web3";
 import { MULTISIG } from "@constants";
 import axios from "axios";
@@ -65,10 +70,10 @@ function Team() {
 
       for (const address of $balances[0]) {
         const balance = await $publicClient.readContract({
-          address: address as `0x${string}`,
+          address: address as TAddress,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [MULTISIG[0] as `0x${string}`],
+          args: [MULTISIG[0] as TAddress],
         });
         const decimals = getTokenData(address)?.decimals;
 
@@ -201,9 +206,11 @@ function Team() {
       </div>
     </div>
   ) : (
-    <div className="grid justify-center  min-h-[370px] m-auto mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="flex align-middle my-auto">Loading Team...</h1>
-      <Loader />
+    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[370px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+      <Loader
+        customHeight={100}
+        customWidth={100}
+      />
     </div>
   );
 }

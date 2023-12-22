@@ -170,7 +170,7 @@ type TDAOData = {
   multisigAddress: string;
   numberOfTotalVaults: string;
   totalTvl: string;
-  strategieNames: string;
+  strategieNames: string[];
   platformFee: string;
   vaultManagerFee: string;
   typesOfVaults: string;

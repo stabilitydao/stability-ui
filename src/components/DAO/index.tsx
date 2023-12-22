@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { vaults, publicClient, balances, assetsPrices, account } from "@store";
+import { vaults, publicClient, balances, assetsPrices } from "@store";
 import { PlatformABI, FactoryABI, platform, ERC20ABI } from "@web3";
-import type { TDAOData } from "@types";
+import type { TDAOData, TAddress } from "@types";
 import { PROFIT, TREASURY } from "@constants";
 import { getStrategyInfo } from "@utils";
 import Tokenomics from "./Tokenomics";
@@ -20,10 +20,10 @@ function DAO() {
   const $assetsPrices = useStore(assetsPrices);
 
   //get strategie bg-col/color
-  function getFarmColor(farmName: string) {
+  const getFarmColor = (farmName: string) => {
     let color;
     const farm = farmName.split(" ");
-    const initials = farm.map(function (initials: string) {
+    const initials = farm.map((initials: string) => {
       return initials.charAt(0);
     });
     const result = initials.join("");
@@ -33,7 +33,7 @@ function DAO() {
       color = getStrategyInfo(result);
     }
     return color;
-  }
+  };
 
   const fetchPlatformData = async () => {
     if ($publicClient && $assetsPrices) {
@@ -57,10 +57,10 @@ function DAO() {
         });
 
         const treasuryBalance = await $publicClient.readContract({
-          address: PROFIT[0] as `0x${string}`,
+          address: PROFIT[0] as TAddress,
           abi: ERC20ABI,
           functionName: "balanceOf",
-          args: [TREASURY[0] as `0x${string}`],
+          args: [TREASURY[0] as TAddress],
         });
         const network: any = await $publicClient.readContract({
           address: platform,
@@ -127,7 +127,7 @@ function DAO() {
   }, [$balances]);
 
   return (
-    <main className="overflow-hidden p-0 m-auto">
+    <main className="overflow-hidden m-auto">
       <div className="w-full flex px-5 justify-between h-[70px] bg-button shadow-lg rounded-md">
         <h1 className="text-xxl text-[#8D8E96] my-auto">Platform</h1>
         <p className="text-sm text-[#8D8E96] my-auto pt-3">
@@ -212,24 +212,22 @@ function DAO() {
                 <h2 className="text-xl font-medium text-left text-[#8D8E96]">
                   Strategies:
                 </h2>
-                {Array.isArray(daoData?.strategieNames) &&
-                  daoData?.strategieNames.map(
-                    (strategyName: string, index: number) => (
-                      <div
-                        key={index}
-                        className="gap-3 py-3">
-                        <h3
-                          className="rounded-md m-0 py-2 px-1"
-                          style={{
-                            color: getFarmColor(strategyName)?.color,
-                            backgroundColor:
-                              getFarmColor(strategyName)?.bgColor,
-                          }}>
-                          {strategyName}
-                        </h3>
-                      </div>
-                    )
-                  )}
+                {daoData?.strategieNames.map(
+                  (strategyName: string, index: number) => (
+                    <div
+                      key={index}
+                      className="gap-3 py-3">
+                      <h3
+                        className="rounded-md m-0 py-2 px-1"
+                        style={{
+                          color: getFarmColor(strategyName)?.color,
+                          backgroundColor: getFarmColor(strategyName)?.bgColor,
+                        }}>
+                        {strategyName}
+                      </h3>
+                    </div>
+                  )
+                )}
                 <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
                   <div className="m-auto">
                     <h2 className="font-bold">Vault Types</h2>
@@ -246,47 +244,49 @@ function DAO() {
           </div>
 
           {daoData?.pendingPlatformUpgrade &&
-          daoData?.pendingPlatformUpgrade.newVersion !== "" ? (
-            <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
-              <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
-                <em className="text-xl font-medium">New version:</em>{" "}
-                {daoData.pendingPlatformUpgrade.newVersion}
-              </h2>
+            daoData?.pendingPlatformUpgrade.newVersion !== "" && (
+              <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
+                <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
+                  <em className="text-xl font-medium">New version:</em>{" "}
+                  {daoData.pendingPlatformUpgrade.newVersion}
+                </h2>
 
-              <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
-                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-                  <p>Proxies:</p>
-                  {daoData?.pendingPlatformUpgrade.proxies.map(
-                    (proxy: string, index: number) => (
-                      <div key={index}>
-                        <p className="text-xs grid">
-                          <ShortAddress address={proxy} />
-                        </p>
-                      </div>
-                    )
-                  )}
-                </div>
+                <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
+                  <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                    <p>Proxies:</p>
+                    {daoData?.pendingPlatformUpgrade.proxies.map(
+                      (proxy: string, index: number) => (
+                        <div key={index}>
+                          <p className="text-xs grid">
+                            <ShortAddress address={proxy} />
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
 
-                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-                  <p>New implementations:</p>
-                  {daoData?.pendingPlatformUpgrade.newImplementations.map(
-                    (implementation: string, index: number) => (
-                      <div key={index}>
-                        <p className="text-xs grid">
-                          <ShortAddress address={implementation} />
-                        </p>
-                      </div>
-                    )
-                  )}
+                  <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                    <p>New implementations:</p>
+                    {daoData?.pendingPlatformUpgrade.newImplementations.map(
+                      (implementation: string, index: number) => (
+                        <div key={index}>
+                          <p className="text-xs grid">
+                            <ShortAddress address={implementation} />
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : null}
+            )}
         </div>
       ) : (
-        <div className="grid justify-center m-auto w-full min-h-[302px] p-3 bg-button shadow-lg rounded-md mt-2">
-          <h1 className="flex align-middle my-auto">Loading platform...</h1>
-          <Loader />
+        <div className="flex justify-center min-h-[302px] p-3 bg-button shadow-lg rounded-md mt-2">
+          <Loader
+            customHeight={100}
+            customWidth={100}
+          />
         </div>
       )}
       <Tokenomics />

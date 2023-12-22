@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { SDIV, PROFIT, PM, TREASURY } from "@constants";
+import { TREASURY } from "@constants";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 
@@ -66,9 +65,11 @@ function Governance(props: any) {
       </div>
     </div>
   ) : (
-    <div className="grid justify-center min-h-[217px] m-auto mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="flex align-middle my-auto">Loading Governance...</h1>
-      <Loader />
+    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[217px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+      <Loader
+        customHeight={100}
+        customWidth={100}
+      />
     </div>
   );
 }

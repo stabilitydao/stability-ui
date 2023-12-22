@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from "react";
-
-function ShortAddress(props) {
+function ShortAddress(props: any) {
   const prefix = props.address.slice(0, 6);
   const suffix = props.address.slice(-4);
   const address = `${prefix}...${suffix}`;
 
   const copyAddress = () => {
-    // Crea un elemento de texto oculto
     const textArea = document.createElement("textarea");
     textArea.value = props.address;
     document.body.appendChild(textArea);
 
-    // Selecciona y copia el texto
     textArea.select();
     document.execCommand("copy");
 
-    // Elimina el elemento de texto oculto
     document.body.removeChild(textArea);
   };
   return (
