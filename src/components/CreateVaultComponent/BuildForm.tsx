@@ -336,16 +336,24 @@ const BuildForm = ({
       {!buildResult && (
         <div className="flex flex-col gap-2 pb-5">
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Vault type</span>
-            <span>{vaultType}</span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Vault type
+            </span>
+            <span className="text-[14px] sm:text-[16px]">{vaultType}</span>
           </div>
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Strategy logic</span>
-            <span>{strategyId}</span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Strategy logic
+            </span>
+            <span className="text-[14px] sm:text-[16px]">{strategyId}</span>
           </div>
           <div className="flex w-full justify-between">
-            <p className="w-[30%] text-[22px]">Strategy description</p>
-            <p className="text-end text-[16px]">{strategyDesc}</p>
+            <p className="w-[30%] text-[16px] sm:text-[22px]">
+              Strategy description
+            </p>
+            <p className="text-end text-[12px] sm:text-[16px]">
+              {strategyDesc}
+            </p>
           </div>
           {nftData && (
             <div className="flex w-full justify-between">
@@ -353,12 +361,16 @@ const BuildForm = ({
                 Free vaults by PM used until <br />
                 {nftData.nextUpdate}
               </span>
-              <span>{nftData.freeVaults} of 1</span>
+              <span className="text-[14px] sm:text-[16px]">
+                {nftData.freeVaults} of 1
+              </span>
             </div>
           )}
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Build price</span>
-            <span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Build price
+            </span>
+            <span className="text-[14px] sm:text-[16px]">
               {buildingPrice && payPerVaultToken
                 ? `${formatUnits(buildingPrice, payPerVaultToken.decimals)} ${
                     payPerVaultToken.symbol
@@ -367,8 +379,10 @@ const BuildForm = ({
             </span>
           </div>
           <div className="flex w-full justify-between">
-            <span className="w-[30%] text-[22px]">Your balance</span>
-            <span>
+            <span className="w-[30%] text-[16px] sm:text-[22px]">
+              Your balance
+            </span>
+            <span className="text-[14px] sm:text-[16px]">
               {$balance?.buildingPayPerVaultTokenBalance && payPerVaultToken
                 ? `${formatUnits(
                     $balance.buildingPayPerVaultTokenBalance,
@@ -381,13 +395,17 @@ const BuildForm = ({
           {vaultType === "Rewarding" && (
             <>
               <div className="flex w-full justify-between">
-                <span className="w-[30%] text-[22px]">Buy-back token</span>
-                <span>
+                <span className="w-[30%] text-[16px] sm:text-[22px]">
+                  Buy-back token
+                </span>
+                <span className="text-[14px] sm:text-[16px]">
                   {getTokenData(initParams.initVaultAddresses[0])?.symbol}
                 </span>
               </div>
 
-              <p className="text-center text-[22px]">Initial boost rewards</p>
+              <p className="text-center text-[16px] sm:text-[22px]">
+                Initial boost rewards
+              </p>
               <div className="flex flex-col gap-2">
                 {boostRewardsTokens.map((token, index) => {
                   return (
