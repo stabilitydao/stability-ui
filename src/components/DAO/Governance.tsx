@@ -1,9 +1,38 @@
-import { TREASURY } from "@constants";
+import { useEffect, useState } from "react";
+import { useStore } from "@nanostores/react";
+import { PROFIT, TREASURY } from "@constants";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
+import { publicClient } from "@store";
+import { ERC20ABI } from "@web3";
+import { formatUnits } from "viem";
+import type { TAddress } from "@types";
 
 function Governance(props: any) {
-  return props.daoData ? (
+  const [treasuryBalance, setTreasuryBalance] = useState<number>();
+  const $publicClient = useStore(publicClient);
+
+  const fetchTreasury = async () => {
+    if ($publicClient) {
+      const _treasuryBalance = await $publicClient.readContract({
+        address: PROFIT[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [TREASURY[0] as TAddress],
+      });
+      setTreasuryBalance(
+        Math.trunc(Number(formatUnits(_treasuryBalance, 18)) * 100) / 100
+      );
+
+      console.log(treasuryBalance);
+    }
+  };
+
+  useEffect(() => {
+    fetchTreasury();
+  }, []);
+
+  return treasuryBalance ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
         Governance
@@ -28,7 +57,7 @@ function Governance(props: any) {
               </tr>
               <tr>
                 <td>Total balance: </td>
-                <td>{props.daoData?.treasuryBalance} PROFIT</td>
+                <td>{treasuryBalance} PROFIT</td>
               </tr>
             </tbody>
           </table>

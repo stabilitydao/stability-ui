@@ -52,7 +52,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: PlatformABI,
         functionName: "getData",
       });
-      console.log(contractData);
 
       if (contractData[1]) {
         tokens.set(contractData[1] as TAddress[]);
@@ -113,6 +112,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         abi: IVaultManagerABI,
         functionName: "vaults",
       });
+      console.log(contractVaults);
 
       /// debug visual
       // if (contractVaults?.length) {

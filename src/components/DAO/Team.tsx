@@ -9,18 +9,19 @@ import type {
   TMultisigBalance,
   TMultiTokenData,
 } from "@types";
-import { ERC20ABI } from "@web3";
+import { ERC20ABI, platform, PlatformABI } from "@web3";
 import { MULTISIG } from "@constants";
 import axios from "axios";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 
 function Team() {
-  const $balances = useStore(balances);
   const $publicClient = useStore(publicClient);
+  const $assetsPrices = useStore(assetsPrices);
+  const $balances = useStore(balances);
+
   const [members, setMembers] = useState<TGitHubUser[]>();
   const [_multisigBalance, setMultisigBalance] = useState<TMultisigBalance>();
-  const $assetsPrices = useStore(assetsPrices);
 
   const fetchTeamData = async () => {
     try {
@@ -66,46 +67,61 @@ function Team() {
 
   const fetchMultiSig = async () => {
     if ($publicClient && $assetsPrices) {
-      const _balances: TMultisigBalance = {};
+      try {
+        const _balances: TMultisigBalance = {};
 
-      for (const address of $balances[0]) {
-        const balance = await $publicClient.readContract({
-          address: address as TAddress,
-          abi: ERC20ABI,
-          functionName: "balanceOf",
-          args: [MULTISIG[0] as TAddress],
+        const contractBalance: any = await $publicClient.readContract({
+          address: platform,
+          abi: PlatformABI,
+          functionName: "getBalance",
+          args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
         });
-        const decimals = getTokenData(address)?.decimals;
+        if (contractBalance) {
+          for (const address of contractBalance[0]) {
+            console.log("asd");
 
-        if (decimals && balance > 0n) {
-          const tokenInfo: TMultiTokenData = {
-            balance:
-              Math.trunc(Number(formatUnits(balance, decimals)) * 100) / 100,
-            priceBalance: Number(
-              Math.trunc(
-                Number(formatUnits(balance, decimals)) *
-                  Number(
-                    formatUnits($assetsPrices[address].tokenPrice, decimals)
-                  ) *
-                  100
-              ) / 100
-            ),
-          };
+            const balance = await $publicClient.readContract({
+              address: address as TAddress,
+              abi: ERC20ABI,
+              functionName: "balanceOf",
+              args: [MULTISIG[0] as TAddress],
+            });
+            const decimals = getTokenData(address)?.decimals;
 
-          _balances[address] = tokenInfo;
+            if (decimals && balance >= 0n) {
+              const tokenInfo: TMultiTokenData = {
+                balance:
+                  Math.trunc(Number(formatUnits(balance, decimals)) * 100) /
+                  100,
+                priceBalance: Number(
+                  Math.trunc(
+                    Number(formatUnits(balance, decimals)) *
+                      Number(
+                        formatUnits($assetsPrices[address].tokenPrice, decimals)
+                      ) *
+                      100
+                  ) / 100
+                ),
+              };
+
+              _balances[address] = tokenInfo;
+            }
+          }
+          setMultisigBalance(_balances);
         }
+      } catch (error) {
+        console.error("Fetching multisig", error);
       }
-      setMultisigBalance(_balances);
     }
   };
 
   useEffect(() => {
     fetchTeamData();
     fetchMultiSig();
-  }, [$balances]);
+  }, []);
 
   return _multisigBalance ? (
-    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md">
+    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[1062px]">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
       <div className="p-3 border border-gray-600 rounded-md mt-2">
@@ -200,13 +216,16 @@ function Team() {
               </a>
             ))
           ) : (
-            <p>Loading team..</p>
+            <Loader
+              customHeight={50}
+              customWidth={50}
+            />
           )}
         </div>
       </div>
     </div>
   ) : (
-    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[370px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[1062px] m-auto mt-5 bg-[#3d404b] border-gray-600">
       <Loader
         customHeight={100}
         customWidth={100}

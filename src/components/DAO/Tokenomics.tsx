@@ -4,10 +4,11 @@ import { account, publicClient, assetsPrices } from "@store";
 import { formatUnits, parseUnits } from "viem";
 import { getTokenData } from "@utils";
 import type {
-  TProfitTokenData,
+  TProfitTokenomics,
   TTokenomics,
   TProfitTokenWallet,
   TAddress,
+  TSdivTokenWallet,
 } from "@types";
 import { writeContract } from "@wagmi/core";
 import { SDIV, PROFIT, PM } from "@constants";
@@ -31,8 +32,9 @@ function Tokenomics() {
   const [showMintModal, setShowMintModal] = useState(false);
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [tabStakeModal, setTabStakeModal] = useState("stake");
-  const [profitTokenomics, setProfitTokenomics] = useState<TProfitTokenData>();
+  const [profitTokenomics, setProfitTokenomics] = useState<TProfitTokenomics>();
   const [profitWallet, setProfitWallet] = useState<TProfitTokenWallet>();
+  const [sdivWallet, setSdivtWallet] = useState<TSdivTokenWallet>();
 
   const fetchTokenomicsData = async () => {
     if ($publicClient && $account) {
@@ -55,20 +57,6 @@ function Tokenomics() {
           functionName: "totalSupply",
         });
 
-        const sdivBalance = await $publicClient.readContract({
-          address: SDIV[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
-
-        const sdivEarned = (await $publicClient.readContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "pending",
-          args: [$account],
-        })) as bigint;
-
         const pmMintAllowance = await $publicClient.readContract({
           address: PROFIT[0] as TAddress,
           abi: ERC20MetadataUpgradeableABI,
@@ -80,47 +68,38 @@ function Tokenomics() {
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)
           ).toLocaleString(),
-          sdivBalance:
-            Math.trunc(Number(formatUnits(sdivBalance, 18)) * 100) / 100,
-          sdivEarned:
-            Math.trunc(Number(formatUnits(sdivEarned, 18)) * 100) / 100,
           pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
           pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
           pmMintAllowance: formatUnits(pmMintAllowance, 18),
         };
         setPoolData(_poolData);
+        console.log($assetsPrices?.[PROFIT[0]]);
 
-        const profitTokenomics: TProfitTokenData = {
-          price: Number(
-            Math.trunc(
-              Number(
-                formatUnits(
-                  $assetsPrices?.[PROFIT[0]]?.tokenPrice as bigint,
-                  18
-                )
-              ) * 100
-            ) / 100
-          ).toLocaleString(),
-
-          totalSupply: Number(
-            formatUnits(profitTotalSupply, 18)
-          ).toLocaleString(),
-
-          marketCap: Number(
-            Number(
+        if ($assetsPrices) {
+          const profitTokenomics = {
+            price: (
               Math.trunc(
-                Number(
-                  formatUnits(
-                    $assetsPrices?.[PROFIT[0]]?.tokenPrice as bigint,
-                    18
-                  )
-                ) * 100
+                Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
+                  100
               ) / 100
-            ) * Number(formatUnits(profitTotalSupply, 18))
-          ).toLocaleString(),
-        };
+            ).toLocaleString(),
 
-        setProfitTokenomics(profitTokenomics);
+            totalSupply: Number(
+              formatUnits(profitTotalSupply, 18)
+            ).toLocaleString(),
+
+            marketCap: (
+              (Math.trunc(
+                Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
+                  100
+              ) /
+                100) *
+              Number(formatUnits(profitTotalSupply, 18))
+            ).toLocaleString(),
+          };
+
+          setProfitTokenomics(profitTokenomics);
+        }
       } catch (error) {
         console.error("Error fetching Tokenomics:", error);
       }
@@ -129,7 +108,7 @@ function Tokenomics() {
 
   const aproveStaking = async () => {
     try {
-      const amount = parseUnits(inputStake.toString(), 18);
+      const amount = parseUnits(inputStake, 18);
       const aproveStaking = await writeContract({
         address: PROFIT[0] as TAddress,
         abi: ERC20MetadataUpgradeableABI,
@@ -151,57 +130,102 @@ function Tokenomics() {
 
   const stake = async () => {
     if (Number(inputStake) > 0) {
-      const ammount = parseUnits(inputStake, 18);
-      console.log(inputStake);
+      try {
+        const ammount = parseUnits(inputStake, 18);
+        const stake = await writeContract({
+          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+          abi: DividendMinterABI,
+          functionName: "stake",
+          args: [ammount],
+        });
 
-      console.log(ammount);
-      console.log(profitWallet?.profitBalance);
+        const transaction = await $publicClient?.waitForTransactionReceipt(
+          stake
+        );
 
-      const stake = await writeContract({
-        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-        abi: DividendMinterABI,
-        functionName: "stake",
-        args: [ammount],
-      });
-      const transaction = await $publicClient?.waitForTransactionReceipt(stake);
-
-      if (transaction?.status === "success") {
-        profitStakingAllowance();
-        setInputStake("");
-      } else {
-        console.error("Couldn't get new allowance");
+        if (transaction?.status === "success") {
+          profitStakingAllowance();
+          setInputStake("");
+        } else {
+          console.error("Couldn't get new allowance");
+        }
+      } catch (error) {
+        console.error("Error in stake:", error);
       }
     }
   };
 
   const unStake = async () => {
-    if ($publicClient && inputStake != "") {
-      const ammount = parseUnits(inputStake.toString(), 18);
-      const unStake = await writeContract({
-        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-        abi: DividendMinterABI,
-        functionName: "unstake",
-        args: [ammount],
-      });
-      const transaction = await $publicClient?.waitForTransactionReceipt(
-        unStake
-      );
+    if ($publicClient && Number(inputStake) > 0) {
+      try {
+        const ammount = parseUnits(inputStake, 18);
+        const unStake = await writeContract({
+          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+          abi: DividendMinterABI,
+          functionName: "unstake",
+          args: [ammount],
+        });
+        const transaction = await $publicClient?.waitForTransactionReceipt(
+          unStake
+        );
 
-      if (transaction?.status === "success") {
-        profitStakingAllowance();
-      } else {
-        console.error("Couldn't get new allowance");
+        if (transaction?.status === "success") {
+          profitStakingAllowance();
+        } else {
+          console.error("Couldn't get new allowance");
+        }
+      } catch (error) {
+        console.error("Error in unstake:", error);
       }
     }
   };
 
   const harvest = async () => {
     if ($publicClient) {
-      const harvest = await writeContract({
+      try {
+        const harvest = await writeContract({
+          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+          abi: DividendMinterABI,
+          functionName: "harvest",
+        });
+
+        const transaction = await $publicClient?.waitForTransactionReceipt(
+          harvest
+        );
+
+        if (transaction?.status === "success") {
+          fetchSdivWallet();
+        } else {
+          console.error("Couldn't get new sdiv balance after harvest");
+        }
+      } catch (error) {
+        console.error("Error in harvest:", error);
+      }
+    }
+  };
+
+  const fetchSdivWallet = async () => {
+    if ($publicClient) {
+      const sdivBalance = await $publicClient.readContract({
+        address: SDIV[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      });
+
+      const sdivEarned = (await $publicClient.readContract({
         address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
         abi: DividendMinterABI,
-        functionName: "harvest",
-      });
+        functionName: "pending",
+        args: [$account],
+      })) as bigint;
+
+      const sdivWallet = {
+        sdivBalance:
+          Math.trunc(Number(formatUnits(sdivBalance, 18)) * 100) / 100,
+        sdivEarned: Math.trunc(Number(formatUnits(sdivEarned, 18)) * 100) / 100,
+      };
+      setSdivtWallet(sdivWallet);
     }
   };
 
@@ -213,7 +237,6 @@ function Tokenomics() {
         functionName: "MINTER_ROLE",
       });
     }
-    console.log(harvest);
   };
 
   const profitStakingAllowance = async () => {
@@ -258,6 +281,7 @@ function Tokenomics() {
   useEffect(() => {
     fetchTokenomicsData();
     profitStakingAllowance();
+    fetchSdivWallet();
   }, [$assetsPrices]);
 
   return profitTokenomics ? (
@@ -427,11 +451,11 @@ function Tokenomics() {
                   </tr>
                   <tr>
                     <td>Wallet: </td>
-                    <td>{poolData.sdivBalance} SDIV</td>
+                    <td>{sdivWallet?.sdivBalance} SDIV</td>
                   </tr>
                   <tr>
                     <td>Earned: </td>
-                    <td>{poolData.sdivEarned} SDIV</td>
+                    <td>{sdivWallet?.sdivEarned} SDIV</td>
                   </tr>
                 </tbody>
               </table>

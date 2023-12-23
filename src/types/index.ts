@@ -169,16 +169,15 @@ type TDAOData = {
   platformGovernance: string;
   multisigAddress: string;
   numberOfTotalVaults: string;
-  totalTvl: string;
+  totalTvl: number;
   strategieNames: string[];
   platformFee: string;
   vaultManagerFee: string;
   typesOfVaults: string;
   strategyLogicFee: string;
   ecosystemFee: string;
-  treasuryBalance: number;
   network: string;
-  farmsLength: string;
+  farmsLength: number;
 };
 
 type TPendingPlatformUpgrade = {
@@ -196,12 +195,6 @@ type TGitHubUser = {
   followers: number;
 };
 
-type TProfitTokenData = {
-  price: string;
-  totalSupply: string;
-  marketCap: string;
-};
-
 type TMultiTokenData = {
   balance: number;
   priceBalance: number;
@@ -210,17 +203,26 @@ type TMultiTokenData = {
 type TMultisigBalance = Record<string, TMultiTokenData>;
 
 type TTokenomics = {
-  sdivBalance: string;
-  sdivEarned: string;
   pmToMint: string;
   pmTotalSupply: string;
   pmMintAllowance: string;
   sdivTotalSupply: string;
 };
 
+type TProfitTokenomics = {
+  price: string;
+  totalSupply: string;
+  marketCap: string;
+};
+
 type TProfitTokenWallet = {
   profitBalance: number;
   profitStaked: number;
+};
+
+type TSdivTokenWallet = {
+  sdivBalance: number;
+  sdivEarned: number;
 };
 
 export type {
@@ -251,9 +253,10 @@ export type {
   TVaultBalance,
   TDAOData,
   TGitHubUser,
-  TProfitTokenData,
+  TProfitTokenomics,
   TMultisigBalance,
   TMultiTokenData,
   TTokenomics,
   TProfitTokenWallet,
+  TSdivTokenWallet,
 };
