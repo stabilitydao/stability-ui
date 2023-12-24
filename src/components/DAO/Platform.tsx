@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { publicClient, balances } from "@store";
+import { publicClient } from "@store";
 import { PlatformABI, FactoryABI, platform, IVaultManagerABI } from "@web3";
-import type { TDAOData, TAddress } from "@types";
+import type { TDAOData } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
@@ -72,6 +72,7 @@ function Platform() {
           functionName: "getBalance",
           args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
         });
+
         const contractVaults: any = await $publicClient.readContract({
           address: contractBalance[6][1],
           abi: IVaultManagerABI,
@@ -89,7 +90,7 @@ function Platform() {
           (fee / 1000n).toString()
         );
 
-        const daoData: TDAOData = {
+        const daoData = {
           platformVersion: platformVersion,
           pendingPlatformUpgrade: pendingPlatformUpgrade,
           platformGovernance: contractData[0][5],
@@ -127,7 +128,7 @@ function Platform() {
       </div>
 
       {daoData ? (
-        <div className="w-full p-3 bg-button shadow-lg rounded-md mt-2">
+        <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
             <div className="grid h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
               <div className="m-auto">
@@ -158,11 +159,13 @@ function Platform() {
               </div>
             </div>
 
-            <div className="p-5 bg-[#3d404b] rounded-md shadow-sm">
-              <table className="w-full h-full text-[#8D8E96]">
+            <div className="p-3 bg-[#3d404b] rounded-md shadow-sm">
+              <table className="w-full h-full text-[#8D8E96] font-medium">
                 <thead>
                   <tr>
-                    <th className="text-left text-2xl pb-2">Fees:</th>
+                    <th className="text-left text-2xl font-medium pb-2">
+                      Fees:
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="text-md">
@@ -200,16 +203,16 @@ function Platform() {
 
             <div className="p-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
               <div className="w-full h-full grid m-auto">
-                <h2 className="text-xl font-medium text-left text-[#8D8E96]">
+                <h2 className="text-2xl pb-2 font-medium text-left text-[#8D8E96]">
                   Strategies:
                 </h2>
                 {daoData?.strategieNames.map(
                   (strategyName: string, index: number) => (
                     <div
                       key={index}
-                      className="gap-3 py-3">
+                      className="py-3 font-medium">
                       <h3
-                        className="rounded-md m-0 py-2 px-1"
+                        className="rounded-md m-0 py-2 ps-2 px-1"
                         style={{
                           color: getFarmColor(strategyName)?.color,
                           backgroundColor: getFarmColor(strategyName)?.bgColor,
@@ -221,11 +224,15 @@ function Platform() {
                 )}
                 <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
                   <div className="m-auto">
-                    <h2 className="font-bold">Vault Types</h2>
+                    <h2 className="font-bold text-lg">Vault Types</h2>
                     {Array.isArray(daoData?.typesOfVaults) &&
                       daoData.typesOfVaults.map(
                         (vaultType: string, index: number) => (
-                          <h2 key={index}>{vaultType}</h2>
+                          <h2
+                            className="font-medium"
+                            key={index}>
+                            {vaultType}
+                          </h2>
                         )
                       )}
                   </div>
@@ -273,7 +280,7 @@ function Platform() {
             )}
         </div>
       ) : (
-        <div className="flex justify-center min-h-[302px] p-3 bg-button shadow-lg rounded-md mt-2">
+        <div className="flex justify-center min-h-[315px] p-3 bg-button shadow-lg rounded-md mt-2">
           <Loader
             customHeight={100}
             customWidth={100}

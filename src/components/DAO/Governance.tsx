@@ -8,7 +8,7 @@ import { ERC20ABI } from "@web3";
 import { formatUnits } from "viem";
 import type { TAddress } from "@types";
 
-function Governance(props: any) {
+function Governance() {
   const [treasuryBalance, setTreasuryBalance] = useState<number>();
   const $publicClient = useStore(publicClient);
 
@@ -23,8 +23,6 @@ function Governance(props: any) {
       setTreasuryBalance(
         Math.trunc(Number(formatUnits(_treasuryBalance, 18)) * 100) / 100
       );
-
-      console.log(treasuryBalance);
     }
   };
 
@@ -33,14 +31,14 @@ function Governance(props: any) {
   }, []);
 
   return treasuryBalance ? (
-    <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
+    <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600 relative">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
         Governance
       </h1>
 
-      <div className="rounded-md bg-[#3d404b] mt-2 grid md:grid-cols-2 p-3 gap-3 border border-gray-600">
+      <div className="rounded-md bg-[#3d404b] mt-2 grid md:grid-cols-2 p-2 gap-3 border border-gray-600">
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
-          <table className="text-sm text-[#8D8E96]">
+          <table className="text-sm font-medium text-[#8D8E96]">
             <thead>
               <tr>
                 <td className="w-[100px]">
@@ -64,7 +62,7 @@ function Governance(props: any) {
         </div>
 
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
-          <table className="text-sm text-[#8D8E96]">
+          <table className="text-sm font-medium text-[#8D8E96]">
             <thead>
               <tr>
                 <td>
@@ -85,7 +83,8 @@ function Governance(props: any) {
             <a
               className="rounded-sm p-2 ms-auto bg-button"
               href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226"
-              title="Tally governance app">
+              title="Tally governance app"
+              target="blank">
               {" "}
               Tally governance app
             </a>

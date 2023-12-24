@@ -5,7 +5,7 @@ import Platform from "./Platform";
 
 function DAO() {
   return (
-    <main className="overflow-hidden">
+    <main className="p-0 m-auto">
       <Platform />
       <Tokenomics />
       <Governance />

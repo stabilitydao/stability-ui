@@ -43,7 +43,8 @@ function ShortAddress(props: any) {
       <a
         target="_blank"
         href={`https://polygonscan.com/address/${props.address}`}
-        title="Go to polygonscan">
+        title="Go to polygonscan"
+        className="my-auto">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-[18px] icon icon-tabler icon-tabler-external-link my-auto"

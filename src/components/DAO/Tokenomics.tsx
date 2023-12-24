@@ -28,7 +28,7 @@ function Tokenomics() {
   const $publicClient = useStore(publicClient);
   const [poolData, setPoolData] = useState<TTokenomics | any>("");
   const [inputStake, setInputStake] = useState("");
-  const [stakingAllowance, setProfitStakingAllowance] = useState("");
+  const [_profitAllowance, setProfitAllowance] = useState("");
   const [showMintModal, setShowMintModal] = useState(false);
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [tabStakeModal, setTabStakeModal] = useState("stake");
@@ -73,7 +73,6 @@ function Tokenomics() {
           pmMintAllowance: formatUnits(pmMintAllowance, 18),
         };
         setPoolData(_poolData);
-        console.log($assetsPrices?.[PROFIT[0]]);
 
         if ($assetsPrices) {
           const profitTokenomics = {
@@ -109,6 +108,7 @@ function Tokenomics() {
   const aproveStaking = async () => {
     try {
       const amount = parseUnits(inputStake, 18);
+
       const aproveStaking = await writeContract({
         address: PROFIT[0] as TAddress,
         abi: ERC20MetadataUpgradeableABI,
@@ -121,7 +121,7 @@ function Tokenomics() {
       );
 
       if (transaction?.status === "success") {
-        profitStakingAllowance();
+        profitAllowance();
       }
     } catch (error) {
       console.error("Error in aproveStaking:", error);
@@ -131,12 +131,12 @@ function Tokenomics() {
   const stake = async () => {
     if (Number(inputStake) > 0) {
       try {
-        const ammount = parseUnits(inputStake, 18);
+        const amount = parseUnits(inputStake, 18);
         const stake = await writeContract({
           address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
           abi: DividendMinterABI,
           functionName: "stake",
-          args: [ammount],
+          args: [amount],
         });
 
         const transaction = await $publicClient?.waitForTransactionReceipt(
@@ -144,7 +144,7 @@ function Tokenomics() {
         );
 
         if (transaction?.status === "success") {
-          profitStakingAllowance();
+          profitAllowance();
           setInputStake("");
         } else {
           console.error("Couldn't get new allowance");
@@ -158,19 +158,20 @@ function Tokenomics() {
   const unStake = async () => {
     if ($publicClient && Number(inputStake) > 0) {
       try {
-        const ammount = parseUnits(inputStake, 18);
+        const amount = parseUnits(inputStake, 18);
         const unStake = await writeContract({
           address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
           abi: DividendMinterABI,
           functionName: "unstake",
-          args: [ammount],
+          args: [amount],
         });
         const transaction = await $publicClient?.waitForTransactionReceipt(
           unStake
         );
 
         if (transaction?.status === "success") {
-          profitStakingAllowance();
+          profitAllowance();
+          setInputStake("");
         } else {
           console.error("Couldn't get new allowance");
         }
@@ -239,8 +240,8 @@ function Tokenomics() {
     }
   };
 
-  const profitStakingAllowance = async () => {
-    const profitStakingAllowance = await $publicClient?.readContract({
+  const profitAllowance = async () => {
+    const profitAllowance = await $publicClient?.readContract({
       address: PROFIT[0] as TAddress,
       abi: ERC20MetadataUpgradeableABI,
       functionName: "allowance",
@@ -273,14 +274,12 @@ function Tokenomics() {
     };
 
     setProfitWallet(profitWallet);
-    setProfitStakingAllowance(
-      formatUnits(profitStakingAllowance as bigint, 18)
-    );
+    setProfitAllowance(formatUnits(profitAllowance as bigint, 18));
   };
 
   useEffect(() => {
     fetchTokenomicsData();
-    profitStakingAllowance();
+    profitAllowance();
     fetchSdivWallet();
   }, [$assetsPrices]);
 
@@ -291,9 +290,9 @@ function Tokenomics() {
       </h1>
 
       <div className="mt-2  border border-gray-600 rounded-md w-full">
-        <div className="p-3 grid lg:flex gap-2">
+        <div className="p-2 grid lg:flex gap-2">
           <div className="bg-[#2c2f38] rounded-md p-3 relative lg:w-1/3 shadow-sm border border-gray-700">
-            <table className="text-sm h-[215px] text-[#8D8E96]">
+            <table className="text-sm font-medium h-[215px] text-[#8D8E96]">
               <tbody>
                 <tr>
                   <td className="min-w-[95px]">Name: </td>
@@ -344,7 +343,7 @@ function Tokenomics() {
             </table>
 
             <img
-              className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
+              className="rounded-full absolute right-3 top-3 w-1/6 md:w-1/5 lg:w-1/5"
               src={getTokenData(PROFIT[0])?.logoURI}
               alt={getTokenData(PROFIT[0])?.logoURI}
               title={getTokenData(PROFIT[0])?.symbol}
@@ -357,7 +356,7 @@ function Tokenomics() {
                   setInputStake("");
                   setTabStakeModal("stake");
                 }}
-                className="bg-button me-3 rounded-sm p-2 text-[#8D8E96]">
+                className="bg-button me-3 rounded-sm p-2 font-medium text-[#8D8E96]">
                 Stake | Unstake
               </button>
 
@@ -429,7 +428,7 @@ function Tokenomics() {
 
           <div className="grid md:grid-cols-2 lg:w-2/3 gap-2 w-full">
             <div className="w-full h-full bg-[#2c2f38] rounded-md p-3 relative shadow-sm border border-gray-700">
-              <table className="text-sm h-[215px] text-[#8D8E96]">
+              <table className="text-sm font-medium h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
                     <td className="min-w-[95px]">Name: </td>
@@ -473,14 +472,14 @@ function Tokenomics() {
                   onClick={() => {
                     harvest();
                   }}
-                  className="bg-button rounded-sm p-2 text-[#8D8E96]">
+                  className="bg-button rounded-sm p-2 font-medium text-[#8D8E96]">
                   Claim
                 </button>
               </div>
             </div>
 
             <div className="bg-[#2c2f38] rounded-md p-3 relative shadow-sm border border-gray-700">
-              <table className="text-sm h-[215px] text-[#8D8E96]">
+              <table className="text-sm font-medium h-[215px] text-[#8D8E96]">
                 <tbody>
                   <tr>
                     <td className="min-w-[95px]">Name: </td>
@@ -517,7 +516,7 @@ function Tokenomics() {
                     setShowMintModal(true);
                     setInputStake("");
                   }}
-                  className="bg-button rounded-sm p-2 text-[#8D8E96]">
+                  className="bg-button rounded-sm p-2 font-medium text-[#8D8E96]">
                   Mint
                 </button>
 
@@ -525,6 +524,7 @@ function Tokenomics() {
                   <a
                     className="rounded-sm text-start p-2 text-sm my-auto flex bg-button "
                     href="https://opensea.io/collection/profit-maker"
+                    target="blank"
                     title="Marketplace">
                     Marketplace
                   </a>
@@ -618,7 +618,7 @@ function Tokenomics() {
 
             {tabStakeModal === "stake" &&
             Number(inputStake) > 0 &&
-            Number(inputStake) <= Number(stakingAllowance) &&
+            Number(inputStake) <= Number(_profitAllowance) &&
             Number(inputStake) <= Number(profitWallet?.profitBalance) ? (
               <div className="flex w-full">
                 <button
@@ -631,7 +631,7 @@ function Tokenomics() {
                 </button>
               </div>
             ) : tabStakeModal === "stake" &&
-              inputStake > stakingAllowance &&
+              Number(inputStake) > Number(_profitAllowance) &&
               Number(inputStake) <= Number(profitWallet?.profitBalance) ? (
               <button
                 onClick={e => {
@@ -743,7 +743,7 @@ function Tokenomics() {
       )}
     </div>
   ) : (
-    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[376px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[368px] m-auto mt-5 bg-[#3d404b] border-gray-600">
       <Loader
         customHeight={100}
         customWidth={100}

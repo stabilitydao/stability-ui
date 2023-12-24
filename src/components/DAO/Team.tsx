@@ -18,7 +18,6 @@ import { Loader } from "../Loader/index";
 function Team() {
   const $publicClient = useStore(publicClient);
   const $assetsPrices = useStore(assetsPrices);
-  const $balances = useStore(balances);
 
   const [members, setMembers] = useState<TGitHubUser[]>();
   const [_multisigBalance, setMultisigBalance] = useState<TMultisigBalance>();
@@ -78,14 +77,13 @@ function Team() {
         });
         if (contractBalance) {
           for (const address of contractBalance[0]) {
-            console.log("asd");
-
             const balance = await $publicClient.readContract({
               address: address as TAddress,
               abi: ERC20ABI,
               functionName: "balanceOf",
               args: [MULTISIG[0] as TAddress],
             });
+
             const decimals = getTokenData(address)?.decimals;
 
             if (decimals && balance >= 0n) {
@@ -120,12 +118,12 @@ function Team() {
     fetchMultiSig();
   }, []);
 
-  return _multisigBalance ? (
-    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[1062px]">
+  return $assetsPrices ? (
+    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
-      <div className="p-3 border border-gray-600 rounded-md mt-2">
-        <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
+      <div className="p-2 border border-gray-600 rounded-md mt-2">
+        <div className="p-3 bg-[#2c2f38] rounded-md text-sm font-medium border border-gray-700">
           <table className="text-[#8D8E96]">
             <thead>
               <tr>
@@ -146,16 +144,16 @@ function Team() {
               </tr>
             </tbody>
           </table>
-          <div className="flex flex-wrap justify-evenly w-full gap-3 mt-4 mb-2">
+          <div className="flex flex-wrap justify-evenly w-full gap-2 mt-4 mb-2 ">
             {_multisigBalance &&
               $assetsPrices &&
               Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
                 <div
-                  className="bg-button p-3 rounded-md w-[110px] m-auto"
+                  className="bg-button p-3 rounded-md w-[115px] m-auto overflow-hidden"
                   key={address}>
                   <div className="grid justify-center">
                     <img
-                      className="w-[28px] rounded-full m-auto mb-2"
+                      className="w-[38px] rounded-full m-auto mb-2"
                       alt={getTokenData(address)?.symbol}
                       src={getTokenData(address)?.logoURI}
                     />
@@ -173,8 +171,8 @@ function Team() {
         </div>
       </div>
 
-      <div className="p-3">
-        <div className="flex flex-wrap m-auto justify-evenly w-full gap-3 my-5 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-8">
+      <div className="p-2">
+        <div className="flex flex-wrap m-auto justify-evenly w-full gap-1 my-5 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-8">
           {members ? (
             members.map(member => (
               <a
@@ -187,11 +185,11 @@ function Team() {
                   src={member.avatar_url}
                   alt={`Avatar de ${member.name}`}
                 />
-                <p className="font-semibold text-center mt-1 text-gray-200 w-[110px]">
+                <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]">
                   {member.name}
                 </p>
                 {member.location !== null ? (
-                  <p className="flex sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[110px]">
+                  <p className="flex  sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
                     <svg
                       className="pe-1 my-auto"
                       stroke="currentColor"
@@ -210,7 +208,7 @@ function Team() {
                 ) : (
                   ""
                 )}
-                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[110px]">
+                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
                   {member.bio}
                 </p>
               </a>
