@@ -17,6 +17,7 @@ import {
   isVaultsLoaded,
   connected,
   apiData,
+  // grtVaults,
 } from "@store";
 
 import {
@@ -41,6 +42,7 @@ const Vaults = () => {
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $connected = useStore(connected);
   const $apiData = useStore(apiData);
+  // const $grtVaults = useStore(grtVaults);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
@@ -176,6 +178,7 @@ const Vaults = () => {
             abi: StrategyABI,
             functionName: "getAssetsProportions",
           });
+
           const assetsProportions = getAssetsProportions
             ? getAssetsProportions.map((proportion) =>
                 Math.round(Number(formatUnits(proportion, 16)))
@@ -196,7 +199,6 @@ const Vaults = () => {
           ).toFixed(2);
 
           const APY = calculateAPY(APR).toFixed(2);
-
           return {
             name: $vaults[1][index],
             assets,

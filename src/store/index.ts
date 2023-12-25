@@ -1,4 +1,4 @@
-import { atom } from "nanostores";
+import { atom, deepMap } from "nanostores";
 import type { PublicClient } from "wagmi";
 import type {
   TPlatformData,
@@ -11,6 +11,7 @@ import type {
   TAddress,
 } from "@types";
 
+// atoms
 const account = atom<string | undefined>();
 const network = atom<string | undefined>();
 const publicClient = atom<PublicClient | undefined>();
@@ -33,6 +34,10 @@ const tokens = atom<TAddress[] | undefined>();
 const connected = atom<boolean | undefined>();
 
 const apiData = atom<any>();
+
+// deepMaps
+
+const grtVaults = deepMap<any>();
 
 //Assets balances
 const addAssetBalance = (r: any[]) => {
@@ -93,4 +98,5 @@ export {
   tokens,
   connected,
   apiData,
+  grtVaults,
 };

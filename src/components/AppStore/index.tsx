@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect } from "react";
-// import { parseUnits } from "viem";
+import { formatUnits } from "viem";
 import axios from "axios";
 
 import { useStore } from "@nanostores/react";
@@ -28,6 +28,7 @@ import {
   connected,
   apiData,
   lastTx,
+  grtVaults,
 } from "@store";
 import {
   platform,
@@ -36,7 +37,14 @@ import {
   ERC20MetadataUpgradeableABI,
 } from "@web3";
 
-import { addAssetsPrice } from "@utils";
+import {
+  addAssetsPrice,
+  formatFromBigInt,
+  calculateAPY,
+  getStrategyInfo,
+} from "@utils";
+
+import { GRAPH_ENDPOINT, GRAPH_VAULTS, STABILITY_API } from "@constants";
 
 import type { TAddress } from "@types";
 
@@ -45,6 +53,8 @@ const AppStore = (props: React.PropsWithChildren) => {
   const { chain } = useNetwork();
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
+
+  let stabilityAPIData: any;
   const getData = async () => {
     if (address && chain?.id) {
       const contractData = await readContract(_publicClient, {
@@ -90,7 +100,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         addVaultData(contractBalance);
         addAssetsPrice(contractBalance);
         addAssetBalance(contractBalance);
-
         //
 
         for (let i = 0; i < contractBalance[1].length; i++) {
@@ -165,6 +174,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
         }
       });
+
       isVaultsLoaded.set(true);
       if (contractBalance) {
         balances.set(contractBalance);
@@ -176,11 +186,103 @@ const AppStore = (props: React.PropsWithChildren) => {
         vaultAssets.set(vaultInfoes);
       }
     }
+    //else
+
+    const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+      query: GRAPH_VAULTS,
+    });
+
+    // assets
+    //let assets;
+    // if ($vaultAssets.length) {
+    //   const token1 = getTokenData($vaultAssets[index][1][0]);
+    //   const token2 = getTokenData($vaultAssets[index][1][1]);
+
+    //   if (token1 && token2) {
+    //     const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+    //       tokenAsset.addresses.includes(token1.address)
+    //     );
+    //     const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+    //       tokenAsset.addresses.includes(token2.address)
+    //     );
+
+    //     assets = [
+    //       {
+    //         logo: token1?.logoURI,
+    //         symbol: token1?.symbol,
+    //         name: token1?.name,
+    //         color: token1Extended?.color,
+    //       },
+    //       {
+    //         logo: token2?.logoURI,
+    //         symbol: token2?.symbol,
+    //         name: token2?.name,
+    //         color: token2Extended?.color,
+    //       },
+    //     ];
+    //   }
+    // }
+    //
+
+    const graphVaults = graphResponse.data.data.vaultEntities.reduce(
+      (vaults: any, vault: any) => {
+        //APY
+        const data =
+          stabilityAPIData?.underlyings?.["137"]?.[
+            vault.underlying.toLowerCase()
+          ];
+
+        let monthlyApr = 0;
+        if (data) {
+          monthlyApr = data.apr.daily.feeApr;
+        }
+        /////
+        const APR = (
+          formatFromBigInt(String(vault.apr), 3, "withDecimals") +
+          Number(monthlyApr) * 100
+        ).toFixed(2);
+
+        const APY = calculateAPY(APR).toFixed(2);
+        //
+
+        //AssetsProportions
+        const assetsProportions = vault.assetsProportions
+          ? vault.assetsProportions.map((proportion: any) =>
+              Math.round(Number(formatUnits(proportion, 16)))
+            )
+          : [];
+
+        vaults[vault.id] = {
+          address: vault.id,
+          name: vault.name,
+          apr: vault.apr,
+          apy: APY,
+          //todo assets
+          assetsProportions,
+          //todo balance
+          monthlyUnderlyingApr: monthlyApr,
+          shareprice: vault.sharePrice,
+          strategy: vault.strategyId,
+          strategyApr: vault.apr,
+          strategyInfo: getStrategyInfo(vault.symbol),
+          //todo strategySpecific
+          symbol: vault.symbol,
+          tvl: vault.tvl,
+          type: vault.vaultType,
+        };
+        return vaults;
+      },
+      {}
+    );
+
+    grtVaults.set(graphVaults);
+    console.log("graph", graphVaults);
   };
   const getDataFromStabilityAPI = async () => {
     try {
-      const response = await axios.get("https://api.stabilitydao.org/");
-      apiData.set(response.data);
+      const response = await axios.get(STABILITY_API);
+      stabilityAPIData = response.data;
+      apiData.set(stabilityAPIData);
     } catch (error) {
       console.log("API ERROR:", error);
     }
