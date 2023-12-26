@@ -190,23 +190,23 @@ function Team() {
       </div>
 
       <div className="p-2">
-        <div className="flex flex-wrap m-auto justify-evenly w-full gap-1 my-5 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-8">
+        <div className="flex flex-wrap m-auto justify-evenly w-full gap-4 my-7 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-5">
           {members.map(member => (
             <a
               href={member.html_url}
               key={member.name}
-              className="text-sm p-2 h-auto  hover:bg-button rounded-md"
+              className="text-sm p-3 md:w-[155px] hover:bg-button rounded-md"
               target="_blank">
               <img
                 className="rounded-full m-auto w-[75px]"
                 src={member.avatar_url}
                 alt={`Avatar de ${member.name}`}
               />
-              <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]">
+              <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]  md:w-full">
                 {member.name}
               </p>
               {member.location !== null ? (
-                <p className="flex  sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
+                <p className="flex md:w-full sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
                   <svg
                     className="pe-1 my-auto"
                     stroke="currentColor"
@@ -225,7 +225,7 @@ function Team() {
               ) : (
                 ""
               )}
-              <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
+              <p className="font-thin  md:w-full text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
                 {member.bio}
               </p>
             </a>

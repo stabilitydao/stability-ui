@@ -130,59 +130,53 @@ function Tokenomics() {
   };
 
   const stake = async () => {
-    if (Number(input) > 0) {
-      try {
-        const amount = parseUnits(input, 18);
-        const stake = await writeContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "stake",
-          args: [amount],
-        });
+    try {
+      const amount = parseUnits(input, 18);
+      const stake = await writeContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
+        abi: DividendMinterABI,
+        functionName: "stake",
+        args: [amount],
+      });
 
-        const transaction = await $publicClient?.waitForTransactionReceipt(
-          stake
-        );
+      const transaction = await $publicClient?.waitForTransactionReceipt(stake);
 
-        if (transaction?.status === "success") {
-          setInput("");
-          profitStakingAllowance();
-          profitBalance();
-          sdivBalance();
-        } else {
-          console.error("Couldn't get new allowance");
-        }
-      } catch (error) {
-        console.error("Error in stake:", error);
+      if (transaction?.status === "success") {
+        setInput("");
+        profitStakingAllowance();
+        profitBalance();
+        sdivBalance();
+      } else {
+        console.error("Couldn't get new allowance");
       }
+    } catch (error) {
+      console.error("Error in stake:", error);
     }
   };
 
   const unStake = async () => {
-    if ($publicClient && Number(input) > 0) {
-      try {
-        const amount = parseUnits(input, 18);
-        const unStake = await writeContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "unstake",
-          args: [amount],
-        });
-        const transaction = await $publicClient?.waitForTransactionReceipt(
-          unStake
-        );
+    try {
+      const amount = parseUnits(input, 18);
+      const unStake = await writeContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+        abi: DividendMinterABI,
+        functionName: "unstake",
+        args: [amount],
+      });
+      const transaction = await $publicClient?.waitForTransactionReceipt(
+        unStake
+      );
 
-        if (transaction?.status === "success") {
-          setInput("");
-          profitStakingAllowance();
-          profitBalance();
-          sdivBalance();
-        } else {
-          console.error("Couldn't get new allowance");
-        }
-      } catch (error) {
-        console.error("Error in unstake:", error);
+      if (transaction?.status === "success") {
+        setInput("");
+        profitStakingAllowance();
+        profitBalance();
+        sdivBalance();
+      } else {
+        console.error("Couldn't get new allowance");
       }
+    } catch (error) {
+      console.error("Error in unstake:", error);
     }
   };
 
@@ -275,7 +269,7 @@ function Tokenomics() {
       address: PROFIT[0] as TAddress,
       abi: ERC20ABI,
       functionName: "balanceOf",
-      args: [$account as TAddress],
+      args: [$account],
     });
 
     const profitStaked = (await $publicClient?.readContract({
@@ -679,8 +673,9 @@ function Tokenomics() {
                   <div className="flex w-full m-auto">
                     <button
                       onClick={e => {
-                        e.stopPropagation();
                         stake();
+
+                        e.stopPropagation();
                       }}
                       className="bg-button w-full m-auto rounded-sm p-2 text-[#8D8E96]">
                       Stake
