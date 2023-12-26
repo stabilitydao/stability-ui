@@ -93,7 +93,7 @@ function Governance() {
       </div>
     </div>
   ) : (
-    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[217px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+    <div className="flex p-3 shadow-lg rounded-md justify-center md:h-[210px] m-auto mt-5 bg-[#3d404b] border-gray-600">
       <Loader
         customHeight={100}
         customWidth={100}

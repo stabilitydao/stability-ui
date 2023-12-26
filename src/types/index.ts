@@ -203,16 +203,13 @@ type TMultiTokenData = {
 type TMultisigBalance = Record<string, TMultiTokenData>;
 
 type TTokenomics = {
+  profitPrice: number;
+  profitTotalSupply: number;
+  profitMarketCap: number;
   pmToMint: string;
   pmTotalSupply: string;
   pmMintAllowance: string;
   sdivTotalSupply: string;
-};
-
-type TProfitTokenomics = {
-  price: string;
-  totalSupply: string;
-  marketCap: string;
 };
 
 type TProfitTokenWallet = {
@@ -253,7 +250,6 @@ export type {
   TVaultBalance,
   TDAOData,
   TGitHubUser,
-  TProfitTokenomics,
   TMultisigBalance,
   TMultiTokenData,
   TTokenomics,

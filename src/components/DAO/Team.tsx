@@ -24,18 +24,30 @@ function Team() {
 
   const fetchTeamData = async () => {
     try {
+      const cachedData = localStorage.getItem("teamDataCache");
+
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+
+        const expirationTime = 12 * 60 * 60 * 1000;
+        if (new Date().getTime() - parsedData.timestamp < expirationTime) {
+          setMembers(parsedData.data);
+          return;
+        }
+      }
+
       const response = await axios.get(
         "https://api.github.com/orgs/stabilitydao/public_members"
       );
 
       const members = response.data;
-      const membersAdditionalInfo: TGitHubUser[] = await Promise.all(
+      const membersAdditionalInfo = await Promise.all(
         members.map(async (member: any) => {
           try {
             const memberInfoResponse = await axios.get(
               `https://api.github.com/users/${member.login}`
             );
-            const updatedMember: TGitHubUser = {
+            const updatedMember = {
               bio: memberInfoResponse.data.bio,
               location: memberInfoResponse.data.location,
               name: memberInfoResponse.data.name,
@@ -57,6 +69,12 @@ function Team() {
       const sortedMembers = membersAdditionalInfo.sort(
         (a, b) => b.followers - a.followers
       );
+
+      const cacheData = {
+        data: sortedMembers,
+        timestamp: new Date().getTime(),
+      };
+      localStorage.setItem("teamDataCache", JSON.stringify(cacheData));
 
       setMembers(sortedMembers);
     } catch (error) {
@@ -118,7 +136,7 @@ function Team() {
     fetchMultiSig();
   }, []);
 
-  return $assetsPrices ? (
+  return members ? (
     <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
@@ -173,52 +191,45 @@ function Team() {
 
       <div className="p-2">
         <div className="flex flex-wrap m-auto justify-evenly w-full gap-1 my-5 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-8">
-          {members ? (
-            members.map(member => (
-              <a
-                href={member.html_url}
-                key={member.name}
-                className="text-sm p-2 h-auto  hover:bg-button rounded-md"
-                target="_blank">
-                <img
-                  className="rounded-full m-auto w-[75px]"
-                  src={member.avatar_url}
-                  alt={`Avatar de ${member.name}`}
-                />
-                <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]">
-                  {member.name}
+          {members.map(member => (
+            <a
+              href={member.html_url}
+              key={member.name}
+              className="text-sm p-2 h-auto  hover:bg-button rounded-md"
+              target="_blank">
+              <img
+                className="rounded-full m-auto w-[75px]"
+                src={member.avatar_url}
+                alt={`Avatar de ${member.name}`}
+              />
+              <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]">
+                {member.name}
+              </p>
+              {member.location !== null ? (
+                <p className="flex  sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
+                  <svg
+                    className="pe-1 my-auto"
+                    stroke="currentColor"
+                    fill="currentColor"
+                    strokeWidth="0"
+                    viewBox="0 0 12 16"
+                    height="1em"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      fillRule="evenodd"
+                      d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
+                  </svg>
+                  {member.location}
                 </p>
-                {member.location !== null ? (
-                  <p className="flex  sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
-                    <svg
-                      className="pe-1 my-auto"
-                      stroke="currentColor"
-                      fill="currentColor"
-                      strokeWidth="0"
-                      viewBox="0 0 12 16"
-                      height="1em"
-                      width="1em"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        fillRule="evenodd"
-                        d="M6 0C2.69 0 0 2.5 0 5.5 0 10.02 6 16 6 16s6-5.98 6-10.5C12 2.5 9.31 0 6 0zm0 14.55C4.14 12.52 1 8.44 1 5.5 1 3.02 3.25 1 6 1c1.34 0 2.61.48 3.56 1.36.92.86 1.44 1.97 1.44 3.14 0 2.94-3.14 7.02-5 9.05zM8 5.5c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"></path>
-                    </svg>
-                    {member.location}
-                  </p>
-                ) : (
-                  ""
-                )}
-                <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
-                  {member.bio}
-                </p>
-              </a>
-            ))
-          ) : (
-            <Loader
-              customHeight={50}
-              customWidth={50}
-            />
-          )}
+              ) : (
+                ""
+              )}
+              <p className="font-thin text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
+                {member.bio}
+              </p>
+            </a>
+          ))}
         </div>
       </div>
     </div>

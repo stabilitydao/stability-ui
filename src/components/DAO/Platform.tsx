@@ -130,28 +130,28 @@ function Platform() {
       {daoData ? (
         <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
-            <div className="grid h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
-              <div className="m-auto">
-                <h2 className="text-3xl">{daoData?.network}</h2>
-                <h2 className="text-md">Network</h2>
+            <div className="grid gap-3 h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
+              <div className="my-auto">
+                <h2 className="text-4xl">{daoData?.network}</h2>
+                <h2 className="text-lg">Network</h2>
               </div>
 
-              <div className="mt-5 mb-2">
-                <h2 className="text-4xl font-semibold">
-                  $ {daoData?.totalTvl}
+              <div className="my-auto rounded-md border-gray-800 font-semibold">
+                <h2 className="text-4xl">
+                  {"$ "} {daoData?.totalTvl}
                 </h2>
                 <h2 className="text-lg">TVL</h2>
               </div>
 
-              <div className="flex w-full m-auto align-middle border border-t-1 border-x-0 border-b-0 border-gray-800 shadow-sm">
+              <div className="flex w-full border border-t-1 border-x-0 border-b-0 border-gray-800 shadow-sm">
                 <div className="m-auto">
-                  <h2 className="text-2xl font-semibold">
+                  <h2 className="text-3xl font-semibold">
                     {daoData?.numberOfTotalVaults}
                   </h2>
                   <h2>Vaults</h2>
                 </div>
                 <div className="m-auto">
-                  <h2 className="text-2xl font-semibold">
+                  <h2 className="text-3xl font-semibold">
                     {daoData?.farmsLength}
                   </h2>
                   <h2>Farms</h2>
@@ -280,7 +280,7 @@ function Platform() {
             )}
         </div>
       ) : (
-        <div className="flex justify-center min-h-[315px] p-3 bg-button shadow-lg rounded-md mt-2">
+        <div className="flex justify-center md:h-[314px] h-[732px] p-3 bg-button shadow-lg rounded-md mt-2">
           <Loader
             customHeight={100}
             customWidth={100}
