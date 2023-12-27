@@ -5,17 +5,9 @@ import { useStore } from "@nanostores/react";
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
-import { Wallet, VaultType, AssetsProportion } from "@components";
+import { VaultType, AssetsProportion } from "@components";
 
-import {
-  vaultData,
-  vaults,
-  vaultAssets,
-  isVaultsLoaded,
-  connected,
-  apiData,
-  // grtVaults,
-} from "@store";
+import { vaults, isVaultsLoaded } from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -24,11 +16,7 @@ import type { TLocalVault } from "@types";
 
 const Vaults = () => {
   const $vaults = useStore(vaults);
-  const $vaultData = useStore(vaultData);
-  const $vaultAssets: any = useStore(vaultAssets);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
-  const $connected = useStore(connected);
-  // const $grtVaults = useStore(grtVaults);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TLocalVault[]>([]);
@@ -115,7 +103,7 @@ const Vaults = () => {
 
   useEffect(() => {
     initVaults();
-  }, [$vaults, $vaultData, $vaultAssets]);
+  }, [$vaults]);
 
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <p className="text-[36px] text-center">Loading vaults...</p>
@@ -294,9 +282,9 @@ const Vaults = () => {
                         e.stopPropagation();
                         setAprModal({
                           apr: vault.apr,
-                          assetsWithApr: $vaultAssets[index][3],
+                          assetsWithApr: vault.assetsWithApr,
                           assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: $vaultAssets[index][5],
+                          lastHardWork: vault.lastHardWork,
                           strategyApr: Number(vault.strategyApr),
                           state: true,
                         });
@@ -426,9 +414,9 @@ const Vaults = () => {
                         e.stopPropagation();
                         setAprModal({
                           apr: vault.apr,
-                          assetsWithApr: $vaultAssets[index][3],
+                          assetsWithApr: vault.assetsWithApr,
                           assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: $vaultAssets[index][5],
+                          lastHardWork: vault.lastHardWork,
                           strategyApr: Number(vault.strategyApr),
                           state: true,
                         });

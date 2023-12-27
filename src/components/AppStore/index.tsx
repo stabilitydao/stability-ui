@@ -398,6 +398,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         },
         {}
       );
+
       vaults.set(graphVaults);
       isVaultsLoaded.set(true);
     }
