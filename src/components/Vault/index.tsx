@@ -35,9 +35,7 @@ import {
   getTokenData,
   formatNumber,
   formatFromBigInt,
-  calculateAPY,
   getTimeDifference,
-  getStrategyInfo,
   get1InchRoutes,
   debounce,
 } from "@utils";
@@ -1181,103 +1179,8 @@ function Vault({ vault }: IProps) {
     }
   };
   const initVault = async () => {
-    if ($vaults?.length && $vaultData) {
-      const vaultUserBalances = Object.values($vaultData).map(
-        ({ vaultUserBalance }) => String(vaultUserBalance)
-      );
-      const vaults = await Promise.all(
-        $vaults[0].map(async (_: any, index: number) => {
-          let assets;
-          if ($vaultAssets.length) {
-            const token1 = getTokenData($vaultAssets[index][1][0]);
-            const token2 = getTokenData($vaultAssets[index][1][1]);
-            if (token1 && token2) {
-              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token1.address)
-              );
-              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token2.address)
-              );
-
-              assets = [
-                {
-                  logo: token1?.logoURI,
-                  symbol: token1?.symbol,
-                  name: token1?.name,
-                  color: token1Extended?.color,
-                },
-                {
-                  logo: token2?.logoURI,
-                  symbol: token2?.symbol,
-                  name: token2?.name,
-                  color: token2Extended?.color,
-                },
-              ];
-            }
-          }
-
-          const assetsWithApr: string[] = [];
-          const assetsAprs: string[] = [];
-          let totalAPR = Number(formatUnits($vaults[7][index], 3));
-          const data =
-            $apiData?.underlyings?.["137"]?.[
-              underlyingToken?.address.toLowerCase()
-            ];
-          if (data) {
-            const gammaApr = data.apr.daily.feeApr;
-            if (gammaApr) {
-              assetsWithApr.push("Pool swap fees");
-              assetsAprs.push((Number(gammaApr) * 100).toFixed(2));
-              totalAPR += Number(gammaApr) * 100;
-            }
-          }
-
-          const APY = calculateAPY(totalAPR).toFixed(2);
-          /////
-          const strategy = await readContract(_publicClient, {
-            address: vault as TAddress,
-            abi: VaultABI,
-            functionName: "strategy",
-          });
-
-          const getAssetsProportions = await readContract(_publicClient, {
-            address: strategy,
-            abi: StrategyABI,
-            functionName: "getAssetsProportions",
-          });
-          const assetsProportions = getAssetsProportions
-            ? getAssetsProportions.map((proportion) =>
-                Math.round(Number(formatUnits(proportion, 16)))
-              )
-            : [];
-
-          /////
-          return {
-            address: $vaults[0][index],
-            name: $vaults[1][index],
-            symbol: $vaults[2][index],
-            type: $vaults[3][index],
-            assetsWithApr,
-            assetsAprs,
-            lastHardWork: $vaultAssets[index][5],
-            shareprice: String($vaults[5][index]),
-            tvl: String($vaults[6][index]),
-            apr: totalAPR.toFixed(2),
-            strategyApr: Number(formatUnits($vaults[8][index], 3)).toFixed(2),
-            strategySpecific: $vaults[9][index],
-            apy: APY,
-            balance: vaultUserBalances[index],
-            daily: (Number(totalAPR) / 365).toFixed(2),
-            assets: assets,
-            strategyInfo: getStrategyInfo($vaults[2][index]),
-            assetsProportions,
-          };
-        })
-      );
-
-      setLocalVault(
-        vaults.filter((thisVault: any) => thisVault.address === vault)[0]
-      );
+    if ($vaults && vault) {
+      setLocalVault($vaults[vault]);
     }
   };
 
@@ -1683,7 +1586,9 @@ function Vault({ vault }: IProps) {
                   <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                     Strategy APR
                   </p>
-                  <p>{localVault.strategyApr}%</p>
+                  <p>
+                    {Number(formatUnits(localVault.strategyApr, 3)).toFixed(2)}%
+                  </p>
                 </div>
 
                 <div className="hidden mt-2">

@@ -28,13 +28,14 @@ import {
   connected,
   apiData,
   lastTx,
-  grtVaults,
 } from "@store";
 import {
   platform,
   PlatformABI,
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
+  VaultABI,
+  StrategyABI,
 } from "@web3";
 
 import {
@@ -42,9 +43,15 @@ import {
   formatFromBigInt,
   calculateAPY,
   getStrategyInfo,
+  getTokenData,
 } from "@utils";
 
-import { GRAPH_ENDPOINT, GRAPH_VAULTS, STABILITY_API } from "@constants";
+import {
+  GRAPH_ENDPOINT,
+  GRAPH_VAULTS,
+  STABILITY_API,
+  TOKENS_ASSETS,
+} from "@constants";
 
 import type { TAddress } from "@types";
 
@@ -56,7 +63,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   let stabilityAPIData: any;
   const getData = async () => {
-    if (address && chain?.id) {
+    if (isConnected) {
       const contractData = await readContract(_publicClient, {
         address: platform,
         abi: PlatformABI,
@@ -87,7 +94,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         address: platform,
         abi: PlatformABI,
         functionName: "getBalance",
-        args: [address],
+        args: [address as TAddress],
       });
 
       console.log("Platform.getBalance", contractBalance);
@@ -144,7 +151,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           return response;
         })
       );
-
       /// debug visual
       // if (vaultInfoes?.length) {
       //   console.log('vaultInfo', vaultInfoes[0])
@@ -175,108 +181,226 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
       });
 
-      isVaultsLoaded.set(true);
       if (contractBalance) {
         balances.set(contractBalance);
-      }
-      if (contractVaults) {
-        vaults.set(contractVaults);
       }
       if (vaultInfoes) {
         vaultAssets.set(vaultInfoes);
       }
+      if (contractVaults) {
+        const vaultsPromise = await Promise.all(
+          contractVaults[0].map(async (vault: any, index: number) => {
+            const assetsWithApr: string[] = [];
+            const assetsAprs: string[] = [];
+            let monthlyAPR = 0;
+
+            const strategy = await readContract(_publicClient, {
+              address: contractVaults[0][index] as TAddress,
+              abi: VaultABI,
+              functionName: "strategy",
+            });
+
+            const underlying = await readContract(_publicClient, {
+              address: strategy,
+              abi: StrategyABI,
+              functionName: "underlying",
+            });
+
+            const getAssetsProportions = await readContract(_publicClient, {
+              address: strategy,
+              abi: StrategyABI,
+              functionName: "getAssetsProportions",
+            });
+
+            const assetsProportions = getAssetsProportions
+              ? getAssetsProportions.map((proportion) =>
+                  Math.round(Number(formatUnits(proportion, 16)))
+                )
+              : [];
+
+            const APIData =
+              stabilityAPIData?.underlyings?.["137"]?.[
+                underlying.toLowerCase()
+              ];
+
+            if (APIData?.apr?.daily?.feeApr) {
+              monthlyAPR = APIData.apr.daily.feeApr;
+              assetsWithApr.push("Pool swap fees");
+              assetsAprs.push((Number(monthlyAPR) * 100).toFixed(2));
+            }
+
+            const APR = (
+              formatFromBigInt(
+                String(contractVaults[7][index]),
+                3,
+                "withDecimals"
+              ) +
+              Number(monthlyAPR) * 100
+            ).toFixed(2);
+
+            const APY = calculateAPY(APR).toFixed(2);
+
+            let assets;
+            if (vaultInfoes.length) {
+              const token1 = getTokenData(vaultInfoes[index][1][0]);
+              const token2 = getTokenData(vaultInfoes[index][1][1]);
+              if (token1 && token2) {
+                const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                  tokenAsset.addresses.includes(token1.address)
+                );
+                const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                  tokenAsset.addresses.includes(token2.address)
+                );
+
+                assets = [
+                  {
+                    logo: token1?.logoURI,
+                    symbol: token1?.symbol,
+                    name: token1?.name,
+                    color: token1Extended?.color,
+                  },
+                  {
+                    logo: token2?.logoURI,
+                    symbol: token2?.symbol,
+                    name: token2?.name,
+                    color: token2Extended?.color,
+                  },
+                ];
+              }
+            }
+            return {
+              [vault]: {
+                address: vault,
+                name: contractVaults[1][index],
+                symbol: contractVaults[2][index],
+                type: contractVaults[3][index],
+                strategy: contractVaults[4][index],
+                shareprice: String(contractVaults[5][index]),
+                tvl: String(contractVaults[6][index]),
+                apr: String(contractVaults[7][index]),
+                apy: APY,
+                strategyApr: contractVaults[8][index],
+                strategySpecific: contractVaults[9][index],
+                balance: contractBalance[5][index],
+                lastHardWork: vaultInfoes[index][5],
+                daily: (Number(APR) / 365).toFixed(2),
+                monthlyUnderlyingApr: monthlyAPR,
+                assets,
+                assetsProportions,
+                assetsWithApr,
+                assetsAprs,
+                strategyInfo: getStrategyInfo(contractVaults[2][index]),
+              },
+            };
+          })
+        );
+        const vaultsObject = vaultsPromise.reduce(
+          (acc, curr) => ({ ...acc, ...curr }),
+          {}
+        );
+
+        vaults.set(vaultsObject);
+      }
+      isVaultsLoaded.set(true);
+    } else {
+      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+        query: GRAPH_VAULTS,
+      });
+
+      const graphVaults = graphResponse.data.data.vaultEntities.reduce(
+        (vaults: any, vault: any) => {
+          //APY
+          const APIData =
+            stabilityAPIData?.underlyings?.["137"]?.[
+              vault.underlying.toLowerCase()
+            ];
+
+          let monthlyAPR = 0;
+          const assetsWithApr: string[] = [];
+          const assetsAprs: string[] = [];
+
+          if (APIData?.apr?.daily?.feeApr) {
+            monthlyAPR = APIData.apr.daily.feeApr;
+            assetsWithApr.push("Pool swap fees");
+            assetsAprs.push((Number(monthlyAPR) * 100).toFixed(2));
+          }
+          /////
+          const APR = (
+            formatFromBigInt(String(vault.apr), 3, "withDecimals") +
+            Number(monthlyAPR) * 100
+          ).toFixed(2);
+
+          const APY = calculateAPY(APR).toFixed(2);
+          //
+
+          //AssetsProportions
+          const assetsProportions = vault.assetsProportions
+            ? vault.assetsProportions.map((proportion: any) =>
+                Math.round(Number(formatUnits(proportion, 16)))
+              )
+            : [];
+          //
+
+          let assets;
+          if (vault.strategyAssets.length) {
+            const token1 = getTokenData(vault.strategyAssets[0]);
+            const token2 = getTokenData(vault.strategyAssets[1]);
+
+            if (token1 && token2) {
+              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token1.address)
+              );
+              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token2.address)
+              );
+
+              assets = [
+                {
+                  logo: token1?.logoURI,
+                  symbol: token1?.symbol,
+                  name: token1?.name,
+                  color: token1Extended?.color,
+                },
+                {
+                  logo: token2?.logoURI,
+                  symbol: token2?.symbol,
+                  name: token2?.name,
+                  color: token2Extended?.color,
+                },
+              ];
+            }
+          }
+
+          //
+          vaults[vault.id] = {
+            address: vault.id,
+            name: vault.name,
+            symbol: vault.symbol,
+            type: vault.vaultType,
+            strategy: vault.strategyId,
+            shareprice: vault.sharePrice,
+            tvl: vault.tvl,
+            apr: vault.apr,
+            apy: APY,
+            strategyApr: vault.apr, // todo in strategy
+            strategySpecific: vault.strategySpecific,
+            balance: "",
+            lastHardWork: vault.lastHardWork,
+            daily: (Number(APR) / 365).toFixed(2),
+            monthlyUnderlyingApr: monthlyAPR,
+            assets,
+            assetsProportions,
+            assetsWithApr: assetsWithApr,
+            assetsAprs: assetsAprs,
+            strategyInfo: getStrategyInfo(vault.symbol),
+          };
+          return vaults;
+        },
+        {}
+      );
+      vaults.set(graphVaults);
+      isVaultsLoaded.set(true);
     }
-    //else
-
-    const graphResponse = await axios.post(GRAPH_ENDPOINT, {
-      query: GRAPH_VAULTS,
-    });
-
-    // assets
-    //let assets;
-    // if ($vaultAssets.length) {
-    //   const token1 = getTokenData($vaultAssets[index][1][0]);
-    //   const token2 = getTokenData($vaultAssets[index][1][1]);
-
-    //   if (token1 && token2) {
-    //     const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
-    //       tokenAsset.addresses.includes(token1.address)
-    //     );
-    //     const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
-    //       tokenAsset.addresses.includes(token2.address)
-    //     );
-
-    //     assets = [
-    //       {
-    //         logo: token1?.logoURI,
-    //         symbol: token1?.symbol,
-    //         name: token1?.name,
-    //         color: token1Extended?.color,
-    //       },
-    //       {
-    //         logo: token2?.logoURI,
-    //         symbol: token2?.symbol,
-    //         name: token2?.name,
-    //         color: token2Extended?.color,
-    //       },
-    //     ];
-    //   }
-    // }
-    //
-
-    const graphVaults = graphResponse.data.data.vaultEntities.reduce(
-      (vaults: any, vault: any) => {
-        //APY
-        const data =
-          stabilityAPIData?.underlyings?.["137"]?.[
-            vault.underlying.toLowerCase()
-          ];
-
-        let monthlyApr = 0;
-        if (data) {
-          monthlyApr = data.apr.daily.feeApr;
-        }
-        /////
-        const APR = (
-          formatFromBigInt(String(vault.apr), 3, "withDecimals") +
-          Number(monthlyApr) * 100
-        ).toFixed(2);
-
-        const APY = calculateAPY(APR).toFixed(2);
-        //
-
-        //AssetsProportions
-        const assetsProportions = vault.assetsProportions
-          ? vault.assetsProportions.map((proportion: any) =>
-              Math.round(Number(formatUnits(proportion, 16)))
-            )
-          : [];
-
-        vaults[vault.id] = {
-          address: vault.id,
-          name: vault.name,
-          apr: vault.apr,
-          apy: APY,
-          //todo assets
-          assetsProportions,
-          //todo balance
-          monthlyUnderlyingApr: monthlyApr,
-          shareprice: vault.sharePrice,
-          strategy: vault.strategyId,
-          strategyApr: vault.apr,
-          strategyInfo: getStrategyInfo(vault.symbol),
-          //todo strategySpecific
-          symbol: vault.symbol,
-          tvl: vault.tvl,
-          type: vault.vaultType,
-        };
-        return vaults;
-      },
-      {}
-    );
-
-    grtVaults.set(graphVaults);
-    console.log("graph", graphVaults);
   };
   const getDataFromStabilityAPI = async () => {
     try {

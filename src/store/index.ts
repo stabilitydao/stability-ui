@@ -24,7 +24,6 @@ const assetsBalances = atom<TBalances | undefined>();
 
 const vaultData = atom<TVaults>({});
 
-const vaults = atom<any>();
 const balances = atom<any>();
 const vaultAssets = atom<TVaultAssets[] | undefined>();
 const isVaultsLoaded = atom<boolean>(false);
@@ -37,7 +36,7 @@ const apiData = atom<any>();
 
 // deepMaps
 
-const grtVaults = deepMap<any>();
+const vaults = deepMap<any>();
 
 //Assets balances
 const addAssetBalance = (r: any[]) => {
@@ -98,5 +97,4 @@ export {
   tokens,
   connected,
   apiData,
-  grtVaults,
 };

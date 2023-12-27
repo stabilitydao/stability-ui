@@ -124,8 +124,6 @@ const GRAPH_VAULTS = `
         vaultEntities {
           id
           apr
-          name
-          symbol
           tvl
           sharePrice
           assetsProportions
@@ -138,7 +136,15 @@ const GRAPH_VAULTS = `
           version
           colorBackground
           deployAllowed
+          vaultBuildingPrice
           underlying
+          symbol
+          strategySpecific
+          name
+          strategyAssets
+          lastHardWork
+          assetsWithApr
+          assetsAprs
         }
       }
       `;

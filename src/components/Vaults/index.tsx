@@ -2,9 +2,6 @@ import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { usePublicClient } from "wagmi";
-import { readContract } from "viem/actions";
-
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
@@ -20,20 +17,10 @@ import {
   // grtVaults,
 } from "@store";
 
-import {
-  getTokenData,
-  formatNumber,
-  getStrategyShortName,
-  formatFromBigInt,
-  getStrategyInfo,
-  calculateAPY,
-} from "@utils";
+import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
-import { VaultABI, StrategyABI } from "@web3";
-
-import { TABLE, PAGINATION_VAULTS, TOKENS_ASSETS } from "@constants";
-import type { TLocalVault, TAddress } from "@types";
-import { formatUnits } from "viem";
+import { TABLE, PAGINATION_VAULTS } from "@constants";
+import type { TLocalVault } from "@types";
 
 const Vaults = () => {
   const $vaults = useStore(vaults);
@@ -41,7 +28,6 @@ const Vaults = () => {
   const $vaultAssets: any = useStore(vaultAssets);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $connected = useStore(connected);
-  const $apiData = useStore(apiData);
   // const $grtVaults = useStore(grtVaults);
 
   const [localVaults, setLocalVaults] = useState<TLocalVault[]>([]);
@@ -69,8 +55,6 @@ const Vaults = () => {
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
-  const _publicClient = usePublicClient();
-
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
   };
@@ -82,7 +66,9 @@ const Vaults = () => {
     sortOrder: string
   ) => {
     if (dataType === "number") {
-      return sortOrder === "ascendentic" ? a - b : b - a;
+      return sortOrder === "ascendentic"
+        ? Number(a) - Number(b)
+        : Number(b) - Number(a);
     }
     if (dataType === "string") {
       return sortOrder === "ascendentic"
@@ -117,109 +103,8 @@ const Vaults = () => {
   };
 
   const initVaults = async () => {
-    if ($vaults?.length && $vaultData) {
-      const balances = Object.values($vaultData).map(({ vaultUserBalance }) =>
-        String(vaultUserBalance)
-      );
-
-      const vaults = await Promise.all(
-        $vaults[0].map(async (_: any, index: number) => {
-          let assets;
-          if ($vaultAssets.length) {
-            const token1 = getTokenData($vaultAssets[index][1][0]);
-            const token2 = getTokenData($vaultAssets[index][1][1]);
-
-            if (token1 && token2) {
-              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token1.address)
-              );
-              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token2.address)
-              );
-
-              assets = [
-                {
-                  logo: token1?.logoURI,
-                  symbol: token1?.symbol,
-                  name: token1?.name,
-                  color: token1Extended?.color,
-                },
-                {
-                  logo: token2?.logoURI,
-                  symbol: token2?.symbol,
-                  name: token2?.name,
-                  color: token2Extended?.color,
-                },
-              ];
-            }
-          }
-
-          ///// before graph
-          const strategyPromise = readContract(_publicClient, {
-            address: $vaults[0][index] as TAddress,
-            abi: VaultABI,
-            functionName: "strategy",
-          });
-          const underlyingPromise = strategyPromise.then((strategy) =>
-            readContract(_publicClient, {
-              address: strategy,
-              abi: StrategyABI,
-              functionName: "underlying",
-            })
-          );
-
-          const [strategy, underlying] = await Promise.all([
-            strategyPromise,
-            underlyingPromise,
-          ]);
-
-          const getAssetsProportions = await readContract(_publicClient, {
-            address: strategy,
-            abi: StrategyABI,
-            functionName: "getAssetsProportions",
-          });
-
-          const assetsProportions = getAssetsProportions
-            ? getAssetsProportions.map((proportion) =>
-                Math.round(Number(formatUnits(proportion, 16)))
-              )
-            : [];
-
-          const data =
-            $apiData?.underlyings?.["137"]?.[underlying.toLowerCase()];
-
-          let monthlyApr = 0;
-          if (data) {
-            monthlyApr = data.apr.daily.feeApr;
-          }
-          /////
-          const APR = (
-            formatFromBigInt(String($vaults[7][index]), 3, "withDecimals") +
-            Number(monthlyApr) * 100
-          ).toFixed(2);
-
-          const APY = calculateAPY(APR).toFixed(2);
-          return {
-            name: $vaults[1][index],
-            assets,
-            symbol: $vaults[2][index],
-            type: $vaults[3][index],
-            strategy: $vaults[4][index],
-            balance: balances[index],
-            shareprice: String($vaults[5][index]),
-            tvl: String($vaults[6][index]),
-            apr: String($vaults[7][index]),
-            apy: APY,
-            strategyApr: $vaults[8][index],
-            address: $vaults[0][index],
-            strategyInfo: getStrategyInfo($vaults[2][index]),
-            strategySpecific: $vaults[9][index],
-            monthlyUnderlyingApr: monthlyApr,
-            assetsProportions,
-          };
-        })
-      );
-
+    if ($vaults) {
+      const vaults: TLocalVault[] = Object.values($vaults);
       vaults.sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
 
       setLocalVaults(vaults);
@@ -232,11 +117,7 @@ const Vaults = () => {
     initVaults();
   }, [$vaults, $vaultData, $vaultAssets]);
 
-  return !$connected ? (
-    <div className="flex items-center justify-center">
-      <Wallet />
-    </div>
-  ) : !$isVaultsLoaded || !isLocalVaultsLoaded ? (
+  return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
     <>
