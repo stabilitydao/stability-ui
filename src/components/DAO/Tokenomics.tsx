@@ -199,8 +199,10 @@ function Tokenomics() {
         } else {
           console.error("Couldn't get new sdiv balance after harvest");
         }
+        setStakeLoader(false);
       } catch (error) {
         console.error("Error in harvest:", error);
+        setStakeLoader(false);
       }
     }
   };
@@ -535,15 +537,23 @@ function Tokenomics() {
                 title={getTokenData(SDIV[0])?.symbol}
               />
               {sdivWallet && sdivWallet?.sdivEarned > 0 && (
-                <div className="flex mt-3 text-sm">
-                  {" "}
-                  <button
-                    onClick={() => {
-                      harvest();
-                    }}
-                    className="bg-button rounded-sm p-2 font-medium text-[#8D8E96]">
-                    Claim
-                  </button>
+                <div className="flex mt-3 text-sm w-[51px] h-[36px]">
+                  {stakeLoader === false ? (
+                    <button
+                      onClick={() => {
+                        harvest();
+                        setStakeLoader(true);
+                      }}
+                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full">
+                      Claim
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full"
+                      disabled>
+                      <Loader />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
