@@ -190,15 +190,15 @@ function Team() {
       </div>
 
       <div className="p-2">
-        <div className="flex flex-wrap m-auto justify-evenly w-full gap-4 my-7 rounded-md md:w-4/5 md:gap-4 lg:w-4/5 lg:gap-5">
+        <div className="flex flex-wrap m-auto justify-evenly w-full gap-4 my-7 rounded-md md:w-4/5 md:gap-4  lg:gap-5">
           {members.map(member => (
             <a
               href={member.html_url}
               key={member.name}
-              className="text-sm p-3 md:w-[155px] hover:bg-button rounded-md"
+              className="text-sm p-3 md:w-[150px] hover:bg-button rounded-md"
               target="_blank">
               <img
-                className="rounded-full m-auto w-[75px]"
+                className="rounded-full m-auto w-[80px]"
                 src={member.avatar_url}
                 alt={`Avatar de ${member.name}`}
               />

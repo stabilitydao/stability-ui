@@ -204,12 +204,11 @@ type TMultisigBalance = Record<string, TMultiTokenData>;
 
 type TTokenomics = {
   profitPrice: number;
-  profitTotalSupply: number;
-  profitMarketCap: number;
+  profitTotalSupply: string;
+  profitMarketCap: string;
+  sdivTotalSupply: string;
   pmToMint: string;
   pmTotalSupply: string;
-  pmMintAllowance: string;
-  sdivTotalSupply: string;
 };
 
 type TProfitTokenWallet = {
