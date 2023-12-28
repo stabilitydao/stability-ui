@@ -30,10 +30,11 @@ function Tokenomics() {
   const [sdivWallet, setSdivtWallet] = useState<TSdivTokenWallet>();
   const [input, setInput] = useState("");
   const [_profitStakingAllowance, setProfitStakingAllowance] = useState("");
+  const [_pmMintAllowance, setPmMintAllowance] = useState("");
   const [showMintModal, setShowMintModal] = useState(false);
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [tabStakeModal, setTabStakeModal] = useState("stake");
-  const [stakeLoader, setStakeLoader] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const fetchTokenomicsData = async () => {
     if ($publicClient && $account) {
@@ -122,6 +123,8 @@ function Tokenomics() {
       if (transaction?.status === "success") {
         profitStakingAllowance();
         profitBalance();
+      } else {
+        console.error("Transaction error");
       }
     } catch (error) {
       console.error("Error in aproveStaking:", error);
@@ -144,12 +147,12 @@ function Tokenomics() {
         profitBalance();
         sdivBalance();
         setInput("");
-        setStakeLoader(false);
+        setLoader(false);
       } else {
-        console.error("Couldn't get new allowance");
+        console.error("Transaction error");
       }
     } catch (error) {
-      setStakeLoader(false);
+      setLoader(false);
       console.error("Error in stake:", error);
     }
   };
@@ -171,12 +174,12 @@ function Tokenomics() {
         profitBalance();
         sdivBalance();
         setInput("");
-        setStakeLoader(false);
+        setLoader(false);
       } else {
-        console.error("Couldn't get new allowance");
+        console.error("Transaction error");
       }
     } catch (error) {
-      setStakeLoader(false);
+      setLoader(false);
       console.error("Error in unstake:", error);
     }
   };
@@ -197,12 +200,12 @@ function Tokenomics() {
         if (transaction?.status === "success") {
           sdivBalance();
         } else {
-          console.error("Couldn't get new sdiv balance after harvest");
+          console.error("Transaction error");
         }
-        setStakeLoader(false);
+        setLoader(false);
       } catch (error) {
         console.error("Error in harvest:", error);
-        setStakeLoader(false);
+        setLoader(false);
       }
     }
   };
@@ -216,9 +219,37 @@ function Tokenomics() {
           functionName: "allowance",
           args: [$account as TAddress, PM[0] as TAddress],
         });
+
+        setPmMintAllowance(formatUnits(pmMintAllowance as bigint, 18));
       } catch (error) {
         console.error("Error fetching mint allowance:", error);
       }
+    }
+  };
+
+  const aproveMinting = async () => {
+    try {
+      const amount = parseUnits(input, 18);
+
+      const aproveMinting = await writeContract({
+        address: PROFIT[0] as TAddress,
+        abi: ERC20MetadataUpgradeableABI,
+        functionName: "approve",
+        args: [$account as TAddress, amount],
+      });
+
+      const transaction = await $publicClient?.waitForTransactionReceipt(
+        aproveStaking
+      );
+
+      if (transaction?.status === "success") {
+        profitStakingAllowance();
+        profitBalance();
+      } else {
+        console.error("Transaction error");
+      }
+    } catch (error) {
+      console.error("Error in aproveStaking:", error);
     }
   };
 
@@ -228,7 +259,7 @@ function Tokenomics() {
         const mint = await writeContract({
           address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as TAddress,
           abi: DividendTokenABI,
-          functionName: "MINTER_ROLE",
+          functionName: "mint",
         });
 
         const transaction = await $publicClient?.waitForTransactionReceipt(
@@ -236,11 +267,15 @@ function Tokenomics() {
         );
 
         if (transaction?.status === "success") {
-          sdivBalance();
+          fetchTokenomicsData();
+          profitBalance();
+          setInput("");
+          setLoader(false);
         } else {
-          console.error("Couldn't get new sdiv balance after harvest");
+          console.error("Transaction error");
         }
       } catch (error) {
+        setLoader(false);
         console.error("Error in mint:", error);
       }
     }
@@ -311,6 +346,7 @@ function Tokenomics() {
   useEffect(() => {
     fetchTokenomicsData();
     profitStakingAllowance();
+    pmMintAllowance();
     sdivBalance();
     profitBalance();
   }, [$assetsPrices]);
@@ -538,20 +574,22 @@ function Tokenomics() {
               />
               {sdivWallet && sdivWallet?.sdivEarned > 0 && (
                 <div className="flex mt-3 text-sm w-[51px] h-[36px]">
-                  {stakeLoader === false ? (
-                    <button
-                      onClick={() => {
-                        harvest();
-                        setStakeLoader(true);
-                      }}
-                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full">
-                      Claim
-                    </button>
-                  ) : (
+                  {loader === true &&
+                  showMintModal === false &&
+                  showStakeModal === false ? (
                     <button
                       className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full"
                       disabled>
                       <Loader />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        harvest();
+                        setLoader(true);
+                      }}
+                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full">
+                      Claim
                     </button>
                   )}
                 </div>
@@ -627,7 +665,7 @@ function Tokenomics() {
           className="overlay"
           onClick={() => {
             setShowStakeModal(false);
-            setStakeLoader(false);
+            setLoader(false);
           }}>
           <div
             className="flex flex-col min-w-[270px] h-auto z-[120] p-4 rounded-md bg-modal"
@@ -704,14 +742,14 @@ function Tokenomics() {
               </button>
             </div>
 
-            {_profitStakingAllowance !== "" && stakeLoader !== true ? (
+            {_profitStakingAllowance !== "" && loader !== true ? (
               <>
                 {isStakingAllowed ? (
                   <div className="flex w-full m-auto">
                     <button
                       onClick={() => {
                         stake();
-                        setStakeLoader(true);
+                        setLoader(true);
                       }}
                       className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                       Stake
@@ -739,7 +777,7 @@ function Tokenomics() {
                     onClick={e => {
                       e.stopPropagation();
                       unStake();
-                      setStakeLoader(true);
+                      setLoader(true);
                     }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                     Unstake
@@ -799,7 +837,10 @@ function Tokenomics() {
             <div className="flex items-center w-full m-auto relative  ">
               <input
                 value={input}
-                onChange={e => setInput(e.target.value)}
+                onChange={e => {
+                  setInput(e.target.value);
+                  pmMintAllowance();
+                }}
                 onClick={e => e.stopPropagation()}
                 className="ps-2 rounded-sm p-1 my-5 text-gray-400 bg-transparent border border-gray-600 w-full m-auto"
                 placeholder="0"
@@ -812,37 +853,50 @@ function Tokenomics() {
               </button>
             </div>
 
-            {isMintAllowed ? (
-              <div className="flex justify-between w-full">
-                <button
-                  onClick={e => {
-                    e.stopPropagation();
-                    mint();
-                  }}
-                  className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
-                  Mint
-                </button>
-              </div>
-            ) : isMintNotAproved ? (
+            {_pmMintAllowance !== "" && loader !== true ? (
+              <>
+                {isMintAllowed ? (
+                  <div className="flex justify-between w-full">
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        mint();
+                      }}
+                      className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                      Mint
+                    </button>
+                  </div>
+                ) : isMintNotAproved ? (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      mint();
+                      pmMintAllowance();
+                    }}
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                    Aprove
+                  </button>
+                ) : Number(input) > Number(profitWallet?.profitBalance) ? (
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                    }}
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
+                    disabled>
+                    INSUFFICIENT BALANCE
+                  </button>
+                ) : null}
+              </>
+            ) : (
               <button
-                onClick={e => {
-                  e.stopPropagation();
-                  mint();
-                  pmMintAllowance();
-                }}
-                className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
-                Aprove
-              </button>
-            ) : Number(input) > Number(profitWallet?.profitBalance) ? (
-              <button
-                onClick={e => {
-                  e.stopPropagation();
-                }}
                 className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
                 disabled>
-                INSUFFICIENT BALANCE
+                <Loader
+                  customHeight={30}
+                  customWidth={30}
+                />
               </button>
-            ) : null}
+            )}
           </div>
         </div>
       )}
