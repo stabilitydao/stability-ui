@@ -19,8 +19,8 @@ import {
   vaultAssets,
   platformData,
   tokens,
-  apiData,
   lastTx,
+  connected,
 } from "@store";
 
 import {
@@ -68,8 +68,7 @@ function Vault({ vault }: IProps) {
   const $vaultAssets: any = useStore(vaultAssets);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
-  const $apiData = useStore(apiData);
-
+  const $connected = useStore(connected);
   const _publicClient = usePublicClient();
 
   const [tab, setTab] = useState("Deposit");
@@ -189,7 +188,6 @@ function Vault({ vault }: IProps) {
       logoURI: logoURI,
     });
   };
-
   const handleInputChange = (amount: string, asset: string) => {
     if (!amount) {
       resetInputs(option);
@@ -270,10 +268,10 @@ function Vault({ vault }: IProps) {
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
     if (!$tokens) return;
-    const filtredTokens = tokensJson.tokens
-      .filter((token) => $tokens.includes(token.address))
-      .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
+    const filtredTokens = tokensJson.tokens
+      .filter((token) => $tokens.includes(token.address.toLowerCase()))
+      .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
     ///// GET UNDERLYING TOKEN
     try {
       const strategy = await readContract(_publicClient, {
@@ -320,11 +318,8 @@ function Vault({ vault }: IProps) {
           allowance: formatUnits(underlyingAllowance, underlyingDecimals),
           logoURI: "/protocols/Gamma.png",
         });
-
-        setOptionTokens(filtredTokens);
-      } else {
-        setOptionTokens(filtredTokens);
       }
+      setOptionTokens(filtredTokens);
     } catch (error) {
       setOptionTokens(filtredTokens);
       console.error("UNDERLYING TOKEN ERROR:", error);
@@ -374,7 +369,7 @@ function Vault({ vault }: IProps) {
         tab === "Deposit" &&
         Number(amount) > Number(balances[asset]?.assetBalance)
       ) {
-        setZapButton("insuficcientBalance");
+        setZapButton("insufficientBalance");
       }
 
       if (
@@ -384,7 +379,7 @@ function Vault({ vault }: IProps) {
             formatUnits($vaultData[vault as TAddress].vaultUserBalance, 18)
           )
       ) {
-        setZapButton("insuficcientBalance");
+        setZapButton("insufficientBalance");
         setZapTokens(false);
         return;
       }
@@ -1015,7 +1010,7 @@ function Vault({ vault }: IProps) {
       }
 
       if (Number(value) > balance) {
-        setZapButton("insuficcientBalance");
+        setZapButton("insufficientBalance");
         return;
       }
 
@@ -1096,6 +1091,7 @@ function Vault({ vault }: IProps) {
   };
 
   const checkAllowance = async () => {
+    if (!$connected) return;
     const allowanceResult: TVaultAllowance | any = {};
 
     for (let i = 0; i < option.length; i++) {
@@ -1308,7 +1304,7 @@ function Vault({ vault }: IProps) {
     };
   }, [tokenSelectorRef]);
 
-  return vault && $vaultData[vault] ? (
+  return vault && $vaults[vault] ? (
     <main className="w-full mx-auto">
       <div className="flex justify-between items-center p-4 bg-button rounded-md">
         {localVault && (
@@ -1317,7 +1313,7 @@ function Vault({ vault }: IProps) {
               <div className="flex items-center">
                 <AssetsProportion
                   proportions={localVault.assetsProportions}
-                  assets={localVault.assets}
+                  assets={localVault?.assets}
                   type="vault"
                 />
                 <span className="inline-flex text-[18px] font-bold whitespace-nowrap">
@@ -1626,19 +1622,19 @@ function Vault({ vault }: IProps) {
             <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
               Assets
             </h2>
-            {$assets &&
-              $assets.map((asset: TAddress) => {
-                const assetData: TToken | any = getTokenData(asset);
+            {localVault &&
+              localVault?.assets.map((asset: any) => {
+                const assetData: TToken | any = getTokenData(asset.address);
 
                 const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
                   return tokenAsset.addresses.includes(assetData?.address);
                 });
 
-                if (assetData && $assetsPrices) {
-                  return (
+                return (
+                  assetData && (
                     <article
                       className="rounded-md p-3 mb-4 flex bg-[#32343f]"
-                      key={asset}
+                      key={asset.address}
                     >
                       <div className="flex w-full flex-col gap-3">
                         <div className="flex w-full justify-between items-center  flex-wrap">
@@ -1690,7 +1686,7 @@ function Vault({ vault }: IProps) {
                             <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                               <a
                                 className="flex items-center"
-                                href={`https://polygonscan.com/token/${asset}`}
+                                href={`https://polygonscan.com/token/${asset.address}`}
                                 target="_blank"
                               >
                                 Contract
@@ -1752,12 +1748,17 @@ function Vault({ vault }: IProps) {
                           </div>
                         </div>
 
-                        <div className="flex justify-start items-center text-[16px]">
-                          <p>
-                            Price: $
-                            {formatUnits($assetsPrices[asset].tokenPrice, 18)}
-                          </p>
-                        </div>
+                        {$assetsPrices && (
+                          <div className="flex justify-start items-center text-[16px]">
+                            <p>
+                              Price: $
+                              {formatUnits(
+                                $assetsPrices[asset.address]?.tokenPrice,
+                                18
+                              )}
+                            </p>
+                          </div>
+                        )}
 
                         <p className="text-[16px]">
                           {tokenAssets?.description}
@@ -1776,8 +1777,8 @@ function Vault({ vault }: IProps) {
                         )}
                       </div>
                     </article>
-                  );
-                }
+                  )
+                );
               })}
           </article>
         </div>
@@ -2087,29 +2088,34 @@ function Vault({ vault }: IProps) {
                       <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                         {option.map((asset: any) => (
                           <div key={asset}>
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>Balance:</p>
+                            {$connected && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>Balance:</p>
 
-                              <p>{balances[asset]?.assetBalance}</p>
-                            </div>
-                            <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                              <div className="absolute end-5 bottom-4">
-                                <div className="flex items-center">
-                                  <button
-                                    className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                    type="button"
-                                    onClick={() =>
-                                      balances[asset] &&
-                                      handleInputChange(
-                                        balances[asset].assetBalance,
-                                        asset
-                                      )
-                                    }
-                                  >
-                                    MAX
-                                  </button>
-                                </div>
+                                <p>{balances[asset]?.assetBalance}</p>
                               </div>
+                            )}
+
+                            <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
+                              {$connected && (
+                                <div className="absolute end-5 bottom-4">
+                                  <div className="flex items-center">
+                                    <button
+                                      className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                      type="button"
+                                      onClick={() =>
+                                        balances[asset] &&
+                                        handleInputChange(
+                                          balances[asset].assetBalance,
+                                          asset
+                                        )
+                                      }
+                                    >
+                                      MAX
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                               <input
                                 className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
                                 list="amount"
@@ -2152,22 +2158,21 @@ function Vault({ vault }: IProps) {
                                 })}
                               </div>
                             </div>
-                            {$assetsPrices[asset] &&
-                              inputs[asset]?.amount > 0 && (
-                                <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                  <p>
-                                    $
-                                    {(
-                                      Number(
-                                        formatUnits(
-                                          $assetsPrices[asset].tokenPrice,
-                                          18
-                                        )
-                                      ) * inputs[asset].amount
-                                    ).toFixed(2)}
-                                  </p>
-                                </div>
-                              )}
+                            {$assetsPrices && inputs[asset]?.amount > 0 && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>
+                                  $
+                                  {(
+                                    Number(
+                                      formatUnits(
+                                        $assetsPrices[asset].tokenPrice,
+                                        18
+                                      )
+                                    ) * inputs[asset].amount
+                                  ).toFixed(2)}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -2208,7 +2213,7 @@ function Vault({ vault }: IProps) {
                                 disabled
                                 className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
                               >
-                                INSUFICCIENT BALANCE
+                                INSUFFICIENT BALANCE
                               </button>
                             )
                           )}
@@ -2220,7 +2225,7 @@ function Vault({ vault }: IProps) {
                   ) : (
                     <div>
                       <div className="flex flex-col mt-[15px] text-[15px] w-full">
-                        {balances[option[0]] && (
+                        {$connected && balances[option[0]] && (
                           <div className="text-left text-[gray] ml-2">
                             Balance: {balances[option[0]].assetBalance}
                           </div>
@@ -2245,7 +2250,7 @@ function Vault({ vault }: IProps) {
                               }
                             })}
                           </div>
-                          {balances && balances[option[0]] && (
+                          {$connected && balances[option[0]] && (
                             <div>
                               <div
                                 className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
@@ -2296,22 +2301,21 @@ function Vault({ vault }: IProps) {
                             />
                           )}
                         </div>
-                        {$assetsPrices[option[0]] &&
-                          inputs[option[0]]?.amount > 0 && (
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>
-                                $
-                                {(
-                                  Number(
-                                    formatUnits(
-                                      $assetsPrices[option[0]].tokenPrice,
-                                      18
-                                    )
-                                  ) * inputs[option[0]]?.amount
-                                ).toFixed(2)}
-                              </p>
-                            </div>
-                          )}
+                        {$assetsPrices && inputs[option[0]]?.amount > 0 && (
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>
+                              $
+                              {(
+                                Number(
+                                  formatUnits(
+                                    $assetsPrices[option[0]].tokenPrice,
+                                    18
+                                  )
+                                ) * inputs[option[0]]?.amount
+                              ).toFixed(2)}
+                            </p>
+                          </div>
+                        )}
                         {!loader && (
                           <>
                             {zapTokens && (
@@ -2398,12 +2402,12 @@ function Vault({ vault }: IProps) {
                       {!loader ? (
                         <>
                           {" "}
-                          {zapButton === "insuficcientBalance" ? (
+                          {zapButton === "insufficientBalance" ? (
                             <button
                               disabled
                               className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
                             >
-                              INSUFICCIENT BALANCE
+                              INSUFFICIENT BALANCE
                             </button>
                           ) : zapButton === "needApprove" ? (
                             <button
@@ -2439,7 +2443,7 @@ function Vault({ vault }: IProps) {
               {tab === "Withdraw" && (
                 <>
                   <div className="grid mt-[15px] text-[15px] w-full">
-                    {balances && balances[option[0]] && (
+                    {$connected && balances[option[0]] && (
                       <div className="text-left text-[gray] ml-2">
                         Balance:{" "}
                         {parseFloat(
@@ -2449,7 +2453,7 @@ function Vault({ vault }: IProps) {
                     )}
 
                     <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                      {balances && balances[option[0]] && (
+                      {$connected && balances[option[0]] && (
                         <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
                           <div className="flex items-center">
                             <button
@@ -2498,21 +2502,20 @@ function Vault({ vault }: IProps) {
                       />
                     </div>
 
-                    {$assetsPrices[option[0]] &&
-                      inputs[option[0]]?.amount > 0 && (
-                        <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                          <p>
-                            $
-                            {(
-                              formatFromBigInt(
-                                localVault.shareprice,
-                                18,
-                                "withDecimals"
-                              ) * inputs[option[0]]?.amount
-                            ).toFixed(2)}
-                          </p>
-                        </div>
-                      )}
+                    {$assetsPrices && inputs[option[0]]?.amount > 0 && (
+                      <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                        <p>
+                          $
+                          {(
+                            formatFromBigInt(
+                              localVault.shareprice,
+                              18,
+                              "withDecimals"
+                            ) * inputs[option[0]]?.amount
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   {!loader ? (
                     <>
@@ -2658,12 +2661,12 @@ function Vault({ vault }: IProps) {
                         </div>
                       )}
 
-                      {zapButton === "insuficcientBalance" ? (
+                      {zapButton === "insufficientBalance" ? (
                         <button
                           disabled
                           className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
                         >
-                          INSUFICCIENT BALANCE
+                          INSUFFICIENT BALANCE
                         </button>
                       ) : zapButton === "needApprove" ? (
                         <button

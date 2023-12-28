@@ -119,7 +119,7 @@ const SLIPPAGE_VALUES = ["0.5", "1", "2"];
 const GRAPH_ENDPOINT =
   "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
 
-const GRAPH_VAULTS = `
+const GRAPH_QUERY = `
       {
         vaultEntities {
           id
@@ -146,6 +146,9 @@ const GRAPH_VAULTS = `
           assetsWithApr
           assetsAprs
         }
+        platformEntities {
+          bcAssets
+        }
       }
       `;
 
@@ -158,6 +161,6 @@ export {
   CHAINS,
   SLIPPAGE_VALUES,
   GRAPH_ENDPOINT,
-  GRAPH_VAULTS,
+  GRAPH_QUERY,
   STABILITY_API,
 };

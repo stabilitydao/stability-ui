@@ -18,8 +18,6 @@ import {
   platformData,
   publicClient,
   userBalance,
-  addAssetBalance,
-  addVaultData,
   vaults,
   vaultAssets,
   isVaultsLoaded,
@@ -44,11 +42,13 @@ import {
   calculateAPY,
   getStrategyInfo,
   getTokenData,
+  addAssetsBalance,
+  addVaultData,
 } from "@utils";
 
 import {
   GRAPH_ENDPOINT,
-  GRAPH_VAULTS,
+  GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
 } from "@constants";
@@ -102,11 +102,10 @@ const AppStore = (props: React.PropsWithChildren) => {
         const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
         const erc20Balance: { [token: string]: bigint } = {};
         const erc721Balance: { [token: string]: bigint } = {};
-
         //function -> .set vault/
         addVaultData(contractBalance);
         addAssetsPrice(contractBalance);
-        addAssetBalance(contractBalance);
+        addAssetsBalance(contractBalance);
         //
 
         for (let i = 0; i < contractBalance[1].length; i++) {
@@ -254,12 +253,14 @@ const AppStore = (props: React.PropsWithChildren) => {
 
                 assets = [
                   {
+                    address: token1?.address,
                     logo: token1?.logoURI,
                     symbol: token1?.symbol,
                     name: token1?.name,
                     color: token1Extended?.color,
                   },
                   {
+                    address: token2?.address,
                     logo: token2?.logoURI,
                     symbol: token2?.symbol,
                     name: token2?.name,
@@ -298,15 +299,13 @@ const AppStore = (props: React.PropsWithChildren) => {
           (acc, curr) => ({ ...acc, ...curr }),
           {}
         );
-
         vaults.set(vaultsObject);
       }
       isVaultsLoaded.set(true);
     } else {
       const graphResponse = await axios.post(GRAPH_ENDPOINT, {
-        query: GRAPH_VAULTS,
+        query: GRAPH_QUERY,
       });
-
       const graphVaults = graphResponse.data.data.vaultEntities.reduce(
         (vaults: any, vault: any) => {
           //APY
@@ -342,6 +341,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           //
 
           let assets;
+
           if (vault.strategyAssets.length) {
             const token1 = getTokenData(vault.strategyAssets[0]);
             const token2 = getTokenData(vault.strategyAssets[1]);
@@ -356,12 +356,14 @@ const AppStore = (props: React.PropsWithChildren) => {
 
               assets = [
                 {
+                  address: token1?.address,
                   logo: token1?.logoURI,
                   symbol: token1?.symbol,
                   name: token1?.name,
                   color: token1Extended?.color,
                 },
                 {
+                  address: token2?.address,
                   logo: token2?.logoURI,
                   symbol: token2?.symbol,
                   name: token2?.name,
@@ -399,6 +401,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         {}
       );
 
+      tokens.set(graphResponse.data.data.platformEntities[0].bcAssets);
       vaults.set(graphVaults);
       isVaultsLoaded.set(true);
     }

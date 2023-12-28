@@ -127,9 +127,9 @@ type TTableColumn = {
 };
 type TAPRModal = {
   apr: string;
-  assetsWithApr: string;
+  assetsWithApr: any;
   assetsAprs: number;
-  lastHardWork: number;
+  lastHardWork: any;
   strategyApr: number;
   state: boolean;
 };

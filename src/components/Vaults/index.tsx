@@ -282,9 +282,9 @@ const Vaults = () => {
                         e.stopPropagation();
                         setAprModal({
                           apr: vault.apr,
-                          assetsWithApr: vault.assetsWithApr,
+                          assetsWithApr: vault.assetsWithApr as any,
                           assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: vault.lastHardWork,
+                          lastHardWork: vault.lastHardWork as any,
                           strategyApr: Number(vault.strategyApr),
                           state: true,
                         });
@@ -414,9 +414,9 @@ const Vaults = () => {
                         e.stopPropagation();
                         setAprModal({
                           apr: vault.apr,
-                          assetsWithApr: vault.assetsWithApr,
+                          assetsWithApr: vault.assetsWithApr as any,
                           assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: vault.lastHardWork,
+                          lastHardWork: vault.lastHardWork as any,
                           strategyApr: Number(vault.strategyApr),
                           state: true,
                         });
