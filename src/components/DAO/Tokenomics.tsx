@@ -29,8 +29,7 @@ function Tokenomics() {
   const [profitWallet, setProfitWallet] = useState<TProfitTokenWallet>();
   const [sdivWallet, setSdivtWallet] = useState<TSdivTokenWallet>();
   const [input, setInput] = useState("");
-  const [_profitStakingAllowance, setProfitStakingAllowance] = useState("");
-  const [_pmMintAllowance, setPmMintAllowance] = useState("");
+  const [_allowance, setAllowance] = useState("");
   const [showMintModal, setShowMintModal] = useState(false);
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [tabStakeModal, setTabStakeModal] = useState("stake");
@@ -90,8 +89,8 @@ function Tokenomics() {
     }
   };
 
-  const profitStakingAllowance = async () => {
-    const profitStakingAllowance = await $publicClient?.readContract({
+  const allowance = async () => {
+    const allowance = await $publicClient?.readContract({
       address: PROFIT[0] as TAddress,
       abi: ERC20MetadataUpgradeableABI,
       functionName: "allowance",
@@ -100,16 +99,14 @@ function Tokenomics() {
         "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
       ],
     });
-    setProfitStakingAllowance(
-      formatUnits(profitStakingAllowance as bigint, 18)
-    );
+    setAllowance(formatUnits(allowance as bigint, 18));
   };
 
-  const aproveStaking = async () => {
+  const aprove = async () => {
     try {
       const amount = parseUnits(input, 18);
 
-      const aproveStaking = await writeContract({
+      const aprove = await writeContract({
         address: PROFIT[0] as TAddress,
         abi: ERC20MetadataUpgradeableABI,
         functionName: "approve",
@@ -117,17 +114,20 @@ function Tokenomics() {
       });
 
       const transaction = await $publicClient?.waitForTransactionReceipt(
-        aproveStaking
+        aprove
       );
 
       if (transaction?.status === "success") {
-        profitStakingAllowance();
+        allowance();
         profitBalance();
+        setLoader(false);
       } else {
         console.error("Transaction error");
       }
     } catch (error) {
-      console.error("Error in aproveStaking:", error);
+      setLoader(false);
+
+      console.error("Error in aprove:", error);
     }
   };
 
@@ -207,49 +207,6 @@ function Tokenomics() {
         console.error("Error in harvest:", error);
         setLoader(false);
       }
-    }
-  };
-
-  const pmMintAllowance = async () => {
-    if ($publicClient) {
-      try {
-        const pmMintAllowance = await $publicClient.readContract({
-          address: PROFIT[0] as TAddress,
-          abi: ERC20MetadataUpgradeableABI,
-          functionName: "allowance",
-          args: [$account as TAddress, PM[0] as TAddress],
-        });
-
-        setPmMintAllowance(formatUnits(pmMintAllowance as bigint, 18));
-      } catch (error) {
-        console.error("Error fetching mint allowance:", error);
-      }
-    }
-  };
-
-  const aproveMinting = async () => {
-    try {
-      const amount = parseUnits(input, 18);
-
-      const aproveMinting = await writeContract({
-        address: PROFIT[0] as TAddress,
-        abi: ERC20MetadataUpgradeableABI,
-        functionName: "approve",
-        args: [$account as TAddress, amount],
-      });
-
-      const transaction = await $publicClient?.waitForTransactionReceipt(
-        aproveStaking
-      );
-
-      if (transaction?.status === "success") {
-        profitStakingAllowance();
-        profitBalance();
-      } else {
-        console.error("Transaction error");
-      }
-    } catch (error) {
-      console.error("Error in aproveStaking:", error);
     }
   };
 
@@ -345,8 +302,7 @@ function Tokenomics() {
 
   useEffect(() => {
     fetchTokenomicsData();
-    profitStakingAllowance();
-    pmMintAllowance();
+    allowance();
     sdivBalance();
     profitBalance();
   }, [$assetsPrices]);
@@ -354,12 +310,12 @@ function Tokenomics() {
   const isStakingAllowed =
     tabStakeModal === "stake" &&
     Number(input) > 0 &&
-    Number(input) <= Number(_profitStakingAllowance) &&
+    Number(input) <= Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
   const isStakingNotAproved =
     tabStakeModal === "stake" &&
-    Number(input) > Number(_profitStakingAllowance) &&
+    Number(input) > Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
   const isStakingInsufficient =
@@ -376,14 +332,15 @@ function Tokenomics() {
     Number(input) > Number(profitWallet?.profitStaked);
 
   const isMintAllowed =
-    Number(input) > 0 &&
-    Number(input) === Number(tokenomics.pmMintAllowance) &&
+    Number(input) >= 10000 &&
+    Number(input) <= Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
   const isMintNotAproved =
-    Number(input) > 0 &&
-    Number(input) > Number(tokenomics.pmMintAllowance) &&
+    Number(input) > Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
+
+  const isMintingInsufficient = Number(input) > 0;
 
   return tokenomics ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
@@ -717,10 +674,10 @@ function Tokenomics() {
                 value={input}
                 onChange={e => {
                   setInput(e.target.value);
-                  setProfitStakingAllowance("");
+                  setAllowance("");
                   profitBalance();
                   sdivBalance();
-                  profitStakingAllowance();
+                  allowance();
                 }}
                 onClick={e => e.stopPropagation()}
                 className="ps-2 rounded-sm p-1 my-3 text-gray-400 bg-transparent border border-gray-600 w-full m-auto"
@@ -733,8 +690,8 @@ function Tokenomics() {
                   } else {
                     setInput(String(profitWallet?.profitStaked));
                   }
-                  setProfitStakingAllowance("");
-                  profitStakingAllowance();
+                  setAllowance("");
+                  allowance();
                 }}
                 className="flex rounded-md w-10 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-sm absolute right-2 justify-center"
                 type="button">
@@ -742,7 +699,7 @@ function Tokenomics() {
               </button>
             </div>
 
-            {_profitStakingAllowance !== "" && loader !== true ? (
+            {_allowance !== "" && loader !== true ? (
               <>
                 {isStakingAllowed ? (
                   <div className="flex w-full m-auto">
@@ -758,8 +715,8 @@ function Tokenomics() {
                 ) : isStakingNotAproved ? (
                   <button
                     onClick={e => {
-                      e.stopPropagation();
-                      aproveStaking();
+                      aprove();
+                      setLoader(true);
                     }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                     Aprove
@@ -839,28 +796,34 @@ function Tokenomics() {
                 value={input}
                 onChange={e => {
                   setInput(e.target.value);
-                  pmMintAllowance();
+                  setAllowance("");
+                  profitBalance();
+                  allowance();
                 }}
                 onClick={e => e.stopPropagation()}
                 className="ps-2 rounded-sm p-1 my-5 text-gray-400 bg-transparent border border-gray-600 w-full m-auto"
                 placeholder="0"
               />
               <button
-                onClick={() => setInput(String(profitWallet?.profitBalance))}
+                onClick={() => {
+                  setInput(String(profitWallet?.profitBalance));
+                  setAllowance("");
+                  allowance();
+                }}
                 className="flex rounded-md w-10 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-sm absolute right-2 justify-center"
                 type="button">
                 MAX
               </button>
             </div>
 
-            {_pmMintAllowance !== "" && loader !== true ? (
+            {_allowance !== "" && loader !== true ? (
               <>
                 {isMintAllowed ? (
                   <div className="flex justify-between w-full">
                     <button
                       onClick={e => {
-                        e.stopPropagation();
                         mint();
+                        setLoader(true);
                       }}
                       className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                       Mint
@@ -869,18 +832,14 @@ function Tokenomics() {
                 ) : isMintNotAproved ? (
                   <button
                     onClick={e => {
-                      e.stopPropagation();
-                      mint();
-                      pmMintAllowance();
+                      aprove();
+                      setLoader(true);
                     }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                     Aprove
                   </button>
-                ) : Number(input) > Number(profitWallet?.profitBalance) ? (
+                ) : isMintingInsufficient ? (
                   <button
-                    onClick={e => {
-                      e.stopPropagation();
-                    }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
                     disabled>
                     INSUFFICIENT BALANCE
