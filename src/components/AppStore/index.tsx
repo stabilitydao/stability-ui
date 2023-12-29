@@ -63,6 +63,10 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   let stabilityAPIData: any;
   const getData = async () => {
+    const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+      query: GRAPH_QUERY,
+    });
+
     if (isConnected) {
       const contractData = await readContract(_publicClient, {
         address: platform,
@@ -70,9 +74,10 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "getData",
       });
       console.log("getData", contractData);
-
       if (contractData[1]) {
-        tokens.set(contractData[1] as TAddress[]);
+        tokens.set(
+          contractData[1].map((address) => address.toLowerCase()) as TAddress[]
+        );
       }
 
       if (contractData && Array.isArray(contractData)) {
@@ -165,7 +170,6 @@ const AppStore = (props: React.PropsWithChildren) => {
       //   console.log('vaultInfo test', vaultInfoes[0])
       // }
       ///////////////////////
-
       vaultInfoes.forEach(async (vaultInfo, index) => {
         if (vaultInfo[3]?.length) {
           for (let i = 0; i < vaultInfo[3]?.length; i++) {
@@ -193,33 +197,19 @@ const AppStore = (props: React.PropsWithChildren) => {
             const assetsAprs: string[] = [];
             let monthlyAPR = 0;
 
-            const strategy = await readContract(_publicClient, {
-              address: contractVaults[0][index] as TAddress,
-              abi: VaultABI,
-              functionName: "strategy",
-            });
+            const graphVault = graphResponse.data.data.vaultEntities.find(
+              (obj: any) => obj.id === vault.toLowerCase()
+            );
 
-            const underlying = await readContract(_publicClient, {
-              address: strategy,
-              abi: StrategyABI,
-              functionName: "underlying",
-            });
-
-            const getAssetsProportions = await readContract(_publicClient, {
-              address: strategy,
-              abi: StrategyABI,
-              functionName: "getAssetsProportions",
-            });
-
-            const assetsProportions = getAssetsProportions
-              ? getAssetsProportions.map((proportion) =>
+            const assetsProportions = graphVault.assetsProportions
+              ? graphVault.assetsProportions.map((proportion: bigint) =>
                   Math.round(Number(formatUnits(proportion, 16)))
                 )
               : [];
 
             const APIData =
               stabilityAPIData?.underlyings?.["137"]?.[
-                underlying.toLowerCase()
+                graphVault.underlying.toLowerCase()
               ];
 
             if (APIData?.apr?.daily?.feeApr) {
@@ -253,14 +243,14 @@ const AppStore = (props: React.PropsWithChildren) => {
 
                 assets = [
                   {
-                    address: token1?.address,
+                    address: token1?.address.toLowerCase(),
                     logo: token1?.logoURI,
                     symbol: token1?.symbol,
                     name: token1?.name,
                     color: token1Extended?.color,
                   },
                   {
-                    address: token2?.address,
+                    address: token2?.address.toLowerCase(),
                     logo: token2?.logoURI,
                     symbol: token2?.symbol,
                     name: token2?.name,
@@ -303,9 +293,6 @@ const AppStore = (props: React.PropsWithChildren) => {
       }
       isVaultsLoaded.set(true);
     } else {
-      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
-        query: GRAPH_QUERY,
-      });
       const graphVaults = graphResponse.data.data.vaultEntities.reduce(
         (vaults: any, vault: any) => {
           //APY
@@ -417,15 +404,15 @@ const AppStore = (props: React.PropsWithChildren) => {
   };
 
   useEffect(() => {
+    getDataFromStabilityAPI();
+    getData();
     account.set(address);
     publicClient.set(_publicClient);
     network.set(chain?.name);
     connected.set(isConnected);
-    getDataFromStabilityAPI();
-    getData();
   }, [address, chain?.id, isConnected, $lastTx]);
 
-  return <>{props.children}</>;
+  return <div className="flex flex-col flex-1">{props.children}</div>;
 };
 
 export { AppStore };

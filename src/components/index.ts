@@ -7,6 +7,7 @@ import { VaultType } from "./VaultType";
 import { Loader } from "./Loader";
 import { AssetsProportion } from "./AssetsProportion";
 import { Header } from "./Header";
+import { Footer } from "./Footer";
 
 export {
   AppStore,
@@ -18,4 +19,5 @@ export {
   Loader,
   AssetsProportion,
   Header,
+  Footer,
 };

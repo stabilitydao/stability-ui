@@ -1,9 +1,9 @@
 import { assetsBalances } from "@store";
 
-import type { TBalances } from "@types";
+import type { TAddress, TBalances } from "@types";
 
 const addAssetsBalance = (data: any[]) => {
-  const assets = data[0];
+  const assets = data[0].map((address: TAddress) => address.toLowerCase());
   const _assetsBalances = data[2];
   const balances: TBalances = {};
   if (assets.length === _assetsBalances.length) {
