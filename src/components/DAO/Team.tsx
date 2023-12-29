@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { publicClient, balances, assetsPrices } from "@store";
+import { publicClient, assetsPrices } from "@store";
 import { formatUnits } from "viem";
 import { getTokenData } from "@utils";
 import type {
@@ -102,6 +102,8 @@ function Team() {
               args: [MULTISIG[0] as TAddress],
             });
 
+            console.log(balance);
+
             const decimals = getTokenData(address)?.decimals;
 
             if (decimals && balance >= 0n) {
@@ -123,6 +125,8 @@ function Team() {
               _balances[address] = tokenInfo;
             }
           }
+          console.log(_balances);
+
           setMultisigBalance(_balances);
         }
       } catch (error) {
@@ -134,14 +138,14 @@ function Team() {
   useEffect(() => {
     fetchTeamData();
     fetchMultiSig();
-  }, []);
+  }, [$assetsPrices]);
 
   return members ? (
     <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
       <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
 
       <div className="p-2 border border-gray-600 rounded-md mt-2">
-        <div className="p-3 bg-[#2c2f38] rounded-md text-sm font-medium border border-gray-700">
+        <div className="p-3 bg-[#2c2f38] rounded-md text-sm font-medium border border-gray-700 min-h-[262px]">
           <table className="text-[#8D8E96]">
             <thead>
               <tr>
@@ -163,8 +167,7 @@ function Team() {
             </tbody>
           </table>
           <div className="flex flex-wrap justify-evenly w-full gap-2 mt-4 mb-2 ">
-            {_multisigBalance &&
-              $assetsPrices &&
+            {_multisigBalance ? (
               Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
                 <div
                   className="bg-button p-3 rounded-md w-[115px] m-auto overflow-hidden"
@@ -184,7 +187,15 @@ function Team() {
                     ≈${tokenInfo.priceBalance}
                   </p>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="flex w-full justify-center m-auto ">
+                <Loader
+                  customHeight={50}
+                  customWidth={50}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
