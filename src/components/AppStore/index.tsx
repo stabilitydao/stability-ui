@@ -66,7 +66,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     const graphResponse = await axios.post(GRAPH_ENDPOINT, {
       query: GRAPH_QUERY,
     });
-
     if (isConnected) {
       const contractData = await readContract(_publicClient, {
         address: platform,
@@ -102,7 +101,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         args: [address as TAddress],
       });
 
-      console.log("Platform.getBalance", contractBalance);
+      console.log("getBalance", contractBalance);
       if (contractBalance?.length) {
         const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
         const erc20Balance: { [token: string]: bigint } = {};
@@ -134,16 +133,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         functionName: "vaults",
       });
 
-      /// debug visual
-      // if (contractVaults?.length) {
-      //   console.log('contractVaults', contractVaults)
-      //   contractVaults[5][0] = parseUnits('1.09343432', 18)
-      //   contractVaults[6][0] = parseUnits('814658.09343432', 18)
-      //   contractVaults[7][0] = parseUnits('24.682', 16)
-      //   contractVaults[8][0] = parseUnits('16.157', 16)
-      // }
-      ///////////////////////
-
       const vaultInfoes: any[] = await Promise.all(
         contractVaults[0].map(async (vault: string) => {
           const response: any = await readContract(_publicClient, {
@@ -155,21 +144,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           return response;
         })
       );
-      /// debug visual
-      // if (vaultInfoes?.length) {
-      //   console.log('vaultInfo', vaultInfoes[0])
-      //   vaultInfoes[0][3] = [
-      //     '0x45A3A657b834699f5cC902e796c547F826703b79',
-      //     '0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4',
-      //   ]
-      //   vaultInfoes[0][4] = [
-      //     parseUnits('9.6572445545', 16),
-      //     parseUnits('3.5355231352413', 16)
-      //   ]
-      //   vaultInfoes[0][5] = BigInt(1700574478)
-      //   console.log('vaultInfo test', vaultInfoes[0])
-      // }
-      ///////////////////////
       vaultInfoes.forEach(async (vaultInfo, index) => {
         if (vaultInfo[3]?.length) {
           for (let i = 0; i < vaultInfo[3]?.length; i++) {
@@ -281,6 +255,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr,
                 assetsAprs,
                 strategyInfo: getStrategyInfo(contractVaults[2][index]),
+                underlying: graphVault.underlying,
+                strategyAddress: graphVault.strategy,
               },
             };
           })
@@ -359,7 +335,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               ];
             }
           }
-
           //
           vaults[vault.id] = {
             address: vault.id,
@@ -382,6 +357,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsWithApr: assetsWithApr,
             assetsAprs: assetsAprs,
             strategyInfo: getStrategyInfo(vault.symbol),
+            underlying: vault.underlying,
+            strategyAddress: vault.strategy,
           };
           return vaults;
         },

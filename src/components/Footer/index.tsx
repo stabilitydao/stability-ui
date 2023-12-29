@@ -1,8 +1,12 @@
 const Footer = () => {
   return (
     <footer className="shrink-0">
-      <div className="flex items-center justify-end gap-5 py-5 px-3">
-        <a href="https://github.com/stabilitydao">
+      <div className="flex items-center justify-end py-5 px-3">
+        <a
+          className="px-3"
+          target="_blank"
+          href="https://github.com/stabilitydao"
+        >
           <svg
             width="15"
             height="16"
@@ -18,7 +22,11 @@ const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a href="https://twitter.com/stabilitydao">
+        <a
+          className="px-3"
+          target="_blank"
+          href="https://twitter.com/stabilitydao"
+        >
           <svg
             width="14"
             height="12"
@@ -32,7 +40,7 @@ const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a href="https://t.me/stabilitydao">
+        <a className="px-3" target="_blank" href="https://t.me/stabilitydao">
           <svg
             width="18"
             height="18"
@@ -46,7 +54,11 @@ const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a href="https://discord.com/invite/R3nnetWzC9">
+        <a
+          className="px-3"
+          target="_blank"
+          href="https://discord.com/invite/R3nnetWzC9"
+        >
           <svg
             width="16"
             height="17"
@@ -62,7 +74,11 @@ const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a href="https://book.stabilitydao.org/">
+        <a
+          className="px-3"
+          target="_blank"
+          href="https://book.stabilitydao.org/"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="19"

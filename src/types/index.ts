@@ -116,6 +116,8 @@ type TLocalVault = {
   assetsWithApr: string[];
   assetsAprs: string[];
   strategyInfo: IStrategyInfo;
+  underlying: TAddress;
+  strategyAddress: TAddress;
 };
 type TVaultAssets = [string, string];
 

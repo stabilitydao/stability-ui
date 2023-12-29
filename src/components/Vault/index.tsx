@@ -275,51 +275,54 @@ function Vault({ vault }: IProps) {
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     ///// GET UNDERLYING TOKEN
+
     try {
-      const strategy = await readContract(_publicClient, {
-        address: vault as TAddress,
-        abi: VaultABI,
-        functionName: "strategy",
-      });
-      const underlying = await readContract(_publicClient, {
-        address: strategy,
-        abi: StrategyABI,
-        functionName: "underlying",
-      });
-      if (underlying != zeroAddress) {
-        const underlyingSymbol = await readContract(_publicClient, {
-          address: underlying,
-          abi: ERC20MetadataUpgradeableABI,
-          functionName: "symbol",
-        });
+      if (localVault.underlying != zeroAddress) {
+        if ($connected) {
+          const underlyingSymbol = await readContract(_publicClient, {
+            address: localVault.underlying,
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "symbol",
+          });
 
-        const underlyingDecimals = await readContract(_publicClient, {
-          address: underlying,
-          abi: ERC20MetadataUpgradeableABI,
-          functionName: "decimals",
-        });
+          const underlyingDecimals = await readContract(_publicClient, {
+            address: localVault.underlying,
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "decimals",
+          });
 
-        const underlyingAllowance = await readContract(_publicClient, {
-          address: underlying,
-          abi: ERC20MetadataUpgradeableABI,
-          functionName: "allowance",
-          args: [$account as TAddress, vault as TAddress],
-        });
+          const underlyingAllowance = await readContract(_publicClient, {
+            address: localVault.underlying,
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "allowance",
+            args: [$account as TAddress, vault as TAddress],
+          });
 
-        const underlyingBalance = await readContract(_publicClient, {
-          address: underlying,
-          abi: ERC20MetadataUpgradeableABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
-        setUnderlyingToken({
-          address: underlying,
-          symbol: underlyingSymbol,
-          decimals: underlyingDecimals,
-          balance: formatUnits(underlyingBalance, underlyingDecimals),
-          allowance: formatUnits(underlyingAllowance, underlyingDecimals),
-          logoURI: "/protocols/Gamma.png",
-        });
+          const underlyingBalance = await readContract(_publicClient, {
+            address: localVault.underlying,
+            abi: ERC20MetadataUpgradeableABI,
+            functionName: "balanceOf",
+            args: [$account as TAddress],
+          });
+          setUnderlyingToken({
+            address: localVault.underlying,
+            symbol: underlyingSymbol,
+            decimals: underlyingDecimals,
+            balance: formatUnits(underlyingBalance, underlyingDecimals),
+            allowance: formatUnits(underlyingAllowance, underlyingDecimals),
+            logoURI: "/protocols/Gamma.png",
+          });
+        } else {
+          const defaultTokens = defaultOptionSymbols.split(" + ");
+          setUnderlyingToken({
+            address: localVault.underlying,
+            symbol: `aw${defaultTokens[0]}-${defaultTokens[1]}`,
+            decimals: 18,
+            balance: 0,
+            allowance: 0,
+            logoURI: "/protocols/Gamma.png",
+          });
+        }
       }
       setOptionTokens(filtredTokens);
     } catch (error) {
@@ -1219,8 +1222,10 @@ function Vault({ vault }: IProps) {
   }, [option]);
 
   useEffect(() => {
-    selectTokensHandler();
-  }, [$tokens, defaultOptionSymbols]);
+    if (localVault) {
+      selectTokensHandler();
+    }
+  }, [localVault, $tokens, defaultOptionSymbols]);
 
   // need tests
   useEffect(() => {
