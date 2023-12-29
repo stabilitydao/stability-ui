@@ -209,6 +209,7 @@ type TTokenomics = {
   sdivTotalSupply: string;
   pmToMint: string;
   pmTotalSupply: string;
+  pmMinted: string;
 };
 
 type TProfitTokenWallet = {

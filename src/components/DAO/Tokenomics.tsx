@@ -32,7 +32,7 @@ function Tokenomics() {
   const [_allowance, setAllowance] = useState("");
   const [showMintModal, setShowMintModal] = useState(false);
   const [showStakeModal, setShowStakeModal] = useState(false);
-  const [tabStakeModal, setTabStakeModal] = useState("stake");
+  const [handleTabStakeModal, setHandleTabStakeModal] = useState("stake");
   const [loader, setLoader] = useState(false);
 
   const fetchTokenomicsData = async () => {
@@ -44,16 +44,23 @@ function Tokenomics() {
           functionName: "totalSupply",
         });
 
+        const sdivTotalSupply = await $publicClient.readContract({
+          address: SDIV[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "totalSupply",
+        });
+
         const pmTotalSupply = await $publicClient.readContract({
           address: PM[0] as TAddress,
           abi: IERC721Enumerable,
           functionName: "totalSupply",
         });
 
-        const sdivTotalSupply = await $publicClient.readContract({
-          address: SDIV[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "totalSupply",
+        const pmMinted = await $publicClient.readContract({
+          address: PM[0] as TAddress,
+          abi: IERC721Enumerable,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
         });
 
         if ($assetsPrices) {
@@ -77,9 +84,10 @@ function Tokenomics() {
             sdivTotalSupply: Number(
               formatUnits(sdivTotalSupply, 18)
             ).toLocaleString(),
-
+            //MUST FIX IT
             pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
             pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
+            pmMinted: Number(pmMinted).toLocaleString(),
           };
           setTokenomics(_tokenomics);
         }
@@ -102,11 +110,11 @@ function Tokenomics() {
     setAllowance(formatUnits(allowance as bigint, 18));
   };
 
-  const aprove = async () => {
+  const approve = async () => {
     try {
       const amount = parseUnits(input, 18);
 
-      const aprove = await writeContract({
+      const approve = await writeContract({
         address: PROFIT[0] as TAddress,
         abi: ERC20MetadataUpgradeableABI,
         functionName: "approve",
@@ -114,7 +122,7 @@ function Tokenomics() {
       });
 
       const transaction = await $publicClient?.waitForTransactionReceipt(
-        aprove
+        approve
       );
 
       if (transaction?.status === "success") {
@@ -127,7 +135,7 @@ function Tokenomics() {
     } catch (error) {
       setLoader(false);
 
-      console.error("Error in aprove:", error);
+      console.error("Error in approve:", error);
     }
   };
 
@@ -308,27 +316,27 @@ function Tokenomics() {
   }, [$assetsPrices]);
 
   const isStakingAllowed =
-    tabStakeModal === "stake" &&
+    handleTabStakeModal === "stake" &&
     Number(input) > 0 &&
     Number(input) <= Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
-  const isStakingNotAproved =
-    tabStakeModal === "stake" &&
+  const isStakingNotApproved =
+    handleTabStakeModal === "stake" &&
     Number(input) > Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
   const isStakingInsufficient =
-    tabStakeModal === "stake" &&
+    handleTabStakeModal === "stake" &&
     Number(input) > Number(profitWallet?.profitBalance);
 
   const isUnstakingAllowed =
-    tabStakeModal === "unstake" &&
+    handleTabStakeModal === "unstake" &&
     Number(input) > 0 &&
     Number(input) <= Number(profitWallet?.profitStaked);
 
   const isUnstakingInsufficient =
-    tabStakeModal === "unstake" &&
+    handleTabStakeModal === "unstake" &&
     Number(input) > Number(profitWallet?.profitStaked);
 
   const isMintAllowed =
@@ -336,7 +344,7 @@ function Tokenomics() {
     Number(input) <= Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
-  const isMintNotAproved =
+  const isMintNotApproved =
     Number(input) > Number(_allowance) &&
     Number(input) <= Number(profitWallet?.profitBalance);
 
@@ -413,7 +421,7 @@ function Tokenomics() {
                 onClick={() => {
                   setShowStakeModal(true);
                   setInput("");
-                  setTabStakeModal("stake");
+                  setHandleTabStakeModal("stake");
                 }}
                 className="bg-button me-3 rounded-sm p-2 font-medium text-[#8D8E96]">
                 Stake | Unstake
@@ -580,7 +588,7 @@ function Tokenomics() {
                   </tr>
                   <tr>
                     <td>Minted: </td>
-                    <td>0 PM</td>
+                    <td>{tokenomics.pmMinted} PM</td>
                   </tr>
                 </tbody>
               </table>
@@ -632,11 +640,11 @@ function Tokenomics() {
             <div className="w-full flex justify-evenly">
               <button
                 onClick={() => {
-                  setTabStakeModal("stake");
+                  setHandleTabStakeModal("stake");
                   setInput("");
                 }}
                 className={`w-1/2 text-gray-400 ${
-                  tabStakeModal === "stake" &&
+                  handleTabStakeModal === "stake" &&
                   "border border-b-1 border-t-0 border-l-0 border-r-0 border-gray-400 text-white rounded-top-md"
                 }`}>
                 STAKE
@@ -644,11 +652,11 @@ function Tokenomics() {
 
               <button
                 onClick={() => {
-                  setTabStakeModal("unstake");
+                  setHandleTabStakeModal("unstake");
                   setInput("");
                 }}
                 className={`w-1/2 text-gray-400 ${
-                  tabStakeModal === "unstake" &&
+                  handleTabStakeModal === "unstake" &&
                   "border border-b-1 border-t-0 border-l-0 border-r-0 border-gray-400 text-white"
                 }`}>
                 UNSTAKE
@@ -685,7 +693,7 @@ function Tokenomics() {
               />
               <button
                 onClick={() => {
-                  if (tabStakeModal === "stake") {
+                  if (handleTabStakeModal === "stake") {
                     setInput(String(profitWallet?.profitBalance));
                   } else {
                     setInput(String(profitWallet?.profitStaked));
@@ -712,14 +720,14 @@ function Tokenomics() {
                       Stake
                     </button>
                   </div>
-                ) : isStakingNotAproved ? (
+                ) : isStakingNotApproved ? (
                   <button
                     onClick={e => {
-                      aprove();
+                      approve();
                       setLoader(true);
                     }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
-                    Aprove
+                    Approve
                   </button>
                 ) : isStakingInsufficient ? (
                   <button
@@ -829,14 +837,14 @@ function Tokenomics() {
                       Mint
                     </button>
                   </div>
-                ) : isMintNotAproved ? (
+                ) : isMintNotApproved ? (
                   <button
                     onClick={e => {
-                      aprove();
+                      approve();
                       setLoader(true);
                     }}
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
-                    Aprove
+                    Approve
                   </button>
                 ) : isMintingInsufficient ? (
                   <button
