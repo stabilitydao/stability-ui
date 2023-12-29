@@ -96,22 +96,28 @@ type TAssetBalance = {
   assetBalance: bigint;
 };
 type TLocalVault = {
+  address: TAddress;
   name: string;
-  assets: { logo: string; symbol: string; name: string; color: string }[];
   symbol: string;
   type: string;
   strategy: string;
-  balance: string;
   shareprice: string;
   tvl: string;
   apr: string;
   apy: string;
   strategyApr: string;
-  address: string;
-  strategyInfo: IStrategyInfo;
-  strategySpecific: any;
+  strategySpecific: string;
+  balance: string;
+  lastHardWork: bigint;
+  daily: number;
   monthlyUnderlyingApr: number;
-  assetsProportions?: number[];
+  assets: { logo: string; symbol: string; name: string; color: string }[];
+  assetsProportions: number[];
+  assetsWithApr: string[];
+  assetsAprs: string[];
+  strategyInfo: IStrategyInfo;
+  underlying: TAddress;
+  strategyAddress: TAddress;
 };
 type TVaultAssets = [string, string];
 
@@ -123,9 +129,9 @@ type TTableColumn = {
 };
 type TAPRModal = {
   apr: string;
-  assetsWithApr: string;
+  assetsWithApr: any;
   assetsAprs: number;
-  lastHardWork: number;
+  lastHardWork: any;
   strategyApr: number;
   state: boolean;
 };
