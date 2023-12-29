@@ -126,8 +126,8 @@ function Tokenomics() {
       );
 
       if (transaction?.status === "success") {
-        allowance();
-        profitBalance();
+        await allowance();
+        await profitBalance();
         setLoader(false);
       } else {
         console.error("Transaction error");
@@ -152,8 +152,8 @@ function Tokenomics() {
       const transaction = await $publicClient?.waitForTransactionReceipt(stake);
 
       if (transaction?.status === "success") {
-        profitBalance();
-        sdivBalance();
+        await profitBalance();
+        await sdivBalance();
         setInput("");
         setLoader(false);
       } else {
@@ -179,8 +179,8 @@ function Tokenomics() {
       );
 
       if (transaction?.status === "success") {
-        profitBalance();
-        sdivBalance();
+        await profitBalance();
+        await sdivBalance();
         setInput("");
         setLoader(false);
       } else {
@@ -232,8 +232,8 @@ function Tokenomics() {
         );
 
         if (transaction?.status === "success") {
-          fetchTokenomicsData();
-          profitBalance();
+          await fetchTokenomicsData();
+          await profitBalance();
           setInput("");
           setLoader(false);
         } else {
