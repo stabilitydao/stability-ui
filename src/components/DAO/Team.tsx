@@ -102,8 +102,6 @@ function Team() {
               args: [MULTISIG[0] as TAddress],
             });
 
-            console.log(balance);
-
             const decimals = getTokenData(address)?.decimals;
 
             if (decimals && balance >= 0n) {
@@ -111,22 +109,19 @@ function Team() {
                 balance:
                   Math.trunc(Number(formatUnits(balance, decimals)) * 100) /
                   100,
-                priceBalance: Number(
+                priceBalance:
                   Math.trunc(
-                    Number(formatUnits(balance, decimals)) *
+                    Number(formatUnits(balance, 18)) *
                       Number(
                         formatUnits($assetsPrices[address].tokenPrice, decimals)
                       ) *
                       100
-                  ) / 100
-                ),
+                  ) / 100,
               };
 
               _balances[address] = tokenInfo;
             }
           }
-          console.log(_balances);
-
           setMultisigBalance(_balances);
         }
       } catch (error) {

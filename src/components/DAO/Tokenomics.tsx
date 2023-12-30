@@ -206,7 +206,7 @@ function Tokenomics() {
         );
 
         if (transaction?.status === "success") {
-          sdivBalance();
+          await sdivBalance();
         } else {
           console.error("Transaction error");
         }
@@ -340,15 +340,10 @@ function Tokenomics() {
     Number(input) > Number(profitWallet?.profitStaked);
 
   const isMintAllowed =
-    Number(input) >= 10000 &&
-    Number(input) <= Number(_allowance) &&
-    Number(input) <= Number(profitWallet?.profitBalance);
+    Number(_allowance) >= 10000 && Number(profitWallet?.profitBalance) >= 10000;
 
   const isMintNotApproved =
-    Number(input) > Number(_allowance) &&
-    Number(input) <= Number(profitWallet?.profitBalance);
-
-  const isMintingInsufficient = Number(input) > 0;
+    Number(_allowance) < 10000 && Number(profitWallet?.profitBalance) >= 10000;
 
   return tokenomics ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
@@ -419,9 +414,10 @@ function Tokenomics() {
             <div className="flex mt-3 text-sm me-auto  justify-between">
               <button
                 onClick={() => {
-                  setShowStakeModal(true);
-                  setInput("");
+                  allowance();
+                  profitBalance();
                   setHandleTabStakeModal("stake");
+                  setShowStakeModal(true);
                 }}
                 className="bg-button me-3 rounded-sm p-2 font-medium text-[#8D8E96]">
                 Stake | Unstake
@@ -596,8 +592,10 @@ function Tokenomics() {
               <div className="flex justify-between mt-3 text-sm">
                 <button
                   onClick={() => {
+                    setInput(10000);
+                    profitBalance();
+                    allowance();
                     setShowMintModal(true);
-                    setInput("");
                   }}
                   className="bg-button rounded-sm p-2 font-medium text-[#8D8E96]">
                   Mint
@@ -684,7 +682,6 @@ function Tokenomics() {
                   setInput(e.target.value);
                   setAllowance("");
                   profitBalance();
-                  sdivBalance();
                   allowance();
                 }}
                 onClick={e => e.stopPropagation()}
@@ -740,7 +737,6 @@ function Tokenomics() {
                 {isUnstakingAllowed ? (
                   <button
                     onClick={e => {
-                      e.stopPropagation();
                       unStake();
                       setLoader(true);
                     }}
@@ -786,7 +782,7 @@ function Tokenomics() {
               </button>
             </div>
 
-            <table className="w-full m-auto mt-3">
+            <table className="w-full m-auto my-3">
               <tbody>
                 <tr>
                   <td className="w-[70px]">Wallet: </td>
@@ -798,31 +794,18 @@ function Tokenomics() {
                 </tr>
               </tbody>
             </table>
-
-            <div className="flex items-center w-full m-auto relative  ">
-              <input
-                value={input}
-                onChange={e => {
-                  setInput(e.target.value);
-                  setAllowance("");
-                  profitBalance();
-                  allowance();
-                }}
-                onClick={e => e.stopPropagation()}
-                className="ps-2 rounded-sm p-1 my-5 text-gray-400 bg-transparent border border-gray-600 w-full m-auto"
-                placeholder="0"
+            <p className="text-sm mb-3 flex">
+              1 PM
+              <img
+                className="w-5 rounded-full mx-1"
+                src="https://stabilitydao.org/pm.png"
               />
-              <button
-                onClick={() => {
-                  setInput(String(profitWallet?.profitBalance));
-                  setAllowance("");
-                  allowance();
-                }}
-                className="flex rounded-md w-10 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-sm absolute right-2 justify-center"
-                type="button">
-                MAX
-              </button>
-            </div>
+              {"->"} 10.000 PROFIT
+              <img
+                className="w-5 rounded-full mx-1"
+                src="https://stabilitydao.org/profit.png"
+              />
+            </p>
 
             {_allowance !== "" && loader !== true ? (
               <>
@@ -846,13 +829,13 @@ function Tokenomics() {
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
                     Approve
                   </button>
-                ) : isMintingInsufficient ? (
+                ) : (
                   <button
                     className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
                     disabled>
                     INSUFFICIENT BALANCE
                   </button>
-                ) : null}
+                )}
               </>
             ) : (
               <button
