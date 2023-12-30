@@ -6,6 +6,8 @@ import { calculateAPY } from "./functions/calculateAPY";
 import { getTimeDifference } from "./functions/getTimeDifference";
 import { getStrategyInfo } from "./functions/getStrategyInfo";
 import { addAssetsPrice } from "./functions/addAssetsPrice";
+import { addAssetsBalance } from "./functions/addAssetsBalance";
+import { addVaultData } from "./functions/addVaultData";
 import { get1InchRoutes } from "./functions/get1InchRoutes";
 import { debounce } from "./functions/debounce";
 
@@ -20,4 +22,6 @@ export {
   addAssetsPrice,
   get1InchRoutes,
   debounce,
+  addAssetsBalance,
+  addVaultData,
 };

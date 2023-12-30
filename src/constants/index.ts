@@ -127,11 +127,53 @@ const CHAINS = [
 ];
 
 const SLIPPAGE_VALUES = ["0.5", "1", "2"];
+const GRAPH_ENDPOINT =
+  "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
+
+const GRAPH_QUERY = `
+      {
+        vaultEntities {
+          id
+          apr
+          tvl
+          sharePrice
+          assetsProportions
+          strategy
+          strategyId
+          totalSupply
+          color
+          upgradeAllowed
+          vaultType
+          version
+          colorBackground
+          deployAllowed
+          vaultBuildingPrice
+          underlying
+          symbol
+          strategySpecific
+          name
+          strategyAssets
+          lastHardWork
+          assetsWithApr
+          assetsAprs
+        }
+        platformEntities {
+          bcAssets
+        }
+      }
+      `;
+
+const STABILITY_API = "https://api.stabilitydao.org/";
+
 export {
   TABLE,
   PAGINATION_VAULTS,
   TOKENS_ASSETS,
   CHAINS,
+  SLIPPAGE_VALUES,
+  GRAPH_ENDPOINT,
+  GRAPH_QUERY,
+  STABILITY_API,
   USDC,
   USDT,
   DAI,
@@ -142,6 +184,5 @@ export {
   SDIV,
   PM,
   TREASURY,
-  SLIPPAGE_VALUES,
   MULTISIG,
 };

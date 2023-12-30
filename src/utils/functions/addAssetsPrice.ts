@@ -1,8 +1,8 @@
 import { assetsPrices } from "@store";
-import type { TAssetPrices } from "@types";
+import type { TAddress, TAssetPrices } from "@types";
 
 export const addAssetsPrice = (data: any) => {
-  const tokenAdress = data[0];
+  const tokenAdress = data[0].map((address: TAddress) => address.toLowerCase());
   const tokenPrice = data[1];
   const assetPrice: TAssetPrices = {};
 

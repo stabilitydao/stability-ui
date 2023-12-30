@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits } from "viem";
 
 import { platform, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
-import { platformData, publicClient, lastTx, balances, account } from "@store";
+import {
+  platformData,
+  publicClient,
+  lastTx,
+  balances,
+  account,
+  connected,
+} from "@store";
 
 import { BuildForm } from "./BuildForm";
 
@@ -20,6 +28,9 @@ const CreateVaultComponent = () => {
   const $platformData = useStore(platformData);
   const $balances = useStore(balances);
   const $account = useStore(account);
+  const $connected = useStore(connected);
+
+  const { open } = useWeb3Modal();
 
   const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
@@ -205,147 +216,212 @@ const CreateVaultComponent = () => {
     variant => variant.vaultType === "Compounding"
   ).length;
   return (
-    <div>
-      <h2 className="text-[22px] mb-3">Compounding vault</h2>
-      {compoundingVaultsForBuilding ? (
-        <table className="bg-[#2c2f38] rounded-lg mx-auto">
-          <thead className="h-[50px]">
-            <tr className="text-[18px]">
-              <td>Strategy logic</td>
-              <td>Strategy description</td>
-              <td></td>
-            </tr>
-          </thead>
-          <tbody className="text-[16px]">
+    <>
+      {$connected ? (
+        <div>
+          <h2 className="text-[22px] mb-3">Compounding vault</h2>
+          {compoundingVaultsForBuilding ? (
+            <table className="bg-[#2c2f38] rounded-lg mx-auto">
+              <thead className="h-[50px]">
+                <tr className="text-[18px]">
+                  <td>Strategy logic</td>
+                  <td>Strategy description</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody className="text-[16px]">
+                {buildVariants.map((variant, i) => {
+                  if (variant.vaultType !== "Compounding") {
+                    return;
+                  }
+                  return (
+                    <tr
+                      className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                      key={
+                        variant.strategyDesc +
+                        variant.vaultType +
+                        variant.strategyId
+                      }>
+                      <td>{variant.strategyId}</td>
+                      <td>{variant.strategyDesc}</td>
+                      <td>
+                        {variant.canBuild && (
+                          <button
+                            className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
+                            onClick={() => {
+                              setBuildIndex(i);
+                            }}>
+                            Assemble
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <div className="bg-[#486556] border-[2px] border-[#488B57] max-w-[500px] flex items-center justify-center flex-col mx-auto py-3 px-5 text-center gap-2 rounded-md">
+              <p>All compounding vaults have already been created. </p>
+              <p>New vaults can be created after developing new strategies.</p>
+            </div>
+          )}
+          <h2 className="text-[22px] my-5">Rewarding vault</h2>
+          <div className="bg-[#2c2f38] rounded-md mb-5 max-w-[800px] mx-auto">
+            <div className="px-5 py-3">
+              {allowedBBTokenVaults && (
+                <div>
+                  <p className="text-center text-[18px] mb-2">
+                    For allowed buy-back tokens, the following number of
+                    rewarding vaults can be created:
+                  </p>
+                  <div className="flex flex-col">
+                    {Object.keys(allowedBBTokenVaults).map(token => {
+                      const tokenData = getTokenData(token);
+                      return (
+                        <div
+                          key={token}
+                          className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md">
+                          <div className="flex items-center justify-center px-1 py-1">
+                            {tokenData && (
+                              <img
+                                src={tokenData.logoURI}
+                                alt={tokenData.name}
+                                className="max-w-[22px] mr-1"
+                              />
+                            )}
+                            {tokenData?.symbol || token}
+                          </div>
+                          <p>{allowedBBTokenVaults[token]}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {minInitialBoostPerDay !== undefined && (
+                <div className="text-[18px] my-2 flex items-start sm:items-center justify-between sm:justify-center">
+                  <p className="w-3/4 sm:w-auto">
+                    Minimal initial boost value per day:{" "}
+                  </p>
+                  <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+                    ${formatUnits(minInitialBoostPerDay, 18)}
+                  </div>
+                </div>
+              )}
+              <div className="text-[18px] mb-2 flex items-start sm:items-center justify-between sm:justify-center">
+                <p className="w-3/4 sm:w-auto">
+                  Buy-back rewards vesting duration:{" "}
+                </p>
+                <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
+                  7 days
+                </div>
+              </div>
+              <div className="text-[18px] flex items-start sm:items-center justify-between sm:justify-center">
+                <p className="w-3/4 sm:w-auto">
+                  Boost rewards vesting duration:{" "}
+                </p>
+                <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-0 sm:ml-2 px-1 py-1">
+                  30 days
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <table className="hidden md:table bg-[#2c2f38] rounded-lg mx-auto">
+            <thead className="h-[70px]">
+              <tr className="text-[18px] whitespace-nowrap">
+                <td>Vault type</td>
+                <td>Buy-back token</td>
+                <td>Strategy logic</td>
+                <td>Strategy description</td>
+                <td></td>
+              </tr>
+            </thead>
+            <tbody className="text-[16px]">
+              {buildVariants.map((variant, i) => {
+                if (variant.vaultType !== "Rewarding") {
+                  return;
+                }
+                return (
+                  <tr
+                    key={
+                      variant.strategyDesc +
+                      variant.vaultType +
+                      variant.strategyId
+                    }
+                    className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]">
+                    <td>{variant.vaultType}</td>
+                    <td>
+                      {
+                        getTokenData(
+                          buildVariants[i].initParams.initVaultAddresses[0]
+                        )?.symbol
+                      }
+                    </td>
+                    <td>{variant.strategyId}</td>
+                    <td>{variant.strategyDesc}</td>
+                    <td>
+                      {variant.canBuild && (
+                        <button
+                          className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
+                          onClick={() => {
+                            setBuildIndex(i);
+                          }}>
+                          Assemble
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="md:hidden flex flex-col justify-center items-center gap-3">
             {buildVariants.map((variant, i) => {
-              if (variant.vaultType !== "Compounding") {
+              if (variant.vaultType !== "Rewarding") {
                 return;
               }
               return (
-                <tr
-                  className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                <div
                   key={
                     variant.strategyDesc +
                     variant.vaultType +
                     variant.strategyId
-                  }>
-                  <td>{variant.strategyId}</td>
-                  <td>{variant.strategyDesc}</td>
-                  <td>
-                    {variant.canBuild && (
-                      <button
-                        className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
-                        onClick={() => {
-                          setBuildIndex(i);
-                        }}>
-                        Assemble
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      ) : (
-        <div className="bg-[#486556] border-[2px] border-[#488B57] max-w-[500px] flex items-center justify-center flex-col mx-auto py-3 px-5 text-center gap-2 rounded-md">
-          <p>All compounding vaults have already been created. </p>
-          <p>New vaults can be created after developing new strategies.</p>
-        </div>
-      )}
-      <h2 className="text-[22px] my-5">Rewarding vault</h2>
-      <div className="bg-[#2c2f38] rounded-md mb-5 max-w-[800px] mx-auto">
-        <div className="px-5 py-3">
-          {allowedBBTokenVaults && (
-            <div>
-              <p className="text-center text-[18px] mb-2">
-                For allowed buy-back tokens, the following number of rewarding
-                vaults can be created:
-              </p>
-              <div className="flex flex-col">
-                {Object.keys(allowedBBTokenVaults).map(token => {
-                  const tokenData = getTokenData(token);
-                  return (
-                    <div
-                      key={token}
-                      className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md">
-                      <div className="flex items-center justify-center px-1 py-1">
-                        {tokenData && (
-                          <img
-                            src={tokenData.logoURI}
-                            alt={tokenData.name}
-                            className="max-w-[22px] mr-1"
-                          />
-                        )}
-                        {tokenData?.symbol || token}
-                      </div>
-                      <p>{allowedBBTokenVaults[token]}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {minInitialBoostPerDay !== undefined && (
-            <div className="text-[18px] my-2 flex items-start sm:items-center justify-between sm:justify-center">
-              <p className="w-3/4 sm:w-auto">
-                Minimal initial boost value per day:{" "}
-              </p>
-              <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
-                ${formatUnits(minInitialBoostPerDay, 18)}
-              </div>
-            </div>
-          )}
-          <div className="text-[18px] mb-2 flex items-start sm:items-center justify-between sm:justify-center">
-            <p className="w-3/4 sm:w-auto">
-              Buy-back rewards vesting duration:{" "}
-            </p>
-            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-2 px-1 py-1">
-              7 days
-            </div>
-          </div>
-          <div className="text-[18px] flex items-start sm:items-center justify-between sm:justify-center">
-            <p className="w-3/4 sm:w-auto">Boost rewards vesting duration: </p>
-            <div className="border-[2px] bg-[#486556] text-[#B0DDB8] border-[#488B57] rounded-md ml-0 sm:ml-2 px-1 py-1">
-              30 days
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <table className="hidden md:table bg-[#2c2f38] rounded-lg mx-auto">
-        <thead className="h-[70px]">
-          <tr className="text-[18px] whitespace-nowrap">
-            <td>Vault type</td>
-            <td>Buy-back token</td>
-            <td>Strategy logic</td>
-            <td>Strategy description</td>
-            <td></td>
-          </tr>
-        </thead>
-        <tbody className="text-[16px]">
-          {buildVariants.map((variant, i) => {
-            if (variant.vaultType !== "Rewarding") {
-              return;
-            }
-            return (
-              <tr
-                key={
-                  variant.strategyDesc + variant.vaultType + variant.strategyId
-                }
-                className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]">
-                <td>{variant.vaultType}</td>
-                <td>
-                  {
-                    getTokenData(
-                      buildVariants[i].initParams.initVaultAddresses[0]
-                    )?.symbol
                   }
-                </td>
-                <td>{variant.strategyId}</td>
-                <td>{variant.strategyDesc}</td>
-                <td>
+                  className="flex flex-col items-center justify-center py-[10px] transition delay-[10ms] bg-[#2C2F38] w-full px-5 rounded-md">
+                  <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                    <p className="w-1/2 border-r border-[#4f5158]">
+                      Vault type
+                    </p>
+                    <p className="w-1/2 text-end">{variant.vaultType}</p>
+                  </div>
+                  <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                    <p className="w-1/2 border-r border-[#4f5158]">
+                      Buy-back token
+                    </p>
+                    <p className="w-1/2 text-end">
+                      {
+                        getTokenData(
+                          buildVariants[i].initParams.initVaultAddresses[0]
+                        )?.symbol
+                      }
+                    </p>
+                  </div>
+                  <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                    <p className="w-1/2 border-r border-[#4f5158]">
+                      Strategy logic
+                    </p>
+                    <p className="w-1/2 text-end">{variant.strategyId}</p>
+                  </div>
+                  <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
+                    <p className="w-1/2 border-r border-[#4f5158]">
+                      Strategy description
+                    </p>
+                    <p className="w-1/2 text-end">{variant.strategyDesc}</p>
+                  </div>
+
                   {variant.canBuild && (
                     <button
                       className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
@@ -355,105 +431,59 @@ const CreateVaultComponent = () => {
                       Assemble
                     </button>
                   )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <div className="md:hidden flex flex-col justify-center items-center gap-3">
-        {buildVariants.map((variant, i) => {
-          if (variant.vaultType !== "Rewarding") {
-            return;
-          }
-          return (
-            <div
-              key={
-                variant.strategyDesc + variant.vaultType + variant.strategyId
-              }
-              className="flex flex-col items-center justify-center py-[10px] transition delay-[10ms] bg-[#2C2F38] w-full px-5 rounded-md">
-              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                <p className="w-1/2 border-r border-[#4f5158]">Vault type</p>
-                <p className="w-1/2 text-end">{variant.vaultType}</p>
-              </div>
-              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                <p className="w-1/2 border-r border-[#4f5158]">
-                  Buy-back token
-                </p>
-                <p className="w-1/2 text-end">
-                  {
-                    getTokenData(
-                      buildVariants[i].initParams.initVaultAddresses[0]
-                    )?.symbol
-                  }
-                </p>
-              </div>
-              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                <p className="w-1/2 border-r border-[#4f5158]">
-                  Strategy logic
-                </p>
-                <p className="w-1/2 text-end">{variant.strategyId}</p>
-              </div>
-              <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                <p className="w-1/2 border-r border-[#4f5158]">
-                  Strategy description
-                </p>
-                <p className="w-1/2 text-end">{variant.strategyDesc}</p>
-              </div>
-
-              {variant.canBuild && (
-                <button
-                  className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
-                  onClick={() => {
-                    setBuildIndex(i);
-                  }}>
-                  Assemble
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
-      <div className="text-[22px] text-center">Coming soon</div>
-
-      {$platformData && buildIndex !== undefined && (
-        <div
-          className="overlay"
-          onClick={() => {
-            setBuildIndex(undefined);
-          }}>
-          <div
-            className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[10px] sm:px-[30px] rounded-md bg-modal mr-0 md:mr-5 "
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}>
-            <div className="font-bold text-[1.2rem] sm:text-[1.5rem] flex justify-center">
-              Assembling
-            </div>
-            <BuildForm
-              vaultType={buildVariants[buildIndex].vaultType}
-              strategyId={buildVariants[buildIndex].strategyId}
-              strategyDesc={buildVariants[buildIndex].strategyDesc}
-              initParams={buildVariants[buildIndex].initParams}
-              buildingPrice={
-                $platformData.buildingPrices[
-                  buildVariants[buildIndex].vaultType
-                ]
-              }
-              defaultBoostTokens={defaultBoostTokens}
-              minInitialBoostPerDay={formatUnits(
-                minInitialBoostPerDay as bigint,
-                18
-              )}
-              nftData={freeVaults}
-            />
+                </div>
+              );
+            })}
           </div>
+
+          <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
+          <div className="text-[22px] text-center">Coming soon</div>
+
+          {$platformData && buildIndex !== undefined && (
+            <div
+              className="overlay"
+              onClick={() => {
+                setBuildIndex(undefined);
+              }}>
+              <div
+                className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[10px] sm:px-[30px] rounded-md bg-modal mr-0 md:mr-5 "
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}>
+                <div className="font-bold text-[1.2rem] sm:text-[1.5rem] flex justify-center">
+                  Assembling
+                </div>
+                <BuildForm
+                  vaultType={buildVariants[buildIndex].vaultType}
+                  strategyId={buildVariants[buildIndex].strategyId}
+                  strategyDesc={buildVariants[buildIndex].strategyDesc}
+                  initParams={buildVariants[buildIndex].initParams}
+                  buildingPrice={
+                    $platformData.buildingPrices[
+                      buildVariants[buildIndex].vaultType
+                    ]
+                  }
+                  defaultBoostTokens={defaultBoostTokens}
+                  minInitialBoostPerDay={formatUnits(
+                    minInitialBoostPerDay as bigint,
+                    18
+                  )}
+                  nftData={freeVaults}
+                />
+              </div>
+            </div>
+          )}
         </div>
+      ) : (
+        <button
+          type="button"
+          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+          onClick={() => open()}>
+          CONNECT WALLET
+        </button>
       )}
-    </div>
+    </>
   );
 };
 export { CreateVaultComponent };
