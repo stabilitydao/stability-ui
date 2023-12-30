@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
+import {
+  formatUnits,
+  parseUnits,
+  zeroAddress,
+  maxUint256,
+  getAddress,
+} from "viem";
 import { readContract } from "viem/actions";
 import { writeContract } from "@wagmi/core";
 
@@ -279,7 +285,6 @@ function Vault({ vault }: IProps) {
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     ///// GET UNDERLYING TOKEN
-
     try {
       if (localVault.underlying != zeroAddress) {
         if ($connected) {
@@ -512,6 +517,7 @@ function Vault({ vault }: IProps) {
           }
         } catch (err) {
           err = err as WriteContractErrorType;
+          // @ts-ignore
           setError(err.name);
           lastTx.set("No approve hash...");
           setLoader(false);
@@ -541,8 +547,8 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
-        setError(err.name);
+        const viemError = err as WriteContractErrorType;
+        setError(viemError.name);
         lastTx.set("No approve hash...");
         setLoader(false);
         console.error("APPROVE ERROR:", err);
@@ -580,8 +586,8 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
-        setError(err.name);
+        const viemError = err as WriteContractErrorType;
+        setError(viemError.name);
         lastTx.set("No depositAssets hash...");
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
@@ -625,8 +631,8 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
-        setError(err.name);
+        const viemError = err as WriteContractErrorType;
+        setError(viemError.name);
         lastTx.set("No deposit hash...");
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
@@ -739,8 +745,8 @@ function Vault({ vault }: IProps) {
         setLoader(false);
       }
     } catch (err) {
-      err = err as WriteContractErrorType;
-      setError(err.name);
+      const viemError = err as WriteContractErrorType;
+      setError(viemError.name);
       lastTx.set("No approve hash...");
       setLoader(false);
       console.error("ZAP ERROR:", err);
@@ -809,9 +815,9 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
+        const viemError = err as WriteContractErrorType;
 
-        setError(err.name);
+        setError(viemError.name);
         lastTx.set("No approve hash...");
         const newAllowance = (await readContract(_publicClient, {
           address: asset,
@@ -853,7 +859,6 @@ function Vault({ vault }: IProps) {
     }
 
     const decimalPercent = BigInt(Math.floor(Number(slippage)));
-
     const out = sharesOut - (sharesOut * decimalPercent) / 100n;
     try {
       const depositAssets = await writeContract({
@@ -872,9 +877,9 @@ function Vault({ vault }: IProps) {
         setLoader(false);
       }
     } catch (err) {
-      err = err as WriteContractErrorType;
+      const viemError = err as WriteContractErrorType;
 
-      setError(err.name);
+      setError(viemError.name);
       lastTx.set("No depositAssets hash...");
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
@@ -915,8 +920,8 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
-        setError(err.name);
+        const viemError = err as WriteContractErrorType;
+        setError(viemError.name);
         lastTx.set("No withdrawAssets hash...");
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
@@ -956,8 +961,8 @@ function Vault({ vault }: IProps) {
           setLoader(false);
         }
       } catch (err) {
-        err = err as WriteContractErrorType;
-        setError(err.name);
+        const viemError = err as WriteContractErrorType;
+        setError(viemError.name);
         lastTx.set("No withdraw hash...");
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
@@ -1147,7 +1152,7 @@ function Vault({ vault }: IProps) {
   };
   const previewDeposit = async () => {
     // if (!Number(lastKeyPress.key2)) return;
-    if ($assets && lastKeyPress.key1 && tab === "Deposit") {
+    if ($assets && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
       if (option) {
@@ -1156,8 +1161,8 @@ function Vault({ vault }: IProps) {
           if (i === changedInput) {
             amounts.push(
               parseUnits(
-                inputs[lastKeyPress.key1].amount,
-                Number(getTokenData(lastKeyPress.key1)?.decimals)
+                inputs[lastKeyPress.key1 as string].amount,
+                Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
               )
             );
           } else {
@@ -1212,7 +1217,7 @@ function Vault({ vault }: IProps) {
   };
   const initVault = async () => {
     if ($vaults && vault) {
-      setLocalVault($vaults[vault]);
+      setLocalVault($vaults[vault.toLowerCase()]);
     }
   };
 
@@ -1257,7 +1262,6 @@ function Vault({ vault }: IProps) {
     }
   }, [localVault, $tokens, defaultOptionSymbols]);
 
-  // need tests
   useEffect(() => {
     setZapTokens(false);
   }, [inputs]);
@@ -1282,7 +1286,7 @@ function Vault({ vault }: IProps) {
     }
   }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
   useEffect(() => {
-    setSharesOut(false);
+    //setSharesOut(false); //todo test
     setUnderlyingShares(false);
     setZapShares(false);
     if (
@@ -1342,7 +1346,7 @@ function Vault({ vault }: IProps) {
     };
   }, [tokenSelectorRef]);
 
-  return vault && $vaults[vault] ? (
+  return vault && localVault ? (
     <main className="w-full mx-auto">
       <div className="flex justify-between items-center p-4 bg-button rounded-md">
         {localVault && (
