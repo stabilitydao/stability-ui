@@ -3,7 +3,7 @@ const Footer = () => {
     <footer className="shrink-0">
       <div className="flex items-center justify-end py-5 px-3">
         <a
-          className="px-3"
+          className="px-3 py-2"
           target="_blank"
           href="https://github.com/stabilitydao"
         >
@@ -23,7 +23,7 @@ const Footer = () => {
           </svg>
         </a>
         <a
-          className="px-3"
+          className="px-3 py-2"
           target="_blank"
           href="https://twitter.com/stabilitydao"
         >
@@ -40,7 +40,11 @@ const Footer = () => {
             ></path>
           </svg>
         </a>
-        <a className="px-3" target="_blank" href="https://t.me/stabilitydao">
+        <a
+          className="px-3 py-2"
+          target="_blank"
+          href="https://t.me/stabilitydao"
+        >
           <svg
             width="18"
             height="18"
@@ -55,7 +59,7 @@ const Footer = () => {
           </svg>
         </a>
         <a
-          className="px-3"
+          className="px-3 py-2"
           target="_blank"
           href="https://discord.com/invite/R3nnetWzC9"
         >
@@ -75,7 +79,7 @@ const Footer = () => {
           </svg>
         </a>
         <a
-          className="px-3"
+          className="px-3 py-2"
           target="_blank"
           href="https://book.stabilitydao.org/"
         >

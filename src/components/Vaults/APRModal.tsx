@@ -10,7 +10,6 @@ interface IProps {
 
 const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const modalRef: any = useRef(null);
-
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       setModalState({
@@ -24,12 +23,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
     }
   };
 
-  const APR = (
-    formatFromBigInt(state.apr, 3, "withDecimals") +
-    Number(state.assetsAprs) * 100
-  ).toFixed(2);
-
-  const APY = calculateAPY(APR).toFixed(2);
+  const APY = calculateAPY(state.apr).toFixed(2);
 
   const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
 
@@ -129,7 +123,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
 
           <div className="text-[16px]">
             <p className="font-bold">
-              Total APR {APR}% ({APY}% APY)
+              Total APR {state.apr}% ({APY}% APY)
             </p>
             {!!state.assetsAprs && (
               <p>Fee APR {(state.assetsAprs * 100).toFixed(2)}%</p>
