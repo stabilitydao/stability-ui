@@ -202,7 +202,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             ).toFixed(2);
 
             const APY = calculateAPY(APR).toFixed(2);
-
             let assets;
             if (vaultInfoes.length) {
               const token1 = getTokenData(vaultInfoes[index][1][0]);
@@ -234,15 +233,15 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             }
             return {
-              [vault]: {
-                address: vault,
+              [vault.toLowerCase()]: {
+                address: vault.toLowerCase(),
                 name: contractVaults[1][index],
                 symbol: contractVaults[2][index],
                 type: contractVaults[3][index],
                 strategy: contractVaults[4][index],
                 shareprice: String(contractVaults[5][index]),
                 tvl: String(contractVaults[6][index]),
-                apr: String(contractVaults[7][index]),
+                apr: String(APR),
                 apy: APY,
                 strategyApr: contractVaults[8][index],
                 strategySpecific: contractVaults[9][index],
@@ -344,7 +343,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             strategy: vault.strategyId,
             shareprice: vault.sharePrice,
             tvl: vault.tvl,
-            apr: vault.apr,
+            apr: String(APR),
             apy: APY,
             strategyApr: vault.apr, // todo in strategy
             strategySpecific: vault.strategySpecific,
