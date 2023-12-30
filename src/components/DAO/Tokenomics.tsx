@@ -592,7 +592,7 @@ function Tokenomics() {
               <div className="flex justify-between mt-3 text-sm">
                 <button
                   onClick={() => {
-                    setInput(10000);
+                    setInput("10000");
                     profitBalance();
                     allowance();
                     setShowMintModal(true);
