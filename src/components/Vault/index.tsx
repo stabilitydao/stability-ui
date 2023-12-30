@@ -2376,7 +2376,8 @@ function Vault({ vault }: IProps) {
                                       className="text-[18px]  flex items-center gap-1 ml-2"
                                       key={token.address}
                                     >
-                                      {token.address !== option[0] && (
+                                      {token.address.toLowerCase() !==
+                                        option[0].toLowerCase() && (
                                         <div className="flex items-center gap-1 mt-2">
                                           <img
                                             src="/oneInch.svg"
@@ -2613,7 +2614,8 @@ function Vault({ vault }: IProps) {
                                       symbol: string;
                                     }) => (
                                       <div key={amountIn}>
-                                        {address !== option[0] && (
+                                        {address.toLowerCase() !==
+                                          option[0].toLowerCase() && (
                                           <div className="flex">
                                             <img
                                               src="/oneInch.svg"
