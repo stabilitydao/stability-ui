@@ -7,9 +7,13 @@ import type { TDAOData } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
+import { GRAPH_QUERY, GRAPH_ENDPOINT } from "@constants";
+
+import axios from "axios";
 
 function Platform() {
   const [daoData, setDaoData] = useState<TDAOData>();
+  const [graphData, setGraphData] = useState<any>();
   const $publicClient = useStore(publicClient);
 
   const getFarmColor = (farmName: string) => {
@@ -27,14 +31,35 @@ function Platform() {
     return color;
   };
 
+  const fetchGraph = async () => {
+    axios
+      .post(
+        GRAPH_ENDPOINT,
+        { query: GRAPH_QUERY },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then(response => {
+        setGraphData(response.data.data.vaultEntities);
+        console.log(graphData);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  };
+
   const fetchDaoData = async () => {
-    if ($publicClient) {
+    if ($publicClient && graphData) {
       try {
         const platformVersion: any = await $publicClient.readContract({
           address: platform,
           abi: PlatformABI,
           functionName: "platformVersion",
         });
+        console.log(platformVersion);
 
         const platformFees: any = await $publicClient.readContract({
           address: platform,
@@ -73,15 +98,11 @@ function Platform() {
           args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
         });
 
-        const contractVaults: any = await $publicClient.readContract({
-          address: contractBalance[6][1],
-          abi: IVaultManagerABI,
-          functionName: "vaults",
-        });
-
         //tvl
-        const totalTvl: bigint = contractVaults[6].reduce(
-          (total: bigint, number: bigint) => total + number,
+        const totalTvl = graphData?.reduce(
+          (total: bigint, item: { tvl: string }) => {
+            return total + BigInt(item.tvl);
+          },
           BigInt(0)
         );
 
@@ -96,7 +117,8 @@ function Platform() {
           platformGovernance: contractData[0][5],
           multisigAddress: contractData[0][6],
           numberOfTotalVaults: contractBalance[3].length,
-          totalTvl: Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100,
+          totalTvl:
+            Math.trunc(Number(formatUnits(totalTvl as bigint, 18)) * 100) / 100,
           strategieNames: contractData[6],
           platformFee: percentageFees[0],
           vaultManagerFee: percentageFees[1],
@@ -115,8 +137,9 @@ function Platform() {
   };
 
   useEffect(() => {
+    fetchGraph();
     fetchDaoData();
-  }, []);
+  }, [$publicClient]);
 
   return (
     <>

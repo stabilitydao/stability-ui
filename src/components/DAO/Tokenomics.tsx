@@ -67,16 +67,24 @@ function Tokenomics() {
           const _tokenomics = {
             profitPrice:
               Math.trunc(
-                Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
-                  100
+                Number(
+                  formatUnits(
+                    $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
+                    18
+                  )
+                ) * 100
               ) / 100,
             profitTotalSupply: Number(
               formatUnits(profitTotalSupply, 18)
             ).toLocaleString(),
             profitMarketCap: (
               (Math.trunc(
-                Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
-                  100
+                Number(
+                  formatUnits(
+                    $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
+                    18
+                  )
+                ) * 100
               ) /
                 100) *
               Number(formatUnits(profitTotalSupply, 18))

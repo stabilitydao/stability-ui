@@ -93,16 +93,17 @@ function Team() {
           functionName: "getBalance",
           args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
         });
+
         if (contractBalance) {
           for (const address of contractBalance[0]) {
-            const balance = await $publicClient.readContract({
+            const balance = (await $publicClient.readContract({
               address: address as TAddress,
               abi: ERC20ABI,
               functionName: "balanceOf",
               args: [MULTISIG[0] as TAddress],
-            });
+            })) as bigint;
 
-            const decimals = getTokenData(address)?.decimals;
+            const decimals = getTokenData(address.toLowerCase())?.decimals;
 
             if (decimals && balance >= 0n) {
               const tokenInfo: TMultiTokenData = {
@@ -111,9 +112,12 @@ function Team() {
                   100,
                 priceBalance:
                   Math.trunc(
-                    Number(formatUnits(balance, 18)) *
+                    Number(formatUnits(balance, decimals)) *
                       Number(
-                        formatUnits($assetsPrices[address].tokenPrice, decimals)
+                        formatUnits(
+                          $assetsPrices[address.toLowerCase()]?.tokenPrice,
+                          18
+                        )
                       ) *
                       100
                   ) / 100,
