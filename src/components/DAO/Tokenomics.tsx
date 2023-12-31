@@ -36,77 +36,75 @@ function Tokenomics() {
   const [loader, setLoader] = useState(false);
 
   const fetchTokenomicsData = async () => {
-    if ($publicClient && $account) {
-      try {
-        const profitTotalSupply = await $publicClient.readContract({
-          address: PROFIT[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "totalSupply",
-        });
+    try {
+      const profitTotalSupply = (await $publicClient?.readContract({
+        address: PROFIT[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "totalSupply",
+      })) as bigint;
 
-        const sdivTotalSupply = await $publicClient.readContract({
-          address: SDIV[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "totalSupply",
-        });
+      const sdivTotalSupply = (await $publicClient?.readContract({
+        address: SDIV[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "totalSupply",
+      })) as bigint;
 
-        const pmTotalSupply = await $publicClient.readContract({
-          address: PM[0] as TAddress,
-          abi: IERC721Enumerable,
-          functionName: "totalSupply",
-        });
+      const pmTotalSupply = await $publicClient?.readContract({
+        address: PM[0] as TAddress,
+        abi: IERC721Enumerable,
+        functionName: "totalSupply",
+      });
 
-        const pmMinted = await $publicClient.readContract({
-          address: PM[0] as TAddress,
-          abi: IERC721Enumerable,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
+      const pmMinted = await $publicClient?.readContract({
+        address: PM[0] as TAddress,
+        abi: IERC721Enumerable,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      });
 
-        if ($assetsPrices) {
-          const _tokenomics = {
-            profitPrice:
-              Math.trunc(
-                Number(
-                  formatUnits(
-                    $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
-                    18
-                  )
-                ) * 100
-              ) / 100,
-            profitTotalSupply: Number(
-              formatUnits(profitTotalSupply, 18)
-            ).toLocaleString(),
-            profitMarketCap: (
-              (Math.trunc(
-                Number(
-                  formatUnits(
-                    $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
-                    18
-                  )
-                ) * 100
-              ) /
-                100) *
-              Number(formatUnits(profitTotalSupply, 18))
-            ).toLocaleString(),
-            sdivTotalSupply: Number(
-              formatUnits(sdivTotalSupply, 18)
-            ).toLocaleString(),
-            //MUST FIX IT
-            pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
-            pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
-            pmMinted: Number(pmMinted).toLocaleString(),
-          };
-          setTokenomics(_tokenomics);
-        }
-      } catch (error) {
-        console.error("Error fetching Tokenomics:", error);
+      if ($assetsPrices) {
+        const _tokenomics = {
+          profitPrice:
+            Math.trunc(
+              Number(
+                formatUnits(
+                  $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
+                  18
+                )
+              ) * 100
+            ) / 100,
+          profitTotalSupply: Number(
+            formatUnits(profitTotalSupply, 18)
+          ).toLocaleString(),
+          profitMarketCap: (
+            (Math.trunc(
+              Number(
+                formatUnits(
+                  $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
+                  18
+                )
+              ) * 100
+            ) /
+              100) *
+            Number(formatUnits(profitTotalSupply, 18))
+          ).toLocaleString(),
+          sdivTotalSupply: Number(
+            formatUnits(sdivTotalSupply, 18)
+          ).toLocaleString(),
+          //MUST FIX IT
+          pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
+          pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
+          pmMinted: Number(pmMinted).toLocaleString(),
+        };
+        setTokenomics(_tokenomics);
       }
+    } catch (error) {
+      console.error("Error fetching Tokenomics:", error);
     }
   };
 
   const allowance = async () => {
-    const allowance = await $publicClient?.readContract({
+    const allowance = (await $publicClient?.readContract({
       address: PROFIT[0] as TAddress,
       abi: ERC20MetadataUpgradeableABI,
       functionName: "allowance",
@@ -114,8 +112,8 @@ function Tokenomics() {
         $account as TAddress,
         "0x29353bB4c9010c6112a77d702Ac890e70CD73d53",
       ],
-    });
-    setAllowance(formatUnits(allowance as bigint, 18));
+    })) as bigint;
+    setAllowance(formatUnits(allowance, 18));
   };
 
   const approve = async () => {
@@ -201,127 +199,116 @@ function Tokenomics() {
   };
 
   const harvest = async () => {
-    if ($publicClient) {
-      try {
-        const harvest = await writeContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "harvest",
-        });
+    try {
+      const harvest = await writeContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+        abi: DividendMinterABI,
+        functionName: "harvest",
+      });
 
-        const transaction = await $publicClient?.waitForTransactionReceipt(
-          harvest
-        );
+      const transaction = await $publicClient?.waitForTransactionReceipt(
+        harvest
+      );
 
-        if (transaction?.status === "success") {
-          await sdivBalance();
-        } else {
-          console.error("Transaction error");
-        }
-        setLoader(false);
-      } catch (error) {
-        console.error("Error in harvest:", error);
-        setLoader(false);
+      if (transaction?.status === "success") {
+        await sdivBalance();
+      } else {
+        console.error("Transaction error");
       }
+      setLoader(false);
+    } catch (error) {
+      console.error("Error in harvest:", error);
+      setLoader(false);
     }
   };
 
   const mint = async () => {
-    if ($publicClient) {
-      try {
-        const mint = await writeContract({
-          address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as TAddress,
-          abi: DividendTokenABI,
-          functionName: "mint",
-        });
+    try {
+      const mint = await writeContract({
+        address: "0x9844a1c30462B55cd383A2C06f90BB4171f9D4bB" as TAddress,
+        abi: DividendTokenABI,
+        functionName: "mint",
+      });
 
-        const transaction = await $publicClient?.waitForTransactionReceipt(
-          mint
-        );
+      const transaction = await $publicClient?.waitForTransactionReceipt(mint);
 
-        if (transaction?.status === "success") {
-          await fetchTokenomicsData();
-          await profitBalance();
-          setInput("");
-          setLoader(false);
-        } else {
-          console.error("Transaction error");
-        }
-      } catch (error) {
+      if (transaction?.status === "success") {
+        await fetchTokenomicsData();
+        await profitBalance();
+        setInput("");
         setLoader(false);
-        console.error("Error in mint:", error);
+      } else {
+        console.error("Transaction error");
       }
+    } catch (error) {
+      setLoader(false);
+      console.error("Error in mint:", error);
     }
   };
 
   const sdivBalance = async () => {
-    if ($publicClient) {
-      try {
-        const sdivBalance = await $publicClient.readContract({
-          address: SDIV[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
+    try {
+      const sdivBalance = (await $publicClient?.readContract({
+        address: SDIV[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      })) as bigint;
 
-        const sdivEarned = (await $publicClient.readContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "pending",
-          args: [$account],
-        })) as bigint;
+      const sdivEarned = (await $publicClient?.readContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+        abi: DividendMinterABI,
+        functionName: "pending",
+        args: [$account],
+      })) as bigint;
 
-        const sdivWallet = {
-          sdivBalance:
-            Math.trunc(Number(formatUnits(sdivBalance, 18)) * 100) / 100,
-          sdivEarned:
-            Math.trunc(Number(formatUnits(sdivEarned, 18)) * 100) / 100,
-        };
+      const sdivWallet = {
+        sdivBalance:
+          Math.trunc(Number(formatUnits(sdivBalance, 18)) * 100) / 100,
+        sdivEarned: Math.trunc(Number(formatUnits(sdivEarned, 18)) * 100) / 100,
+      };
 
-        setSdivtWallet(sdivWallet);
-      } catch (error) {
-        console.error("Error fetching sdivBalance:", error);
-      }
+      setSdivtWallet(sdivWallet);
+    } catch (error) {
+      console.error("Error fetching sdivBalance:", error);
     }
   };
 
   const profitBalance = async () => {
-    if ($publicClient) {
-      try {
-        const profitBalance = (await $publicClient?.readContract({
-          address: PROFIT[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        })) as bigint;
+    try {
+      const profitBalance = (await $publicClient?.readContract({
+        address: PROFIT[0] as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      })) as bigint;
 
-        const profitStaked = (await $publicClient?.readContract({
-          address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
-          abi: DividendMinterABI,
-          functionName: "userInfo",
-          args: [$account],
-        })) as bigint[];
+      const profitStaked = (await $publicClient?.readContract({
+        address: "0x29353bB4c9010c6112a77d702Ac890e70CD73d53" as TAddress,
+        abi: DividendMinterABI,
+        functionName: "userInfo",
+        args: [$account],
+      })) as bigint[];
 
-        const profitWallet = {
-          profitBalance:
-            Math.trunc(Number(formatUnits(profitBalance, 18)) * 100) / 100,
-          profitStaked:
-            Math.trunc(Number(formatUnits(profitStaked[0], 18)) * 100) / 100,
-        };
+      const profitWallet = {
+        profitBalance:
+          Math.trunc(Number(formatUnits(profitBalance, 18)) * 100) / 100,
+        profitStaked:
+          Math.trunc(Number(formatUnits(profitStaked[0], 18)) * 100) / 100,
+      };
 
-        setProfitWallet(profitWallet);
-      } catch (error) {
-        console.error("Error fetching profitBalance:", error);
-      }
+      setProfitWallet(profitWallet);
+    } catch (error) {
+      console.error("Error fetching profitBalance:", error);
     }
   };
 
   useEffect(() => {
     fetchTokenomicsData();
     allowance();
-    sdivBalance();
     profitBalance();
-  }, [$assetsPrices]);
+    sdivBalance();
+  }, [$publicClient, $assetsPrices]);
 
   const isStakingAllowed =
     handleTabStakeModal === "stake" &&
@@ -422,6 +409,7 @@ function Tokenomics() {
             <div className="flex mt-3 text-sm me-auto  justify-between">
               <button
                 onClick={() => {
+                  setInput("");
                   allowance();
                   profitBalance();
                   setHandleTabStakeModal("stake");

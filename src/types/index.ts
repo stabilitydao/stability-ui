@@ -182,7 +182,6 @@ type TDAOData = {
   typesOfVaults: string;
   strategyLogicFee: string;
   ecosystemFee: string;
-  network: string;
   farmsLength: number;
 };
 

@@ -169,11 +169,11 @@ function Team() {
             {_multisigBalance ? (
               Object.entries(_multisigBalance).map(([address, tokenInfo]) => (
                 <div
-                  className="bg-button p-3 rounded-md w-[115px] m-auto overflow-hidden"
+                  className="bg-button p-3 rounded-md w-[115px] m-auto overflow-hidden h-[130px]"
                   key={address}>
                   <div className="grid justify-center">
                     <img
-                      className="w-[38px] rounded-full m-auto mb-2"
+                      className="w-[38px] h-[38px] rounded-full m-auto mb-2"
                       alt={getTokenData(address)?.symbol}
                       src={getTokenData(address)?.logoURI}
                     />
@@ -208,7 +208,7 @@ function Team() {
               className="text-sm p-3 md:w-[150px] hover:bg-button rounded-md"
               target="_blank">
               <img
-                className="rounded-full m-auto w-[80px]"
+                className="rounded-full m-auto w-[80px] h-[80px]"
                 src={member.avatar_url}
                 alt={`Avatar de ${member.name}`}
               />

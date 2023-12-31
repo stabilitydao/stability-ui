@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { publicClient } from "@store";
+import { publicClient, network } from "@store";
 import { PlatformABI, FactoryABI, platform, IVaultManagerABI } from "@web3";
-import type { TDAOData } from "@types";
+import type { TAddress, TDAOData } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
-import { GRAPH_QUERY, GRAPH_ENDPOINT } from "@constants";
 
-import axios from "axios";
-
-function Platform() {
+function Platform({ graphData }: any) {
   const [daoData, setDaoData] = useState<TDAOData>();
-  const [graphData, setGraphData] = useState<any>();
   const $publicClient = useStore(publicClient);
+  const $network = useStore(network);
 
   const getFarmColor = (farmName: string) => {
     let color;
@@ -31,25 +28,7 @@ function Platform() {
     return color;
   };
 
-  const fetchGraph = async () => {
-    axios
-      .post(
-        GRAPH_ENDPOINT,
-        { query: GRAPH_QUERY },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then(response => {
-        setGraphData(response.data.data.vaultEntities);
-        console.log(graphData);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-  };
+  console.log(graphData);
 
   const fetchDaoData = async () => {
     if ($publicClient && graphData) {
@@ -59,7 +38,6 @@ function Platform() {
           abi: PlatformABI,
           functionName: "platformVersion",
         });
-        console.log(platformVersion);
 
         const platformFees: any = await $publicClient.readContract({
           address: platform,
@@ -73,14 +51,8 @@ function Platform() {
           functionName: "getData",
         });
 
-        const network: any = await $publicClient.readContract({
-          address: platform,
-          abi: PlatformABI,
-          functionName: "getPlatformSettings",
-        });
-
         const farmsLength = await $publicClient.readContract({
-          address: contractData[0][0],
+          address: contractData[0][0] as TAddress,
           abi: FactoryABI,
           functionName: "farmsLength",
         });
@@ -91,16 +63,9 @@ function Platform() {
           functionName: "pendingPlatformUpgrade",
         });
 
-        const contractBalance: any = await $publicClient.readContract({
-          address: platform,
-          abi: PlatformABI,
-          functionName: "getBalance",
-          args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
-        });
-
         //tvl
         const totalTvl = graphData?.reduce(
-          (total: bigint, item: { tvl: string }) => {
+          (total: bigint, item: { tvl: bigint }) => {
             return total + BigInt(item.tvl);
           },
           BigInt(0)
@@ -111,25 +76,23 @@ function Platform() {
           (fee / 1000n).toString()
         );
 
-        const daoData = {
+        const _daoData = {
           platformVersion: platformVersion,
           pendingPlatformUpgrade: pendingPlatformUpgrade,
           platformGovernance: contractData[0][5],
           multisigAddress: contractData[0][6],
-          numberOfTotalVaults: contractBalance[3].length,
-          totalTvl:
-            Math.trunc(Number(formatUnits(totalTvl as bigint, 18)) * 100) / 100,
+          numberOfTotalVaults: graphData.length,
+          totalTvl: Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100,
           strategieNames: contractData[6],
           platformFee: percentageFees[0],
           vaultManagerFee: percentageFees[1],
           typesOfVaults: contractData[3],
           strategyLogicFee: percentageFees[2],
           ecosystemFee: percentageFees[3],
-          network: network.networkName,
           farmsLength: Number(farmsLength),
         };
 
-        setDaoData(daoData);
+        setDaoData(_daoData);
       } catch (error) {
         console.error("Error fetching platform data:", error);
       }
@@ -137,9 +100,8 @@ function Platform() {
   };
 
   useEffect(() => {
-    fetchGraph();
     fetchDaoData();
-  }, [$publicClient]);
+  }, [graphData]);
 
   return (
     <>
@@ -155,7 +117,7 @@ function Platform() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
             <div className="grid gap-3 h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
               <div className="my-auto">
-                <h2 className="text-4xl">{daoData?.network}</h2>
+                <h2 className="text-4xl">{$network}</h2>
                 <h2 className="text-lg">Network</h2>
               </div>
 

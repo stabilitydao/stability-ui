@@ -13,17 +13,15 @@ function Governance() {
   const $publicClient = useStore(publicClient);
 
   const fetchTreasury = async () => {
-    if ($publicClient) {
-      const _treasuryBalance = await $publicClient.readContract({
-        address: PROFIT[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "balanceOf",
-        args: [TREASURY[0] as TAddress],
-      });
-      setTreasuryBalance(
-        Math.trunc(Number(formatUnits(_treasuryBalance, 18)) * 100) / 100
-      );
-    }
+    const _treasuryBalance = (await $publicClient?.readContract({
+      address: PROFIT[0] as TAddress,
+      abi: ERC20ABI,
+      functionName: "balanceOf",
+      args: [TREASURY[0] as TAddress],
+    })) as bigint;
+    setTreasuryBalance(
+      Math.trunc(Number(formatUnits(_treasuryBalance, 18)) * 100) / 100
+    );
   };
 
   useEffect(() => {
