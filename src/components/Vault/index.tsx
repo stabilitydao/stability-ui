@@ -2541,7 +2541,7 @@ function Vault({ vault }: IProps) {
                     <div className="grid mt-[15px] text-[15px] w-full">
                       {balances[option[0]] && (
                         <div className="text-left text-[gray] ml-2">
-                          Balance:{" "}
+                          Balance:
                           {parseFloat(
                             formatUnits($vaultData[vault].vaultUserBalance, 18)
                           )}
