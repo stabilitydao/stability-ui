@@ -21,7 +21,7 @@ import {
 } from "@web3";
 import { Loader } from "@components";
 
-function Tokenomics() {
+function Tokenomics({ platformEntities }: any) {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
   const $publicClient = useStore(publicClient);
@@ -37,12 +37,6 @@ function Tokenomics() {
 
   const fetchTokenomicsData = async () => {
     try {
-      const profitTotalSupply = (await $publicClient?.readContract({
-        address: PROFIT[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "totalSupply",
-      })) as bigint;
-
       const sdivTotalSupply = (await $publicClient?.readContract({
         address: SDIV[0] as TAddress,
         abi: ERC20ABI,
@@ -73,9 +67,6 @@ function Tokenomics() {
                 )
               ) * 100
             ) / 100,
-          profitTotalSupply: Number(
-            formatUnits(profitTotalSupply, 18)
-          ).toLocaleString(),
           profitMarketCap: (
             (Math.trunc(
               Number(
@@ -86,7 +77,7 @@ function Tokenomics() {
               ) * 100
             ) /
               100) *
-            Number(formatUnits(profitTotalSupply, 18))
+            1000000
           ).toLocaleString(),
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)
@@ -308,7 +299,7 @@ function Tokenomics() {
     allowance();
     profitBalance();
     sdivBalance();
-  }, [$publicClient, $assetsPrices]);
+  }, [$assetsPrices]);
 
   const isStakingAllowed =
     handleTabStakeModal === "stake" &&
@@ -353,11 +344,11 @@ function Tokenomics() {
               <tbody>
                 <tr>
                   <td className="min-w-[95px]">Name: </td>
-                  <td>{getTokenData(PROFIT[0])?.name} </td>
+                  <td>Stability</td>
                 </tr>
                 <tr>
                   <td>Symbol: </td>
-                  <td>{getTokenData(PROFIT[0])?.symbol} </td>
+                  <td>PROFIT</td>
                 </tr>
                 <tr>
                   <td>Address: </td>
@@ -374,7 +365,7 @@ function Tokenomics() {
                 </tr>
                 <tr>
                   <td>Total supply: </td>
-                  <td>{tokenomics?.profitTotalSupply} PROFIT</td>
+                  <td>1.000.000 PROFIT</td>
                 </tr>
                 <tr>
                   <td>Market Cap: </td>
@@ -400,6 +391,7 @@ function Tokenomics() {
             </table>
 
             <img
+              loading="eager"
               className="rounded-full absolute right-3 top-3 w-1/6 md:w-1/5 lg:w-1/5"
               src={getTokenData(PROFIT[0])?.logoURI}
               alt={getTokenData(PROFIT[0])?.logoURI}
@@ -496,11 +488,11 @@ function Tokenomics() {
                 <tbody>
                   <tr>
                     <td className="min-w-[95px]">Name: </td>
-                    <td>{getTokenData(SDIV[0])?.name} </td>
+                    <td>Stability Dividend</td>
                   </tr>
                   <tr>
                     <td>Symbol: </td>
-                    <td>{getTokenData(SDIV[0])?.symbol} </td>
+                    <td>SDIV</td>
                   </tr>
                   <tr>
                     <td>Address: </td>
@@ -524,6 +516,7 @@ function Tokenomics() {
               </table>
 
               <img
+                loading="eager"
                 className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
                 src={getTokenData(SDIV[0])?.logoURI}
                 alt={getTokenData(SDIV[0])?.logoURI}
@@ -609,6 +602,7 @@ function Tokenomics() {
               </div>
 
               <img
+                loading="eager"
                 className="rounded-full absolute right-3 top-3 w-1/6 lg:w-1/5"
                 alt="Profit maker"
                 src="https://stabilitydao.org/pm.png"

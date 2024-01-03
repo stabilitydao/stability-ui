@@ -8,7 +8,7 @@ import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 
-function Platform({ graphData }: any) {
+function Platform({ vaultEntities, platformEntities }: any) {
   const [daoData, setDaoData] = useState<TDAOData>();
   const $publicClient = useStore(publicClient);
   const $network = useStore(network);
@@ -27,11 +27,12 @@ function Platform({ graphData }: any) {
     }
     return color;
   };
+  console.log(platformEntities);
 
-  console.log(graphData);
+  console.log(vaultEntities);
 
   const fetchDaoData = async () => {
-    if ($publicClient && graphData) {
+    if ($publicClient && vaultEntities && platformEntities) {
       try {
         const platformVersion: any = await $publicClient.readContract({
           address: platform,
@@ -50,9 +51,10 @@ function Platform({ graphData }: any) {
           abi: PlatformABI,
           functionName: "getData",
         });
+        console.log(contractData);
 
         const farmsLength = await $publicClient.readContract({
-          address: contractData[0][0] as TAddress,
+          address: "0xa14EaAE76890595B3C7ea308dAEBB93863480EAD" as TAddress,
           abi: FactoryABI,
           functionName: "farmsLength",
         });
@@ -64,7 +66,7 @@ function Platform({ graphData }: any) {
         });
 
         //tvl
-        const totalTvl = graphData?.reduce(
+        const totalTvl = vaultEntities?.reduce(
           (total: bigint, item: { tvl: bigint }) => {
             return total + BigInt(item.tvl);
           },
@@ -75,13 +77,15 @@ function Platform({ graphData }: any) {
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
           (fee / 1000n).toString()
         );
+        console.log(contractData);
+        console.log(vaultEntities);
 
         const _daoData = {
           platformVersion: platformVersion,
           pendingPlatformUpgrade: pendingPlatformUpgrade,
           platformGovernance: contractData[0][5],
           multisigAddress: contractData[0][6],
-          numberOfTotalVaults: graphData.length,
+          numberOfTotalVaults: vaultEntities.length,
           totalTvl: Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100,
           strategieNames: contractData[6],
           platformFee: percentageFees[0],
@@ -101,7 +105,7 @@ function Platform({ graphData }: any) {
 
   useEffect(() => {
     fetchDaoData();
-  }, [graphData]);
+  }, [vaultEntities]);
 
   return (
     <>

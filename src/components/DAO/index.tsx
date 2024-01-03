@@ -7,7 +7,11 @@ import axios from "axios";
 import { GRAPH_QUERY, GRAPH_ENDPOINT } from "@constants";
 
 function DAO() {
-  const [graphData, setGraphData] = useState<any>();
+  const [vaultEntities, setVaultEntities] = useState<any>();
+  const [platformEntities, setPlatformEntities] = useState<any>();
+
+  console.log(vaultEntities);
+  console.log(platformEntities);
 
   const fetchGraph = async () => {
     try {
@@ -20,9 +24,14 @@ function DAO() {
           },
         }
       );
-      setGraphData(response.data.data.vaultEntities);
+      const { vaultEntities, platformEntities } = response.data.data;
+      setVaultEntities(vaultEntities);
+      console.log(platformEntities[0].bcAssets);
+      console.log(vaultEntities);
+
+      setPlatformEntities(platformEntities[0].bcAssets);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error fetching graph data:", error);
     }
   };
 
@@ -32,8 +41,11 @@ function DAO() {
 
   return (
     <main className="p-0 m-auto">
-      <Platform graphData={graphData} />
-      <Tokenomics />
+      <Platform
+        vaultEntities={vaultEntities}
+        platformEntities={platformEntities}
+      />
+      <Tokenomics platformEntities={platformEntities} />
       <Governance />
       <Team />
     </main>

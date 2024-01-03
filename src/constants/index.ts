@@ -160,6 +160,7 @@ const GRAPH_QUERY = `
         platformEntities {
           bcAssets
         }
+      
       }
       `;
 

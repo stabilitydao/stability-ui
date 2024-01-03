@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { publicClient, assetsPrices } from "@store";
 import { formatUnits } from "viem";
@@ -18,9 +18,9 @@ import { Loader } from "../Loader/index";
 function Team() {
   const $publicClient = useStore(publicClient);
   const $assetsPrices = useStore(assetsPrices);
-
   const [members, setMembers] = useState<TGitHubUser[]>();
   const [_multisigBalance, setMultisigBalance] = useState<TMultisigBalance>();
+  const teamDataCache = useRef(null);
 
   const fetchTeamData = async () => {
     try {
@@ -135,9 +135,12 @@ function Team() {
   };
 
   useEffect(() => {
-    fetchTeamData();
     fetchMultiSig();
   }, [$assetsPrices]);
+
+  useEffect(() => {
+    fetchTeamData();
+  }, []);
 
   return members ? (
     <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
@@ -205,7 +208,7 @@ function Team() {
             <a
               href={member.html_url}
               key={member.name}
-              className="text-sm p-3 md:w-[150px] hover:bg-button rounded-md"
+              className="text-sm p-3 md:w-[155px] hover:bg-button rounded-md"
               target="_blank">
               <img
                 className="rounded-full m-auto w-[80px] h-[80px]"
@@ -235,7 +238,7 @@ function Team() {
               ) : (
                 ""
               )}
-              <p className="font-thin  md:w-full text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
+              <p className="font-thin  md:w-full text-pretty text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
                 {member.bio}
               </p>
             </a>
