@@ -55,7 +55,7 @@ const ColumnSort: React.FC<TProps> = ({
           className={`${
             index < 5
               ? "px-0 md:px-2 lg:px-4"
-              : "pl-0 md:px-2 lg:px-4 text-right"
+              : "pl-0 md:px-2 lg:px-3 text-right"
           } py-2 text-center cursor-pointer ${styles[value] || ""}`}
         >
           <p className="inline-block">{value}</p>

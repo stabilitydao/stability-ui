@@ -181,7 +181,7 @@ const Vaults = () => {
                 key={vault.name}
                 onClick={() => toVault(vault.address)}
               >
-                <td className="px-2 lg:px-4 py-2 lg:py-3">
+                <td className="px-2 lg:px-3 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
                     <AssetsProportion
                       proportions={vault.assetsProportions as number[]}
@@ -204,7 +204,7 @@ const Vaults = () => {
                   </div>
                 </td>
 
-                <td className="px-2 lg:px-4 py-2 hidden lg:table-cell">
+                <td className="px-2 lg:px-1 py-2 hidden lg:table-cell">
                   <VaultType type={vault.type} />
                 </td>
                 <td className=" pl-2 py-2 hidden md:table-cell whitespace-nowrap">
@@ -221,7 +221,7 @@ const Vaults = () => {
                         >
                           {vault.strategyInfo.shortName}
                         </span>
-                        <span className="px-2 rounded-r-[10px] bg-[#41465a] d-none md:flex h-8 items-center min-w-[100px] lg:min-w-[170px]">
+                        <span className="px-2 rounded-r-[10px] bg-[#41465a] d-none md:flex h-8 items-center min-w-[100px] lg:min-w-[160px]">
                           <span className="flex min-w-[42px] justify-center">
                             {vault.strategyInfo.protocols.map(
                               (protocol, index) => (
@@ -256,8 +256,8 @@ const Vaults = () => {
                             <span
                               className={
                                 vault.strategySpecific.length > 10
-                                  ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
-                                  : `ml-0.5 uppercase font-bold text-[11px] px-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
+                                  ? `ml-0.5 lowercase font-bold text-[9px] pl-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
+                                  : `ml-0.5 uppercase font-bold text-[10px] px-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
                               }
                             >
                               {vault.strategySpecific}
@@ -268,7 +268,7 @@ const Vaults = () => {
                     )}
                   </div>
                 </td>
-                <td className="px-2 lg:px-4 py-2">
+                <td className="px-2 lg:px-3 py-2">
                   <div className="flex w-[80px] justify-end">
                     <p>{vault.apy}%</p>
                     <svg
@@ -297,6 +297,9 @@ const Vaults = () => {
                       />
                     </svg>
                   </div>
+                </td>
+                <td className="px-2 lg:px-4 py-2">
+                  <span className="uppercase font-bold text-[12px]" style={{color: vault.strategyInfo.il?.color}}>{vault.strategyInfo.il?.title}</span>
                 </td>
                 <td className="px-2 lg:px-4 py-2">
                   ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
