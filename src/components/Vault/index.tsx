@@ -400,14 +400,12 @@ function Vault({ vault }: IProps) {
           });
 
           setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-
           const allowanceData = (await readContract(_publicClient, {
             address: option[0] as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
             args: [$account as TAddress, vault as TAddress],
           })) as bigint;
-
           if (
             Number(formatUnits(allowanceData, 18)) < Number(amount) &&
             Number(amount) <= Number(balances[asset]?.assetBalance)
@@ -436,7 +434,7 @@ function Vault({ vault }: IProps) {
 
           const allowanceData = await getZapAllowance(asset);
 
-          if (tab === "Withdraw") {
+          if (tab === "Withdraw" && option.length === 1) {
             if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
               setZapButton("needApprove");
             }
@@ -493,9 +491,10 @@ function Vault({ vault }: IProps) {
             args: [$platformData.zap as TAddress, maxUint256],
           });
           setLoader(true);
-          const transaction = await _publicClient.waitForTransactionReceipt(
-            assetApprove
-          );
+          const transaction = await _publicClient.waitForTransactionReceipt({
+            confirmations: 5,
+            hash: assetApprove?.hash,
+          });
 
           if (transaction.status === "success") {
             lastTx.set(transaction?.transactionHash);
@@ -512,7 +511,10 @@ function Vault({ vault }: IProps) {
           const errName = err instanceof Error ? err.name : String(err);
           const errorMessage =
             err instanceof Error
-              ? err.message.substring(0, 200) + "..."
+              ? err.message.substring(
+                  0,
+                  err.message.indexOf("Contract call:")
+                ) + "..."
               : String(err);
 
           setError({ name: errName, message: errorMessage });
@@ -530,9 +532,10 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          assetApprove
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: assetApprove?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -579,9 +582,10 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          depositAssets
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: depositAssets?.hash,
+        });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
           setLoader(false);
@@ -629,9 +633,10 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          zapDeposit
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: zapDeposit?.hash,
+        });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
           setLoader(false);
@@ -639,6 +644,7 @@ function Vault({ vault }: IProps) {
       } catch (err) {
         lastTx.set("No deposit hash...");
         const errName = err instanceof Error ? err.name : String(err);
+
         const errorMessage =
           err instanceof Error
             ? err.message.substring(0, 200) + "..."
@@ -735,7 +741,7 @@ function Vault({ vault }: IProps) {
       });
       setLoader(true);
       const transaction = await _publicClient.waitForTransactionReceipt({
-        confirmations: 3,
+        confirmations: 5,
         hash: assetApprove?.hash,
       });
 
@@ -777,6 +783,7 @@ function Vault({ vault }: IProps) {
     if (!isRefresh) return;
 
     setRotation(rotation + 360);
+    loadAssetsBalances();
     zapInputHandler(inputs[option[0]]?.amount, option[0]);
   };
   /////
@@ -801,7 +808,7 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
-          confirmations: 3,
+          confirmations: 5,
           hash: assetApprove?.hash,
         });
 
@@ -889,9 +896,10 @@ function Vault({ vault }: IProps) {
         args: [$assets as TAddress[], input, out, $account as TAddress],
       });
       setLoader(true);
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        depositAssets
-      );
+      const transaction = await _publicClient.waitForTransactionReceipt({
+        confirmations: 5,
+        hash: depositAssets?.hash,
+      });
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -936,9 +944,10 @@ function Vault({ vault }: IProps) {
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          withdrawAssets
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: withdrawAssets?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -982,9 +991,10 @@ function Vault({ vault }: IProps) {
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          zapWithdraw
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: zapWithdraw?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -1186,70 +1196,74 @@ function Vault({ vault }: IProps) {
     setAllowance(allowanceResult);
   };
   const previewDeposit = async () => {
-    // if (!Number(lastKeyPress.key2)) return;
-    if ($assets && tab === "Deposit") {
-      const changedInput = $assets?.indexOf(lastKeyPress.key1);
-      const preview: TVaultInput | any = {};
-      if (option) {
-        let amounts: bigint[] = [];
-        for (let i = 0; i < option.length; i++) {
-          if (i === changedInput) {
-            amounts.push(
-              parseUnits(
-                inputs[lastKeyPress.key1 as string].amount,
-                Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
-              )
-            );
-          } else {
-            const token = tokensJson.tokens.find(
-              (token) => token.address === option[0]
-            );
+    debouncedPreviewDeposit();
+  };
+  const debouncedPreviewDeposit = useCallback(
+    debounce(async () => {
+      // if (!Number(lastKeyPress.key2)) return;
+      if ($assets && tab === "Deposit") {
+        const changedInput = $assets?.indexOf(lastKeyPress.key1);
+        const preview: TVaultInput | any = {};
+        if (option) {
+          let amounts: bigint[] = [];
+          for (let i = 0; i < option.length; i++) {
+            if (i === changedInput) {
+              amounts.push(
+                parseUnits(
+                  inputs[lastKeyPress.key1 as string].amount,
+                  Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
+                )
+              );
+            } else {
+              const token = tokensJson.tokens.find(
+                (token) => token.address === option[0]
+              );
 
-            const decimals = token ? token.decimals + 18 : 24;
+              const decimals = token ? token.decimals + 18 : 24;
 
-            amounts.push(parseUnits("1", decimals));
-          }
-        }
-        try {
-          const previewDepositAssets = await readContract(_publicClient, {
-            address: vault as TAddress,
-            abi: VaultABI,
-            functionName: "previewDepositAssets",
-            args: [$assets as TAddress[], amounts],
-          });
-
-          checkInputsAllowance(previewDepositAssets[0] as bigint[]);
-          setSharesOut(
-            ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
-          );
-
-          const previewDepositAssetsArray: bigint[] = [
-            ...previewDepositAssets[0],
-          ];
-          for (let i = 0; i < $assets.length; i++) {
-            const decimals = getTokenData($assets[i])?.decimals;
-            if (i !== changedInput && decimals) {
-              preview[$assets[i]] = {
-                amount: formatUnits(previewDepositAssetsArray[i], decimals),
-              };
+              amounts.push(parseUnits("1", decimals));
             }
           }
-          if (lastKeyPress.key2 !== "") {
+          try {
+            const previewDepositAssets = await readContract(_publicClient, {
+              address: vault as TAddress,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [$assets as TAddress[], amounts],
+            });
+
+            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+            setSharesOut(
+              ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+            );
+
+            const previewDepositAssetsArray: bigint[] = [
+              ...previewDepositAssets[0],
+            ];
+            for (let i = 0; i < $assets.length; i++) {
+              const decimals = getTokenData($assets[i])?.decimals;
+              if (i !== changedInput && decimals) {
+                preview[$assets[i]] = {
+                  amount: formatUnits(previewDepositAssetsArray[i], decimals),
+                };
+              }
+            }
             setInputs((prevInputs: any) => ({
               ...prevInputs,
               ...preview,
             }));
+          } catch (error) {
+            console.error(
+              "Error: the asset balance is too low to convert.",
+              error
+            );
+            setIsApprove(undefined);
           }
-        } catch (error) {
-          console.error(
-            "Error: the asset balance is too low to convert.",
-            error
-          );
-          setIsApprove(undefined);
         }
       }
-    }
-  };
+    }, 500),
+    [option, balances]
+  );
   const initVault = async () => {
     if ($vaults && vault) {
       setLocalVault($vaults[vault.toLowerCase()]);
@@ -2172,7 +2186,7 @@ function Vault({ vault }: IProps) {
                           {option.map((asset: any) => (
                             <div key={asset}>
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                <p>Balance:</p>
+                                <p>Balance: </p>
 
                                 <p>{balances[asset]?.assetBalance}</p>
                               </div>
@@ -2541,7 +2555,7 @@ function Vault({ vault }: IProps) {
                     <div className="grid mt-[15px] text-[15px] w-full">
                       {balances[option[0]] && (
                         <div className="text-left text-[gray] ml-2">
-                          Balance:
+                          Balance:{" "}
                           {parseFloat(
                             formatUnits($vaultData[vault].vaultUserBalance, 18)
                           )}
