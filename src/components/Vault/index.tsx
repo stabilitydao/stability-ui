@@ -508,16 +508,18 @@ function Vault({ vault }: IProps) {
           }
         } catch (err) {
           lastTx.set("No approve hash...");
-          const errName = err instanceof Error ? err.name : String(err);
-          const errorMessage =
-            err instanceof Error
-              ? err.message.substring(
-                  0,
-                  err.message.indexOf("Contract call:")
-                ) + "..."
-              : String(err);
+          if (err instanceof Error) {
+            const errName = err.name;
+            const errorMessageLength =
+              err.message.indexOf("Contract Call:") !== -1
+                ? err.message.indexOf("Contract Call:")
+                : 150;
 
-          setError({ name: errName, message: errorMessage });
+            const errorMessage =
+              err.message.substring(0, errorMessageLength) + "...";
+
+            setError({ name: errName, message: errorMessage });
+          }
           setLoader(false);
           console.error("APPROVE ERROR:", err);
         }
@@ -547,13 +549,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No approve hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("APPROVE ERROR:", err);
       }
@@ -592,13 +599,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No depositAssets hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
       }
@@ -643,14 +655,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No deposit hash...");
-        const errName = err instanceof Error ? err.name : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
 
-        setError({ name: errName, message: errorMessage });
+          setError({ name: errName, message: errorMessage });
+        }
 
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
@@ -764,13 +780,18 @@ function Vault({ vault }: IProps) {
       }
     } catch (err) {
       lastTx.set("No approve hash...");
-      const errName = err instanceof Error ? err.name : String(err);
-      const errorMessage =
-        err instanceof Error
-          ? err.message.substring(0, 200) + "..."
-          : String(err);
+      if (err instanceof Error) {
+        const errName = err.name;
+        const errorMessageLength =
+          err.message.indexOf("Contract Call:") !== -1
+            ? err.message.indexOf("Contract Call:")
+            : 150;
 
-      setError({ name: errName, message: errorMessage });
+        const errorMessage =
+          err.message.substring(0, errorMessageLength) + "...";
+
+        setError({ name: errName, message: errorMessage });
+      }
       setLoader(false);
       console.error("ZAP ERROR:", err);
     }
@@ -861,13 +882,18 @@ function Vault({ vault }: IProps) {
         ) {
           setIsApprove(1);
         }
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
       }
     }
@@ -907,13 +933,18 @@ function Vault({ vault }: IProps) {
       }
     } catch (err) {
       lastTx.set("No depositAssets hash...");
-      const errName = err instanceof Error ? err.name : String(err);
-      const errorMessage =
-        err instanceof Error
-          ? err.message.substring(0, 200) + "..."
-          : String(err);
+      if (err instanceof Error) {
+        const errName = err.name;
+        const errorMessageLength =
+          err.message.indexOf("Contract Call:") !== -1
+            ? err.message.indexOf("Contract Call:")
+            : 150;
 
-      setError({ name: errName, message: errorMessage });
+        const errorMessage =
+          err.message.substring(0, errorMessageLength) + "...";
+
+        setError({ name: errName, message: errorMessage });
+      }
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
     }
@@ -955,13 +986,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No withdrawAssets hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
@@ -1002,13 +1038,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No withdraw hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
