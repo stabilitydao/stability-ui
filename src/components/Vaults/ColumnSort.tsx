@@ -16,8 +16,8 @@ const ColumnSort: React.FC<TProps> = ({
   filter,
 }) => {
   const styles: Record<string, string> = {
-    Type: "hidden lg:table-cell",
-    Strategy: "hidden md:table-cell",
+    Type: "hidden xl:table-cell",
+    Strategy: "hidden lg:table-cell",
   };
 
   const tabController = () => {
