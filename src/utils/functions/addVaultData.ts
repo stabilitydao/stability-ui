@@ -12,7 +12,7 @@ const addVaultData = (data: any[]) => {
     vaultAddress.length === vaultUserBalance.length
   ) {
     for (let i = 0; i < vaultAddress.length; i++) {
-      vault[vaultAddress[i]] = {
+      vault[vaultAddress[i].toLowerCase()] = {
         vaultSharePrice: vaultSharePrice[i],
         vaultUserBalance: vaultUserBalance[i],
       };

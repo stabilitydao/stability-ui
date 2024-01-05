@@ -28,6 +28,12 @@ const TABLE = [
   },
   { name: "APY", keyName: "apy", sortType: "none", dataType: "number" },
   {
+    name: "IL",
+    keyName: "il",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
     name: "Price",
     keyName: "shareprice",
     sortType: "none",

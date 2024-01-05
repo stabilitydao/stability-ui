@@ -6,12 +6,7 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 
 import { readContract } from "viem/actions";
-import {
-  useAccount,
-  usePublicClient,
-  useNetwork,
-  // useWalletClient,
-} from "wagmi";
+import { useAccount, usePublicClient, useNetwork } from "wagmi";
 import {
   account,
   network,
@@ -32,8 +27,6 @@ import {
   PlatformABI,
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
-  VaultABI,
-  StrategyABI,
 } from "@web3";
 
 import {
@@ -254,6 +247,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr,
                 assetsAprs,
                 strategyInfo: getStrategyInfo(contractVaults[2][index]),
+                il: getStrategyInfo(contractVaults[2][index])?.il?.rate,
                 underlying: graphVault.underlying,
                 strategyAddress: graphVault.strategy,
               },
@@ -356,6 +350,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsWithApr: assetsWithApr,
             assetsAprs: assetsAprs,
             strategyInfo: getStrategyInfo(vault.symbol),
+            il: getStrategyInfo(vault.symbol)?.il?.rate,
             underlying: vault.underlying,
             strategyAddress: vault.strategy,
           };
