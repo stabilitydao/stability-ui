@@ -8,7 +8,7 @@ import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 
-function Platform({ vaultEntities, platformEntities }: any) {
+function Platform({ vaultEntities }: any) {
   const [daoData, setDaoData] = useState<TDAOData>();
   const $publicClient = useStore(publicClient);
   const $network = useStore(network);
@@ -27,12 +27,10 @@ function Platform({ vaultEntities, platformEntities }: any) {
     }
     return color;
   };
-  console.log(platformEntities);
-
   console.log(vaultEntities);
 
   const fetchDaoData = async () => {
-    if ($publicClient && vaultEntities && platformEntities) {
+    if ($publicClient && vaultEntities) {
       try {
         const platformVersion: any = await $publicClient.readContract({
           address: platform,
@@ -51,7 +49,6 @@ function Platform({ vaultEntities, platformEntities }: any) {
           abi: PlatformABI,
           functionName: "getData",
         });
-        console.log(contractData);
 
         const farmsLength = await $publicClient.readContract({
           address: "0xa14EaAE76890595B3C7ea308dAEBB93863480EAD" as TAddress,
@@ -77,8 +74,6 @@ function Platform({ vaultEntities, platformEntities }: any) {
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
           (fee / 1000n).toString()
         );
-        console.log(contractData);
-        console.log(vaultEntities);
 
         const _daoData = {
           platformVersion: platformVersion,
@@ -105,7 +100,7 @@ function Platform({ vaultEntities, platformEntities }: any) {
 
   useEffect(() => {
     fetchDaoData();
-  }, [vaultEntities]);
+  }, [vaultEntities, $publicClient]);
 
   return (
     <>

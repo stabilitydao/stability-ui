@@ -86,46 +86,51 @@ function Team() {
     if ($publicClient && $assetsPrices) {
       try {
         const _balances: TMultisigBalance = {};
-
-        const contractBalance: any = await $publicClient.readContract({
+        const contractBalanceResponse: any = await $publicClient.readContract({
           address: platform,
           abi: PlatformABI,
           functionName: "getBalance",
           args: ["0x2138eB956dca8a04670693039a2EBc3087c9a20d"],
         });
 
-        if (contractBalance) {
-          for (const address of contractBalance[0]) {
-            const balance = (await $publicClient.readContract({
-              address: address as TAddress,
-              abi: ERC20ABI,
-              functionName: "balanceOf",
-              args: [MULTISIG[0] as TAddress],
-            })) as bigint;
+        if (contractBalanceResponse) {
+          const contractAddresses = contractBalanceResponse[0];
+          const balancePromises = contractAddresses.map(
+            async (address: TAddress) => {
+              const balance = (await $publicClient.readContract({
+                address: address as TAddress,
+                abi: ERC20ABI,
+                functionName: "balanceOf",
+                args: [MULTISIG[0] as TAddress],
+              })) as bigint;
 
-            const decimals = getTokenData(address.toLowerCase())?.decimals;
+              const decimals = getTokenData(address.toLowerCase())?.decimals;
 
-            if (decimals && balance >= 0n) {
-              const tokenInfo: TMultiTokenData = {
-                balance:
-                  Math.trunc(Number(formatUnits(balance, decimals)) * 100) /
-                  100,
-                priceBalance:
-                  Math.trunc(
-                    Number(formatUnits(balance, decimals)) *
-                      Number(
-                        formatUnits(
-                          $assetsPrices[address.toLowerCase()]?.tokenPrice,
-                          18
-                        )
-                      ) *
-                      100
-                  ) / 100,
-              };
+              if (decimals && balance >= 0n) {
+                const tokenInfo: TMultiTokenData = {
+                  balance:
+                    Math.trunc(Number(formatUnits(balance, decimals)) * 100) /
+                    100,
+                  priceBalance:
+                    Math.trunc(
+                      Number(formatUnits(balance, decimals)) *
+                        Number(
+                          formatUnits(
+                            $assetsPrices[address.toLowerCase()]?.tokenPrice,
+                            18
+                          )
+                        ) *
+                        100
+                    ) / 100,
+                };
 
-              _balances[address] = tokenInfo;
+                _balances[address] = tokenInfo;
+              }
             }
-          }
+          );
+
+          await Promise.all(balancePromises);
+
           setMultisigBalance(_balances);
         }
       } catch (error) {

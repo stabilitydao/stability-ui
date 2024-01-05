@@ -21,7 +21,7 @@ import {
 } from "@web3";
 import { Loader } from "@components";
 
-function Tokenomics({ platformEntities }: any) {
+function Tokenomics() {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
   const $publicClient = useStore(publicClient);
@@ -149,6 +149,7 @@ function Tokenomics({ platformEntities }: any) {
       const transaction = await $publicClient?.waitForTransactionReceipt(stake);
 
       if (transaction?.status === "success") {
+        await new Promise(resolve => setTimeout(resolve, 500));
         await profitBalance();
         await sdivBalance();
         setInput("");
@@ -176,6 +177,7 @@ function Tokenomics({ platformEntities }: any) {
       );
 
       if (transaction?.status === "success") {
+        await new Promise(resolve => setTimeout(resolve, 500));
         await profitBalance();
         await sdivBalance();
         setInput("");
@@ -208,8 +210,8 @@ function Tokenomics({ platformEntities }: any) {
       }
       setLoader(false);
     } catch (error) {
-      console.error("Error in harvest:", error);
       setLoader(false);
+      console.error("Error in harvest:", error);
     }
   };
 
@@ -296,7 +298,6 @@ function Tokenomics({ platformEntities }: any) {
 
   useEffect(() => {
     fetchTokenomicsData();
-    allowance();
     profitBalance();
     sdivBalance();
   }, [$assetsPrices]);
@@ -394,7 +395,7 @@ function Tokenomics({ platformEntities }: any) {
               loading="eager"
               className="rounded-full absolute right-3 top-3 w-1/6 md:w-1/5 lg:w-1/5"
               src={getTokenData(PROFIT[0])?.logoURI}
-              alt={getTokenData(PROFIT[0])?.logoURI}
+              alt="PROFIT"
               title={getTokenData(PROFIT[0])?.symbol}
             />
 

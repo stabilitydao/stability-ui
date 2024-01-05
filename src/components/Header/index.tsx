@@ -21,7 +21,10 @@ const Header = () => {
         <a
           href="/"
           title="Stability">
-          <img src="/logo.svg" />
+          <img
+            src="/logo.svg"
+            alt="Stability DAO"
+          />
           <span className="hidden sm:flex">Stability</span>
         </a>
       </span>

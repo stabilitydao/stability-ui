@@ -97,7 +97,6 @@ const Vaults = () => {
       console.log(vaults);
       console.log($vaults);
       console.log(localVaults);
-      console.log($vaultAssets);
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
