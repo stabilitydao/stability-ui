@@ -400,14 +400,12 @@ function Vault({ vault }: IProps) {
           });
 
           setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-
           const allowanceData = (await readContract(_publicClient, {
             address: option[0] as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
             args: [$account as TAddress, vault as TAddress],
           })) as bigint;
-
           if (
             Number(formatUnits(allowanceData, 18)) < Number(amount) &&
             Number(amount) <= Number(balances[asset]?.assetBalance)
@@ -436,7 +434,7 @@ function Vault({ vault }: IProps) {
 
           const allowanceData = await getZapAllowance(asset);
 
-          if (tab === "Withdraw") {
+          if (tab === "Withdraw" && option.length === 1) {
             if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
               setZapButton("needApprove");
             }
@@ -493,9 +491,10 @@ function Vault({ vault }: IProps) {
             args: [$platformData.zap as TAddress, maxUint256],
           });
           setLoader(true);
-          const transaction = await _publicClient.waitForTransactionReceipt(
-            assetApprove
-          );
+          const transaction = await _publicClient.waitForTransactionReceipt({
+            confirmations: 5,
+            hash: assetApprove?.hash,
+          });
 
           if (transaction.status === "success") {
             lastTx.set(transaction?.transactionHash);
@@ -509,13 +508,18 @@ function Vault({ vault }: IProps) {
           }
         } catch (err) {
           lastTx.set("No approve hash...");
-          const errName = err instanceof Error ? err.name : String(err);
-          const errorMessage =
-            err instanceof Error
-              ? err.message.substring(0, 200) + "..."
-              : String(err);
+          if (err instanceof Error) {
+            const errName = err.name;
+            const errorMessageLength =
+              err.message.indexOf("Contract Call:") !== -1
+                ? err.message.indexOf("Contract Call:")
+                : 150;
 
-          setError({ name: errName, message: errorMessage });
+            const errorMessage =
+              err.message.substring(0, errorMessageLength) + "...";
+
+            setError({ name: errName, message: errorMessage });
+          }
           setLoader(false);
           console.error("APPROVE ERROR:", err);
         }
@@ -530,9 +534,10 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          assetApprove
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: assetApprove?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -544,13 +549,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No approve hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("APPROVE ERROR:", err);
       }
@@ -579,22 +589,28 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          depositAssets
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: depositAssets?.hash,
+        });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (err) {
         lastTx.set("No depositAssets hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
       }
@@ -629,22 +645,28 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          zapDeposit
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: zapDeposit?.hash,
+        });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
           setLoader(false);
         }
       } catch (err) {
         lastTx.set("No deposit hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
 
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
@@ -735,7 +757,7 @@ function Vault({ vault }: IProps) {
       });
       setLoader(true);
       const transaction = await _publicClient.waitForTransactionReceipt({
-        confirmations: 3,
+        confirmations: 5,
         hash: assetApprove?.hash,
       });
 
@@ -758,13 +780,18 @@ function Vault({ vault }: IProps) {
       }
     } catch (err) {
       lastTx.set("No approve hash...");
-      const errName = err instanceof Error ? err.name : String(err);
-      const errorMessage =
-        err instanceof Error
-          ? err.message.substring(0, 200) + "..."
-          : String(err);
+      if (err instanceof Error) {
+        const errName = err.name;
+        const errorMessageLength =
+          err.message.indexOf("Contract Call:") !== -1
+            ? err.message.indexOf("Contract Call:")
+            : 150;
 
-      setError({ name: errName, message: errorMessage });
+        const errorMessage =
+          err.message.substring(0, errorMessageLength) + "...";
+
+        setError({ name: errName, message: errorMessage });
+      }
       setLoader(false);
       console.error("ZAP ERROR:", err);
     }
@@ -775,8 +802,9 @@ function Vault({ vault }: IProps) {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh) return;
-
     setRotation(rotation + 360);
+    setLoader(true);
+    loadAssetsBalances();
     zapInputHandler(inputs[option[0]]?.amount, option[0]);
   };
   /////
@@ -801,7 +829,7 @@ function Vault({ vault }: IProps) {
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
-          confirmations: 3,
+          confirmations: 5,
           hash: assetApprove?.hash,
         });
 
@@ -854,13 +882,18 @@ function Vault({ vault }: IProps) {
         ) {
           setIsApprove(1);
         }
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
       }
     }
@@ -889,9 +922,10 @@ function Vault({ vault }: IProps) {
         args: [$assets as TAddress[], input, out, $account as TAddress],
       });
       setLoader(true);
-      const transaction = await _publicClient.waitForTransactionReceipt(
-        depositAssets
-      );
+      const transaction = await _publicClient.waitForTransactionReceipt({
+        confirmations: 5,
+        hash: depositAssets?.hash,
+      });
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -899,13 +933,18 @@ function Vault({ vault }: IProps) {
       }
     } catch (err) {
       lastTx.set("No depositAssets hash...");
-      const errName = err instanceof Error ? err.name : String(err);
-      const errorMessage =
-        err instanceof Error
-          ? err.message.substring(0, 200) + "..."
-          : String(err);
+      if (err instanceof Error) {
+        const errName = err.name;
+        const errorMessageLength =
+          err.message.indexOf("Contract Call:") !== -1
+            ? err.message.indexOf("Contract Call:")
+            : 150;
 
-      setError({ name: errName, message: errorMessage });
+        const errorMessage =
+          err.message.substring(0, errorMessageLength) + "...";
+
+        setError({ name: errName, message: errorMessage });
+      }
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
     }
@@ -936,9 +975,10 @@ function Vault({ vault }: IProps) {
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          withdrawAssets
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: withdrawAssets?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -946,13 +986,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No withdrawAssets hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
@@ -982,9 +1027,10 @@ function Vault({ vault }: IProps) {
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          zapWithdraw
-        );
+        const transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: zapWithdraw?.hash,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -992,13 +1038,18 @@ function Vault({ vault }: IProps) {
         }
       } catch (err) {
         lastTx.set("No withdraw hash...");
-        const errName = err instanceof Error ? err.name : String(err);
-        const errorMessage =
-          err instanceof Error
-            ? err.message.substring(0, 200) + "..."
-            : String(err);
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
 
-        setError({ name: errName, message: errorMessage });
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
@@ -1234,12 +1285,10 @@ function Vault({ vault }: IProps) {
               };
             }
           }
-          if (lastKeyPress.key2 !== "") {
-            setInputs((prevInputs: any) => ({
-              ...prevInputs,
-              ...preview,
-            }));
-          }
+          setInputs((prevInputs: any) => ({
+            ...prevInputs,
+            ...preview,
+          }));
         } catch (error) {
           console.error(
             "Error: the asset balance is too low to convert.",
@@ -1321,14 +1370,10 @@ function Vault({ vault }: IProps) {
     }
   }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
   useEffect(() => {
-    //setSharesOut(false); //todo test
+    //setSharesOut(false);
     setUnderlyingShares(false);
     setZapShares(false);
-    if (
-      option.length > 1 ||
-      option[0] === underlyingToken?.address ||
-      !inputs[option[0]]?.amount
-    ) {
+    if (option[0] === underlyingToken?.address || !inputs[option[0]]?.amount) {
       setIsRefresh(false);
       return;
     }
@@ -1668,14 +1713,17 @@ function Vault({ vault }: IProps) {
                   <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                     Impermanent Loss
                   </p>
-                  <p>
-                    <p style={{color: localVault.strategyInfo.il.color}} className="text-[20px] font-bold">
-                    {localVault.strategyInfo.il.title}
+                  <div>
+                    <p
+                      style={{ color: localVault.strategyInfo.il.color }}
+                      className="text-[20px] font-bold"
+                    >
+                      {localVault.strategyInfo.il.title}
                     </p>
                     <p className="text-[14px]">
                       {localVault.strategyInfo.il.desc}
                     </p>
-                  </p>
+                  </div>
                 </div>
 
                 <div className="hidden mt-2">
@@ -2121,7 +2169,6 @@ function Vault({ vault }: IProps) {
 
                 {$connected && (
                   <>
-                    {" "}
                     <svg
                       fill={isRefresh ? "#ffffff" : "#959595"}
                       height="22"
@@ -2184,33 +2231,31 @@ function Vault({ vault }: IProps) {
                       <>
                         <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                           {option.map((asset: any) => (
-                            <div key={asset}>
+                            <div className="w-full" key={asset}>
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                <p>Balance:</p>
+                                <p>Balance: </p>
 
                                 <p>{balances[asset]?.assetBalance}</p>
                               </div>
 
                               <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                                {$connected && (
-                                  <div className="absolute end-5 bottom-4">
-                                    <div className="flex items-center">
-                                      <button
-                                        className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                        type="button"
-                                        onClick={() =>
-                                          balances[asset] &&
-                                          handleInputChange(
-                                            balances[asset].assetBalance,
-                                            asset
-                                          )
-                                        }
-                                      >
-                                        MAX
-                                      </button>
-                                    </div>
+                                <div className="absolute end-5 bottom-4">
+                                  <div className="flex items-center">
+                                    <button
+                                      className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                      type="button"
+                                      onClick={() =>
+                                        balances[asset] &&
+                                        handleInputChange(
+                                          balances[asset].assetBalance,
+                                          asset
+                                        )
+                                      }
+                                    >
+                                      MAX
+                                    </button>
                                   </div>
-                                )}
+                                </div>
                                 <input
                                   className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
                                   list="amount"
@@ -2256,21 +2301,23 @@ function Vault({ vault }: IProps) {
                                   })}
                                 </div>
                               </div>
-                              {$assetsPrices && inputs[asset]?.amount > 0 && (
-                                <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                  <p>
-                                    $
-                                    {(
-                                      Number(
-                                        formatUnits(
-                                          $assetsPrices[asset].tokenPrice,
-                                          18
-                                        )
-                                      ) * inputs[asset].amount
-                                    ).toFixed(2)}
-                                  </p>
-                                </div>
-                              )}
+                              {$assetsPrices &&
+                                inputs[asset]?.amount > 0 &&
+                                underlyingToken?.address != option[0] && (
+                                  <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                    <p>
+                                      $
+                                      {(
+                                        Number(
+                                          formatUnits(
+                                            $assetsPrices[asset].tokenPrice,
+                                            18
+                                          )
+                                        ) * inputs[asset].amount
+                                      ).toFixed(2)}
+                                    </p>
+                                  </div>
+                                )}
                             </div>
                           ))}
                         </div>
@@ -2401,21 +2448,23 @@ function Vault({ vault }: IProps) {
                               />
                             )}
                           </div>
-                          {$assetsPrices && inputs[option[0]]?.amount > 0 && (
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>
-                                $
-                                {(
-                                  Number(
-                                    formatUnits(
-                                      $assetsPrices[option[0]].tokenPrice,
-                                      18
-                                    )
-                                  ) * inputs[option[0]]?.amount
-                                ).toFixed(2)}
-                              </p>
-                            </div>
-                          )}
+                          {$assetsPrices &&
+                            inputs[option[0]]?.amount > 0 &&
+                            underlyingToken?.address !== option[0] && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>
+                                  $
+                                  {(
+                                    Number(
+                                      formatUnits(
+                                        $assetsPrices[option[0]].tokenPrice,
+                                        18
+                                      )
+                                    ) * inputs[option[0]]?.amount
+                                  ).toFixed(2)}
+                                </p>
+                              </div>
+                            )}
                           {!loader && (
                             <>
                               {zapTokens && (
@@ -2555,7 +2604,7 @@ function Vault({ vault }: IProps) {
                     <div className="grid mt-[15px] text-[15px] w-full">
                       {balances[option[0]] && (
                         <div className="text-left text-[gray] ml-2">
-                          Balance:
+                          Balance:{" "}
                           {parseFloat(
                             formatUnits($vaultData[vault].vaultUserBalance, 18)
                           )}
