@@ -1719,6 +1719,20 @@ function Vault({ vault }: IProps) {
                   </p>
                 </div>
 
+                <div className="mt-2">
+                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                    Impermanent Loss
+                  </p>
+                  <p>
+                    <p style={{color: localVault.strategyInfo.il.color}} className="text-[20px] font-bold">
+                    {localVault.strategyInfo.il.title}
+                    </p>
+                    <p className="text-[14px]">
+                      {localVault.strategyInfo.il.desc}
+                    </p>
+                  </p>
+                </div>
+
                 <div className="hidden mt-2">
                   <div className="mr-5">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">

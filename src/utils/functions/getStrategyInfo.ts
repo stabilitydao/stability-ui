@@ -19,8 +19,10 @@ export const getStrategyInfo = (
     svg: farmSvg,
   };
 
+  let r: IStrategyInfo|undefined
+
   if (vaultSymbol.match(/GQF(S|N|W)$/)) {
-    return {
+    r = {
       name: "Gamma QuickSwap Farm",
       shortName: "GQF",
       protocols: [gamma, quickSWap],
@@ -34,10 +36,8 @@ export const getStrategyInfo = (
       ammAdapter: "Algebra",
       sourceCode: "https://github.com/stabilitydao/stability-contracts/blob/main/src/strategies/GammaQuickSwapFarmStrategy.sol",
     };
-  }
-  
-  if (vaultSymbol.match(/QSF$/)) {
-    return {
+  } else if (vaultSymbol.match(/QSF$/)) {
+    r = {
       name: "QuickSwap Static Farm",
       shortName: "QSF",
       protocols: [quickSWap],
@@ -53,5 +53,44 @@ export const getStrategyInfo = (
     };
   }
 
-  return undefined;
+  // get IL
+  if (r) {
+    if (r.shortName === 'QSF') {
+      r.il = {
+        rate: 0,
+        title: 'None',
+        desc: 'Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.',
+        color: '#00ff00',
+      }
+    }
+    
+    if (r.shortName === 'GQF' && vaultSymbol.match(/GQFS$/)) {
+      r.il = {
+        rate: 1,
+        title: 'Zero exp',
+        desc: 'The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.',
+        color: '#92ff10',
+      }
+    }
+
+    if (r.shortName === 'GQF' && vaultSymbol.match(/GQFN$/)) {
+      r.il = {
+        rate: 8,
+        title: 'High',
+        desc: 'The strategy of the underlying liquidity provider (Gamma Narrow LP) provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.',
+        color: '#ff0000',
+      }
+    }
+
+    if (r.shortName === 'GQF' && vaultSymbol.match(/GQFW$/)) {
+      r.il = {
+        rate: 5,
+        title: 'Medium',
+        desc: 'The strategy of the underlying liquidity provider (Gamma Wide LP) provides liquidity in the wide range, rebalancing the position infrequently (when the price deviates from the average by approximately +-10%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.',
+        color: '#ffb700',
+      }
+    }
+  }
+
+  return r;
 };

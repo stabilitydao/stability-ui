@@ -1,4 +1,11 @@
 // interfaces
+interface IL {
+  rate: number;
+  title: string;
+  desc: string;
+  color: string;
+}
+
 interface IProtocol {
   name: string;
   logoSrc: string;
@@ -21,6 +28,7 @@ interface IStrategyInfo {
   baseStrategies: string[];
   ammAdapter: string;
   sourceCode: string;
+  il?: IL;
 }
 
 // types
@@ -116,6 +124,7 @@ type TLocalVault = {
   assetsWithApr: string[];
   assetsAprs: string[];
   strategyInfo: IStrategyInfo;
+  il: number;
   underlying: TAddress;
   strategyAddress: TAddress;
 };

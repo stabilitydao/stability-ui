@@ -16,8 +16,8 @@ const ColumnSort: React.FC<TProps> = ({
   filter,
 }) => {
   const styles: Record<string, string> = {
-    Type: "hidden lg:table-cell",
-    Strategy: "hidden md:table-cell",
+    Type: "hidden xl:table-cell",
+    Strategy: "hidden lg:table-cell",
   };
 
   const tabController = () => {
@@ -55,7 +55,7 @@ const ColumnSort: React.FC<TProps> = ({
           className={`${
             index < 5
               ? "px-0 md:px-2 lg:px-4"
-              : "pl-0 md:px-2 lg:px-4 text-right"
+              : "pl-0 md:px-2 lg:px-3 text-right"
           } py-2 text-center cursor-pointer ${styles[value] || ""}`}
         >
           <p className="inline-block">{value}</p>
