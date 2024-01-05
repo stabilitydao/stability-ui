@@ -184,12 +184,13 @@ const Vaults = () => {
                 <td className="px-2 lg:px-3 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
                     <VaultState status={vault.status} />
-                    <AssetsProportion
-                      proportions={vault.assetsProportions as number[]}
-                      assets={vault.assets}
-                      type="vaults"
-                    />
-
+                    {vault.assets && (
+                      <AssetsProportion
+                        proportions={vault.assetsProportions as number[]}
+                        assets={vault.assets}
+                        type="vaults"
+                      />
+                    )}
                     <div className="max-w-[250px] flex items-start flex-col">
                       <p
                         title={vault.name}
@@ -334,11 +335,13 @@ const Vaults = () => {
               <div className="flex flex-col items-center justify-center p-5">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center flex-wrap gap-1">
-                    <AssetsProportion
-                      proportions={vault.assetsProportions as number[]}
-                      assets={vault.assets}
-                      type="vaults"
-                    />
+                    {vault.assets && (
+                      <AssetsProportion
+                        proportions={vault.assetsProportions as number[]}
+                        assets={vault.assets}
+                        type="vaults"
+                      />
+                    )}
                     <p
                       title={vault.name}
                       className="whitespace-nowrap text-[18px] font-bold"
