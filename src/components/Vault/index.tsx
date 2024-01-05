@@ -802,8 +802,8 @@ function Vault({ vault }: IProps) {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh) return;
-
     setRotation(rotation + 360);
+    setLoader(true);
     loadAssetsBalances();
     zapInputHandler(inputs[option[0]]?.amount, option[0]);
   };
@@ -1237,74 +1237,68 @@ function Vault({ vault }: IProps) {
     setAllowance(allowanceResult);
   };
   const previewDeposit = async () => {
-    debouncedPreviewDeposit();
-  };
-  const debouncedPreviewDeposit = useCallback(
-    debounce(async () => {
-      // if (!Number(lastKeyPress.key2)) return;
-      if ($assets && tab === "Deposit") {
-        const changedInput = $assets?.indexOf(lastKeyPress.key1);
-        const preview: TVaultInput | any = {};
-        if (option) {
-          let amounts: bigint[] = [];
-          for (let i = 0; i < option.length; i++) {
-            if (i === changedInput) {
-              amounts.push(
-                parseUnits(
-                  inputs[lastKeyPress.key1 as string].amount,
-                  Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
-                )
-              );
-            } else {
-              const token = tokensJson.tokens.find(
-                (token) => token.address === option[0]
-              );
-
-              const decimals = token ? token.decimals + 18 : 24;
-
-              amounts.push(parseUnits("1", decimals));
-            }
-          }
-          try {
-            const previewDepositAssets = await readContract(_publicClient, {
-              address: vault as TAddress,
-              abi: VaultABI,
-              functionName: "previewDepositAssets",
-              args: [$assets as TAddress[], amounts],
-            });
-
-            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
-            setSharesOut(
-              ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+    // if (!Number(lastKeyPress.key2)) return;
+    if ($assets && tab === "Deposit") {
+      const changedInput = $assets?.indexOf(lastKeyPress.key1);
+      const preview: TVaultInput | any = {};
+      if (option) {
+        let amounts: bigint[] = [];
+        for (let i = 0; i < option.length; i++) {
+          if (i === changedInput) {
+            amounts.push(
+              parseUnits(
+                inputs[lastKeyPress.key1 as string].amount,
+                Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
+              )
+            );
+          } else {
+            const token = tokensJson.tokens.find(
+              (token) => token.address === option[0]
             );
 
-            const previewDepositAssetsArray: bigint[] = [
-              ...previewDepositAssets[0],
-            ];
-            for (let i = 0; i < $assets.length; i++) {
-              const decimals = getTokenData($assets[i])?.decimals;
-              if (i !== changedInput && decimals) {
-                preview[$assets[i]] = {
-                  amount: formatUnits(previewDepositAssetsArray[i], decimals),
-                };
-              }
-            }
-            setInputs((prevInputs: any) => ({
-              ...prevInputs,
-              ...preview,
-            }));
-          } catch (error) {
-            console.error(
-              "Error: the asset balance is too low to convert.",
-              error
-            );
-            setIsApprove(undefined);
+            const decimals = token ? token.decimals + 18 : 24;
+
+            amounts.push(parseUnits("1", decimals));
           }
         }
+        try {
+          const previewDepositAssets = await readContract(_publicClient, {
+            address: vault as TAddress,
+            abi: VaultABI,
+            functionName: "previewDepositAssets",
+            args: [$assets as TAddress[], amounts],
+          });
+
+          checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+          setSharesOut(
+            ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+          );
+
+          const previewDepositAssetsArray: bigint[] = [
+            ...previewDepositAssets[0],
+          ];
+          for (let i = 0; i < $assets.length; i++) {
+            const decimals = getTokenData($assets[i])?.decimals;
+            if (i !== changedInput && decimals) {
+              preview[$assets[i]] = {
+                amount: formatUnits(previewDepositAssetsArray[i], decimals),
+              };
+            }
+          }
+          setInputs((prevInputs: any) => ({
+            ...prevInputs,
+            ...preview,
+          }));
+        } catch (error) {
+          console.error(
+            "Error: the asset balance is too low to convert.",
+            error
+          );
+          setIsApprove(undefined);
+        }
       }
-    }, 500),
-    [option, balances]
-  );
+    }
+  };
   const initVault = async () => {
     if ($vaults && vault) {
       setLocalVault($vaults[vault.toLowerCase()]);
@@ -1376,14 +1370,10 @@ function Vault({ vault }: IProps) {
     }
   }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
   useEffect(() => {
-    //setSharesOut(false); //todo test
+    //setSharesOut(false);
     setUnderlyingShares(false);
     setZapShares(false);
-    if (
-      option.length > 1 ||
-      option[0] === underlyingToken?.address ||
-      !inputs[option[0]]?.amount
-    ) {
+    if (option[0] === underlyingToken?.address || !inputs[option[0]]?.amount) {
       setIsRefresh(false);
       return;
     }
@@ -1723,14 +1713,17 @@ function Vault({ vault }: IProps) {
                   <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                     Impermanent Loss
                   </p>
-                  <p>
-                    <p style={{color: localVault.strategyInfo.il.color}} className="text-[20px] font-bold">
-                    {localVault.strategyInfo.il.title}
+                  <div>
+                    <p
+                      style={{ color: localVault.strategyInfo.il.color }}
+                      className="text-[20px] font-bold"
+                    >
+                      {localVault.strategyInfo.il.title}
                     </p>
                     <p className="text-[14px]">
                       {localVault.strategyInfo.il.desc}
                     </p>
-                  </p>
+                  </div>
                 </div>
 
                 <div className="hidden mt-2">
@@ -2176,7 +2169,6 @@ function Vault({ vault }: IProps) {
 
                 {$connected && (
                   <>
-                    {" "}
                     <svg
                       fill={isRefresh ? "#ffffff" : "#959595"}
                       height="22"
@@ -2239,7 +2231,7 @@ function Vault({ vault }: IProps) {
                       <>
                         <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                           {option.map((asset: any) => (
-                            <div key={asset}>
+                            <div className="w-full" key={asset}>
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                                 <p>Balance: </p>
 
@@ -2247,25 +2239,23 @@ function Vault({ vault }: IProps) {
                               </div>
 
                               <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                                {$connected && (
-                                  <div className="absolute end-5 bottom-4">
-                                    <div className="flex items-center">
-                                      <button
-                                        className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                        type="button"
-                                        onClick={() =>
-                                          balances[asset] &&
-                                          handleInputChange(
-                                            balances[asset].assetBalance,
-                                            asset
-                                          )
-                                        }
-                                      >
-                                        MAX
-                                      </button>
-                                    </div>
+                                <div className="absolute end-5 bottom-4">
+                                  <div className="flex items-center">
+                                    <button
+                                      className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                                      type="button"
+                                      onClick={() =>
+                                        balances[asset] &&
+                                        handleInputChange(
+                                          balances[asset].assetBalance,
+                                          asset
+                                        )
+                                      }
+                                    >
+                                      MAX
+                                    </button>
                                   </div>
-                                )}
+                                </div>
                                 <input
                                   className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
                                   list="amount"
@@ -2311,21 +2301,23 @@ function Vault({ vault }: IProps) {
                                   })}
                                 </div>
                               </div>
-                              {$assetsPrices && inputs[asset]?.amount > 0 && (
-                                <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                                  <p>
-                                    $
-                                    {(
-                                      Number(
-                                        formatUnits(
-                                          $assetsPrices[asset].tokenPrice,
-                                          18
-                                        )
-                                      ) * inputs[asset].amount
-                                    ).toFixed(2)}
-                                  </p>
-                                </div>
-                              )}
+                              {$assetsPrices &&
+                                inputs[asset]?.amount > 0 &&
+                                underlyingToken?.address != option[0] && (
+                                  <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                    <p>
+                                      $
+                                      {(
+                                        Number(
+                                          formatUnits(
+                                            $assetsPrices[asset].tokenPrice,
+                                            18
+                                          )
+                                        ) * inputs[asset].amount
+                                      ).toFixed(2)}
+                                    </p>
+                                  </div>
+                                )}
                             </div>
                           ))}
                         </div>
@@ -2456,21 +2448,23 @@ function Vault({ vault }: IProps) {
                               />
                             )}
                           </div>
-                          {$assetsPrices && inputs[option[0]]?.amount > 0 && (
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>
-                                $
-                                {(
-                                  Number(
-                                    formatUnits(
-                                      $assetsPrices[option[0]].tokenPrice,
-                                      18
-                                    )
-                                  ) * inputs[option[0]]?.amount
-                                ).toFixed(2)}
-                              </p>
-                            </div>
-                          )}
+                          {$assetsPrices &&
+                            inputs[option[0]]?.amount > 0 &&
+                            underlyingToken?.address !== option[0] && (
+                              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                                <p>
+                                  $
+                                  {(
+                                    Number(
+                                      formatUnits(
+                                        $assetsPrices[option[0]].tokenPrice,
+                                        18
+                                      )
+                                    ) * inputs[option[0]]?.amount
+                                  ).toFixed(2)}
+                                </p>
+                              </div>
+                            )}
                           {!loader && (
                             <>
                               {zapTokens && (

@@ -6,12 +6,7 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 
 import { readContract } from "viem/actions";
-import {
-  useAccount,
-  usePublicClient,
-  useNetwork,
-  // useWalletClient,
-} from "wagmi";
+import { useAccount, usePublicClient, useNetwork } from "wagmi";
 import {
   account,
   network,
@@ -32,8 +27,6 @@ import {
   PlatformABI,
   IVaultManagerABI,
   ERC20MetadataUpgradeableABI,
-  VaultABI,
-  StrategyABI,
 } from "@web3";
 
 import {
