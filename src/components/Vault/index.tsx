@@ -8,7 +8,7 @@ import { writeContract } from "@wagmi/core";
 import { usePublicClient } from "wagmi";
 
 import { SettingsModal } from "./SettingsModal";
-import { VaultType, Loader, AssetsProportion } from "@components";
+import { VaultType, Loader, AssetsProportion, VaultState } from "@components";
 
 import {
   vaultData,
@@ -1433,6 +1433,7 @@ function Vault({ vault }: IProps) {
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
               <div className="flex items-center">
+                <VaultState status={localVault?.status} />
                 <AssetsProportion
                   proportions={localVault.assetsProportions}
                   assets={localVault?.assets}
