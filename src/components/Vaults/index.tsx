@@ -5,8 +5,7 @@ import { useStore } from "@nanostores/react";
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
-import { VaultState } from "./VaultState";
-import { VaultType, AssetsProportion } from "@components";
+import { VaultType, AssetsProportion, VaultState } from "@components";
 
 import { vaults, isVaultsLoaded } from "@store";
 
