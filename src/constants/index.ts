@@ -1,3 +1,4 @@
+import type { TVaultStatuses } from "@types";
 import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
 
 const TABLE = [
@@ -122,6 +123,15 @@ const CHAINS = [
 
 const SLIPPAGE_VALUES = ["0.5", "1", "2"];
 
+const VAULT_STATUSES: TVaultStatuses = {
+  0: "NOT_EXIST",
+  1: "ACTIVE",
+  2: "DEPRECATED",
+  3: "EMERGENCY_EXIT",
+  4: "DISABLED",
+  5: "DEPOSITS_UNAVAILABLE",
+};
+
 const GRAPH_ENDPOINT =
   "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
 
@@ -151,6 +161,7 @@ const GRAPH_QUERY = `
           lastHardWork
           assetsWithApr
           assetsAprs
+          vaultStatus
         }
         platformEntities {
           bcAssets
@@ -169,4 +180,5 @@ export {
   GRAPH_ENDPOINT,
   GRAPH_QUERY,
   STABILITY_API,
+  VAULT_STATUSES,
 };

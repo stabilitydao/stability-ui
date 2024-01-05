@@ -5,6 +5,7 @@ import { useStore } from "@nanostores/react";
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
+import { VaultState } from "./VaultState";
 import { VaultType, AssetsProportion } from "@components";
 
 import { vaults, isVaultsLoaded } from "@store";
@@ -183,6 +184,7 @@ const Vaults = () => {
               >
                 <td className="px-2 lg:px-3 py-2 lg:py-3">
                   <div className="flex items-center justify-start">
+                    <VaultState status={vault.status} />
                     <AssetsProportion
                       proportions={vault.assetsProportions as number[]}
                       assets={vault.assets}
@@ -349,6 +351,7 @@ const Vaults = () => {
                   <VaultType type={vault.type} />
                 </div>
                 <div className="flex items-center rounded-[8px] my-3 border-[#935ec2]">
+                  <VaultState status={vault.status} />
                   {vault.strategyInfo && (
                     <>
                       <span

@@ -127,6 +127,7 @@ type TLocalVault = {
   il: number;
   underlying: TAddress;
   strategyAddress: TAddress;
+  status: number;
 };
 type TVaultAssets = [string, string];
 
@@ -177,6 +178,10 @@ type TVaultsAddress = {
   [vaultAddress: string]: string | any;
 };
 
+type TVaultStatuses = {
+  [key: number]: string;
+};
+
 ////
 
 export type {
@@ -205,4 +210,5 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
+  TVaultStatuses,
 };
