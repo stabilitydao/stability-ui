@@ -16,7 +16,7 @@ const AssetsProportion = ({ proportions, assets, type }: IProps) => {
       <div
         style={{
           width: `${proportions ? (30 * proportions[0]) / 100 : 25}px`,
-          backgroundColor: assets[0].color,
+          backgroundColor: assets[0]?.color,
         }}
         className="h-6"
       >
@@ -30,7 +30,7 @@ const AssetsProportion = ({ proportions, assets, type }: IProps) => {
       <div
         style={{
           width: `${proportions ? (30 * proportions[1]) / 100 : 25}px`,
-          backgroundColor: assets[1].color,
+          backgroundColor: assets[1]?.color,
         }}
         className="h-6 flex justify-end"
       >
