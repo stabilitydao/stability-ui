@@ -254,6 +254,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr,
                 assetsAprs,
                 strategyInfo: getStrategyInfo(contractVaults[2][index]),
+                il: getStrategyInfo(contractVaults[2][index])?.il?.rate,
                 underlying: graphVault.underlying,
                 strategyAddress: graphVault.strategy,
               },
@@ -356,6 +357,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsWithApr: assetsWithApr,
             assetsAprs: assetsAprs,
             strategyInfo: getStrategyInfo(vault.symbol),
+            il: getStrategyInfo(vault.symbol)?.il?.rate,
             underlying: vault.underlying,
             strategyAddress: vault.strategy,
           };
