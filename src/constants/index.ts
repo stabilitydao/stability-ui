@@ -166,6 +166,10 @@ const GRAPH_QUERY = `
         platformEntities {
           bcAssets
         }
+        vaultTypeEntities {
+          version
+          id
+        }
       }
       `;
 

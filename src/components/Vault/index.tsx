@@ -22,6 +22,7 @@ import {
   tokens,
   lastTx,
   connected,
+  vaultTypes,
 } from "@store";
 
 import {
@@ -30,6 +31,7 @@ import {
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
+  FactoryABI,
 } from "@web3";
 
 import {
@@ -70,6 +72,7 @@ function Vault({ vault }: IProps) {
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
   const $connected = useStore(connected);
+  const $vaultTypes = useStore(vaultTypes);
   const _publicClient = usePublicClient();
 
   const { open } = useWeb3Modal();
@@ -91,6 +94,8 @@ function Vault({ vault }: IProps) {
   }>({ key1: undefined, key2: undefined });
 
   const [sharesOut, setSharesOut] = useState<bigint | any>();
+
+  const [needUpdate, setNeedUpdate] = useState<boolean>(false);
 
   const [localVault, setLocalVault] = useState<any>();
   const [timeDifference, setTimeDifference] = useState<any>();
@@ -796,6 +801,50 @@ function Vault({ vault }: IProps) {
       console.error("ZAP ERROR:", err);
     }
   };
+  ///// UPGRADE VAULT & STRATEGY
+
+  const upgradeVault = async () => {
+    try {
+      const upgradeVaultProxy = await writeContract({
+        address: $platformData.factory,
+        abi: FactoryABI,
+        functionName: "upgradeVaultProxy",
+        args: [vault as TAddress],
+      });
+
+      const transaction = await _publicClient.waitForTransactionReceipt({
+        confirmations: 5,
+        hash: upgradeVaultProxy?.hash,
+      });
+
+      if (transaction.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+      }
+    } catch (err) {
+      console.error("UPGRADE VAULT PROXY ERROR:", err);
+    }
+  };
+  const upgradeStrategy = async () => {
+    try {
+      const upgradeStrategyProxy = await writeContract({
+        address: $platformData.factory,
+        abi: FactoryABI,
+        functionName: "upgradeStrategyProxy",
+        args: [localVault.strategyAddress as TAddress],
+      });
+
+      const transaction = await _publicClient.waitForTransactionReceipt({
+        confirmations: 5,
+        hash: upgradeStrategyProxy?.hash,
+      });
+
+      if (transaction.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+      }
+    } catch (err) {
+      console.error("UPGRADE STRATEGY PROXY ERROR:", err);
+    }
+  };
 
   /////
 
@@ -1347,6 +1396,15 @@ function Vault({ vault }: IProps) {
   }, [localVault, $tokens, defaultOptionSymbols]);
 
   useEffect(() => {
+    if (localVault && $vaultTypes) {
+      // @ts-ignore
+      if ($vaultTypes[localVault?.type] !== localVault.version) {
+        setNeedUpdate(true);
+      }
+    }
+  }, [localVault, $vaultTypes]);
+
+  useEffect(() => {
     setZapTokens(false);
   }, [inputs]);
 
@@ -1729,7 +1787,22 @@ function Vault({ vault }: IProps) {
                     </p>
                   </div>
                 </div>
-
+                {needUpdate && (
+                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+                    <button
+                      onClick={upgradeVault}
+                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
+                    >
+                      Upgrade Vault
+                    </button>
+                    <button
+                      onClick={upgradeStrategy}
+                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
+                    >
+                      Upgrade Strategy
+                    </button>
+                  </div>
+                )}
                 <div className="hidden mt-2">
                   <div className="mr-5">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">

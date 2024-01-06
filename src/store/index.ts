@@ -33,6 +33,7 @@ const tokens = atom<TAddress[] | undefined>();
 const connected = atom<boolean | undefined>();
 
 const apiData = atom<any>();
+const vaultTypes = atom();
 
 // deepMaps
 
@@ -56,4 +57,5 @@ export {
   tokens,
   connected,
   apiData,
+  vaultTypes,
 };

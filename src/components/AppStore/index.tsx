@@ -21,6 +21,7 @@ import {
   connected,
   apiData,
   lastTx,
+  vaultTypes,
 } from "@store";
 import {
   platform,
@@ -250,6 +251,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 underlying: graphVault.underlying,
                 strategyAddress: graphVault.strategy,
                 status: Number(graphVault.vaultStatus),
+                version: graphVault.version,
               },
             };
           })
@@ -354,16 +356,25 @@ const AppStore = (props: React.PropsWithChildren) => {
             underlying: vault.underlying,
             strategyAddress: vault.strategy,
             status: Number(vault.vaultStatus),
+            version: vault.version,
           };
           return vaults;
         },
         {}
       );
-
       tokens.set(graphResponse.data.data.platformEntities[0].bcAssets);
       vaults.set(graphVaults);
       isVaultsLoaded.set(true);
     }
+    const vaultTypeEntities = graphResponse.data.data.vaultTypeEntities.reduce(
+      (versions: any, version: any) => {
+        versions[version.id] = version.version;
+
+        return versions;
+      },
+      {}
+    );
+    vaultTypes.set(vaultTypeEntities);
   };
   const getDataFromStabilityAPI = async () => {
     try {
