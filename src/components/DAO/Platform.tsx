@@ -227,7 +227,7 @@ function Platform({ vaultEntities }: any) {
 
           {daoData?.pendingPlatformUpgrade &&
             daoData?.pendingPlatformUpgrade.newVersion !== "" && (
-              <div className="p-3 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
+              <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
                 <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
                   <em className="text-xl font-medium">New version:</em>{" "}
                   {daoData.pendingPlatformUpgrade.newVersion}
@@ -238,10 +238,10 @@ function Platform({ vaultEntities }: any) {
                     <p>Proxies:</p>
                     {daoData?.pendingPlatformUpgrade.proxies.map(
                       (proxy: string, index: number) => (
-                        <div key={index}>
-                          <p className="text-xs grid">
-                            <ShortAddress address={proxy} />
-                          </p>
+                        <div
+                          className="flex justify-evenly"
+                          key={index}>
+                          <ShortAddress address={proxy} />
                         </div>
                       )
                     )}
@@ -251,10 +251,10 @@ function Platform({ vaultEntities }: any) {
                     <p>New implementations:</p>
                     {daoData?.pendingPlatformUpgrade.newImplementations.map(
                       (implementation: string, index: number) => (
-                        <div key={index}>
-                          <p className="text-xs grid">
-                            <ShortAddress address={implementation} />
-                          </p>
+                        <div
+                          className="flex justify-center"
+                          key={index}>
+                          <ShortAddress address={implementation} />
                         </div>
                       )
                     )}

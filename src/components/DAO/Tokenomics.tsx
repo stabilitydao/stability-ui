@@ -34,6 +34,7 @@ function Tokenomics() {
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [handleTabStakeModal, setHandleTabStakeModal] = useState("stake");
   const [loader, setLoader] = useState(false);
+  console.log($assetsPrices);
 
   const fetchTokenomicsData = async () => {
     try {
@@ -254,6 +255,7 @@ function Tokenomics() {
         functionName: "pending",
         args: [$account],
       })) as bigint;
+      console.log(sdivEarned);
 
       const sdivWallet = {
         sdivBalance:
