@@ -9,8 +9,6 @@ import { GRAPH_QUERY, GRAPH_ENDPOINT } from "@constants";
 function DAO() {
   const [vaultEntities, setVaultEntities] = useState<any>();
 
-  console.log(vaultEntities);
-
   const fetchGraph = async () => {
     try {
       const response = await axios.post(

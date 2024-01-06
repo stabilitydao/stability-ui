@@ -56,6 +56,8 @@ function Tokenomics() {
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
+      console.log($assetsPrices);
+      console.log($account);
 
       if ($assetsPrices) {
         const _tokenomics = {
@@ -68,17 +70,13 @@ function Tokenomics() {
                 )
               ) * 100
             ) / 100,
-          profitMarketCap: (
-            (Math.trunc(
-              Number(
-                formatUnits(
-                  $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
-                  18
-                )
-              ) * 100
-            ) /
-              100) *
-            1000000
+          profitMarketCap: Math.trunc(
+            Number(
+              formatUnits(
+                $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
+                18
+              )
+            ) * 1000000
           ).toLocaleString(),
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)
@@ -300,8 +298,10 @@ function Tokenomics() {
 
   useEffect(() => {
     fetchTokenomicsData();
-    profitBalance();
-    sdivBalance();
+    if ($account) {
+      profitBalance();
+      sdivBalance();
+    }
   }, [$assetsPrices]);
 
   const isStakingAllowed =

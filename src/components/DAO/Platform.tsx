@@ -116,7 +116,7 @@ function Platform({ vaultEntities }: any) {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
             <div className="grid gap-3 h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
               <div className="my-auto">
-                <h2 className="text-4xl">{$network}</h2>
+                <h2 className="text-4xl">{$network ? $network : "Polygon"}</h2>
                 <h2 className="text-lg">Network</h2>
               </div>
 

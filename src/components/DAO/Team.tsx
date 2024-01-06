@@ -105,12 +105,14 @@ function Team() {
               })) as bigint;
 
               const decimals = getTokenData(address.toLowerCase())?.decimals;
+              const _balance =
+                Math.trunc(
+                  Number(formatUnits(balance, Number(decimals))) * 100
+                ) / 100;
 
-              if (decimals && balance >= 0n) {
+              if (decimals && _balance > 0) {
                 const tokenInfo: TMultiTokenData = {
-                  balance:
-                    Math.trunc(Number(formatUnits(balance, decimals)) * 100) /
-                    100,
+                  balance: _balance,
                   priceBalance:
                     Math.trunc(
                       Number(formatUnits(balance, decimals)) *
@@ -123,7 +125,6 @@ function Team() {
                         100
                     ) / 100,
                 };
-
                 _balances[address] = tokenInfo;
               }
             }
@@ -185,12 +186,14 @@ function Team() {
                       alt={getTokenData(address)?.symbol}
                       src={getTokenData(address)?.logoURI}
                     />
-                    <p className="my-auto font-medium">
+                    <p className="m-auto font-medium">
                       {getTokenData(address)?.symbol}
                     </p>
                   </div>
-                  <p className="text-center font-medium">{tokenInfo.balance}</p>
-                  <p className="text-center text-gray-400 font-thin">
+                  <p className="text-center font-medium m-auto">
+                    {tokenInfo.balance}
+                  </p>
+                  <p className="text-center text-gray-400 font-thin m-auto">
                     ≈${tokenInfo.priceBalance}
                   </p>
                 </div>
