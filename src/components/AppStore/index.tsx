@@ -167,7 +167,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             const graphVault = graphResponse.data.data.vaultEntities.find(
               (obj: any) => obj.id === vault.toLowerCase()
             );
-
             const assetsProportions = graphVault.assetsProportions
               ? graphVault.assetsProportions.map((proportion: bigint) =>
                   Math.round(Number(formatUnits(proportion, 16)))
@@ -250,6 +249,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 il: getStrategyInfo(contractVaults[2][index])?.il?.rate,
                 underlying: graphVault.underlying,
                 strategyAddress: graphVault.strategy,
+                status: Number(graphVault.vaultStatus),
               },
             };
           })
@@ -353,6 +353,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             il: getStrategyInfo(vault.symbol)?.il?.rate,
             underlying: vault.underlying,
             strategyAddress: vault.strategy,
+            status: Number(vault.vaultStatus),
           };
           return vaults;
         },

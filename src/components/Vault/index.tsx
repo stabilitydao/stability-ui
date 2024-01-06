@@ -8,7 +8,7 @@ import { writeContract } from "@wagmi/core";
 import { usePublicClient } from "wagmi";
 
 import { SettingsModal } from "./SettingsModal";
-import { VaultType, Loader, AssetsProportion } from "@components";
+import { VaultType, Loader, AssetsProportion, VaultState } from "@components";
 
 import {
   vaultData,
@@ -1397,9 +1397,9 @@ function Vault({ vault }: IProps) {
         const token = optionTokens.find(
           (token: any) => token.address.toLowerCase() === address.toLowerCase()
         );
+
         return token?.logoURI;
       });
-
       setActiveOptionToken({
         symbol: defaultOptionSymbols,
         address: defaultOptionAssets,
@@ -1433,11 +1433,15 @@ function Vault({ vault }: IProps) {
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
               <div className="flex items-center">
-                <AssetsProportion
-                  proportions={localVault.assetsProportions}
-                  assets={localVault?.assets}
-                  type="vault"
-                />
+                <VaultState status={localVault?.status} />
+                {localVault?.assets && (
+                  <AssetsProportion
+                    proportions={localVault.assetsProportions}
+                    assets={localVault?.assets}
+                    type="vault"
+                  />
+                )}
+
                 <span className="inline-flex text-[18px] font-bold whitespace-nowrap">
                   {localVault.symbol}
                 </span>
@@ -1778,7 +1782,7 @@ function Vault({ vault }: IProps) {
             <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
               Assets
             </h2>
-            {localVault &&
+            {localVault?.assets &&
               localVault?.assets.map((asset: any) => {
                 const assetData: TToken | any = getTokenData(asset.address);
 
@@ -2034,7 +2038,7 @@ function Vault({ vault }: IProps) {
                         {activeOptionToken?.logoURI &&
                         Array.isArray(activeOptionToken?.logoURI) ? (
                           <div className="flex items-center">
-                            {activeOptionToken?.logoURI.map((logo: string) => (
+                            {defaultOptionImages.map((logo: string) => (
                               <img
                                 key={Math.random()}
                                 className="max-w-6 max-h-6 rounded-full"

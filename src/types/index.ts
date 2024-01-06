@@ -127,6 +127,7 @@ type TLocalVault = {
   il: number;
   underlying: TAddress;
   strategyAddress: TAddress;
+  status: number;
 };
 type TVaultAssets = [string, string];
 
@@ -175,6 +176,10 @@ type TVaultAllowance = {
 
 type TVaultsAddress = {
   [vaultAddress: string]: string | any;
+};
+
+type TVaultStatuses = {
+  [key: number]: string;
 };
 
 //// DAO
@@ -268,4 +273,5 @@ export type {
   TTokenomics,
   TProfitTokenWallet,
   TSdivTokenWallet,
+  TVaultStatuses,
 };

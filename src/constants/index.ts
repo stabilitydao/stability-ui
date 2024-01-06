@@ -11,6 +11,7 @@ import {
   TREASURY,
   MULTISIG,
 } from "./tokens";
+import type { TVaultStatuses } from "@types";
 
 const TABLE = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
@@ -133,6 +134,7 @@ const CHAINS = [
 ];
 
 const SLIPPAGE_VALUES = ["0.5", "1", "2"];
+
 const GRAPH_ENDPOINT =
   "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
 
@@ -162,6 +164,7 @@ const GRAPH_QUERY = `
           lastHardWork
           assetsWithApr
           assetsAprs
+          vaultStatus
         }
         platformEntities {
           bcAssets
@@ -181,15 +184,4 @@ export {
   GRAPH_ENDPOINT,
   GRAPH_QUERY,
   STABILITY_API,
-  USDC,
-  USDT,
-  DAI,
-  WMATIC,
-  WETH,
-  WBTC,
-  PROFIT,
-  SDIV,
-  PM,
-  TREASURY,
-  MULTISIG,
 };

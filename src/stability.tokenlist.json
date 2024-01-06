@@ -6,13 +6,26 @@
     "stablecoin": {
       "name": "Stablecoin",
       "description": "Tokens that are fixed to an external asset, e.g. the US dollar"
+    },
+    "bridged": {
+      "name": "Bridged",
+      "description": "Tokens that are bridged to current chain from another"
     }
   },
-  "timestamp": "2023-10-23T00:00:00+00:00",
+  "timestamp": "2024-01-05T00:00:00+00:00",
   "tokens": [
     {
       "chainId": 137,
       "address": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "symbol": "USDC.e",
+      "name": "Bridged USDC",
+      "decimals": 6,
+      "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg",
+      "tags": ["stablecoin", "bridged"]
+    },
+    {
+      "chainId": 137,
+      "address": "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
       "symbol": "USDC",
       "name": "USD Coin",
       "decimals": 6,
@@ -23,10 +36,10 @@
       "chainId": 137,
       "address": "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
       "symbol": "USDT",
-      "name": "Tether USD",
+      "name": "(PoS) Tether USD",
       "decimals": 6,
       "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdt.jpg",
-      "tags": ["stablecoin"]
+      "tags": ["stablecoin", "bridged"]
     },
     {
       "chainId": 137,
@@ -35,7 +48,7 @@
       "name": "Dai Stablecoin",
       "decimals": 18,
       "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/dai.jpg",
-      "tags": ["stablecoin"]
+      "tags": ["stablecoin", "bridged"]
     },
     {
       "chainId": 137,
@@ -51,15 +64,17 @@
       "symbol": "WETH",
       "name": "Wrapped Ether",
       "decimals": 18,
-      "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/eth.jpg"
+      "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/eth.jpg",
+      "tags": ["bridged"]
     },
     {
       "chainId": 137,
       "address": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
       "symbol": "WBTC",
-      "name": "Wrapped Ether",
+      "name": "(PoS) Wrapped BTC",
       "decimals": 8,
-      "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/btc.jpg"
+      "logoURI": "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/btc.jpg",
+      "tags": ["bridged"]
     },
     {
       "chainId": 137,
@@ -80,7 +95,7 @@
   ],
   "version": {
     "major": 1,
-    "minor": 0,
+    "minor": 1,
     "patch": 0
   }
 }
