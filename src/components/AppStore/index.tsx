@@ -22,6 +22,7 @@ import {
   apiData,
   lastTx,
   vaultTypes,
+  strategyTypes,
 } from "@store";
 import {
   platform,
@@ -168,6 +169,11 @@ const AppStore = (props: React.PropsWithChildren) => {
             const graphVault = graphResponse.data.data.vaultEntities.find(
               (obj: any) => obj.id === vault.toLowerCase()
             );
+
+            const strategyEntity = graphResponse.data.data.stategyEntities.find(
+              (obj: any) => obj.id === graphVault.strategy
+            );
+
             const assetsProportions = graphVault.assetsProportions
               ? graphVault.assetsProportions.map((proportion: bigint) =>
                   Math.round(Number(formatUnits(proportion, 16)))
@@ -231,7 +237,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 name: contractVaults[1][index],
                 symbol: contractVaults[2][index],
                 type: contractVaults[3][index],
-                strategy: contractVaults[4][index],
+                strategy: contractVaults[4][index].toLowerCase(),
                 shareprice: String(contractVaults[5][index]),
                 tvl: String(contractVaults[6][index]),
                 apr: String(APR),
@@ -252,6 +258,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 strategyAddress: graphVault.strategy,
                 status: Number(graphVault.vaultStatus),
                 version: graphVault.version,
+                strategyVersion: strategyEntity.version,
               },
             };
           })
@@ -271,6 +278,9 @@ const AppStore = (props: React.PropsWithChildren) => {
             stabilityAPIData?.underlyings?.["137"]?.[
               vault.underlying.toLowerCase()
             ];
+          const strategyEntity = graphResponse.data.data.stategyEntities.find(
+            (obj: any) => obj.id === vault.strategy
+          );
 
           let monthlyAPR = 0;
           const assetsWithApr: string[] = [];
@@ -357,6 +367,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             strategyAddress: vault.strategy,
             status: Number(vault.vaultStatus),
             version: vault.version,
+            strategyVersion: strategyEntity.version,
           };
           return vaults;
         },
@@ -366,6 +377,15 @@ const AppStore = (props: React.PropsWithChildren) => {
       vaults.set(graphVaults);
       isVaultsLoaded.set(true);
     }
+    const strategyTypeEntities =
+      graphResponse.data.data.stategyConfigEntities.reduce(
+        (versions: any, version: any) => {
+          versions[version.id.toLowerCase()] = version.version;
+
+          return versions;
+        },
+        {}
+      );
     const vaultTypeEntities = graphResponse.data.data.vaultTypeEntities.reduce(
       (versions: any, version: any) => {
         versions[version.id] = version.version;
@@ -374,6 +394,8 @@ const AppStore = (props: React.PropsWithChildren) => {
       },
       {}
     );
+
+    strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
   };
   const getDataFromStabilityAPI = async () => {
@@ -382,7 +404,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       stabilityAPIData = response.data;
       apiData.set(stabilityAPIData);
     } catch (error) {
-      console.log("API ERROR:", error);
+      console.error("API ERROR:", error);
     }
   };
 

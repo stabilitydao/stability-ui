@@ -34,6 +34,7 @@ const connected = atom<boolean | undefined>();
 
 const apiData = atom<any>();
 const vaultTypes = atom();
+const strategyTypes = atom();
 
 // deepMaps
 
@@ -58,4 +59,5 @@ export {
   connected,
   apiData,
   vaultTypes,
+  strategyTypes,
 };

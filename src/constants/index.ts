@@ -170,6 +170,15 @@ const GRAPH_QUERY = `
           version
           id
         }
+        stategyEntities {
+          strategyId
+          version
+          id
+        }
+        stategyConfigEntities {
+          version
+          id
+        }
       }
       `;
 

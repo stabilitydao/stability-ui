@@ -23,6 +23,7 @@ import {
   lastTx,
   connected,
   vaultTypes,
+  strategyTypes,
 } from "@store";
 
 import {
@@ -73,6 +74,7 @@ function Vault({ vault }: IProps) {
   const $tokens: TAddress[] | any = useStore(tokens);
   const $connected = useStore(connected);
   const $vaultTypes = useStore(vaultTypes);
+  const $strategyTypes = useStore(strategyTypes);
   const _publicClient = usePublicClient();
 
   const { open } = useWeb3Modal();
@@ -95,7 +97,9 @@ function Vault({ vault }: IProps) {
 
   const [sharesOut, setSharesOut] = useState<bigint | any>();
 
-  const [needUpdate, setNeedUpdate] = useState<boolean>(false);
+  const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
+  const [needStrategyUpgrade, setNeedStrategyUpgrade] =
+    useState<boolean>(false);
 
   const [localVault, setLocalVault] = useState<any>();
   const [timeDifference, setTimeDifference] = useState<any>();
@@ -818,7 +822,7 @@ function Vault({ vault }: IProps) {
       });
 
       if (transaction.status === "success") {
-        lastTx.set(transaction?.transactionHash);
+        setNeedVaultUpgrade(false);
       }
     } catch (err) {
       console.error("UPGRADE VAULT PROXY ERROR:", err);
@@ -839,7 +843,7 @@ function Vault({ vault }: IProps) {
       });
 
       if (transaction.status === "success") {
-        lastTx.set(transaction?.transactionHash);
+        setNeedStrategyUpgrade(false);
       }
     } catch (err) {
       console.error("UPGRADE STRATEGY PROXY ERROR:", err);
@@ -1396,13 +1400,17 @@ function Vault({ vault }: IProps) {
   }, [localVault, $tokens, defaultOptionSymbols]);
 
   useEffect(() => {
-    if (localVault && $vaultTypes) {
-      // @ts-ignore
-      if ($vaultTypes[localVault?.type] !== localVault.version) {
-        setNeedUpdate(true);
-      }
+    if (!$connected || !localVault) return;
+
+    // @ts-ignore
+    if ($vaultTypes[localVault?.type] !== localVault.version) {
+      setNeedVaultUpgrade(true);
     }
-  }, [localVault, $vaultTypes]);
+    // @ts-ignore
+    if ($strategyTypes[localVault.strategy] !== localVault.strategyVersion) {
+      setNeedStrategyUpgrade(true);
+    }
+  }, [localVault, $vaultTypes, $strategyTypes]);
 
   useEffect(() => {
     setZapTokens(false);
@@ -1787,22 +1795,26 @@ function Vault({ vault }: IProps) {
                     </p>
                   </div>
                 </div>
-                {needUpdate && (
-                  <div className="mt-2 flex items-center gap-3 flex-wrap">
+
+                <div className="mt-2 flex items-center gap-3 flex-wrap">
+                  {needVaultUpgrade && (
                     <button
                       onClick={upgradeVault}
                       className="bg-[#1c1c23] py-1 px-2 rounded-md"
                     >
                       Upgrade Vault
                     </button>
+                  )}
+                  {needStrategyUpgrade && (
                     <button
                       onClick={upgradeStrategy}
                       className="bg-[#1c1c23] py-1 px-2 rounded-md"
                     >
                       Upgrade Strategy
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
+
                 <div className="hidden mt-2">
                   <div className="mr-5">
                     <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
@@ -2108,14 +2120,25 @@ function Vault({ vault }: IProps) {
                         {activeOptionToken?.logoURI &&
                         Array.isArray(activeOptionToken?.logoURI) ? (
                           <div className="flex items-center">
-                            {defaultOptionImages.map((logo: string) => (
-                              <img
-                                key={Math.random()}
-                                className="max-w-6 max-h-6 rounded-full"
-                                src={logo}
-                                alt="logo"
-                              />
-                            ))}
+                            {$connected
+                              ? defaultOptionImages.map((logo: string) => (
+                                  <img
+                                    key={Math.random()}
+                                    className="max-w-6 max-h-6 rounded-full"
+                                    src={logo}
+                                    alt="logo"
+                                  />
+                                ))
+                              : activeOptionToken?.logoURI.map(
+                                  (logo: string) => (
+                                    <img
+                                      key={Math.random()}
+                                      className="max-w-6 max-h-6 rounded-full"
+                                      src={logo}
+                                      alt="logo"
+                                    />
+                                  )
+                                )}
                           </div>
                         ) : (
                           activeOptionToken?.logoURI && (
