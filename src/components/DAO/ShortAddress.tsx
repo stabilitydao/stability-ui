@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 function ShortAddress(props: any) {
   const prefix = props.address.slice(0, 6);
@@ -13,7 +13,7 @@ function ShortAddress(props: any) {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);
-      }, 400);
+      }, 500);
     } catch (error) {
       console.error("Error copying address:", error);
     }
@@ -21,9 +21,9 @@ function ShortAddress(props: any) {
 
   return (
     <div className="flex my-auto">
-      <p className="m-auto">{address}</p>
+      <p className="m-auto flex">{address}</p>
       <button
-        className="mx-3"
+        className="mx-3 my-auto"
         onClick={copyAddress}
         title="Copy address">
         {copied ? (

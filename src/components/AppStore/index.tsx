@@ -51,6 +51,7 @@ import type { TAddress } from "@types";
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
+
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
 

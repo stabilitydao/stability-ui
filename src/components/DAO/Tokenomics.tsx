@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { account, publicClient, assetsPrices } from "@store";
 import { formatUnits, parseUnits } from "viem";
@@ -34,7 +34,6 @@ function Tokenomics() {
   const [showStakeModal, setShowStakeModal] = useState(false);
   const [handleTabStakeModal, setHandleTabStakeModal] = useState("stake");
   const [loader, setLoader] = useState(false);
-  console.log($assetsPrices);
 
   const fetchTokenomicsData = async () => {
     try {
@@ -56,8 +55,6 @@ function Tokenomics() {
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
-      console.log($assetsPrices);
-      console.log($account);
 
       if ($assetsPrices) {
         const _tokenomics = {

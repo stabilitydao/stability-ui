@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { PROFIT, TREASURY } from "@constants";
-import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 import { publicClient } from "@store";
 import { ERC20ABI } from "@web3";
 import { formatUnits } from "viem";
 import type { TAddress } from "@types";
+import ShortAddress from "./ShortAddress";
 
 function Governance() {
   const [treasuryBalance, setTreasuryBalance] = useState<number>();

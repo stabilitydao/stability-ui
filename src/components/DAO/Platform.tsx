@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { publicClient, network } from "@store";
-import { PlatformABI, FactoryABI, platform, IVaultManagerABI } from "@web3";
+import { PlatformABI, FactoryABI, platform } from "@web3";
 import type { TAddress, TDAOData } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
@@ -27,7 +27,6 @@ function Platform({ vaultEntities }: any) {
     }
     return color;
   };
-  console.log(vaultEntities);
 
   const fetchDaoData = async () => {
     if ($publicClient && vaultEntities) {
@@ -107,7 +106,7 @@ function Platform({ vaultEntities }: any) {
       <div className="w-full flex px-5 justify-between h-[70px] bg-button shadow-lg rounded-md">
         <h1 className="text-xxl text-[#8D8E96] my-auto">Platform</h1>
         <p className="text-sm text-[#8D8E96] my-auto pt-3">
-          v{daoData?.platformVersion}
+          {daoData && `v${daoData?.platformVersion}`}
         </p>
       </div>
 
@@ -239,7 +238,7 @@ function Platform({ vaultEntities }: any) {
                     {daoData?.pendingPlatformUpgrade.proxies.map(
                       (proxy: string, index: number) => (
                         <div
-                          className="flex justify-evenly"
+                          className="flex justify-center"
                           key={index}>
                           <ShortAddress address={proxy} />
                         </div>
