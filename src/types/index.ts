@@ -128,6 +128,8 @@ type TLocalVault = {
   underlying: TAddress;
   strategyAddress: TAddress;
   status: number;
+  version: string;
+  strategyVersion: string;
 };
 type TVaultAssets = [string, string];
 

@@ -166,6 +166,19 @@ const GRAPH_QUERY = `
         platformEntities {
           bcAssets
         }
+        vaultTypeEntities {
+          version
+          id
+        }
+        strategyEntities {
+          strategyId
+          version
+          id
+        }
+        strategyConfigEntities {
+          version
+          id
+        }
       }
       `;
 
