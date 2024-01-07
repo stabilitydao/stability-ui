@@ -170,12 +170,12 @@ const GRAPH_QUERY = `
           version
           id
         }
-        stategyEntities {
+        strategyEntities {
           strategyId
           version
           id
         }
-        stategyConfigEntities {
+        strategyConfigEntities {
           version
           id
         }

@@ -170,9 +170,10 @@ const AppStore = (props: React.PropsWithChildren) => {
               (obj: any) => obj.id === vault.toLowerCase()
             );
 
-            const strategyEntity = graphResponse.data.data.stategyEntities.find(
-              (obj: any) => obj.id === graphVault.strategy
-            );
+            const strategyEntity =
+              graphResponse.data.data.strategyEntities.find(
+                (obj: any) => obj.id === graphVault.strategy
+              );
 
             const assetsProportions = graphVault.assetsProportions
               ? graphVault.assetsProportions.map((proportion: bigint) =>
@@ -278,7 +279,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             stabilityAPIData?.underlyings?.["137"]?.[
               vault.underlying.toLowerCase()
             ];
-          const strategyEntity = graphResponse.data.data.stategyEntities.find(
+          const strategyEntity = graphResponse.data.data.strategyEntities.find(
             (obj: any) => obj.id === vault.strategy
           );
 
@@ -378,7 +379,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       isVaultsLoaded.set(true);
     }
     const strategyTypeEntities =
-      graphResponse.data.data.stategyConfigEntities.reduce(
+      graphResponse.data.data.strategyConfigEntities.reduce(
         (versions: any, version: any) => {
           versions[version.id.toLowerCase()] = version.version;
 
