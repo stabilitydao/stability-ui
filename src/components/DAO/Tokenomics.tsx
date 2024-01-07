@@ -333,14 +333,14 @@ function Tokenomics() {
 
   return tokenomics ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
+      <h1 className="text-xxl text-left text-[#9c9c9c] ps-4 my-auto">
         Tokenomics
       </h1>
 
-      <div className="mt-2  border border-gray-600 rounded-md w-full">
+      <div className="mt-2 border border-gray-600 rounded-md w-full">
         <div className="p-2 grid lg:flex gap-2">
           <div className="bg-[#2c2f38] rounded-md p-3 relative lg:w-1/3 shadow-sm border border-gray-700">
-            <table className="text-sm font-medium h-[215px] text-[#8D8E96]">
+            <table className="text-sm font-medium h-[215px] text-[#9c9c9c]">
               <tbody>
                 <tr>
                   <td className="min-w-[95px]">Name: </td>
@@ -407,7 +407,7 @@ function Tokenomics() {
                   setHandleTabStakeModal("stake");
                   setShowStakeModal(true);
                 }}
-                className="bg-button me-3 rounded-sm p-2 font-medium text-[#8D8E96]">
+                className="bg-button me-3 rounded-sm p-2 font-medium text-[#9c9c9c]">
                 Stake | Unstake
               </button>
 
@@ -484,7 +484,7 @@ function Tokenomics() {
                   sdivWallet && sdivWallet?.sdivEarned > 0
                     ? "max-h-[215px]"
                     : "h-full"
-                } text-sm font-medium h-full min-h-[215px] text-[#8D8E96]`}>
+                } text-sm font-medium h-full min-h-[215px] text-[#9c9c9c]`}>
                 <tbody>
                   <tr>
                     <td className="min-w-[95px]">Name: </td>
@@ -528,7 +528,7 @@ function Tokenomics() {
                   showMintModal === false &&
                   showStakeModal === false ? (
                     <button
-                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full"
+                      className="bg-button rounded-sm p-2 font-medium text-[#9c9c9c] w-full"
                       disabled>
                       <Loader />
                     </button>
@@ -538,7 +538,7 @@ function Tokenomics() {
                         harvest();
                         setLoader(true);
                       }}
-                      className="bg-button rounded-sm p-2 font-medium text-[#8D8E96] w-full">
+                      className="bg-button rounded-sm p-2 font-medium text-[#9c9c9c] w-full">
                       Claim
                     </button>
                   )}
@@ -547,7 +547,7 @@ function Tokenomics() {
             </div>
 
             <div className="bg-[#2c2f38] rounded-md p-3 relative shadow-sm border border-gray-700">
-              <table className="text-sm font-medium h-[215px] text-[#8D8E96]">
+              <table className="text-sm font-medium h-[215px] text-[#9c9c9c]">
                 <tbody>
                   <tr>
                     <td className="min-w-[95px]">Name: </td>
@@ -586,7 +586,7 @@ function Tokenomics() {
                     allowance();
                     setShowMintModal(true);
                   }}
-                  className="bg-button rounded-sm p-2 font-medium text-[#8D8E96]">
+                  className="bg-button rounded-sm p-2 font-medium text-[#9c9c9c]">
                   Mint
                 </button>
 
@@ -703,7 +703,7 @@ function Tokenomics() {
                         stake();
                         setLoader(true);
                       }}
-                      className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                      className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]">
                       Stake
                     </button>
                   </div>
@@ -713,12 +713,12 @@ function Tokenomics() {
                       approve();
                       setLoader(true);
                     }}
-                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]">
                     Approve
                   </button>
                 ) : isStakingInsufficient ? (
                   <button
-                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]"
                     disabled>
                     INSUFFICIENT BALANCE
                   </button>
@@ -730,12 +730,12 @@ function Tokenomics() {
                       unStake();
                       setLoader(true);
                     }}
-                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]">
                     Unstake
                   </button>
                 ) : isUnstakingInsufficient ? (
                   <button
-                    className="bg-button rounded-sm p-2 text-sm text-[#8D8E96] m-auto w-full h-[48px]"
+                    className="bg-button rounded-sm p-2 text-sm text-[#9c9c9c] m-auto w-full h-[48px]"
                     disabled>
                     INSUFFICIENT STAKED AMOUNT
                   </button>
@@ -743,7 +743,7 @@ function Tokenomics() {
               </>
             ) : (
               <button
-                className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
+                className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]"
                 disabled>
                 <Loader
                   customHeight={30}
@@ -806,7 +806,7 @@ function Tokenomics() {
                         mint();
                         setLoader(true);
                       }}
-                      className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                      className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]">
                       Mint
                     </button>
                   </div>
@@ -816,12 +816,12 @@ function Tokenomics() {
                       approve();
                       setLoader(true);
                     }}
-                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]">
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]">
                     Approve
                   </button>
                 ) : (
                   <button
-                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
+                    className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]"
                     disabled>
                     INSUFFICIENT BALANCE
                   </button>
@@ -829,7 +829,7 @@ function Tokenomics() {
               </>
             ) : (
               <button
-                className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#8D8E96]"
+                className="bg-button w-full h-[48px] m-auto rounded-sm p-2 text-[#9c9c9c]"
                 disabled>
                 <Loader
                   customHeight={30}

@@ -116,8 +116,8 @@ function Platform({ vaultEntities }: any) {
   return (
     <>
       <div className="w-full flex px-5 justify-between h-[70px] bg-button shadow-lg rounded-md">
-        <h1 className="text-xxl text-[#8D8E96] my-auto">Platform</h1>
-        <p className="text-sm text-[#8D8E96] my-auto pt-3">
+        <h1 className="text-xxl text-[#9c9c9c] my-auto">Platform</h1>
+        <p className="text-sm text-[#9c9c9c] my-auto pt-3">
           {daoData && `v${daoData?.platformVersion}`}
         </p>
       </div>
@@ -154,8 +154,8 @@ function Platform({ vaultEntities }: any) {
               </div>
             </div>
 
-            <div className="p-3 bg-[#3d404b] rounded-md shadow-sm">
-              <table className="w-full h-full text-[#8D8E96] font-medium">
+            <div className="p-3 bg-[#343741] rounded-md shadow-sm">
+              <table className="w-full h-full text-gray-400 font-medium">
                 <thead>
                   <tr>
                     <th className="text-left text-2xl font-medium pb-2">
@@ -198,7 +198,7 @@ function Platform({ vaultEntities }: any) {
 
             <div className="p-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
               <div className="w-full h-full grid m-auto">
-                <h2 className="text-2xl pb-2 font-medium text-left text-[#8D8E96]">
+                <h2 className="text-2xl pb-2 font-medium text-left text-[#9c9c9c]">
                   Strategies:
                 </h2>
                 {daoData?.strategieNames.map(
@@ -217,7 +217,7 @@ function Platform({ vaultEntities }: any) {
                     </div>
                   )
                 )}
-                <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#9c9c9c]">
                   <div className="m-auto">
                     <h2 className="font-bold text-lg">Vault Types</h2>
                     {Array.isArray(daoData?.typesOfVaults) &&
@@ -238,13 +238,13 @@ function Platform({ vaultEntities }: any) {
 
           {platformUpdates && platformUpdates?.newVersion !== "" && (
             <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
-              <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
+              <h2 className="w-full font-thin text-lg text-left text-gray-400   py-1">
                 <em className="text-xl font-medium">New version:</em>{" "}
                 {platformUpdates?.newVersion}
               </h2>
 
               <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
-                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#9c9c9c]">
                   <p>Proxies:</p>
                   {platformUpdates?.proxies.map(
                     (proxy: string, index: number) => (
@@ -257,7 +257,7 @@ function Platform({ vaultEntities }: any) {
                   )}
                 </div>
 
-                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#9c9c9c]">
                   <p>New implementations:</p>
                   {platformUpdates?.newImplementations.map(
                     (implementation: string, index: number) => (

@@ -30,13 +30,13 @@ function Governance() {
 
   return treasuryBalance ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600 relative">
-      <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">
+      <h1 className="text-xxl text-left text-[#9c9c9c] ps-4 my-auto">
         Governance
       </h1>
 
       <div className="rounded-md bg-[#3d404b] mt-2 grid md:grid-cols-2 p-2 gap-3 border border-gray-600">
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
-          <table className="text-sm font-medium text-[#8D8E96]">
+          <table className="text-sm font-medium text-[#9c9c9c]">
             <thead>
               <tr>
                 <td className="w-[100px]">
@@ -60,7 +60,7 @@ function Governance() {
         </div>
 
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm border border-gray-700">
-          <table className="text-sm font-medium text-[#8D8E96]">
+          <table className="text-sm font-medium text-[#9c9c9c]">
             <thead>
               <tr>
                 <td>

@@ -150,11 +150,11 @@ function Team() {
 
   return members ? (
     <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
-      <h1 className="text-xxl text-left text-[#8D8E96] ps-4 my-auto">Team</h1>
+      <h1 className="text-xxl text-left text-[#9c9c9c] ps-4 my-auto">Team</h1>
 
       <div className="p-2 border border-gray-600 rounded-md mt-2">
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm font-medium border border-gray-700 min-h-[262px]">
-          <table className="text-[#8D8E96]">
+          <table className="text-[#9c9c9c]">
             <thead>
               <tr>
                 <td>
@@ -222,12 +222,13 @@ function Team() {
                 className="rounded-full m-auto w-[80px] h-[80px]"
                 src={member.avatar_url}
                 alt={`Avatar de ${member.name}`}
+                loading="lazy"
               />
               <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]  md:w-full">
                 {member.name}
               </p>
               {member.location !== null ? (
-                <p className="flex md:w-full sm:text text-xs mt-1 text-left font-thin text-gray-400 w-[115px]">
+                <p className="flex md:w-full sm:text text-xs mt-1 text-left font-thin text-gray-300 w-[115px]">
                   <svg
                     className="pe-1 my-auto"
                     stroke="currentColor"
@@ -246,7 +247,7 @@ function Team() {
               ) : (
                 ""
               )}
-              <p className="font-thin  md:w-full text-pretty text-xs line-clamp-3 mt-1 text-gray-300 w-[115px]">
+              <p className="font-thin  md:w-full text-pretty text-xs line-clamp-3 mt-1 text-gray-100 w-[115px]">
                 {member.bio}
               </p>
             </a>
