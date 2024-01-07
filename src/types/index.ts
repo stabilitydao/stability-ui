@@ -187,7 +187,6 @@ type TVaultStatuses = {
 //// DAO
 type TDAOData = {
   platformVersion: string;
-  pendingPlatformUpgrade: TPendingPlatformUpgrade;
   platformGovernance: string;
   multisigAddress: string;
   numberOfTotalVaults: string;
@@ -276,4 +275,5 @@ export type {
   TProfitTokenWallet,
   TSdivTokenWallet,
   TVaultStatuses,
+  TPendingPlatformUpgrade,
 };

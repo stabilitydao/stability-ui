@@ -3,13 +3,15 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { publicClient, network } from "@store";
 import { PlatformABI, FactoryABI, platform } from "@web3";
-import type { TAddress, TDAOData } from "@types";
+import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
 
 function Platform({ vaultEntities }: any) {
   const [daoData, setDaoData] = useState<TDAOData>();
+  const [platformUpdates, setPlatformUpdates] =
+    useState<TPendingPlatformUpgrade>();
   const $publicClient = useStore(publicClient);
   const $network = useStore(network);
 
@@ -55,12 +57,6 @@ function Platform({ vaultEntities }: any) {
           functionName: "farmsLength",
         });
 
-        const pendingPlatformUpgrade: any = await $publicClient.readContract({
-          address: platform,
-          abi: PlatformABI,
-          functionName: "pendingPlatformUpgrade",
-        });
-
         //tvl
         const totalTvl = vaultEntities?.reduce(
           (total: bigint, item: { tvl: bigint }) => {
@@ -76,7 +72,6 @@ function Platform({ vaultEntities }: any) {
 
         const _daoData = {
           platformVersion: platformVersion,
-          pendingPlatformUpgrade: pendingPlatformUpgrade,
           platformGovernance: contractData[0][5],
           multisigAddress: contractData[0][6],
           numberOfTotalVaults: vaultEntities.length,
@@ -97,9 +92,26 @@ function Platform({ vaultEntities }: any) {
     }
   };
 
+  const fetchPlatformUpdates = async () => {
+    try {
+      const pendingPlatformUpgrade: any = await $publicClient?.readContract({
+        address: platform,
+        abi: PlatformABI,
+        functionName: "pendingPlatformUpgrade",
+      });
+      setPlatformUpdates(pendingPlatformUpgrade);
+    } catch (error) {
+      console.error("Error fetching platform updates:", error);
+    }
+  };
+
   useEffect(() => {
     fetchDaoData();
   }, [vaultEntities, $publicClient]);
+
+  useEffect(() => {
+    fetchPlatformUpdates();
+  }, []);
 
   return (
     <>
@@ -224,46 +236,48 @@ function Platform({ vaultEntities }: any) {
             </div>
           </div>
 
-          {daoData?.pendingPlatformUpgrade &&
-            daoData?.pendingPlatformUpgrade.newVersion !== "" && (
-              <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
-                <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
-                  <em className="text-xl font-medium">New version:</em>{" "}
-                  {daoData.pendingPlatformUpgrade.newVersion}
-                </h2>
+          {platformUpdates && platformUpdates?.newVersion !== "" && (
+            <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
+              <h2 className="w-full font-thin text-lg text-left text-[#8D8E96] py-1">
+                <em className="text-xl font-medium">New version:</em>{" "}
+                {platformUpdates?.newVersion}
+              </h2>
 
-                <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
-                  <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-                    <p>Proxies:</p>
-                    {daoData?.pendingPlatformUpgrade.proxies.map(
-                      (proxy: string, index: number) => (
-                        <div
-                          className="flex justify-center"
-                          key={index}>
-                          <ShortAddress address={proxy} />
-                        </div>
-                      )
-                    )}
-                  </div>
+              <div className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 h-full m-auto gap-3">
+                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                  <p>Proxies:</p>
+                  {platformUpdates?.proxies.map(
+                    (proxy: string, index: number) => (
+                      <div
+                        className="flex justify-center"
+                        key={index}>
+                        <ShortAddress address={proxy} />
+                      </div>
+                    )
+                  )}
+                </div>
 
-                  <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
-                    <p>New implementations:</p>
-                    {daoData?.pendingPlatformUpgrade.newImplementations.map(
-                      (implementation: string, index: number) => (
-                        <div
-                          className="flex justify-center"
-                          key={index}>
-                          <ShortAddress address={implementation} />
-                        </div>
-                      )
-                    )}
-                  </div>
+                <div className="p-3 grid bg-[#13151A] shadow-md rounded-md text-[#8D8E96]">
+                  <p>New implementations:</p>
+                  {platformUpdates?.newImplementations.map(
+                    (implementation: string, index: number) => (
+                      <div
+                        className="flex justify-center"
+                        key={index}>
+                        <ShortAddress address={implementation} />
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
-            )}
+            </div>
+          )}
         </div>
       ) : (
-        <div className="flex justify-center md:h-[314px] h-[732px] p-3 bg-button shadow-lg rounded-md mt-2">
+        <div
+          className={`flex justify-center bg-button md:h-[314px] h-[732px] p-3 ${
+            platformUpdates?.newVersion !== "" ? "md:h-[477px]" : "md:h-[314px]"
+          } shadow-lg rounded-md mt-2`}>
           <Loader
             customHeight={100}
             customWidth={100}
