@@ -184,7 +184,63 @@ type TVaultStatuses = {
   [key: number]: string;
 };
 
-////
+//// DAO
+type TDAOData = {
+  platformVersion: string;
+  pendingPlatformUpgrade: TPendingPlatformUpgrade;
+  platformGovernance: string;
+  multisigAddress: string;
+  numberOfTotalVaults: string;
+  totalTvl: number;
+  strategieNames: string[];
+  platformFee: string;
+  vaultManagerFee: string;
+  typesOfVaults: string;
+  strategyLogicFee: string;
+  ecosystemFee: string;
+  farmsLength: number;
+};
+
+type TPendingPlatformUpgrade = {
+  newVersion: string;
+  proxies: string[];
+  newImplementations: string[];
+};
+
+type TGitHubUser = {
+  bio: string;
+  location: string;
+  name: string;
+  avatar_url: string;
+  html_url: string;
+  followers: number;
+};
+
+type TMultiTokenData = {
+  balance: number;
+  priceBalance: number;
+};
+
+type TMultisigBalance = Record<string, TMultiTokenData>;
+
+type TTokenomics = {
+  profitPrice: number;
+  profitMarketCap: string;
+  sdivTotalSupply: string;
+  pmToMint: string;
+  pmTotalSupply: string;
+  pmMinted: string;
+};
+
+type TProfitTokenWallet = {
+  profitBalance: number;
+  profitStaked: number;
+};
+
+type TSdivTokenWallet = {
+  sdivBalance: number;
+  sdivEarned: number;
+};
 
 export type {
   TPlatformData,
@@ -212,5 +268,12 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
+  TDAOData,
+  TGitHubUser,
+  TMultisigBalance,
+  TMultiTokenData,
+  TTokenomics,
+  TProfitTokenWallet,
+  TSdivTokenWallet,
   TVaultStatuses,
 };

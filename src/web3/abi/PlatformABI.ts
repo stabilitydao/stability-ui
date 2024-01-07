@@ -16,6 +16,32 @@ export default [
     type: "error",
   },
   {
+    inputs: [],
+    name: "AlreadyExist",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ETHTransferFailed",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "key",
+        type: "bytes32",
+      },
+    ],
+    name: "EnumerableMapNonexistentKey",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "IncorrectArrayLength",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -33,12 +59,92 @@ export default [
   },
   {
     inputs: [],
+    name: "IncorrectInitParams",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "IncorrectMsgSender",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "IncorrectZeroArgument",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidInitialization",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "NoNewVersion",
     type: "error",
   },
   {
     inputs: [],
     name: "NotEnoughAllowedBBToken",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotExist",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotFactory",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotGovernance",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotGovernanceAndNotMultisig",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotInitializing",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotMultisig",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotOperator",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotPlatform",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotTheOwner",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotVault",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "RewardIsTooBig",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "RewardIsTooSmall",
     type: "error",
   },
   {
@@ -237,6 +343,31 @@ export default [
       {
         indexed: false,
         internalType: "address",
+        name: "platform",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "ts",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "block",
+        type: "uint256",
+      },
+    ],
+    name: "ContractInitialized",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
         name: "receiver",
         type: "address",
       },
@@ -280,6 +411,19 @@ export default [
     inputs: [
       {
         indexed: false,
+        internalType: "uint64",
+        name: "version",
+        type: "uint64",
+      },
+    ],
+    name: "Initialized",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: "uint256",
         name: "minInitialBoostPerDay",
         type: "uint256",
@@ -292,6 +436,25 @@ export default [
       },
     ],
     name: "MinInitialBoostChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "oldValue",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newValue",
+        type: "uint256",
+      },
+    ],
+    name: "MinTvlForFreeHardWorkChanged",
     type: "event",
   },
   {
@@ -499,12 +662,64 @@ export default [
   },
   {
     inputs: [],
-    name: "PLATFORM_VERSION",
+    name: "CONTROLLABLE_VERSION",
     outputs: [
       {
         internalType: "string",
         name: "",
         type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MAX_FEE",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MIN_FEE",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MIN_FEE_SHARE_STRATEGY_LOGIC",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MIN_FEE_SHARE_VAULT_MANAGER",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -518,6 +733,19 @@ export default [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "VERSION",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
       },
     ],
     stateMutability: "view",
@@ -794,6 +1022,19 @@ export default [
   },
   {
     inputs: [],
+    name: "createdBlock",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "defaultBoostRewardTokens",
     outputs: [
       {
@@ -869,12 +1110,12 @@ export default [
     outputs: [
       {
         internalType: "string[]",
-        name: "id",
+        name: "ids",
         type: "string[]",
       },
       {
         internalType: "address[]",
-        name: "proxy",
+        name: "proxies",
         type: "address[]",
       },
     ],
@@ -971,7 +1212,7 @@ export default [
       },
       {
         internalType: "uint256[]",
-        name: "vaultBulldingPrice",
+        name: "vaultBuildingPrice",
         type: "uint256[]",
       },
       {
@@ -1111,6 +1352,24 @@ export default [
     inputs: [
       {
         internalType: "address",
+        name: "multisig_",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "version",
+        type: "string",
+      },
+    ],
+    name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "dexAggRouter",
         type: "address",
       },
@@ -1173,6 +1432,19 @@ export default [
   },
   {
     inputs: [],
+    name: "minTvlForFreeHardWork",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "multisig",
     outputs: [
       {
@@ -1212,6 +1484,19 @@ export default [
   },
   {
     inputs: [],
+    name: "operatorsList",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "pendingPlatformUpgrade",
     outputs: [
       {
@@ -1242,6 +1527,45 @@ export default [
   },
   {
     inputs: [],
+    name: "platform",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "platformUpgradeTimelock",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "platformVersion",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "priceReader",
     outputs: [
       {
@@ -1251,6 +1575,19 @@ export default [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "bbToken",
+        type: "address",
+      },
+    ],
+    name: "removeAllowedBBToken",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -1324,6 +1661,195 @@ export default [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "setEcosystemRevenueReceiver",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "feeShareVaultManager",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "feeShareStrategyLogic",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "feeShareEcosystem",
+        type: "uint256",
+      },
+    ],
+    name: "setFees",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "minInitialBoostPerDay_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minInitialBoostDuration_",
+        type: "uint256",
+      },
+    ],
+    name: "setInitialBoost",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "setMinTvlForFreeHardWork",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "factory",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "priceReader",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "swapper",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "buildingPermitToken",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "buildingPayPerVaultToken",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "vaultManager",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "strategyLogic",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "aprOracle",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "targetExchangeAsset",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "hardWorker",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "zap",
+            type: "address",
+          },
+        ],
+        internalType: "struct IPlatform.SetupAddresses",
+        name: "addresses",
+        type: "tuple",
+      },
+      {
+        components: [
+          {
+            internalType: "string",
+            name: "networkName",
+            type: "string",
+          },
+          {
+            internalType: "bytes32",
+            name: "networkExtra",
+            type: "bytes32",
+          },
+          {
+            internalType: "uint256",
+            name: "fee",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "feeShareVaultManager",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "feeShareStrategyLogic",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "feeShareEcosystem",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "minInitialBoostPerDay",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "minInitialBoostDuration",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IPlatform.PlatformSettings",
+        name: "settings",
+        type: "tuple",
+      },
+    ],
+    name: "setup",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "strategyLogic",
     outputs: [
@@ -1331,6 +1857,25 @@ export default [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -1408,4 +1953,4 @@ export default [
     stateMutability: "view",
     type: "function",
   },
-]as const;
+];

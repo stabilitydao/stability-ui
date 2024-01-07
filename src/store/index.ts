@@ -10,6 +10,7 @@ import type {
   TLocalVault,
   TAddress,
 } from "@types";
+import { platform } from "@web3";
 
 // atoms
 const account = atom<string | undefined>();
@@ -21,7 +22,6 @@ const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
 const assetsPrices = atom<TAssetPrices | undefined>();
 const assetsBalances = atom<TBalances | undefined>();
-
 const vaultData = atom<TVaults>({});
 
 const balances = atom<any>();

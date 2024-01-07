@@ -1,5 +1,17 @@
+import {
+  USDC,
+  USDT,
+  DAI,
+  WMATIC,
+  WETH,
+  WBTC,
+  PROFIT,
+  SDIV,
+  PM,
+  TREASURY,
+  MULTISIG,
+} from "./tokens";
 import type { TVaultStatuses } from "@types";
-import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
 
 const TABLE = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
@@ -193,5 +205,10 @@ export {
   GRAPH_ENDPOINT,
   GRAPH_QUERY,
   STABILITY_API,
+  PM,
+  TREASURY,
+  MULTISIG,
+  PROFIT,
+  SDIV,
   VAULT_STATUSES,
 };

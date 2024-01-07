@@ -1,14 +1,18 @@
-const Loader = () => {
+interface LoaderProps {
+  customWidth?: any;
+  customHeight?: any;
+}
+
+const Loader: React.FC<LoaderProps> = ({ customWidth, customHeight }) => {
   return (
     <div className="flex items-center justify-center">
       <svg
-        width="16"
-        height="16"
+        width={customWidth || "16"}
+        height={customHeight || "16"}
         viewBox="0 0 16 16"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="animate-spin"
-      >
+        className="animate-spin">
         <path
           fillRule="evenodd"
           clipRule="evenodd"

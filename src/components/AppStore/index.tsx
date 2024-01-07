@@ -53,6 +53,7 @@ import type { TAddress } from "@types";
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
+
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
 
@@ -70,7 +71,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       console.log("getData", contractData);
       if (contractData[1]) {
         tokens.set(
-          contractData[1].map((address) => address.toLowerCase()) as TAddress[]
+          contractData[1].map(address => address.toLowerCase()) as TAddress[]
         );
       }
 
@@ -207,10 +208,10 @@ const AppStore = (props: React.PropsWithChildren) => {
               const token1 = getTokenData(vaultInfoes[index][1][0]);
               const token2 = getTokenData(vaultInfoes[index][1][1]);
               if (token1 && token2) {
-                const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                const token1Extended = TOKENS_ASSETS.find(tokenAsset =>
                   tokenAsset.addresses.includes(token1.address)
                 );
-                const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+                const token2Extended = TOKENS_ASSETS.find(tokenAsset =>
                   tokenAsset.addresses.includes(token2.address)
                 );
 
@@ -316,10 +317,10 @@ const AppStore = (props: React.PropsWithChildren) => {
             const token2 = getTokenData(vault.strategyAssets[1]);
 
             if (token1 && token2) {
-              const token1Extended = TOKENS_ASSETS.find((tokenAsset) =>
+              const token1Extended = TOKENS_ASSETS.find(tokenAsset =>
                 tokenAsset.addresses.includes(token1.address)
               );
-              const token2Extended = TOKENS_ASSETS.find((tokenAsset) =>
+              const token2Extended = TOKENS_ASSETS.find(tokenAsset =>
                 tokenAsset.addresses.includes(token2.address)
               );
 
