@@ -185,6 +185,7 @@ function Team() {
                       className="w-[38px] h-[38px] rounded-full m-auto mb-2"
                       alt={getTokenData(address)?.symbol}
                       src={getTokenData(address)?.logoURI}
+                      loading="lazy"
                     />
                     <p className="m-auto font-medium">
                       {getTokenData(address)?.symbol}
@@ -210,13 +211,13 @@ function Team() {
         </div>
       </div>
 
-      <div className="p-2">
-        <div className="flex flex-wrap m-auto justify-evenly w-full gap-4 my-7 rounded-md md:w-4/5 md:gap-4  lg:gap-5">
+      <div className="py-2">
+        <div className="flex flex-wrap m-auto gap-y-4 my-7 rounded-md md:w-4/5 md:gap-4 px-3 lg:gap-5">
           {members.map(member => (
             <a
               href={member.html_url}
               key={member.name}
-              className="text-sm p-3 md:w-[155px] hover:bg-button rounded-md"
+              className="text-sm p-3 w-[160px] hover:bg-button rounded-md mx-auto"
               target="_blank">
               <img
                 className="rounded-full m-auto w-[80px] h-[80px]"
@@ -224,11 +225,11 @@ function Team() {
                 alt={`Avatar de ${member.name}`}
                 loading="lazy"
               />
-              <p className="font-semibold text-center mt-1 text-gray-200 w-[115px]  md:w-full">
+              <p className="font-semibold text-center mt-1 text-gray-200  md:w-full ">
                 {member.name}
               </p>
               {member.location !== null ? (
-                <p className="flex md:w-full sm:text text-xs mt-1 text-left font-thin text-gray-300 w-[115px]">
+                <p className="flex md:w-full sm:text text-xs mt-1 text-left font-thin text-gray-300">
                   <svg
                     className="pe-1 my-auto"
                     stroke="currentColor"
@@ -247,7 +248,7 @@ function Team() {
               ) : (
                 ""
               )}
-              <p className="font-thin  md:w-full text-pretty text-xs line-clamp-3 mt-1 text-gray-100 w-[115px]">
+              <p className="font-thin  md:w-full text-pretty text-xs line-clamp-3 mt-1 text-gray-100">
                 {member.bio}
               </p>
             </a>
