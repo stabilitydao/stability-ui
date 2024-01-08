@@ -333,7 +333,7 @@ function Tokenomics() {
 
   return tokenomics ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="text-xxl text-left text-[#9c9c9c] ps-4 my-auto">
+      <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-4 my-auto">
         Tokenomics
       </h1>
 

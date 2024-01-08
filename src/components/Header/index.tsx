@@ -23,7 +23,7 @@ const Header = () => {
           title="Stability">
           <img
             src="/logo.svg"
-            alt="Stability DAO"
+            alt="Stability logo"
           />
           <span className="hidden sm:flex">Stability</span>
         </a>
