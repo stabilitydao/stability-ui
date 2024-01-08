@@ -107,7 +107,7 @@ function Platform({ vaultEntities }: any) {
 
   useEffect(() => {
     fetchDaoData();
-  }, [vaultEntities, $publicClient]);
+  }, [vaultEntities, platformUpdates]);
 
   useEffect(() => {
     fetchPlatformUpdates();
