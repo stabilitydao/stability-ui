@@ -1,4 +1,4 @@
-import type { TVaultStatuses } from "@types";
+import type { TVaultStatuses, TVaultFilters } from "@types";
 import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
 
 const TABLE = [
@@ -36,6 +36,15 @@ const TABLE = [
     dataType: "number",
   },
 ];
+const TABLE_FILTERS: TVaultFilters[] = [
+  { name: "Stablecoins", type: "single", state: false },
+  { name: "Strategy", type: "multiple", state: true },
+  { name: "My vaults", type: "sample", state: false },
+  { name: "Active", type: "sample", state: false },
+];
+
+const STABLECOINS = [...USDC, ...USDT, ...DAI];
+
 const PAGINATION_VAULTS = 20;
 
 const TOKENS_ASSETS = [
@@ -186,8 +195,10 @@ const STABILITY_API = "https://api.stabilitydao.org/";
 
 export {
   TABLE,
+  TABLE_FILTERS,
   PAGINATION_VAULTS,
   TOKENS_ASSETS,
+  STABLECOINS,
   CHAINS,
   SLIPPAGE_VALUES,
   GRAPH_ENDPOINT,

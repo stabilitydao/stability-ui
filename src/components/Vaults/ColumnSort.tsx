@@ -5,16 +5,10 @@ type TProps = {
   value: string;
   table: TTableColumn[];
   type: string;
-  filter: (table: TTableColumn[]) => void;
+  sort: (table: TTableColumn[]) => void;
 };
 
-const ColumnSort: React.FC<TProps> = ({
-  index,
-  value,
-  table,
-  type,
-  filter,
-}) => {
+const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
   const styles: Record<string, string> = {
     Type: "hidden xl:table-cell",
     Strategy: "hidden lg:table-cell",
@@ -44,8 +38,7 @@ const ColumnSort: React.FC<TProps> = ({
         return { ...column, sortType: "none" };
       }
     });
-
-    filter(updatedTable);
+    sort(updatedTable);
   };
   return (
     <>
