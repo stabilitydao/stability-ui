@@ -79,45 +79,44 @@ const Vaults = () => {
 
     //filter
     tableFilters.forEach((f) => {
-      if (f.state) {
-        switch (f.type) {
-          case "single":
-            if (f.name === "Stablecoins") {
-              sortedVaults = sortedVaults.filter(
-                (vault: any) =>
-                  STABLECOINS.includes(vault.assets[0].address) &&
-                  STABLECOINS.includes(vault.assets[1].address)
-              );
-            }
-            break;
-          case "multiple":
-            if (!f.variants) break;
+      if (!f.state) return;
+      switch (f.type) {
+        case "single":
+          if (f.name === "Stablecoins") {
+            sortedVaults = sortedVaults.filter(
+              (vault: any) =>
+                STABLECOINS.includes(vault.assets[0].address) &&
+                STABLECOINS.includes(vault.assets[1].address)
+            );
+          }
+          break;
+        case "multiple":
+          if (!f.variants) break;
 
-            if (f.name === "Strategy") {
-              const strategyName = f.variants.find(
-                (variant: any) => variant.state
-              )?.name;
-              if (strategyName) {
-                sortedVaults = sortedVaults.filter(
-                  (vault: any) => vault.strategyInfo.shortName === strategyName
-                );
-              }
-            }
-            break;
-          case "sample":
-            if (f.name === "My vaults") {
-              sortedVaults = sortedVaults.filter((vault: any) => vault.balance);
-            }
-            if (f.name === "Active") {
+          if (f.name === "Strategy") {
+            const strategyName = f.variants.find(
+              (variant: any) => variant.state
+            )?.name;
+            if (strategyName) {
               sortedVaults = sortedVaults.filter(
-                (vault: any) => vault.status === 1
+                (vault: any) => vault.strategyInfo.shortName === strategyName
               );
             }
-            break;
-          default:
-            console.error("NO FILTER CASE");
-            break;
-        }
+          }
+          break;
+        case "sample":
+          if (f.name === "My vaults") {
+            sortedVaults = sortedVaults.filter((vault: any) => vault.balance);
+          }
+          if (f.name === "Active") {
+            sortedVaults = sortedVaults.filter(
+              (vault: any) => vault.status === 1
+            );
+          }
+          break;
+        default:
+          console.error("NO FILTER CASE");
+          break;
       }
     });
 

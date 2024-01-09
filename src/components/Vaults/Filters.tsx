@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { TVaultFilters } from "@types";
 
 interface IProps {
