@@ -3,7 +3,6 @@ import tokenlist from "../../stability.tokenlist.json";
 
 export const getTokenData = (address: string): TTokenData | undefined => {
   for (const token of tokenlist.tokens) {
-    console.log(address);
     if (token.address.toLowerCase() === address.toLowerCase()) {
       return {
         address: token.address.toLowerCase(),

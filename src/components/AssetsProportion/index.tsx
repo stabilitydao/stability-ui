@@ -5,9 +5,6 @@ interface IProps {
 }
 
 const AssetsProportion = ({ proportions, assets, type }: IProps) => {
-  console.log(proportions);
-  console.log(assets);
-  console.log(type);
   return proportions.length > 1 ? (
     <div
       className={

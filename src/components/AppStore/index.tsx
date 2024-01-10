@@ -318,7 +318,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             });
           }
-          console.log(assets);
           //
           vaults[vault.id] = {
             address: vault.id,
