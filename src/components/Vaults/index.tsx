@@ -90,11 +90,15 @@ const Vaults = () => {
       switch (f.type) {
         case "single":
           if (f.name === "Stablecoins") {
-            sortedVaults = sortedVaults.filter(
-              (vault: any) =>
-                STABLECOINS.includes(vault.assets[0].address) &&
-                STABLECOINS.includes(vault.assets[1].address)
-            );
+            sortedVaults = sortedVaults.filter((vault: any) => {
+              if (vault.assets.length > 1) {
+                return (
+                  STABLECOINS.includes(vault.assets[0].address) &&
+                  STABLECOINS.includes(vault.assets[1].address)
+                );
+              }
+              return STABLECOINS.includes(vault.assets[0].address);
+            });
           }
           break;
         case "multiple":
@@ -174,7 +178,6 @@ const Vaults = () => {
     });
   };
   const initFilters = (vaults: TLocalVault[]) => {
-    console.log(vaults.find((vault) => vault.assets.length === 1));
     let shortNames: any = [
       ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
     ];
