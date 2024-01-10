@@ -125,7 +125,7 @@ function Platform({ vaultEntities }: any) {
       </div>
 
       {daoData ? (
-        <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2  h-[375px]">
+        <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
             <div className="grid gap-3 h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
               <div className="my-auto">
@@ -200,16 +200,16 @@ function Platform({ vaultEntities }: any) {
 
             <div className="p-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
               <div className="w-full h-full grid m-auto">
-                <h2 className="text-2xl pb-2 font-medium text-left text-[#9c9c9c]">
+                <h2 className="text-2xl pb-2 font-medium text-left text-[#9c9c9c] mb-1">
                   Strategies:
                 </h2>
                 {daoData?.strategieNames.map(
                   (strategyName: string, index: number) => (
                     <div
                       key={index}
-                      className="py-3 font-medium">
+                      className="mb-2 font-medium">
                       <h3
-                        className="rounded-md m-0 py-2 ps-2 px-1"
+                        className="rounded-md m-0 py-2 px-3"
                         style={{
                           color: getFarmColor(strategyName)?.color,
                           backgroundColor: getFarmColor(strategyName)?.bgColor,
@@ -280,7 +280,7 @@ function Platform({ vaultEntities }: any) {
           className={`flex justify-center bg-button  p-3 ${
             platformUpdates?.newVersion === undefined ||
             platformUpdates?.newVersion === ""
-              ? "md:h-[314px]"
+              ? "md:h-[330px]"
               : "md:h-[477px]"
           } shadow-lg rounded-md mt-2`}>
           <Loader
