@@ -1,4 +1,4 @@
-import type { TVaultStatuses } from "@types";
+import type { TVaultStatuses, TVaultFilters, IProtocol } from "@types";
 import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
 
 const TABLE = [
@@ -36,6 +36,15 @@ const TABLE = [
     dataType: "number",
   },
 ];
+const TABLE_FILTERS: TVaultFilters[] = [
+  { name: "Stablecoins", type: "single", state: false },
+  { name: "Strategy", type: "multiple", state: true },
+  { name: "My vaults", type: "sample", state: false },
+  { name: "Active", type: "sample", state: false },
+];
+
+const STABLECOINS = [...USDC, ...USDT, ...DAI];
+
 const PAGINATION_VAULTS = 20;
 
 const TOKENS_ASSETS = [
@@ -132,6 +141,21 @@ const VAULT_STATUSES: TVaultStatuses = {
   5: "DEPOSITS_UNAVAILABLE",
 };
 
+const PROTOCOLS = {
+  quickSwap: {
+    name: "QuickSwap",
+    logoSrc: "/protocols/QuickSwap.png",
+  },
+  gamma: {
+    name: "Gamma",
+    logoSrc: "/protocols/Gamma.png",
+  },
+  compound: {
+    name: "Compound",
+    logoSrc: "/protocols/Compound.png",
+  },
+};
+
 const GRAPH_ENDPOINT =
   "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
 
@@ -186,11 +210,14 @@ const STABILITY_API = "https://api.stabilitydao.org/";
 
 export {
   TABLE,
+  TABLE_FILTERS,
   PAGINATION_VAULTS,
   TOKENS_ASSETS,
+  STABLECOINS,
   CHAINS,
   SLIPPAGE_VALUES,
   GRAPH_ENDPOINT,
+  PROTOCOLS,
   GRAPH_QUERY,
   STABILITY_API,
   VAULT_STATUSES,
