@@ -6,6 +6,7 @@ import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
 import { Filters } from "./Filters";
+import { Portfolio } from "./Portfolio";
 import { VaultType, AssetsProportion, VaultState } from "@components";
 
 import { vaults, isVaultsLoaded } from "@store";
@@ -39,6 +40,12 @@ const Vaults = () => {
 
   const [currentTab, setCurrentTab] = useState(1);
 
+  const [portfolio, setPortfolio] = useState({
+    deposited: "0",
+    monthly: "0",
+    daily: "0",
+    avg: "0",
+  });
   const [sortSelector, setSortSelector] = useState(false);
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
@@ -142,7 +149,32 @@ const Vaults = () => {
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
+  const initPortfolio = (vaults: TLocalVault[]) => {
+    let deposited = 0n;
+    let monthly = 0;
+    let daily = 0;
+    let avgApy = 0;
+
+    vaults.forEach((v) => {
+      if (v.balance) {
+        deposited += v.balance;
+        monthly +=
+          (formatNumber(formatFromBigInt(v.balance, 18), "format") *
+            (1 + v.apy / 100)) /
+          12;
+        daily += monthly / 30;
+        avgApy += Number(v.apy);
+      }
+    });
+    setPortfolio({
+      deposited: formatNumber(formatFromBigInt(deposited, 18), "format"),
+      monthly: String(monthly.toFixed(3)),
+      daily: String(daily.toFixed(3)),
+      avg: String(avgApy.toFixed(3)),
+    });
+  };
   const initFilters = (vaults: TLocalVault[]) => {
+    console.log(vaults.find((vault) => vault.assets.length === 1));
     let shortNames: any = [
       ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
     ];
@@ -171,6 +203,7 @@ const Vaults = () => {
       vaults.sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
 
       initFilters(vaults);
+      initPortfolio(vaults);
       setLocalVaults(vaults);
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
@@ -189,6 +222,7 @@ const Vaults = () => {
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
     <>
+      <Portfolio data={portfolio} />
       <input
         type="text"
         className="mt-1 w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"

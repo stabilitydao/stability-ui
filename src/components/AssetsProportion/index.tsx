@@ -5,7 +5,10 @@ interface IProps {
 }
 
 const AssetsProportion = ({ proportions, assets, type }: IProps) => {
-  return (
+  console.log(proportions);
+  console.log(assets);
+  console.log(type);
+  return proportions.length > 1 ? (
     <div
       className={
         type === "vaults"
@@ -39,6 +42,28 @@ const AssetsProportion = ({ proportions, assets, type }: IProps) => {
           src={assets[1].logo}
           alt={assets[1].symbol}
           title={assets[1].name}
+        />
+      </div>
+    </div>
+  ) : (
+    <div
+      className={
+        type === "vaults"
+          ? "flex w-[50px] h-6 mr-[14px]"
+          : "flex mr-2  w-[60px]"
+      }
+    >
+      <div
+        style={{
+          backgroundColor: assets[0]?.color,
+        }}
+        className="h-6 w-full rounded-full flex items-center justify-center"
+      >
+        <img
+          className="w-6 h-6 rounded-full"
+          src={assets[0].logo}
+          alt={assets[0].symbol}
+          title={assets[0].name}
         />
       </div>
     </div>
