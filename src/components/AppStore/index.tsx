@@ -203,35 +203,25 @@ const AppStore = (props: React.PropsWithChildren) => {
             ).toFixed(2);
 
             const APY = calculateAPY(APR).toFixed(2);
-            let assets;
-            if (vaultInfoes.length) {
-              const token1 = getTokenData(vaultInfoes[index][1][0]);
-              const token2 = getTokenData(vaultInfoes[index][1][1]);
-              if (token1 && token2) {
-                const token1Extended = TOKENS_ASSETS.find(tokenAsset =>
-                  tokenAsset.addresses.includes(token1.address)
-                );
-                const token2Extended = TOKENS_ASSETS.find(tokenAsset =>
-                  tokenAsset.addresses.includes(token2.address)
-                );
 
-                assets = [
-                  {
-                    address: token1?.address.toLowerCase(),
-                    logo: token1?.logoURI,
-                    symbol: token1?.symbol,
-                    name: token1?.name,
-                    color: token1Extended?.color,
-                  },
-                  {
-                    address: token2?.address.toLowerCase(),
-                    logo: token2?.logoURI,
-                    symbol: token2?.symbol,
-                    name: token2?.name,
-                    color: token2Extended?.color,
-                  },
-                ];
-              }
+            const assets = [];
+            if (vaultInfoes.length) {
+              vaultInfoes[index][1].forEach((strategyAsset: any) => {
+                const token = getTokenData(strategyAsset);
+                if (token) {
+                  const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
+                    tokenAsset.addresses.includes(token.address)
+                  );
+
+                  assets.push({
+                    address: token?.address,
+                    logo: token?.logoURI,
+                    symbol: token?.symbol,
+                    name: token?.name,
+                    color: tokenExtended?.color,
+                  });
+                }
+              });
             }
             return {
               [vault.toLowerCase()]: {
@@ -310,37 +300,24 @@ const AppStore = (props: React.PropsWithChildren) => {
             : [];
           //
 
-          let assets;
+          const assets = [];
 
           if (vault.strategyAssets.length) {
-            const token1 = getTokenData(vault.strategyAssets[0]);
-            const token2 = getTokenData(vault.strategyAssets[1]);
-
-            if (token1 && token2) {
-              const token1Extended = TOKENS_ASSETS.find(tokenAsset =>
-                tokenAsset.addresses.includes(token1.address)
-              );
-              const token2Extended = TOKENS_ASSETS.find(tokenAsset =>
-                tokenAsset.addresses.includes(token2.address)
-              );
-
-              assets = [
-                {
-                  address: token1?.address,
-                  logo: token1?.logoURI,
-                  symbol: token1?.symbol,
-                  name: token1?.name,
-                  color: token1Extended?.color,
-                },
-                {
-                  address: token2?.address,
-                  logo: token2?.logoURI,
-                  symbol: token2?.symbol,
-                  name: token2?.name,
-                  color: token2Extended?.color,
-                },
-              ];
-            }
+            vault.strategyAssets.forEach((strategyAsset: any) => {
+              const token = getTokenData(strategyAsset);
+              if (token) {
+                const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
+                  tokenAsset.addresses.includes(token.address)
+                );
+                assets.push({
+                  address: token?.address,
+                  logo: token?.logoURI,
+                  symbol: token?.symbol,
+                  name: token?.name,
+                  color: tokenExtended?.color,
+                });
+              }
+            });
           }
           //
           vaults[vault.id] = {

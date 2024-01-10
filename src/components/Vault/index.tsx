@@ -682,7 +682,6 @@ function Vault({ vault }: IProps) {
       }
     }
   };
-
   const getZapDepositSwapAmounts = async (amount: string) => {
     try {
       setLoader(true);
@@ -854,7 +853,7 @@ function Vault({ vault }: IProps) {
 
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
-    if (!isRefresh) return;
+    if (!isRefresh || loader) return;
     setRotation(rotation + 360);
     setLoader(true);
     loadAssetsBalances();
@@ -1087,12 +1086,19 @@ function Vault({ vault }: IProps) {
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
+          setInputs((prevInputs: any) => ({
+            ...prevInputs,
+            [option[0]]: {
+              amount: "",
+            },
+          }));
           setLoader(false);
         }
       } catch (err) {
         lastTx.set("No withdraw hash...");
         if (err instanceof Error) {
           const errName = err.name;
+          console.log(errName);
           const errorMessageLength =
             err.message.indexOf("Contract Call:") !== -1
               ? err.message.indexOf("Contract Call:")

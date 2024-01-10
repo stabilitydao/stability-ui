@@ -131,6 +131,7 @@ type TLocalVault = {
   version: string;
   strategyVersion: string;
 };
+
 type TVaultAssets = [string, string];
 
 type TTableColumn = {
@@ -138,6 +139,12 @@ type TTableColumn = {
   keyName: string;
   sortType: string;
   dataType: string;
+};
+type TVaultFilters = {
+  name: string;
+  type: string;
+  variants?: any;
+  state: boolean;
 };
 type TAPRModal = {
   apr: string;
@@ -275,5 +282,5 @@ export type {
   TProfitTokenWallet,
   TSdivTokenWallet,
   TVaultStatuses,
-  TPendingPlatformUpgrade,
+  TVaultFilters,
 };

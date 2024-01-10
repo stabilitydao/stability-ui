@@ -5,13 +5,20 @@ import { useStore } from "@nanostores/react";
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
+import { Filters } from "./Filters";
+import { Portfolio } from "./Portfolio";
 import { VaultType, AssetsProportion, VaultState } from "@components";
 
 import { vaults, isVaultsLoaded } from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
-import { TABLE, PAGINATION_VAULTS } from "@constants";
+import {
+  TABLE,
+  TABLE_FILTERS,
+  PAGINATION_VAULTS,
+  STABLECOINS,
+} from "@constants";
 import type { TLocalVault } from "@types";
 
 const Vaults = () => {
@@ -33,12 +40,20 @@ const Vaults = () => {
 
   const [currentTab, setCurrentTab] = useState(1);
 
+  const [portfolio, setPortfolio] = useState({
+    deposited: "0",
+    monthly: "0",
+    daily: "0",
+    avg: "0",
+  });
   const [sortSelector, setSortSelector] = useState(false);
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
   const [tableStates, setTableStates] = useState(TABLE);
+  const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
+
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const toVault = (address: string) => {
@@ -64,13 +79,58 @@ const Vaults = () => {
     return 0;
   };
 
-  const tableFilter = (table: any) => {
+  const tableHandler = (table: any = tableStates) => {
     const searchValue: any = search?.current?.value.toLowerCase();
     let sortedVaults: any = localVaults;
 
-    sortedVaults = localVaults.filter(vault =>
-      vault.symbol.toLowerCase().includes(searchValue)
-    );
+    //filter
+    tableFilters.forEach(f => {
+      if (!f.state) return;
+      switch (f.type) {
+        case "single":
+          if (f.name === "Stablecoins") {
+            sortedVaults = sortedVaults.filter((vault: any) => {
+              if (vault.assets.length > 1) {
+                return (
+                  STABLECOINS.includes(vault.assets[0].address) &&
+                  STABLECOINS.includes(vault.assets[1].address)
+                );
+              }
+              return STABLECOINS.includes(vault.assets[0].address);
+            });
+          }
+          break;
+        case "multiple":
+          if (!f.variants) break;
+
+          if (f.name === "Strategy") {
+            const strategyName = f.variants.find(
+              (variant: any) => variant.state
+            )?.name;
+            if (strategyName) {
+              sortedVaults = sortedVaults.filter(
+                (vault: any) => vault.strategyInfo.shortName === strategyName
+              );
+            }
+          }
+          break;
+        case "sample":
+          if (f.name === "My vaults") {
+            sortedVaults = sortedVaults.filter((vault: any) => vault.balance);
+          }
+          if (f.name === "Active") {
+            sortedVaults = sortedVaults.filter(
+              (vault: any) => vault.status === 1
+            );
+          }
+          break;
+        default:
+          console.error("NO FILTER CASE");
+          break;
+      }
+    });
+
+    //sort
     table.forEach((state: any) => {
       if (state.sortType !== "none") {
         sortedVaults = [...sortedVaults].sort((a, b) =>
@@ -84,15 +144,68 @@ const Vaults = () => {
       }
     });
 
+    //search
+    sortedVaults = sortedVaults.filter((vault: any) =>
+      vault.symbol.toLowerCase().includes(searchValue)
+    );
+
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
+  const initPortfolio = (vaults: TLocalVault[]) => {
+    let deposited = 0n;
+    let monthly = 0;
+    let daily = 0;
+    let avgApy = 0;
 
+    vaults.forEach(v => {
+      if (v.balance) {
+        deposited += v.balance;
+        monthly +=
+          (formatNumber(formatFromBigInt(v.balance, 18), "format") *
+            (1 + v.apy / 100)) /
+          12;
+        daily += monthly / 30;
+        avgApy += Number(v.apy);
+      }
+    });
+    setPortfolio({
+      deposited: formatNumber(formatFromBigInt(deposited, 18), "format"),
+      monthly: String(monthly.toFixed(3)),
+      daily: String(daily.toFixed(3)),
+      avg: String(avgApy.toFixed(3)),
+    });
+  };
+  const initFilters = (vaults: TLocalVault[]) => {
+    let shortNames: any = [
+      ...new Set(vaults.map(vault => vault.strategyInfo.shortName)),
+    ];
+    shortNames = shortNames.map((name: string) => ({
+      name: name,
+      state: false,
+    }));
+
+    tableFilters.forEach((f, index) => {
+      if (f.name === "Strategy")
+        setTableFilters(prev => {
+          const updatedArray = [...prev];
+
+          updatedArray[index] = {
+            ...updatedArray[index],
+            variants: shortNames,
+          };
+
+          return updatedArray;
+        });
+    });
+  };
   const initVaults = async () => {
     if ($vaults) {
       const vaults: TLocalVault[] = Object.values($vaults);
       vaults.sort((a: any, b: any) => parseInt(b.tvl) - parseInt(a.tvl));
 
+      initFilters(vaults);
+      initPortfolio(vaults);
       setLocalVaults(vaults);
       console.log(vaults);
       console.log($vaults);
@@ -104,6 +217,10 @@ const Vaults = () => {
   };
 
   useEffect(() => {
+    tableHandler();
+  }, [tableFilters]);
+
+  useEffect(() => {
     initVaults();
   }, [$vaults]);
 
@@ -111,12 +228,17 @@ const Vaults = () => {
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
     <>
+      <Portfolio data={portfolio} />
       <input
         type="text"
         className="mt-1 w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
         placeholder="Search"
         ref={search}
-        onChange={() => tableFilter(tableStates)}
+        onChange={() => tableHandler()}
+      />
+      <Filters
+        filters={tableFilters}
+        setFilters={setTableFilters}
       />
       <div className="flex md:hidden items-center mt-4 gap-3 relative ">
         <div className="relative select-none w-full">
@@ -153,14 +275,14 @@ const Vaults = () => {
                   value={value.name}
                   table={tableStates}
                   type="tile"
-                  filter={tableFilter}
+                  sort={tableHandler}
                 />
               ))}
             </div>
           </div>
         </div>
       </div>
-      <table className="hidden md:table table-auto w-full rounded-lg bg-[#2c2f38] mt-5 select-none">
+      <table className="hidden md:table table-auto w-full rounded-lg bg-[#2c2f38] select-none">
         <thead>
           <tr className="text-[12px] text-[#8f8f8f] uppercase">
             {tableStates.map((value: any, index: number) => (
@@ -170,13 +292,13 @@ const Vaults = () => {
                 value={value.name}
                 table={tableStates}
                 type="table"
-                filter={tableFilter}
+                sort={tableHandler}
               />
             ))}
           </tr>
         </thead>
         <tbody>
-          {currentTabVaults.map((vault: TLocalVault, index: number) => {
+          {currentTabVaults.map((vault: TLocalVault) => {
             return (
               <tr
                 className="border-t border-[#4f5158] text-center text-[15px] transition delay-[40ms] hover:bg-[#3d404b] cursor-pointer"
