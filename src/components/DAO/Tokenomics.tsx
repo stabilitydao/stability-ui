@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { account, publicClient, assetsPrices } from "@store";
+import { account, publicClient, assetsPrices, connected } from "@store";
 import { formatUnits, parseUnits } from "viem";
 import { getTokenData } from "@utils";
 import type {
@@ -25,6 +25,7 @@ function Tokenomics() {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
   const $publicClient = useStore(publicClient);
+  const $connected = useStore(connected);
   const [tokenomics, setTokenomics] = useState<TTokenomics | any>("");
   const [profitWallet, setProfitWallet] = useState<TProfitTokenWallet>();
   const [sdivWallet, setSdivtWallet] = useState<TSdivTokenWallet>();
@@ -78,7 +79,7 @@ function Tokenomics() {
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)
           ).toLocaleString(),
-          //MUST FIX IT
+          //MUST CHECK pmToMint
           pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
           pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
           pmMinted: Number(pmMinted).toLocaleString(),
@@ -295,7 +296,7 @@ function Tokenomics() {
 
   useEffect(() => {
     fetchTokenomicsData();
-    if ($account) {
+    if ($connected) {
       profitBalance();
       sdivBalance();
     }

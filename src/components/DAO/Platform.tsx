@@ -125,7 +125,7 @@ function Platform({ vaultEntities }: any) {
       </div>
 
       {daoData ? (
-        <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2">
+        <div className="w-full p-2 bg-button shadow-lg rounded-md mt-2  h-[375px]">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm bg-transparent">
             <div className="grid gap-3 h-full p-3 m-auto rounded-md bg-[#1c1c23] shadow-sm w-full">
               <div className="my-auto">

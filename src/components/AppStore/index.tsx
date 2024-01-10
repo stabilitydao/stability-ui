@@ -63,7 +63,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       query: GRAPH_QUERY,
     });
     if (isConnected) {
-      const contractData = await readContract(_publicClient, {
+      const contractData: any = await readContract(_publicClient, {
         address: platform,
         abi: PlatformABI,
         functionName: "getData",
@@ -71,7 +71,9 @@ const AppStore = (props: React.PropsWithChildren) => {
       console.log("getData", contractData);
       if (contractData[1]) {
         tokens.set(
-          contractData[1].map(address => address.toLowerCase()) as TAddress[]
+          contractData[1].map((address: TAddress) =>
+            address.toLowerCase()
+          ) as TAddress[]
         );
       }
 
@@ -204,7 +206,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
             const APY = calculateAPY(APR).toFixed(2);
 
-            const assets = [];
+            const assets: any = [];
             if (vaultInfoes.length) {
               vaultInfoes[index][1].forEach((strategyAsset: any) => {
                 const token = getTokenData(strategyAsset);
@@ -300,7 +302,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             : [];
           //
 
-          const assets = [];
+          const assets: any = [];
 
           if (vault.strategyAssets.length) {
             vault.strategyAssets.forEach((strategyAsset: any) => {

@@ -283,4 +283,5 @@ export type {
   TSdivTokenWallet,
   TVaultStatuses,
   TVaultFilters,
+  TPendingPlatformUpgrade,
 };

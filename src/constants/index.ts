@@ -1,5 +1,17 @@
 import type { TVaultStatuses, TVaultFilters, IProtocol } from "@types";
-import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
+import {
+  USDC,
+  USDT,
+  DAI,
+  WMATIC,
+  WETH,
+  WBTC,
+  PROFIT,
+  SDIV,
+  PM,
+  MULTISIG,
+  TREASURY,
+} from "./tokens";
 
 const TABLE = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
