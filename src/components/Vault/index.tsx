@@ -642,7 +642,7 @@ function Vault({ vault }: IProps) {
 
         const router = zapTokens[0].router || zapTokens[1].router;
 
-        const txData = zapTokens.map((tokens) => tokens.txData);
+        const txData = zapTokens.map((tokens: any) => tokens.txData);
 
         const zapDeposit = await writeContract({
           address: $platformData.zap,
@@ -1076,7 +1076,7 @@ function Vault({ vault }: IProps) {
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
 
-      const txData = zapPreviewWithdraw.map((preview) => preview.txData);
+      const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
 
       try {
         const zapWithdraw = await writeContract({
@@ -1232,7 +1232,7 @@ function Vault({ vault }: IProps) {
           },
         ]);
       } else {
-        const assetsLength = $assets.map((_) => 0n);
+        const assetsLength = $assets.map((_: any) => 0n);
 
         const { result } = await _publicClient.simulateContract({
           address: vault as TAddress,

@@ -1,12 +1,12 @@
-import type { TVaultFilters } from "@types";
+import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
-  filters: TVaultFilters[];
+  filters: TTableFilters[];
   setFilters: any;
 }
 
 const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
-  const activeFiltersHandler = (filter: TVaultFilters, option?: string) => {
+  const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
     const filterName = filters.find((item) => item.name === filter.name);
     if (!filterName) return;
 
@@ -22,11 +22,12 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
           f.name === filterName.name
             ? {
                 ...f,
-                variants: f.variants.map((variant: any) =>
-                  variant.name === option
-                    ? { ...variant, state: !variant.state }
-                    : { ...variant, state: false }
-                ),
+                variants:
+                  f.variants?.map((variant: TTAbleFiltersVariant) =>
+                    variant.name === option
+                      ? { ...variant, state: !variant.state }
+                      : { ...variant, state: false }
+                  ) || [],
               }
             : f
         );
@@ -48,8 +49,8 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
 
   return (
     filters.length && (
-      <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none">
-        {filters.map((filter: any) => (
+      <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none lg:min-w-[60%]">
+        {filters.map((filter: TTableFilters) => (
           <div key={filter.name}>
             {filter.type === "single" ? (
               <div
@@ -72,7 +73,7 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                 key={filter.name}
                 className="flex items-center bg-button rounded-md"
               >
-                {filter.variants.map((variant: any) => (
+                {filter.variants?.map((variant: TTAbleFiltersVariant) => (
                   <p
                     key={variant.name}
                     onClick={() => activeFiltersHandler(filter, variant.name)}
