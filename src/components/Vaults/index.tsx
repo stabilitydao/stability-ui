@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
+import { formatUnits } from "viem";
 
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
@@ -11,7 +12,12 @@ import { VaultType, AssetsProportion, VaultState } from "@components";
 
 import { vaults, isVaultsLoaded } from "@store";
 
-import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
+import {
+  formatNumber,
+  getStrategyShortName,
+  formatFromBigInt,
+  calculateAPY,
+} from "@utils";
 
 import {
   TABLE,
@@ -165,17 +171,19 @@ const Vaults = () => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        deposited += v.balance;
+        deposited += BigInt(v.balance);
         monthly +=
-          (formatNumber(formatFromBigInt(v.balance, 18), "format") *
-            (1 + v.apy / 100)) /
+          ((1 + Number(v.apy) / 100) *
+            Number(formatUnits(BigInt(v.balance), 18))) /
           12;
-        daily += monthly / 30;
-        avgApy += Number(v.apy);
+        avgApy += Number(v.apr);
       }
     });
+
+    daily += monthly / 30;
+    avgApy = calculateAPY(avgApy);
     setPortfolio({
-      deposited: formatNumber(formatFromBigInt(deposited, 18), "format"),
+      deposited: Number(formatUnits(deposited, 18)).toFixed(3),
       monthly: String(monthly.toFixed(3)),
       daily: String(daily.toFixed(3)),
       avg: String(avgApy.toFixed(3)),
