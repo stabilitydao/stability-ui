@@ -251,7 +251,6 @@ function Tokenomics() {
         functionName: "pending",
         args: [$account],
       })) as bigint;
-      console.log(sdivEarned);
 
       const sdivWallet = {
         sdivBalance:

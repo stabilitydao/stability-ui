@@ -10,8 +10,6 @@ function DAO() {
   const [vaultEntities, setVaultEntities] = useState<any>();
 
   const fetchGraph = async () => {
-    console.log("ASD");
-
     try {
       const response = await axios.post(
         GRAPH_ENDPOINT,

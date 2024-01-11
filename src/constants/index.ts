@@ -215,6 +215,12 @@ const GRAPH_QUERY = `
           version
           id
         }
+        assetHistoryEntities {
+          id
+          price
+          timestamp
+          address
+        }
       }
       `;
 
