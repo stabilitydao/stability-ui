@@ -1,7 +1,7 @@
 import type { TTokenData } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
-export const getTokenData = (address: string): TTokenData | undefined => {
+const getTokenData = (address: string): TTokenData => {
   for (const token of tokenlist.tokens) {
     if (token.address.toLowerCase() === address.toLowerCase()) {
       return {
@@ -17,3 +17,4 @@ export const getTokenData = (address: string): TTokenData | undefined => {
   }
   return undefined;
 };
+export { getTokenData };

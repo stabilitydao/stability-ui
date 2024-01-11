@@ -6,12 +6,11 @@ interface IProps {
 
 const Portfolio: React.FC<IProps> = ({ data }) => {
   const [visible, setVisible] = useState(true);
-
   return (
     <div className="bg-[#23262d] my-2 rounded-sm">
       <div className="p-2">
         <div className="flex items-center gap-3">
-          <h3 className="text-[24px] font-medium">Portfolio</h3>
+          <h3 className="text-[1.5rem] font-medium">Portfolio</h3>
           <div className="cursor-pointer">
             {!visible && (
               <svg
@@ -52,28 +51,38 @@ const Portfolio: React.FC<IProps> = ({ data }) => {
             )}
           </div>
         </div>
-        <div className="flex items-center justify-start gap-5">
+        <div className="flex items-center justify-start gap-5 flex-wrap">
           <div>
-            <h2 className="text-[18px] font-medium select-none">DEPOSITED</h2>
-            <p className="text-[26px]">
+            <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
+              DEPOSITED
+            </h2>
+            <p className="text-[1.2rem] md:text-[1.625rem]">
               {visible ? `$${data.deposited}` : "****"}
             </p>
           </div>
           <div>
-            <h2 className="text-[18px] font-medium select-none">
+            <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               MONTHLY YIELD
             </h2>
-            <p className="text-[26px]">
+            <p className="text-[1.2rem] md:text-[1.625rem]">
               {visible ? `$${data.monthly}` : "****"}
             </p>
           </div>
           <div>
-            <h2 className="text-[18px] font-medium select-none">DAILY YIELD</h2>
-            <p className="text-[26px]">{visible ? `$${data.daily}` : "****"}</p>
+            <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
+              DAILY YIELD
+            </h2>
+            <p className="text-[1.2rem] md:text-[1.625rem]">
+              {visible ? `$${data.daily}` : "****"}
+            </p>
           </div>
           <div>
-            <h2 className="text-[18px] font-medium select-none">AVG. APY</h2>
-            <p className="text-[26px]">{visible ? `${data.avg}%` : "****"}</p>
+            <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
+              AVG. APY
+            </h2>
+            <p className="text-[1.2rem] md:text-[1.625rem]">
+              {visible ? `${data.avg}%` : "****"}
+            </p>
           </div>
         </div>
       </div>

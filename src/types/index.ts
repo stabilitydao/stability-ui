@@ -103,7 +103,7 @@ type TBalances = {
 type TAssetBalance = {
   assetBalance: bigint;
 };
-type TLocalVault = {
+type TVault = {
   address: TAddress;
   name: string;
   symbol: string;
@@ -119,7 +119,13 @@ type TLocalVault = {
   lastHardWork: bigint;
   daily: number;
   monthlyUnderlyingApr: number;
-  assets: { logo: string; symbol: string; name: string; color: string }[];
+  assets: {
+    address: TAddress;
+    color: string;
+    logo: string;
+    name: string;
+    symbol: string;
+  }[];
   assetsProportions: number[];
   assetsWithApr: string[];
   assetsAprs: string[];
@@ -140,12 +146,19 @@ type TTableColumn = {
   sortType: string;
   dataType: string;
 };
-type TVaultFilters = {
+
+type TTAbleFiltersVariant = {
   name: string;
-  type: string;
-  variants?: any;
   state: boolean;
 };
+
+type TTableFilters = {
+  name: string;
+  type: string;
+  variants?: TTAbleFiltersVariant[];
+  state: boolean;
+};
+
 type TAPRModal = {
   apr: string;
   assetsWithApr: any;
@@ -205,7 +218,7 @@ export type {
   TAssetPrices,
   TBalances,
   TAssetBalance,
-  TLocalVault,
+  TVault,
   TVaultAssets,
   TTableColumn,
   TAPRModal,
@@ -220,5 +233,6 @@ export type {
   TVaultInput,
   TVaultBalance,
   TVaultStatuses,
-  TVaultFilters,
+  TTableFilters,
+  TTAbleFiltersVariant,
 };

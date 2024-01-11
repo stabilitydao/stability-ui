@@ -31,13 +31,15 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
         break;
     }
 
-    const updatedTable: any = table.map((column: TTableColumn, i: number) => {
-      if (index === i) {
-        return { ...column, sortType: nextCase };
-      } else {
-        return { ...column, sortType: "none" };
+    const updatedTable: TTableColumn[] = table.map(
+      (column: TTableColumn, i: number) => {
+        if (index === i) {
+          return { ...column, sortType: nextCase };
+        } else {
+          return { ...column, sortType: "none" };
+        }
       }
-    });
+    );
     sort(updatedTable);
   };
   return (

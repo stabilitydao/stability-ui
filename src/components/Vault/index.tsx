@@ -151,16 +151,13 @@ function Vault({ vault }: IProps) {
 
     for (let i = 0; i < input.length; i++) {
       if (
-        $assets &&
         $assetsBalances &&
-        input[i] > $assetsBalances[$assets[i]].assetBalance &&
-        lastKeyPress.key2 !== ""
+        input[i] > $assetsBalances[$assets[i]].assetBalance
       ) {
         setIsApprove(0);
         change = true;
       }
     }
-
     if (!change) {
       for (let i = 0; i < input.length; i++) {
         if (
@@ -175,9 +172,10 @@ function Vault({ vault }: IProps) {
           apprDepo.push(2);
         }
       }
+
       const button = checkButtonApproveDeposit(apprDepo);
       if (button) {
-        setIsApprove(apprDepo[1]);
+        setIsApprove(apprDepo[apprDepo.length - 1]);
       } else {
         setIsApprove(2);
       }
@@ -217,7 +215,10 @@ function Vault({ vault }: IProps) {
             },
           } as TVaultInput)
       );
-      if (option.length > 1) {
+      if (
+        option.length > 1 ||
+        (defaultOptionAssets === option[0] && option.length < 2)
+      ) {
         setLastKeyPress({ key1: asset, key2: amount });
       }
     } else {
@@ -281,10 +282,13 @@ function Vault({ vault }: IProps) {
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
     if (!$tokens) return;
-    const filtredTokens = tokensJson.tokens
+    let filtredTokens = tokensJson.tokens
       .filter((token) => $tokens.includes(token.address.toLowerCase()))
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
+    filtredTokens = filtredTokens.filter(
+      (token) => token.address != defaultOptionAssets
+    );
     ///// GET UNDERLYING TOKEN
     try {
       if (localVault.underlying != zeroAddress) {
@@ -638,6 +642,8 @@ function Vault({ vault }: IProps) {
 
         const router = zapTokens[0].router || zapTokens[1].router;
 
+        const txData = zapTokens.map((tokens: any) => tokens.txData);
+
         const zapDeposit = await writeContract({
           address: $platformData.zap,
           abi: ZapABI,
@@ -647,7 +653,7 @@ function Vault({ vault }: IProps) {
             option[0],
             amountIn,
             router,
-            [zapTokens[0].txData, zapTokens[1].txData],
+            txData,
             out,
             $account as TAddress,
           ],
@@ -1009,22 +1015,28 @@ function Vault({ vault }: IProps) {
     if (!sharesToBurn) return;
 
     ///// 2ASSETS -> UNDERLYING -> ZAP
-
-    if (option.length > 1 || underlyingToken?.address === option[0]) {
+    //before rewrite
+    if (
+      (defaultOptionAssets === option[0] && option.length < 2) ||
+      underlyingToken?.address === option[0] ||
+      option.length > 1
+    ) {
       const decimalPercent = BigInt(Math.floor(Number(slippage)));
-      const amountShares =
-        sharesToBurn - (sharesToBurn * decimalPercent) / 100n;
+      const withdrawAmounts = withdrawAmount.map((obj: any) => {
+        const decimals = tokensJson.tokens.find(
+          (token) => token.symbol === obj.symbol
+        )?.decimals;
+
+        const amount = parseUnits(obj.amount, decimals ? decimals : 18);
+        return amount - (amount * decimalPercent) / 100n;
+      });
 
       try {
         const withdrawAssets = await writeContract({
           address: vault as TAddress,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [
-            $assets as TAddress[],
-            amountShares,
-            Array.from({ length: option.length }, () => 0n),
-          ],
+          args: [$assets as TAddress[], sharesToBurn, withdrawAmounts],
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
@@ -1064,6 +1076,8 @@ function Vault({ vault }: IProps) {
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
 
+      const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
+
       try {
         const zapWithdraw = await writeContract({
           address: $platformData.zap,
@@ -1073,7 +1087,7 @@ function Vault({ vault }: IProps) {
             vault as TAddress,
             option[0],
             router,
-            [zapPreviewWithdraw[0].txData, zapPreviewWithdraw[1].txData],
+            txData,
             sharesToBurn,
             minAmountOut,
           ],
@@ -1098,7 +1112,6 @@ function Vault({ vault }: IProps) {
         lastTx.set("No withdraw hash...");
         if (err instanceof Error) {
           const errName = err.name;
-          console.log(errName);
           const errorMessageLength =
             err.message.indexOf("Contract Call:") !== -1
               ? err.message.indexOf("Contract Call:")
@@ -1219,15 +1232,20 @@ function Vault({ vault }: IProps) {
           },
         ]);
       } else {
+        const assetsLength = $assets.map((_: any) => 0n);
+
         const { result } = await _publicClient.simulateContract({
           address: vault as TAddress,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [$assets as TAddress[], currentValue, [0n, 0n]],
+          args: [$assets as TAddress[], currentValue, assetsLength],
           account: $account as TAddress,
         });
 
-        if (option?.length > 1) {
+        if (
+          (defaultOptionAssets === option[0] && option.length < 2) ||
+          option.length > 1
+        ) {
           const preview = result.map((amount: any, index: number) => {
             const tokenData: TTokenData | any = getTokenData($assets[index]);
             return {
@@ -1320,6 +1338,7 @@ function Vault({ vault }: IProps) {
             amounts.push(parseUnits("1", decimals));
           }
         }
+
         try {
           const previewDepositAssets = await readContract(_publicClient, {
             address: vault as TAddress,
@@ -1327,7 +1346,6 @@ function Vault({ vault }: IProps) {
             functionName: "previewDepositAssets",
             args: [$assets as TAddress[], amounts],
           });
-
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -2193,7 +2211,11 @@ function Vault({ vault }: IProps) {
                         className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
                       >
                         {defaultOptionImages?.length && (
-                          <div className="flex items-center">
+                          <div
+                            className={`flex items-center ${
+                              defaultOptionImages?.length < 2 && "ml-3"
+                            }`}
+                          >
                             {defaultOptionImages.map((logo: string) => (
                               <img
                                 key={Math.random()}
@@ -2204,7 +2226,13 @@ function Vault({ vault }: IProps) {
                             ))}
                           </div>
                         )}
-                        <p className="ml-[-4px] text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
+                        <p
+                          className={`${
+                            defaultOptionImages?.length < 2
+                              ? "ml-2"
+                              : "ml-[-4px]"
+                          }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}
+                        >
                           {defaultOptionSymbols}
                         </p>
                       </div>
@@ -2333,7 +2361,8 @@ function Vault({ vault }: IProps) {
               {tab === "Deposit" &&
                 ($connected ? (
                   <>
-                    {option?.length > 1 ? (
+                    {option?.length > 1 ||
+                    (defaultOptionAssets === option[0] && option.length < 2) ? (
                       <>
                         <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                           {option.map((asset: any) => (
@@ -2386,7 +2415,6 @@ function Vault({ vault }: IProps) {
                                     ) && evt.preventDefault()
                                   }
                                 />
-
                                 <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
                                   {tokensJson.tokens.map((token) => {
                                     if (token.address.toLowerCase() === asset) {
@@ -2429,7 +2457,6 @@ function Vault({ vault }: IProps) {
                         </div>
                         {!loader ? (
                           <>
-                            {" "}
                             {isApprove === 1 ? (
                               <button
                                 className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
@@ -2900,7 +2927,9 @@ function Vault({ vault }: IProps) {
                                           zapPreviewWithdraw[0].amountIn
                                         ) +
                                           Number(
-                                            zapPreviewWithdraw[1].amountIn
+                                            zapPreviewWithdraw.length > 1
+                                              ? zapPreviewWithdraw[1].amountIn
+                                              : 0
                                           )) *
                                           Number(
                                             formatFromBigInt(
@@ -2920,7 +2949,9 @@ function Vault({ vault }: IProps) {
                                     <p>{`($${(
                                       (Number(zapPreviewWithdraw[0].amountIn) +
                                         Number(
-                                          zapPreviewWithdraw[1].amountIn
+                                          zapPreviewWithdraw.length > 1
+                                            ? zapPreviewWithdraw[1].amountIn
+                                            : 0
                                         )) *
                                       formatFromBigInt(
                                         localVault.shareprice,

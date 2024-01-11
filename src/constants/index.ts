@@ -1,7 +1,7 @@
-import type { TVaultStatuses, TVaultFilters, IProtocol } from "@types";
+import type { TVaultStatuses, TTableFilters, TTableColumn } from "@types";
 import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
 
-const TABLE = [
+const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
   {
     name: "Type",
@@ -36,11 +36,11 @@ const TABLE = [
     dataType: "number",
   },
 ];
-const TABLE_FILTERS: TVaultFilters[] = [
+const TABLE_FILTERS: TTableFilters[] = [
   { name: "Stablecoins", type: "single", state: false },
   { name: "Strategy", type: "multiple", state: true },
   { name: "My vaults", type: "sample", state: false },
-  { name: "Active", type: "sample", state: false },
+  { name: "Active", type: "sample", state: true },
 ];
 
 const STABLECOINS = [...USDC, ...USDT, ...DAI];

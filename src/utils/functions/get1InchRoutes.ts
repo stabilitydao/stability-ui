@@ -6,7 +6,6 @@ import { getTokenData } from "./getTokenData";
 
 import type { TAddress } from "@types";
 
-// get1InchRoutes is a temp frunction before graph
 export const get1InchRoutes = async (
   fromAddress: TAddress,
   toAddress: TAddress,
