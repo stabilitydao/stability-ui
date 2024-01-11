@@ -173,12 +173,12 @@ const Vaults = () => {
       if (v.balance) {
         deposited += BigInt(v.balance);
         monthly +=
-          ((1 + Number(v.apy) / 100) *
-            Number(formatUnits(BigInt(v.balance), 18))) /
-          12;
+          (1 + Number(v.apy) / 100) *
+          Number(formatUnits(BigInt(v.balance), 18));
         avgApy += Number(v.apr);
       }
     });
+    monthly = monthly / 12;
 
     daily += monthly / 30;
     avgApy = calculateAPY(avgApy);
