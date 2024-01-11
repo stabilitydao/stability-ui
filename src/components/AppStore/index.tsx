@@ -206,7 +206,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
             const APY = calculateAPY(APR).toFixed(2);
 
-            const assets: any = [];
+            const assets: any[] = [];
             if (vaultInfoes.length) {
               vaultInfoes[index][1].forEach((strategyAsset: any) => {
                 const token = getTokenData(strategyAsset);
@@ -302,7 +302,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             : [];
           //
 
-          const assets: any = [];
+          const assets: any[] = [];
 
           if (vault.strategyAssets.length) {
             vault.strategyAssets.forEach((strategyAsset: any) => {

@@ -1,9 +1,9 @@
 import { PAGINATION_VAULTS } from "@constants";
 
-import type { TLocalVault } from "@types";
+import type { TVault } from "@types";
 
 interface IProps {
-  vaults: TLocalVault[];
+  vaults: TVault[];
   tab: number;
   setTab: (number: number) => void;
 }
