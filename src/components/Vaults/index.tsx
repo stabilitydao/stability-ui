@@ -166,22 +166,23 @@ const Vaults = () => {
   const initPortfolio = (vaults: TVault[]) => {
     let deposited = 0n;
     let monthly = 0;
-    let daily = 0;
     let avgApy = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
-        deposited += BigInt(v.balance);
-        monthly +=
-          (1 + Number(v.apy) / 100) *
-          Number(formatUnits(BigInt(v.balance), 18));
-        avgApy += Number(v.apr);
+        const apr = Number(v.apr);
+        const balance = BigInt(v.balance);
+
+        deposited += balance;
+        monthly += (1 + apr / 100) * Number(formatUnits(balance, 18));
+        avgApy += apr;
       }
     });
-    monthly = monthly / 12;
 
-    daily += monthly / 30;
+    monthly = monthly / 12;
+    const daily = monthly / 30;
     avgApy = calculateAPY(avgApy);
+
     setPortfolio({
       deposited: Number(formatUnits(deposited, 18)).toFixed(3),
       monthly: String(monthly.toFixed(3)),
