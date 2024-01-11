@@ -162,9 +162,8 @@ const Vaults = () => {
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
-  //// todo portfolio сorrect formula
   const initPortfolio = (vaults: TVault[]) => {
-    let deposited = 0n;
+    let deposited: any = 0n;
     let monthly = 0;
     let avgApy = 0;
 
@@ -174,17 +173,17 @@ const Vaults = () => {
         const balance = BigInt(v.balance);
 
         deposited += balance;
-        monthly += (1 + apr / 100) * Number(formatUnits(balance, 18));
+        monthly += ((apr / 100) * Number(formatUnits(balance, 18))) / 12;
         avgApy += apr;
       }
     });
 
-    monthly = monthly / 12;
+    deposited = Number(formatUnits(deposited, 18));
     const daily = monthly / 30;
-    avgApy = calculateAPY(avgApy);
+    avgApy = (100 * daily * 365) / deposited;
 
     setPortfolio({
-      deposited: Number(formatUnits(deposited, 18)).toFixed(3),
+      deposited: String(deposited.toFixed(3)),
       monthly: String(monthly.toFixed(3)),
       daily: String(daily.toFixed(3)),
       avg: String(avgApy.toFixed(3)),
