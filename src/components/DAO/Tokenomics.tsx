@@ -61,20 +61,12 @@ function Tokenomics() {
         const _tokenomics = {
           profitPrice:
             Math.trunc(
-              Number(
-                formatUnits(
-                  $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
-                  18
-                )
-              ) * 100
+              Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
+                100
             ) / 100,
           profitMarketCap: Math.trunc(
-            Number(
-              formatUnits(
-                $assetsPrices?.[PROFIT[0].toLowerCase()].tokenPrice,
-                18
-              )
-            ) * 1000000
+            Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
+              1000000
           ).toLocaleString(),
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)
@@ -333,10 +325,9 @@ function Tokenomics() {
 
   return tokenomics ? (
     <div className="overflow-hidden mt-5 bg-[#3d404b] rounded-md border border-gray-600">
-      <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-4 my-auto">
+      <h1 className="me-auto flex text-[#9c9c9c] ps-4 my-auto h-[50px]">
         Tokenomics
       </h1>
-
       <div className="mt-2 border border-gray-600 rounded-md w-full">
         <div className="p-2 grid lg:flex gap-2">
           <div className="bg-[#2c2f38] rounded-md p-3 relative lg:w-1/3 shadow-sm border border-gray-700">
@@ -842,7 +833,7 @@ function Tokenomics() {
       )}
     </div>
   ) : (
-    <div className="flex p-3 shadow-lg rounded-md justify-center min-h-[368px] m-auto mt-5 bg-[#3d404b] border-gray-600">
+    <div className="flex p-3 shadow-lg rounded-md justify-center md:h-[368px] h-[900px] m-auto mt-5 bg-[#3d404b] border-gray-600">
       <Loader
         customHeight={100}
         customWidth={100}

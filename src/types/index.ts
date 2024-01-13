@@ -297,4 +297,5 @@ export type {
   TVaultStatuses,
   TTableFilters,
   TTAbleFiltersVariant,
+  TPendingPlatformUpgrade,
 };

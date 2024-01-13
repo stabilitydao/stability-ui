@@ -95,37 +95,44 @@ function Team() {
 
         if (contractBalanceResponse) {
           const contractAddresses = contractBalanceResponse[0];
+
+          const processedTokens: Record<string, boolean> = {};
+
           const balancePromises = contractAddresses.map(
             async (address: TAddress) => {
-              const balance = (await $publicClient.readContract({
-                address: address as TAddress,
-                abi: ERC20ABI,
-                functionName: "balanceOf",
-                args: [MULTISIG[0] as TAddress],
-              })) as bigint;
+              if (!processedTokens[address]) {
+                processedTokens[address] = true;
 
-              const decimals = getTokenData(address.toLowerCase())?.decimals;
-              const _balance =
-                Math.trunc(
-                  Number(formatUnits(balance, Number(decimals))) * 100
-                ) / 100;
+                const balance = (await $publicClient.readContract({
+                  address: address as TAddress,
+                  abi: ERC20ABI,
+                  functionName: "balanceOf",
+                  args: [MULTISIG[0] as TAddress],
+                })) as bigint;
 
-              if (decimals && _balance > 0) {
-                const tokenInfo: TMultiTokenData = {
-                  balance: _balance,
-                  priceBalance:
-                    Math.trunc(
-                      Number(formatUnits(balance, decimals)) *
-                        Number(
-                          formatUnits(
-                            $assetsPrices[address.toLowerCase()]?.tokenPrice,
-                            18
-                          )
-                        ) *
-                        100
-                    ) / 100,
-                };
-                _balances[address] = tokenInfo;
+                const decimals = getTokenData(address.toLowerCase())?.decimals;
+                const _balance =
+                  Math.trunc(
+                    Number(formatUnits(balance, Number(decimals))) * 100
+                  ) / 100;
+
+                if (decimals && _balance > 0) {
+                  const tokenInfo: TMultiTokenData = {
+                    balance: _balance,
+                    priceBalance:
+                      Math.trunc(
+                        Number(formatUnits(balance, decimals)) *
+                          Number(
+                            formatUnits(
+                              $assetsPrices[address.toLowerCase()]?.tokenPrice,
+                              18
+                            )
+                          ) *
+                          100
+                      ) / 100,
+                  };
+                  _balances[address] = tokenInfo;
+                }
               }
             }
           );
@@ -149,12 +156,12 @@ function Team() {
   }, []);
 
   return members ? (
-    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[701px]">
-      <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-4 my-auto">
+    <div className="mt-5 bg-[#3d404b] border border-gray-600 rounded-md min-h-[1030px]">
+      <h1 className="me-auto flex text-[#9c9c9c] ps-4 my-auto h-[50px]">
         Team
       </h1>
 
-      <div className="p-2 border border-gray-600 rounded-md mt-2">
+      <div className="p-2 my-auto border border-gray-600 rounded-md mt-2">
         <div className="p-3 bg-[#2c2f38] rounded-md text-sm font-medium border border-gray-700 min-h-[262px]">
           <table className="text-[#9c9c9c]">
             <thead>
@@ -202,7 +209,7 @@ function Team() {
                 </div>
               ))
             ) : (
-              <div className="flex w-full justify-center m-auto ">
+              <div className="flex w-full justify-center m-auto">
                 <Loader
                   customHeight={50}
                   customWidth={50}

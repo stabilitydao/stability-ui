@@ -116,7 +116,7 @@ function Platform({ vaultEntities }: any) {
   return (
     <>
       <div className="w-full flex px-2 justify-between h-[70px] bg-button shadow-lg rounded-md">
-        <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-2 my-auto">
+        <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-2 my-auto h-[50px]">
           Platform
         </h1>
         <p className="text-sm text-[#9c9c9c] my-auto pt-3 pe-2">
@@ -277,12 +277,12 @@ function Platform({ vaultEntities }: any) {
         </div>
       ) : (
         <div
-          className={`flex justify-center bg-button  p-3 ${
+          className={`flex justify-center bg-button  p-3 shadow-lg rounded-md mt-2 ${
             platformUpdates?.newVersion === undefined ||
             platformUpdates?.newVersion === ""
-              ? "md:h-[330px]"
+              ? "sm:h-[583px] md:h-[330px] h-[747px]"
               : "md:h-[477px]"
-          } shadow-lg rounded-md mt-2`}>
+          }`}>
           <Loader
             customHeight={100}
             customWidth={100}
