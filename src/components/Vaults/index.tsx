@@ -61,7 +61,6 @@ const Vaults = () => {
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
   };
-
   const compareHandler = (
     a: any,
     b: any,
@@ -221,6 +220,62 @@ const Vaults = () => {
       setIsLocalVaultsLoaded(true);
     }
   };
+  useEffect(() => {
+    const handleSearchChange = () => {
+      const searchParams = new URLSearchParams(window.location.search);
+
+      const tagsParam = searchParams.get("tags");
+      const strategyParam = searchParams.get("strategy");
+      const vaultsParam = searchParams.get("vaults");
+      const statusParam = searchParams.get("status");
+
+      let newFilters = tableFilters;
+
+      if (tagsParam) {
+        newFilters = newFilters.map((f) =>
+          f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
+        );
+      }
+
+      // if (strategyParam) {
+      //   newFilters = newFilters.map((f) => {
+      //     return f.name.toLowerCase() === "strategy"
+      //       ? {
+      //           ...f,
+      //           variants:
+      //             f.variants?.map((variant: TTAbleFiltersVariant) =>
+      //               variant.name === strategyParam.toLowerCase()
+      //                 ? { ...variant, state: !variant.state }
+      //                 : { ...variant, state: false }
+      //             ) || [],
+      //         }
+      //       : f;
+      //   });
+      // }
+      if (vaultsParam) {
+        newFilters = newFilters.map((f) => {
+          if (f.name.toLowerCase() === "my vaults") {
+            return vaultsParam === "my"
+              ? { ...f, state: true }
+              : { ...f, state: false };
+          }
+          return f;
+        });
+      }
+      if (statusParam) {
+        newFilters = newFilters.map((f) => {
+          if (f.name.toLowerCase() === "active") {
+            return statusParam === "active"
+              ? { ...f, state: true }
+              : { ...f, state: false };
+          }
+          return f;
+        });
+      }
+      setTableFilters(newFilters);
+    };
+    handleSearchChange();
+  }, [window.location.search]);
 
   useEffect(() => {
     tableHandler();
@@ -229,7 +284,6 @@ const Vaults = () => {
   useEffect(() => {
     initVaults();
   }, [$vaults]);
-
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
