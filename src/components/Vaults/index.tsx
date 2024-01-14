@@ -10,7 +10,7 @@ import { Filters } from "./Filters";
 import { Portfolio } from "./Portfolio";
 import { VaultType, AssetsProportion, VaultState } from "@components";
 
-import { vaults, isVaultsLoaded } from "@store";
+import { vaults, isVaultsLoaded, connected } from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -20,11 +20,17 @@ import {
   PAGINATION_VAULTS,
   STABLECOINS,
 } from "@constants";
-import type { TVault, TTableColumn, TTAbleFiltersVariant } from "@types";
+import type {
+  TVault,
+  TTableColumn,
+  TTableFilters,
+  TTAbleFiltersVariant,
+} from "@types";
 
 const Vaults = () => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
+  const $connected = useStore(connected);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
@@ -78,6 +84,58 @@ const Vaults = () => {
         : b.localeCompare(a);
     }
     return 0;
+  };
+
+  const setURLFilters = (filters: TTableFilters[]) => {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const tagsParam = searchParams.get("tags");
+    const strategyParam = searchParams.get("strategy");
+    const vaultsParam = searchParams.get("vaults");
+    const statusParam = searchParams.get("status");
+
+    if (tagsParam) {
+      filters = filters.map((f) =>
+        f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
+      );
+    }
+    if (strategyParam) {
+      filters = filters.map((f) => {
+        return f.name.toLowerCase() === "strategy"
+          ? {
+              ...f,
+              variants:
+                f.variants?.map((variant: TTAbleFiltersVariant) => {
+                  return variant.name.toLowerCase() ===
+                    strategyParam.toLowerCase()
+                    ? { ...variant, state: true }
+                    : { ...variant, state: false };
+                }) || [],
+            }
+          : f;
+      });
+    }
+    if (vaultsParam) {
+      filters = filters.map((f) => {
+        if (f.name.toLowerCase() === "my vaults") {
+          return vaultsParam === "my"
+            ? { ...f, state: true }
+            : { ...f, state: false };
+        }
+        return f;
+      });
+    }
+    if (statusParam) {
+      filters = filters.map((f) => {
+        if (f.name.toLowerCase() === "active") {
+          return statusParam === "active"
+            ? { ...f, state: true }
+            : { ...f, state: false };
+        }
+        return f;
+      });
+    }
+    setTableFilters(filters);
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
@@ -157,6 +215,7 @@ const Vaults = () => {
     setTableStates(table);
   };
   const initPortfolio = (vaults: TVault[]) => {
+    if (!$connected) return;
     let deposited: any = 0n;
     let monthly = 0;
     let avgApy = 0;
@@ -168,7 +227,6 @@ const Vaults = () => {
 
         deposited += balance;
         monthly += ((apr / 100) * Number(formatUnits(balance, 18))) / 12;
-        avgApy += apr;
       }
     });
 
@@ -194,19 +252,10 @@ const Vaults = () => {
       state: false,
     }));
 
-    tableFilters.forEach((f, index) => {
-      if (f.name === "Strategy")
-        setTableFilters((prev) => {
-          const updatedArray = [...prev];
-
-          updatedArray[index] = {
-            ...updatedArray[index],
-            variants: shortNames,
-          };
-
-          return updatedArray;
-        });
-    });
+    const newFilters = tableFilters.map((f) =>
+      f.name === "Strategy" ? { ...f, variants: shortNames } : f
+    );
+    setURLFilters(newFilters);
   };
   const initVaults = async () => {
     if ($vaults) {
@@ -220,62 +269,6 @@ const Vaults = () => {
       setIsLocalVaultsLoaded(true);
     }
   };
-  useEffect(() => {
-    const handleSearchChange = () => {
-      const searchParams = new URLSearchParams(window.location.search);
-
-      const tagsParam = searchParams.get("tags");
-      const strategyParam = searchParams.get("strategy");
-      const vaultsParam = searchParams.get("vaults");
-      const statusParam = searchParams.get("status");
-
-      let newFilters = tableFilters;
-
-      if (tagsParam) {
-        newFilters = newFilters.map((f) =>
-          f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
-        );
-      }
-
-      // if (strategyParam) {
-      //   newFilters = newFilters.map((f) => {
-      //     return f.name.toLowerCase() === "strategy"
-      //       ? {
-      //           ...f,
-      //           variants:
-      //             f.variants?.map((variant: TTAbleFiltersVariant) =>
-      //               variant.name === strategyParam.toLowerCase()
-      //                 ? { ...variant, state: !variant.state }
-      //                 : { ...variant, state: false }
-      //             ) || [],
-      //         }
-      //       : f;
-      //   });
-      // }
-      if (vaultsParam) {
-        newFilters = newFilters.map((f) => {
-          if (f.name.toLowerCase() === "my vaults") {
-            return vaultsParam === "my"
-              ? { ...f, state: true }
-              : { ...f, state: false };
-          }
-          return f;
-        });
-      }
-      if (statusParam) {
-        newFilters = newFilters.map((f) => {
-          if (f.name.toLowerCase() === "active") {
-            return statusParam === "active"
-              ? { ...f, state: true }
-              : { ...f, state: false };
-          }
-          return f;
-        });
-      }
-      setTableFilters(newFilters);
-    };
-    handleSearchChange();
-  }, [window.location.search]);
 
   useEffect(() => {
     tableHandler();
