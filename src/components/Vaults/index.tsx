@@ -8,11 +8,21 @@ import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
 import { Filters } from "./Filters";
 import { Portfolio } from "./Portfolio";
-import { VaultType, AssetsProportion, VaultState } from "@components";
+import {
+  VaultType,
+  AssetsProportion,
+  VaultState,
+  TimeDifferenceIndicator,
+} from "@components";
 
 import { vaults, isVaultsLoaded, connected } from "@store";
 
-import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
+import {
+  formatNumber,
+  getStrategyShortName,
+  formatFromBigInt,
+  calculateAPY,
+} from "@utils";
 
 import {
   TABLE,
@@ -162,7 +172,6 @@ const Vaults = () => {
           break;
         case "multiple":
           if (!f.variants) break;
-
           if (f.name === "Strategy") {
             const strategyName = f.variants.find(
               (variant: TTAbleFiltersVariant) => variant.state
@@ -191,7 +200,6 @@ const Vaults = () => {
           break;
       }
     });
-
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
@@ -205,12 +213,10 @@ const Vaults = () => {
         );
       }
     });
-
     //search
     sortedVaults = sortedVaults.filter((vault: TVault) =>
       vault.symbol.toLowerCase().includes(searchValue)
     );
-
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
@@ -478,12 +484,41 @@ const Vaults = () => {
                           />
                         </svg>
                         <div className="visible__tooltip">
-                          <div className="flex items-start flex-col gap-2">
+                          <div className="flex items-start flex-col gap-4">
                             <p className="text-[14px]">
                               The Annual Percentage Rate (APR) for the Vault is
                               equal to the sum of the Strategy APR and
                               Underlying APRs
                             </p>
+
+                            <div className="text-[16px] flex flex-col gap-1 items-start">
+                              <p>
+                                Total APR {vault.apr}% (
+                                {calculateAPY(vault.apr).toFixed(2)}% APY)
+                              </p>
+                              {!!vault.monthlyUnderlyingApr && (
+                                <p>
+                                  Fee APR
+                                  {(vault.monthlyUnderlyingApr * 100).toFixed(
+                                    2
+                                  )}
+                                  %
+                                </p>
+                              )}
+                              <p>
+                                Strategy APR{" "}
+                                {formatFromBigInt(vault.strategyApr, 3).toFixed(
+                                  2
+                                )}
+                                %
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <p className="text-[16px]">Last Hard Work :</p>
+                              <TimeDifferenceIndicator
+                                unix={vault.lastHardWork}
+                              />
+                            </div>
                           </div>
                           <i></i>
                         </div>
