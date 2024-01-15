@@ -1,17 +1,17 @@
-import Tokenomics from "./Tokenomics";
-import Team from "./Team";
-import Governance from "./Governance";
-import Platform from "./Platform";
+import { Platform } from "./Platform";
+import { Tokenomics } from "./Tokenomics";
+import { Governance } from "./Governance";
+import { Team } from "./Team";
 
-function DAO() {
+const DAO = () => {
   return (
-    <main className="p-0 m-auto">
+    <main className="p-0">
       <Platform />
       <Tokenomics />
       <Governance />
       <Team />
     </main>
   );
-}
+};
 
 export { DAO };

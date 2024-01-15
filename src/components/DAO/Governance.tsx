@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
-import { PROFIT, TREASURY } from "@constants";
-import { Loader } from "../Loader/index";
+import { formatUnits } from "viem";
+
+import { ShortAddress } from "./ShortAddress";
+
+import { Loader } from "@components";
 import { publicClient } from "@store";
 import { ERC20ABI } from "@web3";
-import { formatUnits } from "viem";
-import type { TAddress } from "@types";
-import ShortAddress from "./ShortAddress";
+import { PROFIT, TREASURY } from "@constants";
 
-function Governance() {
-  const [treasuryBalance, setTreasuryBalance] = useState<number>();
+import type { TAddress } from "@types";
+
+const Governance = () => {
   const $publicClient = useStore(publicClient);
+
+  const [treasuryBalance, setTreasuryBalance] = useState<number>();
 
   const fetchTreasury = async () => {
     const _treasuryBalance = (await $publicClient?.readContract({
-      address: PROFIT[0] as TAddress,
+      address: PROFIT[0],
       abi: ERC20ABI,
       functionName: "balanceOf",
-      args: [TREASURY[0] as TAddress],
+      args: [TREASURY[0]],
     })) as bigint;
     setTreasuryBalance(
       Math.trunc(Number(formatUnits(_treasuryBalance, 18)) * 100) / 100
@@ -82,7 +86,8 @@ function Governance() {
               className="rounded-sm p-2 ms-auto bg-button"
               href="https://www.tally.xyz/governance/eip155:137:0x6214Ba4Ce85C0A6F6025b0d63be7d65214463226"
               title="Tally governance app"
-              target="blank">
+              target="blank"
+            >
               {" "}
               Tally governance app
             </a>
@@ -92,11 +97,8 @@ function Governance() {
     </div>
   ) : (
     <div className="flex p-3 shadow-lg rounded-md justify-center md:h-[210px] m-auto mt-5 bg-[#3d404b] border-gray-600">
-      <Loader
-        customHeight={100}
-        customWidth={100}
-      />
+      <Loader height={100} width={100} />
     </div>
   );
-}
-export default Governance;
+};
+export { Governance };
