@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { TimeDifferenceIndicator } from "@components";
+
 import { calculateAPY, formatFromBigInt, getTimeDifference } from "@utils";
 import type { TAPRModal } from "@types";
 
@@ -26,8 +28,6 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const APY = calculateAPY(state.apr).toFixed(2);
 
   const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
-
-  const timeDifference = getTimeDifference(state.lastHardWork);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -130,34 +130,9 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             )}
             <p>Strategy APR {strategyAPR}%</p>
           </div>
-
           <div className="flex items-center gap-3">
             <p className="text-[16px]">Last Hard Work :</p>
-            {timeDifference.days ? (
-              <>
-                {timeDifference?.days < 1000 ? (
-                  <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
-                    {timeDifference.days}
-                    {timeDifference.days > 1 ? "days" : "day"}{" "}
-                    {timeDifference.hours}h ago
-                  </div>
-                ) : (
-                  <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
-                    None
-                  </div>
-                )}
-              </>
-            ) : (
-              <div
-                className={`text-[14px] px-2 py-1 rounded-lg border-[2px]  ${
-                  timeDifference.hours > 4
-                    ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
-                    : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                }`}
-              >
-                {timeDifference.hours}h ago
-              </div>
-            )}
+            <TimeDifferenceIndicator unix={state.lastHardWork} />
           </div>
         </div>
       </div>

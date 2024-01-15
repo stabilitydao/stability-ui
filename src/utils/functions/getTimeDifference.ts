@@ -1,4 +1,4 @@
-export const getTimeDifference = (unix: number | string) => {
+export const getTimeDifference = (unix: number | string | bigint) => {
   unix = Number(unix);
   const currentTime = new Date().getTime() / 1000;
   const targetTime = unix;

@@ -10,11 +10,22 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
     const filterName = filters.find((item) => item.name === filter.name);
     if (!filterName) return;
 
+    ///// for vaults url filters
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+    /////
+
     switch (filter.type) {
       case "single":
+        if (filter.name.toLowerCase() === "stablecoins") {
+          !filter.state
+            ? params.set("tags", "stablecoins")
+            : params.delete("tags");
+        }
         const updatedFiltersSingle = filters.map((f) =>
           f.name === filterName.name ? { ...f, state: !f.state } : f
         );
+
         setFilters(updatedFiltersSingle);
         break;
       case "multiple":
@@ -31,6 +42,20 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
               }
             : f
         );
+
+        const multipleFilter = updatedFiltersMultiple.find(
+          (f) => f.name === filterName.name
+        );
+
+        if (multipleFilter?.name.toLowerCase() === "strategy") {
+          const strategy =
+            multipleFilter?.variants &&
+            multipleFilter?.variants.find((variant) => variant.state);
+          strategy
+            ? params.set("strategy", strategy.name)
+            : params.delete("strategy");
+        }
+
         setFilters(updatedFiltersMultiple);
         break;
       case "sample":
@@ -39,12 +64,26 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
             ? { ...f, state: option !== "All" ? true : false }
             : f
         );
+        const sampleFilter = updatedFiltersSample.find(
+          (f) => f.name === filterName.name
+        );
+        if (sampleFilter?.name.toLowerCase() === "my vaults") {
+          sampleFilter.state
+            ? params.set("vaults", "my")
+            : params.set("vaults", "all");
+        } else if (sampleFilter?.name.toLowerCase() === "active") {
+          sampleFilter.state
+            ? params.set("status", "active")
+            : params.set("status", "all");
+        }
         setFilters(updatedFiltersSample);
         break;
       default:
         console.error("NO FILTER CASE");
         break;
     }
+    newUrl.search = `?${params.toString()}`;
+    window.history.pushState({}, "", newUrl.toString());
   };
 
   return (
@@ -61,8 +100,8 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                 } bg-button rounded-md cursor-pointer`}
               >
                 <p
-                  className={`p-2 opacity-70 hover:opacity-100 ${
-                    filter.state && "opacity-100"
+                  className={`p-2 hover:opacity-100 ${
+                    filter.state ? "opacity-100" : "opacity-70"
                   }`}
                 >
                   {filter.name}
@@ -77,8 +116,8 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                   <p
                     key={variant.name}
                     onClick={() => activeFiltersHandler(filter, variant.name)}
-                    className={`p-2 cursor-pointer opacity-70 hover:opacity-100 ${
-                      variant.state && "opacity-100"
+                    className={`p-2 cursor-pointer hover:opacity-100 ${
+                      variant.state ? "opacity-100" : "opacity-70"
                     }`}
                   >
                     {variant.name}
@@ -93,16 +132,16 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                 >
                   <p
                     onClick={() => activeFiltersHandler(filter, "All")}
-                    className={`py-2 px-4 cursor-pointer opacity-70 hover:opacity-100 ${
-                      !filter.state && "bg-[#35373E] opacity-100"
+                    className={`py-2 px-4 cursor-pointer hover:opacity-100 ${
+                      !filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >
                     All
                   </p>
                   <p
                     onClick={() => activeFiltersHandler(filter)}
-                    className={`p-2 cursor-pointer opacity-70 hover:opacity-100 ${
-                      filter.state && "bg-[#35373E] opacity-100"
+                    className={`p-2 cursor-pointer hover:opacity-100 ${
+                      filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >
                     {filter.name}

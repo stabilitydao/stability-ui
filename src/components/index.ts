@@ -9,6 +9,7 @@ import { AssetsProportion } from "./AssetsProportion";
 import { VaultState } from "./VaultState";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { TimeDifferenceIndicator } from "./TimeDifferenceIndicator";
 
 export {
   AppStore,
@@ -22,4 +23,5 @@ export {
   Header,
   Footer,
   VaultState,
+  TimeDifferenceIndicator,
 };
