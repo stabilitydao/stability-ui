@@ -53,6 +53,7 @@ import type { TAddress } from "@types";
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
+
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
 
@@ -62,7 +63,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       query: GRAPH_QUERY,
     });
     if (isConnected) {
-      const contractData = await readContract(_publicClient, {
+      const contractData: any = await readContract(_publicClient, {
         address: platform,
         abi: PlatformABI,
         functionName: "getData",
@@ -70,7 +71,9 @@ const AppStore = (props: React.PropsWithChildren) => {
       console.log("getData", contractData);
       if (contractData[1]) {
         tokens.set(
-          contractData[1].map((address) => address.toLowerCase()) as TAddress[]
+          contractData[1].map((address: TAddress) =>
+            address.toLowerCase()
+          ) as TAddress[]
         );
       }
 
@@ -208,7 +211,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               vaultInfoes[index][1].forEach((strategyAsset: any) => {
                 const token = getTokenData(strategyAsset);
                 if (token) {
-                  const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
+                  const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
                     tokenAsset.addresses.includes(token.address)
                   );
 
@@ -305,7 +308,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.strategyAssets.forEach((strategyAsset: any) => {
               const token = getTokenData(strategyAsset);
               if (token) {
-                const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
+                const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
                   tokenAsset.addresses.includes(token.address)
                 );
                 assets.push({
