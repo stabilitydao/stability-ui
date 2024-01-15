@@ -270,9 +270,6 @@ const Vaults = () => {
       initFilters(vaults);
       initPortfolio(vaults);
       setLocalVaults(vaults);
-      console.log(vaults);
-      console.log($vaults);
-      console.log(localVaults);
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);

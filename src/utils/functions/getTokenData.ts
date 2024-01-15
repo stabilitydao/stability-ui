@@ -1,7 +1,7 @@
 import type { TTokenData } from "@types";
 import tokenlist from "../../stability.tokenlist.json";
 
-const getTokenData = (address: string): TTokenData => {
+const getTokenData = (address: string): TTokenData | undefined => {
   for (const token of tokenlist.tokens) {
     if (token.address.toLowerCase() === address.toLowerCase()) {
       return {

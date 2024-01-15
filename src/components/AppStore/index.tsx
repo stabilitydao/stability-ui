@@ -211,7 +211,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               vaultInfoes[index][1].forEach((strategyAsset: any) => {
                 const token = getTokenData(strategyAsset);
                 if (token) {
-                  const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
+                  const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
                     tokenAsset.addresses.includes(token.address)
                   );
 
@@ -308,7 +308,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.strategyAssets.forEach((strategyAsset: any) => {
               const token = getTokenData(strategyAsset);
               if (token) {
-                const tokenExtended = TOKENS_ASSETS.find(tokenAsset =>
+                const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
                   tokenAsset.addresses.includes(token.address)
                 );
                 assets.push({

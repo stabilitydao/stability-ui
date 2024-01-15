@@ -7,7 +7,7 @@ import type {
   TAssetPrices,
   TBalances,
   TVaultAssets,
-  TLocalVault,
+  TVault,
   TAddress,
 } from "@types";
 import { platform } from "@web3";

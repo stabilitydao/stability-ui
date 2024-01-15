@@ -100,8 +100,8 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                 } bg-button rounded-md cursor-pointer`}
               >
                 <p
-                  className={`p-2 opacity-70 hover:opacity-100 ${
-                    filter.state && "opacity-100"
+                  className={`p-2 hover:opacity-100 ${
+                    filter.state ? "opacity-100" : "opacity-70"
                   }`}
                 >
                   {filter.name}
@@ -116,8 +116,8 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                   <p
                     key={variant.name}
                     onClick={() => activeFiltersHandler(filter, variant.name)}
-                    className={`p-2 cursor-pointer opacity-70 hover:opacity-100 ${
-                      variant.state && "opacity-100"
+                    className={`p-2 cursor-pointer hover:opacity-100 ${
+                      variant.state ? "opacity-100" : "opacity-70"
                     }`}
                   >
                     {variant.name}
@@ -132,16 +132,16 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
                 >
                   <p
                     onClick={() => activeFiltersHandler(filter, "All")}
-                    className={`py-2 px-4 cursor-pointer opacity-70 hover:opacity-100 ${
-                      !filter.state && "bg-[#35373E] opacity-100"
+                    className={`py-2 px-4 cursor-pointer hover:opacity-100 ${
+                      !filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >
                     All
                   </p>
                   <p
                     onClick={() => activeFiltersHandler(filter)}
-                    className={`p-2 cursor-pointer opacity-70 hover:opacity-100 ${
-                      filter.state && "bg-[#35373E] opacity-100"
+                    className={`p-2 cursor-pointer hover:opacity-100 ${
+                      filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >
                     {filter.name}
