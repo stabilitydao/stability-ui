@@ -7,13 +7,53 @@ import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
 import { getStrategyInfo } from "@utils";
 import ShortAddress from "./ShortAddress";
 import { Loader } from "../Loader/index";
+import { GRAPH_ENDPOINT } from "@constants";
+import axios from "axios";
 
-function Platform({ vaultEntities }: any) {
+function Platform() {
   const [daoData, setDaoData] = useState<TDAOData>();
   const [platformUpdates, setPlatformUpdates] =
     useState<TPendingPlatformUpgrade>();
+  const [tvl, setTvl] = useState<any>();
+  const [totalNumberOfVaults, setTotalNumberOfVaults] = useState<any>();
+
   const $publicClient = useStore(publicClient);
   const $network = useStore(network);
+
+  const fetchGraph = async () => {
+    try {
+      const response = await axios.post(
+        GRAPH_ENDPOINT,
+        {
+          query: `
+            query MyQuery {
+              vaultEntities {
+                tvl
+              }
+            }
+          `,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const tvll = response.data.data.vaultEntities;
+
+      const totalTvl = tvll.reduce((total: bigint, item: { tvl: bigint }) => {
+        return total + BigInt(item.tvl);
+      }, BigInt(0));
+
+      const _tvl = Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100;
+
+      setTvl(_tvl);
+      setTotalNumberOfVaults(tvll.length);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching graph data:", error);
+    }
+  };
 
   const getFarmColor = (farmName: string) => {
     let color;
@@ -31,7 +71,7 @@ function Platform({ vaultEntities }: any) {
   };
 
   const fetchDaoData = async () => {
-    if ($publicClient && vaultEntities) {
+    if ($publicClient && tvl) {
       try {
         const platformVersion: any = await $publicClient.readContract({
           address: platform,
@@ -57,14 +97,6 @@ function Platform({ vaultEntities }: any) {
           functionName: "farmsLength",
         });
 
-        //tvl
-        const totalTvl = vaultEntities?.reduce(
-          (total: bigint, item: { tvl: bigint }) => {
-            return total + BigInt(item.tvl);
-          },
-          BigInt(0)
-        );
-
         //fees
         const percentageFees: string[] = platformFees.map((fee: bigint) =>
           (fee / 1000n).toString()
@@ -74,8 +106,6 @@ function Platform({ vaultEntities }: any) {
           platformVersion: platformVersion,
           platformGovernance: contractData[0][5],
           multisigAddress: contractData[0][6],
-          numberOfTotalVaults: vaultEntities.length,
-          totalTvl: Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100,
           strategieNames: contractData[6],
           platformFee: percentageFees[0],
           vaultManagerFee: percentageFees[1],
@@ -106,12 +136,13 @@ function Platform({ vaultEntities }: any) {
   };
 
   useEffect(() => {
-    fetchDaoData();
-  }, [vaultEntities, platformUpdates]);
+    fetchGraph();
+  }, []);
 
   useEffect(() => {
+    fetchDaoData();
     fetchPlatformUpdates();
-  }, []);
+  }, [tvl]);
 
   return (
     <>
@@ -135,7 +166,7 @@ function Platform({ vaultEntities }: any) {
 
               <div className="my-auto rounded-md border-gray-800 font-semibold">
                 <h2 className="text-4xl">
-                  {"$ "} {daoData?.totalTvl}
+                  {"$ "} {tvl}
                 </h2>
                 <h2 className="text-lg">TVL</h2>
               </div>
@@ -143,7 +174,7 @@ function Platform({ vaultEntities }: any) {
               <div className="flex w-full border border-t-1 border-x-0 border-b-0 border-gray-800 shadow-sm">
                 <div className="m-auto">
                   <h2 className="text-3xl font-semibold">
-                    {daoData?.numberOfTotalVaults}
+                    {totalNumberOfVaults}
                   </h2>
                   <h2>Vaults</h2>
                 </div>

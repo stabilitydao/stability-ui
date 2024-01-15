@@ -13,6 +13,7 @@ import { ERC20ABI, platform, PlatformABI } from "@web3";
 import { MULTISIG } from "@constants";
 import axios from "axios";
 import ShortAddress from "./ShortAddress";
+import { GRAPH_ENDPOINT } from "@constants";
 import { Loader } from "../Loader/index";
 
 function Team() {
@@ -83,7 +84,7 @@ function Team() {
   };
 
   const fetchMultiSig = async () => {
-    if ($publicClient && $assetsPrices) {
+    if ($publicClient) {
       try {
         const _balances: TMultisigBalance = {};
         const contractBalanceResponse: any = await $publicClient.readContract({
@@ -95,7 +96,6 @@ function Team() {
 
         if (contractBalanceResponse) {
           const contractAddresses = contractBalanceResponse[0];
-
           const processedTokens: Record<string, boolean> = {};
 
           const balancePromises = contractAddresses.map(
@@ -103,12 +103,15 @@ function Team() {
               if (!processedTokens[address]) {
                 processedTokens[address] = true;
 
+                const assetPrice = await fetchAssetPrices(address);
+
                 const balance = (await $publicClient.readContract({
                   address: address as TAddress,
                   abi: ERC20ABI,
                   functionName: "balanceOf",
                   args: [MULTISIG[0] as TAddress],
                 })) as bigint;
+                console.log(assetPrice);
 
                 const decimals = getTokenData(address.toLowerCase())?.decimals;
                 const _balance =
@@ -116,18 +119,13 @@ function Team() {
                     Number(formatUnits(balance, Number(decimals))) * 100
                   ) / 100;
 
-                if (decimals && _balance > 0) {
+                if (decimals && _balance > 0 && assetPrice !== undefined) {
                   const tokenInfo: TMultiTokenData = {
                     balance: _balance,
                     priceBalance:
                       Math.trunc(
                         Number(formatUnits(balance, decimals)) *
-                          Number(
-                            formatUnits(
-                              $assetsPrices[address.toLowerCase()]?.tokenPrice,
-                              18
-                            )
-                          ) *
+                          Number(formatUnits(assetPrice, 18)) *
                           100
                       ) / 100,
                   };
@@ -144,6 +142,47 @@ function Team() {
       } catch (error) {
         console.error("Fetching multisig", error);
       }
+    }
+  };
+
+  const fetchAssetPrices = async (address: TAddress) => {
+    try {
+      const response = await axios.post(
+        GRAPH_ENDPOINT,
+        {
+          query: `
+            query MyQuery {
+              assetHistoryEntities(
+                where: { address: "${address}"}
+                first: 1
+                orderBy: timestamp
+                orderDirection: desc
+              ) {
+                price
+                address
+              }
+            }
+          `,
+          variables: {
+            address: [address],
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const assetHistoryEntities = response.data?.data?.assetHistoryEntities;
+
+      if (assetHistoryEntities && assetHistoryEntities.length > 0) {
+        const assetPrices = assetHistoryEntities[0].price;
+        return assetPrices;
+      }
+    } catch (error) {
+      console.error("Error fetching asset prices:", error);
+      return "0";
     }
   };
 

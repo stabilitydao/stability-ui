@@ -209,8 +209,6 @@ type TDAOData = {
   platformVersion: string;
   platformGovernance: string;
   multisigAddress: string;
-  numberOfTotalVaults: string;
-  totalTvl: number;
   strategieNames: string[];
   platformFee: string;
   vaultManagerFee: string;
@@ -248,7 +246,6 @@ type TTokenomics = {
   sdivTotalSupply: string;
   pmToMint: string;
   pmTotalSupply: string;
-  pmMinted: string;
 };
 
 type TProfitTokenWallet = {

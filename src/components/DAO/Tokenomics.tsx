@@ -29,6 +29,7 @@ function Tokenomics() {
   const [tokenomics, setTokenomics] = useState<TTokenomics | any>("");
   const [profitWallet, setProfitWallet] = useState<TProfitTokenWallet>();
   const [sdivWallet, setSdivtWallet] = useState<TSdivTokenWallet>();
+  const [pmMinted, setPmMinted] = useState<number>();
   const [input, setInput] = useState("");
   const [_allowance, setAllowance] = useState("");
   const [showMintModal, setShowMintModal] = useState(false);
@@ -44,18 +45,11 @@ function Tokenomics() {
         functionName: "totalSupply",
       })) as bigint;
 
-      const pmTotalSupply = await $publicClient?.readContract({
+      const pmTotalSupply = (await $publicClient?.readContract({
         address: PM[0] as TAddress,
         abi: IERC721Enumerable,
         functionName: "totalSupply",
-      });
-
-      const pmMinted = await $publicClient?.readContract({
-        address: PM[0] as TAddress,
-        abi: IERC721Enumerable,
-        functionName: "balanceOf",
-        args: [$account as TAddress],
-      });
+      })) as bigint;
 
       if ($assetsPrices) {
         const _tokenomics = {
@@ -72,9 +66,8 @@ function Tokenomics() {
             formatUnits(sdivTotalSupply, 18)
           ).toLocaleString(),
           //MUST CHECK pmToMint
-          pmToMint: (Number(10) - Number(pmTotalSupply)).toLocaleString(),
-          pmTotalSupply: Number(pmTotalSupply).toLocaleString(),
-          pmMinted: Number(pmMinted).toLocaleString(),
+          pmToMint: Number(10) - Number(formatUnits(pmTotalSupply, 0)),
+          pmTotalSupply: Number(formatUnits(pmTotalSupply, 0)),
         };
         setTokenomics(_tokenomics);
       }
@@ -224,7 +217,23 @@ function Tokenomics() {
       }
     } catch (error) {
       setLoader(false);
-      console.error("Error in mint:", error);
+      console.error("Error at mint:", error);
+    }
+  };
+
+  const minted = async () => {
+    try {
+      const _pmMinted = (await $publicClient?.readContract({
+        address: PM[0] as TAddress,
+        abi: IERC721Enumerable,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      })) as bigint;
+
+      setPmMinted(Number(formatUnits(_pmMinted, 18)));
+    } catch (error) {
+      setLoader(false);
+      console.error("Error fetching minted tokens:", error);
     }
   };
 
@@ -290,8 +299,9 @@ function Tokenomics() {
     if ($connected) {
       profitBalance();
       sdivBalance();
+      minted();
     }
-  }, [$assetsPrices]);
+  }, [$assetsPrices, $connected]);
 
   const isStakingAllowed =
     handleTabStakeModal === "stake" &&
@@ -365,19 +375,22 @@ function Tokenomics() {
                     {tokenomics?.profitMarketCap}{" "}
                   </td>
                 </tr>
-
-                <tr>
-                  <td>Wallet: </td>
-                  <td>{profitWallet?.profitBalance} PROFIT</td>
-                </tr>
-                <tr>
-                  <td>Staked:</td>
-                  <td>
-                    <p className="my-auto ">
-                      {profitWallet?.profitStaked} PROFIT
-                    </p>{" "}
-                  </td>
-                </tr>
+                {$connected && (
+                  <>
+                    <tr>
+                      <td>Wallet: </td>
+                      <td>{profitWallet?.profitBalance} PROFIT</td>
+                    </tr>
+                    <tr>
+                      <td>Staked:</td>
+                      <td>
+                        <p className="my-auto ">
+                          {profitWallet?.profitStaked} PROFIT
+                        </p>{" "}
+                      </td>
+                    </tr>
+                  </>
+                )}
               </tbody>
             </table>
 
@@ -390,17 +403,19 @@ function Tokenomics() {
             />
 
             <div className="flex mt-3 text-sm me-auto  justify-between">
-              <button
-                onClick={() => {
-                  setInput("");
-                  allowance();
-                  profitBalance();
-                  setHandleTabStakeModal("stake");
-                  setShowStakeModal(true);
-                }}
-                className="bg-button me-3 rounded-sm p-2 font-medium text-[#9c9c9c]">
-                Stake | Unstake
-              </button>
+              {$connected && (
+                <button
+                  onClick={() => {
+                    setInput("");
+                    allowance();
+                    profitBalance();
+                    setHandleTabStakeModal("stake");
+                    setShowStakeModal(true);
+                  }}
+                  className="bg-button me-3 rounded-sm p-2 font-medium text-[#9c9c9c]">
+                  Stake | Unstake
+                </button>
+              )}
 
               <div className="flex">
                 <a
@@ -495,14 +510,18 @@ function Tokenomics() {
                     <td>Total supply: </td>
                     <td>{tokenomics.sdivTotalSupply} SDIV</td>
                   </tr>
-                  <tr>
-                    <td>Wallet: </td>
-                    <td>{sdivWallet?.sdivBalance} SDIV</td>
-                  </tr>
-                  <tr>
-                    <td>Earned: </td>
-                    <td>{sdivWallet?.sdivEarned} SDIV</td>
-                  </tr>
+                  {$connected && (
+                    <>
+                      <tr>
+                        <td>Wallet: </td>
+                        <td>{sdivWallet?.sdivBalance} SDIV</td>
+                      </tr>
+                      <tr>
+                        <td>Earned: </td>
+                        <td>{sdivWallet?.sdivEarned} SDIV</td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
 
@@ -513,7 +532,7 @@ function Tokenomics() {
                 alt={getTokenData(SDIV[0])?.logoURI}
                 title={getTokenData(SDIV[0])?.symbol}
               />
-              {sdivWallet && sdivWallet?.sdivEarned > 0 && (
+              {$connected && sdivWallet && sdivWallet?.sdivEarned > 0 && (
                 <div className="flex mt-3 text-sm w-[51px] h-[36px]">
                   {loader === true &&
                   showMintModal === false &&
@@ -562,24 +581,28 @@ function Tokenomics() {
                     <td>To mint: </td>
                     <td>{tokenomics.pmToMint} PM</td>
                   </tr>
-                  <tr>
-                    <td>Minted: </td>
-                    <td>{tokenomics.pmMinted} PM</td>
-                  </tr>
+                  {$connected && (
+                    <tr>
+                      <td>Minted: </td>
+                      <td>{pmMinted} PM</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
 
               <div className="flex justify-between mt-3 text-sm">
-                <button
-                  onClick={() => {
-                    setInput("10000");
-                    profitBalance();
-                    allowance();
-                    setShowMintModal(true);
-                  }}
-                  className="bg-button rounded-sm p-2 font-medium text-[#9c9c9c]">
-                  Mint
-                </button>
+                {$connected && (
+                  <button
+                    onClick={() => {
+                      setInput("10000");
+                      profitBalance();
+                      allowance();
+                      setShowMintModal(true);
+                    }}
+                    className="bg-button rounded-sm p-2 font-medium text-[#9c9c9c]">
+                    Mint
+                  </button>
+                )}
 
                 <div className="flex">
                   <a
