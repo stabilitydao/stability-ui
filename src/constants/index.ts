@@ -1,5 +1,17 @@
 import type { TVaultStatuses, TTableFilters, TTableColumn } from "@types";
-import { USDC, USDT, DAI, WMATIC, WETH, WBTC, PROFIT, SDIV } from "./tokens";
+import {
+  USDC,
+  USDT,
+  DAI,
+  WMATIC,
+  WETH,
+  WBTC,
+  PROFIT,
+  SDIV,
+  PM,
+  MULTISIG,
+  TREASURY,
+} from "./tokens";
 
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
@@ -203,6 +215,12 @@ const GRAPH_QUERY = `
           version
           id
         }
+        assetHistoryEntities {
+          id
+          price
+          timestamp
+          address
+        }
       }
       `;
 
@@ -220,5 +238,10 @@ export {
   PROTOCOLS,
   GRAPH_QUERY,
   STABILITY_API,
+  PROFIT,
+  PM,
+  SDIV,
   VAULT_STATUSES,
+  MULTISIG,
+  TREASURY,
 };

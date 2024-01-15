@@ -68,7 +68,6 @@ const Vaults = () => {
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   const [tableStates, setTableStates] = useState(TABLE);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
 
@@ -271,6 +270,10 @@ const Vaults = () => {
       initFilters(vaults);
       initPortfolio(vaults);
       setLocalVaults(vaults);
+      console.log(vaults);
+      console.log($vaults);
+      console.log(localVaults);
+
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
     }
