@@ -212,7 +212,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const token = getTokenData(strategyAsset);
                 if (token) {
                   const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-                    tokenAsset.addresses.includes(token.address)
+                    tokenAsset.addresses.includes(token.address as TAddress)
                   );
 
                   assets.push({
@@ -309,7 +309,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               const token = getTokenData(strategyAsset);
               if (token) {
                 const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-                  tokenAsset.addresses.includes(token.address)
+                  tokenAsset.addresses.includes(token.address as TAddress)
                 );
                 assets.push({
                   address: token?.address,
