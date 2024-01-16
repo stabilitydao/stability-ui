@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { publicClient, network } from "@store";
-import { PlatformABI, FactoryABI, platform } from "@web3";
-import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
-import { getStrategyInfo } from "@utils";
-import ShortAddress from "./ShortAddress";
-import { Loader } from "../Loader/index";
-import { GRAPH_ENDPOINT } from "@constants";
-import axios from "axios";
 
-function Platform() {
+import { ShortAddress } from "./ShortAddress";
+
+import { publicClient, network } from "@store";
+import { Loader } from "@components";
+import { GRAPH_ENDPOINT } from "@constants";
+import { PlatformABI, FactoryABI, platform } from "@web3";
+import { getStrategyInfo } from "@utils";
+
+import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
+
+const Platform = () => {
+  const $publicClient = useStore(publicClient);
+  const $network = useStore(network);
+
   const [daoData, setDaoData] = useState<TDAOData>();
   const [platformUpdates, setPlatformUpdates] =
     useState<TPendingPlatformUpgrade>();
   const [tvl, setTvl] = useState<any>();
   const [totalNumberOfVaults, setTotalNumberOfVaults] = useState<any>();
-
-  const $publicClient = useStore(publicClient);
-  const $network = useStore(network);
 
   const fetchGraph = async () => {
     try {
@@ -39,35 +42,36 @@ function Platform() {
           },
         }
       );
-      const tvll = response.data.data.vaultEntities;
+      const tvlVaultEntities = response.data.data.vaultEntities;
 
-      const totalTvl = tvll.reduce((total: bigint, item: { tvl: bigint }) => {
-        return total + BigInt(item.tvl);
-      }, BigInt(0));
+      const totalTvl = tvlVaultEntities.reduce(
+        (total: bigint, item: { tvl: bigint }) => {
+          return total + BigInt(item.tvl);
+        },
+        BigInt(0)
+      );
 
       const _tvl = Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100;
 
       setTvl(_tvl);
-      setTotalNumberOfVaults(tvll.length);
-      console.log(response.data);
+      setTotalNumberOfVaults(tvlVaultEntities.length);
     } catch (error) {
       console.error("Error fetching graph data:", error);
     }
   };
 
   const getFarmColor = (farmName: string) => {
-    let color;
-    const farm = farmName.split(" ");
-    const initials = farm.map((initials: string) => {
-      return initials.charAt(0);
-    });
-    const result = initials.join("");
-    if (result === "GQF") {
-      color = getStrategyInfo(result + "S");
-    } else {
-      color = getStrategyInfo(result);
+    const initials = farmName
+      .split(" ")
+      .map((initials: string) => {
+        return initials.charAt(0);
+      })
+      .join("");
+
+    if (initials === "GQF") {
+      return getStrategyInfo(initials + "S");
     }
-    return color;
+    return getStrategyInfo(initials);
   };
 
   const fetchDaoData = async () => {
@@ -136,13 +140,13 @@ function Platform() {
   };
 
   useEffect(() => {
-    fetchGraph();
-  }, []);
-
-  useEffect(() => {
     fetchDaoData();
     fetchPlatformUpdates();
   }, [tvl]);
+
+  useEffect(() => {
+    fetchGraph();
+  }, []);
 
   return (
     <>
@@ -150,7 +154,7 @@ function Platform() {
         <h1 className="text-xxl me-auto flex text-[#9c9c9c] ps-2 my-auto h-[50px]">
           Platform
         </h1>
-        <p className="text-sm text-[#9c9c9c] my-auto pt-3 pe-2">
+        <p className="text-sm text-[#9c9c9c] my-auto pt-3 pr-2">
           {daoData && `v${daoData?.platformVersion}`}
         </p>
       </div>
@@ -236,15 +240,14 @@ function Platform() {
                 </h2>
                 {daoData?.strategieNames.map(
                   (strategyName: string, index: number) => (
-                    <div
-                      key={index}
-                      className="mb-2 font-medium">
+                    <div key={index} className="mb-2 font-medium">
                       <h3
                         className="rounded-md m-0 py-2 px-3"
                         style={{
                           color: getFarmColor(strategyName)?.color,
                           backgroundColor: getFarmColor(strategyName)?.bgColor,
-                        }}>
+                        }}
+                      >
                         {strategyName}
                       </h3>
                     </div>
@@ -253,12 +256,10 @@ function Platform() {
                 <div className="p-3 flex bg-[#13151A] shadow-md rounded-md text-[#9c9c9c]">
                   <div className="m-auto">
                     <h2 className="font-bold text-lg">Vault Types</h2>
-                    {Array.isArray(daoData?.typesOfVaults) &&
-                      daoData.typesOfVaults.map(
+                    {Array.isArray(daoData.typesOfVaults) &&
+                      daoData.typesOfVaults?.map(
                         (vaultType: string, index: number) => (
-                          <h2
-                            className="font-medium"
-                            key={index}>
+                          <h2 className="font-medium" key={index}>
                             {vaultType}
                           </h2>
                         )
@@ -269,7 +270,7 @@ function Platform() {
             </div>
           </div>
 
-          {platformUpdates && platformUpdates?.newVersion !== "" && (
+          {platformUpdates?.newVersion && (
             <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
               <h2 className="w-full font-thin text-lg text-left text-gray-400   py-1">
                 <em className="text-xl font-medium">New version:</em>{" "}
@@ -281,10 +282,8 @@ function Platform() {
                   <p>Proxies:</p>
                   {platformUpdates?.proxies.map(
                     (proxy: string, index: number) => (
-                      <div
-                        className="flex justify-center"
-                        key={index}>
-                        <ShortAddress address={proxy} />
+                      <div className="flex justify-center" key={index}>
+                        <ShortAddress address={proxy as TAddress} />
                       </div>
                     )
                   )}
@@ -294,10 +293,8 @@ function Platform() {
                   <p>New implementations:</p>
                   {platformUpdates?.newImplementations.map(
                     (implementation: string, index: number) => (
-                      <div
-                        className="flex justify-center"
-                        key={index}>
-                        <ShortAddress address={implementation} />
+                      <div className="flex justify-center" key={index}>
+                        <ShortAddress address={implementation as TAddress} />
                       </div>
                     )
                   )}
@@ -309,18 +306,15 @@ function Platform() {
       ) : (
         <div
           className={`flex justify-center bg-button  p-3 shadow-lg rounded-md mt-2 ${
-            platformUpdates?.newVersion === undefined ||
-            platformUpdates?.newVersion === ""
-              ? "sm:h-[583px] md:h-[330px] h-[747px]"
-              : "md:h-[477px]"
-          }`}>
-          <Loader
-            customHeight={100}
-            customWidth={100}
-          />
+            platformUpdates?.newVersion
+              ? "md:h-[477px]"
+              : "sm:h-[583px] md:h-[330px] h-[747px]"
+          }`}
+        >
+          <Loader height={100} width={100} />
         </div>
       )}
     </>
   );
-}
-export default Platform;
+};
+export { Platform };

@@ -1,17 +1,14 @@
 interface LoaderProps {
-  customWidth?: any;
-  customHeight?: any;
+  width?: any;
+  height?: any;
 }
 
-const Loader: React.FC<LoaderProps> = ({
-  customWidth = "16",
-  customHeight = "16",
-}) => {
+const Loader: React.FC<LoaderProps> = ({ width = "16", height = "16" }) => {
   return (
     <div className="flex items-center justify-center">
       <svg
-        width={customWidth}
-        height={customHeight}
+        width={width}
+        height={height}
         viewBox="0 0 16 16"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
