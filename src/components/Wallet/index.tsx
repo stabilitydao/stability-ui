@@ -66,8 +66,8 @@ function Wallet() {
         `<div style="width:70px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px">
           <div style="display:flex; flex-direction:column; align-items:center; padding:10px;">
             <img style="width: 32px; height:32px; border-radius:100%" src=${asset.logo} alt="logo" />
-            <p style="margin:0;">${asset.symbol}</p>
-            <p style="margin:0;">${asset.balance}</p>
+            <p style="margin:0; font-size:14px; margin-top:2px;">${asset.symbol}</p>
+            <p style="margin:0; font-size:14px;">${asset.balance}</p>
           </div>
         </div>`
     );
