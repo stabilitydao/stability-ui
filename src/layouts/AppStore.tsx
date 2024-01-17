@@ -6,7 +6,12 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 
 import { readContract } from "viem/actions";
-import { useAccount, usePublicClient, useNetwork } from "wagmi";
+import {
+  useAccount,
+  usePublicClient,
+  useNetwork,
+  useSwitchNetwork,
+} from "wagmi";
 import {
   account,
   network,
@@ -53,6 +58,7 @@ import type { TAddress } from "@types";
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
@@ -388,6 +394,12 @@ const AppStore = (props: React.PropsWithChildren) => {
       console.error("API ERROR:", error);
     }
   };
+
+  useEffect(() => {
+    if (chain?.id != 137) {
+      switchNetwork?.(137);
+    }
+  }, [chain]);
 
   useEffect(() => {
     getDataFromStabilityAPI();
