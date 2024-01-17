@@ -241,9 +241,9 @@ const Vaults = () => {
     avgApr = (100 * daily * 365) / deposited;
 
     setPortfolio({
-      deposited: String(deposited.toFixed(3)),
-      monthly: String(monthly.toFixed(3)),
-      daily: String(daily.toFixed(3)),
+      deposited: String(deposited.toFixed(2)),
+      monthly: String(monthly.toFixed(2)),
+      daily: String(daily.toFixed(2)),
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
     });
