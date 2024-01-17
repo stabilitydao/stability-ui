@@ -61,7 +61,8 @@ const Vaults = () => {
     deposited: "0",
     monthly: "0",
     daily: "0",
-    avg: "0",
+    apr: "0",
+    apy: "0",
   });
   const [sortSelector, setSortSelector] = useState(false);
 
@@ -223,7 +224,7 @@ const Vaults = () => {
     if (!$connected) return;
     let deposited: any = 0n;
     let monthly = 0;
-    let avgApy = 0;
+    let avgApr = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
@@ -237,13 +238,14 @@ const Vaults = () => {
 
     deposited = Number(formatUnits(deposited, 18));
     const daily = monthly / 30;
-    avgApy = (100 * daily * 365) / deposited;
+    avgApr = (100 * daily * 365) / deposited;
 
     setPortfolio({
       deposited: String(deposited.toFixed(3)),
       monthly: String(monthly.toFixed(3)),
       daily: String(daily.toFixed(3)),
-      avg: String(avgApy.toFixed(3)),
+      apr: String(avgApr.toFixed(3)),
+      apy: String(calculateAPY(avgApr).toFixed(3)),
     });
   };
 

@@ -1,6 +1,10 @@
 const VaultType = ({ type }: { type: string }) => {
   const vaultTypes = [
-    { type: "Compounding", styles: "text-[#00bb99] bg-[#00110a]", symbol: "C" },
+    {
+      type: "Compounding",
+      styles: "text-[#00bb99] bg-[#00110a]",
+      symbol: "C",
+    },
     { type: "Rewarding", styles: "text-[#6052ff] bg-[#090816]", symbol: "R" },
     {
       type: "Rewarding Managed",

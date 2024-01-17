@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
@@ -5,7 +6,7 @@ interface IProps {
   setFilters: any;
 }
 
-const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
+const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
   const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
     const filterName = filters.find((item) => item.name === filter.name);
     if (!filterName) return;
@@ -70,10 +71,10 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
         if (sampleFilter?.name.toLowerCase() === "my vaults") {
           sampleFilter.state
             ? params.set("vaults", "my")
-            : params.set("vaults", "all");
+            : params.delete("vaults");
         } else if (sampleFilter?.name.toLowerCase() === "active") {
           sampleFilter.state
-            ? params.set("status", "active")
+            ? params.delete("status")
             : params.set("status", "all");
         }
         setFilters(updatedFiltersSample);
@@ -154,6 +155,6 @@ const Filters: React.FC<IProps> = ({ filters, setFilters }) => {
       </div>
     )
   );
-};
+});
 
 export { Filters };
