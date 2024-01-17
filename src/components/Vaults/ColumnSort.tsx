@@ -13,7 +13,6 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
     Type: "hidden xl:table-cell",
     Strategy: "hidden lg:table-cell",
   };
-
   const tabController = () => {
     let nextCase: string = "";
 
@@ -100,5 +99,4 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
     </>
   );
 };
-
 export { ColumnSort };

@@ -8,7 +8,7 @@ import { getTokenData } from "@utils";
 
 import { CHAINS } from "@constants";
 
-function Wallet() {
+const Wallet = () => {
   const $account = useStore(account);
   const $network = useStore(network);
   const $assetsBalances = useStore(assetsBalances);
@@ -49,7 +49,9 @@ function Wallet() {
       customDescription.innerHTML = `<p style="margin:0; color:#949e9e;">$${userBalance}</p>`;
 
       web3ModalCard.appendChild(customContent);
-      we3ModalDescription.appendChild(customDescription);
+      if (we3ModalDescription) {
+        we3ModalDescription.appendChild(customDescription);
+      }
     } else {
       setTimeout(openProfile, 1000);
     }
@@ -70,7 +72,7 @@ function Wallet() {
           )
         );
         const price = Number(
-          formatUnits($assetsPrices[address].tokenPrice, 18)
+          formatUnits($assetsPrices?.[address].tokenPrice || 0n, 18)
         );
         const balanceInUSD = balance * price;
 
@@ -98,7 +100,7 @@ function Wallet() {
         </div>`
     );
 
-    setUserBalance(profileBalance.toFixed(2));
+    setUserBalance(Number(profileBalance.toFixed(2)));
     setUserAssets(assetsTemplates);
   }, [$assetsBalances]);
 
@@ -128,5 +130,5 @@ function Wallet() {
       </button>
     </div>
   );
-}
+};
 export { Wallet };

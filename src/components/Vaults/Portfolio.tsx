@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 
 interface IProps {
   data: any;
 }
 
-const Portfolio: React.FC<IProps> = ({ data }) => {
+const Portfolio: React.FC<IProps> = memo(({ data }) => {
   const [visible, setVisible] = useState(true);
   return (
     <div className="bg-[#23262d] my-2 rounded-sm">
@@ -78,16 +78,24 @@ const Portfolio: React.FC<IProps> = ({ data }) => {
           </div>
           <div>
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
+              AVG. APR
+            </h2>
+            <p className="text-[1.2rem] md:text-[1.625rem]">
+              {visible ? `${data.apr}%` : "****"}
+            </p>
+          </div>
+          <div>
+            <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               AVG. APY
             </h2>
             <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `${data.avg}%` : "****"}
+              {visible ? `${data.apy}%` : "****"}
             </p>
           </div>
         </div>
       </div>
     </div>
   );
-};
+});
 
 export { Portfolio };
