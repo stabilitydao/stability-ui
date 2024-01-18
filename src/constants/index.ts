@@ -156,7 +156,7 @@ const VAULT_STATUSES: TVaultStatuses = {
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
-    logoSrc: "/protocols/QuickSwap.png",
+    logoSrc: "/protocols/QuickSwap.webp",
   },
   gamma: {
     name: "Gamma",
@@ -168,11 +168,11 @@ const PROTOCOLS = {
   },
   defiedge: {
     name: "DefiEdge",
-    logoSrc: "/protocols/DefiEdge.png",
+    logoSrc: "/protocols/DefiEdge.svg",
   },
   merkl: {
     name: "Merkl",
-    logoSrc: "/protocols/Merkl.webp",
+    logoSrc: "/protocols/Merkl.svg",
   },
 };
 
