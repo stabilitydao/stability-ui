@@ -166,6 +166,14 @@ const PROTOCOLS = {
     name: "Compound",
     logoSrc: "/protocols/Compound.png",
   },
+  defiedge: {
+    name: "DefiEdge",
+    logoSrc: "/protocols/DefiEdge.png",
+  },
+  merkl: {
+    name: "Merkl",
+    logoSrc: "/protocols/Merkl.webp",
+  },
 };
 
 const GRAPH_ENDPOINT =
