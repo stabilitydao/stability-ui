@@ -36,6 +36,12 @@ const IL = {
     desc: "Providing assets to the landing protocol does not incur impermanent losses.",
     color: "#4aff71",
   },
+  DQMFN: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#F52A11",
+  },
 };
 
 export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
@@ -51,7 +57,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     sourceCode: "",
   };
 
-  const { quickSwap, gamma, compound } = PROTOCOLS;
+  const { quickSwap, gamma, compound, defiedge, merkl } = PROTOCOLS;
 
   const farm: IFeature = {
     name: "Farming",
@@ -106,6 +112,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il: IL.CF,
+    };
+  } else if (vaultSymbol.match(/DQMFN[a-z0-9]{1}$/)) {
+    strategyInfo = {
+      name: "DefiEdge QuickSwap Merkl Farm",
+      shortName: "DQMF",
+      protocols: [defiedge,quickSwap,merkl],
+      features: [farm],
+      color: "#3477ff",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.DQMFN,
     };
   }
 
