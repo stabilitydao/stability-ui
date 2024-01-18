@@ -241,9 +241,9 @@ const Vaults = () => {
     avgApr = (100 * daily * 365) / deposited;
 
     setPortfolio({
-      deposited: String(deposited.toFixed(3)),
-      monthly: String(monthly.toFixed(3)),
-      daily: String(daily.toFixed(3)),
+      deposited: String(deposited.toFixed(2)),
+      monthly: String(monthly.toFixed(2)),
+      daily: String(daily.toFixed(2)),
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
     });
@@ -404,12 +404,12 @@ const Vaults = () => {
                               backgroundColor: vault.strategyInfo.bgColor,
                               color: vault.strategyInfo.color,
                             }}
-                            className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[48px]"
+                            className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
                             title={vault.strategyInfo.name}
                           >
                             {vault.strategyInfo.shortName}
                           </span>
-                          <span className="px-2 rounded-r-[10px] bg-[#41465a] hidden md:flex h-8 items-center min-w-[100px] lg:min-w-[160px]">
+                          <span className="px-2 rounded-r-[10px] bg-[#41465a] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
                             <span className="flex min-w-[42px] justify-center">
                               {vault.strategyInfo.protocols.map(
                                 (protocol, index) => (
@@ -442,11 +442,11 @@ const Vaults = () => {
                             </span>
                             {vault.strategySpecific && (
                               <span
-                                className={
+                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden lg:inline ${
                                   vault.strategySpecific.length > 10
-                                    ? `ml-0.5 lowercase font-bold text-[9px] pl-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
-                                    : `ml-0.5 uppercase font-bold text-[10px] px-[6px] rounded-[4px] text-[#b6bdd7] hidden lg:inline`
-                                }
+                                    ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
+                                    : "uppercase  text-[10px] px-[6px]"
+                                }`}
                               >
                                 {vault.strategySpecific}
                               </span>
@@ -596,7 +596,7 @@ const Vaults = () => {
                           backgroundColor: vault.strategyInfo.bgColor,
                           color: vault.strategyInfo.color,
                         }}
-                        className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center w-[48px]"
+                        className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
                         title={vault.strategyInfo.name}
                       >
                         {vault.strategyInfo.shortName}
