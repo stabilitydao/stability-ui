@@ -9,9 +9,7 @@ export const addAssetsPrice = (data: any) => {
   try {
     if (tokenAdress.length === tokenPrice.length) {
       for (let i = 0; i < tokenAdress.length; i++) {
-        assetPrice[tokenAdress[i]] = {
-          tokenPrice: tokenPrice[i],
-        };
+        assetPrice[tokenAdress[i]] = tokenPrice[i];
       }
       assetsPrices.set(assetPrice);
     }

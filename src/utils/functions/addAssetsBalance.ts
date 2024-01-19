@@ -8,9 +8,7 @@ const addAssetsBalance = (data: any[]) => {
   const balances: TBalances = {};
   if (assets.length === _assetsBalances.length) {
     for (let i = 0; i < assets.length; i++) {
-      balances[assets[i]] = {
-        assetBalance: _assetsBalances[i],
-      };
+      balances[assets[i]] = _assetsBalances[i];
     }
     assetsBalances.set(balances);
   } else {

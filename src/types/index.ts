@@ -91,18 +91,21 @@ type TToken = {
 };
 
 type TAssetPrices = {
-  [address: string]: {
-    tokenPrice: bigint;
-  };
+  [address: string]: bigint;
 };
 
 type TBalances = {
-  [balance: string]: TAssetBalance;
+  [address: string]: bigint;
 };
 
-type TAssetBalance = {
-  assetBalance: bigint;
+type TAsset = {
+  address: TAddress;
+  color: string;
+  logo: string;
+  name: string;
+  symbol: string;
 };
+
 type TVault = {
   address: TAddress;
   name: string;
@@ -119,13 +122,7 @@ type TVault = {
   lastHardWork: bigint;
   daily: number;
   monthlyUnderlyingApr: number;
-  assets: {
-    address: TAddress;
-    color: string;
-    logo: string;
-    name: string;
-    symbol: string;
-  }[];
+  assets: TAsset[];
   assetsProportions: number[];
   assetsWithApr: string[];
   assetsAprs: string[];
@@ -269,9 +266,9 @@ export type {
   TToken,
   TAssetPrices,
   TBalances,
-  TAssetBalance,
   TVault,
   TVaultAssets,
+  TAsset,
   TTableColumn,
   TAPRModal,
   TBuildVariant,

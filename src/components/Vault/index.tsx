@@ -8,7 +8,12 @@ import { writeContract } from "@wagmi/core";
 import { usePublicClient } from "wagmi";
 
 import { SettingsModal } from "./SettingsModal";
-import { VaultType, Loader, AssetsProportion, VaultState } from "@components";
+import { VaultBar } from "./VaultBar";
+import { StatisticBar } from "./StatisticBar";
+import { Strategy } from "./Strategy";
+import { Assets } from "./Assets";
+import { UserBar } from "./UserBar";
+import { Loader } from "@components";
 
 import {
   vaultData,
@@ -22,8 +27,6 @@ import {
   tokens,
   lastTx,
   connected,
-  vaultTypes,
-  strategyTypes,
 } from "@store";
 
 import {
@@ -32,22 +35,16 @@ import {
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
-  FactoryABI,
 } from "@web3";
 
 import {
   getTokenData,
-  formatNumber,
   formatFromBigInt,
-  getTimeDifference,
   get1InchRoutes,
   debounce,
 } from "@utils";
 
-import { TOKENS_ASSETS, CHAINS } from "@constants";
-
 import type {
-  TToken,
   TAddress,
   TVaultAllowance,
   TVaultInput,
@@ -59,10 +56,14 @@ import type {
 import tokensJson from "../../stability.tokenlist.json";
 
 interface IProps {
-  vault?: TAddress | undefined;
+  vault: TAddress;
 }
 
-function Vault({ vault }: IProps) {
+const Vault: React.FC<IProps> = ({ vault }) => {
+  const _publicClient = usePublicClient();
+
+  const { open } = useWeb3Modal();
+
   const $vaultData = useStore(vaultData);
   const $assets: any = useStore(assets);
   const $account = useStore(account);
@@ -73,11 +74,6 @@ function Vault({ vault }: IProps) {
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
   const $connected = useStore(connected);
-  const $vaultTypes = useStore(vaultTypes);
-  const $strategyTypes = useStore(strategyTypes);
-  const _publicClient = usePublicClient();
-
-  const { open } = useWeb3Modal();
 
   const [tab, setTab] = useState("Deposit");
   const [option, setOption] = useState<string[] | any>([]);
@@ -97,15 +93,8 @@ function Vault({ vault }: IProps) {
 
   const [sharesOut, setSharesOut] = useState<bigint | any>();
 
-  const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
-  const [needStrategyUpgrade, setNeedStrategyUpgrade] =
-    useState<boolean>(false);
-
   const [localVault, setLocalVault] = useState<any>();
-  const [timeDifference, setTimeDifference] = useState<any>();
-  const [strategyAddress, setStrategyAddress] = useState<
-    TAddress | undefined
-  >();
+
   const [strategyDescription, setStrategyDescription] = useState<
     string | undefined
   >();
@@ -116,8 +105,6 @@ function Vault({ vault }: IProps) {
   const [zapShares, setZapShares] = useState<any>();
   const [zapButton, setZapButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<any>();
-
-  const [currentChain, setCurrentChain] = useState<any>();
 
   const [tokenSelector, setTokenSelector] = useState<boolean>(false);
   const [activeOptionToken, setActiveOptionToken] = useState<any>({
@@ -150,10 +137,7 @@ function Vault({ vault }: IProps) {
     let change = false;
 
     for (let i = 0; i < input.length; i++) {
-      if (
-        $assetsBalances &&
-        input[i] > $assetsBalances[$assets[i]].assetBalance
-      ) {
+      if ($assetsBalances && input[i] > $assetsBalances[$assets[i]]) {
         setIsApprove(0);
         change = true;
       }
@@ -164,7 +148,7 @@ function Vault({ vault }: IProps) {
           allowance &&
           $assets &&
           $assetsBalances &&
-          input[i] <= $assetsBalances[$assets[i]].assetBalance &&
+          input[i] <= $assetsBalances[$assets[i]] &&
           allowance[$assets[i]]?.allowance[0] >= input[i]
         ) {
           apprDepo.push(1);
@@ -384,10 +368,7 @@ function Vault({ vault }: IProps) {
         return;
       }
 
-      if (
-        tab === "Deposit" &&
-        Number(amount) > Number(balances[asset]?.assetBalance)
-      ) {
+      if (tab === "Deposit" && Number(amount) > Number(balances[asset])) {
         setZapButton("insufficientBalance");
       }
 
@@ -421,13 +402,13 @@ function Vault({ vault }: IProps) {
           })) as bigint;
           if (
             Number(formatUnits(allowanceData, 18)) < Number(amount) &&
-            Number(amount) <= Number(balances[asset]?.assetBalance)
+            Number(amount) <= Number(balances[asset])
           ) {
             setZapButton("needApprove");
           }
 
           if (
-            Number(amount) <= Number(balances[asset]?.assetBalance) &&
+            Number(amount) <= Number(balances[asset]) &&
             Number(formatUnits(allowanceData, 18)) >= Number(amount)
           ) {
             setZapButton(tab.toLowerCase());
@@ -455,7 +436,7 @@ function Vault({ vault }: IProps) {
           if (tab === "Deposit") {
             if (
               Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
-              Number(amount) <= Number(balances[asset]?.assetBalance)
+              Number(amount) <= Number(balances[asset])
             ) {
               setZapButton("needApprove");
             }
@@ -743,13 +724,13 @@ function Vault({ vault }: IProps) {
       setZapShares(formatUnits(previewDepositAssets[1], 18));
       if (
         Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
-        Number(amount) <= Number(balances[option[0]]?.assetBalance)
+        Number(amount) <= Number(balances[option[0]])
       ) {
         setZapButton("needApprove");
       }
       if (
         Number(formatUnits(allowanceData, decimals)) >= Number(amount) &&
-        Number(amount) <= Number(balances[option[0]]?.assetBalance)
+        Number(amount) <= Number(balances[option[0]])
       ) {
         setZapButton("deposit");
       }
@@ -810,52 +791,6 @@ function Vault({ vault }: IProps) {
       console.error("ZAP ERROR:", err);
     }
   };
-  ///// UPGRADE VAULT & STRATEGY
-
-  const upgradeVault = async () => {
-    try {
-      const upgradeVaultProxy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "upgradeVaultProxy",
-        args: [vault as TAddress],
-      });
-
-      const transaction = await _publicClient.waitForTransactionReceipt({
-        confirmations: 5,
-        hash: upgradeVaultProxy?.hash,
-      });
-
-      if (transaction.status === "success") {
-        setNeedVaultUpgrade(false);
-      }
-    } catch (err) {
-      console.error("UPGRADE VAULT PROXY ERROR:", err);
-    }
-  };
-  const upgradeStrategy = async () => {
-    try {
-      const upgradeStrategyProxy = await writeContract({
-        address: $platformData.factory,
-        abi: FactoryABI,
-        functionName: "upgradeStrategyProxy",
-        args: [localVault.strategyAddress as TAddress],
-      });
-
-      const transaction = await _publicClient.waitForTransactionReceipt({
-        confirmations: 5,
-        hash: upgradeStrategyProxy?.hash,
-      });
-
-      if (transaction.status === "success") {
-        setNeedStrategyUpgrade(false);
-      }
-    } catch (err) {
-      console.error("UPGRADE STRATEGY PROXY ERROR:", err);
-    }
-  };
-
-  /////
 
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
@@ -1128,73 +1063,47 @@ function Vault({ vault }: IProps) {
     }
   };
   const getStrategy = async () => {
-    if (vault) {
-      const strategy: TAddress | undefined = (await readContract(
-        _publicClient,
-        {
-          address: vault,
-          abi: VaultABI,
-          functionName: "strategy",
-        }
-      )) as TAddress | undefined;
+    if (localVault) {
+      const assetsData = localVault.assets.map((asset: any) =>
+        asset.address.toLowerCase()
+      );
 
-      if (typeof strategy === "string") {
-        setStrategyAddress(strategy);
-        let assetsData: string[] = (await readContract(_publicClient, {
-          address: strategy,
-          abi: StrategyABI,
-          functionName: "assets",
-        })) as string[];
+      const description = await readContract(_publicClient, {
+        address: localVault?.strategyAddress,
+        abi: StrategyABI,
+        functionName: "description",
+      });
 
-        assetsData = assetsData.map((address) => address.toLowerCase());
+      if (description) {
+        setStrategyDescription(description);
+      }
 
-        const description = await readContract(_publicClient, {
-          address: strategy,
-          abi: StrategyABI,
-          functionName: "description",
-        });
-        if (description) {
-          setStrategyDescription(description);
-        }
-
-        if (Array.isArray(assetsData)) {
-          assets.set(assetsData);
-          setOption(assetsData);
-          defaultAssetsOption(assetsData);
-        }
+      if (Array.isArray(assetsData)) {
+        assets.set(assetsData);
+        setOption(assetsData);
+        defaultAssetsOption(assetsData);
       }
     }
   };
 
   const loadAssetsBalances = () => {
     const balance: TVaultBalance | any = {};
-    if ($assetsBalances && option.length > 1) {
+
+    if ($assetsBalances) {
       for (let i = 0; i < option.length; i++) {
         const decimals = getTokenData(option[i])?.decimals;
         if (decimals) {
-          balance[option[i]] = {
-            assetBalance: formatUnits(
-              $assetsBalances[option[i]].assetBalance,
-              decimals
-            ),
-          };
+          balance[option[i]] = formatUnits(
+            $assetsBalances[option[i]],
+            decimals
+          );
         }
       }
-    } else if ($assetsBalances?.[option[0]] && option.length === 1) {
-      const decimals = getTokenData(option[0])?.decimals;
-      if (decimals !== undefined) {
-        balance[option[0]] = {
-          assetBalance: formatUnits(
-            $assetsBalances[option[0]].assetBalance,
-            decimals
-          ),
-        };
-      }
-    } else if (underlyingToken && option.length === 1) {
-      balance[option[0]] = {
-        assetBalance: underlyingToken.balance,
-      };
     }
+    if (underlyingToken && option.length === 1) {
+      balance[option[0]] = underlyingToken.balance;
+    }
+
     setBalances(balance);
   };
   const debouncedPreviewWithdraw = useCallback(
@@ -1385,7 +1294,7 @@ function Vault({ vault }: IProps) {
 
   useEffect(() => {
     getStrategy();
-  }, [vault]);
+  }, [localVault]);
 
   useEffect(() => {
     checkAllowance();
@@ -1399,13 +1308,6 @@ function Vault({ vault }: IProps) {
   useEffect(() => {
     initVault();
   }, [$vaults, $vaultData, $vaultAssets, underlyingToken]);
-
-  useEffect(() => {
-    if (localVault) {
-      const TD = getTimeDifference(localVault.lastHardWork);
-      setTimeDifference(TD);
-    }
-  }, [localVault]);
 
   useEffect(() => {
     setZapButton("none");
@@ -1423,19 +1325,6 @@ function Vault({ vault }: IProps) {
       selectTokensHandler();
     }
   }, [localVault, $tokens, defaultOptionSymbols]);
-
-  useEffect(() => {
-    if (!$connected || !localVault) return;
-
-    // @ts-ignore
-    if ($vaultTypes[localVault?.type] !== localVault.version) {
-      setNeedVaultUpgrade(true);
-    }
-    // @ts-ignore
-    if ($strategyTypes[localVault.strategy] !== localVault.strategyVersion) {
-      setNeedStrategyUpgrade(true);
-    }
-  }, [localVault, $vaultTypes, $strategyTypes]);
 
   useEffect(() => {
     setZapTokens(false);
@@ -1471,14 +1360,6 @@ function Vault({ vault }: IProps) {
     setIsRefresh(true);
   }, [option, inputs]);
   /////
-
-  useEffect(() => {
-    if (_publicClient) {
-      setCurrentChain(
-        CHAINS.find((item) => item.name === _publicClient.chain.name)
-      );
-    }
-  }, [_publicClient]);
   useEffect(() => {
     if (
       (!activeOptionToken.symbol || !activeOptionToken.address) &&
@@ -1519,578 +1400,17 @@ function Vault({ vault }: IProps) {
 
   return vault && localVault ? (
     <main className="w-full mx-auto">
-      <div className="flex justify-between items-center p-4 bg-button rounded-md">
-        {localVault && (
-          <div className="flex flex-col w-full">
-            <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
-              <div className="flex items-center">
-                <VaultState status={localVault?.status} />
-                {localVault?.assets && (
-                  <AssetsProportion
-                    proportions={localVault.assetsProportions}
-                    assets={localVault?.assets}
-                    type="vault"
-                  />
-                )}
-
-                <span className="inline-flex text-[18px] font-bold whitespace-nowrap">
-                  {localVault.symbol}
-                </span>
-              </div>
-
-              <div className="flex items-center">
-                <span className="text-[18px] lg:text-[20px]">
-                  {localVault.name}
-                </span>
-              </div>
-              <img
-                className="w-8 h-8 rounded-full mx-1 hidden lg:flex"
-                src={currentChain?.logoURI}
-                alt={currentChain?.name}
-                title={currentChain?.name}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      <VaultBar vault={localVault} />
       <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
         <div className="w-full md:w-1/2 lg:w-3/5 ">
-          {localVault && (
-            <div className="flex flex-wrap justify-between items-center bg-button p-4 rounded-md md:h-[80px] mt-[-40px] md:mt-0">
-              <VaultType type={localVault.type} />
-              <div>
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  TVL
-                </p>
-                <p>
-                  {formatNumber(
-                    formatFromBigInt(localVault.tvl, 18, "withFloor"),
-                    "abbreviate"
-                  )}
-                </p>
-              </div>
-              <div>
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  APY
-                </p>
-                <p>{localVault.apy}%</p>
-              </div>
-              <div className="hidden lg:block">
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  Daily
-                </p>
-                <p>{localVault.daily}%</p>
-              </div>
-              <div>
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  SHARE PRICE
-                </p>
-                <p>
-                  ${formatFromBigInt(localVault.shareprice, 18, "withDecimals")}
-                </p>
-              </div>
-            </div>
-          )}
+          <StatisticBar vault={localVault} />
 
-          {localVault?.strategyInfo && (
-            <div className="rounded-md mt-5 bg-button">
-              <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
-                <h2 className=" text-[24px] text-start ml-4">Strategy</h2>
-                <div className="hidden lg:flex items-center gap-5 mr-3 ">
-                  <button className="rounded-md bg-button flex justify-center items-center min-w-[140px]">
-                    <a
-                      className="flex items-center text-[15px] py-2 px-4 whitespace-nowrap"
-                      href={`https://polygonscan.com/address/${strategyAddress}`}
-                      target="_blank"
-                    >
-                      Strategy contract
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-external-link ms-1"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </button>
-                  <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
-                    <a
-                      className="flex items-center text-[15px] py-2 px-1"
-                      href={`https://polygonscan.com/token/${localVault.address}`}
-                      target="_blank"
-                    >
-                      Vault contract
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-external-link ms-1"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </button>
-                  <button className="rounded-md bg-button justify-center items-center w-[140px] hidden">
-                    <a
-                      className="flex items-center text-[15px] py-2 px-1"
-                      href={localVault.strategyInfo.sourceCode}
-                      target="_blank"
-                    >
-                      Github
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-external-link ms-1"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </button>
-                </div>
-              </div>
-              <div className="flex flex-col items-start gap-3 p-4">
-                <div className="flex items-start flex-col gap-3">
-                  <div
-                    style={{
-                      backgroundColor: localVault.strategyInfo.bgColor,
-                      color: localVault.strategyInfo.color,
-                    }}
-                    className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
-                  >
-                    <p>
-                      {localVault.strategyInfo.name}
-                      {localVault.strategySpecific
-                        ? " " + localVault.strategySpecific
-                        : ""}
-                    </p>
-                  </div>
-                  <div className="flex">
-                    <span
-                      style={{
-                        backgroundColor: localVault.strategyInfo.bgColor,
-                        color: localVault.strategyInfo.color,
-                      }}
-                      className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[70px]"
-                      title={localVault.strategyInfo.name}
-                    >
-                      {localVault.strategyInfo.shortName}
-                    </span>
-                    <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[160px]">
-                      <span className="flex min-w-[42px] justify-center">
-                        {localVault.strategyInfo.protocols.map(
-                          (protocol, index) => (
-                            <img
-                              className={`h-7 w-7 rounded-full ${
-                                localVault.strategyInfo.protocols.length > 1 &&
-                                index &&
-                                "ml-[-4px]"
-                              }`}
-                              key={index}
-                              src={protocol.logoSrc}
-                              alt={protocol.name}
-                              title={protocol.name}
-                            />
-                          )
-                        )}
-                      </span>
-                      <span className="flex">
-                        {localVault.strategyInfo.features.map((feature, i) => (
-                          <img
-                            key={i}
-                            title={feature.name}
-                            alt={feature.name}
-                            className="w-6 h-6 ml-1"
-                            src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                              feature.svg
-                            )}`}
-                          />
-                        ))}
-                      </span>
-                      {localVault.strategySpecific && (
-                        <span className="font-bold rounded-[4px] text-[#b6bdd7] inline uppercase text-[10px] px-[6px]">
-                          {localVault.strategySpecific}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                </div>
+          <Strategy vault={localVault} description={strategyDescription} />
 
-                {strategyDescription && (
-                  <div className="mt-2">
-                    <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                      DESCRIPTION
-                    </p>
-                    <p className="text-[16px] mt-1">{strategyDescription}</p>
-                  </div>
-                )}
-                <div className="mt-2">
-                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                    Total APR / APY
-                  </p>
-                  <p>
-                    {localVault.apr}% / {localVault.apy}%
-                  </p>
-                </div>
-                {!!localVault.assetsWithApr?.length && (
-                  <div>
-                    {localVault.assetsAprs.map((apr: string, index: number) => {
-                      return (
-                        <div className="mt-2" key={index}>
-                          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                            {localVault.assetsWithApr[index]} APR
-                          </p>
-                          <p>{apr}%</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                <div className="mt-2">
-                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                    Strategy APR
-                  </p>
-                  <p>
-                    {Number(formatUnits(localVault.strategyApr, 3)).toFixed(2)}%
-                  </p>
-                </div>
-
-                <div className="mt-2">
-                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                    Impermanent Loss
-                  </p>
-                  <div>
-                    <p
-                      style={{ color: localVault.strategyInfo.il.color }}
-                      className="text-[20px] font-bold"
-                    >
-                      {localVault.strategyInfo.il.title}
-                    </p>
-                    <p className="text-[14px]">
-                      {localVault.strategyInfo.il.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-2 flex items-center gap-3 flex-wrap">
-                  {needVaultUpgrade && (
-                    <button
-                      onClick={upgradeVault}
-                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
-                    >
-                      Upgrade Vault
-                    </button>
-                  )}
-                  {needStrategyUpgrade && (
-                    <button
-                      onClick={upgradeStrategy}
-                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
-                    >
-                      Upgrade Strategy
-                    </button>
-                  )}
-                </div>
-
-                <div className="hidden mt-2">
-                  <div className="mr-5">
-                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                      BASE STRATEGIES
-                    </p>
-                    <div className="flex items-center gap-3 flex-wrap mt-3">
-                      {localVault.strategyInfo.baseStrategies.map(
-                        (strategy: string) => (
-                          <p
-                            className="text-[14px] px-2 rounded-lg border-[2px] bg-[#486556] border-[#488B57]"
-                            key={strategy}
-                          >
-                            {strategy}
-                          </p>
-                        )
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                      AMM ADAPTER
-                    </p>
-                    <p className="flex h-9 text-[16px] items-end">
-                      {localVault.strategyInfo.ammAdapter}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-md p-3 mt-5 bg-button">
-            <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
-              Assets
-            </h2>
-            {localVault?.assets &&
-              localVault?.assets.map((asset: any) => {
-                const assetData: TToken | any = getTokenData(asset.address);
-
-                const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
-                  return tokenAsset.addresses.includes(assetData?.address);
-                });
-
-                return (
-                  assetData && (
-                    <article
-                      className="rounded-md p-3 mb-4 flex bg-[#32343f]"
-                      key={asset.address}
-                    >
-                      <div className="flex w-full flex-col gap-3">
-                        <div className="flex w-full justify-between items-center  flex-wrap">
-                          <div className="inline-flex items-center">
-                            <img
-                              className="rounded-full w-[30px] m-auto mr-2"
-                              src={assetData.logoURI}
-                            />
-                            <span className="mr-5 font-bold text-[18px]">
-                              {assetData.symbol}
-                            </span>
-                            <span className="text-[18px]">
-                              {assetData.name}
-                            </span>
-                          </div>
-                          <div className="flex flex-row flex-wrap gap-1 md:gap-3 md:mt-0 mt-2">
-                            {tokenAssets?.website && (
-                              <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                                <a
-                                  className="flex items-center"
-                                  href={tokenAssets?.website}
-                                  target="_blank"
-                                >
-                                  Website
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="icon icon-tabler icon-tabler-external-link ms-1"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="2"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path
-                                      stroke="none"
-                                      d="M0 0h24v24H0z"
-                                      fill="none"
-                                    ></path>
-                                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                    <path d="M11 13l9 -9"></path>
-                                    <path d="M15 4h5v5"></path>
-                                  </svg>
-                                </a>
-                              </div>
-                            )}
-                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                              <a
-                                className="flex items-center"
-                                href={`https://polygonscan.com/token/${asset.address}`}
-                                target="_blank"
-                              >
-                                Contract
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="icon icon-tabler icon-tabler-external-link ms-1"
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path
-                                    stroke="none"
-                                    d="M0 0h24v24H0z"
-                                    fill="none"
-                                  ></path>
-                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                  <path d="M11 13l9 -9"></path>
-                                  <path d="M15 4h5v5"></path>
-                                </svg>
-                              </a>
-                            </div>
-                            {tokenAssets?.docs && (
-                              <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                                <a
-                                  className="flex items-center"
-                                  href={tokenAssets?.docs}
-                                  target="_blank"
-                                >
-                                  Docs
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="icon icon-tabler icon-tabler-external-link ms-1"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth="2"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path
-                                      stroke="none"
-                                      d="M0 0h24v24H0z"
-                                      fill="none"
-                                    ></path>
-                                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                    <path d="M11 13l9 -9"></path>
-                                    <path d="M15 4h5v5"></path>
-                                  </svg>
-                                </a>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {$assetsPrices && (
-                          <div className="flex justify-start items-center text-[16px]">
-                            <p>
-                              Price: $
-                              {formatUnits(
-                                $assetsPrices[asset.address]?.tokenPrice,
-                                18
-                              )}
-                            </p>
-                          </div>
-                        )}
-
-                        <p className="text-[16px]">
-                          {tokenAssets?.description}
-                        </p>
-                        {assetData?.tags && (
-                          <div className="flex items-center gap-3 flex-wrap">
-                            {assetData.tags.map((tag: string) => (
-                              <p
-                                className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
-                                key={tag}
-                              >
-                                {tag}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </article>
-                  )
-                );
-              })}
-          </div>
+          <Assets assets={localVault?.assets} />
         </div>
         <div className="w-full md:w-1/2 lg:w-2/5">
-          {localVault && (
-            <div className="flex justify-between flex-wrap items-center bg-button px-5 py-2 md:py-4 rounded-md md:h-[80px]">
-              <div className="flex flex-col my-2 md:my-0">
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                  Your Balance
-                </p>
-
-                <div className="text-[20px] h-8 flex">
-                  <p className="mr-1">
-                    {formatFromBigInt(localVault.balance, 18).toFixed(5)}
-                  </p>
-                  <p className="whitespace-nowrap md:hidden lg:block">
-                    / $
-                    {(
-                      formatFromBigInt(
-                        localVault.shareprice,
-                        18,
-                        "withDecimals"
-                      ) *
-                      Number(
-                        formatFromBigInt(localVault.balance, 18, "withDecimals")
-                      )
-                    ).toFixed(2)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col my-2 md:my-0">
-                {timeDifference && (
-                  <div className="flex flex-col justify-between">
-                    <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
-                      Last Hard Work
-                    </p>
-                    {timeDifference?.days ? (
-                      <>
-                        {timeDifference?.days < 1000 ? (
-                          <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
-                            {timeDifference.days}
-                            {timeDifference.days > 1 ? " days" : " day"}{" "}
-                            {timeDifference.hours}h ago
-                          </div>
-                        ) : (
-                          <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2  rounded-lg border-[2px] border-[#AE642E] text-center">
-                            None
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div
-                        className={`text-[14px] px-2 rounded-lg border-[2px] text-center  ${
-                          timeDifference.hours > 4
-                            ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
-                            : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                        }`}
-                      >
-                        {timeDifference?.hours
-                          ? `${timeDifference.hours}h ago`
-                          : "<1h ago"}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          <UserBar vault={localVault} />
 
           <div className="mt-5 bg-button rounded-md">
             <div className="flex">
@@ -2136,7 +1456,7 @@ function Vault({ vault }: IProps) {
                         {activeOptionToken?.logoURI &&
                         Array.isArray(activeOptionToken?.logoURI) ? (
                           <div className="flex items-center">
-                            {$connected
+                            {$connected && defaultOptionImages
                               ? defaultOptionImages.map((logo: string) => (
                                   <img
                                     key={Math.random()}
@@ -2362,7 +1682,7 @@ function Vault({ vault }: IProps) {
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                                 <p>Balance: </p>
 
-                                <p>{balances[asset]?.assetBalance}</p>
+                                <p>{balances[asset]}</p>
                               </div>
 
                               <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
@@ -2374,7 +1694,7 @@ function Vault({ vault }: IProps) {
                                       onClick={() =>
                                         balances[asset] &&
                                         handleInputChange(
-                                          balances[asset].assetBalance,
+                                          balances[asset],
                                           asset
                                         )
                                       }
@@ -2435,10 +1755,7 @@ function Vault({ vault }: IProps) {
                                       $
                                       {(
                                         Number(
-                                          formatUnits(
-                                            $assetsPrices[asset].tokenPrice,
-                                            18
-                                          )
+                                          formatUnits($assetsPrices[asset], 18)
                                         ) * inputs[asset].amount
                                       ).toFixed(2)}
                                     </p>
@@ -2499,7 +1816,7 @@ function Vault({ vault }: IProps) {
                         <div className="flex flex-col mt-[15px] text-[15px] w-full">
                           {balances[option[0]] && (
                             <div className="text-left text-[gray] ml-2">
-                              Balance: {balances[option[0]].assetBalance}
+                              Balance: {balances[option[0]]}
                             </div>
                           )}
 
@@ -2535,7 +1852,7 @@ function Vault({ vault }: IProps) {
                                     <button
                                       onClick={() =>
                                         zapInputHandler(
-                                          balances[option[0]].assetBalance,
+                                          balances[option[0]],
                                           option[0]
                                         )
                                       }
@@ -2581,10 +1898,7 @@ function Vault({ vault }: IProps) {
                                   $
                                   {(
                                     Number(
-                                      formatUnits(
-                                        $assetsPrices[option[0]].tokenPrice,
-                                        18
-                                      )
+                                      formatUnits($assetsPrices[option[0]], 18)
                                     ) * inputs[option[0]]?.amount
                                   ).toFixed(2)}
                                 </p>
@@ -2932,7 +2246,7 @@ function Vault({ vault }: IProps) {
                                           )) /
                                         Number(
                                           formatUnits(
-                                            $assetsPrices[option[0]].tokenPrice,
+                                            $assetsPrices[option[0]],
                                             18
                                           )
                                         )
@@ -3096,5 +2410,5 @@ function Vault({ vault }: IProps) {
   ) : (
     <h1>Loading Vault..</h1>
   );
-}
+};
 export { Vault };

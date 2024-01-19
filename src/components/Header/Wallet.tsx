@@ -63,17 +63,12 @@ const Wallet = () => {
     let profileBalance = 0;
 
     const assets = Object.entries($assetsBalances)
-      .filter((token) => token[1].assetBalance && getTokenData(token[0]))
+      .filter((token) => token[1] && getTokenData(token[0]))
       .map(([address, data]) => {
         const balance = Number(
-          formatUnits(
-            data.assetBalance,
-            getTokenData(address)?.decimals as number
-          )
+          formatUnits(data, getTokenData(address)?.decimals as number)
         );
-        const price = Number(
-          formatUnits($assetsPrices?.[address].tokenPrice || 0n, 18)
-        );
+        const price = Number(formatUnits($assetsPrices?.[address] || 0n, 18));
         const balanceInUSD = balance * price;
 
         profileBalance += balanceInUSD;

@@ -7,10 +7,8 @@ import type {
   TAssetPrices,
   TBalances,
   TVaultAssets,
-  TVault,
   TAddress,
 } from "@types";
-import { platform } from "@web3";
 
 // atoms
 const account = atom<string | undefined>();
