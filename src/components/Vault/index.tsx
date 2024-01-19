@@ -142,7 +142,7 @@ function Vault({ vault }: IProps) {
     if (apprDepo.length < 2) {
       return true;
     }
-    return apprDepo.every(element => element === apprDepo[0]);
+    return apprDepo.every((element) => element === apprDepo[0]);
   };
 
   const checkInputsAllowance = (input: bigint[]) => {
@@ -188,7 +188,7 @@ function Vault({ vault }: IProps) {
     address: string | TAddress,
     logoURI: string | string[]
   ) => {
-    setTokenSelector(prevState => !prevState);
+    setTokenSelector((prevState) => !prevState);
 
     ///// Option change
     resetInputs(option);
@@ -234,7 +234,7 @@ function Vault({ vault }: IProps) {
   };
   const resetOptions = () => {
     if ($assets) {
-      const logos = defaultOptionAssets.split(", ").map(address => {
+      const logos = defaultOptionAssets.split(", ").map((address) => {
         const token = optionTokens.find(
           (token: any) => token.address.toLowerCase() === address
         );
@@ -283,11 +283,11 @@ function Vault({ vault }: IProps) {
   const selectTokensHandler = async () => {
     if (!$tokens) return;
     let filtredTokens = tokensJson.tokens
-      .filter(token => $tokens.includes(token.address.toLowerCase()))
+      .filter((token) => $tokens.includes(token.address.toLowerCase()))
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     filtredTokens = filtredTokens.filter(
-      token => token.address != defaultOptionAssets
+      (token) => token.address != defaultOptionAssets
     );
     ///// GET UNDERLYING TOKEN
     try {
@@ -717,9 +717,9 @@ function Vault({ vault }: IProps) {
       setZapTokens(outData);
 
       const addresses: (TAddress | undefined)[] = outData.map(
-        tokenOut => tokenOut?.address
+        (tokenOut) => tokenOut?.address
       );
-      let amounts = outData.map(tokenOut =>
+      let amounts = outData.map((tokenOut) =>
         parseUnits(
           tokenOut?.amountOut as string,
           getTokenData(tokenOut?.address as TAddress)?.decimals as number
@@ -1024,7 +1024,7 @@ function Vault({ vault }: IProps) {
       const decimalPercent = BigInt(Math.floor(Number(slippage)));
       const withdrawAmounts = withdrawAmount.map((obj: any) => {
         const decimals = tokensJson.tokens.find(
-          token => token.symbol === obj.symbol
+          (token) => token.symbol === obj.symbol
         )?.decimals;
 
         const amount = parseUnits(obj.amount, decimals ? decimals : 18);
@@ -1146,7 +1146,7 @@ function Vault({ vault }: IProps) {
           functionName: "assets",
         })) as string[];
 
-        assetsData = assetsData.map(address => address.toLowerCase());
+        assetsData = assetsData.map((address) => address.toLowerCase());
 
         const description = await readContract(_publicClient, {
           address: strategy,
@@ -1313,6 +1313,7 @@ function Vault({ vault }: IProps) {
     }
     setAllowance(allowanceResult);
   };
+
   const previewDeposit = async () => {
     // if (!Number(lastKeyPress.key2)) return;
     if ($assets && tab === "Deposit") {
@@ -1330,7 +1331,7 @@ function Vault({ vault }: IProps) {
             );
           } else {
             const token = tokensJson.tokens.find(
-              token => token.address === option[0]
+              (token) => token.address === option[0]
             );
 
             const decimals = token ? token.decimals + 18 : 24;
@@ -1474,7 +1475,7 @@ function Vault({ vault }: IProps) {
   useEffect(() => {
     if (_publicClient) {
       setCurrentChain(
-        CHAINS.find(item => item.name === _publicClient.chain.name)
+        CHAINS.find((item) => item.name === _publicClient.chain.name)
       );
     }
   }, [_publicClient]);
@@ -1483,7 +1484,7 @@ function Vault({ vault }: IProps) {
       (!activeOptionToken.symbol || !activeOptionToken.address) &&
       optionTokens
     ) {
-      const logos = defaultOptionAssets.split(", ").map(address => {
+      const logos = defaultOptionAssets.split(", ").map((address) => {
         const token = optionTokens.find(
           (token: any) => token.address.toLowerCase() === address.toLowerCase()
         );
@@ -1600,7 +1601,8 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-4 whitespace-nowrap"
                       href={`https://polygonscan.com/address/${strategyAddress}`}
-                      target="_blank">
+                      target="_blank"
+                    >
                       Strategy contract
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1612,11 +1614,13 @@ function Vault({ vault }: IProps) {
                         stroke="currentColor"
                         fill="none"
                         strokeLinecap="round"
-                        strokeLinejoin="round">
+                        strokeLinejoin="round"
+                      >
                         <path
                           stroke="none"
                           d="M0 0h24v24H0z"
-                          fill="none"></path>
+                          fill="none"
+                        ></path>
                         <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                         <path d="M11 13l9 -9"></path>
                         <path d="M15 4h5v5"></path>
@@ -1627,7 +1631,8 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={`https://polygonscan.com/token/${localVault.address}`}
-                      target="_blank">
+                      target="_blank"
+                    >
                       Vault contract
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1639,11 +1644,13 @@ function Vault({ vault }: IProps) {
                         stroke="currentColor"
                         fill="none"
                         strokeLinecap="round"
-                        strokeLinejoin="round">
+                        strokeLinejoin="round"
+                      >
                         <path
                           stroke="none"
                           d="M0 0h24v24H0z"
-                          fill="none"></path>
+                          fill="none"
+                        ></path>
                         <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                         <path d="M11 13l9 -9"></path>
                         <path d="M15 4h5v5"></path>
@@ -1654,7 +1661,8 @@ function Vault({ vault }: IProps) {
                     <a
                       className="flex items-center text-[15px] py-2 px-1"
                       href={localVault.strategyInfo.sourceCode}
-                      target="_blank">
+                      target="_blank"
+                    >
                       Github
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1666,11 +1674,13 @@ function Vault({ vault }: IProps) {
                         stroke="currentColor"
                         fill="none"
                         strokeLinecap="round"
-                        strokeLinejoin="round">
+                        strokeLinejoin="round"
+                      >
                         <path
                           stroke="none"
                           d="M0 0h24v24H0z"
-                          fill="none"></path>
+                          fill="none"
+                        ></path>
                         <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                         <path d="M11 13l9 -9"></path>
                         <path d="M15 4h5v5"></path>
@@ -1679,41 +1689,15 @@ function Vault({ vault }: IProps) {
                   </button>
                 </div>
               </div>
-
-              <div className={`flex flex-col items-start gap-3 p-4`}>
-                <div className="md:flex">
-                  <div
-                    className={`hidden lg:flex py-1 ${
-                      localVault.strategyInfo.protocols.length > 1 && "pl-[8px]"
-                    } mr-3 mb-3 md:mb-0`}>
-                    {localVault.strategyInfo.protocols.map(
-                      ({
-                        name,
-                        logoSrc,
-                      }: {
-                        name: string;
-                        logoSrc: string;
-                      }) => (
-                        <img
-                          title={name}
-                          key={name}
-                          src={logoSrc}
-                          alt={name}
-                          className={`h-8 w-8 rounded-full ${
-                            localVault.strategyInfo.protocols.length > 1 &&
-                            "ml-[-8px]"
-                          }`}
-                        />
-                      )
-                    )}
-                  </div>
-
+              <div className="flex flex-col items-start gap-3 p-4">
+                <div className="flex items-start flex-col gap-3">
                   <div
                     style={{
                       backgroundColor: localVault.strategyInfo.bgColor,
                       color: localVault.strategyInfo.color,
                     }}
-                    className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0">
+                    className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
+                  >
                     <p>
                       {localVault.strategyInfo.name}
                       {localVault.strategySpecific
@@ -1721,63 +1705,54 @@ function Vault({ vault }: IProps) {
                         : ""}
                     </p>
                   </div>
-
-                  <div
-                    className="hidden lg:flex items-center ml-3"
-                    title="Farming strategy">
-                    <svg
-                      fill="#46e29b"
-                      width="32px"
-                      height="32px"
-                      viewBox="0 0 96 96"
-                      id="Layer_1_1_"
-                      version="1.1"
-                      xmlSpace="preserve"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlnsXlink="http://www.w3.org/1999/xlink">
-                      <rect
-                        height="2"
-                        width="2"
-                        x="18"
-                        y="84"
-                      />
-                      <rect
-                        height="2"
-                        width="2"
-                        x="6"
-                        y="82"
-                      />
-                      <rect
-                        height="2"
-                        width="2"
-                        x="30"
-                        y="79"
-                      />
-                      <rect
-                        height="2"
-                        width="2"
-                        x="63"
-                        y="79"
-                      />
-                      <rect
-                        height="2"
-                        width="2"
-                        x="78"
-                        y="81"
-                      />
-                      <rect
-                        height="2"
-                        width="2"
-                        x="86"
-                        y="85"
-                      />
-                      <path d="M94,91l-18.739-1.972l-2.707,1.805c-0.035,0.023-0.07,0.044-0.107,0.062l-2,1l-0.895-1.789l1.944-0.972l1.616-1.077L69,86  h-6.586l-3.707,3.707C58.52,89.895,58.265,90,58,90h-2v-2h1.586l3.073-3.073L57,82h-7v-8.025C67.209,73.445,81,59.338,81,42h0  c-17.338,0-31.445,13.791-31.975,31h-1.051C47.445,55.791,33.338,42,16,42h0c0,17.338,13.791,31.445,31,31.975V82h-8l-3.499,2.799  l2.053,1.369c0.145,0.097,0.262,0.229,0.34,0.385L38.618,88H42v2h-4c-0.379,0-0.725-0.214-0.895-0.553l-0.881-1.763L33.697,86H27  l-5.091,2.182L24.6,90.2l-1.2,1.6l-3.69-2.768L2,91l-0.03,3H94V91z M77.293,44.293l1.414,1.414l-25,25l-1.414-1.414L77.293,44.293z   M44.309,70.723l-23-22l1.383-1.445l23,22L44.309,70.723z" />
-                      <path d="M33,11.899V19c0,0.315,0.148,0.611,0.4,0.8l7.6,5.7V48h2V25c0-0.315-0.148-0.611-0.4-0.8L35,18.5v-6.601  c2.282-0.463,4-2.48,4-4.899c0-2.761-2.239-5-5-5s-5,2.239-5,5C29,9.419,30.718,11.436,33,11.899z M34,6c0.552,0,1,0.448,1,1  c0,0.552-0.448,1-1,1s-1-0.448-1-1C33,6.448,33.448,6,34,6z" />
-                      <path d="M56,24.535l5.555-3.703C61.833,20.646,62,20.334,62,20v-8.101c2.282-0.463,4-2.48,4-4.899c0-2.761-2.239-5-5-5s-5,2.239-5,5  c0,2.419,1.718,4.436,4,4.899v7.566l-5.555,3.703C54.167,23.354,54,23.666,54,24v24h2V24.535z M61,6c0.552,0,1,0.448,1,1  c0,0.552-0.448,1-1,1s-1-0.448-1-1C60,6.448,60.448,6,61,6z" />
-                      <path d="M70,24.899V29h-8c-0.552,0-1,0.448-1,1v12h2V31h8c0.552,0,1-0.448,1-1v-5.101c2.282-0.463,4-2.48,4-4.899  c0-2.761-2.239-5-5-5s-5,2.239-5,5C66,22.419,67.718,24.436,70,24.899z M71,19c0.552,0,1,0.448,1,1c0,0.552-0.448,1-1,1  s-1-0.448-1-1C70,19.448,70.448,19,71,19z" />
-                      <path d="M24,23.899V30c0,0.552,0.448,1,1,1h8v10h2V30c0-0.552-0.448-1-1-1h-8v-5.101c2.282-0.463,4-2.48,4-4.899  c0-2.761-2.239-5-5-5s-5,2.239-5,5C20,21.419,21.718,23.436,24,23.899z M25,18c0.552,0,1,0.448,1,1c0,0.552-0.448,1-1,1  s-1-0.448-1-1C24,18.448,24.448,18,25,18z" />
-                      <path d="M47.5,20.899V51h2V20.899c2.282-0.463,4-2.48,4-4.899c0-2.761-2.239-5-5-5s-5,2.239-5,5  C43.5,18.419,45.218,20.436,47.5,20.899z M48.5,15c0.552,0,1,0.448,1,1c0,0.552-0.448,1-1,1s-1-0.448-1-1  C47.5,15.448,47.948,15,48.5,15z" />
-                    </svg>
+                  <div className="flex">
+                    <span
+                      style={{
+                        backgroundColor: localVault.strategyInfo.bgColor,
+                        color: localVault.strategyInfo.color,
+                      }}
+                      className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[70px]"
+                      title={localVault.strategyInfo.name}
+                    >
+                      {localVault.strategyInfo.shortName}
+                    </span>
+                    <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[160px]">
+                      <span className="flex min-w-[42px] justify-center">
+                        {localVault.strategyInfo.protocols.map(
+                          (protocol, index) => (
+                            <img
+                              className={`h-7 w-7 rounded-full ${
+                                localVault.strategyInfo.protocols.length > 1 &&
+                                index &&
+                                "ml-[-4px]"
+                              }`}
+                              key={index}
+                              src={protocol.logoSrc}
+                              alt={protocol.name}
+                              title={protocol.name}
+                            />
+                          )
+                        )}
+                      </span>
+                      <span className="flex">
+                        {localVault.strategyInfo.features.map((feature, i) => (
+                          <img
+                            key={i}
+                            title={feature.name}
+                            alt={feature.name}
+                            className="w-6 h-6 ml-1"
+                            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                              feature.svg
+                            )}`}
+                          />
+                        ))}
+                      </span>
+                      {localVault.strategySpecific && (
+                        <span className="font-bold rounded-[4px] text-[#b6bdd7] inline uppercase text-[10px] px-[6px]">
+                          {localVault.strategySpecific}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </div>
 
@@ -1801,9 +1776,7 @@ function Vault({ vault }: IProps) {
                   <div>
                     {localVault.assetsAprs.map((apr: string, index: number) => {
                       return (
-                        <div
-                          className="mt-2"
-                          key={index}>
+                        <div className="mt-2" key={index}>
                           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                             {localVault.assetsWithApr[index]} APR
                           </p>
@@ -1829,7 +1802,8 @@ function Vault({ vault }: IProps) {
                   <div>
                     <p
                       style={{ color: localVault.strategyInfo.il.color }}
-                      className="text-[20px] font-bold">
+                      className="text-[20px] font-bold"
+                    >
                       {localVault.strategyInfo.il.title}
                     </p>
                     <p className="text-[14px]">
@@ -1842,14 +1816,16 @@ function Vault({ vault }: IProps) {
                   {needVaultUpgrade && (
                     <button
                       onClick={upgradeVault}
-                      className="bg-[#1c1c23] py-1 px-2 rounded-md">
+                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
+                    >
                       Upgrade Vault
                     </button>
                   )}
                   {needStrategyUpgrade && (
                     <button
                       onClick={upgradeStrategy}
-                      className="bg-[#1c1c23] py-1 px-2 rounded-md">
+                      className="bg-[#1c1c23] py-1 px-2 rounded-md"
+                    >
                       Upgrade Strategy
                     </button>
                   )}
@@ -1865,7 +1841,8 @@ function Vault({ vault }: IProps) {
                         (strategy: string) => (
                           <p
                             className="text-[14px] px-2 rounded-lg border-[2px] bg-[#486556] border-[#488B57]"
-                            key={strategy}>
+                            key={strategy}
+                          >
                             {strategy}
                           </p>
                         )
@@ -1885,7 +1862,7 @@ function Vault({ vault }: IProps) {
             </div>
           )}
 
-          <article className="rounded-md p-3 mt-5 bg-button">
+          <div className="rounded-md p-3 mt-5 bg-button">
             <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
               Assets
             </h2>
@@ -1893,7 +1870,7 @@ function Vault({ vault }: IProps) {
               localVault?.assets.map((asset: any) => {
                 const assetData: TToken | any = getTokenData(asset.address);
 
-                const tokenAssets = TOKENS_ASSETS.find(tokenAsset => {
+                const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
                   return tokenAsset.addresses.includes(assetData?.address);
                 });
 
@@ -1901,7 +1878,8 @@ function Vault({ vault }: IProps) {
                   assetData && (
                     <article
                       className="rounded-md p-3 mb-4 flex bg-[#32343f]"
-                      key={asset.address}>
+                      key={asset.address}
+                    >
                       <div className="flex w-full flex-col gap-3">
                         <div className="flex w-full justify-between items-center  flex-wrap">
                           <div className="inline-flex items-center">
@@ -1922,7 +1900,8 @@ function Vault({ vault }: IProps) {
                                 <a
                                   className="flex items-center"
                                   href={tokenAssets?.website}
-                                  target="_blank">
+                                  target="_blank"
+                                >
                                   Website
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -1934,11 +1913,13 @@ function Vault({ vault }: IProps) {
                                     stroke="currentColor"
                                     fill="none"
                                     strokeLinecap="round"
-                                    strokeLinejoin="round">
+                                    strokeLinejoin="round"
+                                  >
                                     <path
                                       stroke="none"
                                       d="M0 0h24v24H0z"
-                                      fill="none"></path>
+                                      fill="none"
+                                    ></path>
                                     <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                                     <path d="M11 13l9 -9"></path>
                                     <path d="M15 4h5v5"></path>
@@ -1950,7 +1931,8 @@ function Vault({ vault }: IProps) {
                               <a
                                 className="flex items-center"
                                 href={`https://polygonscan.com/token/${asset.address}`}
-                                target="_blank">
+                                target="_blank"
+                              >
                                 Contract
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -1962,11 +1944,13 @@ function Vault({ vault }: IProps) {
                                   stroke="currentColor"
                                   fill="none"
                                   strokeLinecap="round"
-                                  strokeLinejoin="round">
+                                  strokeLinejoin="round"
+                                >
                                   <path
                                     stroke="none"
                                     d="M0 0h24v24H0z"
-                                    fill="none"></path>
+                                    fill="none"
+                                  ></path>
                                   <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                                   <path d="M11 13l9 -9"></path>
                                   <path d="M15 4h5v5"></path>
@@ -1978,7 +1962,8 @@ function Vault({ vault }: IProps) {
                                 <a
                                   className="flex items-center"
                                   href={tokenAssets?.docs}
-                                  target="_blank">
+                                  target="_blank"
+                                >
                                   Docs
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -1990,11 +1975,13 @@ function Vault({ vault }: IProps) {
                                     stroke="currentColor"
                                     fill="none"
                                     strokeLinecap="round"
-                                    strokeLinejoin="round">
+                                    strokeLinejoin="round"
+                                  >
                                     <path
                                       stroke="none"
                                       d="M0 0h24v24H0z"
-                                      fill="none"></path>
+                                      fill="none"
+                                    ></path>
                                     <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
                                     <path d="M11 13l9 -9"></path>
                                     <path d="M15 4h5v5"></path>
@@ -2025,7 +2012,8 @@ function Vault({ vault }: IProps) {
                             {assetData.tags.map((tag: string) => (
                               <p
                                 className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
-                                key={tag}>
+                                key={tag}
+                              >
                                 {tag}
                               </p>
                             ))}
@@ -2036,7 +2024,7 @@ function Vault({ vault }: IProps) {
                   )
                 );
               })}
-          </article>
+          </div>
         </div>
         <div className="w-full md:w-1/2 lg:w-2/5">
           {localVault && (
@@ -2091,7 +2079,8 @@ function Vault({ vault }: IProps) {
                           timeDifference.hours > 4
                             ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
                             : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                        }`}>
+                        }`}
+                      >
                         {timeDifference?.hours
                           ? `${timeDifference.hours}h ago`
                           : "<1h ago"}
@@ -2113,7 +2102,8 @@ function Vault({ vault }: IProps) {
                   setTab("Deposit");
                   resetInputs(option);
                   resetOptions();
-                }}>
+                }}
+              >
                 Deposit
               </button>
               <button
@@ -2124,23 +2114,24 @@ function Vault({ vault }: IProps) {
                   setTab("Withdraw");
                   resetOptions();
                   resetInputs(option);
-                }}>
+                }}
+              >
                 Withdraw
               </button>
             </div>
-            <form
-              autoComplete="off"
-              className="w-full px-4 mb-10 pb-5">
+            <form autoComplete="off" className="w-full px-4 mb-10 pb-5">
               <div className="flex items-center mt-4 gap-3 relative">
                 {optionTokens && (
                   <div
                     className="relative select-none w-full"
-                    ref={tokenSelectorRef}>
+                    ref={tokenSelectorRef}
+                  >
                     <div
                       onClick={() => {
-                        setTokenSelector(prevState => !prevState);
+                        setTokenSelector((prevState) => !prevState);
                       }}
-                      className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer">
+                      className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer"
+                    >
                       <div className="flex items-center gap-2">
                         {activeOptionToken?.logoURI &&
                         Array.isArray(activeOptionToken?.logoURI) ? (
@@ -2187,11 +2178,9 @@ function Vault({ vault }: IProps) {
                         xmlns="http://www.w3.org/2000/svg"
                         className={`transition delay-[50ms] ${
                           tokenSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-                        }`}>
-                        <path
-                          d="M1 1L7.5 7.5L14 1"
-                          stroke="white"
-                        />
+                        }`}
+                      >
+                        <path d="M1 1L7.5 7.5L14 1" stroke="white" />
                       </svg>
                     </div>
 
@@ -2200,7 +2189,8 @@ function Vault({ vault }: IProps) {
                         tokenSelector
                           ? "absolute transition delay-[50ms]"
                           : "hidden"
-                      } `}>
+                      } `}
+                    >
                       <div
                         onClick={() => {
                           optionHandler(
@@ -2210,12 +2200,14 @@ function Vault({ vault }: IProps) {
                             defaultOptionImages
                           );
                         }}
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3">
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
+                      >
                         {defaultOptionImages?.length && (
                           <div
                             className={`flex items-center ${
                               defaultOptionImages?.length < 2 && "ml-3"
-                            }`}>
+                            }`}
+                          >
                             {defaultOptionImages.map((logo: string) => (
                               <img
                                 key={Math.random()}
@@ -2231,7 +2223,8 @@ function Vault({ vault }: IProps) {
                             defaultOptionImages?.length < 2
                               ? "ml-2"
                               : "ml-[-4px]"
-                          }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}>
+                          }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}
+                        >
                           {defaultOptionSymbols}
                         </p>
                       </div>
@@ -2245,7 +2238,8 @@ function Vault({ vault }: IProps) {
                               underlyingToken?.address,
                               "/protocols/Gamma.png"
                             );
-                          }}>
+                          }}
+                        >
                           {underlyingToken?.logoURI && (
                             <img
                               className="max-w-6 max-h-6 rounded-full "
@@ -2279,7 +2273,8 @@ function Vault({ vault }: IProps) {
                                   address,
                                   logoURI
                                 );
-                              }}>
+                              }}
+                            >
                               {logoURI && (
                                 <img
                                   className="max-w-6 max-h-6 rounded-full"
@@ -2313,7 +2308,8 @@ function Vault({ vault }: IProps) {
                         isRefresh ? "cursor-pointer" : "cursor-default"
                       } transition-transform duration-500`}
                       style={{ transform: `rotate(${rotation}deg)` }}
-                      onClick={refreshData}>
+                      onClick={refreshData}
+                    >
                       <g>
                         <g>
                           <path
@@ -2334,11 +2330,13 @@ function Vault({ vault }: IProps) {
                       className={`settingsModal cursor-pointer transition-transform transform ${
                         settingsModal ? "rotate-180" : "rotate-0"
                       }`}
-                      onClick={() => setSettingsModal(prev => !prev)}>
+                      onClick={() => setSettingsModal((prev) => !prev)}
+                    >
                       <path
                         className="settingsModal"
                         d="M20.83 14.6C19.9 14.06 19.33 13.07 19.33 12C19.33 10.93 19.9 9.93999 20.83 9.39999C20.99 9.29999 21.05 9.1 20.95 8.94L19.28 6.06C19.22 5.95 19.11 5.89001 19 5.89001C18.94 5.89001 18.88 5.91 18.83 5.94C18.37 6.2 17.85 6.34 17.33 6.34C16.8 6.34 16.28 6.19999 15.81 5.92999C14.88 5.38999 14.31 4.41 14.31 3.34C14.31 3.15 14.16 3 13.98 3H10.02C9.83999 3 9.69 3.15 9.69 3.34C9.69 4.41 9.12 5.38999 8.19 5.92999C7.72 6.19999 7.20001 6.34 6.67001 6.34C6.15001 6.34 5.63001 6.2 5.17001 5.94C5.01001 5.84 4.81 5.9 4.72 6.06L3.04001 8.94C3.01001 8.99 3 9.05001 3 9.10001C3 9.22001 3.06001 9.32999 3.17001 9.39999C4.10001 9.93999 4.67001 10.92 4.67001 11.99C4.67001 13.07 4.09999 14.06 3.17999 14.6H3.17001C3.01001 14.7 2.94999 14.9 3.04999 15.06L4.72 17.94C4.78 18.05 4.89 18.11 5 18.11C5.06 18.11 5.12001 18.09 5.17001 18.06C6.11001 17.53 7.26 17.53 8.19 18.07C9.11 18.61 9.67999 19.59 9.67999 20.66C9.67999 20.85 9.82999 21 10.02 21H13.98C14.16 21 14.31 20.85 14.31 20.66C14.31 19.59 14.88 18.61 15.81 18.07C16.28 17.8 16.8 17.66 17.33 17.66C17.85 17.66 18.37 17.8 18.83 18.06C18.99 18.16 19.19 18.1 19.28 17.94L20.96 15.06C20.99 15.01 21 14.95 21 14.9C21 14.78 20.94 14.67 20.83 14.6ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"
-                        fill="currentColor"></path>
+                        fill="currentColor"
+                      ></path>
                     </svg>
                   </>
                 )}
@@ -2360,9 +2358,7 @@ function Vault({ vault }: IProps) {
                       <>
                         <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
                           {option.map((asset: any) => (
-                            <div
-                              className="w-full"
-                              key={asset}>
+                            <div className="w-full" key={asset}>
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                                 <p>Balance: </p>
 
@@ -2381,7 +2377,8 @@ function Vault({ vault }: IProps) {
                                           balances[asset].assetBalance,
                                           asset
                                         )
-                                      }>
+                                      }
+                                    >
                                       MAX
                                     </button>
                                   </div>
@@ -2397,26 +2394,27 @@ function Vault({ vault }: IProps) {
                                     inputs[asset] &&
                                     inputs[asset].amount
                                   }
-                                  onChange={e =>
+                                  onChange={(e) =>
                                     handleInputChange(
                                       e.target.value,
                                       e.target.id
                                     )
                                   }
                                   type="text"
-                                  onKeyDown={evt =>
+                                  onKeyDown={(evt) =>
                                     ["e", "E", "+", "-", " ", ","].includes(
                                       evt.key
                                     ) && evt.preventDefault()
                                   }
                                 />
                                 <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
-                                  {tokensJson.tokens.map(token => {
+                                  {tokensJson.tokens.map((token) => {
                                     if (token.address.toLowerCase() === asset) {
                                       return (
                                         <div
                                           className="flex items-center gap-2"
-                                          key={token.address}>
+                                          key={token.address}
+                                        >
                                           {/* <p className="my-auto">{token.symbol}</p> */}
                                           <img
                                             className="rounded-full w-[25px] h-[25px] "
@@ -2455,7 +2453,8 @@ function Vault({ vault }: IProps) {
                               <button
                                 className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                                 type="button"
-                                onClick={deposit}>
+                                onClick={deposit}
+                              >
                                 Deposit
                               </button>
                             ) : isApprove === 2 ? (
@@ -2473,7 +2472,8 @@ function Vault({ vault }: IProps) {
                                         type="button"
                                         onClick={() =>
                                           approve(asset as TAddress)
-                                        }>
+                                        }
+                                      >
                                         Approve {getTokenData(asset)?.symbol}
                                       </button>
                                     )
@@ -2483,7 +2483,8 @@ function Vault({ vault }: IProps) {
                               isApprove === 0 && (
                                 <button
                                   disabled
-                                  className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md">
+                                  className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                                >
                                   INSUFFICIENT BALANCE
                                 </button>
                               )
@@ -2504,12 +2505,13 @@ function Vault({ vault }: IProps) {
 
                           <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
                             <div className="absolute top-[30%] left-[5%]">
-                              {tokensJson.tokens.map(token => {
+                              {tokensJson.tokens.map((token) => {
                                 if (token.address === option[0]) {
                                   return (
                                     <div
                                       className="flex items-center"
-                                      key={token.address}>
+                                      key={token.address}
+                                    >
                                       <img
                                         className="w-[25px] h-[25px] rounded-full"
                                         src={token.logoURI}
@@ -2527,7 +2529,8 @@ function Vault({ vault }: IProps) {
                                     underlyingToken?.address === option[0]
                                       ? "bottom-[-9%]"
                                       : "bottom-0"
-                                  }`}>
+                                  }`}
+                                >
                                   <div className="flex items-center">
                                     <button
                                       onClick={() =>
@@ -2537,7 +2540,8 @@ function Vault({ vault }: IProps) {
                                         )
                                       }
                                       className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                      type="button">
+                                      type="button"
+                                    >
                                       MAX
                                     </button>
                                   </div>
@@ -2553,10 +2557,10 @@ function Vault({ vault }: IProps) {
                                 name="amount"
                                 type="text"
                                 placeholder="0"
-                                onChange={e =>
+                                onChange={(e) =>
                                   zapInputHandler(e.target.value, e.target.id)
                                 }
-                                onKeyDown={evt =>
+                                onKeyDown={(evt) =>
                                   ["e", "E", "+", "-", " ", ","].includes(
                                     evt.key
                                   ) && evt.preventDefault()
@@ -2593,7 +2597,8 @@ function Vault({ vault }: IProps) {
                                   {zapTokens.map((token: any) => (
                                     <div
                                       className="text-[18px]  flex items-center gap-1 ml-2"
-                                      key={token.address}>
+                                      key={token.address}
+                                    >
                                       {token.address.toLowerCase() !==
                                         option[0].toLowerCase() && (
                                         <div className="flex items-center gap-1 mt-2">
@@ -2675,14 +2680,16 @@ function Vault({ vault }: IProps) {
                             {zapButton === "insufficientBalance" ? (
                               <button
                                 disabled
-                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md">
+                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                              >
                                 INSUFFICIENT BALANCE
                               </button>
                             ) : zapButton === "needApprove" ? (
                               <button
                                 className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                                 type="button"
-                                onClick={zapApprove}>
+                                onClick={zapApprove}
+                              >
                                 Approve{" "}
                                 {underlyingToken?.address === option[0]
                                   ? underlyingToken.symbol
@@ -2693,7 +2700,8 @@ function Vault({ vault }: IProps) {
                                 <button
                                   className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                                   type="button"
-                                  onClick={zapDeposit}>
+                                  onClick={zapDeposit}
+                                >
                                   Deposit
                                 </button>
                               )
@@ -2709,7 +2717,8 @@ function Vault({ vault }: IProps) {
                   <button
                     type="button"
                     className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                    onClick={() => open()}>
+                    onClick={() => open()}
+                  >
                     CONNECT WALLET
                   </button>
                 ))}
@@ -2748,7 +2757,8 @@ function Vault({ vault }: IProps) {
                                   );
                                 }}
                                 type="button"
-                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg">
+                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                              >
                                 MAX
                               </button>
                             </div>
@@ -2761,12 +2771,12 @@ function Vault({ vault }: IProps) {
                           value={inputs[option[0]]?.amount}
                           name="amount"
                           placeholder="0"
-                          onChange={e => {
+                          onChange={(e) => {
                             zapInputHandler(e.target.value, e.target.id);
                             previewWithdraw(e.target.value);
                             handleInputChange(e.target.value, e.target.id);
                           }}
-                          onKeyDown={evt =>
+                          onKeyDown={(evt) =>
                             ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
                             evt.preventDefault()
                           }
@@ -2951,14 +2961,16 @@ function Vault({ vault }: IProps) {
                         {zapButton === "insufficientBalance" ? (
                           <button
                             disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md">
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                          >
                             INSUFFICIENT BALANCE
                           </button>
                         ) : zapButton === "needApprove" ? (
                           <button
                             className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
                             type="button"
-                            onClick={withdrawZapApprove}>
+                            onClick={withdrawZapApprove}
+                          >
                             Approve
                           </button>
                         ) : (
@@ -2967,7 +2979,8 @@ function Vault({ vault }: IProps) {
                             <button
                               type="button"
                               className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                              onClick={withdraw}>
+                              onClick={withdraw}
+                            >
                               WITHDRAW
                             </button>
                           )
@@ -2981,7 +2994,8 @@ function Vault({ vault }: IProps) {
                   <button
                     type="button"
                     className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                    onClick={() => open()}>
+                    onClick={() => open()}
+                  >
                     CONNECT WALLET
                   </button>
                 ))}
@@ -2996,7 +3010,8 @@ function Vault({ vault }: IProps) {
                         viewBox="0 0 24 21"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
-                        className="mr-2">
+                        className="mr-2"
+                      >
                         <path
                           d="M23.2266 17.7266L13.8516 1.4375C13.1484 0.226562 11.3125 0.1875 10.6094 1.4375L1.23438 17.7266C0.53125 18.9375 1.42969 20.5 2.875 20.5H21.5859C23.0312 20.5 23.9297 18.9766 23.2266 17.7266ZM12.25 14.3281C13.2266 14.3281 14.0469 15.1484 14.0469 16.125C14.0469 17.1406 13.2266 17.9219 12.25 17.9219C11.2344 17.9219 10.4531 17.1406 10.4531 16.125C10.4531 15.1484 11.2344 14.3281 12.25 14.3281ZM10.5312 7.88281C10.4922 7.60938 10.7266 7.375 11 7.375H13.4609C13.7344 7.375 13.9688 7.60938 13.9297 7.88281L13.6562 13.1953C13.6172 13.4688 13.4219 13.625 13.1875 13.625H11.2734C11.0391 13.625 10.8438 13.4688 10.8047 13.1953L10.5312 7.88281Z"
                           fill="#DE2E2E"
@@ -3010,7 +3025,8 @@ function Vault({ vault }: IProps) {
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         className="cursor-pointer"
-                        onClick={() => setError(false)}>
+                        onClick={() => setError(false)}
+                      >
                         <g filter="url(#filter0_i_910_1842)">
                           <path
                             fillRule="evenodd"
@@ -3027,7 +3043,8 @@ function Vault({ vault }: IProps) {
                             width="14"
                             height="14"
                             filterUnits="userSpaceOnUse"
-                            colorInterpolationFilters="sRGB">
+                            colorInterpolationFilters="sRGB"
+                          >
                             <feFlood
                               floodOpacity="0"
                               result="BackgroundImageFix"
@@ -3044,10 +3061,7 @@ function Vault({ vault }: IProps) {
                               values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
                               result="hardAlpha"
                             />
-                            <feOffset
-                              dx="2"
-                              dy="2"
-                            />
+                            <feOffset dx="2" dy="2" />
                             <feGaussianBlur stdDeviation="1" />
                             <feComposite
                               in2="hardAlpha"
