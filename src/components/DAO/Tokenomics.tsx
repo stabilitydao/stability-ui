@@ -58,12 +58,10 @@ const Tokenomics = () => {
         const _tokenomics = {
           profitPrice:
             Math.trunc(
-              Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
-                100
+              Number(formatUnits($assetsPrices?.[PROFIT[0]], 18)) * 100
             ) / 100,
           profitMarketCap: Math.trunc(
-            Number(formatUnits($assetsPrices?.[PROFIT[0]].tokenPrice, 18)) *
-              1000000
+            Number(formatUnits($assetsPrices?.[PROFIT[0]], 18)) * 1000000
           ).toLocaleString(),
           sdivTotalSupply: Number(
             formatUnits(sdivTotalSupply, 18)

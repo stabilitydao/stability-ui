@@ -60,10 +60,10 @@ const BuildForm = ({
     symbol: tokensJson.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
-      $assetsBalances[addr]?.assetBalance || "0",
+      $assetsBalances[addr] || "0",
       tokensJson.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
-    price: formatUnits($assetsPrices[addr]?.tokenPrice || "0", 18),
+    price: formatUnits($assetsPrices[addr] || "0", 18),
     sum: "",
     allowance: "",
     decimals:
