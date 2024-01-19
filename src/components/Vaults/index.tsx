@@ -404,7 +404,7 @@ const Vaults = () => {
                               backgroundColor: vault.strategyInfo.bgColor,
                               color: vault.strategyInfo.color,
                             }}
-                            className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
+                            className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
                             title={vault.strategyInfo.name}
                           >
                             {vault.strategyInfo.shortName}
@@ -596,7 +596,7 @@ const Vaults = () => {
                           backgroundColor: vault.strategyInfo.bgColor,
                           color: vault.strategyInfo.color,
                         }}
-                        className="pl-2 pr-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
+                        className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
                         title={vault.strategyInfo.name}
                       >
                         {vault.strategyInfo.shortName}
