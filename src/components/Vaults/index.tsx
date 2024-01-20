@@ -222,21 +222,22 @@ const Vaults = () => {
   };
   const initPortfolio = (vaults: TVault[]) => {
     if (!$connected) return;
-    let deposited: any = 0n;
+    let deposited = 0;
     let monthly = 0;
     let avgApr = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
+        let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
+        let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
+
         const apr = Number(v.apr);
-        const balance = BigInt(v.balance);
+        const balance = vaultBalance * vaultSharePrice;
 
         deposited += balance;
-        monthly += ((apr / 100) * Number(formatUnits(balance, 18))) / 12;
+        monthly += ((apr / 100) * balance) / 12;
       }
     });
-
-    deposited = Number(formatUnits(deposited, 18));
     const daily = monthly / 30;
     avgApr = (100 * daily * 365) / deposited;
 
