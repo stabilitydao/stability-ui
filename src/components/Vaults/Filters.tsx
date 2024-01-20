@@ -86,7 +86,6 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
     newUrl.search = `?${params.toString()}`;
     window.history.pushState({}, "", newUrl.toString());
   };
-
   return (
     filters.length && (
       <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none lg:min-w-[60%]">
@@ -101,8 +100,8 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 } bg-button rounded-md cursor-pointer`}
               >
                 <p
-                  className={`p-2 hover:opacity-100 ${
-                    filter.state ? "opacity-100" : "opacity-70"
+                  className={`p-2 ${
+                    filter.state ? "opacity-100" : "opacity-70 hover:opacity-80"
                   }`}
                 >
                   {filter.name}
@@ -117,8 +116,10 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   <p
                     key={variant.name}
                     onClick={() => activeFiltersHandler(filter, variant.name)}
-                    className={`p-2 cursor-pointer hover:opacity-100 ${
-                      variant.state ? "opacity-100" : "opacity-70"
+                    className={`p-2 cursor-pointer ${
+                      variant.state
+                        ? "opacity-100"
+                        : "opacity-70 hover:opacity-80"
                     }`}
                   >
                     {variant.name}
