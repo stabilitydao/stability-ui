@@ -24,8 +24,12 @@ const StatisticBar: React.FC<IProps> = memo(({ vault }) => {
         </p>
       </div>
       <div>
-        <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">APY</p>
-        <p>{vault.apy}%</p>
+        <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+          APR / APY
+        </p>
+        <p>
+          {vault.apr} / {vault.apy}%
+        </p>
       </div>
       <div className="hidden lg:block">
         <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">Daily</p>
