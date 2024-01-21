@@ -12,10 +12,9 @@ import type { TAddress, TPlatformData, TVault } from "@types";
 
 interface IProps {
   vault: TVault;
-  description: string | undefined;
 }
 
-const Strategy: React.FC<IProps> = memo(({ vault, description }) => {
+const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const _publicClient = usePublicClient();
 
   const $connected = useStore(connected);
@@ -232,12 +231,12 @@ const Strategy: React.FC<IProps> = memo(({ vault, description }) => {
           </div>
         </div>
 
-        {description && (
+        {vault.strategyDescription && (
           <div className="mt-2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               DESCRIPTION
             </p>
-            <p className="text-[16px] mt-1">{description}</p>
+            <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
           </div>
         )}
         <div className="mt-2">

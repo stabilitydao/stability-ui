@@ -200,6 +200,7 @@ const GRAPH_QUERY = `
           underlying
           symbol
           strategySpecific
+          strategyDescription
           name
           strategyAssets
           lastHardWork
@@ -228,6 +229,12 @@ const GRAPH_QUERY = `
           price
           timestamp
           address
+        }
+        vaultHistoryEntities {
+          TVL
+          address
+          sharePrice
+          timestamp
         }
       }
       `;

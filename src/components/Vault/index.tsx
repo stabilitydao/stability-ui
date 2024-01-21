@@ -3,9 +3,8 @@ import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 import { readContract } from "viem/actions";
-import { writeContract } from "@wagmi/core";
-
 import { usePublicClient } from "wagmi";
+import { writeContract } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 import { VaultBar } from "./VaultBar";
@@ -13,6 +12,7 @@ import { StatisticBar } from "./StatisticBar";
 import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
+//import { Chart } from "./Chart";
 import { Loader } from "@components";
 
 import {
@@ -95,9 +95,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
   const [localVault, setLocalVault] = useState<any>();
 
-  const [strategyDescription, setStrategyDescription] = useState<
-    string | undefined
-  >();
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
   const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<any>();
   const [underlyingToken, setUnderlyingToken] = useState<any>();
@@ -1062,29 +1059,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       }
     }
   };
-  const getStrategy = async () => {
-    if (localVault) {
-      const assetsData = localVault.assets.map((asset: any) =>
-        asset.address.toLowerCase()
-      );
-
-      const description = await readContract(_publicClient, {
-        address: localVault?.strategyAddress,
-        abi: StrategyABI,
-        functionName: "description",
-      });
-
-      if (description) {
-        setStrategyDescription(description);
-      }
-
-      if (Array.isArray(assetsData)) {
-        assets.set(assetsData);
-        setOption(assetsData);
-        defaultAssetsOption(assetsData);
-      }
-    }
-  };
 
   const loadAssetsBalances = () => {
     const balance: TVaultBalance | any = {};
@@ -1293,7 +1267,17 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   };
 
   useEffect(() => {
-    getStrategy();
+    if (localVault) {
+      const assetsData = localVault.assets.map((asset: any) =>
+        asset.address.toLowerCase()
+      );
+
+      if (Array.isArray(assetsData)) {
+        assets.set(assetsData);
+        setOption(assetsData);
+        defaultAssetsOption(assetsData);
+      }
+    }
   }, [localVault]);
 
   useEffect(() => {
@@ -1405,7 +1389,9 @@ const Vault: React.FC<IProps> = ({ vault }) => {
         <div className="w-full md:w-1/2 lg:w-3/5 ">
           <StatisticBar vault={localVault} />
 
-          <Strategy vault={localVault} description={strategyDescription} />
+          {/* <Chart /> */}
+
+          <Strategy vault={localVault} />
 
           <Assets assets={localVault?.assets} />
         </div>

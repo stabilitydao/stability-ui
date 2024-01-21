@@ -228,7 +228,6 @@ const Tokenomics = () => {
         functionName: "balanceOf",
         args: [$account as TAddress],
       })) as bigint;
-
       setPmMinted(Number(formatUnits(_pmMinted, 18)));
     } catch (error) {
       setLoader(false);

@@ -130,6 +130,7 @@ type TVault = {
   il: number;
   underlying: TAddress;
   strategyAddress: TAddress;
+  strategyDescription: string;
   status: number;
   version: string;
   strategyVersion: string;
