@@ -27,7 +27,7 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "string",
   },
-  { name: "APY", keyName: "apy", sortType: "none", dataType: "number" },
+  { name: "APR / APY", keyName: "apy", sortType: "none", dataType: "number" },
   {
     name: "IL",
     keyName: "il",
