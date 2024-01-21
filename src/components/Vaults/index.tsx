@@ -492,7 +492,7 @@ const Vaults = () => {
                             fill="white"
                           />
                         </svg>
-                        <div className="visible__tooltip">
+                        <div className="visible__tooltip hover:hidden">
                           <div className="flex items-start flex-col gap-4">
                             <p className="text-[14px]">
                               The Annual Percentage Rate (APR) for the Vault is

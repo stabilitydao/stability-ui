@@ -31,7 +31,7 @@ import {
 
 import {
   VaultABI,
-  StrategyABI,
+  ERC20DQMFABI,
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
@@ -42,6 +42,7 @@ import {
   formatFromBigInt,
   get1InchRoutes,
   debounce,
+  decodeHex,
 } from "@utils";
 
 import type {
@@ -274,31 +275,40 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     try {
       if (localVault.underlying != zeroAddress) {
         if ($connected) {
-          const underlyingSymbol = await readContract(_publicClient, {
-            address: localVault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "symbol",
-          });
+          let underlyingSymbol = "";
+          if (localVault.strategyInfo.shortName === "DQMF") {
+            underlyingSymbol = await readContract(_publicClient, {
+              address: localVault.underlying,
+              abi: ERC20DQMFABI,
+              functionName: "symbol",
+            });
+            underlyingSymbol = decodeHex(underlyingSymbol);
+          } else {
+            underlyingSymbol = await readContract(_publicClient, {
+              address: localVault.underlying,
+              abi: ERC20MetadataUpgradeableABI,
+              functionName: "symbol",
+            });
+          }
 
           const underlyingDecimals = await readContract(_publicClient, {
             address: localVault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "decimals",
           });
-
           const underlyingAllowance = await readContract(_publicClient, {
             address: localVault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "allowance",
             args: [$account as TAddress, vault as TAddress],
           });
-
           const underlyingBalance = await readContract(_publicClient, {
             address: localVault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "balanceOf",
             args: [$account as TAddress],
           });
+
           setUnderlyingToken({
             address: localVault.underlying,
             symbol: underlyingSymbol,
@@ -1536,7 +1546,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
                       </div>
                       {underlyingToken && (
                         <div
-                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-5 gap-3 ml-3"
+                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
                           onClick={() => {
                             optionHandler(
                               [underlyingToken?.address],

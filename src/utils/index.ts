@@ -10,6 +10,7 @@ import { addAssetsBalance } from "./functions/addAssetsBalance";
 import { addVaultData } from "./functions/addVaultData";
 import { get1InchRoutes } from "./functions/get1InchRoutes";
 import { debounce } from "./functions/debounce";
+import { decodeHex } from "./functions/decodeHex";
 
 export {
   getTokenData,
@@ -24,4 +25,5 @@ export {
   debounce,
   addAssetsBalance,
   addVaultData,
+  decodeHex,
 };
