@@ -27,7 +27,7 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "string",
   },
-  { name: "APY", keyName: "apy", sortType: "none", dataType: "number" },
+  { name: "APR / APY", keyName: "apy", sortType: "none", dataType: "number" },
   {
     name: "IL",
     keyName: "il",
@@ -200,6 +200,7 @@ const GRAPH_QUERY = `
           underlying
           symbol
           strategySpecific
+          strategyDescription
           name
           strategyAssets
           lastHardWork
@@ -228,6 +229,12 @@ const GRAPH_QUERY = `
           price
           timestamp
           address
+        }
+        vaultHistoryEntities {
+          TVL
+          address
+          sharePrice
+          timestamp
         }
       }
       `;

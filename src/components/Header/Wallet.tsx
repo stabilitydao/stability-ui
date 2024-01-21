@@ -2,15 +2,26 @@ import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { account, assetsBalances, assetsPrices, network } from "@store";
+import {
+  account,
+  assetsBalances,
+  assetsPrices,
+  network,
+  publicClient,
+} from "@store";
+
+import { IERC721Enumerable } from "@web3";
 
 import { getTokenData } from "@utils";
 
-import { CHAINS } from "@constants";
+import { CHAINS, PM } from "@constants";
+
+import type { TAddress } from "@types";
 
 const Wallet = () => {
   const $account = useStore(account);
   const $network = useStore(network);
+  const $publicClient = useStore(publicClient);
   const $assetsBalances = useStore(assetsBalances);
   const $assetsPrices = useStore(assetsPrices);
 
@@ -20,6 +31,23 @@ const Wallet = () => {
   const chain = CHAINS.find((item) => item.name === $network);
 
   const { open } = useWeb3Modal();
+
+  const checkPM = async () => {
+    const balance = (await $publicClient?.readContract({
+      address: PM[0],
+      abi: IERC721Enumerable,
+      functionName: "balanceOf",
+      args: [$account as TAddress],
+    })) as bigint;
+    if (balance) {
+      return {
+        balance: String(formatUnits(balance, 18)),
+        balanceInUSD: "",
+        logo: "https://stabilitydao.org/pm.png",
+        symbol: "PM",
+      };
+    }
+  };
 
   const openProfile = () => {
     open();
@@ -43,7 +71,7 @@ const Wallet = () => {
 
       customContent.setAttribute(
         "style",
-        "display: flex; align-items:center;justify-content:space-between; flex-wrap: wrap; gap: 10px;"
+        "display: flex; align-items:center;justify-content:center; flex-wrap: wrap; gap: 10px;"
       );
 
       customDescription.innerHTML = `<p style="margin:0; color:#949e9e;">$${userBalance}</p>`;
@@ -57,11 +85,10 @@ const Wallet = () => {
     }
   };
 
-  useEffect(() => {
+  const initProfile = async () => {
     if (!$assetsBalances) return;
 
     let profileBalance = 0;
-
     const assets = Object.entries($assetsBalances)
       .filter((token) => token[1] && getTokenData(token[0]))
       .map(([address, data]) => {
@@ -81,15 +108,27 @@ const Wallet = () => {
         };
       });
 
+    const profitMaker = await checkPM();
+
+    if (profitMaker) assets.push(profitMaker);
+
     const assetsTemplates = assets.map(
       (asset) =>
-        `<div style="width:70px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px">
+        `<div style="width:70px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px;flex-grow:1;">
           <div style="display:flex; flex-direction:column; align-items:center; padding:10px;">
-            <img style="width: 32px; height:32px; border-radius:100%" src=${asset.logo} alt="logo" />
-            <p style="margin:0; font-size:14px; margin-top:2px;">${asset.symbol}</p>
+            <img style="width: 32px; height:32px; border-radius:100%" src=${
+              asset.logo
+            } alt="logo" />
+            <p style="margin:0; font-size:14px; margin-top:2px;">${
+              asset.symbol
+            }</p>
             <div style="font-size:12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;">
               <p style="margin:0; ">${asset.balance}</p>
-              <p style="margin:0; ">($${asset.balanceInUSD})</p>
+              ${
+                asset.balanceInUSD
+                  ? `<p style="margin:0;">($${asset.balanceInUSD})</p>`
+                  : ""
+              }
             </div>
           </div>
         </div>`
@@ -97,6 +136,10 @@ const Wallet = () => {
 
     setUserBalance(Number(profileBalance.toFixed(2)));
     setUserAssets(assetsTemplates);
+  };
+
+  useEffect(() => {
+    initProfile();
   }, [$assetsBalances]);
 
   return (

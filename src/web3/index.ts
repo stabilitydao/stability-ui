@@ -8,6 +8,7 @@ import { EIP6963Connector } from "@web3modal/wagmi";
 
 import ERC20ABI from "./abi/ERC20ABI.ts";
 import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.ts";
+import ERC20DQMFABI from "./abi/ERC20DQMFABI.ts";
 import FactoryABI from "./abi/FactoryABI.ts";
 import IVaultManagerABI from "./abi/IVaultManagerABI.ts";
 import PlatformABI from "./abi/PlatformABI.ts";
@@ -82,6 +83,7 @@ export {
   walletConnectProjectId,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,
+  ERC20DQMFABI,
   FactoryABI,
   IVaultManagerABI,
   PlatformABI,

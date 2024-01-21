@@ -9,16 +9,14 @@ interface IProps {
   setTab: (number: number) => void;
 }
 
-const Pagination: React.FC<IProps> = memo(
-  ({ vaults, tab, setTab }) => {
-    const paginationNumbers = [];
-    for (let i = 1; i <= Math.ceil(vaults.length / PAGINATION_VAULTS); i++) {
-      paginationNumbers.push(i);
-    }
-    if (paginationNumbers.length <= 1) {
-      return;
-    }
-    return (
+const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
+  const paginationNumbers = [];
+  for (let i = 1; i <= Math.ceil(vaults.length / PAGINATION_VAULTS); i++) {
+    paginationNumbers.push(i);
+  }
+
+  return (
+    paginationNumbers.length > 1 && (
       <div className="flex gap-3 mt-3 select-none">
         {paginationNumbers.map((number) => (
           <p
@@ -34,11 +32,8 @@ const Pagination: React.FC<IProps> = memo(
           </p>
         ))}
       </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    return nextProps.vaults.length > PAGINATION_VAULTS;
-  }
-);
+    )
+  );
+});
 
 export { Pagination };

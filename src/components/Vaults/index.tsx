@@ -60,7 +60,8 @@ const Vaults = () => {
   const [portfolio, setPortfolio] = useState({
     deposited: "0",
     monthly: "0",
-    daily: "0",
+    dailySum: "0",
+    dailyPercent: "",
     apr: "0",
     apy: "0",
   });
@@ -238,13 +239,16 @@ const Vaults = () => {
         monthly += ((apr / 100) * balance) / 12;
       }
     });
-    const daily = monthly / 30;
-    avgApr = (100 * daily * 365) / deposited;
+    const dailySum = monthly / 30;
+    avgApr = (100 * dailySum * 365) / deposited;
+
+    const dailyPercent = String(avgApr / 365);
 
     setPortfolio({
       deposited: String(deposited.toFixed(2)),
       monthly: String(monthly.toFixed(2)),
-      daily: String(daily.toFixed(2)),
+      dailySum: String(dailySum.toFixed(2)),
+      dailyPercent: dailyPercent,
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
     });
@@ -368,7 +372,7 @@ const Vaults = () => {
                   key={vault.name}
                   onClick={() => toVault(vault.address)}
                 >
-                  <td className="px-2 lg:px-3 py-2 lg:py-3">
+                  <td className="px-2 min-[1110px]:px-3 py-2  min-[1110px]:py-3">
                     <div className="flex items-center justify-start">
                       <VaultState status={vault.status} />
                       {vault.assets && (
@@ -385,18 +389,18 @@ const Vaults = () => {
                         >
                           {vault.symbol}
                         </p>
-                        <p className="lg:hidden">{vault.type}</p>
-                        <p className="lg:hidden">
+                        <p className="min-[1110px]:hidden">{vault.type}</p>
+                        <p className="min-[1110px]:hidden">
                           {getStrategyShortName(vault.symbol)}
                         </p>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-2 lg:px-1 py-2 hidden xl:table-cell">
+                  <td className="px-2 min-[1110px]:px-1 py-2 hidden xl:table-cell">
                     <VaultType type={vault.type} />
                   </td>
-                  <td className="pl-2 py-2 hidden lg:table-cell whitespace-nowrap">
+                  <td className="pl-2 py-2 hidden min-[1110px]:table-cell whitespace-nowrap">
                     <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                       {vault.strategyInfo && (
                         <>
@@ -443,7 +447,7 @@ const Vaults = () => {
                             </span>
                             {vault.strategySpecific && (
                               <span
-                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden lg:inline ${
+                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1110px]:inline ${
                                   vault.strategySpecific.length > 10
                                     ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
                                     : "uppercase  text-[10px] px-[6px]"
@@ -457,9 +461,11 @@ const Vaults = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-2 lg:px-3 py-2">
-                    <div className="flex w-[80px] justify-end">
-                      <p>{vault.apy}%</p>
+                  <td className="px-2 min-[1110px]:px-3 py-2">
+                    <div className="flex items-center justify-start">
+                      <p className="text-[14px] whitespace-nowrap w-[120px] text-end">
+                        {vault.apr} / {vault.apy}%
+                      </p>
                       <div className="tooltip">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -486,7 +492,7 @@ const Vaults = () => {
                             fill="white"
                           />
                         </svg>
-                        <div className="visible__tooltip">
+                        <div className="visible__tooltip hover:hidden">
                           <div className="flex items-start flex-col gap-4">
                             <p className="text-[14px]">
                               The Annual Percentage Rate (APR) for the Vault is
@@ -528,7 +534,7 @@ const Vaults = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 lg:px-4 py-2">
+                  <td className="px-2 min-[1110px]:px-4 py-2">
                     <span
                       className="uppercase font-bold text-[12px]"
                       style={{ color: vault.strategyInfo.il?.color }}
@@ -536,16 +542,21 @@ const Vaults = () => {
                       {vault.strategyInfo.il?.title}
                     </span>
                   </td>
-                  <td className="px-2 lg:px-4 py-2">
-                    ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+                  <td className="px-2 min-[1110px]:px-4 py-2">
+                    $
+                    {formatFromBigInt(
+                      vault.shareprice,
+                      18,
+                      "withDecimals"
+                    ).toFixed(3)}
                   </td>
-                  <td className="px-2 lg:px-4 py-2 text-right">
+                  <td className="px-2 min-[1110px]:px-4 py-2 text-right">
                     {formatNumber(
                       formatFromBigInt(vault.tvl, 18, "withFloor"),
                       "abbreviate"
                     )}
                   </td>
-                  <td className="pr-2 md:pr-3 lg:pr-5 py-2 text-right">
+                  <td className="pr-2 md:pr-3 min-[1110px]:pr-5 py-2 text-right">
                     {formatNumber(
                       formatFromBigInt(vault.balance, 18),
                       "format"

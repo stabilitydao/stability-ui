@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       backgroundColor: {
-        button: "#262830",//"#2c2f38",
+        button: "#262830", //"#2c2f38",
         modal: "#1C1D2D",
       },
     },
