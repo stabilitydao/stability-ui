@@ -60,7 +60,8 @@ const Vaults = () => {
   const [portfolio, setPortfolio] = useState({
     deposited: "0",
     monthly: "0",
-    daily: "0",
+    dailySum: "0",
+    dailyPercent: "",
     apr: "0",
     apy: "0",
   });
@@ -238,13 +239,16 @@ const Vaults = () => {
         monthly += ((apr / 100) * balance) / 12;
       }
     });
-    const daily = monthly / 30;
-    avgApr = (100 * daily * 365) / deposited;
+    const dailySum = monthly / 30;
+    avgApr = (100 * dailySum * 365) / deposited;
+
+    const dailyPercent = String(avgApr / 365);
 
     setPortfolio({
       deposited: String(deposited.toFixed(2)),
       monthly: String(monthly.toFixed(2)),
-      daily: String(daily.toFixed(2)),
+      dailySum: String(dailySum.toFixed(2)),
+      dailyPercent: dailyPercent,
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
     });

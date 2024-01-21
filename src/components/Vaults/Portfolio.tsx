@@ -1,5 +1,7 @@
 import { memo, useState } from "react";
 
+import { formatNumber } from "@utils";
+
 interface IProps {
   data: any;
 }
@@ -52,44 +54,49 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
           </div>
         </div>
         <div className="flex items-center justify-start gap-5 flex-wrap">
-          <div>
+          <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               DEPOSITED
             </h2>
-            <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `$${data.deposited}` : "****"}
+            <p className="text-[1rem] md:text-[1.5rem]">
+              {visible ? `$${formatNumber(data.deposited, "format")}` : "****"}
             </p>
           </div>
-          <div>
+          <div className="max-w-[120px] w-full md:max-w-[150px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               MONTHLY YIELD
             </h2>
-            <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `$${data.monthly}` : "****"}
+            <p className="text-[1rem] md:text-[1.5rem]">
+              {visible ? `$${formatNumber(data.monthly, "format")}` : "****"}
             </p>
           </div>
-          <div>
+          <div className="w-[120px] md:w-[180px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               DAILY YIELD
             </h2>
-            <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `$${data.daily}` : "****"}
+            <p className="text-[1rem] md:text-[1.5rem]">
+              {visible
+                ? `${formatNumber(
+                    data.dailyPercent,
+                    "format"
+                  )}% / $${formatNumber(data.dailySum, "format")}`
+                : "****"}
             </p>
           </div>
-          <div>
+          <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               AVG. APR
             </h2>
-            <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `${data.apr}%` : "****"}
+            <p className="text-[1rem] md:text-[1.5rem]">
+              {visible ? `${formatNumber(data.apr, "format")}%` : "****"}
             </p>
           </div>
-          <div>
+          <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               AVG. APY
             </h2>
-            <p className="text-[1.2rem] md:text-[1.625rem]">
-              {visible ? `${data.apy}%` : "****"}
+            <p className="text-[1rem] md:text-[1.5rem]">
+              {visible ? `${formatNumber(data.apr, "format")}%` : "****"}
             </p>
           </div>
         </div>
