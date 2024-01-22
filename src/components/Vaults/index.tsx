@@ -464,7 +464,7 @@ const Vaults = () => {
                   <td className="px-2 min-[1110px]:px-3 py-2">
                     <div className="flex items-center justify-start">
                       <p className="text-[14px] whitespace-nowrap w-[120px] text-end">
-                        {vault.apr} / {vault.apy}%
+                        {vault.apr}% / {vault.apy}%
                       </p>
                       <div className="tooltip">
                         <svg
@@ -660,9 +660,11 @@ const Vaults = () => {
                   )}
                 </div>
                 <div className="flex justify-between border-b border-[#4f5158] w-full text-[16px] text-[#8f8f8f]">
-                  <p className="w-1/2 border-r border-[#4f5158]">APY</p>
-                  <div className="w-1/2 flex items-center justify-end">
-                    <p>{vault.apy}%</p>
+                  <p className="w-1/3 border-r border-[#4f5158]">APR / APY</p>
+                  <div className="w-2/3 flex items-center justify-end">
+                    <p>
+                      {vault.apr}% / {vault.apy}%
+                    </p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="18"
@@ -691,14 +693,14 @@ const Vaults = () => {
                   </div>
                 </div>
                 <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                  <p className="w-1/2 border-r border-[#4f5158]">PRICE</p>
-                  <p className="w-1/2 text-end">
+                  <p className="w-1/3 border-r border-[#4f5158]">PRICE</p>
+                  <p className="w-2/3 text-end">
                     ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
                   </p>
                 </div>
                 <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                  <p className="w-1/2 border-r border-[#4f5158]">TVL</p>
-                  <p className="w-1/2 text-end">
+                  <p className="w-1/3 border-r border-[#4f5158]">TVL</p>
+                  <p className="w-2/3 text-end">
                     {formatNumber(
                       formatFromBigInt(vault.tvl, 18, "withFloor"),
                       "abbreviate"
@@ -706,17 +708,17 @@ const Vaults = () => {
                   </p>
                 </div>
                 <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                  <p className="w-1/2 border-r border-[#4f5158]">IL</p>
+                  <p className="w-1/3 border-r border-[#4f5158]">IL</p>
                   <p
-                    className="w-1/2 text-end uppercase font-bold text-[12px]"
+                    className="w-2/3 text-end uppercase font-bold text-[12px]"
                     style={{ color: vault.strategyInfo.il?.color }}
                   >
                     {vault.strategyInfo.il?.title}
                   </p>
                 </div>
                 <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
-                  <p className="w-1/2 border-r border-[#4f5158]">BALANCE</p>
-                  <p className="w-1/2 text-end">
+                  <p className="w-1/3 border-r border-[#4f5158]">BALANCE</p>
+                  <p className="w-2/3 text-end">
                     {formatNumber(
                       formatFromBigInt(vault.balance, 18),
                       "format"

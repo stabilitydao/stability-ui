@@ -62,7 +62,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
               {visible ? `$${formatNumber(data.deposited, "format")}` : "****"}
             </p>
           </div>
-          <div className="max-w-[120px] w-full md:max-w-[150px] flex flex-col items-start">
+          <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               MONTHLY YIELD
             </h2>
@@ -76,10 +76,10 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
             </h2>
             <p className="text-[1rem] md:text-[1.5rem]">
               {visible
-                ? `${formatNumber(
+                ? `$${formatNumber(data.dailySum, "format")} / ${formatNumber(
                     data.dailyPercent,
                     "format"
-                  )}% / $${formatNumber(data.dailySum, "format")}`
+                  )}%`
                 : "****"}
             </p>
           </div>
@@ -96,7 +96,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
               AVG. APY
             </h2>
             <p className="text-[1rem] md:text-[1.5rem]">
-              {visible ? `${formatNumber(data.apr, "format")}%` : "****"}
+              {visible ? `${formatNumber(data.apy, "format")}%` : "****"}
             </p>
           </div>
         </div>
