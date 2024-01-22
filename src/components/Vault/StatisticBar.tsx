@@ -34,7 +34,7 @@ const StatisticBar: React.FC<IProps> = memo(({ vault }) => {
           APR / APY
         </p>
         <p>
-          {vault.apr} / {vault.apy}%
+          {vault.apr}% / {vault.apy}%
         </p>
       </div>
       <div className="block md:hidden lg:block">

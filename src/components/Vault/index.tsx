@@ -274,8 +274,13 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     ///// GET UNDERLYING TOKEN
     try {
       if (localVault.underlying != zeroAddress) {
+        const logo =
+          localVault.strategyInfo.shortName === "DQMF"
+            ? "/protocols/DefiEdge.svg"
+            : "/protocols/Gamma.png";
         if ($connected) {
           let underlyingSymbol = "";
+
           if (localVault.strategyInfo.shortName === "DQMF") {
             underlyingSymbol = await readContract(_publicClient, {
               address: localVault.underlying,
@@ -315,7 +320,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             decimals: underlyingDecimals,
             balance: formatUnits(underlyingBalance, underlyingDecimals),
             allowance: formatUnits(underlyingAllowance, underlyingDecimals),
-            logoURI: "/protocols/Gamma.png",
+            logoURI: logo,
           });
         } else {
           const defaultTokens = defaultOptionSymbols.split(" + ");
@@ -325,7 +330,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             decimals: 18,
             balance: 0,
             allowance: 0,
-            logoURI: "/protocols/Gamma.png",
+            logoURI: logo,
           });
         }
       }
@@ -1076,6 +1081,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     if ($assetsBalances) {
       for (let i = 0; i < option.length; i++) {
         const decimals = getTokenData(option[i])?.decimals;
+
         if (decimals) {
           balance[option[i]] = formatUnits(
             $assetsBalances[option[i]],
@@ -1084,7 +1090,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
         }
       }
     }
-    if (underlyingToken && option.length === 1) {
+    if (underlyingToken && underlyingToken?.address === option[0]) {
       balance[option[0]] = underlyingToken.balance;
     }
 
@@ -1224,7 +1230,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             );
           } else {
             const token = tokensJson.tokens.find(
-              (token) => token.address === option[0]
+              (token) => token.address === option[changedInput ? 0 : 1]
             );
 
             const decimals = token ? token.decimals + 18 : 24;
@@ -1552,7 +1558,9 @@ const Vault: React.FC<IProps> = ({ vault }) => {
                               [underlyingToken?.address],
                               underlyingToken?.symbol,
                               underlyingToken?.address,
-                              "/protocols/Gamma.png"
+                              localVault.strategyInfo.shortName === "DQMF"
+                                ? "/protocols/DefiEdge.svg"
+                                : "/protocols/Gamma.png"
                             );
                           }}
                         >
@@ -1677,7 +1685,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
                             <div className="w-full" key={asset}>
                               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                                 <p>Balance: </p>
-
                                 <p>{balances[asset]}</p>
                               </div>
 
