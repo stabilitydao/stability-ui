@@ -27,6 +27,7 @@ import {
   tokens,
   lastTx,
   connected,
+  transactionSettings,
 } from "@store";
 
 import {
@@ -72,6 +73,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   const $assetsPrices: any = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
   const $vaultAssets: any = useStore(vaultAssets);
+  const $transactionSettings = useStore(transactionSettings);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
   const $connected = useStore(connected);
@@ -113,11 +115,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
   const [settingsModal, setSettingsModal] = useState(false);
 
-  const [settings, setSettings] = useState({
-    slippage: "1",
-    approves: "unlimited",
-    gasLimit: "1.1",
-  });
+  const [settings, setSettings] = useState($transactionSettings);
 
   const [zapTokens, setZapTokens] = useState<any>(false);
   const [zapError, setZapError] = useState<boolean>(false);
@@ -1433,6 +1431,10 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("transactionSettings", JSON.stringify(settings));
+  }, [settings]);
 
   useEffect(() => {
     if (localVault) {

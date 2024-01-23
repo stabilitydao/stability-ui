@@ -148,6 +148,12 @@ const TRANSACTION_SETTINGS = {
   gasLimits: ["1", "1.1"],
 };
 
+const DEFAULT_TRANSACTION_SETTINGS = {
+  slippage: "1",
+  approves: "unlimited",
+  gasLimit: "1.1",
+};
+
 const VAULT_STATUSES: TVaultStatuses = {
   0: "NOT_EXIST",
   1: "ACTIVE",
@@ -253,6 +259,7 @@ export {
   STABLECOINS,
   CHAINS,
   TRANSACTION_SETTINGS,
+  DEFAULT_TRANSACTION_SETTINGS,
   GRAPH_ENDPOINT,
   PROTOCOLS,
   GRAPH_QUERY,
