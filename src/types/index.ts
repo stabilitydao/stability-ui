@@ -202,6 +202,12 @@ type TVaultStatuses = {
   [key: number]: string;
 };
 
+type TSettings = {
+  slippage: string;
+  approves: string;
+  gasLimit: string;
+};
+
 //// DAO
 type TDAOData = {
   platformVersion: string;
@@ -287,6 +293,7 @@ export type {
   TMultisigBalance,
   TMultiTokenData,
   TTokenomics,
+  TSettings,
   TProfitTokenWallet,
   TSdivTokenWallet,
   TVaultStatuses,

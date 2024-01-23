@@ -142,7 +142,11 @@ const CHAINS = [
   },
 ];
 
-const SLIPPAGE_VALUES = ["0.5", "1", "2"];
+const TRANSACTION_SETTINGS = {
+  slippage: ["0.5", "1", "2"],
+  approves: ["limited", "unlimited"],
+  gasLimits: ["1", "1.1"],
+};
 
 const VAULT_STATUSES: TVaultStatuses = {
   0: "NOT_EXIST",
@@ -248,7 +252,7 @@ export {
   TOKENS_ASSETS,
   STABLECOINS,
   CHAINS,
-  SLIPPAGE_VALUES,
+  TRANSACTION_SETTINGS,
   GRAPH_ENDPOINT,
   PROTOCOLS,
   GRAPH_QUERY,
