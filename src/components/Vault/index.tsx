@@ -112,7 +112,13 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   });
   const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
   const [settingsModal, setSettingsModal] = useState(false);
-  const [slippage, setSlippage] = useState("1");
+
+  const [settings, setSettings] = useState({
+    slippage: "1",
+    approves: "unlimited",
+    gasLimit: "1.1",
+  });
+
   const [zapTokens, setZapTokens] = useState<any>(false);
   const [zapError, setZapError] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
@@ -484,17 +490,33 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
     setError(false);
     const amount = inputs[option[0]]?.amount;
+    const decimals = getTokenData(option[0])?.decimals || 18;
+
+    const approveSum =
+      settings.approves === "unlimited"
+        ? maxUint256
+        : parseUnits(amount, decimals);
 
     if (option[0] !== underlyingToken?.address) {
-      const decimals = getTokenData(option[0])?.decimals;
-
       if (amount && decimals) {
         try {
+          const gas = await _publicClient.estimateContractGas({
+            address: option[0],
+            abi: ERC20ABI,
+            functionName: "approve",
+            args: [$platformData.zap as TAddress, approveSum],
+            account: $account as TAddress,
+          });
+          const gasLimit = BigInt(
+            Math.trunc(Number(gas) * Number(settings.gasLimit))
+          );
+
           const assetApprove = await writeContract({
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
-            args: [$platformData.zap as TAddress, maxUint256],
+            args: [$platformData.zap as TAddress, approveSum],
+            gas: gasLimit,
           });
           setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt({
@@ -532,11 +554,23 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       }
     } else {
       try {
+        const gas = await _publicClient.estimateContractGas({
+          address: underlyingToken?.address,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [vault as TAddress, approveSum],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+
         const assetApprove = await writeContract({
           address: underlyingToken?.address,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [vault as TAddress, maxUint256],
+          args: [vault as TAddress, approveSum],
+          gas: gasLimit,
         });
         setLoader(true);
 
@@ -578,9 +612,25 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     if (underlyingToken?.address === option[0]) {
       try {
         const shares = parseUnits(underlyingShares, 18);
-        const decimalPercent = BigInt(Math.floor(Number(slippage)));
+        const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
         const out = shares - (shares * decimalPercent) / 100n;
+
+        const gas = await _publicClient.estimateContractGas({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [
+            option as TAddress[],
+            [parseUnits(inputs[option[0]]?.amount, 18)],
+            out,
+            $account as TAddress,
+          ],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
 
         const depositAssets = await writeContract({
           address: vault as TAddress,
@@ -592,6 +642,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             out,
             $account as TAddress,
           ],
+          gas: gasLimit,
         });
         setLoader(true);
 
@@ -622,7 +673,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       }
     } else {
       try {
-        const decimalPercent = BigInt(Math.floor(Number(slippage)));
+        const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
         const shares = parseUnits(zapShares, 18);
 
@@ -637,6 +688,25 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
         const txData = zapTokens.map((tokens: any) => tokens.txData);
 
+        const gas = await _publicClient.estimateContractGas({
+          address: $platformData.zap,
+          abi: ZapABI,
+          functionName: "deposit",
+          args: [
+            vault as TAddress,
+            option[0],
+            amountIn,
+            router,
+            txData,
+            out,
+            $account as TAddress,
+          ],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+
         const zapDeposit = await writeContract({
           address: $platformData.zap,
           abi: ZapABI,
@@ -650,6 +720,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             out,
             $account as TAddress,
           ],
+          gas: gasLimit,
         });
         setLoader(true);
 
@@ -755,12 +826,30 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
   const withdrawZapApprove = async () => {
     setError(false);
+
+    const amount = inputs[option[0]].amount;
+
+    const approveSum =
+      settings.approves === "unlimited" ? maxUint256 : parseUnits(amount, 18);
+
     try {
+      const gas = await _publicClient.estimateContractGas({
+        address: vault as TAddress,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: [$platformData.zap, approveSum],
+        account: $account as TAddress,
+      });
+      const gasLimit = BigInt(
+        Math.trunc(Number(gas) * Number(settings.gasLimit))
+      );
+
       const assetApprove = await writeContract({
         address: vault as TAddress,
         abi: ERC20ABI,
         functionName: "approve",
-        args: [$platformData.zap, maxUint256],
+        args: [$platformData.zap, approveSum],
+        gas: gasLimit,
       });
       setLoader(true);
       const transaction = await _publicClient.waitForTransactionReceipt({
@@ -815,6 +904,14 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   /////
 
   const approve = async (asset: TAddress) => {
+    const amount = inputs[asset].amount;
+    const decimals = getTokenData(asset)?.decimals || 18;
+
+    const approveSum =
+      settings.approves === "unlimited"
+        ? maxUint256
+        : parseUnits(amount, decimals);
+
     setError(false);
     const needApprove = option.filter(
       (asset: TAddress) =>
@@ -826,11 +923,23 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     );
     if (vault) {
       try {
+        const gas = await _publicClient.estimateContractGas({
+          address: asset,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [vault, approveSum],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+
         const assetApprove = await writeContract({
           address: asset,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [vault, maxUint256],
+          args: [vault, approveSum],
+          gas: gasLimit,
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
@@ -917,14 +1026,25 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
 
-    const decimalPercent = BigInt(Math.floor(Number(slippage)));
+    const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
     const out = sharesOut - (sharesOut * decimalPercent) / 100n;
     try {
+      const gas = await _publicClient.estimateContractGas({
+        address: vault as TAddress,
+        abi: VaultABI,
+        functionName: "depositAssets",
+        args: [$assets as TAddress[], input, out, $account as TAddress],
+        account: $account as TAddress,
+      });
+      const gasLimit = BigInt(
+        Math.trunc(Number(gas) * Number(settings.gasLimit))
+      );
       const depositAssets = await writeContract({
         address: vault as TAddress,
         abi: VaultABI,
         functionName: "depositAssets",
         args: [$assets as TAddress[], input, out, $account as TAddress],
+        gas: gasLimit,
       });
       setLoader(true);
       const transaction = await _publicClient.waitForTransactionReceipt({
@@ -968,7 +1088,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       underlyingToken?.address === option[0] ||
       option.length > 1
     ) {
-      const decimalPercent = BigInt(Math.floor(Number(slippage)));
+      const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
       const withdrawAmounts = withdrawAmount.map((obj: any) => {
         const decimals = tokensJson.tokens.find(
           (token) => token.symbol === obj.symbol
@@ -979,11 +1099,23 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       });
 
       try {
+        const gas = await _publicClient.estimateContractGas({
+          address: vault as TAddress,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [$assets as TAddress[], sharesToBurn, withdrawAmounts],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+
         const withdrawAssets = await writeContract({
           address: vault as TAddress,
           abi: VaultABI,
           functionName: "withdrawAssets",
           args: [$assets as TAddress[], sharesToBurn, withdrawAmounts],
+          gas: gasLimit,
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
@@ -1015,7 +1147,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     } else {
       const optionAmount = Number(inputs[option[0]]?.amount);
       const calculatedValue =
-        optionAmount - (optionAmount * Math.floor(Number(slippage))) / 100;
+        optionAmount -
+        (optionAmount * Math.floor(Number(settings.slippage))) / 100;
       const minAmountOut = parseUnits(
         String(calculatedValue),
         getTokenData(option[0])?.decimals as number
@@ -1026,6 +1159,24 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
 
       try {
+        const gas = await _publicClient.estimateContractGas({
+          address: $platformData.zap,
+          abi: ZapABI,
+          functionName: "withdraw",
+          args: [
+            vault as TAddress,
+            option[0],
+            router,
+            txData,
+            sharesToBurn,
+            minAmountOut,
+          ],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+
         const zapWithdraw = await writeContract({
           address: $platformData.zap,
           abi: ZapABI,
@@ -1038,6 +1189,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             sharesToBurn,
             minAmountOut,
           ],
+          gas: gasLimit,
         });
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
@@ -1667,8 +1819,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
                 {settingsModal && (
                   <SettingsModal
-                    slippageState={slippage}
-                    setSlippageState={setSlippage}
+                    settingsState={settings}
+                    setSettingsState={setSettings}
                     setModalState={setSettingsModal}
                   />
                 )}
