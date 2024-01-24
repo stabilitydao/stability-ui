@@ -28,6 +28,7 @@ import {
   lastTx,
   vaultTypes,
   strategyTypes,
+  transactionSettings,
 } from "@store";
 import {
   platform,
@@ -51,6 +52,7 @@ import {
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
+  DEFAULT_TRANSACTION_SETTINGS,
 } from "@constants";
 
 import type { TAddress } from "@types";
@@ -396,6 +398,17 @@ const AppStore = (props: React.PropsWithChildren) => {
       console.error("API ERROR:", error);
     }
   };
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("transactionSettings");
+
+    if (savedSettings) {
+      const savedData = JSON.parse(savedSettings);
+      transactionSettings.set(savedData);
+    } else {
+      transactionSettings.set(DEFAULT_TRANSACTION_SETTINGS);
+    }
+  }, []);
 
   useEffect(() => {
     if (chain?.id != 137) {
