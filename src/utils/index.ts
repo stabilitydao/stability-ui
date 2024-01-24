@@ -11,6 +11,7 @@ import { addVaultData } from "./functions/addVaultData";
 import { get1InchRoutes } from "./functions/get1InchRoutes";
 import { debounce } from "./functions/debounce";
 import { decodeHex } from "./functions/decodeHex";
+import { setLocalStoreHash } from "./functions/setLocalStoreHash";
 
 export {
   getTokenData,
@@ -26,4 +27,5 @@ export {
   addAssetsBalance,
   addVaultData,
   decodeHex,
+  setLocalStoreHash,
 };
