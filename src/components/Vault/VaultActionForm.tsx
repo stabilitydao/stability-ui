@@ -8,7 +8,7 @@ import { writeContract } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 
-import { Loader } from "@components";
+import { Loader, ShareSkeleton, AssetsSkeleton } from "@components";
 
 import {
   vaultData,
@@ -53,7 +53,6 @@ import type {
 } from "@types";
 
 import tokensJson from "../../stability.tokenlist.json";
-
 interface IProps {
   vault: TVault;
 }
@@ -116,6 +115,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const [zapError, setZapError] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
   const [isRefresh, setIsRefresh] = useState(false);
+  const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
 
   const [error, setError] = useState<any>(false);
@@ -482,6 +482,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const zapApprove = async () => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
     setError(false);
+    setTransactionInProgress(true);
     const amount = inputs[option[0]]?.amount;
     const decimals = getTokenData(option[0])?.decimals || 18;
 
@@ -598,10 +599,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         console.error("APPROVE ERROR:", err);
       }
     }
+    setTransactionInProgress(false);
   };
   const zapDeposit = async () => {
     ///// UNDERLYING
     setError(false);
+    setTransactionInProgress(true);
     let transaction, depositAssets: any, zapDeposit: any;
     if (underlyingToken?.address === option[0]) {
       try {
@@ -759,6 +762,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         tokens: option,
       });
     }
+    setTransactionInProgress(false);
   };
   const getZapDepositSwapAmounts = async (amount: string) => {
     try {
@@ -834,6 +838,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const withdrawZapApprove = async () => {
     setError(false);
+    setTransactionInProgress(true);
 
     const amount = inputs[option[0]].amount;
 
@@ -899,6 +904,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setLoader(false);
       console.error("ZAP ERROR:", err);
     }
+    setTransactionInProgress(false);
   };
 
   ///// 1INCH DATA REFRESH
@@ -912,6 +918,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   /////
 
   const approve = async (asset: TAddress) => {
+    setTransactionInProgress(true);
     const amount = inputs[asset].amount;
     const decimals = getTokenData(asset)?.decimals || 18;
 
@@ -1019,10 +1026,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
       }
     }
+    setTransactionInProgress(false);
   };
 
   const deposit = async () => {
     setError(false);
+    setTransactionInProgress(true);
     let assets: string[] = [];
     let input: any = [];
 
@@ -1089,10 +1098,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       vault: vault.address,
       tokens: option,
     });
+    setTransactionInProgress(false);
   };
 
   const withdraw = async () => {
     setError(false);
+    setTransactionInProgress(true);
     const sharesToBurn = parseUnits(inputs[option[0]]?.amount, 18);
 
     if (!sharesToBurn) return;
@@ -1254,6 +1265,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         tokens: option,
       });
     }
+    setTransactionInProgress(false);
   };
 
   const loadAssetsBalances = () => {
@@ -1308,9 +1320,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setWithdrawAmount([
           {
             symbol: underlyingToken?.symbol,
+            logo: underlyingToken?.logoURI,
             amount: formatUnits(result[0], 18),
           },
         ]);
+        setZapButton("withdraw");
       } else {
         const assetsLength = $assets.map((_: any) => 0n);
 
@@ -1328,9 +1342,17 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         ) {
           const preview = result.map((amount: any, index: number) => {
             const tokenData: TTokenData | any = getTokenData($assets[index]);
+            const amountInTokens = Number(
+              formatUnits(amount, tokenData?.decimals)
+            );
+            const amountInUSD =
+              amountInTokens *
+              Number(formatUnits($assetsPrices[$assets[index]], 18));
             return {
               symbol: tokenData?.symbol,
-              amount: formatUnits(amount, tokenData?.decimals),
+              logo: tokenData?.logoURI,
+              amount: amountInTokens.toFixed(5),
+              amountInUSD: amountInUSD.toFixed(2),
             };
           });
           setWithdrawAmount(preview);
@@ -1355,10 +1377,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   "withdraw"
                 )
             );
-            setLoader(false);
+
             const outData = await Promise.all(promises);
             setZapPreviewWithdraw(outData);
             setZapButton("withdraw");
+            setLoader(false);
           } catch (error) {
             setLoader(false);
             console.error("WITHDRAW ERROR:", error);
@@ -1510,12 +1533,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   useEffect(() => {
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
+        if (transactionInProgress) return;
         if (inputs[option[0]]?.amount) {
           if (tab === "Deposit") {
-            getZapDepositSwapAmounts(inputs[option[0]]?.amount);
+            await getZapDepositSwapAmounts(inputs[option[0]]?.amount);
           }
           if (tab === "Withdraw") {
-            previewWithdraw(inputs[option[0]]?.amount);
+            await previewWithdraw(inputs[option[0]]?.amount);
           }
         }
       };
@@ -1524,7 +1548,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       return () => clearInterval(intervalId);
     }
-  }, [zapTokens, withdrawAmount, zapPreviewWithdraw, zapButton]);
+  }, [
+    zapTokens,
+    withdrawAmount,
+    zapPreviewWithdraw,
+    zapButton,
+    transactionInProgress,
+  ]);
+
   useEffect(() => {
     //setSharesOut(false);
     setUnderlyingShares(false);
@@ -1906,49 +1937,63 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </div>
                     ))}
                   </div>
-                  {!loader ? (
-                    <>
-                      {isApprove === 1 ? (
-                        <button
-                          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                          type="button"
-                          onClick={deposit}
-                        >
-                          Deposit
-                        </button>
-                      ) : isApprove === 2 ? (
-                        <>
-                          {option.map(
-                            (asset: any) =>
-                              allowance &&
-                              formatUnits(
-                                allowance[asset].allowance[0],
-                                Number(getTokenData(asset)?.decimals)
-                              ) < inputs[asset].amount && (
-                                <button
-                                  className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                                  key={asset}
-                                  type="button"
-                                  onClick={() => approve(asset as TAddress)}
-                                >
-                                  Approve {getTokenData(asset)?.symbol}
-                                </button>
-                              )
-                          )}
-                        </>
-                      ) : (
-                        isApprove === 0 && (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                          >
-                            INSUFFICIENT BALANCE
-                          </button>
-                        )
+
+                  {isApprove === 1 ? (
+                    <button
+                      disabled={transactionInProgress}
+                      className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                        transactionInProgress
+                          ? "bg-transparent flex items-center justify-center gap-2"
+                          : "bg-[#486556]"
+                      }`}
+                      type="button"
+                      onClick={deposit}
+                    >
+                      <p>Deposit</p>
+                      {transactionInProgress && <Loader color={"#486556"} />}
+                    </button>
+                  ) : isApprove === 2 ? (
+                    <div className="flex gap-3">
+                      {option.map(
+                        (asset: any) =>
+                          allowance &&
+                          formatUnits(
+                            allowance[asset].allowance[0],
+                            Number(getTokenData(asset)?.decimals)
+                          ) < inputs[asset].amount && (
+                            <button
+                              disabled={transactionInProgress}
+                              className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                transactionInProgress
+                                  ? "bg-transparent flex items-center justify-center gap-1"
+                                  : "bg-[#486556]"
+                              }`}
+                              key={asset}
+                              type="button"
+                              onClick={() => approve(asset as TAddress)}
+                            >
+                              <p>Approve {getTokenData(asset)?.symbol}</p>
+                              {transactionInProgress && (
+                                <Loader color={"#486556"} />
+                              )}
+                            </button>
+                          )
                       )}
-                    </>
+                    </div>
+                  ) : isApprove === 0 ? (
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                    >
+                      INSUFFICIENT BALANCE
+                    </button>
                   ) : (
-                    <Loader />
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                    >
+                      ENTER AMOUNT
+                    </button>
                   )}
                 </>
               ) : (
@@ -2045,117 +2090,153 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </p>
                     </div>
 
-                    {!loader && (
-                      <>
-                        {zapTokens && (
-                          <>
-                            {zapTokens.map((token: any) => (
-                              <div
-                                className="text-[18px]  flex items-center gap-1 ml-2"
-                                key={token.address}
-                              >
-                                {token.address.toLowerCase() !==
-                                  option[0].toLowerCase() && (
-                                  <div className="flex items-center gap-1 mt-2">
-                                    <img
-                                      src="/oneInch.svg"
-                                      alt="1inch logo"
-                                      title="1inch"
-                                    />
-                                    {zapError ? (
-                                      <img
-                                        src="/error.svg"
-                                        alt="error img"
-                                        title="error"
-                                      />
-                                    ) : (
-                                      <>
-                                        <div className="flex items-center gap-1">
-                                          <p>
-                                            {Number(token.amountIn).toFixed(2)}
-                                          </p>
-                                          <img
-                                            src={
-                                              getTokenData(option[0])?.logoURI
-                                            }
-                                            title={
-                                              getTokenData(option[0])?.symbol
-                                            }
-                                            alt={
-                                              getTokenData(option[0])?.symbol
-                                            }
-                                            className="w-6 h-6 rounded-full"
-                                          />
-                                        </div>
-                                        -&gt;
-                                        <div className="flex items-center gap-1">
-                                          <p>
-                                            {Number(token.amountOut).toFixed(2)}
-                                          </p>
-                                          <img
-                                            src={token.img}
-                                            title={token.symbol}
-                                            alt={token.symbol}
-                                            className="w-6 h-6 rounded-full"
-                                          />
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </>
-                        )}
-
-                        {underlyingShares && inputs[option[0]]?.amount > 0 && (
-                          <p className="text-left  ml-2 mt-3 text-[18px]">
-                            Shares: {underlyingShares}
-                          </p>
-                        )}
-                        {zapShares && inputs[option[0]]?.amount > 0 && (
-                          <p className="text-left  ml-2 mt-3 text-[18px]">
-                            Shares: {zapShares}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  {!loader ? (
-                    <>
-                      {" "}
-                      {zapButton === "insufficientBalance" ? (
-                        <button
-                          disabled
-                          className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                        >
-                          INSUFFICIENT BALANCE
-                        </button>
-                      ) : zapButton === "needApprove" ? (
-                        <button
-                          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                          type="button"
-                          onClick={zapApprove}
-                        >
-                          Approve{" "}
-                          {underlyingToken?.address === option[0]
-                            ? underlyingToken.symbol
-                            : getTokenData(option[0])?.symbol}
-                        </button>
+                    <div className="my-2 ml-2 flex flex-col gap-2">
+                      {loader ? (
+                        <AssetsSkeleton />
                       ) : (
-                        zapButton === "deposit" && (
-                          <button
-                            className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                            type="button"
-                            onClick={zapDeposit}
-                          >
-                            Deposit
-                          </button>
-                        )
+                        <div className="h-[100px]">
+                          {zapTokens && (
+                            <div>
+                              <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                                SWAPS
+                              </p>
+                              {zapTokens.map((token: any) => (
+                                <div
+                                  className="text-[18px]  flex items-center gap-1 ml-2"
+                                  key={token.address}
+                                >
+                                  {token.address.toLowerCase() !==
+                                    option[0].toLowerCase() && (
+                                    <div className="flex items-center gap-1 mt-2">
+                                      <img
+                                        src="/oneInch.svg"
+                                        alt="1inch logo"
+                                        title="1inch"
+                                      />
+                                      {zapError ? (
+                                        <img
+                                          src="/error.svg"
+                                          alt="error img"
+                                          title="error"
+                                        />
+                                      ) : (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(token.amountIn).toFixed(
+                                                2
+                                              )}
+                                            </p>
+                                            <img
+                                              src={
+                                                getTokenData(option[0])?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                          -&gt;
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(token.amountOut).toFixed(
+                                                2
+                                              )}
+                                            </p>
+                                            <img
+                                              src={token.img}
+                                              title={token.symbol}
+                                              alt={token.symbol}
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       )}
-                    </>
+                      <div className="mt-5">
+                        {loader ? (
+                          <ShareSkeleton />
+                        ) : (
+                          <div className="h-[63px]">
+                            {(underlyingShares &&
+                              inputs[option[0]]?.amount > 0) ||
+                              (zapShares && inputs[option[0]]?.amount > 0 && (
+                                <div className="text-left text-[18px]">
+                                  <p className="uppercase leading-3 text-[#8D8E96] mb-3">
+                                    YOU RECEIVE
+                                  </p>
+                                  {underlyingShares &&
+                                  inputs[option[0]]?.amount > 0
+                                    ? `Shares: ${underlyingShares}`
+                                    : zapShares &&
+                                      inputs[option[0]]?.amount > 0 &&
+                                      `Shares: ${zapShares}`}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {zapButton === "insufficientBalance" ? (
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                    >
+                      INSUFFICIENT BALANCE
+                    </button>
+                  ) : zapButton === "needApprove" ? (
+                    <button
+                      disabled={transactionInProgress}
+                      className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                        transactionInProgress
+                          ? "bg-transparent flex items-center justify-center gap-2"
+                          : "bg-[#486556]"
+                      }`}
+                      type="button"
+                      onClick={zapApprove}
+                    >
+                      <p>
+                        Approve{" "}
+                        {underlyingToken?.address === option[0]
+                          ? underlyingToken.symbol
+                          : getTokenData(option[0])?.symbol}
+                      </p>
+                      {transactionInProgress && <Loader color={"#486556"} />}
+                    </button>
+                  ) : zapButton === "deposit" ? (
+                    <button
+                      disabled={transactionInProgress}
+                      className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                        transactionInProgress
+                          ? "bg-transparent flex items-center justify-center gap-2"
+                          : "bg-[#486556]"
+                      }`}
+                      type="button"
+                      onClick={zapDeposit}
+                    >
+                      <p>Deposit</p>
+                      {transactionInProgress && <Loader color={"#486556"} />}
+                    </button>
                   ) : (
-                    <Loader />
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                    >
+                      ENTER AMOUNT
+                    </button>
                   )}
                 </div>
               )}
@@ -2251,175 +2332,194 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   </p>
                 </div>
               </div>
-              {!loader ? (
-                <>
-                  {(withdrawAmount || zapPreviewWithdraw) && (
-                    <div>
-                      <div className="my-2 ml-2 flex flex-col gap-2">
-                        {withdrawAmount &&
-                          withdrawAmount?.map(
-                            ({
-                              symbol,
-                              amount,
-                            }: {
-                              symbol: string;
-                              amount: string;
-                            }) => (
-                              <div key={symbol}>
-                                <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                                  {symbol}
-                                </p>
-                                <p>{amount}</p>
-                              </div>
-                            )
-                          )}
-                        {zapPreviewWithdraw && (
-                          <>
-                            {zapPreviewWithdraw?.map(
-                              ({
-                                address,
-                                amountIn,
-                                amountOut,
-                              }: {
-                                address: TAddress;
-                                amountIn: string;
-                                amountOut: string;
-                                symbol: string;
-                              }) => (
-                                <div key={amountIn}>
-                                  {address.toLowerCase() !==
-                                    option[0].toLowerCase() && (
-                                    <div className="flex">
-                                      <img
-                                        src="/oneInch.svg"
-                                        alt="1inch logo"
-                                        title="1inch"
-                                      />
-                                      {!!amountOut ? (
-                                        <>
-                                          <div className="flex items-center gap-1">
-                                            <p>{Number(amountIn).toFixed(5)}</p>
-                                            <img
-                                              src={
-                                                getTokenData(address)?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(address)?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(address)?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                          -&gt;
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(amountOut).toFixed(5)}
-                                            </p>
+              <div className="my-2 ml-2 flex flex-col gap-2">
+                {loader ? (
+                  <AssetsSkeleton />
+                ) : (
+                  <div className="h-[100px]">
+                    {withdrawAmount && (
+                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                        YOU RECEIVE
+                      </p>
+                    )}
 
-                                            <img
-                                              src={
-                                                getTokenData(option[0])?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                        </>
-                                      ) : (
+                    {withdrawAmount &&
+                      withdrawAmount?.map(
+                        ({
+                          symbol,
+                          logo,
+                          amount,
+                          amountInUSD,
+                        }: {
+                          symbol: string;
+                          logo: string;
+                          amount: string;
+                          amountInUSD: number;
+                        }) => (
+                          <div key={symbol} className="flex items-center gap-1">
+                            <img
+                              src={logo}
+                              alt={symbol}
+                              title={symbol}
+                              className="w-6 h-6 rounded-full"
+                            />
+                            <p>{amount}</p>
+                            {amountInUSD && <p>{`($${amountInUSD})`}</p>}
+                          </div>
+                        )
+                      )}
+                    {zapPreviewWithdraw && (
+                      <div>
+                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                          SWAPS
+                        </p>
+                        {zapPreviewWithdraw?.map(
+                          ({
+                            address,
+                            amountIn,
+                            amountOut,
+                          }: {
+                            address: TAddress;
+                            amountIn: string;
+                            amountOut: string;
+                            symbol: string;
+                          }) => (
+                            <div key={amountIn}>
+                              {address.toLowerCase() !==
+                                option[0].toLowerCase() && (
+                                <div className="flex">
+                                  <img
+                                    src="/oneInch.svg"
+                                    alt="1inch logo"
+                                    title="1inch"
+                                  />
+                                  {!!amountOut ? (
+                                    <>
+                                      <div className="flex items-center gap-1">
+                                        <p>{Number(amountIn).toFixed(5)}</p>
                                         <img
-                                          src="/error.svg"
-                                          alt="error img"
-                                          title="error"
+                                          src={getTokenData(address)?.logoURI}
+                                          title={getTokenData(address)?.symbol}
+                                          alt={getTokenData(address)?.symbol}
+                                          className="w-6 h-6 rounded-full"
                                         />
-                                      )}
-                                    </div>
+                                      </div>
+                                      -&gt;
+                                      <div className="flex items-center gap-1">
+                                        <p>{Number(amountOut).toFixed(5)}</p>
+
+                                        <img
+                                          src={getTokenData(option[0])?.logoURI}
+                                          title={
+                                            getTokenData(option[0])?.symbol
+                                          }
+                                          alt={getTokenData(option[0])?.symbol}
+                                          className="w-6 h-6 rounded-full"
+                                        />
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <img
+                                      src="/error.svg"
+                                      alt="error img"
+                                      title="error"
+                                    />
                                   )}
                                 </div>
-                              )
-                            )}
-                            <div className="flex items-center gap-1">
-                              <img
-                                src={getTokenData(option[0])?.logoURI}
-                                alt={getTokenData(option[0])?.symbol}
-                                title={getTokenData(option[0])?.symbol}
-                                className="w-6 h-6 rounded-full"
-                              />
-                              <p>
-                                {(
-                                  ((Number(zapPreviewWithdraw[0].amountIn) +
-                                    Number(
-                                      zapPreviewWithdraw.length > 1
-                                        ? zapPreviewWithdraw[1].amountIn
-                                        : 0
-                                    )) *
-                                    Number(
-                                      formatFromBigInt(
-                                        vault.shareprice,
-                                        18,
-                                        "withDecimals"
-                                      )
-                                    )) /
-                                  Number(
-                                    formatUnits($assetsPrices[option[0]], 18)
-                                  )
-                                ).toFixed(5)}
-                              </p>
-                              <p>{`($${(
-                                (Number(zapPreviewWithdraw[0].amountIn) +
-                                  Number(
-                                    zapPreviewWithdraw.length > 1
-                                      ? zapPreviewWithdraw[1].amountIn
-                                      : 0
-                                  )) *
-                                formatFromBigInt(
-                                  vault.shareprice,
-                                  18,
-                                  "withDecimals"
-                                )
-                              ).toFixed(2)})`}</p>
+                              )}
                             </div>
-                          </>
+                          )
                         )}
                       </div>
+                    )}
+                  </div>
+                )}
+                <div className="mt-5">
+                  {loader ? (
+                    <ShareSkeleton />
+                  ) : (
+                    <div className="h-[63px]">
+                      {zapPreviewWithdraw && (
+                        <div>
+                          <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                            YOU RECEIVE
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <img
+                              src={getTokenData(option[0])?.logoURI}
+                              alt={getTokenData(option[0])?.symbol}
+                              title={getTokenData(option[0])?.symbol}
+                              className="w-6 h-6 rounded-full"
+                            />
+                            <p>
+                              {(
+                                Number(zapPreviewWithdraw[0]?.amountOut) +
+                                Number(
+                                  zapPreviewWithdraw.length > 1
+                                    ? zapPreviewWithdraw[1]?.amountOut
+                                    : 0
+                                )
+                              ).toFixed(5)}
+                            </p>
+                            <p>{`($${(
+                              (Number(zapPreviewWithdraw[0]?.amountOut) +
+                                Number(
+                                  zapPreviewWithdraw.length > 1
+                                    ? zapPreviewWithdraw[1]?.amountOut
+                                    : 0
+                                )) *
+                              Number(formatUnits($assetsPrices[option[0]], 18))
+                            ).toFixed(2)})`}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
+                </div>
+              </div>
 
-                  {zapButton === "insufficientBalance" ? (
-                    <button
-                      disabled
-                      className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                    >
-                      INSUFFICIENT BALANCE
-                    </button>
-                  ) : zapButton === "needApprove" ? (
-                    <button
-                      className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                      type="button"
-                      onClick={withdrawZapApprove}
-                    >
-                      Approve
-                    </button>
-                  ) : (
-                    (zapButton === "withdraw" || zapButton === "deposit") && (
-                      <button
-                        type="button"
-                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                        onClick={withdraw}
-                      >
-                        WITHDRAW
-                      </button>
-                    )
-                  )}
-                </>
+              {zapButton === "insufficientBalance" ? (
+                <button
+                  disabled
+                  className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                >
+                  INSUFFICIENT BALANCE
+                </button>
+              ) : zapButton === "needApprove" ? (
+                <button
+                  disabled={transactionInProgress}
+                  className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                    transactionInProgress
+                      ? "bg-transparent flex items-center justify-center gap-2"
+                      : "bg-[#486556]"
+                  }`}
+                  type="button"
+                  onClick={withdrawZapApprove}
+                >
+                  <p>Approve</p>
+                  {transactionInProgress && <Loader color={"#486556"} />}
+                </button>
+              ) : zapButton === "withdraw" || zapButton === "deposit" ? (
+                <button
+                  disabled={transactionInProgress}
+                  type="button"
+                  className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                    transactionInProgress
+                      ? "bg-transparent flex items-center justify-center gap-2"
+                      : "bg-[#486556]"
+                  }`}
+                  onClick={withdraw}
+                >
+                  <p>WITHDRAW</p>
+                  {transactionInProgress && <Loader color={"#486556"} />}
+                </button>
               ) : (
-                <Loader />
+                <button
+                  disabled
+                  className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                >
+                  ENTER AMOUNT
+                </button>
               )}
             </>
           ) : (

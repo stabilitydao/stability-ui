@@ -3,6 +3,8 @@ import { TimeDifferenceIndicator } from "./TimeDifferenceIndicator";
 import { VaultState } from "./VaultState";
 import { VaultType } from "./VaultType";
 import { Loader } from "./Loader";
+import { AssetsSkeleton } from "./AssetsSkeleton";
+import { ShareSkeleton } from "./ShareSkeleton";
 
 export {
   AssetsProportion,
@@ -10,4 +12,6 @@ export {
   VaultState,
   VaultType,
   Loader,
+  AssetsSkeleton,
+  ShareSkeleton,
 };
