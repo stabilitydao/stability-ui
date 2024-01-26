@@ -99,6 +99,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const [zapShares, setZapShares] = useState<any>();
   const [zapButton, setZapButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<any>();
+  const [approveIndex, setApproveIndex] = useState<any>(false);
 
   const [tokenSelector, setTokenSelector] = useState<boolean>(false);
   const [activeOptionToken, setActiveOptionToken] = useState<any>({
@@ -181,8 +182,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       logoURI: logoURI,
     });
   };
-  const handleInputChange = (amount: string, asset: string) => {
+  const handleInputChange = async (amount: string, asset: string) => {
     if (!amount) {
+      setSharesOut(false);
       resetInputs(option);
       return;
     }
@@ -376,6 +378,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       if (!Number(amount)) {
         setZapButton("none");
         setZapTokens(false);
+        setLoader(false);
         return;
       }
 
@@ -429,6 +432,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
           );
+          setLoader(false);
         } catch (error) {
           console.error("UNDERLYING SHARES ERROR:", error);
         }
@@ -461,10 +465,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     [option, balances]
   );
   const zapInputHandler = (amount: string, asset: string) => {
-    setZapButton("none");
-    setZapTokens(false);
-    setZapPreviewWithdraw(false);
-
     setInputs(
       (prevInputs: any) =>
         ({
@@ -474,6 +474,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           },
         } as TVaultInput)
     );
+
+    setZapButton("none");
+    setZapTokens(false);
+    setZapPreviewWithdraw(false);
+    setLoader(true);
 
     // @ts-ignore
     debouncedZap(amount, asset);
@@ -605,6 +610,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     ///// UNDERLYING
     setError(false);
     setTransactionInProgress(true);
+    setLoader(true);
     let transaction, depositAssets: any, zapDeposit: any;
     if (underlyingToken?.address === option[0]) {
       try {
@@ -765,9 +771,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setTransactionInProgress(false);
   };
   const getZapDepositSwapAmounts = async (amount: string) => {
+    setLoader(true);
     try {
-      setLoader(true);
-
       const decimals = Number(getTokenData(option[0])?.decimals);
       const allowanceData = await getZapAllowance(option[0]);
       const zapAmounts = await readContract(_publicClient, {
@@ -917,8 +922,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   };
   /////
 
-  const approve = async (asset: TAddress) => {
-    setTransactionInProgress(true);
+  const approve = async (asset: TAddress, index: number) => {
+    setApproveIndex(index);
     const amount = inputs[asset].amount;
     const decimals = getTokenData(asset)?.decimals || 18;
 
@@ -932,7 +937,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       (asset: TAddress) =>
         allowance &&
         formatUnits(
-          allowance[asset].allowance[0],
+          allowance[asset]?.allowance[0],
           Number(getTokenData(asset)?.decimals)
         ) < inputs[asset].amount
     );
@@ -1026,7 +1031,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
       }
     }
-    setTransactionInProgress(false);
+    setApproveIndex(false);
   };
 
   const deposit = async () => {
@@ -1357,6 +1362,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           });
           setWithdrawAmount(preview);
           setZapButton("withdraw");
+          setLoader(false);
         } else {
           try {
             setLoader(true);
@@ -1419,6 +1425,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const previewDeposit = async () => {
     // if (!Number(lastKeyPress.key2)) return;
+    setLoader(true);
     if ($assets && tab === "Deposit") {
       const changedInput = $assets?.indexOf(lastKeyPress.key1);
       const preview: TVaultInput | any = {};
@@ -1479,6 +1486,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
       }
     }
+    setLoader(false);
   };
 
   useEffect(() => {
@@ -1510,6 +1518,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   useEffect(() => {
     setZapButton("none");
+    setSharesOut(false);
     setWithdrawAmount(false);
     setUnderlyingShares(false);
     setZapShares(false);
@@ -1557,7 +1566,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   ]);
 
   useEffect(() => {
-    //setSharesOut(false);
     setUnderlyingShares(false);
     setZapShares(false);
     if (option[0] === underlyingToken?.address || !inputs[option[0]]?.amount) {
@@ -1937,6 +1945,32 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </div>
                     ))}
                   </div>
+                  <div className="mt-5">
+                    {loader ? (
+                      <ShareSkeleton />
+                    ) : (
+                      <div className="h-[63px] text-[18px]">
+                        {sharesOut && (
+                          <div>
+                            <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
+                              YOU RECEIVE
+                            </p>
+                            Shares: {formatUnits(sharesOut * BigInt(100), 18)}{" "}
+                            ($
+                            {(
+                              formatUnits(sharesOut * BigInt(100), 18) *
+                              formatFromBigInt(
+                                vault.shareprice,
+                                18,
+                                "withDecimals"
+                              )
+                            ).toFixed(2)}
+                            )
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {isApprove === 1 ? (
                     <button
@@ -1955,25 +1989,25 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   ) : isApprove === 2 ? (
                     <div className="flex gap-3">
                       {option.map(
-                        (asset: any) =>
+                        (asset: any, index: number) =>
                           allowance &&
                           formatUnits(
-                            allowance[asset].allowance[0],
+                            allowance[asset]?.allowance[0],
                             Number(getTokenData(asset)?.decimals)
                           ) < inputs[asset].amount && (
                             <button
-                              disabled={transactionInProgress}
+                              disabled={approveIndex !== false}
                               className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                transactionInProgress
+                                approveIndex === index
                                   ? "bg-transparent flex items-center justify-center gap-1"
                                   : "bg-[#486556]"
                               }`}
                               key={asset}
                               type="button"
-                              onClick={() => approve(asset as TAddress)}
+                              onClick={() => approve(asset as TAddress, index)}
                             >
                               <p>Approve {getTokenData(asset)?.symbol}</p>
-                              {transactionInProgress && (
+                              {approveIndex === index && (
                                 <Loader color={"#486556"} />
                               )}
                             </button>
@@ -1992,7 +2026,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       disabled
                       className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
                     >
-                      ENTER AMOUNT
+                      {loader ? "LOADING..." : "ENTER AMOUNT"}
                     </button>
                   )}
                 </>
@@ -2178,10 +2212,24 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                   </p>
                                   {underlyingShares &&
                                   inputs[option[0]]?.amount > 0
-                                    ? `Shares: ${underlyingShares}`
+                                    ? `Shares: ${underlyingShares} ($${(
+                                        underlyingShares *
+                                        formatFromBigInt(
+                                          vault.shareprice,
+                                          18,
+                                          "withDecimals"
+                                        )
+                                      ).toFixed(2)})`
                                     : zapShares &&
                                       inputs[option[0]]?.amount > 0 &&
-                                      `Shares: ${zapShares}`}
+                                      `Shares: ${zapShares} ($${(
+                                        zapShares *
+                                        formatFromBigInt(
+                                          vault.shareprice,
+                                          18,
+                                          "withDecimals"
+                                        )
+                                      ).toFixed(2)})`}
                                 </div>
                               ))}
                           </div>
@@ -2235,7 +2283,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       disabled
                       className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
                     >
-                      ENTER AMOUNT
+                      {loader ? "LOADING..." : "ENTER AMOUNT"}
                     </button>
                   )}
                 </div>
@@ -2453,20 +2501,28 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             />
                             <p>
                               {(
-                                Number(zapPreviewWithdraw[0]?.amountOut) +
                                 Number(
-                                  zapPreviewWithdraw.length > 1
+                                  Number(zapPreviewWithdraw[0]?.amountOut)
+                                    ? zapPreviewWithdraw[0]?.amountOut
+                                    : zapPreviewWithdraw[0]?.amountIn
+                                ) +
+                                Number(
+                                  Number(zapPreviewWithdraw[1]?.amountOut)
                                     ? zapPreviewWithdraw[1]?.amountOut
-                                    : 0
+                                    : zapPreviewWithdraw[1]?.amountIn
                                 )
                               ).toFixed(5)}
                             </p>
                             <p>{`($${(
-                              (Number(zapPreviewWithdraw[0]?.amountOut) +
+                              (Number(
+                                Number(zapPreviewWithdraw[0]?.amountOut)
+                                  ? zapPreviewWithdraw[0]?.amountOut
+                                  : zapPreviewWithdraw[0]?.amountIn
+                              ) +
                                 Number(
-                                  zapPreviewWithdraw.length > 1
+                                  Number(zapPreviewWithdraw[1]?.amountOut)
                                     ? zapPreviewWithdraw[1]?.amountOut
-                                    : 0
+                                    : zapPreviewWithdraw[1]?.amountIn
                                 )) *
                               Number(formatUnits($assetsPrices[option[0]], 18))
                             ).toFixed(2)})`}</p>
@@ -2518,7 +2574,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   disabled
                   className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
                 >
-                  ENTER AMOUNT
+                  {loader ? "LOADING..." : "ENTER AMOUNT"}
                 </button>
               )}
             </>
