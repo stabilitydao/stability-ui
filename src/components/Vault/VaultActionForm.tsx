@@ -804,12 +804,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       );
 
       let outData = await Promise.all(promises);
-      outData = outData.filter(
-        (obj) => Number(obj.amountIn) > 0 || Number(obj.amountOut) > 0
-      );
 
+      if (vault.strategyInfo.shortName === "IQMF") {
+        outData = outData.filter(
+          (obj) => Number(obj.amountIn) > 0 || Number(obj.amountOut) > 0
+        );
+      }
       setZapTokens(outData);
-
       let assets: TAddress[] = vault.assets.map((asset) => asset.address);
       let amounts;
       if (vault.strategyInfo.shortName === "IQMF") {
@@ -1596,6 +1597,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       }
     }
   }, [vault]);
+
+  useEffect(() => {
+    console.log(tab);
+  }, [tab]);
 
   useEffect(() => {
     checkAllowance();
