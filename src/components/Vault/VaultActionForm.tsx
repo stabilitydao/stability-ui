@@ -291,6 +291,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const logo =
           vault.strategyInfo.shortName === "DQMF"
             ? "/protocols/DefiEdge.svg"
+            : vault.strategyInfo.shortName === "IQMF"
+            ? "/protocols/Ichi.png"
             : "/protocols/Gamma.png";
         if ($connected) {
           let underlyingSymbol = "";
@@ -812,7 +814,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       if (vault.strategyInfo.shortName === "IQMF") {
         outData = outData.filter(
-          (obj) => Number(obj.amountIn) > 0 || Number(obj.amountOut) > 0
+          (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
       }
       setZapTokens(outData);
@@ -822,8 +824,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         amounts = vault.assetsProportions.map((proportion, index) =>
           proportion
             ? parseUnits(
-                outData[index].amountOut,
-                getTokenData(outData[index]?.address as TAddress)?.decimals
+                outData[index]?.amountOut as string,
+                getTokenData(outData[index]?.address as TAddress)
+                  ?.decimals as number
               )
             : 0n
         );
@@ -1083,7 +1086,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       depositAssets: any,
       gas,
       gasLimit,
-      amounts = [];
+      amounts: any = [];
 
     for (let i = 0; i < option.length; i++) {
       if (i === changedInput) {
@@ -1877,6 +1880,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         underlyingToken?.address,
                         vault.strategyInfo.shortName === "DQMF"
                           ? "/protocols/DefiEdge.svg"
+                          : vault.strategyInfo.shortName === "IQMF"
+                          ? "/protocols/Ichi.png"
                           : "/protocols/Gamma.png"
                       );
                     }}
