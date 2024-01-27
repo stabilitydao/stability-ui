@@ -619,7 +619,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setError(false);
     setTransactionInProgress(true);
     setLoader(true);
-    let transaction, depositAssets: any, zapDeposit: any;
+    let transaction, depositAssets: any, zapDeposit: any, gas, gasLimit;
     if (underlyingToken?.address === option[0]) {
       try {
         const shares = parseUnits(underlyingShares, 18);
@@ -704,9 +704,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         const router = zapTokens[0].router || zapTokens[1].router;
 
-        const txData = zapTokens.map((tokens: any) => tokens.txData);
+        let txData = zapTokens.map((tokens: any) => tokens.txData);
 
-        const gas = await _publicClient.estimateContractGas({
+        if (vault.strategyInfo.shortName === "IQMF") txData.push("");
+
+        gas = await _publicClient.estimateContractGas({
           address: $platformData.zap,
           abi: ZapABI,
           functionName: "deposit",
@@ -721,9 +723,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           account: $account as TAddress,
         });
-        const gasLimit = BigInt(
-          Math.trunc(Number(gas) * Number(settings.gasLimit))
-        );
+        gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
 
         zapDeposit = await writeContract({
           address: $platformData.zap,
@@ -740,6 +740,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           gas: gasLimit,
         });
+
         setLoader(true);
 
         transaction = await _publicClient.waitForTransactionReceipt({
@@ -1098,7 +1099,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
 
     try {
-      if ($assets?.length > 1) {
+      if (vault.strategyInfo.shortName !== "IQMF") {
         gas = await _publicClient.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
@@ -1183,6 +1184,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     ///// 2ASSETS -> UNDERLYING -> ZAP
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
+    let assets = $assets;
+    if (vault.strategyInfo.shortName === "IQMF") {
+      assets = vault.assets.map((asset) => asset.address);
+    }
     if (
       (defaultOptionAssets === option[0] && option.length < 2) ||
       underlyingToken?.address === option[0] ||
@@ -1203,7 +1208,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [$assets as TAddress[], sharesToBurn, withdrawAmounts],
+          args: [assets as TAddress[], sharesToBurn, withdrawAmounts],
           account: $account as TAddress,
         });
         const gasLimit = BigInt(
@@ -1214,7 +1219,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [$assets as TAddress[], sharesToBurn, withdrawAmounts],
+          args: [assets as TAddress[], sharesToBurn, withdrawAmounts],
           gas: gasLimit,
         });
         setLoader(true);
@@ -1246,7 +1251,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         timestamp: new Date().getTime(),
         hash: withdrawAssets?.hash,
         status: transaction?.status || "reverted",
-        type: "deposit",
+        type: "withdraw",
         vault: vault.address,
         tokens: option,
       });
@@ -1332,7 +1337,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         timestamp: new Date().getTime(),
         hash: zapWithdraw?.hash,
         status: transaction?.status || "reverted",
-        type: "deposit",
+        type: "withdraw",
         vault: vault.address,
         tokens: option,
       });
@@ -1398,28 +1403,32 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         ]);
         setZapButton("withdraw");
       } else {
-        const assetsLength = $assets.map((_: any) => 0n);
+        let assetsLength = $assets.map((_: any) => 0n);
+        let assets = $assets;
+        if (vault.strategyInfo.shortName === "IQMF") {
+          assetsLength = [0n, 0n];
+          assets = vault.assets.map((asset) => asset.address);
+        }
 
         const { result } = await _publicClient.simulateContract({
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [$assets as TAddress[], currentValue, assetsLength],
+          args: [assets, currentValue, assetsLength],
           account: $account as TAddress,
         });
-
         if (
           (defaultOptionAssets === option[0] && option.length < 2) ||
           option.length > 1
         ) {
           const preview = result.map((amount: any, index: number) => {
-            const tokenData: TTokenData | any = getTokenData($assets[index]);
+            const tokenData: TTokenData | any = getTokenData(assets[index]);
             const amountInTokens = Number(
               formatUnits(amount, tokenData?.decimals)
             );
             const amountInUSD =
               amountInTokens *
-              Number(formatUnits($assetsPrices[$assets[index]], 18));
+              Number(formatUnits($assetsPrices[assets[index]], 18));
             return {
               symbol: tokenData?.symbol,
               logo: tokenData?.logoURI,
@@ -1442,9 +1451,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             const promises = result.map(
               async (amount, index) =>
                 await get1InchRoutes(
-                  $assets[index],
+                  assets[index],
                   option[0],
-                  Number(getTokenData($assets[index])?.decimals),
+                  Number(getTokenData(assets[index])?.decimals),
                   amount,
                   setZapError,
                   "withdraw"
@@ -1518,7 +1527,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
         try {
           let previewDepositAssets: any;
-          if ($assets?.length > 1) {
+          if (vault.strategyInfo.shortName !== "IQMF") {
             previewDepositAssets = await readContract(_publicClient, {
               address: vault.address,
               abi: VaultABI,
