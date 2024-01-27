@@ -262,6 +262,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setDefaultOptionSymbols(defaultOptionAssets.join(" + "));
     setDefaultOptionAssets(assets.join(", "));
     setDefaultOptionImages(logoURIs);
+    setActiveOptionToken({
+      symbol: defaultOptionAssets.join(" + "),
+      address: defaultOptionAssets,
+      logoURI: logoURIs,
+    });
   };
 
   /////
@@ -1599,7 +1604,34 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   }, [vault]);
 
   useEffect(() => {
-    console.log(tab);
+    if (vault.strategyInfo.shortName === "IQMF") {
+      let assetsData;
+      switch (tab) {
+        case "Deposit":
+          assetsData = vault.assets
+            .map((asset: any) => asset.address.toLowerCase())
+            .filter((_, index) => vault.assetsProportions[index]);
+          if (Array.isArray(assetsData)) {
+            assets.set(assetsData);
+            setOption(assetsData);
+            defaultAssetsOption(assetsData);
+          }
+          break;
+        case "Withdraw":
+          assetsData = vault.assets.map((asset: any) =>
+            asset.address.toLowerCase()
+          );
+
+          if (Array.isArray(assetsData)) {
+            assets.set(assetsData);
+            setOption(assetsData);
+            defaultAssetsOption(assetsData);
+          }
+          break;
+        default:
+          break;
+      }
+    }
   }, [tab]);
 
   useEffect(() => {
