@@ -789,31 +789,45 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         functionName: "getDepositSwapAmounts",
         args: [vault.address, option[0], parseUnits(amount, decimals)],
       });
-
       const promises = zapAmounts[0].map(
         async (toAddress, index) =>
-          await get1InchRoutes(
+          vault.assetsProportions[index] &&
+          (await get1InchRoutes(
             option[0],
             toAddress,
             decimals,
             String(zapAmounts[1][index]),
             setZapError,
             "deposit"
-          )
+          ))
       );
 
-      const outData = await Promise.all(promises);
+      let outData = await Promise.all(promises);
+      outData = outData.filter(
+        (obj) => Number(obj.amountIn) > 0 || Number(obj.amountOut) > 0
+      );
+
       setZapTokens(outData);
 
-      const addresses: (TAddress | undefined)[] = outData.map(
-        (tokenOut) => tokenOut?.address
-      );
-      let amounts = outData.map((tokenOut) =>
-        parseUnits(
-          tokenOut?.amountOut as string,
-          getTokenData(tokenOut?.address as TAddress)?.decimals as number
-        )
-      );
+      let assets: TAddress[] = vault.assets.map((asset) => asset.address);
+      let amounts;
+      if (vault.strategyInfo.shortName === "IQMF") {
+        amounts = vault.assetsProportions.map((proportion, index) =>
+          proportion
+            ? parseUnits(
+                outData[index].amountOut,
+                getTokenData(outData[index]?.address as TAddress)?.decimals
+              )
+            : 0n
+        );
+      } else {
+        amounts = outData.map((tokenOut) =>
+          parseUnits(
+            tokenOut?.amountOut as string,
+            getTokenData(tokenOut?.address as TAddress)?.decimals as number
+          )
+        );
+      }
 
       ///// index ^ 1 --> XOR
       amounts = amounts.map((thisAmount, index) => {
@@ -821,12 +835,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
-
       const previewDepositAssets = await readContract(_publicClient, {
         address: vault.address,
         abi: VaultABI,
         functionName: "previewDepositAssets",
-        args: [addresses as TAddress[], amounts],
+        args: [assets as TAddress[], amounts],
       });
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
