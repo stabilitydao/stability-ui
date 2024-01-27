@@ -16,8 +16,6 @@ import {
   assetsPrices,
   assetsBalances,
   account,
-  vaults,
-  vaultAssets,
   platformData,
   tokens,
   lastTx,
@@ -65,10 +63,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const $vaultData = useStore(vaultData);
   const $assets: any = useStore(assets);
   const $account = useStore(account);
-  const $vaults = useStore(vaults);
   const $assetsPrices: any = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
-  const $vaultAssets: any = useStore(vaultAssets);
   const $transactionSettings = useStore(transactionSettings);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $tokens: TAddress[] | any = useStore(tokens);
@@ -124,6 +120,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
+    if (vault.strategyInfo.shortName === "IQMF") {
+      if (apprDepo.includes(1)) return true;
+    }
     if (apprDepo.length < 2) {
       return true;
     }
@@ -157,7 +156,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       const button = checkButtonApproveDeposit(apprDepo);
       if (button) {
-        setIsApprove(apprDepo[apprDepo.length - 1]);
+        if (vault.strategyInfo.shortName === "IQMF") {
+          setIsApprove(1);
+        } else {
+          setIsApprove(apprDepo[apprDepo.length - 1]);
+        }
       } else {
         setIsApprove(2);
       }
@@ -272,8 +275,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     filtredTokens = filtredTokens.filter(
       (token) => token.address != defaultOptionAssets
     );
-    console.log($assets.length);
-    if ($assets.length < 2) {
+    if ($assets?.length < 2) {
       filtredTokens = filtredTokens.filter(
         (token) => token.address != $assets[0]
       );
@@ -1053,29 +1055,75 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
-
+    const changedInput = $assets?.indexOf(lastKeyPress.key1);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
     const out = sharesOut - (sharesOut * decimalPercent) / 100n;
 
-    let transaction, depositAssets: any;
+    let transaction,
+      depositAssets: any,
+      gas,
+      gasLimit,
+      amounts = [];
+
+    for (let i = 0; i < option.length; i++) {
+      if (i === changedInput) {
+        amounts.push(
+          parseUnits(
+            inputs[lastKeyPress.key1 as string].amount,
+            Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
+          )
+        );
+      } else {
+        const token = tokensJson.tokens.find(
+          (token) => token.address === option[changedInput ? 0 : 1]
+        );
+
+        const decimals = token ? token.decimals + 18 : 24;
+
+        amounts.push(parseUnits("1", decimals));
+      }
+    }
+
     try {
-      const gas = await _publicClient.estimateContractGas({
-        address: vault.address,
-        abi: VaultABI,
-        functionName: "depositAssets",
-        args: [$assets as TAddress[], input, out, $account as TAddress],
-        account: $account as TAddress,
-      });
-      const gasLimit = BigInt(
-        Math.trunc(Number(gas) * Number(settings.gasLimit))
-      );
-      depositAssets = await writeContract({
-        address: vault.address,
-        abi: VaultABI,
-        functionName: "depositAssets",
-        args: [$assets as TAddress[], input, out, $account as TAddress],
-        gas: gasLimit,
-      });
+      if ($assets?.length > 1) {
+        gas = await _publicClient.estimateContractGas({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [$assets as TAddress[], input, out, $account as TAddress],
+          account: $account as TAddress,
+        });
+        gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
+        depositAssets = await writeContract({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [$assets as TAddress[], input, out, $account as TAddress],
+          gas: gasLimit,
+        });
+      } else {
+        // IQMF strategy only
+        let assets: TAddress[] = vault.assets.map((asset) => asset.address);
+
+        let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
+          proportion ? amounts[0] : 0n
+        );
+        gas = await _publicClient.estimateContractGas({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [assets, IQMFAmounts, out, $account as TAddress],
+          account: $account as TAddress,
+        });
+        gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
+        depositAssets = await writeContract({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [assets, IQMFAmounts, out, $account as TAddress],
+          gas: gasLimit,
+        });
+      }
       setLoader(true);
       transaction = await _publicClient.waitForTransactionReceipt({
         confirmations: 5,
@@ -1455,13 +1503,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             amounts.push(parseUnits("1", decimals));
           }
         }
-
-        console.log($assets);
-        console.log(amounts);
-        console.log(vault);
         try {
           let previewDepositAssets: any;
-          if ($assets.length > 1) {
+          if ($assets?.length > 1) {
             previewDepositAssets = await readContract(_publicClient, {
               address: vault.address,
               abi: VaultABI,
@@ -1475,8 +1519,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
-            console.log(assets);
-            console.log(IQMFAmounts);
 
             previewDepositAssets = await readContract(_publicClient, {
               address: vault.address,
@@ -1485,8 +1527,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
               args: [assets, IQMFAmounts],
             });
           }
-
-          console.log(previewDepositAssets);
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -1495,7 +1535,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           const previewDepositAssetsArray: bigint[] = [
             ...previewDepositAssets[0],
           ];
-          for (let i = 0; i < $assets.length; i++) {
+          for (let i = 0; i < $assets?.length; i++) {
             const decimals = getTokenData($assets[i])?.decimals;
             if (i !== changedInput && decimals) {
               preview[$assets[i]] = {
@@ -1518,7 +1558,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     setLoader(false);
   };
-
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
@@ -1528,11 +1567,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const assetsData = vault.assets
         .map((asset: any) => asset.address.toLowerCase())
         .filter((_, index) => vault.assetsProportions[index]);
-      console.log(assetsData);
-      console.log(vault.assetsProportions);
-      // if(assetsData.length < 2) {
-
-      // }
       if (Array.isArray(assetsData)) {
         assets.set(assetsData);
         setOption(assetsData);
