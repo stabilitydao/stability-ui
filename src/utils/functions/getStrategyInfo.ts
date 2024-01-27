@@ -123,7 +123,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     strategyInfo = {
       name: "DefiEdge QuickSwap Merkl Farm",
       shortName: "DQMF",
-      protocols: [defiedge,quickSwap,merkl],
+      protocols: [defiedge, quickSwap, merkl],
       features: [farm],
       color: "#3477ff",
       bgColor: "#000000",
@@ -132,11 +132,11 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.DQMFN,
     };
-  } else if (vaultSymbol.match(/IQMF[a-z0-9]{1}?$/)) {
+  } else if (vaultSymbol.match(/IQMF[a-z0-9]{0,1}$/)) {
     strategyInfo = {
       name: "Ichi QuickSwap Merkl Farm",
       shortName: "IQMF",
-      protocols: [ichi,quickSwap,merkl],
+      protocols: [ichi, quickSwap, merkl],
       features: [farm],
       color: "#965fff",
       bgColor: "#000000",

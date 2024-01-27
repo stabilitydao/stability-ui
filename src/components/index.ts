@@ -10,6 +10,8 @@ import {
   VaultState,
   VaultType,
   Loader,
+  AssetsSkeleton,
+  ShareSkeleton,
 } from "./VaultUtils";
 
 export {
@@ -23,4 +25,6 @@ export {
   Footer,
   VaultState,
   TimeDifferenceIndicator,
+  ShareSkeleton,
+  AssetsSkeleton,
 };
