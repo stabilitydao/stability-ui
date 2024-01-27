@@ -272,6 +272,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     filtredTokens = filtredTokens.filter(
       (token) => token.address != defaultOptionAssets
     );
+    console.log($assets.length);
+    if ($assets.length < 2) {
+      filtredTokens = filtredTokens.filter(
+        (token) => token.address != $assets[0]
+      );
+    }
     ///// GET UNDERLYING TOKEN
     try {
       if (vault.underlying != zeroAddress) {
@@ -1450,13 +1456,37 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           }
         }
 
+        console.log($assets);
+        console.log(amounts);
+        console.log(vault);
         try {
-          const previewDepositAssets = await readContract(_publicClient, {
-            address: vault.address,
-            abi: VaultABI,
-            functionName: "previewDepositAssets",
-            args: [$assets as TAddress[], amounts],
-          });
+          let previewDepositAssets: any;
+          if ($assets.length > 1) {
+            previewDepositAssets = await readContract(_publicClient, {
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [$assets as TAddress[], amounts],
+            });
+          } else {
+            // IQMF strategy only
+            let assets: TAddress[] = vault.assets.map((asset) => asset.address);
+
+            let IQMFAmounts: bigint[] = vault.assetsProportions.map(
+              (proportion) => (proportion ? amounts[0] : 0n)
+            );
+            console.log(assets);
+            console.log(IQMFAmounts);
+
+            previewDepositAssets = await readContract(_publicClient, {
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [assets, IQMFAmounts],
+            });
+          }
+
+          console.log(previewDepositAssets);
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
@@ -1495,10 +1525,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   useEffect(() => {
     if (vault) {
-      const assetsData = vault.assets.map((asset: any) =>
-        asset.address.toLowerCase()
-      );
+      const assetsData = vault.assets
+        .map((asset: any) => asset.address.toLowerCase())
+        .filter((_, index) => vault.assetsProportions[index]);
+      console.log(assetsData);
+      console.log(vault.assetsProportions);
+      // if(assetsData.length < 2) {
 
+      // }
       if (Array.isArray(assetsData)) {
         assets.set(assetsData);
         setOption(assetsData);
@@ -1532,7 +1566,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     if (vault) {
       selectTokensHandler();
     }
-  }, [vault, $tokens, defaultOptionSymbols]);
+  }, [vault, $tokens, defaultOptionSymbols, $assets]);
 
   useEffect(() => {
     setZapTokens(false);
