@@ -39,7 +39,13 @@ const IL = {
   DQMFN: {
     rate: 8,
     title: "High",
-    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#F52A11",
+  },
+  IQMF: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
     color: "#F52A11",
   },
 };
@@ -57,7 +63,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     sourceCode: "",
   };
 
-  const { quickSwap, gamma, compound, defiedge, merkl } = PROTOCOLS;
+  const { quickSwap, gamma, compound, defiedge, merkl, ichi } = PROTOCOLS;
 
   const farm: IFeature = {
     name: "Farming",
@@ -125,6 +131,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il: IL.DQMFN,
+    };
+  } else if (vaultSymbol.match(/IQMF[a-z0-9]{1}?$/)) {
+    strategyInfo = {
+      name: "Ichi QuickSwap Merkl Farm",
+      shortName: "IQMF",
+      protocols: [ichi,quickSwap,merkl],
+      features: [farm],
+      color: "#965fff",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.IQMF,
     };
   }
 

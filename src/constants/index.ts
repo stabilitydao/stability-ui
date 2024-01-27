@@ -184,6 +184,10 @@ const PROTOCOLS = {
     name: "Merkl",
     logoSrc: "/protocols/Merkl.svg",
   },
+  ichi: {
+    name: "Ichi",
+    logoSrc: "/protocols/Ichi.png",
+  },
 };
 
 const GRAPH_ENDPOINT =
