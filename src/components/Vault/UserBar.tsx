@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from "react";
 
-import { formatFromBigInt, getTimeDifference } from "@utils";
+import { formatFromBigInt, getTimeDifference, formatNumber } from "@utils";
 
 import type { TVault } from "@types";
 
@@ -27,14 +27,20 @@ const UserBar: React.FC<IProps> = memo(({ vault }) => {
 
         <div className="text-[20px] h-8 flex">
           <p className="mr-1">
-            {formatFromBigInt(vault.balance, 18).toFixed(5)}
+            {formatNumber(
+              formatFromBigInt(vault.balance, 18).toFixed(5),
+              "format"
+            )}
           </p>
           <p className="whitespace-nowrap md:hidden lg:block">
             / $
-            {(
-              formatFromBigInt(vault.shareprice, 18, "withDecimals") *
-              Number(formatFromBigInt(vault.balance, 18, "withDecimals"))
-            ).toFixed(2)}
+            {formatNumber(
+              (
+                formatFromBigInt(vault.shareprice, 18, "withDecimals") *
+                Number(formatFromBigInt(vault.balance, 18, "withDecimals"))
+              ).toFixed(2),
+              "format"
+            )}
           </p>
         </div>
       </div>
