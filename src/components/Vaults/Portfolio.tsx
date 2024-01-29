@@ -53,7 +53,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
             )}
           </div>
         </div>
-        <div className="flex items-center justify-start gap-5 flex-wrap">
+        <div className="flex items-center justify-start gap-5 flex-wrap whitespace-nowrap">
           <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
             <h2 className="text-[1rem] md:text-[1.125rem] md:font-medium select-none">
               DEPOSITED

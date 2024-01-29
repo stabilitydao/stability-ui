@@ -8,7 +8,12 @@ import { writeContract } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 
-import { Loader, ShareSkeleton, AssetsSkeleton } from "@components";
+import {
+  Loader,
+  ShareSkeleton,
+  AssetsSkeleton,
+  AssetsProportion,
+} from "@components";
 
 import {
   vaultData,
@@ -291,6 +296,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const logo =
           vault.strategyInfo.shortName === "DQMF"
             ? "/protocols/DefiEdge.svg"
+            : vault.strategyInfo.shortName === "IQMF"
+            ? "/protocols/Ichi.png"
             : "/protocols/Gamma.png";
         if ($connected) {
           let underlyingSymbol = "";
@@ -812,7 +819,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       if (vault.strategyInfo.shortName === "IQMF") {
         outData = outData.filter(
-          (obj) => Number(obj.amountIn) > 0 || Number(obj.amountOut) > 0
+          (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
       }
       setZapTokens(outData);
@@ -822,8 +829,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         amounts = vault.assetsProportions.map((proportion, index) =>
           proportion
             ? parseUnits(
-                outData[index].amountOut,
-                getTokenData(outData[index]?.address as TAddress)?.decimals
+                outData[index]?.amountOut as string,
+                getTokenData(outData[index]?.address as TAddress)
+                  ?.decimals as number
               )
             : 0n
         );
@@ -1083,7 +1091,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       depositAssets: any,
       gas,
       gasLimit,
-      amounts = [];
+      amounts: any = [];
 
     for (let i = 0; i < option.length; i++) {
       if (i === changedInput) {
@@ -1877,6 +1885,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         underlyingToken?.address,
                         vault.strategyInfo.shortName === "DQMF"
                           ? "/protocols/DefiEdge.svg"
+                          : vault.strategyInfo.shortName === "IQMF"
+                          ? "/protocols/Ichi.png"
                           : "/protocols/Gamma.png"
                       );
                     }}
@@ -2016,7 +2026,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             </div>
                           </div>
                           <input
-                            className="w-[58%] pl-[50px] py-3 flex items-center h-full  text-[25px] bg-transparent"
+                            className="w-[75%] pl-[50px] py-3 flex items-center h-full text-[25px] bg-transparent"
                             list="amount"
                             id={asset}
                             name="amount"
@@ -2028,11 +2038,25 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                               handleInputChange(e.target.value, e.target.id)
                             }
                             type="text"
-                            onKeyDown={(evt) =>
-                              ["e", "E", "+", "-", " ", ","].includes(
-                                evt.key
-                              ) && evt.preventDefault()
-                            }
+                            onKeyDown={(evt) => {
+                              const currentValue =
+                                inputs && inputs[asset] && inputs[asset].amount;
+
+                              if (
+                                !/[\d.]/.test(evt.key) &&
+                                evt.key !== "Backspace"
+                              ) {
+                                evt.preventDefault();
+                              }
+
+                              if (
+                                evt.key === "." &&
+                                currentValue &&
+                                currentValue.includes(".")
+                              ) {
+                                evt.preventDefault();
+                              }
+                            }}
                           />
                           <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
                             {tokensJson.tokens.map((token) => {
@@ -2082,17 +2106,31 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
                               YOU RECEIVE
                             </p>
-                            Shares: {formatUnits(sharesOut * BigInt(100), 18)}{" "}
-                            ($
-                            {(
-                              formatUnits(sharesOut * BigInt(100), 18) *
-                              formatFromBigInt(
-                                vault.shareprice,
-                                18,
-                                "withDecimals"
+                            <div className="flex items-center">
+                              <AssetsProportion
+                                proportions={vault.assetsProportions}
+                                assets={vault?.assets}
+                                type="vault"
+                              />
+                              {Number(
+                                formatUnits(sharesOut * BigInt(100), 18)
+                              ).toFixed(12)}{" "}
+                              ($
+                              {(
+                                Number(
+                                  formatUnits(
+                                    BigInt(sharesOut) * BigInt(100),
+                                    18
+                                  )
+                                ) *
+                                formatFromBigInt(
+                                  vault.shareprice,
+                                  18,
+                                  "withDecimals"
+                                )
+                              ).toFixed(2)}
                               )
-                            ).toFixed(2)}
-                            )
+                            </div>
                           </div>
                         )}
                       </div>
@@ -2223,10 +2261,27 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           onChange={(e) =>
                             zapInputHandler(e.target.value, e.target.id)
                           }
-                          onKeyDown={(evt) =>
-                            ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
-                            evt.preventDefault()
-                          }
+                          onKeyDown={(evt) => {
+                            const currentValue =
+                              inputs &&
+                              inputs[option[0]] &&
+                              inputs[option[0]].amount;
+
+                            if (
+                              !/[\d.]/.test(evt.key) &&
+                              evt.key !== "Backspace"
+                            ) {
+                              evt.preventDefault();
+                            }
+
+                            if (
+                              evt.key === "." &&
+                              currentValue &&
+                              currentValue.includes(".")
+                            ) {
+                              evt.preventDefault();
+                            }
+                          }}
                           className={` py-3 flex items-center h-full   bg-transparent ${
                             underlyingToken?.address === option[0]
                               ? "text-[16px] w-[70%] pl-[10px]"
@@ -2252,15 +2307,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </div>
 
                     <div className="my-2 ml-2 flex flex-col gap-2">
+                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                        SWAPS
+                      </p>
                       {loader ? (
                         <AssetsSkeleton />
                       ) : (
                         <div className="h-[100px]">
                           {zapTokens && (
                             <div>
-                              <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                                SWAPS
-                              </p>
                               {zapTokens.map((token: any) => (
                                 <div
                                   className="text-[18px]  flex items-center gap-1 ml-2"
@@ -2326,41 +2381,57 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         </div>
                       )}
                       <div className="mt-5">
-                        {loader ? (
-                          <ShareSkeleton />
-                        ) : (
+                        <div className="h-[63px]">
+                          <p className="uppercase text-left text-[18px] leading-3 text-[#8D8E96] mb-3">
+                            YOU RECEIVE
+                          </p>
                           <div className="h-[63px]">
-                            {(underlyingShares &&
-                              inputs[option[0]]?.amount > 0) ||
-                              (zapShares && inputs[option[0]]?.amount > 0 && (
-                                <div className="text-left text-[18px]">
-                                  <p className="uppercase leading-3 text-[#8D8E96] mb-3">
-                                    YOU RECEIVE
-                                  </p>
-                                  {underlyingShares &&
-                                  inputs[option[0]]?.amount > 0
-                                    ? `Shares: ${underlyingShares} ($${(
-                                        underlyingShares *
-                                        formatFromBigInt(
-                                          vault.shareprice,
-                                          18,
-                                          "withDecimals"
-                                        )
-                                      ).toFixed(2)})`
-                                    : zapShares &&
-                                      inputs[option[0]]?.amount > 0 &&
-                                      `Shares: ${zapShares} ($${(
-                                        zapShares *
-                                        formatFromBigInt(
-                                          vault.shareprice,
-                                          18,
-                                          "withDecimals"
-                                        )
-                                      ).toFixed(2)})`}
-                                </div>
-                              ))}
+                            <div className="text-left text-[18px]">
+                              <div className="flex items-center">
+                                <AssetsProportion
+                                  proportions={vault.assetsProportions}
+                                  assets={vault?.assets}
+                                  type="vault"
+                                />
+                                {loader ? (
+                                  <ShareSkeleton height={30} width={300} />
+                                ) : (
+                                  <div>
+                                    {(underlyingShares &&
+                                      inputs[option[0]]?.amount > 0) ||
+                                    (zapShares &&
+                                      inputs[option[0]]?.amount > 0) ? (
+                                      <p>
+                                        {underlyingShares &&
+                                        inputs[option[0]]?.amount > 0
+                                          ? `${underlyingShares} ($${(
+                                              underlyingShares *
+                                              formatFromBigInt(
+                                                vault.shareprice,
+                                                18,
+                                                "withDecimals"
+                                              )
+                                            ).toFixed(2)})`
+                                          : zapShares &&
+                                            inputs[option[0]]?.amount > 0 &&
+                                            `${zapShares} ($${(
+                                              zapShares *
+                                              formatFromBigInt(
+                                                vault.shareprice,
+                                                18,
+                                                "withDecimals"
+                                              )
+                                            ).toFixed(2)})`}
+                                      </p>
+                                    ) : (
+                                      <p>0 ($0.0)</p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2482,10 +2553,22 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       previewWithdraw(e.target.value);
                       handleInputChange(e.target.value, e.target.id);
                     }}
-                    onKeyDown={(evt) =>
-                      ["e", "E", "+", "-", " ", ","].includes(evt.key) &&
-                      evt.preventDefault()
-                    }
+                    onKeyDown={(evt) => {
+                      const currentValue =
+                        inputs && inputs[option[0]] && inputs[option[0]].amount;
+
+                      if (!/[\d.]/.test(evt.key) && evt.key !== "Backspace") {
+                        evt.preventDefault();
+                      }
+
+                      if (
+                        evt.key === "." &&
+                        currentValue &&
+                        currentValue.includes(".")
+                      ) {
+                        evt.preventDefault();
+                      }
+                    }}
                     pattern="^[0-9]*[.,]?[0-9]*$"
                     inputMode="decimal"
                     className="py-3 flex items-center h-full  bg-transparent  text-[16px] w-[70%] pl-[10px]"
@@ -2508,47 +2591,45 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </div>
               </div>
               <div className="my-2 ml-2 flex flex-col gap-2">
-                {loader ? (
-                  <AssetsSkeleton />
-                ) : (
-                  <div className="h-[100px]">
-                    {withdrawAmount && (
-                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                        YOU RECEIVE
-                      </p>
-                    )}
+                {option.length > 1 && (
+                  <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
+                    YOU RECEIVE
+                  </p>
+                )}
 
-                    {withdrawAmount &&
-                      withdrawAmount?.map(
-                        ({
-                          symbol,
-                          logo,
-                          amount,
-                          amountInUSD,
-                        }: {
-                          symbol: string;
-                          logo: string;
-                          amount: string;
-                          amountInUSD: number;
-                        }) => (
-                          <div key={symbol} className="flex items-center gap-1">
-                            <img
-                              src={logo}
-                              alt={symbol}
-                              title={symbol}
-                              className="w-6 h-6 rounded-full"
-                            />
-                            <p>{amount}</p>
-                            {amountInUSD && <p>{`($${amountInUSD})`}</p>}
-                          </div>
-                        )
-                      )}
-                    {zapPreviewWithdraw && (
-                      <div>
-                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                          SWAPS
-                        </p>
-                        {zapPreviewWithdraw?.map(
+                <div className="h-[100px]">
+                  {option.length > 1 &&
+                    option.map((address, index) => (
+                      <div className="flex items-center gap-1" key={address}>
+                        <img
+                          src={getTokenData(address)?.logoURI}
+                          alt={getTokenData(address)?.symbol}
+                          title={getTokenData(address)?.symbol}
+                          className="w-6 h-6 rounded-full"
+                        />
+                        {loader ? (
+                          <ShareSkeleton height={32} />
+                        ) : (
+                          <p>
+                            {withdrawAmount
+                              ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index]?.amountInUSD})`
+                              : "0 ($0)"}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+
+                  {option.length < 2 && (
+                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                      SWAPS
+                    </p>
+                  )}
+                  {loader && option.length < 2 ? (
+                    <AssetsSkeleton />
+                  ) : (
+                    <div>
+                      {zapPreviewWithdraw &&
+                        zapPreviewWithdraw?.map(
                           ({
                             address,
                             amountIn,
@@ -2605,60 +2686,68 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             </div>
                           )
                         )}
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="mt-5">
-                  {loader ? (
-                    <ShareSkeleton />
-                  ) : (
-                    <div className="h-[63px]">
-                      {zapPreviewWithdraw && (
-                        <div>
-                          <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                            YOU RECEIVE
-                          </p>
-                          <div className="flex items-center gap-1">
-                            <img
-                              src={getTokenData(option[0])?.logoURI}
-                              alt={getTokenData(option[0])?.symbol}
-                              title={getTokenData(option[0])?.symbol}
-                              className="w-6 h-6 rounded-full"
-                            />
-                            <p>
-                              {(
-                                Number(
-                                  Number(zapPreviewWithdraw[0]?.amountOut)
-                                    ? zapPreviewWithdraw[0]?.amountOut
-                                    : zapPreviewWithdraw[0]?.amountIn
-                                ) +
-                                Number(
-                                  Number(zapPreviewWithdraw[1]?.amountOut)
-                                    ? zapPreviewWithdraw[1]?.amountOut
-                                    : zapPreviewWithdraw[1]?.amountIn
-                                )
-                              ).toFixed(5)}
-                            </p>
-                            <p>{`($${(
-                              (Number(
-                                Number(zapPreviewWithdraw[0]?.amountOut)
-                                  ? zapPreviewWithdraw[0]?.amountOut
-                                  : zapPreviewWithdraw[0]?.amountIn
-                              ) +
-                                Number(
-                                  Number(zapPreviewWithdraw[1]?.amountOut)
-                                    ? zapPreviewWithdraw[1]?.amountOut
-                                    : zapPreviewWithdraw[1]?.amountIn
-                                )) *
-                              Number(formatUnits($assetsPrices[option[0]], 18))
-                            ).toFixed(2)})`}</p>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
+
+                {option.length < 2 && (
+                  <div className="mt-5">
+                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                      YOU RECEIVE
+                    </p>
+                    <div className="h-[63px]">
+                      <div className="flex items-center gap-1">
+                        <img
+                          src={getTokenData(option[0])?.logoURI}
+                          alt={getTokenData(option[0])?.symbol}
+                          title={getTokenData(option[0])?.symbol}
+                          className="w-6 h-6 rounded-full"
+                        />
+                        {loader ? (
+                          <ShareSkeleton height={32} />
+                        ) : (
+                          <div>
+                            {zapPreviewWithdraw ? (
+                              <div className="flex items-center gap-1">
+                                <p>
+                                  {(
+                                    Number(
+                                      Number(zapPreviewWithdraw[0]?.amountOut)
+                                        ? zapPreviewWithdraw[0]?.amountOut
+                                        : zapPreviewWithdraw[0]?.amountIn
+                                    ) +
+                                    Number(
+                                      Number(zapPreviewWithdraw[1]?.amountOut)
+                                        ? zapPreviewWithdraw[1]?.amountOut
+                                        : zapPreviewWithdraw[1]?.amountIn
+                                    )
+                                  ).toFixed(5)}
+                                </p>
+                                <p>{`($${(
+                                  (Number(
+                                    Number(zapPreviewWithdraw[0]?.amountOut)
+                                      ? zapPreviewWithdraw[0]?.amountOut
+                                      : zapPreviewWithdraw[0]?.amountIn
+                                  ) +
+                                    Number(
+                                      Number(zapPreviewWithdraw[1]?.amountOut)
+                                        ? zapPreviewWithdraw[1]?.amountOut
+                                        : zapPreviewWithdraw[1]?.amountIn
+                                    )) *
+                                  Number(
+                                    formatUnits($assetsPrices[option[0]], 18)
+                                  )
+                                ).toFixed(2)})`}</p>
+                              </div>
+                            ) : (
+                              <p>0 ($0)</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {zapButton === "insufficientBalance" ? (
