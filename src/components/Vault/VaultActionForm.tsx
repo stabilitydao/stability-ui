@@ -124,6 +124,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
+  const CFCondition =
+    vault.strategyInfo.shortName === "CF" &&
+    vault.assets[0].address === option[0];
+
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (vault.strategyInfo.shortName === "IQMF") {
       if (apprDepo.includes(1)) return true;
@@ -273,7 +277,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       logoURI: logoURIs,
     });
   };
-
   /////
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
@@ -482,7 +485,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
       }
     }, 1000),
-    [option, balances]
+    [option, balances, tab]
   );
   const zapInputHandler = (amount: string, asset: string) => {
     setInputs(
@@ -1607,6 +1610,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const assetsData = vault.assets
         .map((asset: any) => asset.address.toLowerCase())
         .filter((_, index) => vault.assetsProportions[index]);
+
       if (Array.isArray(assetsData)) {
         assets.set(assetsData);
         setOption(assetsData);
@@ -2595,14 +2599,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </div>
               </div>
               <div className="my-2 ml-2 flex flex-col gap-2">
-                {option.length > 1 && (
+                {(option.length > 1 || CFCondition) && (
                   <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
                     YOU RECEIVE
                   </p>
                 )}
 
                 <div className="h-[100px]">
-                  {option.length > 1 &&
+                  {(option.length > 1 || CFCondition) &&
                     option.map((address, index) => (
                       <div className="flex items-center gap-1" key={address}>
                         <img
@@ -2623,78 +2627,94 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </div>
                     ))}
 
-                  {option.length < 2 && (
-                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                      SWAPS
-                    </p>
-                  )}
-                  {loader && option.length < 2 ? (
-                    <AssetsSkeleton />
-                  ) : (
+                  {!CFCondition && (
                     <div>
-                      {zapPreviewWithdraw &&
-                        zapPreviewWithdraw?.map(
-                          ({
-                            address,
-                            amountIn,
-                            amountOut,
-                          }: {
-                            address: TAddress;
-                            amountIn: string;
-                            amountOut: string;
-                            symbol: string;
-                          }) => (
-                            <div key={amountIn}>
-                              {address.toLowerCase() !==
-                                option[0].toLowerCase() && (
-                                <div className="flex">
-                                  <img
-                                    src="/oneInch.svg"
-                                    alt="1inch logo"
-                                    title="1inch"
-                                  />
-                                  {!!amountOut ? (
-                                    <>
-                                      <div className="flex items-center gap-1">
-                                        <p>{Number(amountIn).toFixed(5)}</p>
-                                        <img
-                                          src={getTokenData(address)?.logoURI}
-                                          title={getTokenData(address)?.symbol}
-                                          alt={getTokenData(address)?.symbol}
-                                          className="w-6 h-6 rounded-full"
-                                        />
-                                      </div>
-                                      -&gt;
-                                      <div className="flex items-center gap-1">
-                                        <p>{Number(amountOut).toFixed(5)}</p>
+                      {option.length < 2 && (
+                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                          SWAPS
+                        </p>
+                      )}
+                      {loader && option.length < 2 ? (
+                        <AssetsSkeleton />
+                      ) : (
+                        <div>
+                          {zapPreviewWithdraw &&
+                            zapPreviewWithdraw?.map(
+                              ({
+                                address,
+                                amountIn,
+                                amountOut,
+                              }: {
+                                address: TAddress;
+                                amountIn: string;
+                                amountOut: string;
+                                symbol: string;
+                              }) => (
+                                <div key={amountIn}>
+                                  {address.toLowerCase() !==
+                                    option[0].toLowerCase() && (
+                                    <div className="flex">
+                                      <img
+                                        src="/oneInch.svg"
+                                        alt="1inch logo"
+                                        title="1inch"
+                                      />
+                                      {!!amountOut ? (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <p>{Number(amountIn).toFixed(5)}</p>
+                                            <img
+                                              src={
+                                                getTokenData(address)?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(address)?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(address)?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                          -&gt;
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(amountOut).toFixed(5)}
+                                            </p>
 
+                                            <img
+                                              src={
+                                                getTokenData(option[0])?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                        </>
+                                      ) : (
                                         <img
-                                          src={getTokenData(option[0])?.logoURI}
-                                          title={
-                                            getTokenData(option[0])?.symbol
-                                          }
-                                          alt={getTokenData(option[0])?.symbol}
-                                          className="w-6 h-6 rounded-full"
+                                          src="/error.svg"
+                                          alt="error img"
+                                          title="error"
                                         />
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <img
-                                      src="/error.svg"
-                                      alt="error img"
-                                      title="error"
-                                    />
+                                      )}
+                                    </div>
                                   )}
                                 </div>
-                              )}
-                            </div>
-                          )
-                        )}
+                              )
+                            )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {option.length < 2 && (
+                {option.length < 2 && !CFCondition && (
                   <div className="mt-5">
                     <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
                       YOU RECEIVE
