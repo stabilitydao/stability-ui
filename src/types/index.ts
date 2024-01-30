@@ -208,6 +208,15 @@ type TSettings = {
   gasLimit: string;
 };
 
+type TToast = {
+  hash: string;
+  status: string;
+  timestamp: number;
+  tokens: Record<string, { amount: string }>;
+  type: string;
+  vault: string;
+};
+
 //// DAO
 type TDAOData = {
   platformVersion: string;
@@ -300,4 +309,5 @@ export type {
   TTableFilters,
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,
+  TToast,
 };

@@ -632,6 +632,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setTransactionInProgress(true);
     setLoader(true);
     let transaction, depositAssets: any, zapDeposit: any, gas, gasLimit;
+    const amount = inputs[option[0]]?.amount;
     if (underlyingToken?.address === option[0]) {
       try {
         const shares = parseUnits(underlyingShares, 18);
@@ -645,7 +646,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           functionName: "depositAssets",
           args: [
             option as TAddress[],
-            [parseUnits(inputs[option[0]]?.amount, 18)],
+            [parseUnits(amount, 18)],
             out,
             $account as TAddress,
           ],
@@ -661,7 +662,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           functionName: "depositAssets",
           args: [
             option as TAddress[],
-            [parseUnits(inputs[option[0]]?.amount, 18)],
+            [parseUnits(amount, 18)],
             out,
             $account as TAddress,
           ],
@@ -673,7 +674,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: depositAssets?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: depositAssets?.hash,
+          status: transaction?.status || "reverted",
+          type: "deposit",
+          vault: vault.address,
+          tokens: inputs,
+        });
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -693,14 +701,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: depositAssets?.hash,
-        status: transaction?.status || "reverted",
-        type: "deposit",
-        vault: vault.address,
-        tokens: option,
-      });
     } else {
       try {
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
@@ -710,7 +710,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const out = shares - (shares * decimalPercent) / 100n;
 
         const amountIn = parseUnits(
-          inputs[option[0]].amount,
+          amount,
           getTokenData(option[0])?.decimals || 18
         );
 
@@ -760,6 +760,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           hash: zapDeposit?.hash,
         });
 
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: zapDeposit?.hash,
+          status: transaction?.status || "reverted",
+          type: "deposit",
+          vault: vault.address,
+          tokens: inputs,
+        });
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -780,14 +788,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: zapDeposit?.hash,
-        status: transaction?.status || "reverted",
-        type: "deposit",
-        vault: vault.address,
-        tokens: option,
-      });
     }
     setTransactionInProgress(false);
   };
@@ -843,7 +843,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           )
         );
       }
-
       ///// index ^ 1 --> XOR
       amounts = amounts.map((thisAmount, index) => {
         return !thisAmount
@@ -1091,7 +1090,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       depositAssets: any,
       gas,
       gasLimit,
-      amounts: any = [];
+      amounts: any = [],
+      txAmounts: any = [];
 
     for (let i = 0; i < option.length; i++) {
       if (i === changedInput) {
@@ -1111,7 +1111,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         amounts.push(parseUnits("1", decimals));
       }
     }
-
     try {
       if (vault.strategyInfo.shortName !== "IQMF") {
         gas = await _publicClient.estimateContractGas({
@@ -1157,7 +1156,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         confirmations: 5,
         hash: depositAssets?.hash,
       });
-
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: depositAssets?.hash,
+        status: transaction?.status || "reverted",
+        type: "deposit",
+        vault: vault.address,
+        tokens: inputs,
+      });
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
     } catch (err) {
@@ -1177,14 +1183,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
     }
-    setLocalStoreHash({
-      timestamp: new Date().getTime(),
-      hash: depositAssets?.hash,
-      status: transaction?.status || "reverted",
-      type: "deposit",
-      vault: vault.address,
-      tokens: option,
-    });
     setTransactionInProgress(false);
   };
 
@@ -1208,6 +1206,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       option.length > 1
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
+      const txTokens = withdrawAmount.reduce((result, token) => {
+        const JSONToken = tokensJson.tokens.find(
+          (t) => t.symbol === token.symbol
+        );
+
+        result[JSONToken.address] = { amount: token.amount };
+        return result;
+      }, {});
+
       const withdrawAmounts = withdrawAmount.map((obj: any) => {
         const decimals = tokensJson.tokens.find(
           (token) => token.symbol === obj.symbol
@@ -1216,7 +1223,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const amount = parseUnits(obj.amount, decimals ? decimals : 18);
         return amount - (amount * decimalPercent) / 100n;
       });
-
       try {
         const gas = await _publicClient.estimateContractGas({
           address: vault.address,
@@ -1241,7 +1247,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: withdrawAssets?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: withdrawAssets?.hash,
+          status: transaction?.status || "reverted",
+          type: "withdraw",
+          vault: vault.address,
+          tokens: txTokens,
+        });
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1261,14 +1274,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: withdrawAssets?.hash,
-        status: transaction?.status || "reverted",
-        type: "withdraw",
-        vault: vault.address,
-        tokens: option,
-      });
     } else {
       const optionAmount = Number(inputs[option[0]]?.amount);
       const calculatedValue =
@@ -1321,7 +1326,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: zapWithdraw?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: zapWithdraw?.hash,
+          status: transaction?.status || "reverted",
+          type: "withdraw",
+          vault: vault.address,
+          tokens: inputs,
+        });
         lastTx.set(transaction?.transactionHash);
         setInputs((prevInputs: any) => ({
           ...prevInputs,
@@ -1347,14 +1359,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: zapWithdraw?.hash,
-        status: transaction?.status || "reverted",
-        type: "withdraw",
-        vault: vault.address,
-        tokens: option,
-      });
     }
     setTransactionInProgress(false);
   };
@@ -2716,11 +2720,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                         ? zapPreviewWithdraw[0]?.amountOut
                                         : zapPreviewWithdraw[0]?.amountIn
                                     ) +
-                                    Number(
-                                      Number(zapPreviewWithdraw[1]?.amountOut)
-                                        ? zapPreviewWithdraw[1]?.amountOut
-                                        : zapPreviewWithdraw[1]?.amountIn
-                                    )
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)
                                   ).toFixed(5)}
                                 </p>
                                 <p>{`($${(
@@ -2729,11 +2737,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                       ? zapPreviewWithdraw[0]?.amountOut
                                       : zapPreviewWithdraw[0]?.amountIn
                                   ) +
-                                    Number(
-                                      Number(zapPreviewWithdraw[1]?.amountOut)
-                                        ? zapPreviewWithdraw[1]?.amountOut
-                                        : zapPreviewWithdraw[1]?.amountIn
-                                    )) *
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)) *
                                   Number(
                                     formatUnits($assetsPrices[option[0]], 18)
                                   )

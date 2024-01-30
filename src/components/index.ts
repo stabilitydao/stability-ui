@@ -14,6 +14,8 @@ import {
   ShareSkeleton,
 } from "./VaultUtils";
 
+import { Toast } from "./VaultUtils/Toast";
+
 export {
   CreateVaultComponent,
   Vault,
@@ -27,4 +29,5 @@ export {
   TimeDifferenceIndicator,
   ShareSkeleton,
   AssetsSkeleton,
+  Toast,
 };

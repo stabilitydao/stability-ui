@@ -4,13 +4,12 @@ type TProps = {
   hash: TAddress;
   status: string;
   timestamp: number;
-  tokens: TAddress[];
+  tokens: any[];
   type: string;
   vault: TAddress;
 };
 
 const setLocalStoreHash = (obj: TProps) => {
-  console.log(obj);
   localStorage.setItem("lastTx", JSON.stringify(obj));
 };
 
