@@ -255,6 +255,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setInputs(reset);
     setIsApprove(undefined);
   };
+  const resetFormAfterTx = () => {
+    setZapButton("none");
+    setZapTokens(false);
+    setZapPreviewWithdraw(false);
+    setUnderlyingShares(false);
+    setWithdrawAmount(false);
+    setSharesOut(false);
+    setZapShares(false);
+    resetInputs(option);
+  };
 
   const defaultAssetsOption = (assets: string[]) => {
     const defaultOptionAssets: string[] = [];
@@ -685,6 +695,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           vault: vault.address,
           tokens: inputs,
         });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -771,6 +784,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           vault: vault.address,
           tokens: inputs,
         });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1159,6 +1175,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         confirmations: 5,
         hash: depositAssets?.hash,
       });
+      if (transaction.status === "success") {
+        resetFormAfterTx();
+      }
       setLocalStoreHash({
         timestamp: new Date().getTime(),
         hash: depositAssets?.hash,
@@ -1258,6 +1277,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           vault: vault.address,
           tokens: txTokens,
         });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1337,13 +1359,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           vault: vault.address,
           tokens: inputs,
         });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
-        setInputs((prevInputs: any) => ({
-          ...prevInputs,
-          [option[0]]: {
-            amount: "",
-          },
-        }));
         setLoader(false);
       } catch (err) {
         lastTx.set("No withdraw hash...");
@@ -1610,14 +1629,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const assetsData = vault.assets
         .map((asset: any) => asset.address.toLowerCase())
         .filter((_, index) => vault.assetsProportions[index]);
-
       if (Array.isArray(assetsData)) {
         assets.set(assetsData);
         setOption(assetsData);
         defaultAssetsOption(assetsData);
       }
     }
-  }, [vault]);
+  }, []);
 
   useEffect(() => {
     if (vault.strategyInfo.shortName === "IQMF") {
@@ -1737,7 +1755,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       });
     }
   }, [defaultOptionAssets, defaultOptionSymbols, optionTokens]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -2052,7 +2069,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
                               if (
                                 !/[\d.]/.test(evt.key) &&
-                                evt.key !== "Backspace"
+                                evt.key !== "Backspace" &&
+                                evt.key !== "ArrowLeft" &&
+                                evt.key !== "ArrowRight"
                               ) {
                                 evt.preventDefault();
                               }

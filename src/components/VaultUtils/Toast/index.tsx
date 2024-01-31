@@ -44,12 +44,10 @@ const Toast = () => {
 
   useEffect(() => {
     const initialTx = JSON.parse(localStorage.getItem("lastTx") as string);
-
     if (initialTx) {
       const currentTime = new Date().getTime();
       const lastUpdateTime = initialTx.timestamp || 0;
       const timeDifference = currentTime - lastUpdateTime;
-
       if (timeDifference < 10000) {
         setStoreTx(initialTx);
         initialTx.status === "success"
@@ -72,7 +70,7 @@ const Toast = () => {
   }, [$lastTx]);
   return (
     isVisible && (
-      <div className="toast z-[20]">
+      <div key={storeTx.hash} className="toast z-[20]">
         <div className="flex flex-col gap-3 px-3 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
