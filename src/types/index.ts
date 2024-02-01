@@ -160,6 +160,7 @@ type TTableFilters = {
 type TAPRModal = {
   apr: string;
   assetsWithApr: any;
+  daily: number;
   assetsAprs: number;
   lastHardWork: any;
   strategyApr: number;

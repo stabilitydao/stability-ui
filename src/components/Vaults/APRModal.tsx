@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { TimeDifferenceIndicator } from "@components";
 
-import { calculateAPY, formatFromBigInt, getTimeDifference } from "@utils";
+import { calculateAPY, formatFromBigInt } from "@utils";
 import type { TAPRModal } from "@types";
 
 interface IProps {
@@ -17,6 +17,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       setModalState({
         apr: "",
         assetsWithApr: "",
+        daily: 0,
         assetsAprs: 0,
         lastHardWork: 0,
         strategyApr: 0,
@@ -50,6 +51,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             setModalState({
               apr: "",
               assetsWithApr: "",
+              daily: 0,
               assetsAprs: 0,
               lastHardWork: 0,
               strategyApr: 0,
@@ -129,6 +131,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Fee APR {(state.assetsAprs * 100).toFixed(2)}%</p>
             )}
             <p>Strategy APR {strategyAPR}%</p>
+            <p>Daily {state.daily}%</p>
           </div>
           <div className="flex items-center gap-3">
             <p className="text-[16px]">Last Hard Work :</p>

@@ -2124,7 +2124,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     ))}
                   </div>
                   <div className="mt-5">
-                    {loader ? (
+                    {loader && !transactionInProgress ? (
                       <ShareSkeleton />
                     ) : (
                       <div className="h-[63px] text-[18px]">
@@ -2337,7 +2337,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
                         SWAPS
                       </p>
-                      {loader ? (
+                      {loader && !transactionInProgress ? (
                         <AssetsSkeleton />
                       ) : (
                         <div className="h-[100px]">
@@ -2420,7 +2420,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                   assets={vault?.assets}
                                   type="vault"
                                 />
-                                {loader ? (
+                                {loader && !transactionInProgress ? (
                                   <ShareSkeleton height={30} width={300} />
                                 ) : (
                                   <div>
@@ -2634,7 +2634,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           title={getTokenData(address)?.symbol}
                           className="w-6 h-6 rounded-full"
                         />
-                        {loader ? (
+                        {loader && !transactionInProgress ? (
                           <ShareSkeleton height={32} />
                         ) : (
                           <p>
@@ -2653,7 +2653,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           SWAPS
                         </p>
                       )}
-                      {loader && option.length < 2 ? (
+                      {loader && option.length < 2 && !transactionInProgress ? (
                         <AssetsSkeleton />
                       ) : (
                         <div>
@@ -2746,7 +2746,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           title={getTokenData(option[0])?.symbol}
                           className="w-6 h-6 rounded-full"
                         />
-                        {loader ? (
+                        {loader && !transactionInProgress ? (
                           <ShareSkeleton height={32} />
                         ) : (
                           <div>
