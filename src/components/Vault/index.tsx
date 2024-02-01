@@ -7,6 +7,7 @@ import { StatisticBar } from "./StatisticBar";
 import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
+import { Toast } from "@components";
 //import { Chart } from "./Chart";
 
 import { vaultData, vaults, vaultAssets } from "@store";
@@ -42,6 +43,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           <Strategy vault={localVault} />
 
           <Assets assets={localVault?.assets} />
+          <Toast />
         </div>
         <div className="w-full md:w-1/2 lg:w-2/5">
           <UserBar vault={localVault} />
@@ -51,7 +53,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </div>
     </main>
   ) : (
-    <h1>Loading Vault..</h1>
+    <h1>Loading Vault...</h1>
   );
 };
 export { Vault };

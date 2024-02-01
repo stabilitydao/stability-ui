@@ -124,6 +124,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
+  const CFCondition =
+    vault.strategyInfo.shortName === "CF" &&
+    vault.assets[0].address === option[0];
+
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (vault.strategyInfo.shortName === "IQMF") {
       if (apprDepo.includes(1)) return true;
@@ -251,6 +255,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setInputs(reset);
     setIsApprove(undefined);
   };
+  const resetFormAfterTx = () => {
+    setZapButton("none");
+    setZapTokens(false);
+    setZapPreviewWithdraw(false);
+    setUnderlyingShares(false);
+    setWithdrawAmount(false);
+    setSharesOut(false);
+    setZapShares(false);
+    resetInputs(option);
+  };
 
   const defaultAssetsOption = (assets: string[]) => {
     const defaultOptionAssets: string[] = [];
@@ -273,7 +287,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       logoURI: logoURIs,
     });
   };
-
   /////
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
@@ -482,7 +495,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
       }
     }, 1000),
-    [option, balances]
+    [option, balances, tab]
   );
   const zapInputHandler = (amount: string, asset: string) => {
     setInputs(
@@ -632,6 +645,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setTransactionInProgress(true);
     setLoader(true);
     let transaction, depositAssets: any, zapDeposit: any, gas, gasLimit;
+    const amount = inputs[option[0]]?.amount;
     if (underlyingToken?.address === option[0]) {
       try {
         const shares = parseUnits(underlyingShares, 18);
@@ -645,7 +659,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           functionName: "depositAssets",
           args: [
             option as TAddress[],
-            [parseUnits(inputs[option[0]]?.amount, 18)],
+            [parseUnits(amount, 18)],
             out,
             $account as TAddress,
           ],
@@ -661,7 +675,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           functionName: "depositAssets",
           args: [
             option as TAddress[],
-            [parseUnits(inputs[option[0]]?.amount, 18)],
+            [parseUnits(amount, 18)],
             out,
             $account as TAddress,
           ],
@@ -673,7 +687,17 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: depositAssets?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: depositAssets?.hash,
+          status: transaction?.status || "reverted",
+          type: "deposit",
+          vault: vault.address,
+          tokens: inputs,
+        });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -693,14 +717,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: depositAssets?.hash,
-        status: transaction?.status || "reverted",
-        type: "deposit",
-        vault: vault.address,
-        tokens: option,
-      });
     } else {
       try {
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
@@ -710,7 +726,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const out = shares - (shares * decimalPercent) / 100n;
 
         const amountIn = parseUnits(
-          inputs[option[0]].amount,
+          amount,
           getTokenData(option[0])?.decimals || 18
         );
 
@@ -760,6 +776,17 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           hash: zapDeposit?.hash,
         });
 
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: zapDeposit?.hash,
+          status: transaction?.status || "reverted",
+          type: "deposit",
+          vault: vault.address,
+          tokens: inputs,
+        });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -780,14 +807,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: zapDeposit?.hash,
-        status: transaction?.status || "reverted",
-        type: "deposit",
-        vault: vault.address,
-        tokens: option,
-      });
     }
     setTransactionInProgress(false);
   };
@@ -843,7 +862,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           )
         );
       }
-
       ///// index ^ 1 --> XOR
       amounts = amounts.map((thisAmount, index) => {
         return !thisAmount
@@ -1091,7 +1109,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       depositAssets: any,
       gas,
       gasLimit,
-      amounts: any = [];
+      amounts: any = [],
+      txAmounts: any = [];
 
     for (let i = 0; i < option.length; i++) {
       if (i === changedInput) {
@@ -1111,7 +1130,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         amounts.push(parseUnits("1", decimals));
       }
     }
-
     try {
       if (vault.strategyInfo.shortName !== "IQMF") {
         gas = await _publicClient.estimateContractGas({
@@ -1157,7 +1175,17 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         confirmations: 5,
         hash: depositAssets?.hash,
       });
-
+      if (transaction.status === "success") {
+        resetFormAfterTx();
+      }
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: depositAssets?.hash,
+        status: transaction?.status || "reverted",
+        type: "deposit",
+        vault: vault.address,
+        tokens: inputs,
+      });
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
     } catch (err) {
@@ -1177,14 +1205,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
     }
-    setLocalStoreHash({
-      timestamp: new Date().getTime(),
-      hash: depositAssets?.hash,
-      status: transaction?.status || "reverted",
-      type: "deposit",
-      vault: vault.address,
-      tokens: option,
-    });
     setTransactionInProgress(false);
   };
 
@@ -1208,6 +1228,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       option.length > 1
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
+      const txTokens = withdrawAmount.reduce((result, token) => {
+        const JSONToken = tokensJson.tokens.find(
+          (t) => t.symbol === token.symbol
+        );
+
+        result[JSONToken.address] = { amount: token.amount };
+        return result;
+      }, {});
+
       const withdrawAmounts = withdrawAmount.map((obj: any) => {
         const decimals = tokensJson.tokens.find(
           (token) => token.symbol === obj.symbol
@@ -1216,7 +1245,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const amount = parseUnits(obj.amount, decimals ? decimals : 18);
         return amount - (amount * decimalPercent) / 100n;
       });
-
       try {
         const gas = await _publicClient.estimateContractGas({
           address: vault.address,
@@ -1241,7 +1269,17 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: withdrawAssets?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: withdrawAssets?.hash,
+          status: transaction?.status || "reverted",
+          type: "withdraw",
+          vault: vault.address,
+          tokens: txTokens,
+        });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1261,14 +1299,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: withdrawAssets?.hash,
-        status: transaction?.status || "reverted",
-        type: "withdraw",
-        vault: vault.address,
-        tokens: option,
-      });
     } else {
       const optionAmount = Number(inputs[option[0]]?.amount);
       const calculatedValue =
@@ -1321,14 +1351,18 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           confirmations: 5,
           hash: zapWithdraw?.hash,
         });
-
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: zapWithdraw?.hash,
+          status: transaction?.status || "reverted",
+          type: "withdraw",
+          vault: vault.address,
+          tokens: inputs,
+        });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
         lastTx.set(transaction?.transactionHash);
-        setInputs((prevInputs: any) => ({
-          ...prevInputs,
-          [option[0]]: {
-            amount: "",
-          },
-        }));
         setLoader(false);
       } catch (err) {
         lastTx.set("No withdraw hash...");
@@ -1347,14 +1381,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
-      setLocalStoreHash({
-        timestamp: new Date().getTime(),
-        hash: zapWithdraw?.hash,
-        status: transaction?.status || "reverted",
-        type: "withdraw",
-        vault: vault.address,
-        tokens: option,
-      });
     }
     setTransactionInProgress(false);
   };
@@ -1609,7 +1635,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         defaultAssetsOption(assetsData);
       }
     }
-  }, [vault]);
+  }, []);
 
   useEffect(() => {
     if (vault.strategyInfo.shortName === "IQMF") {
@@ -1729,7 +1755,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       });
     }
   }, [defaultOptionAssets, defaultOptionSymbols, optionTokens]);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -2044,7 +2069,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
                               if (
                                 !/[\d.]/.test(evt.key) &&
-                                evt.key !== "Backspace"
+                                evt.key !== "Backspace" &&
+                                evt.key !== "ArrowLeft" &&
+                                evt.key !== "ArrowRight"
                               ) {
                                 evt.preventDefault();
                               }
@@ -2591,14 +2618,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </div>
               </div>
               <div className="my-2 ml-2 flex flex-col gap-2">
-                {option.length > 1 && (
+                {(option.length > 1 || CFCondition) && (
                   <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
                     YOU RECEIVE
                   </p>
                 )}
 
                 <div className="h-[100px]">
-                  {option.length > 1 &&
+                  {(option.length > 1 || CFCondition) &&
                     option.map((address, index) => (
                       <div className="flex items-center gap-1" key={address}>
                         <img
@@ -2619,78 +2646,94 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </div>
                     ))}
 
-                  {option.length < 2 && (
-                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                      SWAPS
-                    </p>
-                  )}
-                  {loader && option.length < 2 ? (
-                    <AssetsSkeleton />
-                  ) : (
+                  {!CFCondition && (
                     <div>
-                      {zapPreviewWithdraw &&
-                        zapPreviewWithdraw?.map(
-                          ({
-                            address,
-                            amountIn,
-                            amountOut,
-                          }: {
-                            address: TAddress;
-                            amountIn: string;
-                            amountOut: string;
-                            symbol: string;
-                          }) => (
-                            <div key={amountIn}>
-                              {address.toLowerCase() !==
-                                option[0].toLowerCase() && (
-                                <div className="flex">
-                                  <img
-                                    src="/oneInch.svg"
-                                    alt="1inch logo"
-                                    title="1inch"
-                                  />
-                                  {!!amountOut ? (
-                                    <>
-                                      <div className="flex items-center gap-1">
-                                        <p>{Number(amountIn).toFixed(5)}</p>
-                                        <img
-                                          src={getTokenData(address)?.logoURI}
-                                          title={getTokenData(address)?.symbol}
-                                          alt={getTokenData(address)?.symbol}
-                                          className="w-6 h-6 rounded-full"
-                                        />
-                                      </div>
-                                      -&gt;
-                                      <div className="flex items-center gap-1">
-                                        <p>{Number(amountOut).toFixed(5)}</p>
+                      {option.length < 2 && (
+                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                          SWAPS
+                        </p>
+                      )}
+                      {loader && option.length < 2 ? (
+                        <AssetsSkeleton />
+                      ) : (
+                        <div>
+                          {zapPreviewWithdraw &&
+                            zapPreviewWithdraw?.map(
+                              ({
+                                address,
+                                amountIn,
+                                amountOut,
+                              }: {
+                                address: TAddress;
+                                amountIn: string;
+                                amountOut: string;
+                                symbol: string;
+                              }) => (
+                                <div key={amountIn}>
+                                  {address.toLowerCase() !==
+                                    option[0].toLowerCase() && (
+                                    <div className="flex">
+                                      <img
+                                        src="/oneInch.svg"
+                                        alt="1inch logo"
+                                        title="1inch"
+                                      />
+                                      {!!amountOut ? (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <p>{Number(amountIn).toFixed(5)}</p>
+                                            <img
+                                              src={
+                                                getTokenData(address)?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(address)?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(address)?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                          -&gt;
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(amountOut).toFixed(5)}
+                                            </p>
 
+                                            <img
+                                              src={
+                                                getTokenData(option[0])?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                        </>
+                                      ) : (
                                         <img
-                                          src={getTokenData(option[0])?.logoURI}
-                                          title={
-                                            getTokenData(option[0])?.symbol
-                                          }
-                                          alt={getTokenData(option[0])?.symbol}
-                                          className="w-6 h-6 rounded-full"
+                                          src="/error.svg"
+                                          alt="error img"
+                                          title="error"
                                         />
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <img
-                                      src="/error.svg"
-                                      alt="error img"
-                                      title="error"
-                                    />
+                                      )}
+                                    </div>
                                   )}
                                 </div>
-                              )}
-                            </div>
-                          )
-                        )}
+                              )
+                            )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {option.length < 2 && (
+                {option.length < 2 && !CFCondition && (
                   <div className="mt-5">
                     <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
                       YOU RECEIVE
@@ -2716,11 +2759,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                         ? zapPreviewWithdraw[0]?.amountOut
                                         : zapPreviewWithdraw[0]?.amountIn
                                     ) +
-                                    Number(
-                                      Number(zapPreviewWithdraw[1]?.amountOut)
-                                        ? zapPreviewWithdraw[1]?.amountOut
-                                        : zapPreviewWithdraw[1]?.amountIn
-                                    )
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)
                                   ).toFixed(5)}
                                 </p>
                                 <p>{`($${(
@@ -2729,11 +2776,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                       ? zapPreviewWithdraw[0]?.amountOut
                                       : zapPreviewWithdraw[0]?.amountIn
                                   ) +
-                                    Number(
-                                      Number(zapPreviewWithdraw[1]?.amountOut)
-                                        ? zapPreviewWithdraw[1]?.amountOut
-                                        : zapPreviewWithdraw[1]?.amountIn
-                                    )) *
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)) *
                                   Number(
                                     formatUnits($assetsPrices[option[0]], 18)
                                   )
