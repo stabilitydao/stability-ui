@@ -119,8 +119,8 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
 
         <div className="p-10 flex items-start flex-col gap-4">
           <p className="text-[18px] leading-[22px]">
-            The Annual Percentage Rate (APR) for the Vault is equal to the sum
-            of the Strategy APR and Underlying APRs
+            The Percentage Rate (APR) for the Vault is equal to the sum of the
+            Strategy APR and Underlying APRs
           </p>
 
           <div className="text-[16px]">
