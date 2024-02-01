@@ -118,12 +118,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const [rotation, setRotation] = useState<number>(0);
   const [isRefresh, setIsRefresh] = useState(false);
   const [transactionInProgress, setTransactionInProgress] = useState(false);
+  const [needConfirm, setNeedConfirm] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
 
   const [error, setError] = useState<any>(false);
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
-
   const CFCondition =
     vault.strategyInfo.shortName === "CF" &&
     vault.assets[0].address === option[0];
@@ -542,7 +542,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           const gasLimit = BigInt(
             Math.trunc(Number(gas) * Number(settings.gasLimit))
           );
-
+          setNeedConfirm(true);
           const assetApprove = await writeContract({
             address: option[0],
             abi: ERC20ABI,
@@ -550,6 +550,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             args: [$platformData.zap as TAddress, approveSum],
             gas: gasLimit,
           });
+          setNeedConfirm(false);
           setLoader(true);
           const transaction = await _publicClient.waitForTransactionReceipt({
             confirmations: 5,
@@ -580,6 +581,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
             setError({ name: errName, message: errorMessage });
           }
+          setNeedConfirm(false);
           setLoader(false);
           console.error("APPROVE ERROR:", err);
         }
@@ -596,7 +598,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const gasLimit = BigInt(
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
-
+        setNeedConfirm(true);
         const assetApprove = await writeContract({
           address: underlyingToken?.address,
           abi: ERC20ABI,
@@ -604,6 +606,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [vault.address, approveSum],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
         setLoader(true);
 
         const transaction = await _publicClient.waitForTransactionReceipt({
@@ -634,6 +637,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           setError({ name: errName, message: errorMessage });
         }
         setLoader(false);
+        setNeedConfirm(false);
         console.error("APPROVE ERROR:", err);
       }
     }
@@ -668,7 +672,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const gasLimit = BigInt(
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
-
+        setNeedConfirm(true);
         depositAssets = await writeContract({
           address: vault.address,
           abi: VaultABI,
@@ -681,6 +685,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
         setLoader(true);
 
         transaction = await _publicClient.waitForTransactionReceipt({
@@ -714,6 +719,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           setError({ name: errName, message: errorMessage });
         }
+        setNeedConfirm(false);
         setLoader(false);
         console.error("UNDERLYING DEPOSIT ERROR:", err);
       }
@@ -752,7 +758,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           account: $account as TAddress,
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
-
+        setNeedConfirm(true);
         zapDeposit = await writeContract({
           address: $platformData.zap,
           abi: ZapABI,
@@ -768,7 +774,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           gas: gasLimit,
         });
-
+        setNeedConfirm(false);
         setLoader(true);
 
         transaction = await _publicClient.waitForTransactionReceipt({
@@ -803,7 +809,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           setError({ name: errName, message: errorMessage });
         }
-
+        setNeedConfirm(false);
         setLoader(false);
         console.error("ZAP DEPOSIT ERROR:", err);
       }
@@ -915,7 +921,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(settings.gasLimit))
       );
-
+      setNeedConfirm(true);
       const assetApprove = await writeContract({
         address: vault.address,
         abi: ERC20ABI,
@@ -923,6 +929,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         args: [$platformData.zap, approveSum],
         gas: gasLimit,
       });
+      setNeedConfirm(false);
       setLoader(true);
       const transaction = await _publicClient.waitForTransactionReceipt({
         confirmations: 5,
@@ -960,6 +967,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         setError({ name: errName, message: errorMessage });
       }
+      setNeedConfirm(false);
       setLoader(false);
       console.error("ZAP ERROR:", err);
     }
@@ -1007,7 +1015,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const gasLimit = BigInt(
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
-
+        setNeedConfirm(true);
         const assetApprove = await writeContract({
           address: asset,
           abi: ERC20ABI,
@@ -1015,6 +1023,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [vault.address, approveSum],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
         setLoader(true);
         const transaction = await _publicClient.waitForTransactionReceipt({
           confirmations: 5,
@@ -1082,6 +1091,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           setError({ name: errName, message: errorMessage });
         }
+        setNeedConfirm(false);
         setLoader(false);
       }
     }
@@ -1140,6 +1150,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           account: $account as TAddress,
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
+        setNeedConfirm(true);
         depositAssets = await writeContract({
           address: vault.address,
           abi: VaultABI,
@@ -1147,6 +1158,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [$assets as TAddress[], input, out, $account as TAddress],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
       } else {
         // IQMF strategy only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
@@ -1162,6 +1174,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           account: $account as TAddress,
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
+        setNeedConfirm(true);
         depositAssets = await writeContract({
           address: vault.address,
           abi: VaultABI,
@@ -1169,6 +1182,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [assets, IQMFAmounts, out, $account as TAddress],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
       }
       setLoader(true);
       transaction = await _publicClient.waitForTransactionReceipt({
@@ -1202,6 +1216,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         setError({ name: errName, message: errorMessage });
       }
+      setNeedConfirm(false);
       setLoader(false);
       console.error("DEPOSIT ASSETS ERROR:", err);
     }
@@ -1256,7 +1271,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const gasLimit = BigInt(
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
-
+        setNeedConfirm(true);
         withdrawAssets = await writeContract({
           address: vault.address,
           abi: VaultABI,
@@ -1264,6 +1279,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [assets as TAddress[], sharesToBurn, withdrawAmounts],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
         setLoader(true);
         transaction = await _publicClient.waitForTransactionReceipt({
           confirmations: 5,
@@ -1296,6 +1312,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           setError({ name: errName, message: errorMessage });
         }
+        setNeedConfirm(false);
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
@@ -1331,7 +1348,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const gasLimit = BigInt(
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
-
+        setNeedConfirm(true);
         zapWithdraw = await writeContract({
           address: $platformData.zap,
           abi: ZapABI,
@@ -1346,6 +1363,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           gas: gasLimit,
         });
+        setNeedConfirm(false);
         setLoader(true);
         transaction = await _publicClient.waitForTransactionReceipt({
           confirmations: 5,
@@ -1378,6 +1396,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           setError({ name: errName, message: errorMessage });
         }
+        setNeedConfirm(false);
         setLoader(false);
         console.error("WITHDRAW ERROR:", err);
       }
@@ -2175,7 +2194,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       type="button"
                       onClick={deposit}
                     >
-                      <p>Deposit</p>
+                      <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
                       {transactionInProgress && <Loader color={"#486556"} />}
                     </button>
                   ) : isApprove === 2 ? (
@@ -2198,7 +2217,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                               type="button"
                               onClick={() => approve(asset as TAddress, index)}
                             >
-                              <p>Approve {getTokenData(asset)?.symbol}</p>
+                              <p>
+                                {needConfirm
+                                  ? "Confirm in wallet"
+                                  : `Approve ${getTokenData(asset)?.symbol}`}
+                              </p>
                               {approveIndex === index && (
                                 <Loader color={"#486556"} />
                               )}
@@ -2367,7 +2390,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                           <div className="flex items-center gap-1">
                                             <p>
                                               {Number(token.amountIn).toFixed(
-                                                2
+                                                6
                                               )}
                                             </p>
                                             <img
@@ -2387,7 +2410,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                           <div className="flex items-center gap-1">
                                             <p>
                                               {Number(token.amountOut).toFixed(
-                                                2
+                                                6
                                               )}
                                             </p>
                                             <img
@@ -2482,10 +2505,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       onClick={zapApprove}
                     >
                       <p>
-                        Approve{" "}
-                        {underlyingToken?.address === option[0]
-                          ? underlyingToken.symbol
-                          : getTokenData(option[0])?.symbol}
+                        {needConfirm
+                          ? "Confirm in wallet"
+                          : `Approve ${
+                              underlyingToken?.address === option[0]
+                                ? underlyingToken.symbol
+                                : getTokenData(option[0])?.symbol
+                            }`}
                       </p>
                       {transactionInProgress && <Loader color={"#486556"} />}
                     </button>
@@ -2500,7 +2526,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       type="button"
                       onClick={zapDeposit}
                     >
-                      <p>Deposit</p>
+                      <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
                       {transactionInProgress && <Loader color={"#486556"} />}
                     </button>
                   ) : (
@@ -2681,7 +2707,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                       {!!amountOut ? (
                                         <>
                                           <div className="flex items-center gap-1">
-                                            <p>{Number(amountIn).toFixed(5)}</p>
+                                            <p>{Number(amountIn).toFixed(6)}</p>
                                             <img
                                               src={
                                                 getTokenData(address)?.logoURI
@@ -2698,7 +2724,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                           -&gt;
                                           <div className="flex items-center gap-1">
                                             <p>
-                                              {Number(amountOut).toFixed(5)}
+                                              {Number(amountOut).toFixed(6)}
                                             </p>
 
                                             <img
@@ -2819,7 +2845,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   type="button"
                   onClick={withdrawZapApprove}
                 >
-                  <p>Approve</p>
+                  {" "}
+                  <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
                   {transactionInProgress && <Loader color={"#486556"} />}
                 </button>
               ) : zapButton === "withdraw" || zapButton === "deposit" ? (
@@ -2833,7 +2860,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   }`}
                   onClick={withdraw}
                 >
-                  <p>WITHDRAW</p>
+                  <p>{needConfirm ? "Confirm in wallet" : "WITHDRAW"}</p>
                   {transactionInProgress && <Loader color={"#486556"} />}
                 </button>
               ) : (
@@ -2934,7 +2961,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   </defs>
                 </svg>
               </div>
-              <p className="text-[16px] text-[#f2aeae]">{error.message}</p>
+              <p className="text-[16px] max-w-[400px] text-[#f2aeae] break-words">
+                {error.message}
+              </p>
             </div>
           </div>
         )}

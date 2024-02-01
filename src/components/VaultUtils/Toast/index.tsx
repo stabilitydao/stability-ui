@@ -150,29 +150,33 @@ const Toast = () => {
               </defs>
             </svg>
           </div>
-          <div className=" text-[16px] flex items-center gap-1">
-            <p className="capitalize-first">{storeTx?.type}</p>{" "}
-            <div className="flex flex-col justify-center items-center gap-1">
-              {tokens &&
-                tokens.map((token: any) => (
-                  <div className="flex items-center gap-1" key={token.address}>
-                    <p>{token.amount}</p>
-                    <img
-                      className="w-5 h-5 rounded-full"
-                      src={token.logo}
-                      alt={token.symbol}
-                    />
-                  </div>
-                ))}
-            </div>{" "}
-            <p>{storeTx?.type === "deposit" ? "to" : "from"}</p>
+          <div className="text-[16px] flex flex-col gap-1">
+            <div className="flex items-center gap-1">
+              <p className="capitalize-first">{storeTx?.type}</p>{" "}
+              <div className="flex flex-col justify-center items-center gap-1">
+                {tokens &&
+                  tokens.map((token: any) => (
+                    <div
+                      className="flex items-center gap-1"
+                      key={token.address}
+                    >
+                      <p>{token.amount}</p>
+                      <img
+                        className="w-5 h-5 rounded-full"
+                        src={token.logo}
+                        alt={token.symbol}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
             <a
               target="_blank"
               href={`https://polygonscan.com/address/${storeTx?.vault}`}
-              className="underline"
+              className="underline "
             >
-              {$vaults[storeTx?.vault].strategyInfo.shortName}
-            </a>{" "}
+              {$vaults[storeTx?.vault].symbol}
+            </a>
           </div>
           <a
             target="_blank"
