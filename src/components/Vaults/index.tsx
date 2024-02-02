@@ -463,7 +463,7 @@ const Vaults = () => {
                     </div>
                   </td>
                   <td className="px-2 min-[1110px]:px-3 py-2 tooltip">
-                    <div className="flex items-center justify-start">
+                    <div className="flex items-center justify-start gap-[6px]">
                       <p className="text-[14px] whitespace-nowrap w-[120px] text-end">
                         {vault.apr}% / {vault.apy}%
                       </p>
@@ -473,7 +473,7 @@ const Vaults = () => {
                         height="18"
                         viewBox="0 0 16 16"
                         fill="none"
-                        className="mt-[4px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
+                        className="mt-[2px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -495,11 +495,6 @@ const Vaults = () => {
                       </svg>
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
-                          <p className="text-[14px]">
-                            The Percentage Rate (APR) for the Vault is equal to
-                            the sum of the Strategy APR and Underlying APRs
-                          </p>
-
                           <div className="text-[16px] flex flex-col gap-1 items-start">
                             <p>
                               Total APR {vault.apr}% (
