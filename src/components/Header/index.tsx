@@ -24,7 +24,7 @@ const Header = () => {
         </a>
       </span>
       <div className="menu w-1/3">
-        <a className={currentPath === "" ? "active" : ""} href="/">
+        <a className={currentPath === "" ? "active font-bold" : ""} href="/">
           Vaults
         </a>
         {/* <a className={currentPath === "dao" ? "active" : ""} href="/dao">

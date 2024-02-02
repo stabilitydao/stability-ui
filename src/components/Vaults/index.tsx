@@ -506,29 +506,42 @@ const Vaults = () => {
                       </svg>
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
-                          <div className="text-[16px] flex flex-col gap-1 items-start">
-                            <p>
-                              Total APR {vault.apr}% (
-                              {calculateAPY(vault.apr).toFixed(2)}% APY)
-                            </p>
-                            {!!vault.monthlyUnderlyingApr && (
-                              <p>
-                                Pool swap fees APR{" "}
-                                {vault.monthlyUnderlyingApr.toFixed(2)}%
+                          <div className="text-[14px] flex flex-col gap-1 w-full">
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Total APY</p>
+                              <p className="text-end">
+                                {calculateAPY(vault.apr).toFixed(2)}%
                               </p>
-                            )}
-                            <p>
-                              Strategy APR{" "}
-                              {formatFromBigInt(vault.strategyApr, 3).toFixed(
-                                2
-                              )}
-                              %
-                            </p>
+                            </div>
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Total APR</p>
+                              <p className="text-end">{vault.apr}%</p>
+                            </div>
 
-                            <p>Daily {vault.daily}%</p>
+                            {!!vault.monthlyUnderlyingApr && (
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Pool swap fees APR</p>
+                                <p className="text-end">
+                                  {vault.monthlyUnderlyingApr.toFixed(2)}%
+                                </p>
+                              </div>
+                            )}
+                            <div className="font-bold flex items-center justify-between">
+                              <p> Strategy APR</p>
+                              <p className="text-end">
+                                {formatFromBigInt(vault.strategyApr, 3).toFixed(
+                                  2
+                                )}
+                                %
+                              </p>
+                            </div>
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Daily</p>
+                              <p className="text-end">{vault.daily}%</p>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <p className="text-[16px]">Last Hard Work :</p>
+                          <div className="flex items-center justify-between w-full">
+                            <p className="text-[16px]">Last Hard Work</p>
                             <TimeDifferenceIndicator
                               unix={vault.lastHardWork}
                             />

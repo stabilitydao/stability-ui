@@ -44,7 +44,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] max-w-[500px] w-full bg-modal rounded-[10px] h-[300px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-modal rounded-[10px] h-[250px]"
       >
         <svg
           onClick={() => {
@@ -117,19 +117,33 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           </defs>
         </svg>
 
-        <div className="p-10 flex items-start flex-col gap-4">
-          <div className="text-[16px]">
-            <p className="font-bold">
-              Total APR {state.apr}% ({APY}% APY)
-            </p>
+        <div className="p-10 flex items-start justify-center flex-col gap-4">
+          <div className="text-[12px] sm:text-[16px] w-full">
+            <div className="font-bold flex items-center justify-between">
+              <p>Total APY</p>
+              <p className="text-end">{APY}%</p>
+            </div>
+            <div className="font-bold flex items-center justify-between">
+              <p>Total APR</p>
+              <p className="text-end">{state.apr}%</p>
+            </div>
             {!!state.assetsAprs && (
-              <p>Pool swap fees APR {state.assetsAprs.toFixed(2)}%</p>
+              <div className="flex items-center justify-between">
+                <p>Pool swap fees APR</p>
+                <p className="text-end">{state.assetsAprs.toFixed(2)}%</p>
+              </div>
             )}
-            <p>Strategy APR {strategyAPR}%</p>
-            <p>Daily {state.daily}%</p>
+            <div className="flex items-center justify-between">
+              <p>Strategy APR</p>
+              <p className="text-end">{strategyAPR}%</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <p>Daily yield</p>
+              <p className="text-end">{state.daily}%</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <p className="text-[16px]">Last Hard Work :</p>
+          <div className="flex items-center justify-between w-full">
+            <p className="text-[16px]">Last Hard Work</p>
             <TimeDifferenceIndicator unix={state.lastHardWork} />
           </div>
         </div>
