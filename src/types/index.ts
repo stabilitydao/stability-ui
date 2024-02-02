@@ -181,6 +181,17 @@ type TInputItem = {
   valuePerDay: string;
 };
 
+type TPortfolio = {
+  deposited: string;
+  monthly: string;
+  dailySum: string;
+  dailyPercent: string;
+  monthPercent: string;
+  apr: string;
+  apy: string;
+  tvl: string;
+};
+
 ////          VAULT
 
 type TVaultBalance = {
@@ -311,4 +322,5 @@ export type {
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,
   TToast,
+  TPortfolio,
 };

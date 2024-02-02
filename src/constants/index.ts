@@ -223,6 +223,7 @@ const GRAPH_QUERY = `
           vaultStatus
         }
         platformEntities {
+          version
           bcAssets
         }
         vaultTypeEntities {

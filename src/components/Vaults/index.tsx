@@ -35,6 +35,7 @@ import type {
   TTableColumn,
   TTableFilters,
   TTAbleFiltersVariant,
+  TPortfolio,
 } from "@types";
 
 const Vaults = () => {
@@ -58,13 +59,15 @@ const Vaults = () => {
 
   const [currentTab, setCurrentTab] = useState(1);
 
-  const [portfolio, setPortfolio] = useState({
+  const [portfolio, setPortfolio] = useState<TPortfolio>({
     deposited: "0",
     monthly: "0",
     dailySum: "0",
     dailyPercent: "",
+    monthPercent: "",
     apr: "0",
     apy: "0",
+    tvl: "",
   });
   const [sortSelector, setSortSelector] = useState(false);
 
@@ -227,6 +230,7 @@ const Vaults = () => {
     let deposited = 0;
     let monthly = 0;
     let avgApr = 0;
+    let tvl = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
@@ -239,19 +243,26 @@ const Vaults = () => {
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
       }
+
+      if (v.tvl) {
+        tvl += formatFromBigInt(v.tvl, 18, "withFloor");
+      }
     });
     const dailySum = monthly / 30;
     avgApr = (100 * dailySum * 365) / deposited;
 
     const dailyPercent = String(avgApr / 365);
+    const monthPercent = String(avgApr / 12);
 
     setPortfolio({
       deposited: String(deposited.toFixed(2)),
       monthly: String(monthly.toFixed(2)),
       dailySum: String(dailySum.toFixed(2)),
       dailyPercent: dailyPercent,
+      monthPercent: monthPercent,
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
+      tvl: formatNumber(tvl, "abbreviate") as string,
     });
   };
 
@@ -463,7 +474,7 @@ const Vaults = () => {
                     </div>
                   </td>
                   <td className="px-2 min-[1110px]:px-3 py-2 tooltip">
-                    <div className="flex items-center justify-start">
+                    <div className="flex items-center justify-start gap-[6px]">
                       <p className="text-[14px] whitespace-nowrap w-[120px] text-end">
                         {vault.apr}% / {vault.apy}%
                       </p>
@@ -473,7 +484,7 @@ const Vaults = () => {
                         height="18"
                         viewBox="0 0 16 16"
                         fill="none"
-                        className="mt-[4px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
+                        className="mt-[2px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -495,11 +506,6 @@ const Vaults = () => {
                       </svg>
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
-                          <p className="text-[14px]">
-                            The Percentage Rate (APR) for the Vault is equal to
-                            the sum of the Strategy APR and Underlying APRs
-                          </p>
-
                           <div className="text-[16px] flex flex-col gap-1 items-start">
                             <p>
                               Total APR {vault.apr}% (
@@ -507,8 +513,8 @@ const Vaults = () => {
                             </p>
                             {!!vault.monthlyUnderlyingApr && (
                               <p>
-                                Fee APR
-                                {(vault.monthlyUnderlyingApr * 100).toFixed(2)}%
+                                Pool swap fees APR{" "}
+                                {vault.monthlyUnderlyingApr.toFixed(2)}%
                               </p>
                             )}
                             <p>

@@ -16,6 +16,7 @@ import {
   account,
   network,
   platformData,
+  platformVersion,
   publicClient,
   userBalance,
   vaults,
@@ -197,10 +198,10 @@ const AppStore = (props: React.PropsWithChildren) => {
                 graphVault.underlying.toLowerCase()
               ];
 
-            if (APIData?.apr?.daily?.feeApr) {
-              monthlyAPR = APIData.apr.daily.feeApr;
+            if (APIData?.apr?.daily) {
+              monthlyAPR = APIData.apr.daily;
               assetsWithApr.push("Pool swap fees");
-              assetsAprs.push((Number(monthlyAPR) * 100).toFixed(2));
+              assetsAprs.push(Number(monthlyAPR).toFixed(2));
             }
 
             const APR = (
@@ -208,8 +209,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 String(contractVaults[7][index]),
                 3,
                 "withDecimals"
-              ) +
-              Number(monthlyAPR) * 100
+              ) + Number(monthlyAPR)
             ).toFixed(2);
 
             const APY = calculateAPY(APR).toFixed(2);
@@ -289,15 +289,15 @@ const AppStore = (props: React.PropsWithChildren) => {
           const assetsWithApr: string[] = [];
           const assetsAprs: string[] = [];
 
-          if (APIData?.apr?.daily?.feeApr) {
-            monthlyAPR = APIData.apr.daily.feeApr;
+          if (APIData?.apr?.daily) {
+            monthlyAPR = APIData.apr.daily;
             assetsWithApr.push("Pool swap fees");
-            assetsAprs.push((Number(monthlyAPR) * 100).toFixed(2));
+            assetsAprs.push(Number(monthlyAPR).toFixed(2));
           }
           /////
           const APR = (
             formatFromBigInt(String(vault.apr), 3, "withDecimals") +
-            Number(monthlyAPR) * 100
+            Number(monthlyAPR)
           ).toFixed(2);
 
           const APY = calculateAPY(APR).toFixed(2);
@@ -388,6 +388,8 @@ const AppStore = (props: React.PropsWithChildren) => {
 
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
+    if (graphResponse?.data?.data?.platformEntities[0]?.version)
+      platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
   const getDataFromStabilityAPI = async () => {
     try {
