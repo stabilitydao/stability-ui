@@ -19,6 +19,7 @@ const account = atom<string | undefined>();
 const network = atom<string | undefined>();
 const publicClient = atom<PublicClient | undefined>();
 const platformData = atom<TPlatformData | undefined>();
+const platformVersion = atom<string>("24.01.1-alpha");
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
@@ -64,4 +65,5 @@ export {
   vaultTypes,
   strategyTypes,
   transactionSettings,
+  platformVersion,
 };

@@ -123,7 +123,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               Total APR {state.apr}% ({APY}% APY)
             </p>
             {!!state.assetsAprs && (
-              <p>Fee APR {(state.assetsAprs * 100).toFixed(2)}%</p>
+              <p>Pool swap fees APR {state.assetsAprs.toFixed(2)}%</p>
             )}
             <p>Strategy APR {strategyAPR}%</p>
             <p>Daily {state.daily}%</p>

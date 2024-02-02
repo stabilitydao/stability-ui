@@ -35,6 +35,7 @@ import type {
   TTableColumn,
   TTableFilters,
   TTAbleFiltersVariant,
+  TPortfolio,
 } from "@types";
 
 const Vaults = () => {
@@ -58,13 +59,15 @@ const Vaults = () => {
 
   const [currentTab, setCurrentTab] = useState(1);
 
-  const [portfolio, setPortfolio] = useState({
+  const [portfolio, setPortfolio] = useState<TPortfolio>({
     deposited: "0",
     monthly: "0",
     dailySum: "0",
     dailyPercent: "",
+    monthPercent: "",
     apr: "0",
     apy: "0",
+    tvl: "",
   });
   const [sortSelector, setSortSelector] = useState(false);
 
@@ -227,6 +230,7 @@ const Vaults = () => {
     let deposited = 0;
     let monthly = 0;
     let avgApr = 0;
+    let tvl = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
@@ -239,19 +243,26 @@ const Vaults = () => {
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
       }
+
+      if (v.tvl) {
+        tvl += formatFromBigInt(v.tvl, 18, "withFloor");
+      }
     });
     const dailySum = monthly / 30;
     avgApr = (100 * dailySum * 365) / deposited;
 
     const dailyPercent = String(avgApr / 365);
+    const monthPercent = String(avgApr / 12);
 
     setPortfolio({
       deposited: String(deposited.toFixed(2)),
       monthly: String(monthly.toFixed(2)),
       dailySum: String(dailySum.toFixed(2)),
       dailyPercent: dailyPercent,
+      monthPercent: monthPercent,
       apr: String(avgApr.toFixed(3)),
       apy: String(calculateAPY(avgApr).toFixed(3)),
+      tvl: formatNumber(tvl, "abbreviate") as string,
     });
   };
 
@@ -502,8 +513,8 @@ const Vaults = () => {
                             </p>
                             {!!vault.monthlyUnderlyingApr && (
                               <p>
-                                Fee APR
-                                {(vault.monthlyUnderlyingApr * 100).toFixed(2)}%
+                                Pool swap fees APR{" "}
+                                {vault.monthlyUnderlyingApr.toFixed(2)}%
                               </p>
                             )}
                             <p>
