@@ -16,7 +16,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
   const $platformVersion = useStore(platformVersion);
 
   return (
-    <div className="bg-[#23262d] my-2 rounded-sm">
+    <div className="my-2 rounded-sm">
       <div className="p-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -61,13 +61,13 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
               )}
             </div>
           </div>
-          <p className="text-[12px] w-[100px] text-end sm:w-full sm:text-[1.125rem] lg:block hidden font-bold">
+          <p className="text-end w-full text-[1rem] lg:block hidden font-bold">
             Stability Platform {$platformVersion}
           </p>
         </div>
-        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3">
+        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-2">
           <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">
-            <div className="max-w-[130px] w-full flex flex-col items-start">
+            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 DEPOSITED
               </h2>
@@ -77,7 +77,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full flex flex-col items-start">
+            <div className="w-[120px] md:w-[180px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 DAILY YIELD
               </h2>
@@ -90,7 +90,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full flex flex-col items-start">
+            <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 MONTHLY YIELD
               </h2>
@@ -103,7 +103,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full flex flex-col items-start">
+            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 AVG. APR
               </h2>
@@ -111,7 +111,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                 {$visible ? `${formatNumber(data.apr, "format")}%` : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full flex flex-col items-start">
+            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 AVG. APY
               </h2>
