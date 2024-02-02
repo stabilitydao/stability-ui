@@ -67,6 +67,16 @@ const AppStore = (props: React.PropsWithChildren) => {
   const $lastTx = useStore(lastTx);
 
   let stabilityAPIData: any;
+  const getDataFromStabilityAPI = async () => {
+    try {
+      const response = await axios.get(STABILITY_API);
+      stabilityAPIData = response.data;
+      apiData.set(stabilityAPIData);
+    } catch (error) {
+      console.error("API ERROR:", error);
+    }
+  };
+
   const getData = async () => {
     const graphResponse = await axios.post(GRAPH_ENDPOINT, {
       query: GRAPH_QUERY,
@@ -391,14 +401,13 @@ const AppStore = (props: React.PropsWithChildren) => {
     if (graphResponse?.data?.data?.platformEntities[0]?.version)
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
-  const getDataFromStabilityAPI = async () => {
-    try {
-      const response = await axios.get(STABILITY_API);
-      stabilityAPIData = response.data;
-      apiData.set(stabilityAPIData);
-    } catch (error) {
-      console.error("API ERROR:", error);
-    }
+  const fetchAllData = async () => {
+    await getDataFromStabilityAPI();
+    getData();
+    account.set(address);
+    publicClient.set(_publicClient);
+    network.set(chain?.name);
+    connected.set(isConnected);
   };
 
   useEffect(() => {
@@ -419,12 +428,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   }, [chain]);
 
   useEffect(() => {
-    getDataFromStabilityAPI();
-    getData();
-    account.set(address);
-    publicClient.set(_publicClient);
-    network.set(chain?.name);
-    connected.set(isConnected);
+    fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx]);
 
   return <div className="flex flex-col flex-1">{props.children}</div>;

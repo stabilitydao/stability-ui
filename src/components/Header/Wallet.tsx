@@ -5,6 +5,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   account,
   assetsBalances,
+  visible,
   assetsPrices,
   network,
   publicClient,
@@ -21,6 +22,7 @@ import type { TAddress } from "@types";
 const Wallet = () => {
   const $account = useStore(account);
   const $network = useStore(network);
+  const $visible = useStore(visible);
   const $publicClient = useStore(publicClient);
   const $assetsBalances = useStore(assetsBalances);
   const $assetsPrices = useStore(assetsPrices);
@@ -159,11 +161,15 @@ const Wallet = () => {
         </button>
       )}
       <button
-        className="bg-button py-1 px-2 rounded-md sm:mx-4"
+        className="bg-button py-1 px-2 rounded-md sm:mx-4 w-[120px]"
         onClick={() => openProfile()}
       >
         {$account
-          ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
+          ? `${
+              $visible
+                ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
+                : "*************"
+            }`
           : "Connect wallet"}
       </button>
     </div>

@@ -1,7 +1,7 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 
 import { useStore } from "@nanostores/react";
-import { platformVersion } from "@store";
+import { visible, platformVersion } from "@store";
 
 import { formatNumber } from "@utils";
 
@@ -12,9 +12,9 @@ interface IProps {
 }
 
 const Portfolio: React.FC<IProps> = memo(({ data }) => {
+  const $visible = useStore(visible);
   const $platformVersion = useStore(platformVersion);
 
-  const [visible, setVisible] = useState(true);
   return (
     <div className="bg-[#23262d] my-2 rounded-sm">
       <div className="p-2">
@@ -22,9 +22,9 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
           <div className="flex items-center gap-3">
             <h3 className="text-[1.5rem] font-medium">Portfolio</h3>
             <div className="cursor-pointer">
-              {!visible && (
+              {!$visible && (
                 <svg
-                  onClick={() => setVisible(true)}
+                  onClick={() => visible.set(true)}
                   width="22"
                   height="16"
                   viewBox="0 0 22 16"
@@ -38,9 +38,9 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   />
                 </svg>
               )}
-              {visible && (
+              {$visible && (
                 <svg
-                  onClick={() => setVisible(false)}
+                  onClick={() => visible.set(false)}
                   width="22"
                   height="16"
                   viewBox="0 0 22 16"
@@ -61,28 +61,28 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
               )}
             </div>
           </div>
-          <p className="text-[12px] w-[100px] text-end sm:w-full sm:text-[20px]">
-            Stability Platform v{$platformVersion}
+          <p className="text-[12px] w-[100px] text-end sm:w-full sm:text-[1.125rem] lg:block hidden font-bold">
+            Stability Platform {$platformVersion}
           </p>
         </div>
-        <div className="flex items-center justify-center md:justify-between flex-wrap lg:flex-nowrap gap-3">
+        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3">
           <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
+            <div className="max-w-[130px] w-full flex flex-col items-start">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 DEPOSITED
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {visible
+                {$visible
                   ? `$${formatNumber(data.deposited, "format")}`
                   : "****"}
               </p>
             </div>
-            <div className="w-[120px] md:w-[180px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
+            <div className="max-w-[130px] w-full flex flex-col items-start">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 DAILY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {visible
+                {$visible
                   ? `$${formatNumber(data.dailySum, "format")} / ${formatNumber(
                       data.dailyPercent,
                       "format"
@@ -90,12 +90,12 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
+            <div className="max-w-[130px] w-full flex flex-col items-start">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 MONTHLY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {visible
+                {$visible
                   ? `$${formatNumber(data.monthly, "format")} / ${formatNumber(
                       data.monthPercent,
                       "format"
@@ -103,30 +103,33 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                   : "****"}
               </p>
             </div>
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
+            <div className="max-w-[130px] w-full flex flex-col items-start">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 AVG. APR
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {visible ? `${formatNumber(data.apr, "format")}%` : "****"}
+                {$visible ? `${formatNumber(data.apr, "format")}%` : "****"}
               </p>
             </div>
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
+            <div className="max-w-[130px] w-full flex flex-col items-start">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
                 AVG. APY
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {visible ? `${formatNumber(data.apy, "format")}%` : "****"}
+                {$visible ? `${formatNumber(data.apy, "format")}%` : "****"}
               </p>
             </div>
           </div>
-          <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start lg:items-end">
-            <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none">
-              TVL
-            </h2>
-            <p className="text-[1rem] md:text-[1.125rem]">
-              {visible ? data.tvl : "****"}
+          <div>
+            <p className="text-[1rem] text-end font-bold lg:hidden block">
+              Stability Platform {$platformVersion}
             </p>
+            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start lg:items-end">
+              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+                TVL
+              </h2>
+              <p className="text-[1rem] md:text-[1.125rem]">{data.tvl}</p>
+            </div>
           </div>
         </div>
       </div>
