@@ -12,7 +12,9 @@ import {
   useSwitchNetwork,
   WagmiConfig,
 } from "wagmi";
+
 import { wagmiConfig } from "@web3";
+
 import {
   account,
   network,
@@ -421,12 +423,6 @@ const AppStore = (props: React.PropsWithChildren) => {
       transactionSettings.set(DEFAULT_TRANSACTION_SETTINGS);
     }
   }, []);
-
-  useEffect(() => {
-    if (chain?.id != 137) {
-      switchNetwork?.(137);
-    }
-  }, [chain]);
 
   useEffect(() => {
     fetchAllData();
