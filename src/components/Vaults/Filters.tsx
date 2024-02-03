@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
@@ -7,6 +7,9 @@ interface IProps {
 }
 
 const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
+  const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+  const dropDownRef = useRef(null);
+
   const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
     const filterName = filters.find((item) => item.name === filter.name);
     if (!filterName) return;
@@ -30,34 +33,34 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
         setFilters(updatedFiltersSingle);
         break;
       case "multiple":
-        const updatedFiltersMultiple = filters.map((f) =>
-          f.name === filterName.name
-            ? {
-                ...f,
-                variants:
-                  f.variants?.map((variant: TTAbleFiltersVariant) =>
-                    variant.name === option
-                      ? { ...variant, state: !variant.state }
-                      : { ...variant, state: false }
-                  ) || [],
-              }
-            : f
-        );
+        // const updatedFiltersMultiple = filters.map((f) =>
+        //   f.name === filterName.name
+        //     ? {
+        //         ...f,
+        //         variants:
+        //           f.variants?.map((variant: TTAbleFiltersVariant) =>
+        //             variant.name === option
+        //               ? { ...variant, state: !variant.state }
+        //               : { ...variant, state: false }
+        //           ) || [],
+        //       }
+        //     : f
+        // );
 
-        const multipleFilter = updatedFiltersMultiple.find(
-          (f) => f.name === filterName.name
-        );
+        // const multipleFilter = updatedFiltersMultiple.find(
+        //   (f) => f.name === filterName.name
+        // );
 
-        if (multipleFilter?.name.toLowerCase() === "strategy") {
-          const strategy =
-            multipleFilter?.variants &&
-            multipleFilter?.variants.find((variant) => variant.state);
-          strategy
-            ? params.set("strategy", strategy.name)
-            : params.delete("strategy");
-        }
+        // if (multipleFilter?.name.toLowerCase() === "strategy") {
+        //   const strategy =
+        //     multipleFilter?.variants &&
+        //     multipleFilter?.variants.find((variant) => variant.state);
+        //   strategy
+        //     ? params.set("strategy", strategy.name)
+        //     : params.delete("strategy");
+        // }
 
-        setFilters(updatedFiltersMultiple);
+        // setFilters(updatedFiltersMultiple);
         break;
       case "sample":
         const updatedFiltersSample = filters.map((f) =>
@@ -79,6 +82,36 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
         }
         setFilters(updatedFiltersSample);
         break;
+      case "dropdown":
+        const updatedFiltersDropDown = filters.map((f) =>
+          f.name === filterName.name
+            ? {
+                ...f,
+                variants:
+                  f.variants?.map((variant: TTAbleFiltersVariant) =>
+                    variant.name === option
+                      ? { ...variant, state: !variant.state }
+                      : { ...variant, state: false }
+                  ) || [],
+              }
+            : f
+        );
+
+        const dropDownFilter = updatedFiltersDropDown.find(
+          (f) => f.name === filterName.name
+        );
+
+        if (dropDownFilter?.name.toLowerCase() === "strategy") {
+          const strategy =
+            dropDownFilter?.variants &&
+            dropDownFilter?.variants.find((variant) => variant.state);
+          strategy
+            ? params.set("strategy", strategy.name)
+            : params.delete("strategy");
+        }
+        setDropDownSelector(false);
+        setFilters(updatedFiltersDropDown);
+        break;
       default:
         console.error("NO FILTER CASE");
         break;
@@ -86,6 +119,18 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
     newUrl.search = `?${params.toString()}`;
     window.history.pushState({}, "", newUrl.toString());
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setDropDownSelector(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
     filters.length && (
       <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none lg:min-w-[60%]">
@@ -125,6 +170,56 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     {variant.name}
                   </p>
                 ))}
+              </div>
+            ) : filter.type === "dropdown" ? (
+              <div className="relative select-none w-full">
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDropDownSelector((prevState) => !prevState);
+                  }}
+                  className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
+                >
+                  <p className="text-[20px]">{filter.name}</p>
+                  <svg
+                    width="15"
+                    height="9"
+                    viewBox="0 0 15 9"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`transition delay-[50ms] ${
+                      dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
+                    }`}
+                  >
+                    <path d="M1 1L7.5 7.5L14 1" stroke="white" />
+                  </svg>
+                </div>
+                <div
+                  ref={dropDownRef}
+                  className={`bg-button mt-1 rounded-md w-full z-10 ${
+                    dropDownSelector
+                      ? "absolute transition delay-[50ms]"
+                      : "hidden"
+                  } `}
+                >
+                  <div className="flex flex-col items-center">
+                    {filter.variants?.map((variant: TTAbleFiltersVariant) => (
+                      <p
+                        key={variant.name}
+                        onClick={() =>
+                          activeFiltersHandler(filter, variant.name)
+                        }
+                        className={`p-2 cursor-pointer ${
+                          variant.state
+                            ? "opacity-100"
+                            : "opacity-70 hover:opacity-80"
+                        }`}
+                      >
+                        {variant.name}
+                      </p>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               filter.type === "sample" && (

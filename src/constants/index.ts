@@ -50,7 +50,7 @@ const TABLE: TTableColumn[] = [
 ];
 const TABLE_FILTERS: TTableFilters[] = [
   { name: "Stablecoins", type: "single", state: false },
-  { name: "Strategy", type: "multiple", state: true },
+  { name: "Strategy", type: "dropdown", state: true },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];
