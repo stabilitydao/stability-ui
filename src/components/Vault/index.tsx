@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
+import { WagmiConfig } from "wagmi";
+
 import { VaultBar } from "./VaultBar";
 import { VaultActionForm } from "./VaultActionForm";
 import { StatisticBar } from "./StatisticBar";
@@ -11,6 +13,8 @@ import { Toast } from "@components";
 //import { Chart } from "./Chart";
 
 import { vaultData, vaults, vaultAssets } from "@store";
+
+import { wagmiConfig } from "@web3";
 
 import type { TAddress } from "@types";
 
@@ -32,26 +36,28 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   }, [$vaults, $vaultData, $vaultAssets]);
 
   return vault && localVault ? (
-    <main className="w-full mx-auto">
-      <VaultBar vault={localVault} />
-      <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
-        <div className="w-full md:w-1/2 lg:w-3/5 ">
-          <StatisticBar vault={localVault} />
+    <WagmiConfig config={wagmiConfig}>
+      <main className="w-full mx-auto">
+        <VaultBar vault={localVault} />
+        <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
+          <div className="w-full md:w-1/2 lg:w-3/5 ">
+            <StatisticBar vault={localVault} />
 
-          {/* <Chart /> */}
+            {/* <Chart /> */}
 
-          <Strategy vault={localVault} />
+            <Strategy vault={localVault} />
 
-          <Assets assets={localVault?.assets} />
-          <Toast />
+            <Assets assets={localVault?.assets} />
+            <Toast />
+          </div>
+          <div className="w-full md:w-1/2 lg:w-2/5">
+            <UserBar vault={localVault} />
+
+            <VaultActionForm vault={localVault} />
+          </div>
         </div>
-        <div className="w-full md:w-1/2 lg:w-2/5">
-          <UserBar vault={localVault} />
-
-          <VaultActionForm vault={localVault} />
-        </div>
-      </div>
-    </main>
+      </main>
+    </WagmiConfig>
   ) : (
     <h1>Loading Vault...</h1>
   );

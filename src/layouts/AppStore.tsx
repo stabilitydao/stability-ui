@@ -2,7 +2,6 @@ import type React from "react";
 import { useEffect } from "react";
 import { formatUnits } from "viem";
 import axios from "axios";
-
 import { useStore } from "@nanostores/react";
 
 import { readContract } from "viem/actions";
@@ -11,7 +10,9 @@ import {
   usePublicClient,
   useNetwork,
   useSwitchNetwork,
+  WagmiConfig,
 } from "wagmi";
+import { wagmiConfig } from "@web3";
 import {
   account,
   network,
@@ -431,7 +432,11 @@ const AppStore = (props: React.PropsWithChildren) => {
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx]);
 
-  return <div className="flex flex-col flex-1">{props.children}</div>;
+  return (
+    <WagmiConfig config={wagmiConfig}>
+      <div className="flex flex-col flex-1">{props.children}</div>
+    </WagmiConfig>
+  );
 };
 
 export { AppStore };
