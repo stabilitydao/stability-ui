@@ -176,17 +176,17 @@ const Vaults = () => {
           }
           break;
         case "multiple":
-          if (!f.variants) break;
-          if (f.name === "Strategy") {
-            const strategyName = f.variants.find(
-              (variant: TTAbleFiltersVariant) => variant.state
-            )?.name;
-            if (strategyName) {
-              sortedVaults = sortedVaults.filter(
-                (vault: TVault) => vault.strategyInfo.shortName === strategyName
-              );
-            }
-          }
+          // if (!f.variants) break;
+          // if (f.name === "Strategy") {
+          //   const strategyName = f.variants.find(
+          //     (variant: TTAbleFiltersVariant) => variant.state
+          //   )?.name;
+          //   if (strategyName) {
+          //     sortedVaults = sortedVaults.filter(
+          //       (vault: TVault) => vault.strategyInfo.shortName === strategyName
+          //     );
+          //   }
+          // }
           break;
         case "sample":
           if (f.name === "My vaults") {
@@ -198,6 +198,19 @@ const Vaults = () => {
             sortedVaults = sortedVaults.filter(
               (vault: TVault) => vault.status === 1
             );
+          }
+          break;
+        case "dropdown":
+          if (!f.variants) break;
+          if (f.name === "Strategy") {
+            const strategyName = f.variants.find(
+              (variant: TTAbleFiltersVariant) => variant.state
+            )?.name;
+            if (strategyName) {
+              sortedVaults = sortedVaults.filter(
+                (vault: TVault) => vault.strategyInfo.shortName === strategyName
+              );
+            }
           }
           break;
         default:
