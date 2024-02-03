@@ -18,7 +18,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
   return (
     <div className="my-2 rounded-sm">
       <div className="p-2">
-        <div className="flex items-center justify-between">
+        <div className="flex items-end justify-between">
           <div className="flex items-center gap-3">
             <h3 className="text-[1.5rem] font-medium">Portfolio</h3>
             <div className="cursor-pointer">
@@ -65,7 +65,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
             Stability Platform {$platformVersion}
           </p>
         </div>
-        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-2">
+        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
           <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
