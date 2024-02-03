@@ -280,10 +280,10 @@ const Vaults = () => {
       }
     });
     const dailySum = monthly / 30;
-    avgApr = (100 * dailySum * 365) / deposited;
+    avgApr = deposited !== 0 ? (100 * dailySum * 365) / deposited : 0;
 
-    const dailyPercent = String(avgApr / 365);
-    const monthPercent = String(avgApr / 12);
+    const dailyPercent = avgApr !== 0 ? String(avgApr / 365) : "0";
+    const monthPercent = avgApr !== 0 ? String(avgApr / 12) : "0";
 
     setPortfolio({
       deposited: String(deposited.toFixed(2)),
