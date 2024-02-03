@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
+import { useNetwork, useSwitchNetwork } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   account,
@@ -20,6 +21,11 @@ import { CHAINS, PM } from "@constants";
 import type { TAddress } from "@types";
 
 const Wallet = () => {
+  const { open } = useWeb3Modal();
+
+  const { chain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork();
+
   const $account = useStore(account);
   const $network = useStore(network);
   const $visible = useStore(visible);
@@ -30,9 +36,7 @@ const Wallet = () => {
   const [userBalance, setUserBalance] = useState<number>(0);
   const [userAssets, setUserAssets] = useState<any>();
 
-  const chain = CHAINS.find((item) => item.name === $network);
-
-  const { open } = useWeb3Modal();
+  const maticChain = CHAINS.find((item) => item.name === $network);
 
   const checkPM = async () => {
     const balance = (await $publicClient?.readContract({
@@ -141,12 +145,18 @@ const Wallet = () => {
   };
 
   useEffect(() => {
+    if (chain?.id != 137) {
+      switchNetwork?.(137);
+    }
+  }, [chain]);
+
+  useEffect(() => {
     initProfile();
   }, [$assetsBalances]);
 
   return (
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
-      {chain && (
+      {maticChain && (
         <button
           className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
           id="network"
@@ -154,10 +164,18 @@ const Wallet = () => {
         >
           <img
             className="w-6 h-6 rounded-full sm:mx-1"
-            src={chain?.logoURI}
-            alt={chain?.name}
+            src={maticChain?.logoURI}
+            alt={maticChain?.name}
           />
-          <p className="hidden sm:flex"> {chain?.name}</p>
+          <p className="hidden sm:flex"> {maticChain?.name}</p>
+        </button>
+      )}
+      {chain && chain?.id !== 137 && (
+        <button
+          className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
+          onClick={() => switchNetwork?.(137)}
+        >
+          <p>Switch Network</p>
         </button>
       )}
       <button

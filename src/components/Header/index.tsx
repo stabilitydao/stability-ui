@@ -1,4 +1,9 @@
 import { useState } from "react";
+
+import { WagmiConfig } from "wagmi";
+
+import { wagmiConfig } from "@web3";
+
 import { Wallet } from "./Wallet";
 
 import "./header.css";
@@ -16,33 +21,38 @@ const Header = () => {
   };
 
   return (
-    <header>
-      <span className="title w-1/3">
-        <a href="/" title="Stability">
-          <img src="/logo.svg" alt="Stability logo" />
-          <span className="hidden sm:flex">Stability</span>
-        </a>
-      </span>
-      <div className="menu w-1/3">
-        <a className={currentPath === "" ? "active font-bold" : ""} href="/">
-          Vaults
-        </a>
-        {/* <a className={currentPath === "dao" ? "active" : ""} href="/dao">
-          DAO
-        </a> */}
-      </div>
-      <div className="flex sm:w-1/3 justify-end">
-        <Wallet />
-        <div className={`burger-menu ${menu && "active"}`} onClick={toggleMenu}>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
+    <WagmiConfig config={wagmiConfig}>
+      <header>
+        <span className="title w-1/3">
+          <a href="/" title="Stability">
+            <img src="/logo.svg" alt="Stability logo" />
+            <span className="hidden sm:flex">Stability</span>
+          </a>
+        </span>
+        <div className="menu w-1/3">
+          <a className={currentPath === "" ? "active font-bold" : ""} href="/">
+            Vaults
+          </a>
+          {/* <a className={currentPath === "dao" ? "active" : ""} href="/dao">
+        DAO
+      </a> */}
         </div>
-      </div>
-      <nav className={`menu-nav text-center ${menu && "active"}`}>
-        <a href="/">Vaults</a>
-      </nav>
-    </header>
+        <div className="flex sm:w-1/3 justify-end">
+          <Wallet />
+          <div
+            className={`burger-menu ${menu && "active"}`}
+            onClick={toggleMenu}
+          >
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+          </div>
+        </div>
+        <nav className={`menu-nav text-center ${menu && "active"}`}>
+          <a href="/">Vaults</a>
+        </nav>
+      </header>
+    </WagmiConfig>
   );
 };
 
