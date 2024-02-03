@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
@@ -8,6 +8,8 @@ interface IProps {
 
 const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
   const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+  const dropDownRef = useRef(null);
+
   const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
     const filterName = filters.find((item) => item.name === filter.name);
     if (!filterName) return;
@@ -107,7 +109,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
             ? params.set("strategy", strategy.name)
             : params.delete("strategy");
         }
-
+        setDropDownSelector(false);
         setFilters(updatedFiltersDropDown);
         break;
       default:
@@ -117,6 +119,18 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
     newUrl.search = `?${params.toString()}`;
     window.history.pushState({}, "", newUrl.toString());
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setDropDownSelector(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
     filters.length && (
       <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none lg:min-w-[60%]">
@@ -160,7 +174,8 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
             ) : filter.type === "dropdown" ? (
               <div className="relative select-none w-full">
                 <div
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setDropDownSelector((prevState) => !prevState);
                   }}
                   className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
@@ -180,6 +195,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   </svg>
                 </div>
                 <div
+                  ref={dropDownRef}
                   className={`bg-button mt-1 rounded-md w-full z-10 ${
                     dropDownSelector
                       ? "absolute transition delay-[50ms]"

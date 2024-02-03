@@ -1,7 +1,7 @@
 import { memo } from "react";
 
 import { useStore } from "@nanostores/react";
-import { visible, platformVersion } from "@store";
+import { connected, visible, platformVersion } from "@store";
 
 import { formatNumber } from "@utils";
 
@@ -12,8 +12,24 @@ interface IProps {
 }
 
 const Portfolio: React.FC<IProps> = memo(({ data }) => {
+  const $connected = useStore(connected);
   const $visible = useStore(visible);
   const $platformVersion = useStore(platformVersion);
+
+  const dailyYield = $connected
+    ? `$${formatNumber(data.dailySum, "format")} / ${formatNumber(
+        data.dailyPercent,
+        "format"
+      )}%`
+    : "-";
+  const monthlyYield = $connected
+    ? `$${formatNumber(data.monthly, "format")} / ${formatNumber(
+        data.monthPercent,
+        "format"
+      )}%`
+    : "-";
+  const avgApr = $connected ? `${formatNumber(data.apr, "format")}%` : "-";
+  const avgApy = $connected ? `${formatNumber(data.apy, "format")}%` : "-";
 
   return (
     <div className="my-2 rounded-sm">
@@ -82,12 +98,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                 DAILY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible
-                  ? `$${formatNumber(data.dailySum, "format")} / ${formatNumber(
-                      data.dailyPercent,
-                      "format"
-                    )}%`
-                  : "****"}
+                {$visible ? dailyYield : "****"}
               </p>
             </div>
             <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
@@ -95,12 +106,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                 MONTHLY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible
-                  ? `$${formatNumber(data.monthly, "format")} / ${formatNumber(
-                      data.monthPercent,
-                      "format"
-                    )}%`
-                  : "****"}
+                {$visible ? monthlyYield : "****"}
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
@@ -108,7 +114,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                 AVG. APR
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? `${formatNumber(data.apr, "format")}%` : "****"}
+                {$visible ? avgApr : "****"}
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
@@ -116,7 +122,7 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
                 AVG. APY
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? `${formatNumber(data.apy, "format")}%` : "****"}
+                {$visible ? avgApy : "****"}
               </p>
             </div>
           </div>
