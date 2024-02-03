@@ -226,11 +226,29 @@ const Vaults = () => {
     setTableStates(table);
   };
   const initPortfolio = (vaults: TVault[]) => {
-    if (!$connected) return;
+    if (!$connected) {
+      const totalTvl = vaults.reduce((accumulator, v) => {
+        return (
+          accumulator + (v.tvl ? formatFromBigInt(v.tvl, 18, "withFloor") : 0)
+        );
+      }, 0);
+      setPortfolio({
+        deposited: "0",
+        monthly: "0",
+        dailySum: "0",
+        dailyPercent: "",
+        monthPercent: "",
+        apr: "0",
+        apy: "0",
+        tvl: formatNumber(totalTvl, "abbreviate") as string,
+      });
+      return;
+    }
+
+    let tvl = 0;
     let deposited = 0;
     let monthly = 0;
     let avgApr = 0;
-    let tvl = 0;
 
     vaults.forEach((v) => {
       if (v.balance) {
