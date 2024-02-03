@@ -145,12 +145,6 @@ const Wallet = () => {
   };
 
   useEffect(() => {
-    if (chain?.id != 137) {
-      switchNetwork?.(137);
-    }
-  }, [chain]);
-
-  useEffect(() => {
     initProfile();
   }, [$assetsBalances]);
 
