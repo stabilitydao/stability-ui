@@ -145,6 +145,27 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.IQMF,
     };
+  } else if (vaultSymbol.match(/GQMF(S|N|W)$/)) {
+    const il = vaultSymbol.match(/GQMFS$/)
+      ? IL.GQFS
+      : vaultSymbol.match(/GQMFN$/)
+      ? IL.GQFN
+      : vaultSymbol.match(/GQMFW$/)
+      ? IL.GQFW
+      : { rate: 0, title: "None", desc: "None", color: "#000000" };
+
+    strategyInfo = {
+      name: "Gamma QuickSwap Merkl Farm",
+      shortName: "GQMF",
+      protocols: [gamma, quickSwap, merkl],
+      features: [farm],
+      color: "#de43ff",
+      bgColor: "#140414",
+      baseStrategies: ["Liquidity providing", "Farming"],
+      ammAdapter: "Algebra",
+      il: il,
+      sourceCode: "",
+    };
   }
 
   return strategyInfo;
