@@ -500,7 +500,12 @@ const Vaults = () => {
                             {!!vault.monthlyUnderlyingApr && (
                               <div className="font-bold flex items-center justify-between">
                                 <p>Pool swap fees APR</p>
-                                <p className="text-end">
+
+                                <p
+                                  className={`${
+                                    $hideFeeAPR && "line-through"
+                                  } text-end`}
+                                >
                                   {vault.monthlyUnderlyingApr.toFixed(2)}%
                                 </p>
                               </div>

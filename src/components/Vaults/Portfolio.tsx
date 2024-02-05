@@ -162,6 +162,19 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHideFee((prev) => !prev)}
+              className="bg-[#262830] rounded-md"
+            >
+              <div className="flex items-center justify-center gap-2 px-2 py-1">
+                {hideFee ? (
+                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#FFB800]"></div>
+                ) : (
+                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#443C28]"></div>
+                )}
+                <p className="text-[12px]">Hide fee APR</p>
+              </div>
+            </button>
             <div className="tooltip">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -194,20 +207,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <i></i>
               </div>
             </div>
-
-            <button
-              onClick={() => setHideFee((prev) => !prev)}
-              className="w-[120px] bg-[#262830] rounded-md border border-[#CCB3F3]"
-            >
-              <div className="flex items-center justify-center gap-2 px-2 py-1">
-                {hideFee ? (
-                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#FFB800]"></div>
-                ) : (
-                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#443C28]"></div>
-                )}
-                <p className="text-[12px]">Hide fee APR</p>
-              </div>
-            </button>
             <p className="text-end text-[1rem] lg:block hidden font-bold w-[250px]">
               Stability Platform {$platformVersion}
             </p>

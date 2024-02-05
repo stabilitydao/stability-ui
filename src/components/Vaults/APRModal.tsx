@@ -152,7 +152,9 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             {!!state.assetsAprs && (
               <div className="flex items-center justify-between">
                 <p>Pool swap fees APR</p>
-                <p className="text-end">{state.assetsAprs.toFixed(2)}%</p>
+                <p className={`${$hideFeeAPR && "line-through"} text-end`}>
+                  {state.assetsAprs.toFixed(2)}%
+                </p>
               </div>
             )}
             <div className="flex items-center justify-between">
