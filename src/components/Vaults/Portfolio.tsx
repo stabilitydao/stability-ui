@@ -118,7 +118,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   return (
     <div className="my-2 rounded-sm">
       <div className="p-2">
-        <div className="flex items-end justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h3 className="text-[1.5rem] font-medium">Portfolio</h3>
             <div className="cursor-pointer">
@@ -164,7 +164,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setHideFee((prev) => !prev)}
-              className="bg-[#262830] rounded-md"
+              className="bg-[#262830] rounded-md mt-1"
             >
               <div className="flex items-center justify-center gap-2 px-2 py-1">
                 {hideFee ? (
