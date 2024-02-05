@@ -61,7 +61,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
-  const $hideFeeAPR = useStore(hideFeeApr);
 
   let stabilityAPIData: any;
   const getLocalStorageData = () => {
@@ -219,7 +218,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 graphVault.underlying.toLowerCase()
               ];
 
-            if (APIData?.apr?.daily && !$hideFeeAPR) {
+            if (APIData?.apr?.daily) {
               dailyAPR = APIData.apr.daily;
               assetsWithApr.push("Pool swap fees");
               assetsAprs.push(Number(dailyAPR).toFixed(2));
@@ -258,6 +257,13 @@ const AppStore = (props: React.PropsWithChildren) => {
 
             const APY = calculateAPY(APR).toFixed(2);
 
+            const APRWithoutFees = formatFromBigInt(
+              String(contractVaults[7][index]),
+              3,
+              "withDecimals"
+            ).toFixed(2);
+            const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
+
             const assets: any[] = [];
             if (vaultInfoes.length) {
               vaultInfoes[index][1].forEach((strategyAsset: any) => {
@@ -288,6 +294,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                 tvl: String(contractVaults[6][index]),
                 apr: String(APR),
                 apy: APY,
+                aprWithoutFees: APRWithoutFees,
+                apyWithoutFees: APYWithoutFees,
                 strategyApr: contractVaults[8][index],
                 strategySpecific: contractVaults[9][index],
                 balance: contractBalance[5][index],
@@ -333,7 +341,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           const assetsWithApr: string[] = [];
           const assetsAprs: string[] = [];
 
-          if (APIData?.apr?.daily && !$hideFeeAPR) {
+          if (APIData?.apr?.daily) {
             dailyAPR = APIData.apr.daily;
             assetsWithApr.push("Pool swap fees");
             assetsAprs.push(Number(dailyAPR).toFixed(2));
@@ -345,6 +353,13 @@ const AppStore = (props: React.PropsWithChildren) => {
           ).toFixed(2);
 
           const APY = calculateAPY(APR).toFixed(2);
+
+          const APRWithoutFees = formatFromBigInt(
+            String(vault.apr),
+            3,
+            "withDecimals"
+          ).toFixed(2);
+          const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
           //
 
           //AssetsProportions
@@ -385,6 +400,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             tvl: vault.tvl,
             apr: String(APR),
             apy: APY,
+            aprWithoutFees: APRWithoutFees,
+            apyWithoutFees: APYWithoutFees,
             strategyApr: vault.apr,
             strategySpecific: vault.strategySpecific,
             balance: "",
@@ -447,7 +464,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   useEffect(() => {
     fetchAllData();
-  }, [address, chain?.id, isConnected, $lastTx, $hideFeeAPR]);
+  }, [address, chain?.id, isConnected, $lastTx]);
 
   return (
     <WagmiConfig config={wagmiConfig}>

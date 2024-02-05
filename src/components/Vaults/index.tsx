@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
-import { formatUnits } from "viem";
 
 import { APRModal } from "./APRModal";
 import { ColumnSort } from "./ColumnSort";
@@ -15,7 +14,7 @@ import {
   TimeDifferenceIndicator,
 } from "@components";
 
-import { vaults, isVaultsLoaded, connected } from "@store";
+import { vaults, isVaultsLoaded, hideFeeApr } from "@store";
 
 import {
   formatNumber,
@@ -35,18 +34,20 @@ import type {
   TTableColumn,
   TTableFilters,
   TTAbleFiltersVariant,
-  TPortfolio,
 } from "@types";
 
 const Vaults = () => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
-  const $connected = useStore(connected);
+  const $hideFeeAPR = useStore(hideFeeApr);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
     apr: "",
+    apy: "",
+    aprWithoutFees: "",
+    apyWithoutFees: "",
     assetsWithApr: "",
     daily: 0,
     assetsAprs: 0,
@@ -58,17 +59,6 @@ const Vaults = () => {
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [currentTab, setCurrentTab] = useState(1);
-
-  const [portfolio, setPortfolio] = useState<TPortfolio>({
-    deposited: "0",
-    monthly: "0",
-    dailySum: "0",
-    dailyPercent: "",
-    monthPercent: "",
-    apr: "0",
-    apy: "0",
-    tvl: "",
-  });
   const [sortSelector, setSortSelector] = useState(false);
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
@@ -238,64 +228,6 @@ const Vaults = () => {
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
-  const initPortfolio = (vaults: TVault[]) => {
-    if (!$connected) {
-      const totalTvl = vaults.reduce((accumulator, v) => {
-        return (
-          accumulator + (v.tvl ? formatFromBigInt(v.tvl, 18, "withFloor") : 0)
-        );
-      }, 0);
-      setPortfolio({
-        deposited: "0",
-        monthly: "0",
-        dailySum: "0",
-        dailyPercent: "",
-        monthPercent: "",
-        apr: "0",
-        apy: "0",
-        tvl: formatNumber(totalTvl, "abbreviate") as string,
-      });
-      return;
-    }
-
-    let tvl = 0;
-    let deposited = 0;
-    let monthly = 0;
-    let avgApr = 0;
-
-    vaults.forEach((v) => {
-      if (v.balance) {
-        let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
-        let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
-
-        const apr = Number(v.apr);
-        const balance = vaultBalance * vaultSharePrice;
-
-        deposited += balance;
-        monthly += ((apr / 100) * balance) / 12;
-      }
-
-      if (v.tvl) {
-        tvl += formatFromBigInt(v.tvl, 18, "withFloor");
-      }
-    });
-    const dailySum = monthly / 30;
-    avgApr = deposited !== 0 ? (100 * dailySum * 365) / deposited : 0;
-
-    const dailyPercent = avgApr !== 0 ? String(avgApr / 365) : "0";
-    const monthPercent = avgApr !== 0 ? String(avgApr / 12) : "0";
-
-    setPortfolio({
-      deposited: String(deposited.toFixed(2)),
-      monthly: String(monthly.toFixed(2)),
-      dailySum: String(dailySum.toFixed(2)),
-      dailyPercent: dailyPercent,
-      monthPercent: monthPercent,
-      apr: String(avgApr.toFixed(3)),
-      apy: String(calculateAPY(avgApr).toFixed(3)),
-      tvl: formatNumber(tvl, "abbreviate") as string,
-    });
-  };
 
   const initFilters = (vaults: TVault[]) => {
     let shortNames: any[] = [
@@ -318,7 +250,6 @@ const Vaults = () => {
       vaults.sort((a: TVault, b: TVault) => parseInt(b.tvl) - parseInt(a.tvl));
 
       initFilters(vaults);
-      initPortfolio(vaults);
       setLocalVaults(vaults);
 
       setFilteredVaults(vaults);
@@ -337,7 +268,7 @@ const Vaults = () => {
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
     <>
-      <Portfolio data={portfolio} />
+      <Portfolio vaults={localVaults} />
       <div className="flex items-center gap-2 flex-col lg:flex-row">
         <input
           type="text"
@@ -507,7 +438,8 @@ const Vaults = () => {
                   <td className="px-2 min-[1110px]:px-3 py-2 tooltip">
                     <div className="flex items-center justify-start gap-[6px]">
                       <p className="text-[14px] whitespace-nowrap w-[120px] text-end">
-                        {vault.apr}% / {vault.apy}%
+                        {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}% /{" "}
+                        {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
                       </p>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -520,6 +452,9 @@ const Vaults = () => {
                           e.stopPropagation();
                           setAprModal({
                             apr: vault.apr,
+                            apy: vault.apy,
+                            aprWithoutFees: vault.aprWithoutFees,
+                            apyWithoutFees: vault.apyWithoutFees,
                             assetsWithApr: vault.assetsWithApr as any,
                             daily: vault.daily,
                             assetsAprs: vault.monthlyUnderlyingApr,
@@ -540,13 +475,26 @@ const Vaults = () => {
                           <div className="text-[14px] flex flex-col gap-1 w-full">
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APY</p>
-                              <p className="text-end">
-                                {calculateAPY(vault.apr).toFixed(2)}%
-                              </p>
+                              <div className="text-end flex items-center gap-1">
+                                <p
+                                  className={`${$hideFeeAPR && "line-through"}`}
+                                >
+                                  {vault.apy}%
+                                </p>
+                                {$hideFeeAPR && <p>{vault.apyWithoutFees}%</p>}
+                              </div>
                             </div>
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APR</p>
-                              <p className="text-end">{vault.apr}%</p>
+
+                              <div className="text-end flex items-center gap-1">
+                                <p
+                                  className={`${$hideFeeAPR && "line-through"}`}
+                                >
+                                  {vault.apr}%
+                                </p>
+                                {$hideFeeAPR && <p>{vault.aprWithoutFees}%</p>}
+                              </div>
                             </div>
 
                             {!!vault.monthlyUnderlyingApr && (
@@ -558,7 +506,7 @@ const Vaults = () => {
                               </div>
                             )}
                             <div className="font-bold flex items-center justify-between">
-                              <p> Strategy APR</p>
+                              <p>Strategy APR</p>
                               <p className="text-end">
                                 {formatFromBigInt(vault.strategyApr, 3).toFixed(
                                   2
@@ -568,7 +516,21 @@ const Vaults = () => {
                             </div>
                             <div className="font-bold flex items-center justify-between">
                               <p>Daily</p>
-                              <p className="text-end">{vault.daily}%</p>
+                              <div className="text-end flex items-center gap-1">
+                                <p
+                                  className={`${$hideFeeAPR && "line-through"}`}
+                                >
+                                  {vault.daily}%
+                                </p>
+                                {$hideFeeAPR && (
+                                  <p>
+                                    {(
+                                      Number(vault.aprWithoutFees) / 365
+                                    ).toFixed(2)}
+                                    %
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between w-full">
@@ -724,6 +686,9 @@ const Vaults = () => {
                         e.stopPropagation();
                         setAprModal({
                           apr: vault.apr,
+                          apy: vault.apy,
+                          aprWithoutFees: vault.aprWithoutFees,
+                          apyWithoutFees: vault.apyWithoutFees,
                           assetsWithApr: vault.assetsWithApr as any,
                           daily: vault.daily,
                           assetsAprs: vault.monthlyUnderlyingApr,

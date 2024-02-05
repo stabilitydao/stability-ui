@@ -272,8 +272,6 @@ const { title } = Astro.props as IProps;
 		width: 32px;
 		height: 32px;
 	}
-
-
 	/* TOOLTIP */
 
 	.tooltip {
@@ -282,8 +280,8 @@ const { title } = Astro.props as IProps;
 
 	.tooltip .visible__tooltip {
 		width:250px;
-		top:-17px;
 		left:50%;
+		top:-17px;
 		transform:translate(-30%,-100%);
 		padding:10px 20px;
 		color:#ffffff;
@@ -296,7 +294,9 @@ const { title } = Astro.props as IProps;
 		box-shadow:0 1px 8px rgba(0,0,0,0.5);
 		display:none;
 	}
-
+	 .toBottom {
+		top:240px !important;
+	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
 	}
@@ -312,7 +312,6 @@ const { title } = Astro.props as IProps;
 		height:15px;
 		overflow:hidden;
 	}
-
 	.tooltip .visible__tooltip i::after {
 		content:'';
 		position:absolute;
@@ -321,5 +320,8 @@ const { title } = Astro.props as IProps;
 		left:50%;
 		transform:translate(-50%,-50%) rotate(45deg);
 		background-color:#13141f;
+	}
+	.toBottom i::after {
+  		display: none !important;
 	}
 </style>

@@ -1,42 +1,17 @@
 import { useEffect, useRef } from "react";
 
-import { useStore } from "@nanostores/react";
-
-import { TimeDifferenceIndicator } from "@components";
-
-import { hideFeeApr } from "@store";
-
-import { formatFromBigInt } from "@utils";
-import type { TAPRModal } from "@types";
-
 interface IProps {
-  state: TAPRModal;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setModalState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
+const FeeAPRModal: React.FC<IProps> = ({ setModalState }) => {
   const modalRef: any = useRef(null);
-
-  const $hideFeeAPR = useStore(hideFeeApr);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
-      setModalState({
-        apr: "",
-        apy: "",
-        aprWithoutFees: "",
-        apyWithoutFees: "",
-        assetsWithApr: "",
-        daily: 0,
-        assetsAprs: 0,
-        lastHardWork: 0,
-        strategyApr: 0,
-        state: false,
-      });
+      setModalState(false);
     }
   };
-
-  const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -52,22 +27,11 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-modal rounded-[10px] h-[250px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-modal rounded-[10px] h-[300px]"
       >
         <svg
           onClick={() => {
-            setModalState({
-              apr: "",
-              apy: "",
-              aprWithoutFees: "",
-              apyWithoutFees: "",
-              assetsWithApr: "",
-              daily: 0,
-              assetsAprs: 0,
-              lastHardWork: 0,
-              strategyApr: 0,
-              state: false,
-            });
+            setModalState(false);
           }}
           className="absolute right-5 top-5 cursor-pointer"
           xmlns="http://www.w3.org/2000/svg"
@@ -130,54 +94,14 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
 
         <div className="p-10 flex items-start justify-center flex-col gap-4">
           <div className="text-[12px] sm:text-[16px] w-full">
-            <div className="font-bold flex items-center justify-between">
-              <p>Total APY</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.apy}%
-                </p>
-                {$hideFeeAPR && <p>{state.apyWithoutFees}%</p>}
-              </div>
-            </div>
-
-            <div className="font-bold flex items-center justify-between">
-              <p>Total APR</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.apr}%
-                </p>
-                {$hideFeeAPR && <p>{state.aprWithoutFees}%</p>}
-              </div>
-            </div>
-            {!!state.assetsAprs && (
-              <div className="flex items-center justify-between">
-                <p>Pool swap fees APR</p>
-                <p className="text-end">{state.assetsAprs.toFixed(2)}%</p>
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <p>Strategy APR</p>
-              <p className="text-end">{strategyAPR}%</p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p>Daily yield</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.daily}%
-                </p>
-                {$hideFeeAPR && (
-                  <p>{(Number(state.aprWithoutFees) / 365).toFixed(2)}%</p>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <p className="text-[16px]">Last Hard Work</p>
-            <TimeDifferenceIndicator unix={state.lastHardWork} />
+            During times of high volatility, the majority of pool swap fees may
+            be used to cover Impermanent Losses (IL) once ALMs rebalance
+            positions. Excluding swap fees income from profitability
+            calculations can sometimes show more realistic APRs.
           </div>
         </div>
       </div>
     </div>
   );
 };
-export { APRModal };
+export { FeeAPRModal };
