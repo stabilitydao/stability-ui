@@ -283,6 +283,13 @@ type TSdivTokenWallet = {
   sdivEarned: number;
 };
 
+type TIQMFAlm = {
+  alm: TAddress;
+  feeUSD: string;
+  timestamp: string;
+  totalUSD: string;
+};
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -323,4 +330,5 @@ export type {
   TPendingPlatformUpgrade,
   TToast,
   TPortfolio,
+  TIQMFAlm,
 };

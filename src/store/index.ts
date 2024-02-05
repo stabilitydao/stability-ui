@@ -45,6 +45,9 @@ const strategyTypes = atom();
 
 const vaults = deepMap<any>();
 
+// temp hide fee APR condition
+const hideFeeApr = atom(false);
+
 export {
   account,
   network,
@@ -68,4 +71,5 @@ export {
   strategyTypes,
   transactionSettings,
   platformVersion,
+  hideFeeApr,
 };

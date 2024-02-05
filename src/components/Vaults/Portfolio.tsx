@@ -1,7 +1,7 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
-import { connected, visible, platformVersion } from "@store";
+import { connected, visible, platformVersion, hideFeeApr } from "@store";
 
 import { formatNumber } from "@utils";
 
@@ -15,6 +15,9 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
   const $connected = useStore(connected);
   const $visible = useStore(visible);
   const $platformVersion = useStore(platformVersion);
+  const $hideFeeAPR = useStore(hideFeeApr);
+
+  const [hideFee, setHideFee] = useState($hideFeeAPR);
 
   const dailyYield = $connected
     ? `$${formatNumber(data.dailySum, "format")} / ${formatNumber(
@@ -30,6 +33,11 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
     : "-";
   const avgApr = $connected ? `${formatNumber(data.apr, "format")}%` : "-";
   const avgApy = $connected ? `${formatNumber(data.apy, "format")}%` : "-";
+
+  useEffect(() => {
+    localStorage.setItem("hideFeeAPR", JSON.stringify(hideFee));
+    hideFeeApr.set(hideFee);
+  }, [hideFee]);
 
   return (
     <div className="my-2 rounded-sm">
@@ -77,9 +85,24 @@ const Portfolio: React.FC<IProps> = memo(({ data }) => {
               )}
             </div>
           </div>
-          <p className="text-end w-full text-[1rem] lg:block hidden font-bold">
-            Stability Platform {$platformVersion}
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHideFee((prev) => !prev)}
+              className="w-[120px] bg-[#262830] rounded-md border border-[#CCB3F3]"
+            >
+              <div className="flex items-center justify-center gap-2 px-2 py-1">
+                <p className="text-[12px]">Hide fee APR</p>
+                {hideFee ? (
+                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#FFB800]"></div>
+                ) : (
+                  <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#443C28]"></div>
+                )}
+              </div>
+            </button>
+            <p className="text-end text-[1rem] lg:block hidden font-bold w-[250px]">
+              Stability Platform {$platformVersion}
+            </p>
+          </div>
         </div>
         <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
           <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">

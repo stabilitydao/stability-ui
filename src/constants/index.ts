@@ -251,6 +251,12 @@ const GRAPH_QUERY = `
           sharePrice
           timestamp
         }
+        almrebalanceEntities {
+          alm
+          timestamp
+          feeUSD
+          totalUSD
+        }
       }
       `;
 

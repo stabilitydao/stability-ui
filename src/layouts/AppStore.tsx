@@ -27,6 +27,7 @@ import {
   vaultTypes,
   strategyTypes,
   transactionSettings,
+  hideFeeApr,
 } from "@store";
 import {
   platform,
@@ -50,10 +51,9 @@ import {
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
-  DEFAULT_TRANSACTION_SETTINGS,
 } from "@constants";
 
-import type { TAddress } from "@types";
+import type { TAddress, TIQMFAlm } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -61,8 +61,22 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
+  const $hideFeeAPR = useStore(hideFeeApr);
 
   let stabilityAPIData: any;
+  const getLocalStorageData = () => {
+    const savedSettings = localStorage.getItem("transactionSettings");
+    const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
+    if (savedSettings) {
+      const savedData = JSON.parse(savedSettings);
+      transactionSettings.set(savedData);
+    }
+
+    if (savedHideFeeAPR) {
+      const savedData = JSON.parse(savedHideFeeAPR);
+      hideFeeApr.set(savedData);
+    }
+  };
   const getDataFromStabilityAPI = async () => {
     try {
       const response = await axios.get(STABILITY_API);
@@ -180,9 +194,10 @@ const AppStore = (props: React.PropsWithChildren) => {
       if (contractVaults) {
         const vaultsPromise = await Promise.all(
           contractVaults[0].map(async (vault: any, index: number) => {
+            const strategyInfo = getStrategyInfo(contractVaults[2][index]);
             const assetsWithApr: string[] = [];
             const assetsAprs: string[] = [];
-            let monthlyAPR = 0;
+            let dailyAPR = 0;
 
             const graphVault = graphResponse.data.data.vaultEntities.find(
               (obj: any) => obj.id === vault.toLowerCase()
@@ -204,18 +219,41 @@ const AppStore = (props: React.PropsWithChildren) => {
                 graphVault.underlying.toLowerCase()
               ];
 
-            if (APIData?.apr?.daily) {
-              monthlyAPR = APIData.apr.daily;
+            if (APIData?.apr?.daily && !$hideFeeAPR) {
+              dailyAPR = APIData.apr.daily;
               assetsWithApr.push("Pool swap fees");
-              assetsAprs.push(Number(monthlyAPR).toFixed(2));
+              assetsAprs.push(Number(dailyAPR).toFixed(2));
             }
+
+            // if (strategyInfo?.shortName === "IQMF") {
+            //   const IQMFAlms = graphResponse.data.data.almrebalanceEntities
+            //     .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
+            //     .sort(
+            //       (a: TIQMFAlm, b: TIQMFAlm) =>
+            //         Number(b.timestamp) - Number(a.timestamp)
+            //     );
+
+            //   const minutesBetweenRebalances =
+            //     (Number(IQMFAlms[0].timestamp) -
+            //       Number(IQMFAlms[1].timestamp)) /
+            //     60;
+
+            //   const ICHI_APR =
+            //     (IQMFAlms[0].feeUSD /
+            //       IQMFAlms[0].totalUSD /
+            //       minutesBetweenRebalances) *
+            //     525600 *
+            //     100;
+
+            //   console.log("ich", ICHI_APR);
+            // }
 
             const APR = (
               formatFromBigInt(
                 String(contractVaults[7][index]),
                 3,
                 "withDecimals"
-              ) + Number(monthlyAPR)
+              ) + Number(dailyAPR)
             ).toFixed(2);
 
             const APY = calculateAPY(APR).toFixed(2);
@@ -255,13 +293,13 @@ const AppStore = (props: React.PropsWithChildren) => {
                 balance: contractBalance[5][index],
                 lastHardWork: vaultInfoes[index][5],
                 daily: (Number(APR) / 365).toFixed(2),
-                monthlyUnderlyingApr: monthlyAPR,
+                monthlyUnderlyingApr: dailyAPR,
                 assets,
                 assetsProportions,
                 assetsWithApr,
                 assetsAprs,
-                strategyInfo: getStrategyInfo(contractVaults[2][index]),
-                il: getStrategyInfo(contractVaults[2][index])?.il?.rate,
+                strategyInfo: strategyInfo,
+                il: strategyInfo?.il?.rate,
                 underlying: graphVault.underlying,
                 strategyAddress: graphVault.strategy,
                 strategyDescription: graphVault.strategyDescription,
@@ -291,19 +329,19 @@ const AppStore = (props: React.PropsWithChildren) => {
             (obj: any) => obj.id === vault.strategy
           );
 
-          let monthlyAPR = 0;
+          let dailyAPR = 0;
           const assetsWithApr: string[] = [];
           const assetsAprs: string[] = [];
 
-          if (APIData?.apr?.daily) {
-            monthlyAPR = APIData.apr.daily;
+          if (APIData?.apr?.daily && !$hideFeeAPR) {
+            dailyAPR = APIData.apr.daily;
             assetsWithApr.push("Pool swap fees");
-            assetsAprs.push(Number(monthlyAPR).toFixed(2));
+            assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
           /////
           const APR = (
             formatFromBigInt(String(vault.apr), 3, "withDecimals") +
-            Number(monthlyAPR)
+            Number(dailyAPR)
           ).toFixed(2);
 
           const APY = calculateAPY(APR).toFixed(2);
@@ -352,7 +390,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             balance: "",
             lastHardWork: vault.lastHardWork,
             daily: (Number(APR) / 365).toFixed(2),
-            monthlyUnderlyingApr: monthlyAPR,
+            monthlyUnderlyingApr: dailyAPR,
             assets,
             assetsProportions,
             assetsWithApr: assetsWithApr,
@@ -398,6 +436,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
   const fetchAllData = async () => {
+    getLocalStorageData();
     await getDataFromStabilityAPI();
     getData();
     account.set(address);
@@ -407,19 +446,8 @@ const AppStore = (props: React.PropsWithChildren) => {
   };
 
   useEffect(() => {
-    const savedSettings = localStorage.getItem("transactionSettings");
-
-    if (savedSettings) {
-      const savedData = JSON.parse(savedSettings);
-      transactionSettings.set(savedData);
-    } else {
-      transactionSettings.set(DEFAULT_TRANSACTION_SETTINGS);
-    }
-  }, []);
-
-  useEffect(() => {
     fetchAllData();
-  }, [address, chain?.id, isConnected, $lastTx]);
+  }, [address, chain?.id, isConnected, $lastTx, $hideFeeAPR]);
 
   return (
     <WagmiConfig config={wagmiConfig}>
