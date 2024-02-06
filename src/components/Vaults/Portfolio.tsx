@@ -113,7 +113,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
     if (vaults) {
       initPortfolio();
     }
-  }, [hideFee]);
+  }, [hideFee, vaults]);
 
   return (
     <div className="my-2 rounded-sm">
