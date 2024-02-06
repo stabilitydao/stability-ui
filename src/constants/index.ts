@@ -204,6 +204,7 @@ const GRAPH_QUERY = `
           strategy
           strategyId
           totalSupply
+          created
           color
           upgradeAllowed
           vaultType
@@ -256,6 +257,7 @@ const GRAPH_QUERY = `
           timestamp
           feeUSD
           totalUSD
+          APRFromLastEvent
         }
       }
       `;
