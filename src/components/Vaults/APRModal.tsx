@@ -132,22 +132,17 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           <div className="text-[12px] sm:text-[16px] w-full">
             <div className="font-bold flex items-center justify-between">
               <p>Total APY</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.apy}%
-                </p>
-                {$hideFeeAPR && <p>{state.apyWithoutFees}%</p>}
-              </div>
+
+              <p className="text-end">
+                {$hideFeeAPR ? state.apyWithoutFees : state.apy}%
+              </p>
             </div>
 
             <div className="font-bold flex items-center justify-between">
               <p>Total APR</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.apr}%
-                </p>
-                {$hideFeeAPR && <p>{state.aprWithoutFees}%</p>}
-              </div>
+              <p className="text-end">
+                {$hideFeeAPR ? state.aprWithoutFees : state.apr}%
+              </p>
             </div>
             {!!state.assetsAprs && (
               <div className="flex items-center justify-between">
@@ -163,14 +158,12 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             </div>
             <div className="flex items-center justify-between">
               <p>Daily yield</p>
-              <div className="text-end flex items-center gap-1">
-                <p className={`${$hideFeeAPR && "line-through"}`}>
-                  {state.daily}%
-                </p>
-                {$hideFeeAPR && (
-                  <p>{(Number(state.aprWithoutFees) / 365).toFixed(2)}%</p>
-                )}
-              </div>
+              <p className="text-end">
+                {$hideFeeAPR
+                  ? (Number(state.aprWithoutFees) / 365).toFixed(2)
+                  : state.daily}
+                %
+              </p>
             </div>
           </div>
           <div className="flex items-center justify-between w-full">

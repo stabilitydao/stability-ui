@@ -172,7 +172,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 ) : (
                   <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#443C28]"></div>
                 )}
-                <p className="text-[12px]">Hide fee APR</p>
+                <p className="text-[12px]">Hide swap fee APR</p>
                 <div className="tooltip">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -475,32 +475,22 @@ const Vaults = () => {
                           <div className="text-[14px] flex flex-col gap-1 w-full">
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APY</p>
-                              <div className="text-end flex items-center gap-1">
-                                <p
-                                  className={`${$hideFeeAPR && "line-through"}`}
-                                >
-                                  {vault.apy}%
-                                </p>
-                                {$hideFeeAPR && <p>{vault.apyWithoutFees}%</p>}
-                              </div>
+                              <p className="text-end">
+                                {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}
+                                %
+                              </p>
                             </div>
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APR</p>
-
-                              <div className="text-end flex items-center gap-1">
-                                <p
-                                  className={`${$hideFeeAPR && "line-through"}`}
-                                >
-                                  {vault.apr}%
-                                </p>
-                                {$hideFeeAPR && <p>{vault.aprWithoutFees}%</p>}
-                              </div>
+                              <p className="text-end">
+                                {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}
+                                %
+                              </p>
                             </div>
 
                             {!!vault.monthlyUnderlyingApr && (
                               <div className="font-bold flex items-center justify-between">
                                 <p>Pool swap fees APR</p>
-
                                 <p
                                   className={`${
                                     $hideFeeAPR && "line-through"
@@ -521,21 +511,14 @@ const Vaults = () => {
                             </div>
                             <div className="font-bold flex items-center justify-between">
                               <p>Daily</p>
-                              <div className="text-end flex items-center gap-1">
-                                <p
-                                  className={`${$hideFeeAPR && "line-through"}`}
-                                >
-                                  {vault.daily}%
-                                </p>
-                                {$hideFeeAPR && (
-                                  <p>
-                                    {(
+                              <p className="text-end">
+                                {$hideFeeAPR
+                                  ? (
                                       Number(vault.aprWithoutFees) / 365
-                                    ).toFixed(2)}
-                                    %
-                                  </p>
-                                )}
-                              </div>
+                                    ).toFixed(2)
+                                  : vault.daily}
+                                %
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center justify-between w-full">
