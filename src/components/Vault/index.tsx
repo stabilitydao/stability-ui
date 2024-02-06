@@ -34,7 +34,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
-
   return vault && localVault ? (
     <WagmiConfig config={wagmiConfig}>
       <main className="w-full mx-auto">

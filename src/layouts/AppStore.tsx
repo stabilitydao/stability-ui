@@ -352,10 +352,10 @@ const AppStore = (props: React.PropsWithChildren) => {
                   _24HIQMFAlms[_24HIQMFAlms.length - 1].APRFromLastEvent *
                   weight;
 
-                const averageAPR =
+                dailyAPR =
                   lastAPRs.reduce((acc, value) => (acc += value), 0) / 3;
                 assetsWithApr.push("Pool swap fees");
-                assetsAprs.push(Number(averageAPR).toFixed(2));
+                assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
             }
 
@@ -585,13 +585,11 @@ const AppStore = (props: React.PropsWithChildren) => {
               lastAPRs[lastAPRs.length - 1] =
                 _24HIQMFAlms[_24HIQMFAlms.length - 1].APRFromLastEvent * weight;
 
-              const averageAPR =
-                lastAPRs.reduce((acc, value) => (acc += value), 0) / 3;
+              dailyAPR = lastAPRs.reduce((acc, value) => (acc += value), 0) / 3;
               assetsWithApr.push("Pool swap fees");
-              assetsAprs.push(Number(averageAPR).toFixed(2));
+              assetsAprs.push(Number(dailyAPR).toFixed(2));
             }
           }
-
           const APR = (
             formatFromBigInt(String(vault.apr), 3, "withDecimals") +
             Number(dailyAPR)
