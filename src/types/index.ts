@@ -116,6 +116,8 @@ type TVault = {
   tvl: string;
   apr: string;
   apy: string;
+  aprWithoutFees: string;
+  apyWithoutFees: string;
   strategyApr: string;
   strategySpecific: string;
   balance: string;
@@ -159,6 +161,9 @@ type TTableFilters = {
 
 type TAPRModal = {
   apr: string;
+  apy: string;
+  aprWithoutFees: string;
+  apyWithoutFees: string;
   assetsWithApr: any;
   daily: number;
   assetsAprs: number;
@@ -179,17 +184,6 @@ type TAddress = `0x${string}`;
 type TInputItem = {
   inputValue: string | number;
   valuePerDay: string;
-};
-
-type TPortfolio = {
-  deposited: string;
-  monthly: string;
-  dailySum: string;
-  dailyPercent: string;
-  monthPercent: string;
-  apr: string;
-  apy: string;
-  tvl: string;
 };
 
 ////          VAULT
@@ -283,6 +277,13 @@ type TSdivTokenWallet = {
   sdivEarned: number;
 };
 
+type TIQMFAlm = {
+  alm: TAddress;
+  feeUSD: string;
+  timestamp: string;
+  totalUSD: string;
+};
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -322,5 +323,5 @@ export type {
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,
   TToast,
-  TPortfolio,
+  TIQMFAlm,
 };
