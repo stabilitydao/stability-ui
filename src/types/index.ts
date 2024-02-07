@@ -136,6 +136,7 @@ type TVault = {
   status: number;
   version: string;
   strategyVersion: string;
+  rebalances: any;
 };
 
 type TVaultAssets = [string, string];
