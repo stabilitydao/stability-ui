@@ -2353,10 +2353,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
               ) : (
                 <div>
                   <div className="flex flex-col mt-[15px] text-[15px] w-full">
-                    {balances[option[0]] && (
+                    {balances[option[0]] ? (
                       <div className="text-left text-[gray] ml-2">
                         Balance: {balances[option[0]]}
                       </div>
+                    ) : (
+                      ""
                     )}
 
                     <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
@@ -2378,7 +2380,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           }
                         })}
                       </div>
-                      {$connected && balances[option[0]] && (
+                      {$connected && balances[option[0]] ? (
                         <div>
                           <div
                             className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
@@ -2403,6 +2405,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             </div>
                           </div>
                         </div>
+                      ) : (
+                        ""
                       )}
 
                       {option && (
@@ -2681,7 +2685,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ($connected ? (
             <>
               <div className="grid mt-[15px] text-[15px] w-full">
-                {balances[option[0]] && (
+                {balances[option[0]] ? (
                   <div className="text-left text-[gray] ml-2">
                     Balance:{" "}
                     {parseFloat(
@@ -2691,10 +2695,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       )
                     )}
                   </div>
+                ) : (
+                  ""
                 )}
 
                 <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                  {balances[option[0]] && (
+                  {balances[option[0]] ? (
                     <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
                       <div className="flex items-center">
                         <button
@@ -2720,6 +2726,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         </button>
                       </div>
                     </div>
+                  ) : (
+                    ""
                   )}
 
                   <input
