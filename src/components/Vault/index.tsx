@@ -9,7 +9,7 @@ import { StatisticBar } from "./StatisticBar";
 import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
-import { Toast } from "@components";
+import { Toast, Loader } from "@components";
 //import { Chart } from "./Chart";
 
 import { vaultData, vaults, vaultAssets } from "@store";
@@ -58,7 +58,9 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </main>
     </WagmiConfig>
   ) : (
-    <h1>Loading Vault...</h1>
+    <div className="flex justify-center items-center h-screen">
+      <Loader width="100" height="100" color="#ccb3f3" />
+    </div>
   );
 };
 export { Vault };
