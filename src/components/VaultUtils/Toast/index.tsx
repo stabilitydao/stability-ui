@@ -55,12 +55,15 @@ const Toast = () => {
           : setColor("#B34D61");
 
         const array = Object.entries(
-          initialTx.tokens as Record<string, { amount: string }>
-        ).map(([address, { amount }]) => ({
+          initialTx.tokens as Record<
+            string,
+            { amount: string; symbol?: string; logo?: string }
+          >
+        ).map(([address, { amount, symbol, logo }]) => ({
           address,
           amount: Number(amount).toFixed(4),
-          symbol: getTokenData(address)?.symbol,
-          logo: getTokenData(address)?.logoURI,
+          symbol: symbol ? symbol : getTokenData(address)?.symbol,
+          logo: logo ? logo : getTokenData(address)?.logoURI,
         }));
         setTokens(array);
 
