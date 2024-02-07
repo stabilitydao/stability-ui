@@ -131,6 +131,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const CFCondition =
     vault.strategyInfo.shortName === "CF" &&
     vault.assets[0].address === option[0];
+  const underlyingCondition =
+    !underlyingToken || option[0] !== underlyingToken?.address;
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (vault.strategyInfo.shortName === "IQMF") {
@@ -665,6 +667,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         const out = shares - (shares * decimalPercent) / 100n;
 
+        const txToken = {
+          [underlyingToken?.address]: {
+            amount: amount,
+            symbol: underlyingToken?.symbol,
+            logo: underlyingToken?.logoURI,
+          },
+        };
+
         const gas = await _publicClient.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
@@ -706,7 +716,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
-          tokens: inputs,
+          tokens: txToken,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -1245,9 +1255,80 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     if (vault.strategyInfo.shortName === "IQMF") {
       assets = vault.assets.map((asset) => asset.address);
     }
-    if (
+    if (underlyingToken?.address === option[0]) {
+      const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
+
+      const txTokens = withdrawAmount.reduce((result, token) => {
+        result[underlyingToken.address] = {
+          amount: token.amount,
+          symbol: token.symbol,
+          logo: token.logo,
+        };
+        return result;
+      }, {});
+
+      const withdrawAmounts = withdrawAmount.map((obj: any) => {
+        const amount = parseUnits(obj.amount, 18);
+        return amount - (amount * decimalPercent) / 100n;
+      });
+      try {
+        const gas = await _publicClient.estimateContractGas({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [option as TAddress[], sharesToBurn, withdrawAmounts],
+          account: $account as TAddress,
+        });
+        const gasLimit = BigInt(
+          Math.trunc(Number(gas) * Number(settings.gasLimit))
+        );
+        setNeedConfirm(true);
+        withdrawAssets = await writeContract({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "withdrawAssets",
+          args: [option as TAddress[], sharesToBurn, withdrawAmounts],
+          gas: gasLimit,
+        });
+        setNeedConfirm(false);
+        setLoader(true);
+        transaction = await _publicClient.waitForTransactionReceipt({
+          confirmations: 5,
+          hash: withdrawAssets?.hash,
+        });
+        setLocalStoreHash({
+          timestamp: new Date().getTime(),
+          hash: withdrawAssets?.hash,
+          status: transaction?.status || "reverted",
+          type: "withdraw",
+          vault: vault.address,
+          tokens: txTokens,
+        });
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
+        lastTx.set(transaction?.transactionHash);
+        setLoader(false);
+      } catch (err) {
+        lastTx.set("No withdrawAssets hash...");
+        if (err instanceof Error) {
+          const errName = err.name;
+          const errorMessageLength =
+            err.message.indexOf("Contract Call:") !== -1
+              ? err.message.indexOf("Contract Call:")
+              : 150;
+
+          const errorMessage =
+            err.message.substring(0, errorMessageLength) + "...";
+
+          setError({ name: errName, message: errorMessage });
+        }
+        setNeedConfirm(false);
+        setLoader(false);
+        console.error("WITHDRAW ERROR:", err);
+      }
+    } else if (
       (defaultOptionAssets === option[0] && option.length < 2) ||
-      underlyingToken?.address === option[0] ||
       option.length > 1
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
@@ -1255,8 +1336,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const JSONToken = tokensJson.tokens.find(
           (t) => t.symbol === token.symbol
         );
-
-        result[JSONToken.address] = { amount: token.amount };
+        result[JSONToken.address] = {
+          amount: token.amount,
+        };
         return result;
       }, {});
 
@@ -1335,7 +1417,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       );
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
-
       const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
 
       try {
@@ -1460,7 +1541,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [option as TAddress[], currentValue, [0n]],
           account: $account as TAddress,
         });
-
         setWithdrawAmount([
           {
             symbol: underlyingToken?.symbol,
@@ -2273,10 +2353,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
               ) : (
                 <div>
                   <div className="flex flex-col mt-[15px] text-[15px] w-full">
-                    {balances[option[0]] && (
+                    {balances[option[0]] ? (
                       <div className="text-left text-[gray] ml-2">
                         Balance: {balances[option[0]]}
                       </div>
+                    ) : (
+                      ""
                     )}
 
                     <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
@@ -2298,7 +2380,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           }
                         })}
                       </div>
-                      {$connected && balances[option[0]] && (
+                      {$connected && balances[option[0]] ? (
                         <div>
                           <div
                             className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
@@ -2323,6 +2405,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             </div>
                           </div>
                         </div>
+                      ) : (
+                        ""
                       )}
 
                       {option && (
@@ -2382,78 +2466,85 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </div>
 
                     <div className="my-2 ml-2 flex flex-col gap-2">
-                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                        SWAPS
-                      </p>
-                      {loader && !transactionInProgress ? (
-                        <AssetsSkeleton />
-                      ) : (
-                        <div className="h-[100px]">
-                          {zapTokens && (
-                            <div>
-                              {zapTokens.map((token: any) => (
-                                <div
-                                  className="text-[18px]  flex items-center gap-1 ml-2"
-                                  key={token.address}
-                                >
-                                  {token.address.toLowerCase() !==
-                                    option[0].toLowerCase() && (
-                                    <div className="flex items-center gap-1 mt-2">
-                                      <img
-                                        src="/oneInch.svg"
-                                        alt="1inch logo"
-                                        title="1inch"
-                                      />
-                                      {zapError ? (
-                                        <img
-                                          src="/error.svg"
-                                          alt="error img"
-                                          title="error"
-                                        />
-                                      ) : (
-                                        <>
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(token.amountIn).toFixed(
-                                                6
-                                              )}
-                                            </p>
+                      {underlyingCondition && (
+                        <>
+                          <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                            SWAPS
+                          </p>
+                          {loader && !transactionInProgress ? (
+                            <AssetsSkeleton />
+                          ) : (
+                            <div className="h-[100px]">
+                              {zapTokens && (
+                                <div>
+                                  {zapTokens.map((token: any) => (
+                                    <div
+                                      className="text-[18px]  flex items-center gap-1 ml-2"
+                                      key={token.address}
+                                    >
+                                      {token.address.toLowerCase() !==
+                                        option[0].toLowerCase() && (
+                                        <div className="flex items-center gap-1 mt-2">
+                                          <img
+                                            src="/oneInch.svg"
+                                            alt="1inch logo"
+                                            title="1inch"
+                                          />
+                                          {zapError ? (
                                             <img
-                                              src={
-                                                getTokenData(option[0])?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
+                                              src="/error.svg"
+                                              alt="error img"
+                                              title="error"
                                             />
-                                          </div>
-                                          -&gt;
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(token.amountOut).toFixed(
-                                                6
-                                              )}
-                                            </p>
-                                            <img
-                                              src={token.img}
-                                              title={token.symbol}
-                                              alt={token.symbol}
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                        </>
+                                          ) : (
+                                            <>
+                                              <div className="flex items-center gap-1">
+                                                <p>
+                                                  {Number(
+                                                    token.amountIn
+                                                  ).toFixed(6)}
+                                                </p>
+                                                <img
+                                                  src={
+                                                    getTokenData(option[0])
+                                                      ?.logoURI
+                                                  }
+                                                  title={
+                                                    getTokenData(option[0])
+                                                      ?.symbol
+                                                  }
+                                                  alt={
+                                                    getTokenData(option[0])
+                                                      ?.symbol
+                                                  }
+                                                  className="w-6 h-6 rounded-full"
+                                                />
+                                              </div>
+                                              -&gt;
+                                              <div className="flex items-center gap-1">
+                                                <p>
+                                                  {Number(
+                                                    token.amountOut
+                                                  ).toFixed(6)}
+                                                </p>
+                                                <img
+                                                  src={token.img}
+                                                  title={token.symbol}
+                                                  alt={token.symbol}
+                                                  className="w-6 h-6 rounded-full"
+                                                />
+                                              </div>
+                                            </>
+                                          )}
+                                        </div>
                                       )}
                                     </div>
-                                  )}
+                                  ))}
                                 </div>
-                              ))}
+                              )}
                             </div>
                           )}
-                        </div>
+                        </>
                       )}
                       <div className="mt-5">
                         <div className="h-[63px]">
@@ -2594,7 +2685,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ($connected ? (
             <>
               <div className="grid mt-[15px] text-[15px] w-full">
-                {balances[option[0]] && (
+                {balances[option[0]] ? (
                   <div className="text-left text-[gray] ml-2">
                     Balance:{" "}
                     {parseFloat(
@@ -2604,10 +2695,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       )
                     )}
                   </div>
+                ) : (
+                  ""
                 )}
 
                 <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                  {balances[option[0]] && (
+                  {balances[option[0]] ? (
                     <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
                       <div className="flex items-center">
                         <button
@@ -2633,6 +2726,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         </button>
                       </div>
                     </div>
+                  ) : (
+                    ""
                   )}
 
                   <input
@@ -2684,35 +2779,46 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </div>
               </div>
               <div className="my-2 ml-2 flex flex-col gap-2">
-                {(option.length > 1 || CFCondition) && (
+                {(option.length > 1 || CFCondition || !underlyingCondition) && (
                   <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
                     YOU RECEIVE
                   </p>
                 )}
 
                 <div className="h-[100px]">
-                  {(option.length > 1 || CFCondition) &&
+                  {(option.length > 1 || CFCondition || !underlyingCondition) &&
                     option.map((address, index) => (
                       <div className="flex items-center gap-1" key={address}>
-                        <img
-                          src={getTokenData(address)?.logoURI}
-                          alt={getTokenData(address)?.symbol}
-                          title={getTokenData(address)?.symbol}
-                          className="w-6 h-6 rounded-full"
-                        />
+                        {underlyingCondition ? (
+                          <img
+                            src={getTokenData(address)?.logoURI}
+                            alt={getTokenData(address)?.symbol}
+                            title={getTokenData(address)?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                        ) : (
+                          <img
+                            src={underlyingToken?.logoURI}
+                            alt={underlyingToken?.symbol}
+                            title={underlyingToken?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                        )}
                         {loader && !transactionInProgress ? (
                           <ShareSkeleton height={32} />
                         ) : (
                           <p>
                             {withdrawAmount
-                              ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index]?.amountInUSD})`
+                              ? withdrawAmount[index]?.amountInUSD
+                                ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
+                                : `${withdrawAmount[index]?.amount}`
                               : "0 ($0)"}
                           </p>
                         )}
                       </div>
                     ))}
 
-                  {!CFCondition && (
+                  {!CFCondition && underlyingCondition && (
                     <div>
                       {option.length < 2 && (
                         <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
@@ -2799,7 +2905,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   )}
                 </div>
 
-                {option.length < 2 && !CFCondition && (
+                {option.length < 2 && underlyingCondition && !CFCondition && (
                   <div className="mt-5">
                     <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
                       YOU RECEIVE

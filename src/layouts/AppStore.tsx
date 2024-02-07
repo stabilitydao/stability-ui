@@ -199,6 +199,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             const assetsWithApr: string[] = [];
             const assetsAprs: string[] = [];
             let dailyAPR = 0;
+            let rebalances = {};
 
             const graphVault = graphResponse.data.data.vaultEntities.find(
               (obj: any) => obj.id === vault.toLowerCase()
@@ -234,6 +235,15 @@ const AppStore = (props: React.PropsWithChildren) => {
                     Number(b.timestamp) - Number(a.timestamp)
                 );
               const now = Math.floor(Date.now() / 1000);
+
+              const _24HRebalances = IQMFAlms.filter(
+                (obj: any) => Number(obj.timestamp) >= now - 86400
+              ).length;
+              const _7DRebalances = IQMFAlms.filter(
+                (obj: any) => Number(obj.timestamp) >= now - 86400 * 7
+              ).length;
+
+              rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
               const _24HIQMFAlms = IQMFAlms.filter(
                 (obj: any) => Number(obj.timestamp) >= now - 86400
@@ -428,6 +438,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 status: Number(graphVault.vaultStatus),
                 version: graphVault.version,
                 strategyVersion: strategyEntity.version,
+                rebalances: rebalances,
               },
             };
           })
@@ -455,6 +466,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           let dailyAPR = 0;
           const assetsWithApr: string[] = [];
           const assetsAprs: string[] = [];
+          let rebalances = {};
 
           if (APIData?.apr?.daily) {
             dailyAPR = APIData.apr.daily;
@@ -470,6 +482,15 @@ const AppStore = (props: React.PropsWithChildren) => {
                   Number(b.timestamp) - Number(a.timestamp)
               );
             const now = Math.floor(Date.now() / 1000);
+
+            const _24HRebalances = IQMFAlms.filter(
+              (obj: any) => Number(obj.timestamp) >= now - 86400
+            ).length;
+            const _7DRebalances = IQMFAlms.filter(
+              (obj: any) => Number(obj.timestamp) >= now - 86400 * 7
+            ).length;
+
+            rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
             const _24HIQMFAlms = IQMFAlms.filter(
               (obj: any) => Number(obj.timestamp) >= now - 86400
@@ -665,6 +686,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             status: Number(vault.vaultStatus),
             version: vault.version,
             strategyVersion: strategyEntity.version,
+            rebalances: rebalances,
           };
 
           return vaults;

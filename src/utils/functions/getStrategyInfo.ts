@@ -45,7 +45,7 @@ const IL = {
   IQMF: {
     rate: 8,
     title: "High",
-    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
     color: "#F52A11",
   },
 };

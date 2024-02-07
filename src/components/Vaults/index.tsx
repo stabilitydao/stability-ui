@@ -12,6 +12,7 @@ import {
   AssetsProportion,
   VaultState,
   TimeDifferenceIndicator,
+  Loader,
 } from "@components";
 
 import { vaults, isVaultsLoaded, hideFeeApr } from "@store";
@@ -285,7 +286,9 @@ const Vaults = () => {
   }, [$vaults]);
 
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
-    <p className="text-[36px] text-center">Loading vaults...</p>
+    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <Loader width="100" height="100" color="#ccb3f3" />
+    </div>
   ) : localVaults?.length ? (
     <>
       <Portfolio vaults={localVaults} />
