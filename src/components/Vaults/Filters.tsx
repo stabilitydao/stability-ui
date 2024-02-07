@@ -180,7 +180,15 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   }}
                   className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
                 >
-                  <p className="text-[20px]">{filter.name}</p>
+                  <p
+                    className={`text-[20px] ${
+                      filter?.variants?.some((variant) => variant.state)
+                        ? "opacity-100"
+                        : "opacity-70 hover:opacity-80"
+                    }`}
+                  >
+                    {filter.name}
+                  </p>
                   <svg
                     width="15"
                     height="9"

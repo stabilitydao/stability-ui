@@ -129,8 +129,8 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         </svg>
 
         <div className="p-10 flex items-start justify-center flex-col gap-4">
-          <div className="text-[12px] sm:text-[16px] w-full">
-            <div className="font-bold flex items-center justify-between">
+          <div className="text-[16px] w-full">
+            <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APY</p>
 
               <p className="text-end">
@@ -138,21 +138,21 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               </p>
             </div>
 
-            <div className="font-bold flex items-center justify-between">
+            <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APR</p>
               <p className="text-end">
                 {$hideFeeAPR ? state.aprWithoutFees : state.apr}%
               </p>
             </div>
             {!!state.assetsAprs && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-1">
                 <p>Pool swap fees APR</p>
                 <p className={`${$hideFeeAPR && "line-through"} text-end`}>
                   {state.assetsAprs.toFixed(2)}%
                 </p>
               </div>
             )}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-1">
               <p>Strategy APR</p>
               <p className="text-end">{strategyAPR}%</p>
             </div>

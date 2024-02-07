@@ -16,12 +16,7 @@ import {
 
 import { vaults, isVaultsLoaded, hideFeeApr } from "@store";
 
-import {
-  formatNumber,
-  getStrategyShortName,
-  formatFromBigInt,
-  calculateAPY,
-} from "@utils";
+import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
 import {
   TABLE,
@@ -40,6 +35,8 @@ const Vaults = () => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $hideFeeAPR = useStore(hideFeeApr);
+
+  const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
@@ -61,13 +58,18 @@ const Vaults = () => {
   const [currentTab, setCurrentTab] = useState(1);
   const [sortSelector, setSortSelector] = useState(false);
 
+  const [tableStates, setTableStates] = useState(TABLE);
+  const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
+  const [mobileActiveSort, setMobileActiveSort] = useState<TTableColumn>({
+    name: "",
+    keyName: "",
+    sortType: "",
+    dataType: "",
+  });
+
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-  const [tableStates, setTableStates] = useState(TABLE);
-  const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
-
-  const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
@@ -227,6 +229,7 @@ const Vaults = () => {
     );
     setFilteredVaults(sortedVaults);
     setTableStates(table);
+    setSortSelector(false);
   };
 
   const initFilters = (vaults: TVault[]) => {
@@ -258,12 +261,29 @@ const Vaults = () => {
   };
 
   useEffect(() => {
+    const activeTableState = tableStates.find(
+      (state) => state.sortType != "none"
+    );
+    if (activeTableState) {
+      setMobileActiveSort(activeTableState);
+    } else {
+      setMobileActiveSort({
+        name: "",
+        keyName: "",
+        sortType: "",
+        dataType: "",
+      });
+    }
+  }, [tableStates]);
+
+  useEffect(() => {
     tableHandler();
   }, [tableFilters]);
 
   useEffect(() => {
     initVaults();
   }, [$vaults]);
+
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <p className="text-[36px] text-center">Loading vaults...</p>
   ) : localVaults?.length ? (
@@ -288,7 +308,36 @@ const Vaults = () => {
             }}
             className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
           >
-            <p className="text-[16px] md:text-[15px] lg:text-[20px]">Sort by</p>
+            <div className="flex items-center justify-center gap-2">
+              <p className="text-[16px] md:text-[15px] lg:text-[20px]">
+                Sort by:
+              </p>
+              <div>
+                {mobileActiveSort.name && (
+                  <div className="px-0 md:px-2 min-[1110px]:px-4 py-2 text-center cursor-pointer">
+                    <p className="inline-block">{mobileActiveSort?.name}</p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="7"
+                      viewBox="0 0 12 7"
+                      fill="none"
+                      className={`inline-block ml-[10px] transition duration-300 ease-in-out ${
+                        mobileActiveSort?.sortType === "ascendentic" &&
+                        "rotate-[180deg]"
+                      }`}
+                    >
+                      <path
+                        d="M6 7L11.1962 0.25H0.803848L6 7Z"
+                        fill="white"
+                        fillOpacity="0.6"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <svg
               width="15"
               height="9"

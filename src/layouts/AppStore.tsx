@@ -353,7 +353,9 @@ const AppStore = (props: React.PropsWithChildren) => {
                   weight;
 
                 dailyAPR =
-                  lastAPRs.reduce((acc, value) => (acc += value), 0) / 3;
+                  lastAPRs.reduce((acc, value) => (acc += value), 0) /
+                  lastAPRs.length;
+
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
@@ -585,7 +587,9 @@ const AppStore = (props: React.PropsWithChildren) => {
               lastAPRs[lastAPRs.length - 1] =
                 _24HIQMFAlms[_24HIQMFAlms.length - 1].APRFromLastEvent * weight;
 
-              dailyAPR = lastAPRs.reduce((acc, value) => (acc += value), 0) / 3;
+              dailyAPR =
+                lastAPRs.reduce((acc, value) => (acc += value), 0) /
+                lastAPRs.length;
               assetsWithApr.push("Pool swap fees");
               assetsAprs.push(Number(dailyAPR).toFixed(2));
             }

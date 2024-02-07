@@ -192,7 +192,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       fill="white"
                     />
                   </svg>
-                  <div className="visible__tooltip toBottom">
+                  <div className="visible__tooltip toLeft">
                     <div className="flex items-start flex-col">
                       <p className="text-[14px] flex flex-col gap-1 w-full">
                         During times of high volatility, the majority of pool
