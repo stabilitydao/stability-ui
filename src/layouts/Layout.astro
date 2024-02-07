@@ -294,8 +294,9 @@ const { title } = Astro.props as IProps;
 		box-shadow:0 1px 8px rgba(0,0,0,0.5);
 		display:none;
 	}
-	 .toBottom {
+	 .toLeft {
 		top:230px !important;
+		left:-140px !important;
 	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
@@ -321,7 +322,12 @@ const { title } = Astro.props as IProps;
 		transform:translate(-50%,-50%) rotate(45deg);
 		background-color:#13141f;
 	}
-	.toBottom i::after {
+	.toLeft i::after {
   		display: none !important;
+	}
+	@media screen and (max-width:767px) {
+		.tooltip:hover .visible__tooltip {
+			display:none !important;
+		}
 	}
 </style>
