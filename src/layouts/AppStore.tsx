@@ -230,10 +230,26 @@ const AppStore = (props: React.PropsWithChildren) => {
             if (strategyInfo?.shortName === "IQMF") {
               const DAY = 86400;
               const YEAR = 525600;
-              const NOW = Date.now() / 1000;
+              const NOW = Math.floor(Date.now() / 1000);
               const newAPRs = [];
               const weights = [];
               let threshold = 0;
+
+              const IQMFAlms = graphResponse.data.data.almrebalanceEntities
+                .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
+                .sort(
+                  (a: TIQMFAlm, b: TIQMFAlm) =>
+                    Number(b.timestamp) - Number(a.timestamp)
+                );
+
+              const _24HRebalances = IQMFAlms.filter(
+                (obj: any) => Number(obj.timestamp) >= NOW - 86400
+              ).length;
+              const _7DRebalances = IQMFAlms.filter(
+                (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+              ).length;
+
+              rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
               const APRs =
                 graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
@@ -299,7 +315,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                   break;
                 }
               }
-              console.log(weights);
 
               for (let i = 0; i < weights.length; i++) {
                 newAPRs.push(APRs[i] * weights[i]);
@@ -417,10 +432,26 @@ const AppStore = (props: React.PropsWithChildren) => {
           if (strategyInfo?.shortName === "IQMF") {
             const DAY = 86400;
             const YEAR = 525600;
-            const NOW = Date.now() / 1000;
+            const NOW = Math.floor(Date.now() / 1000);
             const newAPRs = [];
             const weights = [];
             let threshold = 0;
+
+            const IQMFAlms = graphResponse.data.data.almrebalanceEntities
+              .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
+              .sort(
+                (a: TIQMFAlm, b: TIQMFAlm) =>
+                  Number(b.timestamp) - Number(a.timestamp)
+              );
+
+            const _24HRebalances = IQMFAlms.filter(
+              (obj: any) => Number(obj.timestamp) >= NOW - 86400
+            ).length;
+            const _7DRebalances = IQMFAlms.filter(
+              (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+            ).length;
+
+            rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
             const APRs = graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
               (value: string) => (Number(value) / 10000) * 100
@@ -532,7 +563,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           const assets = await assetsPromise;
 
-          // Добавляем данные о валюте в объект vaults
           vaults[vault.id] = {
             address: vault.id,
             name: vault.name,
