@@ -43,10 +43,10 @@ const IL = {
     color: "#F52A11",
   },
   IQMF: {
-    rate: 8,
-    title: "High",
-    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#F52A11",
+    rate: 4,
+    title: "Medium",
+    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the wide range, not often rebalancing the position.",
+    color: "#F5DA5B",
   },
 };
 
