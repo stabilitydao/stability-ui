@@ -228,52 +228,21 @@ const AppStore = (props: React.PropsWithChildren) => {
             }
 
             if (strategyInfo?.shortName === "IQMF") {
-              const IQMFAlms = graphResponse.data.data.almrebalanceEntities
-                .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
-                .sort(
-                  (a: TIQMFAlm, b: TIQMFAlm) =>
-                    Number(b.timestamp) - Number(a.timestamp)
-                );
-              const now = Math.floor(Date.now() / 1000);
-
-              const _24HRebalances = IQMFAlms.filter(
-                (obj: any) => Number(obj.timestamp) >= now - 86400
-              ).length;
-              const _7DRebalances = IQMFAlms.filter(
-                (obj: any) => Number(obj.timestamp) >= now - 86400 * 7
-              ).length;
-
-              rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-
-              const _24HIQMFAlms = IQMFAlms.filter(
-                (obj: any) => Number(obj.timestamp) >= now - 86400
-              );
-
-              if (IQMFAlms.length > _24HIQMFAlms.length) {
-                _24HIQMFAlms.push(IQMFAlms[_24HIQMFAlms.length]);
-              } else {
-                // Compare to graphVault.created
-              }
-              const differences = [];
-              for (let i = 0; i < _24HIQMFAlms.length; i++) {
-                if (_24HIQMFAlms.length != i + 1) {
-                  let difference =
-                    Number(_24HIQMFAlms[i].timestamp) -
-                    Number(_24HIQMFAlms[i + 1].timestamp);
-                  differences.push(difference);
-                }
-              }
-              let day = 86400;
-              for (let i = 0; i < differences.length - 1; i++) {
-                day -= differences[i];
-              }
-
-              const weight = day / differences[differences.length - 1]; // *100
+              const DAY = 86400;
+              const YEAR = 525600;
+              const NOW = Date.now() / 1000;
+              const newAPRs = [];
               const weights = [];
-              for (let i = 0; i < differences.length - 1; i++) {
-                weights.push(differences[i] / 86400);
-              }
-              const { result } = await _publicClient.simulateContract({
+              let threshold = 0;
+
+              const APRs =
+                graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
+                  (value: string) => (Number(value) / 10000) * 100
+                );
+              const timestamps =
+                graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
+
+              const collectFees = await _publicClient.simulateContract({
                 address: graphVault.underlying,
                 abi: ICHIABI,
                 functionName: "collectFees",
@@ -288,87 +257,59 @@ const AppStore = (props: React.PropsWithChildren) => {
                 abi: ICHIABI,
                 functionName: "token1",
               });
-
               const getTotalAmounts = await readContract(_publicClient, {
                 address: graphVault.underlying,
                 abi: ICHIABI,
                 functionName: "getTotalAmounts",
               });
-
               const price = await readContract(_publicClient, {
                 address: priceReader,
                 abi: PriceReaderABI,
                 functionName: "getAssetsPrice",
                 args: [
                   [token0, token1, token0, token1],
-                  [...result, getTotalAmounts[0], getTotalAmounts[1]],
+                  [
+                    ...collectFees.result,
+                    getTotalAmounts[0],
+                    getTotalAmounts[1],
+                  ],
                 ],
               });
-              let APR24h = 0;
               const feePrice = Number(price[1][0] + price[1][1]);
               const totalPrice = Number(price[1][2] + price[1][3]);
-              if (now - Number(_24HIQMFAlms[0].timestamp) > 86400) {
-                let percent =
-                  1 - (now - Number(_24HIQMFAlms[0].timestamp) - 86400) / 86400;
-                APR24h = (feePrice / totalPrice) * 100 * percent;
-              } else {
-                let lastRebalanceDifference =
-                  now - Number(_24HIQMFAlms[0].timestamp);
 
-                let percent = (now - Number(_24HIQMFAlms[0].timestamp)) / 86400;
+              let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+              let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+              APRs.push(apr);
+              timestamps.push(NOW);
 
-                _24HIQMFAlms.unshift({
-                  alm: graphVault.underlying,
-                  feeUSD: String(feePrice),
-                  timestamp: String(now),
-                  totalUSD: String(totalPrice),
-                  APRFromLastEvent: String(
-                    (feePrice / totalPrice) * 100 * percent
-                  ),
-                });
+              APRs.reverse();
+              timestamps.reverse();
 
-                let filtred24H = _24HIQMFAlms.filter(
-                  (obj: any) =>
-                    Number(obj.timestamp) >= now - lastRebalanceDifference
-                );
-                const lastAPRs = [];
-
-                /***** WEIGHTS *****/
-                const differences = [];
-                for (let i = 0; i < _24HIQMFAlms.length; i++) {
-                  if (_24HIQMFAlms.length != i + 1) {
-                    let difference =
-                      Number(_24HIQMFAlms[i].timestamp) -
-                      Number(_24HIQMFAlms[i + 1].timestamp);
-                    differences.push(difference);
-                  }
+              for (let i = 0; i < APRs.length; i++) {
+                if (APRs.length === i + 1) {
+                  break;
                 }
-                let day = 86400;
-                for (let i = 0; i < differences.length - 1; i++) {
-                  day -= differences[i];
+                let diff = timestamps[i] - timestamps[i + 1];
+                if (threshold + diff <= DAY) {
+                  threshold += diff;
+                  weights.push(diff / DAY);
+                } else {
+                  weights.push((DAY - threshold) / DAY);
+                  break;
                 }
-
-                const weight = day / differences[differences.length - 1]; // *100
-                const weights = [];
-                for (let i = 0; i < differences.length - 1; i++) {
-                  weights.push(differences[i] / 86400);
-                }
-                /***** WEIGHTS *****/
-                for (let i = 0; i < _24HIQMFAlms.length - 1; i++) {
-                  lastAPRs.push(_24HIQMFAlms[i].APRFromLastEvent * weights[i]);
-                }
-
-                lastAPRs[lastAPRs.length - 1] =
-                  _24HIQMFAlms[_24HIQMFAlms.length - 1].APRFromLastEvent *
-                  weight;
-
-                dailyAPR =
-                  lastAPRs.reduce((acc, value) => (acc += value), 0) /
-                  lastAPRs.length;
-
-                assetsWithApr.push("Pool swap fees");
-                assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
+              console.log(weights);
+
+              for (let i = 0; i < weights.length; i++) {
+                newAPRs.push(APRs[i] * weights[i]);
+              }
+
+              dailyAPR =
+                newAPRs.reduce((acc, value) => (acc += value), 0) /
+                newAPRs.length;
+              assetsWithApr.push("Pool swap fees");
+              assetsAprs.push(Number(dailyAPR).toFixed(2));
             }
 
             const APR = (
@@ -473,54 +414,21 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsWithApr.push("Pool swap fees");
             assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
-
           if (strategyInfo?.shortName === "IQMF") {
-            const IQMFAlms = graphResponse.data.data.almrebalanceEntities
-              .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
-              .sort(
-                (a: TIQMFAlm, b: TIQMFAlm) =>
-                  Number(b.timestamp) - Number(a.timestamp)
-              );
-            const now = Math.floor(Date.now() / 1000);
-
-            const _24HRebalances = IQMFAlms.filter(
-              (obj: any) => Number(obj.timestamp) >= now - 86400
-            ).length;
-            const _7DRebalances = IQMFAlms.filter(
-              (obj: any) => Number(obj.timestamp) >= now - 86400 * 7
-            ).length;
-
-            rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-
-            const _24HIQMFAlms = IQMFAlms.filter(
-              (obj: any) => Number(obj.timestamp) >= now - 86400
-            );
-
-            if (IQMFAlms.length > _24HIQMFAlms.length) {
-              _24HIQMFAlms.push(IQMFAlms[_24HIQMFAlms.length]);
-            } else {
-              // Compare to graphVault.created
-            }
-            const differences = [];
-            for (let i = 0; i < _24HIQMFAlms.length; i++) {
-              if (_24HIQMFAlms.length != i + 1) {
-                let difference =
-                  Number(_24HIQMFAlms[i].timestamp) -
-                  Number(_24HIQMFAlms[i + 1].timestamp);
-                differences.push(difference);
-              }
-            }
-            let day = 86400;
-            for (let i = 0; i < differences.length - 1; i++) {
-              day -= differences[i];
-            }
-
-            const weight = day / differences[differences.length - 1]; // *100
+            const DAY = 86400;
+            const YEAR = 525600;
+            const NOW = Date.now() / 1000;
+            const newAPRs = [];
             const weights = [];
-            for (let i = 0; i < differences.length - 1; i++) {
-              weights.push(differences[i] / 86400);
-            }
-            const { result } = await _publicClient.simulateContract({
+            let threshold = 0;
+
+            const APRs = graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
+              (value: string) => (Number(value) / 10000) * 100
+            );
+            const timestamps =
+              graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
+
+            const collectFees = await _publicClient.simulateContract({
               address: vault.underlying,
               abi: ICHIABI,
               functionName: "collectFees",
@@ -535,85 +443,54 @@ const AppStore = (props: React.PropsWithChildren) => {
               abi: ICHIABI,
               functionName: "token1",
             });
-
             const getTotalAmounts = await readContract(_publicClient, {
               address: vault.underlying,
               abi: ICHIABI,
               functionName: "getTotalAmounts",
             });
-
             const price = await readContract(_publicClient, {
               address: priceReader,
               abi: PriceReaderABI,
               functionName: "getAssetsPrice",
               args: [
                 [token0, token1, token0, token1],
-                [...result, getTotalAmounts[0], getTotalAmounts[1]],
+                [...collectFees.result, getTotalAmounts[0], getTotalAmounts[1]],
               ],
             });
-            let APR24h = 0;
             const feePrice = Number(price[1][0] + price[1][1]);
             const totalPrice = Number(price[1][2] + price[1][3]);
-            if (now - Number(_24HIQMFAlms[0].timestamp) > 86400) {
-              let percent =
-                1 - (now - Number(_24HIQMFAlms[0].timestamp) - 86400) / 86400;
-              APR24h = (feePrice / totalPrice) * 100 * percent;
-            } else {
-              let lastRebalanceDifference =
-                now - Number(_24HIQMFAlms[0].timestamp);
 
-              let percent = (now - Number(_24HIQMFAlms[0].timestamp)) / 86400;
+            let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+            let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+            APRs.push(apr);
+            timestamps.push(NOW);
 
-              _24HIQMFAlms.unshift({
-                alm: vault.underlying,
-                feeUSD: String(feePrice),
-                timestamp: String(now),
-                totalUSD: String(totalPrice),
-                APRFromLastEvent: String(
-                  (feePrice / totalPrice) * 100 * percent
-                ),
-              });
+            APRs.reverse();
+            timestamps.reverse();
 
-              let filtred24H = _24HIQMFAlms.filter(
-                (obj: any) =>
-                  Number(obj.timestamp) >= now - lastRebalanceDifference
-              );
-              const lastAPRs = [];
-
-              /***** WEIGHTS *****/
-              const differences = [];
-              for (let i = 0; i < _24HIQMFAlms.length; i++) {
-                if (_24HIQMFAlms.length != i + 1) {
-                  let difference =
-                    Number(_24HIQMFAlms[i].timestamp) -
-                    Number(_24HIQMFAlms[i + 1].timestamp);
-                  differences.push(difference);
-                }
+            for (let i = 0; i < APRs.length; i++) {
+              if (APRs.length === i + 1) {
+                break;
               }
-              let day = 86400;
-              for (let i = 0; i < differences.length - 1; i++) {
-                day -= differences[i];
+              let diff = timestamps[i] - timestamps[i + 1];
+              if (threshold + diff <= DAY) {
+                threshold += diff;
+                weights.push(diff / DAY);
+              } else {
+                weights.push((DAY - threshold) / DAY);
+                break;
               }
-
-              const weight = day / differences[differences.length - 1]; // *100
-              const weights = [];
-              for (let i = 0; i < differences.length - 1; i++) {
-                weights.push(differences[i] / 86400);
-              }
-              /***** WEIGHTS *****/
-              for (let i = 0; i < _24HIQMFAlms.length - 1; i++) {
-                lastAPRs.push(_24HIQMFAlms[i].APRFromLastEvent * weights[i]);
-              }
-
-              lastAPRs[lastAPRs.length - 1] =
-                _24HIQMFAlms[_24HIQMFAlms.length - 1].APRFromLastEvent * weight;
-
-              dailyAPR =
-                lastAPRs.reduce((acc, value) => (acc += value), 0) /
-                lastAPRs.length;
-              assetsWithApr.push("Pool swap fees");
-              assetsAprs.push(Number(dailyAPR).toFixed(2));
             }
+
+            for (let i = 0; i < weights.length; i++) {
+              newAPRs.push(APRs[i] * weights[i]);
+            }
+
+            dailyAPR =
+              newAPRs.reduce((acc, value) => (acc += value), 0) /
+              newAPRs.length;
+            assetsWithApr.push("Pool swap fees");
+            assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
           const APR = (
             formatFromBigInt(String(vault.apr), 3, "withDecimals") +
