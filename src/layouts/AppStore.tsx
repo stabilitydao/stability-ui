@@ -253,7 +253,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
               const APRs =
                 graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
-                  (value: string) => (Number(value) / 10000) * 100
+                  (value: string) => (Number(value) / 100000) * 100
                 );
               const timestamps =
                 graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
@@ -454,7 +454,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
             const APRs = graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
-              (value: string) => (Number(value) / 10000) * 100
+              (value: string) => (Number(value) / 100000) * 100
             );
             const timestamps =
               graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
