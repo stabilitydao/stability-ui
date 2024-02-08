@@ -259,6 +259,10 @@ const GRAPH_QUERY = `
           totalUSD
           APRFromLastEvent
         }
+        lastFeeAMLEntities {
+          timestamps
+          APRS
+        }
       }
       `;
 
