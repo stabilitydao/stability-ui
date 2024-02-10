@@ -59,6 +59,21 @@ const STABLECOINS = [...USDC, ...USDT, ...DAI];
 
 const PAGINATION_VAULTS = 20;
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 const TOKENS_ASSETS = [
   {
     symbol: "USDC",
@@ -247,9 +262,10 @@ const GRAPH_QUERY = `
           address
         }
         vaultHistoryEntities {
-          TVL
+          APR
           address
           sharePrice
+          TVL
           timestamp
         }
         almrebalanceEntities {
@@ -287,4 +303,5 @@ export {
   VAULT_STATUSES,
   MULTISIG,
   TREASURY,
+  MONTHS,
 };

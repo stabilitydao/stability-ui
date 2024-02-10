@@ -224,6 +224,16 @@ type TToast = {
   vault: string;
 };
 
+//// CHART
+
+type TChartData = {
+  APR: string;
+  TVL: string;
+  address: TAddress;
+  sharePrice: string;
+  timestamp: string;
+};
+
 //// DAO
 type TDAOData = {
   platformVersion: string;
@@ -325,4 +335,5 @@ export type {
   TPendingPlatformUpgrade,
   TToast,
   TIQMFAlm,
+  TChartData,
 };

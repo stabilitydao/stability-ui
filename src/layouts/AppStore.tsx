@@ -92,6 +92,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     const graphResponse = await axios.post(GRAPH_ENDPOINT, {
       query: GRAPH_QUERY,
     });
+    console.log(graphResponse.data.data);
     if (isConnected) {
       const contractData: any = await readContract(_publicClient, {
         address: platform,
@@ -363,6 +364,13 @@ const AppStore = (props: React.PropsWithChildren) => {
                 }
               });
             }
+
+            const chartData = graphResponse.data.data.vaultHistoryEntities
+              .filter((data: any) => data.address === vault.toLowerCase())
+              .sort(
+                (a: any, b: any) =>
+                  parseInt(a.timestamp) - parseInt(b.timestamp)
+              );
             return {
               [vault.toLowerCase()]: {
                 address: vault.toLowerCase(),
@@ -395,6 +403,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 version: graphVault.version,
                 strategyVersion: strategyEntity.version,
                 rebalances: rebalances,
+                chartData: chartData,
               },
             };
           })
@@ -563,6 +572,12 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           const assets = await assetsPromise;
 
+          const chartData = graphResponse.data.data.vaultHistoryEntities
+            .filter((data: any) => data.address === vault.toLowerCase())
+            .sort(
+              (a: any, b: any) => parseInt(a.timestamp) - parseInt(b.timestamp)
+            );
+
           vaults[vault.id] = {
             address: vault.id,
             name: vault.name,
@@ -594,6 +609,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             version: vault.version,
             strategyVersion: strategyEntity.version,
             rebalances: rebalances,
+            chartData: chartData,
           };
 
           return vaults;
