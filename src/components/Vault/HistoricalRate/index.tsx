@@ -46,15 +46,70 @@ const HistoricalRate: React.FC<{ data: TChartData[] }> = memo(({ data }) => {
       date: obj.date,
       APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
     }));
-  const [activeChart, setActiveChart] = useState({
+  const [activeChart, setActiveChart] = useState<any>({
     name: "APR",
     data: APRChartData,
   });
+
+  const handleActiveChart = (chartType: string) => {
+    if (chartType === activeChart.name) return;
+    switch (chartType) {
+      case "APR":
+        setActiveChart({
+          name: "APR",
+          data: APRChartData,
+        });
+        break;
+      case "TVL":
+        setActiveChart({
+          name: "TVL",
+          data: TVLChartData,
+        });
+        break;
+      case "sharePrice":
+        setActiveChart({
+          name: "sharePrice",
+          data: sharePriceChartData,
+        });
+        break;
+      default:
+        console.log("NO ACTIVE CASE");
+        break;
+    }
+  };
+
   return (
     <div className="rounded-md mt-5 bg-button">
-      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
-        <h2 className="text-[24px] text-start ml-4">Historical rate</h2>
+      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
+        <h2 className="text-[24px] text-start ">Historical rate</h2>
+        <div className="flex items-center gap-3 border border-[#6376AF] px-2 py-1 rounded-md text-[1rem]">
+          <p
+            className={`cursor-pointer hover:opacity-100 ${
+              activeChart.name === "APR" ? "opacity-100" : "opacity-80"
+            }`}
+            onClick={() => handleActiveChart("APR")}
+          >
+            APR
+          </p>
+          <p
+            className={`cursor-pointer hover:opacity-100 ${
+              activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
+            }`}
+            onClick={() => handleActiveChart("TVL")}
+          >
+            TVL
+          </p>
+          <p
+            className={`cursor-pointer hover:opacity-100 ${
+              activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
+            }`}
+            onClick={() => handleActiveChart("sharePrice")}
+          >
+            Price
+          </p>
+        </div>
       </div>
+
       <div className="p-3">
         <Chart chart={activeChart} />
       </div>

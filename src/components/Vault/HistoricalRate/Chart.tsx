@@ -47,14 +47,14 @@ const CustomTooltip = ({
     ) : payload[0]?.dataKey === "sharePrice" ? (
       <p>{`Price: $${payload[0].value}`}</p>
     ) : payload[0]?.dataKey === "APR" ? (
-      <p>{`APR: ${payload[0].value}%`}</p>
+      <p>{`Strategy APR: ${payload[0].value}%`}</p>
     ) : (
       ""
     );
 
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#fff] text-[#8d8e96] rounded-md text-[14px]">
+      <div className="bg-[#1c1c23] text-[#fff] rounded-md text-[14px]">
         <div className="px-5 py-3">
           <p>{payload[0].payload.date}</p>
           {PDataKey}
@@ -62,8 +62,6 @@ const CustomTooltip = ({
       </div>
     );
   }
-
-  return null;
 };
 
 const Chart = ({ chart }: { chart: any }) => {
@@ -82,14 +80,16 @@ const Chart = ({ chart }: { chart: any }) => {
           tick={<CustomizedAxisTick fontSize={12} />}
         />
         <YAxis
-          tick={{ dx: 40, dy: 0 }}
-          tickFormatter={(value) => (value === 0 ? "" : value)}
+          tickFormatter={(value) =>
+            value === 0 ? "" : chart.name === "APR" ? `${value}%` : `$${value}`
+          }
           width={10}
           tickLine={false}
           axisLine={false}
           style={{
             fill: "#FFF",
           }}
+          mirror={true}
         />
         <Tooltip content={<CustomTooltip />} />
         <Area
