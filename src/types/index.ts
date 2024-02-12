@@ -225,13 +225,14 @@ type TToast = {
 };
 
 //// CHART
-
 type TChartData = {
-  APR: string;
-  TVL: string;
-  address: TAddress;
-  sharePrice: string;
+  APR?: number;
+  TVL?: number;
+  address?: TAddress;
+  sharePrice?: number;
   timestamp: string;
+  unixTimestamp?: string;
+  date: string;
 };
 
 //// DAO

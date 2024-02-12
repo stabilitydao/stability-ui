@@ -53,6 +53,7 @@ import {
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
+  TIMESTAMPS_IN_SECONDS,
 } from "@constants";
 
 import type { TAddress, TIQMFAlm } from "@types";
@@ -92,7 +93,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     const graphResponse = await axios.post(GRAPH_ENDPOINT, {
       query: GRAPH_QUERY,
     });
-    console.log(graphResponse.data.data);
     if (isConnected) {
       const contractData: any = await readContract(_publicClient, {
         address: platform,
@@ -229,7 +229,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             }
 
             if (strategyInfo?.shortName === "IQMF") {
-              const DAY = 86400;
               const YEAR = 525600;
               const NOW = Math.floor(Date.now() / 1000);
               const newAPRs = [];
@@ -308,11 +307,14 @@ const AppStore = (props: React.PropsWithChildren) => {
                   break;
                 }
                 let diff = timestamps[i] - timestamps[i + 1];
-                if (threshold + diff <= DAY) {
+                if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
                   threshold += diff;
-                  weights.push(diff / DAY);
+                  weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
                 } else {
-                  weights.push((DAY - threshold) / DAY);
+                  weights.push(
+                    (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                      TIMESTAMPS_IN_SECONDS.DAY
+                  );
                   break;
                 }
               }
@@ -364,13 +366,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 }
               });
             }
-
-            const chartData = graphResponse.data.data.vaultHistoryEntities
-              .filter((data: any) => data.address === vault.toLowerCase())
-              .sort(
-                (a: any, b: any) =>
-                  parseInt(a.timestamp) - parseInt(b.timestamp)
-              );
             return {
               [vault.toLowerCase()]: {
                 address: vault.toLowerCase(),
@@ -403,7 +398,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 version: graphVault.version,
                 strategyVersion: strategyEntity.version,
                 rebalances: rebalances,
-                chartData: chartData,
               },
             };
           })
@@ -439,7 +433,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
           if (strategyInfo?.shortName === "IQMF") {
-            const DAY = 86400;
             const YEAR = 525600;
             const NOW = Math.floor(Date.now() / 1000);
             const newAPRs = [];
@@ -513,11 +506,14 @@ const AppStore = (props: React.PropsWithChildren) => {
                 break;
               }
               let diff = timestamps[i] - timestamps[i + 1];
-              if (threshold + diff <= DAY) {
+              if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
                 threshold += diff;
-                weights.push(diff / DAY);
+                weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
               } else {
-                weights.push((DAY - threshold) / DAY);
+                weights.push(
+                  (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                    TIMESTAMPS_IN_SECONDS.DAY
+                );
                 break;
               }
             }
@@ -572,12 +568,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           const assets = await assetsPromise;
 
-          const chartData = graphResponse.data.data.vaultHistoryEntities
-            .filter((data: any) => data.address === vault.toLowerCase())
-            .sort(
-              (a: any, b: any) => parseInt(a.timestamp) - parseInt(b.timestamp)
-            );
-
           vaults[vault.id] = {
             address: vault.id,
             name: vault.name,
@@ -609,7 +599,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             version: vault.version,
             strategyVersion: strategyEntity.version,
             rebalances: rebalances,
-            chartData: chartData,
           };
 
           return vaults;

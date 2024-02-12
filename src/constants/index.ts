@@ -74,6 +74,13 @@ const MONTHS = [
   "Dec",
 ];
 
+const TIMESTAMPS_IN_SECONDS = {
+  DAY: 86400,
+  WEEK: 604800,
+  MONTH: 2592000,
+  YEAR: 31536000,
+};
+
 const TOKENS_ASSETS = [
   {
     symbol: "USDC",
@@ -261,13 +268,6 @@ const GRAPH_QUERY = `
           timestamp
           address
         }
-        vaultHistoryEntities {
-          APR
-          address
-          sharePrice
-          TVL
-          timestamp
-        }
         almrebalanceEntities {
           alm
           timestamp
@@ -304,4 +304,5 @@ export {
   MULTISIG,
   TREASURY,
   MONTHS,
+  TIMESTAMPS_IN_SECONDS,
 };
