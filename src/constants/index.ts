@@ -59,6 +59,28 @@ const STABLECOINS = [...USDC, ...USDT, ...DAI];
 
 const PAGINATION_VAULTS = 20;
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const TIMESTAMPS_IN_SECONDS = {
+  DAY: 86400,
+  WEEK: 604800,
+  MONTH: 2592000,
+  YEAR: 31536000,
+};
+
 const TOKENS_ASSETS = [
   {
     symbol: "USDC",
@@ -246,12 +268,6 @@ const GRAPH_QUERY = `
           timestamp
           address
         }
-        vaultHistoryEntities {
-          TVL
-          address
-          sharePrice
-          timestamp
-        }
         almrebalanceEntities {
           alm
           timestamp
@@ -287,4 +303,6 @@ export {
   VAULT_STATUSES,
   MULTISIG,
   TREASURY,
+  MONTHS,
+  TIMESTAMPS_IN_SECONDS,
 };

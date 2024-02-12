@@ -9,8 +9,8 @@ import { StatisticBar } from "./StatisticBar";
 import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
+// import { HistoricalRate } from "./HistoricalRate";
 import { Toast, Loader } from "@components";
-//import { Chart } from "./Chart";
 
 import { vaultData, vaults, vaultAssets } from "@store";
 
@@ -42,7 +42,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           <div className="w-full md:w-1/2 lg:w-3/5 ">
             <StatisticBar vault={localVault} />
 
-            {/* <Chart /> */}
+            {/* <HistoricalRate address={vault.toLowerCase() as TAddress} /> */}
 
             <Strategy vault={localVault} />
 

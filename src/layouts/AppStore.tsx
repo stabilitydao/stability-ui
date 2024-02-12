@@ -53,6 +53,7 @@ import {
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
+  TIMESTAMPS_IN_SECONDS,
 } from "@constants";
 
 import type { TAddress, TIQMFAlm } from "@types";
@@ -228,7 +229,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             }
 
             if (strategyInfo?.shortName === "IQMF") {
-              const DAY = 86400;
               const YEAR = 525600;
               const NOW = Math.floor(Date.now() / 1000);
               const newAPRs = [];
@@ -307,11 +307,14 @@ const AppStore = (props: React.PropsWithChildren) => {
                   break;
                 }
                 let diff = timestamps[i] - timestamps[i + 1];
-                if (threshold + diff <= DAY) {
+                if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
                   threshold += diff;
-                  weights.push(diff / DAY);
+                  weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
                 } else {
-                  weights.push((DAY - threshold) / DAY);
+                  weights.push(
+                    (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                      TIMESTAMPS_IN_SECONDS.DAY
+                  );
                   break;
                 }
               }
@@ -430,7 +433,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
           if (strategyInfo?.shortName === "IQMF") {
-            const DAY = 86400;
             const YEAR = 525600;
             const NOW = Math.floor(Date.now() / 1000);
             const newAPRs = [];
@@ -504,11 +506,14 @@ const AppStore = (props: React.PropsWithChildren) => {
                 break;
               }
               let diff = timestamps[i] - timestamps[i + 1];
-              if (threshold + diff <= DAY) {
+              if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
                 threshold += diff;
-                weights.push(diff / DAY);
+                weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
               } else {
-                weights.push((DAY - threshold) / DAY);
+                weights.push(
+                  (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                    TIMESTAMPS_IN_SECONDS.DAY
+                );
                 break;
               }
             }

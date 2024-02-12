@@ -1417,6 +1417,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       );
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
+
       const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
 
       try {
@@ -1519,6 +1520,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const balance = Number(
         formatUnits($vaultData[vault.address].vaultUserBalance, 18)
       );
+
       if (!Number(value)) {
         setWithdrawAmount(false);
         setZapPreviewWithdraw(false);
@@ -1564,6 +1566,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [assets, currentValue, assetsLength],
           account: $account as TAddress,
         });
+
         if (
           (defaultOptionAssets === option[0] && option.length < 2) ||
           option.length > 1
@@ -1590,11 +1593,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           try {
             setLoader(true);
             const allowanceData: any = formatUnits(await getZapAllowance(), 18);
-            if (Number(formatUnits(allowanceData, 18)) < Number(value)) {
-              setZapButton("needApprove");
-              setLoader(false);
-              return;
-            }
+
             const promises = result.map(
               async (amount, index) =>
                 await get1InchRoutes(
@@ -1609,7 +1608,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
             const outData = await Promise.all(promises);
             setZapPreviewWithdraw(outData);
-            setZapButton("withdraw");
+
+            if (Number(allowanceData) < Number(value)) {
+              setZapButton("needApprove");
+            } else {
+              setZapButton("withdraw");
+            }
+
             setLoader(false);
           } catch (error) {
             setLoader(false);
@@ -2992,7 +2997,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       type="button"
                       onClick={withdrawZapApprove}
                     >
-                      {" "}
                       <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
                       {transactionInProgress && <Loader color={"#486556"} />}
                     </button>
