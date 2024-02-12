@@ -172,7 +172,9 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
   return (
     <div className="rounded-md mt-5 bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
-        <h2 className="text-[24px] text-start ">Historical rate</h2>
+        <h2 className="text-start text-[1rem] min-[370px]:text-[1.5rem]">
+          Historical rate
+        </h2>
         <div className="flex items-center gap-3 border border-[#6376AF] px-2 py-1 rounded-md text-[1rem]">
           <p
             className={`cursor-pointer hover:opacity-100 ${

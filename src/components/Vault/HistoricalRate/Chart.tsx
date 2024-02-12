@@ -80,6 +80,7 @@ const Chart = ({ chart }: { chart: any }) => {
           tick={<CustomizedAxisTick fontSize={12} />}
         />
         <YAxis
+          domain={chart.name === "sharePrice" ? [0, 2] : undefined}
           tickFormatter={(value) =>
             value === 0 ? "" : chart.name === "APR" ? `${value}%` : `$${value}`
           }
