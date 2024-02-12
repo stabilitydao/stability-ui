@@ -26,7 +26,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
   const [chartData, setChartData] = useState<any>([]);
   const [activeChart, setActiveChart] = useState<any>({});
   const [timeline, setTimeline] = useState<TSegment>(
-    timelineSegments.MONTH as TSegment
+    timelineSegments.WEEK as TSegment
   );
 
   const getData = async () => {
@@ -82,12 +82,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
         timestamp: formattedDate,
         date: formattedTime,
       };
-    });
+    }).sort((a, b) => a.unixTimestamp - b.unixTimestamp);
     const APRChartData = workedData
       .filter(
         (obj) =>
           obj.APR &&
-          Number(obj.unixTimestamp) >= NOW - TIMESTAMPS_IN_SECONDS.MONTH
+          Number(obj.unixTimestamp) >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
       )
       .map((obj) => ({
         unixTimestamp: obj.unixTimestamp,
