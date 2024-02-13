@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -67,7 +68,13 @@ const CustomTooltip = ({
 };
 
 const Chart = ({ chart }: { chart: any }) => {
-  const min = Math.min(...chart.data.map((item: any) => item[chart.name]));
+  let min = 0;
+  useEffect(() => {
+    if (chart.data) {
+      min = Math.min(...chart.data.map((item: any) => item[chart.name]));
+    }
+  }, [chart]);
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart
