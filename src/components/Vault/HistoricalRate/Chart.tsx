@@ -8,6 +8,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import { formatNumber } from "@utils";
+
 const CustomizedAxisTick = ({
   x,
   y,
@@ -47,7 +49,7 @@ const CustomTooltip = ({
     ) : payload[0]?.dataKey === "sharePrice" ? (
       <p>{`Price: $${payload[0].value}`}</p>
     ) : payload[0]?.dataKey === "APR" ? (
-      <p>{`Strategy APR: ${payload[0].value}%`}</p>
+      <p>{`Farm APR: ${payload[0].value}%`}</p>
     ) : (
       ""
     );
@@ -65,6 +67,7 @@ const CustomTooltip = ({
 };
 
 const Chart = ({ chart }: { chart: any }) => {
+  const min = Math.min(...chart.data.map((item: any) => item[chart.name]));
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart
@@ -80,15 +83,22 @@ const Chart = ({ chart }: { chart: any }) => {
           tick={<CustomizedAxisTick fontSize={12} />}
         />
         <YAxis
-          domain={chart.name === "sharePrice" ? [0, 2] : undefined}
+          domain={[min, "auto"]}
           tickFormatter={(value) =>
-            value === 0 ? "" : chart.name === "APR" ? `${value}%` : `$${value}`
+            value === 0
+              ? ""
+              : chart.name === "APR"
+              ? `${value}%`
+              : chart.name === "TVL"
+              ? `${formatNumber(value, "abbreviateInteger")}`
+              : `$${value}`
           }
           width={10}
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#FFF",
+            fill: "#8d8e96",
+            fontSize: "16px",
           }}
           mirror={true}
         />

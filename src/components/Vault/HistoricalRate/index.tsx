@@ -172,20 +172,34 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
   return (
     <div className="rounded-md mt-5 bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
-        <h2 className="text-start text-[1rem] min-[370px]:text-[1.5rem]">
+        <h2 className="text-start text-[1rem] min-[380px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem]">
           Historical rate
         </h2>
-        <div className="flex items-center gap-3 border border-[#6376AF] px-2 py-1 rounded-md text-[1rem]">
+        <div className="flex items-center border border-[#6376AF] rounded-md text-[1rem] relative sm:px-2 px-1 sm:gap-3 gap-2">
+          <div
+            className="absolute bg-[#6376AF] rounded-sm"
+            style={{
+              width: "33.33%",
+              height: "100%",
+              left:
+                activeChart.name === "sharePrice"
+                  ? "66.6%"
+                  : activeChart.name === "TVL"
+                  ? "33.3%"
+                  : "0%",
+              transition: "left 0.3s ease",
+            }}
+          ></div>
           <p
-            className={`cursor-pointer hover:opacity-100 ${
+            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "APR" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("APR")}
           >
-            APR
+            Farm APR
           </p>
           <p
-            className={`cursor-pointer hover:opacity-100 ${
+            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("TVL")}
@@ -193,7 +207,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
             TVL
           </p>
           <p
-            className={`cursor-pointer hover:opacity-100 ${
+            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("sharePrice")}
@@ -206,7 +220,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
       <div className="py-3 px-4">
         <Chart chart={activeChart} />
       </div>
-      <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-3">
+      <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p
           onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
           className="opacity-50 hover:opacity-100 cursor-pointer"
@@ -235,7 +249,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
             timeline === "YEAR" ? "opacity-100" : "opacity-30"
           }`}
         >
-          1Y
+          All
         </p>
       </div>
     </div>
