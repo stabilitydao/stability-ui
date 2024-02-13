@@ -12,10 +12,12 @@ import type { TAddress, TChartData } from "@types";
 
 interface IProps {
   address: TAddress;
+  vaultStrategy: string;
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
-const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
+const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
+  const APRType = vaultStrategy === "compound farm" ? "APR" : "Farm APR";
   const timelineSegments = {
     DAY: "DAY",
     WEEK: "WEEK",
@@ -28,6 +30,35 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
   const [timeline, setTimeline] = useState<TSegment>(
     timelineSegments.WEEK as TSegment
   );
+
+  function formatData(obj: any) {
+    const date = new Date(Number(obj.timestamp) * 1000);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const formattedDate = `${day.toString().padStart(2, "0")}.${month
+      .toString()
+      .padStart(2, "0")}`;
+    const monthName = MONTHS[date.getMonth()];
+    const formattedTime = `${monthName} ${day}, ${date.getFullYear()} ${date.toLocaleString(
+      "en-US",
+      { hour: "numeric", minute: "numeric", hour12: true }
+    )}`;
+
+    return {
+      ...obj,
+      unixTimestamp: obj.timestamp,
+      timestamp: formattedDate,
+      date: formattedTime,
+    };
+  }
+  // function calculateTimeDifference(start, end) {
+  //   const startDate = new Date(start * 1000);
+  //   const endDate = new Date(end * 1000);
+  //   const difference = endDate.getTime() - startDate.getTime();
+  //   const hours = Math.floor(difference / (1000 * 60 * 60));
+  //   const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+  //   return { hours, minutes };
+  // }
 
   const getData = async () => {
     const NOW = Math.floor(Date.now() / 1000);
@@ -59,30 +90,9 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
       }
       entities += 100;
     }
-
-    const workedData = DATA.map((obj) => {
-      const date = new Date(Number(obj.timestamp) * 1000);
-
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-
-      const formattedDate = `${day.toString().padStart(2, "0")}.${month
-        .toString()
-        .padStart(2, "0")}`;
-
-      const monthName = MONTHS[date.getMonth()];
-      const formattedTime = `${monthName} ${day}, ${date.getFullYear()} ${date.toLocaleString(
-        "en-US",
-        { hour: "numeric", minute: "numeric", hour12: true }
-      )}`;
-
-      return {
-        ...obj,
-        unixTimestamp: obj.timestamp,
-        timestamp: formattedDate,
-        date: formattedTime,
-      };
-    }).sort((a, b) => a.unixTimestamp - b.unixTimestamp);
+    const workedData = DATA.map(formatData).sort(
+      (a, b) => a.unixTimestamp - b.unixTimestamp
+    );
     const APRChartData = workedData
       .filter(
         (obj) =>
@@ -95,9 +105,31 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
       }));
-
     setChartData(workedData);
     setActiveChart({ name: "APR", data: APRChartData });
+    //////////////////////////////////
+
+    //let num = Number(APRChartData[0].unixTimestamp);
+
+    //let numbers = [];
+    //while (NOW > num) {
+    //let apr = APRChartData;
+    // console.log(
+    //   calculateTimeDifference(
+    //     a,
+    //     APRChartData.filter((obj) => obj.unixTimestamp > a)[0].unixTimestamp
+    //   )
+    // );
+    // let obj = {
+    //   APR: "222891",
+    //   TVL: "10168010705680305384469",
+    //   address: "0xf9a20fdb3fb3db0b1951ba57bf82a7c899adb7d6",
+    //   sharePrice: "1010875230232836106",
+    //   timestamp: a,
+    // };
+    // ne.push(obj);
+    //a += TIMESTAMPS_IN_SECONDS.HOUR;
+    //}
   };
 
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
@@ -196,7 +228,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
             }`}
             onClick={() => chartHandler("APR")}
           >
-            Farm APR
+            {APRType}
           </p>
           <p
             className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
@@ -218,7 +250,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address }) => {
       </div>
 
       <div className="py-3 px-4">
-        <Chart chart={activeChart} />
+        <Chart chart={activeChart} APRType={APRType} />
       </div>
       <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p

@@ -42,7 +42,10 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           <div className="w-full md:w-1/2 lg:w-3/5 ">
             <StatisticBar vault={localVault} />
 
-            <HistoricalRate address={vault.toLowerCase() as TAddress} />
+            <HistoricalRate
+              address={vault.toLowerCase() as TAddress}
+              vaultStrategy={localVault.strategy}
+            />
 
             <Strategy vault={localVault} />
 
