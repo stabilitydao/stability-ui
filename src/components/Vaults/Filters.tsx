@@ -139,7 +139,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
             {filter.type === "single" ? (
               <div
                 onClick={() => activeFiltersHandler(filter)}
-                className={`${
+                className={`w-[160px] ${
                   filter.state &&
                   "bg-[#35373E] outline outline-1 outline-[#6376AF]"
                 } bg-button rounded-md cursor-pointer`}
@@ -155,7 +155,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
             ) : filter.type === "multiple" ? (
               <div
                 key={filter.name}
-                className="flex items-center bg-button rounded-md"
+                className="w-[160px] flex items-center bg-button rounded-md"
               >
                 {filter.variants?.map((variant: TTAbleFiltersVariant) => (
                   <p
@@ -172,16 +172,16 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 ))}
               </div>
             ) : filter.type === "dropdown" ? (
-              <div className="relative select-none w-full">
+              <div className="relative select-none w-[160px]">
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
                     setDropDownSelector((prevState) => !prevState);
                   }}
-                  className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
+                  className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button cursor-pointer"
                 >
                   <p
-                    className={`text-[20px] ${
+                    className={`${
                       filter?.variants?.some((variant) => variant.state)
                         ? "opacity-100"
                         : "opacity-70 hover:opacity-80"
@@ -210,14 +210,14 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                       : "hidden"
                   } `}
                 >
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-start">
                     {filter.variants?.map((variant: TTAbleFiltersVariant) => (
                       <p
                         key={variant.name}
                         onClick={() =>
                           activeFiltersHandler(filter, variant.name)
                         }
-                        className={`p-2 cursor-pointer ${
+                        className={`py-2 px-3 cursor-pointer ${
                           variant.state
                             ? "opacity-100"
                             : "opacity-70 hover:opacity-80"

@@ -216,7 +216,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
           <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 DEPOSITED
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
@@ -226,7 +226,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </p>
             </div>
             <div className="w-[120px] md:w-[180px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 DAILY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
@@ -234,7 +234,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </p>
             </div>
             <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 MONTHLY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
@@ -242,7 +242,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 AVG. APR
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
@@ -250,7 +250,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 AVG. APY
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
@@ -263,7 +263,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               Stability Platform {$platformVersion}
             </p>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start lg:items-end">
-              <h2 className="text-[14px] md:text-[1rem] md:font-medium select-none leading-3 text-[#8D8E96]">
+              <h2 className="text-[14px] select-none text-[#848E9C] leading-5">
                 TVL
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">{portfolio.tvl}</p>

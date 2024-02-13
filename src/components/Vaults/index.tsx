@@ -292,7 +292,7 @@ const Vaults = () => {
   ) : localVaults?.length ? (
     <>
       <Portfolio vaults={localVaults} />
-      <div className="flex items-center gap-2 flex-col lg:flex-row">
+      <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input
           type="text"
           className="mt-1 lg:mt-0 w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
@@ -376,7 +376,7 @@ const Vaults = () => {
       </div>
       {currentTabVaults.length ? (
         <table className="hidden md:table table-auto w-full rounded-lg select-none">
-          <thead className="bg-[#2c2f38]">
+          <thead className="bg-[#0b0e11]">
             <tr className="text-[12px] text-[#8f8f8f] uppercase">
               {tableStates.map((value: any, index: number) => (
                 <ColumnSort
@@ -394,7 +394,7 @@ const Vaults = () => {
             {currentTabVaults.map((vault: TVault) => {
               return (
                 <tr
-                  className="text-center text-[14px] transition delay-[40ms] hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
+                  className="text-center text-[14px] hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
                   key={vault.name}
                   onClick={() => toVault(vault.address)}
                 >
@@ -408,7 +408,7 @@ const Vaults = () => {
                           type="vaults"
                         />
                       )}
-                      <div className="max-w-[250px] flex items-start flex-col">
+                      <div className="max-w-[250px] flex items-start flex-col text-[#eaecef]">
                         <p title={vault.name} className="md:whitespace-nowrap">
                           {vault.symbol}
                         </p>
@@ -485,9 +485,9 @@ const Vaults = () => {
                     </div>
                   </td>
                   <td className="px-2 min-[1110px]:px-3 py-2 tooltip cursor-help">
-                    <div className="flex items-center justify-start gap-[6px]">
+                    <div>
                       <p
-                        className="text-[14px] whitespace-nowrap w-[120px] text-end dotted-underline"
+                        className="text-[14px] whitespace-nowrap w-[120px] text-start dotted-underline text-[#eaecef]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -507,7 +507,6 @@ const Vaults = () => {
                         {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}% /{" "}
                         {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
                       </p>
-
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
                           <div className="text-[14px] flex flex-col gap-1 w-full">
@@ -570,7 +569,7 @@ const Vaults = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2">
+                  <td className="px-2 min-[1110px]:px-4 py-2 text-start">
                     <span
                       className="uppercase"
                       style={{ color: vault.strategyInfo.il?.color }}
