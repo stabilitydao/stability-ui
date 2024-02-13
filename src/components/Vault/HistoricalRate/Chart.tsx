@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -7,6 +8,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+
+import { formatNumber } from "@utils";
+
+interface IProps {
+  chart: any;
+  APRType: string;
+}
 
 const CustomizedAxisTick = ({
   x,
@@ -37,9 +45,11 @@ const CustomizedAxisTick = ({
 const CustomTooltip = ({
   active,
   payload,
+  APRType,
 }: {
   active: boolean;
   payload: any;
+  APRType: string;
 }) => {
   const PDataKey =
     payload[0]?.dataKey === "TVL" ? (
@@ -47,7 +57,7 @@ const CustomTooltip = ({
     ) : payload[0]?.dataKey === "sharePrice" ? (
       <p>{`Price: $${payload[0].value}`}</p>
     ) : payload[0]?.dataKey === "APR" ? (
-      <p>{`Strategy APR: ${payload[0].value}%`}</p>
+      <p>{`${APRType}: ${payload[0].value}%`}</p>
     ) : (
       ""
     );
@@ -64,7 +74,14 @@ const CustomTooltip = ({
   }
 };
 
-const Chart = ({ chart }: { chart: any }) => {
+const Chart: React.FC<IProps> = ({ chart, APRType }) => {
+  let min = 0;
+  useEffect(() => {
+    if (chart.data) {
+      min = Math.min(...chart.data.map((item: any) => item[chart.name]));
+    }
+  }, [chart]);
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart
@@ -80,18 +97,26 @@ const Chart = ({ chart }: { chart: any }) => {
           tick={<CustomizedAxisTick fontSize={12} />}
         />
         <YAxis
+          domain={chart.name === "sharePrice" ? [0.9, "auto"] : [min, "auto"]}
           tickFormatter={(value) =>
-            value === 0 ? "" : chart.name === "APR" ? `${value}%` : `$${value}`
+            value === 0
+              ? ""
+              : chart.name === "APR"
+              ? `${value}%`
+              : chart.name === "TVL"
+              ? `${formatNumber(value, "abbreviateInteger")}`
+              : `$${value}`
           }
           width={10}
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#FFF",
+            fill: "#8d8e96",
+            fontSize: "16px",
           }}
           mirror={true}
         />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={<CustomTooltip APRType={APRType} />} />
         <Area
           type="monotone"
           dataKey={chart.name}
