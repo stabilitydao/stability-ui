@@ -7,7 +7,13 @@ interface IProps {
 }
 
 const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
+  const searchParams = new URLSearchParams(window.location.search);
+
   const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+  const [activeStrategy, setActiveStrategy] = useState(
+    searchParams.get("strategy") ? searchParams.get("strategy") : "All"
+  );
+
   const dropDownRef = useRef(null);
 
   const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
@@ -105,9 +111,17 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
           const strategy =
             dropDownFilter?.variants &&
             dropDownFilter?.variants.find((variant) => variant.state);
+
           strategy
             ? params.set("strategy", strategy.name)
             : params.delete("strategy");
+
+          // UI representation
+          if (strategy) {
+            setActiveStrategy(strategy.name);
+          } else {
+            setActiveStrategy("All");
+          }
         }
         setDropDownSelector(false);
         setFilters(updatedFiltersDropDown);
@@ -145,7 +159,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 } bg-button rounded-md cursor-pointer`}
               >
                 <p
-                  className={`p-2 ${
+                  className={`px-2 py-1 h-[30px] ${
                     filter.state ? "opacity-100" : "opacity-70 hover:opacity-80"
                   }`}
                 >
@@ -161,7 +175,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   <p
                     key={variant.name}
                     onClick={() => activeFiltersHandler(filter, variant.name)}
-                    className={`p-2 cursor-pointer ${
+                    className={`px-2 py-1 cursor-pointer ${
                       variant.state
                         ? "opacity-100"
                         : "opacity-70 hover:opacity-80"
@@ -178,7 +192,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     e.stopPropagation();
                     setDropDownSelector((prevState) => !prevState);
                   }}
-                  className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button cursor-pointer"
+                  className="flex items-center justify-between gap-3 rounded-md px-3 py-1 h-[30px] bg-button cursor-pointer"
                 >
                   <p
                     className={`${
@@ -187,7 +201,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                         : "opacity-70 hover:opacity-80"
                     }`}
                   >
-                    {filter.name}
+                    {filter.name}: {activeStrategy}
                   </p>
                   <svg
                     width="15"
@@ -237,7 +251,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 >
                   <p
                     onClick={() => activeFiltersHandler(filter, "All")}
-                    className={`py-2 px-4 cursor-pointer hover:opacity-100 ${
+                    className={`py-1 px-4 cursor-pointer h-[30px] hover:opacity-100 ${
                       !filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >
@@ -245,7 +259,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   </p>
                   <p
                     onClick={() => activeFiltersHandler(filter)}
-                    className={`p-2 cursor-pointer hover:opacity-100 ${
+                    className={`px-2 py-1 h-[30px] cursor-pointer hover:opacity-100 ${
                       filter.state ? "bg-[#35373E] opacity-100" : "opacity-70"
                     } rounded-md`}
                   >

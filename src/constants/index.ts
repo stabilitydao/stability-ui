@@ -189,7 +189,7 @@ const VAULT_STATUSES: TVaultStatuses = {
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
-    logoSrc: "/protocols/QuickSwap.webp",
+    logoSrc: "/protocols/QuickSwap.svg",
   },
   gamma: {
     name: "Gamma",

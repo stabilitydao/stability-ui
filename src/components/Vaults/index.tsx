@@ -295,7 +295,7 @@ const Vaults = () => {
       <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input
           type="text"
-          className="mt-1 lg:mt-0 w-full bg-[#2c2f38] outline-none pl-3 py-1.5 rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#9baab4] transition-all duration-300"
+          className="mt-1 lg:mt-0 w-full bg-button outline-none pl-3 py-[3px] rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#6376AF] transition-all duration-300 h-[30px]"
           placeholder="Search"
           ref={search}
           onChange={() => tableHandler()}
@@ -439,8 +439,8 @@ const Vaults = () => {
                           >
                             {vault.strategyInfo.shortName}
                           </span>
-                          <span className="px-2 rounded-r-[10px] bg-[#41465a] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
-                            <span className="flex min-w-[42px] justify-center w-[50px]">
+                          <span className="px-2 rounded-r-[10px] bg-[#2b3139] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
+                            <span className="flex min-w-[50px] justify-center w-[50px]">
                               {vault.strategyInfo.protocols.map(
                                 (protocol, index) => (
                                   <img
