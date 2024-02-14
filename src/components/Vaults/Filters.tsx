@@ -133,7 +133,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
   }, []);
   return (
     filters.length && (
-      <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-5 select-none lg:min-w-[60%]">
+      <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-9 select-none lg:min-w-[60%]">
         {filters.map((filter: TTableFilters) => (
           <div key={filter.name}>
             {filter.type === "single" ? (

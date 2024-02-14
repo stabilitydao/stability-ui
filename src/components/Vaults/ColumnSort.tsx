@@ -53,7 +53,13 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
               : "pl-0 md:px-2  min-[1110px]:px-3 text-right"
           } py-2 text-center cursor-pointer ${styles[value] || ""}`}
         >
-          <p className="inline-block">{value}</p>
+          {value !== "APR / APY" ? (
+            <p className="inline-block">{value}</p>
+          ) : (
+            <p className="inline-block">
+              {window.innerWidth > 915 ? value : "APR"}
+            </p>
+          )}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="12"

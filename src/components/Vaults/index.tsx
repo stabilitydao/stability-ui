@@ -375,7 +375,7 @@ const Vaults = () => {
         </div>
       </div>
       {currentTabVaults.length ? (
-        <table className="hidden md:table table-auto w-full rounded-lg select-none">
+        <table className="hidden md:table table-auto w-full rounded-lg select-none mb-9">
           <thead className="bg-[#0b0e11]">
             <tr className="text-[12px] text-[#8f8f8f] uppercase">
               {tableStates.map((value: any, index: number) => (
@@ -398,7 +398,7 @@ const Vaults = () => {
                   key={vault.name}
                   onClick={() => toVault(vault.address)}
                 >
-                  <td className="px-2 min-[1110px]:px-3 py-2  min-[1110px]:py-3 text-center">
+                  <td className="px-2 min-[1110px]:px-3 py-2  min-[1110px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
                     <div className="flex items-center justify-start">
                       <VaultState status={vault.status} />
                       {vault.assets && (
@@ -412,18 +412,20 @@ const Vaults = () => {
                         <p title={vault.name} className="md:whitespace-nowrap">
                           {vault.symbol}
                         </p>
-                        <p className="min-[1110px]:hidden">{vault.type}</p>
-                        <p className="min-[1110px]:hidden">
+                        <p className="min-[1110px]:hidden text-[#848e9c]">
+                          {vault.type}
+                        </p>
+                        <p className="min-[1110px]:hidden text-[#848e9c]">
                           {getStrategyShortName(vault.symbol)}
                         </p>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-2 min-[1110px]:px-1 py-2 hidden xl:table-cell">
+                  <td className="px-2 min-[1110px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                     <VaultType type={vault.type} />
                   </td>
-                  <td className="pl-2 py-2 hidden min-[1110px]:table-cell whitespace-nowrap">
+                  <td className="pl-2 py-2 hidden min-[1110px]:table-cell whitespace-nowrap w-[250px]">
                     <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                       {vault.strategyInfo && (
                         <>
@@ -438,7 +440,7 @@ const Vaults = () => {
                             {vault.strategyInfo.shortName}
                           </span>
                           <span className="px-2 rounded-r-[10px] bg-[#41465a] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
-                            <span className="flex min-w-[42px] justify-center">
+                            <span className="flex min-w-[42px] justify-center w-[50px]">
                               {vault.strategyInfo.protocols.map(
                                 (protocol, index) => (
                                   <img
@@ -473,7 +475,7 @@ const Vaults = () => {
                                 className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1110px]:inline ${
                                   vault.strategySpecific.length > 10
                                     ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
-                                    : "uppercase  text-[10px] px-[6px]"
+                                    : "uppercase  text-[9px] px-[6px]"
                                 }`}
                               >
                                 {vault.strategySpecific}
@@ -484,10 +486,10 @@ const Vaults = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-2 min-[1110px]:px-3 py-2 tooltip cursor-help">
+                  <td className="px-2 min-[1110px]:px-3 py-2 tooltip cursor-help w-[130px] min-[860px]:w-[160px]">
                     <div>
                       <p
-                        className="text-[14px] whitespace-nowrap w-[120px] text-start dotted-underline text-[#eaecef]"
+                        className="text-[13px] whitespace-nowrap w-[120px] text-end dotted-underline text-[#eaecef]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -569,7 +571,7 @@ const Vaults = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2 text-start">
+                  <td className="px-2 min-[1110px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
                     <span
                       className="uppercase"
                       style={{ color: vault.strategyInfo.il?.color }}
@@ -577,7 +579,7 @@ const Vaults = () => {
                       {vault.strategyInfo.il?.title}
                     </span>
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2">
+                  <td className="px-2 min-[1110px]:px-4 py-2 w-[90px]">
                     $
                     {formatFromBigInt(
                       vault.shareprice,
@@ -585,13 +587,13 @@ const Vaults = () => {
                       "withDecimals"
                     ).toFixed(3)}
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2 text-right">
+                  <td className="px-2 min-[1110px]:px-4 py-2 text-right w-[85px]">
                     {formatNumber(
                       formatFromBigInt(vault.tvl, 18, "withFloor"),
                       "abbreviate"
                     )}
                   </td>
-                  <td className="pr-2 md:pr-3 min-[1110px]:pr-5 py-2 text-right">
+                  <td className="pr-2 md:pr-3 min-[1110px]:pr-5 py-2 text-right w-[130px] min-[815px]:w-[110px]">
                     {formatNumber(
                       formatFromBigInt(vault.balance, 18),
                       "format"
@@ -784,7 +786,7 @@ const Vaults = () => {
         <APRModal state={aprModal} setModalState={setAprModal} />
       )}
       <a href="/create-vault">
-        <button className="bg-button px-3 py-2 rounded-md mt-3">
+        <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
           Create vault
         </button>
       </a>
