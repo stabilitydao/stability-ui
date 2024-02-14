@@ -22,11 +22,11 @@ export const getStrategyShortName = (vaultSymbol: string): string => {
   }
   if (vaultSymbol.match(/GQMF(S|N|W)$/)) {
     const symbol = vaultSymbol.match(/GQMFS$/)
-      ? "GQFS"
+      ? "GQMF Stable"
       : vaultSymbol.match(/GQMFN$/)
-      ? "GQFN"
+      ? "GQMF Narrow"
       : vaultSymbol.match(/GQMFW$/)
-      ? "GQFW"
+      ? "GQMF Wide"
       : "Unknown";
     return symbol;
   }
