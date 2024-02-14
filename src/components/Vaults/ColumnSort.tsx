@@ -11,7 +11,7 @@ type TProps = {
 const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
   const styles: Record<string, string> = {
     Type: "block md:hidden xl:table-cell",
-    Strategy: "block md:hidden min-[1110px]:table-cell",
+    Strategy: "block md:hidden min-[1130px]:table-cell",
   };
 
   const tabController = () => {
@@ -49,8 +49,8 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
           onClick={tabController}
           className={`${
             index < 5
-              ? "px-0 md:px-2  min-[1110px]:px-4"
-              : "pl-0 md:px-2  min-[1110px]:px-3 text-right"
+              ? "px-0 md:px-2  min-[1130px]:px-4"
+              : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
           } py-2 text-center cursor-pointer ${styles[value] || ""}`}
         >
           {value !== "APR / APY" ? (
@@ -66,7 +66,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
             height="7"
             viewBox="0 0 12 7"
             fill="none"
-            className={`inline-block ml-[3px] md:ml-[6px]  min-[1110px]:ml-[10px] transition duration-300 ease-in-out ${
+            className={`inline-block ml-[3px] md:ml-[6px]  min-[1130px]:ml-[10px] transition duration-300 ease-in-out ${
               table[index].sortType === "ascendentic" && "rotate-[180deg]"
             }`}
           >
@@ -80,7 +80,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
       ) : (
         <div
           onClick={tabController}
-          className={`px-0 md:px-2 min-[1110px]:px-4 py-2 text-center cursor-pointer ${
+          className={`px-0 md:px-2 min-[1130px]:px-4 py-2 text-center cursor-pointer ${
             styles[value] || ""
           }`}
         >

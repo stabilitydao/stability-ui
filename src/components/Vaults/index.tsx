@@ -317,7 +317,7 @@ const Vaults = () => {
               </p>
               <div>
                 {mobileActiveSort.name && (
-                  <div className="px-0 md:px-2 min-[1110px]:px-4 py-2 text-center cursor-pointer">
+                  <div className="px-0 md:px-2 min-[1130px]:px-4 py-2 text-center cursor-pointer">
                     <p className="inline-block">{mobileActiveSort?.name}</p>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -398,7 +398,7 @@ const Vaults = () => {
                   key={vault.name}
                   onClick={() => toVault(vault.address)}
                 >
-                  <td className="px-2 min-[1110px]:px-3 py-2  min-[1110px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
+                  <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
                     <div className="flex items-center justify-start">
                       <VaultState status={vault.status} />
                       {vault.assets && (
@@ -412,20 +412,20 @@ const Vaults = () => {
                         <p title={vault.name} className="md:whitespace-nowrap">
                           {vault.symbol}
                         </p>
-                        <p className="min-[1110px]:hidden text-[#848e9c]">
+                        <p className="min-[1130px]:hidden text-[#848e9c]">
                           {vault.type}
                         </p>
-                        <p className="min-[1110px]:hidden text-[#848e9c]">
+                        <p className="min-[1130px]:hidden text-[#848e9c]">
                           {getStrategyShortName(vault.symbol)}
                         </p>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-2 min-[1110px]:px-1 py-2 hidden xl:table-cell w-[90px]">
+                  <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                     <VaultType type={vault.type} />
                   </td>
-                  <td className="pl-2 py-2 hidden min-[1110px]:table-cell whitespace-nowrap w-[250px]">
+                  <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
                     <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                       {vault.strategyInfo && (
                         <>
@@ -472,7 +472,7 @@ const Vaults = () => {
                             </span>
                             {vault.strategySpecific && (
                               <span
-                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1110px]:inline ${
+                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
                                   vault.strategySpecific.length > 10
                                     ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
                                     : "uppercase  text-[9px] px-[6px]"
@@ -486,92 +486,90 @@ const Vaults = () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-2 min-[1110px]:px-3 py-2 tooltip cursor-help w-[130px] min-[860px]:w-[160px]">
-                    <div>
-                      <p
-                        className="text-[13px] whitespace-nowrap w-[120px] text-end dotted-underline text-[#eaecef]"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAprModal({
-                            apr: vault.apr,
-                            apy: vault.apy,
-                            aprWithoutFees: vault.aprWithoutFees,
-                            apyWithoutFees: vault.apyWithoutFees,
-                            assetsWithApr: vault.assetsWithApr as any,
-                            daily: vault.daily,
-                            assetsAprs: vault.monthlyUnderlyingApr,
-                            lastHardWork: vault.lastHardWork as any,
-                            strategyApr: Number(vault.strategyApr),
-                            state: true,
-                          });
-                        }}
-                      >
-                        {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}% /{" "}
-                        {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
-                      </p>
-                      <div className="visible__tooltip">
-                        <div className="flex items-start flex-col gap-4">
-                          <div className="text-[14px] flex flex-col gap-1 w-full">
-                            <div className="font-bold flex items-center justify-between">
-                              <p>Total APY</p>
-                              <p className="text-end">
-                                {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}
-                                %
-                              </p>
-                            </div>
-                            <div className="font-bold flex items-center justify-between">
-                              <p>Total APR</p>
-                              <p className="text-end">
-                                {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}
-                                %
-                              </p>
-                            </div>
-
-                            {!!vault.monthlyUnderlyingApr && (
-                              <div className="font-bold flex items-center justify-between">
-                                <p>Pool swap fees APR</p>
-                                <p
-                                  className={`${
-                                    $hideFeeAPR && "line-through"
-                                  } text-end`}
-                                >
-                                  {vault.monthlyUnderlyingApr.toFixed(2)}%
-                                </p>
-                              </div>
-                            )}
-                            <div className="font-bold flex items-center justify-between">
-                              <p>Strategy APR</p>
-                              <p className="text-end">
-                                {formatFromBigInt(vault.strategyApr, 3).toFixed(
-                                  2
-                                )}
-                                %
-                              </p>
-                            </div>
-                            <div className="font-bold flex items-center justify-between">
-                              <p>Daily</p>
-                              <p className="text-end">
-                                {$hideFeeAPR
-                                  ? (
-                                      Number(vault.aprWithoutFees) / 365
-                                    ).toFixed(2)
-                                  : vault.daily}
-                                %
-                              </p>
-                            </div>
+                  <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[80px] min-[915px]:w-[160px]">
+                    <div
+                      className="text-[13px] whitespace-nowrap w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAprModal({
+                          apr: vault.apr,
+                          apy: vault.apy,
+                          aprWithoutFees: vault.aprWithoutFees,
+                          apyWithoutFees: vault.apyWithoutFees,
+                          assetsWithApr: vault.assetsWithApr as any,
+                          daily: vault.daily,
+                          assetsAprs: vault.monthlyUnderlyingApr,
+                          lastHardWork: vault.lastHardWork as any,
+                          strategyApr: Number(vault.strategyApr),
+                          state: true,
+                        });
+                      }}
+                    >
+                      <p>{$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%</p>
+                      {window.innerWidth > 915 && (
+                        <p>
+                          / {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
+                        </p>
+                      )}
+                    </div>
+                    <div className="visible__tooltip">
+                      <div className="flex items-start flex-col gap-4">
+                        <div className="text-[14px] flex flex-col gap-1 w-full">
+                          <div className="font-bold flex items-center justify-between">
+                            <p>Total APY</p>
+                            <p className="text-end">
+                              {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
+                            </p>
                           </div>
-                          <div className="flex items-center justify-between w-full">
-                            <p className="text-[16px]">Last Hard Work</p>
-                            <TimeDifferenceIndicator
-                              unix={vault.lastHardWork}
-                            />
+                          <div className="font-bold flex items-center justify-between">
+                            <p>Total APR</p>
+                            <p className="text-end">
+                              {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%
+                            </p>
+                          </div>
+
+                          {!!vault.monthlyUnderlyingApr && (
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Pool swap fees APR</p>
+                              <p
+                                className={`${
+                                  $hideFeeAPR && "line-through"
+                                } text-end`}
+                              >
+                                {vault.monthlyUnderlyingApr.toFixed(2)}%
+                              </p>
+                            </div>
+                          )}
+                          <div className="font-bold flex items-center justify-between">
+                            <p>Strategy APR</p>
+                            <p className="text-end">
+                              {formatFromBigInt(vault.strategyApr, 3).toFixed(
+                                2
+                              )}
+                              %
+                            </p>
+                          </div>
+                          <div className="font-bold flex items-center justify-between">
+                            <p>Daily</p>
+                            <p className="text-end">
+                              {$hideFeeAPR
+                                ? (Number(vault.aprWithoutFees) / 365).toFixed(
+                                    2
+                                  )
+                                : vault.daily}
+                              %
+                            </p>
                           </div>
                         </div>
-                        <i></i>
+                        <div className="flex items-center justify-between w-full">
+                          <p className="text-[16px]">Last Hard Work</p>
+                          <TimeDifferenceIndicator unix={vault.lastHardWork} />
+                        </div>
                       </div>
+                      <i></i>
                     </div>
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
+                  <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
                     <span
                       className="uppercase"
                       style={{ color: vault.strategyInfo.il?.color }}
@@ -579,7 +577,7 @@ const Vaults = () => {
                       {vault.strategyInfo.il?.title}
                     </span>
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2 w-[90px]">
+                  <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
                     $
                     {formatFromBigInt(
                       vault.shareprice,
@@ -587,13 +585,13 @@ const Vaults = () => {
                       "withDecimals"
                     ).toFixed(3)}
                   </td>
-                  <td className="px-2 min-[1110px]:px-4 py-2 text-right w-[85px]">
+                  <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
                     {formatNumber(
                       formatFromBigInt(vault.tvl, 18, "withFloor"),
                       "abbreviate"
                     )}
                   </td>
-                  <td className="pr-2 md:pr-3 min-[1110px]:pr-5 py-2 text-right w-[130px] min-[815px]:w-[110px]">
+                  <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
                     {formatNumber(
                       formatFromBigInt(vault.balance, 18),
                       "format"
