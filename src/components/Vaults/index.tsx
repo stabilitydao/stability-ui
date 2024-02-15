@@ -81,7 +81,6 @@ const Vaults = () => {
     dataType: string,
     sortOrder: string
   ) => {
-    console.log(a, b, dataType, sortOrder);
     if (dataType === "number") {
       return sortOrder === "ascendentic"
         ? Number(a) - Number(b)
@@ -215,7 +214,6 @@ const Vaults = () => {
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
-        console.log(state);
         sortedVaults = [...sortedVaults].sort((a, b) =>
           compareHandler(
             a[state.keyName as keyof TVault],
