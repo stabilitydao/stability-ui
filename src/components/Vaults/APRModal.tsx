@@ -52,7 +52,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-modal rounded-[10px] h-[250px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-[#26282f] rounded-[10px] h-[250px]"
       >
         <svg
           onClick={() => {

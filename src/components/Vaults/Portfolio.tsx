@@ -225,7 +225,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                   : "****"}
               </p>
             </div>
-            <div className="w-[120px] md:w-[180px] flex flex-col items-start">
+            <div className="max-w-[130px] w-full md:max-w-[150px]  flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DAILY YIELD
               </h2>
@@ -233,7 +233,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 {$visible ? dailyYield : "****"}
               </p>
             </div>
-            <div className="max-w-[130px] w-full md:max-w-[150px] flex flex-col items-start">
+            <div className="w-[120px] md:w-[180px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 MONTHLY YIELD
               </h2>
