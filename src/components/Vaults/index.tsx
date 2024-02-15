@@ -399,7 +399,7 @@ const Vaults = () => {
                     key={vault.name}
                     onClick={() => toVault(vault.address)}
                   >
-                    <td className="md:px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center  w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10">
+                    <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                       <div className="flex items-center justify-start">
                         <div className="hidden md:block">
                           <VaultState status={vault.status} />
