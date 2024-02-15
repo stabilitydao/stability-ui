@@ -586,7 +586,7 @@ const Vaults = () => {
                         <i></i>
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
                       <span
                         className="uppercase"
                         style={{ color: vault.strategyInfo.il?.color }}
