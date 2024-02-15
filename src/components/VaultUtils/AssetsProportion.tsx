@@ -9,7 +9,7 @@ const AssetsProportion = ({ proportions, assets, type }: IProps) => {
     <div
       className={
         type === "vaults"
-          ? "flex w-[30px] h-6 ml-[12px] mr-5"
+          ? "flex w-[30px] h-6 ml-[12px] mr-5 relative"
           : "flex ml-3 w-[60px]"
       }
     >

@@ -214,7 +214,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           </div>
         </div>
         <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
-          <div className="flex items-center justify-center md:justify-start gap-5 flex-wrap whitespace-nowrap w-full">
+          <div className="flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DEPOSITED

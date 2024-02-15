@@ -10,8 +10,8 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
   const styles: Record<string, string> = {
-    Type: "block md:hidden xl:table-cell",
-    Strategy: "block md:hidden min-[1130px]:table-cell",
+    Type: "hidden xl:table-cell",
+    Strategy: "hidden min-[1130px]:table-cell",
   };
 
   const tabController = () => {

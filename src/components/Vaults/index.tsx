@@ -303,7 +303,7 @@ const Vaults = () => {
         <Filters filters={tableFilters} setFilters={setTableFilters} />
       </div>
 
-      <div className="flex md:hidden items-center mt-4 gap-3 relative ">
+      {/* <div className="flex md:hidden items-center mt-4 gap-3 relative ">
         <div className="relative select-none w-full">
           <div
             onClick={() => {
@@ -373,241 +373,253 @@ const Vaults = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       {currentTabVaults.length ? (
-        <table className="hidden md:table table-auto w-full rounded-lg select-none mb-9">
-          <thead className="bg-[#0b0e11]">
-            <tr className="text-[12px] text-[#8f8f8f] uppercase">
-              {tableStates.map((value: any, index: number) => (
-                <ColumnSort
-                  key={value.name}
-                  index={index}
-                  value={value.name}
-                  table={tableStates}
-                  type="table"
-                  sort={tableHandler}
-                />
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {currentTabVaults.map((vault: TVault) => {
-              return (
-                <tr
-                  className="text-center text-[14px] hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
-                  key={vault.name}
-                  onClick={() => toVault(vault.address)}
-                >
-                  <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
-                    <div className="flex items-center justify-start">
-                      <VaultState status={vault.status} />
-                      {vault.assets && (
-                        <AssetsProportion
-                          proportions={vault.assetsProportions as number[]}
-                          assets={vault.assets}
-                          type="vaults"
-                        />
-                      )}
-                      <div className="max-w-[250px] flex items-start flex-col text-[#eaecef]">
-                        <p title={vault.name} className="md:whitespace-nowrap">
-                          {vault.symbol}
-                        </p>
-                        <p className="min-[1130px]:hidden text-[#848e9c]">
-                          {vault.type}
-                        </p>
-                        <p className="min-[1130px]:hidden text-[#848e9c]">
-                          {getStrategyShortName(vault.symbol)}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
-                    <VaultType type={vault.type} />
-                  </td>
-                  <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
-                    <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
-                      {vault.strategyInfo && (
-                        <>
-                          <span
-                            style={{
-                              backgroundColor: vault.strategyInfo.bgColor,
-                              color: vault.strategyInfo.color,
-                            }}
-                            className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
-                            title={vault.strategyInfo.name}
+        <div className="overflow-x-auto">
+          <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
+            <thead className="bg-[#0b0e11]">
+              <tr className="text-[12px] text-[#8f8f8f] uppercase">
+                {tableStates.map((value: any, index: number) => (
+                  <ColumnSort
+                    key={value.name}
+                    index={index}
+                    value={value.name}
+                    table={tableStates}
+                    type="table"
+                    sort={tableHandler}
+                  />
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {currentTabVaults.map((vault: TVault) => {
+                return (
+                  <tr
+                    className="text-center text-[14px] hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
+                    key={vault.name}
+                    onClick={() => toVault(vault.address)}
+                  >
+                    <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
+                      <div className="flex items-center justify-start">
+                        <VaultState status={vault.status} />
+                        {vault.assets && (
+                          <AssetsProportion
+                            proportions={vault.assetsProportions as number[]}
+                            assets={vault.assets}
+                            type="vaults"
+                          />
+                        )}
+                        <div className="max-w-[250px] flex items-start flex-col text-[#eaecef]">
+                          <p
+                            title={vault.name}
+                            className="md:whitespace-nowrap"
                           >
-                            {vault.strategyInfo.shortName}
-                          </span>
-                          <span className="px-2 rounded-r-[10px] bg-[#2b3139] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
-                            <span className="flex min-w-[50px] justify-center w-[50px]">
-                              {vault.strategyInfo.protocols.map(
-                                (protocol, index) => (
-                                  <img
-                                    className={`h-6 w-6 rounded-full ${
-                                      vault.strategyInfo.protocols.length > 1 &&
-                                      index &&
-                                      "ml-[-8px]"
-                                    }`}
-                                    key={index}
-                                    src={protocol.logoSrc}
-                                    alt={protocol.name}
-                                    title={protocol.name}
-                                  />
-                                )
+                            {vault.symbol}
+                          </p>
+                          <p className="min-[1130px]:hidden text-[#848e9c]">
+                            {vault.type}
+                          </p>
+                          <p className="min-[1130px]:hidden text-[#848e9c]">
+                            {getStrategyShortName(vault.symbol)}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
+                      <VaultType type={vault.type} />
+                    </td>
+                    <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
+                      <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
+                        {vault.strategyInfo && (
+                          <>
+                            <span
+                              style={{
+                                backgroundColor: vault.strategyInfo.bgColor,
+                                color: vault.strategyInfo.color,
+                              }}
+                              className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
+                              title={vault.strategyInfo.name}
+                            >
+                              {vault.strategyInfo.shortName}
+                            </span>
+                            <span className="px-2 rounded-r-[10px] bg-[#2b3139] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
+                              <span className="flex min-w-[50px] justify-center w-[50px]">
+                                {vault.strategyInfo.protocols.map(
+                                  (protocol, index) => (
+                                    <img
+                                      className={`h-6 w-6 rounded-full ${
+                                        vault.strategyInfo.protocols.length >
+                                          1 &&
+                                        index &&
+                                        "ml-[-8px]"
+                                      }`}
+                                      key={index}
+                                      src={protocol.logoSrc}
+                                      alt={protocol.name}
+                                      title={protocol.name}
+                                    />
+                                  )
+                                )}
+                              </span>
+                              <span className="flex">
+                                {vault.strategyInfo.features.map(
+                                  (feature, i) => (
+                                    <img
+                                      key={i}
+                                      title={feature.name}
+                                      alt={feature.name}
+                                      className="w-6 h-6 ml-1"
+                                      src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                                        feature.svg
+                                      )}`}
+                                    />
+                                  )
+                                )}
+                              </span>
+                              {vault.strategySpecific && (
+                                <span
+                                  className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
+                                    vault.strategySpecific.length > 10
+                                      ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
+                                      : "uppercase  text-[9px] px-[6px]"
+                                  }`}
+                                >
+                                  {vault.strategySpecific}
+                                </span>
                               )}
                             </span>
-                            <span className="flex">
-                              {vault.strategyInfo.features.map((feature, i) => (
-                                <img
-                                  key={i}
-                                  title={feature.name}
-                                  alt={feature.name}
-                                  className="w-6 h-6 ml-1"
-                                  src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                    feature.svg
-                                  )}`}
-                                />
-                              ))}
-                            </span>
-                            {vault.strategySpecific && (
-                              <span
-                                className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
-                                  vault.strategySpecific.length > 10
-                                    ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
-                                    : "uppercase  text-[9px] px-[6px]"
-                                }`}
-                              >
-                                {vault.strategySpecific}
-                              </span>
-                            )}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[80px] min-[915px]:w-[160px]">
-                    <div
-                      className="text-[13px] whitespace-nowrap w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setAprModal({
-                          apr: vault.apr,
-                          apy: vault.apy,
-                          aprWithoutFees: vault.aprWithoutFees,
-                          apyWithoutFees: vault.apyWithoutFees,
-                          assetsWithApr: vault.assetsWithApr as any,
-                          daily: vault.daily,
-                          assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: vault.lastHardWork as any,
-                          strategyApr: Number(vault.strategyApr),
-                          state: true,
-                        });
-                      }}
-                    >
-                      <p>{$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%</p>
-                      {window.innerWidth > 915 && (
-                        <p>
-                          / {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
-                        </p>
-                      )}
-                    </div>
-                    <div className="visible__tooltip">
-                      <div className="flex items-start flex-col gap-4">
-                        <div className="text-[14px] flex flex-col gap-1 w-full">
-                          <div className="font-bold flex items-center justify-between">
-                            <p>Total APY</p>
-                            <p className="text-end">
-                              {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
-                            </p>
-                          </div>
-                          <div className="font-bold flex items-center justify-between">
-                            <p>Total APR</p>
-                            <p className="text-end">
-                              {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%
-                            </p>
-                          </div>
-
-                          {!!vault.monthlyUnderlyingApr && (
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[80px] min-[915px]:w-[160px]">
+                      <div
+                        className="text-[13px] whitespace-nowrap w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAprModal({
+                            apr: vault.apr,
+                            apy: vault.apy,
+                            aprWithoutFees: vault.aprWithoutFees,
+                            apyWithoutFees: vault.apyWithoutFees,
+                            assetsWithApr: vault.assetsWithApr as any,
+                            daily: vault.daily,
+                            assetsAprs: vault.monthlyUnderlyingApr,
+                            lastHardWork: vault.lastHardWork as any,
+                            strategyApr: Number(vault.strategyApr),
+                            state: true,
+                          });
+                        }}
+                      >
+                        <p>{$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%</p>
+                        {window.innerWidth > 915 && (
+                          <p>
+                            / {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
+                          </p>
+                        )}
+                      </div>
+                      <div className="visible__tooltip">
+                        <div className="flex items-start flex-col gap-4">
+                          <div className="text-[14px] flex flex-col gap-1 w-full">
                             <div className="font-bold flex items-center justify-between">
-                              <p>Pool swap fees APR</p>
-                              <p
-                                className={`${
-                                  $hideFeeAPR && "line-through"
-                                } text-end`}
-                              >
-                                {vault.monthlyUnderlyingApr.toFixed(2)}%
+                              <p>Total APY</p>
+                              <p className="text-end">
+                                {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}
+                                %
                               </p>
                             </div>
-                          )}
-                          <div className="font-bold flex items-center justify-between">
-                            <p>Strategy APR</p>
-                            <p className="text-end">
-                              {formatFromBigInt(vault.strategyApr, 3).toFixed(
-                                2
-                              )}
-                              %
-                            </p>
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Total APR</p>
+                              <p className="text-end">
+                                {$hideFeeAPR ? vault.aprWithoutFees : vault.apr}
+                                %
+                              </p>
+                            </div>
+
+                            {!!vault.monthlyUnderlyingApr && (
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Pool swap fees APR</p>
+                                <p
+                                  className={`${
+                                    $hideFeeAPR && "line-through"
+                                  } text-end`}
+                                >
+                                  {vault.monthlyUnderlyingApr.toFixed(2)}%
+                                </p>
+                              </div>
+                            )}
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Strategy APR</p>
+                              <p className="text-end">
+                                {formatFromBigInt(vault.strategyApr, 3).toFixed(
+                                  2
+                                )}
+                                %
+                              </p>
+                            </div>
+                            <div className="font-bold flex items-center justify-between">
+                              <p>Daily</p>
+                              <p className="text-end">
+                                {$hideFeeAPR
+                                  ? (
+                                      Number(vault.aprWithoutFees) / 365
+                                    ).toFixed(2)
+                                  : vault.daily}
+                                %
+                              </p>
+                            </div>
                           </div>
-                          <div className="font-bold flex items-center justify-between">
-                            <p>Daily</p>
-                            <p className="text-end">
-                              {$hideFeeAPR
-                                ? (Number(vault.aprWithoutFees) / 365).toFixed(
-                                    2
-                                  )
-                                : vault.daily}
-                              %
-                            </p>
+                          <div className="flex items-center justify-between w-full">
+                            <p className="text-[16px]">Last Hard Work</p>
+                            <TimeDifferenceIndicator
+                              unix={vault.lastHardWork}
+                            />
                           </div>
                         </div>
-                        <div className="flex items-center justify-between w-full">
-                          <p className="text-[16px]">Last Hard Work</p>
-                          <TimeDifferenceIndicator unix={vault.lastHardWork} />
-                        </div>
+                        <i></i>
                       </div>
-                      <i></i>
-                    </div>
-                  </td>
-                  <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
-                    <span
-                      className="uppercase"
-                      style={{ color: vault.strategyInfo.il?.color }}
-                    >
-                      {vault.strategyInfo.il?.title}
-                    </span>
-                  </td>
-                  <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
-                    $
-                    {formatFromBigInt(
-                      vault.shareprice,
-                      18,
-                      "withDecimals"
-                    ).toFixed(3)}
-                  </td>
-                  <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
-                    {formatNumber(
-                      formatFromBigInt(vault.tvl, 18, "withFloor"),
-                      "abbreviate"
-                    )}
-                  </td>
-                  <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
-                    {formatNumber(
-                      formatFromBigInt(vault.balance, 18),
-                      "format"
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[120px] min-[780px]:w-[100px]">
+                      <span
+                        className="uppercase"
+                        style={{ color: vault.strategyInfo.il?.color }}
+                      >
+                        {vault.strategyInfo.il?.title}
+                      </span>
+                    </td>
+                    <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
+                      $
+                      {formatFromBigInt(
+                        vault.shareprice,
+                        18,
+                        "withDecimals"
+                      ).toFixed(3)}
+                    </td>
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
+                      {formatNumber(
+                        formatFromBigInt(vault.tvl, 18, "withFloor"),
+                        "abbreviate"
+                      )}
+                    </td>
+                    <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
+                      {formatNumber(
+                        formatFromBigInt(vault.balance, 18),
+                        "format"
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className="flex items-center justify-center mt-5 md:mt-0">
           No results found...
         </div>
       )}
-      <div className="md:hidden block">
+      {/* <div className="md:hidden block">
         {currentTabVaults.map((vault: TVault, index: number) => {
           return (
             <div
@@ -773,7 +785,7 @@ const Vaults = () => {
             </div>
           );
         })}
-      </div>
+      </div> */}
 
       <Pagination
         vaults={filteredVaults}
