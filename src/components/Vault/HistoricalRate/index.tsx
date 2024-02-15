@@ -215,7 +215,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               height: "100%",
               left:
                 activeChart.name === "sharePrice"
-                  ? "66.6%"
+                  ? "66.7%"
                   : activeChart.name === "TVL"
                   ? "33.3%"
                   : "0%",
