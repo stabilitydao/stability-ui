@@ -395,7 +395,7 @@ const Vaults = () => {
               {currentTabVaults.map((vault: TVault) => {
                 return (
                   <tr
-                    className="text-center text-[14px] hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
+                    className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
                     key={vault.name}
                     onClick={() => toVault(vault.address)}
                   >
