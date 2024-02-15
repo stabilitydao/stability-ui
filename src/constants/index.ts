@@ -15,6 +15,7 @@ import {
 
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
+  { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
   {
     name: "Type",
     keyName: "type",

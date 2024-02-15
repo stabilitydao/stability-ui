@@ -81,6 +81,7 @@ const Vaults = () => {
     dataType: string,
     sortOrder: string
   ) => {
+    console.log(a, b, dataType, sortOrder);
     if (dataType === "number") {
       return sortOrder === "ascendentic"
         ? Number(a) - Number(b)
@@ -214,6 +215,7 @@ const Vaults = () => {
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
+        console.log(state);
         sortedVaults = [...sortedVaults].sort((a, b) =>
           compareHandler(
             a[state.keyName as keyof TVault],
@@ -401,7 +403,9 @@ const Vaults = () => {
                   >
                     <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center  w-[200px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10">
                       <div className="flex items-center justify-start">
-                        <VaultState status={vault.status} />
+                        <div className="hidden md:block">
+                          <VaultState status={vault.status} />
+                        </div>
                         {vault.assets && (
                           <AssetsProportion
                             proportions={vault.assetsProportions as number[]}
@@ -422,7 +426,11 @@ const Vaults = () => {
                         </div>
                       </div>
                     </td>
-
+                    <td className="px-2 min-[1130px]:px-1 py-2 table-cell md:hidden w-[60px]">
+                      <div className="flex items-center justify-center">
+                        <VaultState status={vault.status} />
+                      </div>
+                    </td>
                     <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                       <VaultType type={vault.type} />
                     </td>

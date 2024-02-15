@@ -218,7 +218,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 </div>
                 <div
                   ref={dropDownRef}
-                  className={`bg-button mt-1 rounded-md w-full z-10 ${
+                  className={`bg-button mt-1 rounded-md w-full z-20 ${
                     dropDownSelector
                       ? "absolute transition delay-[50ms]"
                       : "hidden"
