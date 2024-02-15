@@ -15,6 +15,7 @@ import {
 
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
+  { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
   {
     name: "Type",
     keyName: "type",
@@ -189,7 +190,7 @@ const VAULT_STATUSES: TVaultStatuses = {
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
-    logoSrc: "/protocols/QuickSwap.webp",
+    logoSrc: "/protocols/QuickSwap.svg",
   },
   gamma: {
     name: "Gamma",

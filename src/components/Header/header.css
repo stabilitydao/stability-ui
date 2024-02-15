@@ -12,13 +12,16 @@ body.no-scroll {
 
 @media screen and (max-width: 600px) {
   .burger-menu {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
   .burger-menu .bar {
-    width: 25px;
+    width: 16px;
     height: 3px;
     background-color: #fff;
-    margin: 6px 10px;
+    margin: 2px 10px;
     transition: 0.4s;
   }
   .menu-nav {
@@ -45,7 +48,7 @@ body.no-scroll {
   }
 }
 .burger-menu.active .bar:nth-child(1) {
-  transform: rotate(-45deg) translate(-8px, 5px);
+  transform: rotate(-45deg) translate(-4px, 4px);
 }
 
 .burger-menu.active .bar:nth-child(2) {
@@ -54,5 +57,5 @@ body.no-scroll {
 }
 
 .burger-menu.active .bar:nth-child(3) {
-  transform: rotate(45deg) translate(-8px, -5px);
+  transform: rotate(45deg) translate(-6px, -6px);
 }

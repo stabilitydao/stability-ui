@@ -58,7 +58,7 @@ const { title } = Astro.props as IProps;
 	}
 	html {
 		font-family: system-ui, sans-serif;
-		background: #13151a;
+		background: #181A20;
 		background-size: 224px;
 	}
 	body {
@@ -154,7 +154,10 @@ const { title } = Astro.props as IProps;
 		background-size: 400%;
 		background-position: 0%;
 	}
-
+	.dotted-underline {
+		text-decoration:underline dotted;
+		text-underline-position:under;
+	}
 	.btn {
 		cursor: pointer;
 		text-wrap: nowrap;
@@ -285,7 +288,7 @@ const { title } = Astro.props as IProps;
 		transform:translate(-30%,-100%);
 		padding:10px 20px;
 		color:#ffffff;
-		background-color:#13141f;
+		background-color:#26282f;
 		font-size:14px;
 		border-radius:8px;
 		position:absolute;
@@ -320,7 +323,7 @@ const { title } = Astro.props as IProps;
 		height:15px;
 		left:50%;
 		transform:translate(-50%,-50%) rotate(45deg);
-		background-color:#13141f;
+		background-color:#26282f;
 	}
 	.toLeft i::after {
   		display: none !important;
