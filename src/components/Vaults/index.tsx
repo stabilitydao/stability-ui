@@ -375,7 +375,7 @@ const Vaults = () => {
         </div>
       </div> */}
       {currentTabVaults.length ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto md:overflow-x-visible">
           <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
             <thead className="bg-[#0b0e11]">
               <tr className="text-[12px] text-[#8f8f8f] uppercase">
@@ -399,7 +399,7 @@ const Vaults = () => {
                     key={vault.name}
                     onClick={() => toVault(vault.address)}
                   >
-                    <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center  w-[200px] md:w-[270px] min-[860px]:w-[300px] sticky left-0 md:block bg-[#181A20] z-10">
+                    <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center  w-[200px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10">
                       <div className="flex items-center justify-start">
                         <VaultState status={vault.status} />
                         {vault.assets && (
