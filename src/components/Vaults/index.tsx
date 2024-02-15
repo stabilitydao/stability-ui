@@ -399,7 +399,7 @@ const Vaults = () => {
                     key={vault.name}
                     onClick={() => toVault(vault.address)}
                   >
-                    <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center w-[270px] min-[860px]:w-[300px]">
+                    <td className="px-2 min-[1130px]:px-3 py-2  min-[1130px]:py-3 text-center  w-[200px] md:w-[270px] min-[860px]:w-[300px] sticky left-0 md:block bg-[#181A20] z-10">
                       <div className="flex items-center justify-start">
                         <VaultState status={vault.status} />
                         {vault.assets && (
@@ -409,11 +409,8 @@ const Vaults = () => {
                             type="vaults"
                           />
                         )}
-                        <div className="max-w-[250px] flex items-start flex-col text-[#eaecef]">
-                          <p
-                            title={vault.name}
-                            className="md:whitespace-nowrap"
-                          >
+                        <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
+                          <p title={vault.name} className="whitespace-nowrap">
                             {vault.symbol}
                           </p>
                           <p className="min-[1130px]:hidden text-[#848e9c]">
