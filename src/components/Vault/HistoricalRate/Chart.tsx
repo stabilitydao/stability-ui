@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -28,18 +28,35 @@ const CustomizedAxisTick = ({
   fontSize: number;
 }) => {
   return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={10}
-        textAnchor="middle"
-        fill="#8d8e96"
-        fontSize={fontSize}
-      >
-        {payload.value}
-      </text>
-    </g>
+    <>
+      {/* {payload.value === "10.02" ? (
+        <g transform={`translate(${10},${y})`}>
+          <text
+            x={0}
+            y={0}
+            dy={10}
+            textAnchor="middle"
+            fill="#8d8e96"
+            fontSize={fontSize}
+          >
+            {payload.value}
+          </text>
+        </g>
+      ) : ( */}
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dy={10}
+          textAnchor="middle"
+          fill="#8d8e96"
+          fontSize={fontSize}
+        >
+          {payload.value}
+        </text>
+      </g>
+      {/* )} */}
+    </>
   );
 };
 const CustomTooltip = ({
@@ -75,7 +92,10 @@ const CustomTooltip = ({
 };
 
 const Chart: React.FC<IProps> = ({ chart, APRType }) => {
+  const WIDTH = 500;
+
   let min = 0;
+
   useEffect(() => {
     if (chart.data) {
       min = Math.min(...chart.data.map((item: any) => item[chart.name]));
@@ -85,7 +105,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart
-        width={500}
+        width={WIDTH}
         height={200}
         data={chart.data}
         margin={{ left: 0 }}
@@ -122,6 +142,13 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
           dataKey={chart.name}
           stroke="#fff"
           fill="#414141"
+          // points={chart.data.map((entry: any) => {
+          //   let xCoordinate = entry.x;
+          //   if (entry.timestamp === "10.02") {
+          //     xCoordinate += 10;
+          //   }
+          //   return { x: 10, y: entry.y };
+          // })}
         />
       </AreaChart>
     </ResponsiveContainer>

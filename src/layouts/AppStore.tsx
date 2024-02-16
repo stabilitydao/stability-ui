@@ -89,10 +89,234 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
+  const setGraphData = async (data: any) => {
+    const graphVaults = await data.vaultEntities.reduce(
+      async (vaultsPromise: Promise<any>, vault: any) => {
+        const vaults = await vaultsPromise;
+        const strategyInfo = getStrategyInfo(vault.symbol);
+        const APIData =
+          stabilityAPIData?.underlyings?.["137"]?.[
+            vault.underlying.toLowerCase()
+          ];
+        const strategyEntity = data.strategyEntities.find(
+          (obj: any) => obj.id === vault.strategy
+        );
+
+        let dailyAPR = 0;
+        const assetsWithApr: string[] = [];
+        const assetsAprs: string[] = [];
+        let rebalances = {};
+
+        if (APIData?.apr?.daily) {
+          dailyAPR = APIData.apr.daily;
+          assetsWithApr.push("Pool swap fees");
+          assetsAprs.push(Number(dailyAPR).toFixed(2));
+        }
+        if (strategyInfo?.shortName === "IQMF") {
+          const YEAR = 525600;
+          const NOW = Math.floor(Date.now() / 1000);
+          const newAPRs = [];
+          const weights = [];
+          let threshold = 0;
+
+          const IQMFAlms = data.almrebalanceEntities
+            .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
+            .sort(
+              (a: TIQMFAlm, b: TIQMFAlm) =>
+                Number(b.timestamp) - Number(a.timestamp)
+            );
+
+          const _24HRebalances = IQMFAlms.filter(
+            (obj: any) => Number(obj.timestamp) >= NOW - 86400
+          ).length;
+          const _7DRebalances = IQMFAlms.filter(
+            (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+          ).length;
+
+          rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
+
+          const APRs = data.lastFeeAMLEntities[0].APRS.map(
+            (value: string) => (Number(value) / 100000) * 100
+          );
+          const timestamps = data.lastFeeAMLEntities[0].timestamps;
+
+          const collectFees = await _publicClient.simulateContract({
+            address: vault.underlying,
+            abi: ICHIABI,
+            functionName: "collectFees",
+          });
+          const token0 = await readContract(_publicClient, {
+            address: vault.underlying,
+            abi: ICHIABI,
+            functionName: "token0",
+          });
+          const token1 = await readContract(_publicClient, {
+            address: vault.underlying,
+            abi: ICHIABI,
+            functionName: "token1",
+          });
+          const getTotalAmounts = await readContract(_publicClient, {
+            address: vault.underlying,
+            abi: ICHIABI,
+            functionName: "getTotalAmounts",
+          });
+          const price = await readContract(_publicClient, {
+            address: priceReader,
+            abi: PriceReaderABI,
+            functionName: "getAssetsPrice",
+            args: [
+              [token0, token1, token0, token1],
+              [...collectFees.result, getTotalAmounts[0], getTotalAmounts[1]],
+            ],
+          });
+          const feePrice = Number(price[1][0] + price[1][1]);
+          const totalPrice = Number(price[1][2] + price[1][3]);
+
+          let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+          let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+          APRs.push(apr);
+          timestamps.push(NOW);
+
+          APRs.reverse();
+          timestamps.reverse();
+
+          for (let i = 0; i < APRs.length; i++) {
+            if (APRs.length === i + 1) {
+              break;
+            }
+            let diff = timestamps[i] - timestamps[i + 1];
+            if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+              threshold += diff;
+              weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+            } else {
+              weights.push(
+                (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                  TIMESTAMPS_IN_SECONDS.DAY
+              );
+              break;
+            }
+          }
+
+          for (let i = 0; i < weights.length; i++) {
+            newAPRs.push(APRs[i] * weights[i]);
+          }
+
+          dailyAPR =
+            newAPRs.reduce((acc, value) => (acc += value), 0) / newAPRs.length;
+          assetsWithApr.push("Pool swap fees");
+          assetsAprs.push(Number(dailyAPR).toFixed(2));
+        }
+        const APR = (
+          formatFromBigInt(String(vault.apr), 3, "withDecimals") +
+          Number(dailyAPR)
+        ).toFixed(2);
+
+        const APY = calculateAPY(APR).toFixed(2);
+
+        const APRWithoutFees = formatFromBigInt(
+          String(vault.apr),
+          3,
+          "withDecimals"
+        ).toFixed(2);
+        const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
+
+        const assetsProportions = vault.assetsProportions
+          ? vault.assetsProportions.map((proportion: any) =>
+              Math.round(Number(formatUnits(proportion, 16)))
+            )
+          : [];
+
+        const assetsPromise = Promise.all(
+          vault.strategyAssets.map(async (strategyAsset: any) => {
+            const token = getTokenData(strategyAsset);
+            if (token) {
+              const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token.address as TAddress)
+              );
+              return {
+                address: token?.address,
+                logo: token?.logoURI,
+                symbol: token?.symbol,
+                name: token?.name,
+                color: tokenExtended?.color,
+              };
+            }
+          })
+        );
+
+        const assets = await assetsPromise;
+
+        vaults[vault.id] = {
+          address: vault.id,
+          name: vault.name,
+          symbol: vault.symbol,
+          type: vault.vaultType,
+          strategy: vault.strategyId,
+          shareprice: vault.sharePrice,
+          tvl: vault.tvl,
+          apr: String(APR),
+          apy: APY,
+          aprWithoutFees: APRWithoutFees,
+          apyWithoutFees: APYWithoutFees,
+          strategyApr: vault.apr,
+          strategySpecific: vault.strategySpecific,
+          balance: "",
+          lastHardWork: vault.lastHardWork,
+          daily: (Number(APR) / 365).toFixed(2),
+          monthlyUnderlyingApr: dailyAPR,
+          assets,
+          assetsProportions,
+          assetsWithApr: assetsWithApr,
+          assetsAprs: assetsAprs,
+          strategyInfo: strategyInfo,
+          il: strategyInfo?.il?.rate,
+          underlying: vault.underlying,
+          strategyAddress: vault.strategy,
+          strategyDescription: vault.strategyDescription,
+          status: Number(vault.vaultStatus),
+          version: vault.version,
+          strategyVersion: strategyEntity.version,
+          rebalances: rebalances,
+        };
+
+        return vaults;
+      },
+      Promise.resolve({})
+    );
+
+    tokens.set(data.platformEntities[0].bcAssets);
+    vaults.set(graphVaults);
+    isVaultsLoaded.set(true);
+  };
+
   const getData = async () => {
-    const graphResponse = await axios.post(GRAPH_ENDPOINT, {
-      query: GRAPH_QUERY,
-    });
+    let graphResponse: any;
+    let retries = 0;
+    const maxRetries = 2;
+
+    while (retries < maxRetries) {
+      try {
+        graphResponse = await axios.post(GRAPH_ENDPOINT, {
+          query: GRAPH_QUERY,
+        });
+        if (graphResponse.data.errors && graphResponse.data.errors.length > 0) {
+          throw new Error("GRAPH API ERROR");
+        }
+        break;
+      } catch (error) {
+        retries++;
+        console.log("GRAPH API ERROR:", error);
+      }
+    }
+
+    if (retries >= maxRetries) {
+      throw new Error(
+        "Maximum number of retry attempts reached for graph request"
+      );
+    }
+
+    setGraphData(graphResponse.data.data);
+
     if (isConnected) {
       const contractData: any = await readContract(_publicClient, {
         address: platform,
@@ -409,207 +633,8 @@ const AppStore = (props: React.PropsWithChildren) => {
         vaults.set(vaultsObject);
       }
       isVaultsLoaded.set(true);
-    } else {
-      const graphVaults = await graphResponse.data.data.vaultEntities.reduce(
-        async (vaultsPromise: Promise<any>, vault: any) => {
-          const vaults = await vaultsPromise;
-          const strategyInfo = getStrategyInfo(vault.symbol);
-          const APIData =
-            stabilityAPIData?.underlyings?.["137"]?.[
-              vault.underlying.toLowerCase()
-            ];
-          const strategyEntity = graphResponse.data.data.strategyEntities.find(
-            (obj: any) => obj.id === vault.strategy
-          );
-
-          let dailyAPR = 0;
-          const assetsWithApr: string[] = [];
-          const assetsAprs: string[] = [];
-          let rebalances = {};
-
-          if (APIData?.apr?.daily) {
-            dailyAPR = APIData.apr.daily;
-            assetsWithApr.push("Pool swap fees");
-            assetsAprs.push(Number(dailyAPR).toFixed(2));
-          }
-          if (strategyInfo?.shortName === "IQMF") {
-            const YEAR = 525600;
-            const NOW = Math.floor(Date.now() / 1000);
-            const newAPRs = [];
-            const weights = [];
-            let threshold = 0;
-
-            const IQMFAlms = graphResponse.data.data.almrebalanceEntities
-              .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
-              .sort(
-                (a: TIQMFAlm, b: TIQMFAlm) =>
-                  Number(b.timestamp) - Number(a.timestamp)
-              );
-
-            const _24HRebalances = IQMFAlms.filter(
-              (obj: any) => Number(obj.timestamp) >= NOW - 86400
-            ).length;
-            const _7DRebalances = IQMFAlms.filter(
-              (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
-            ).length;
-
-            rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-
-            const APRs = graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
-              (value: string) => (Number(value) / 100000) * 100
-            );
-            const timestamps =
-              graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
-
-            const collectFees = await _publicClient.simulateContract({
-              address: vault.underlying,
-              abi: ICHIABI,
-              functionName: "collectFees",
-            });
-            const token0 = await readContract(_publicClient, {
-              address: vault.underlying,
-              abi: ICHIABI,
-              functionName: "token0",
-            });
-            const token1 = await readContract(_publicClient, {
-              address: vault.underlying,
-              abi: ICHIABI,
-              functionName: "token1",
-            });
-            const getTotalAmounts = await readContract(_publicClient, {
-              address: vault.underlying,
-              abi: ICHIABI,
-              functionName: "getTotalAmounts",
-            });
-            const price = await readContract(_publicClient, {
-              address: priceReader,
-              abi: PriceReaderABI,
-              functionName: "getAssetsPrice",
-              args: [
-                [token0, token1, token0, token1],
-                [...collectFees.result, getTotalAmounts[0], getTotalAmounts[1]],
-              ],
-            });
-            const feePrice = Number(price[1][0] + price[1][1]);
-            const totalPrice = Number(price[1][2] + price[1][3]);
-
-            let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
-            let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
-            APRs.push(apr);
-            timestamps.push(NOW);
-
-            APRs.reverse();
-            timestamps.reverse();
-
-            for (let i = 0; i < APRs.length; i++) {
-              if (APRs.length === i + 1) {
-                break;
-              }
-              let diff = timestamps[i] - timestamps[i + 1];
-              if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-                threshold += diff;
-                weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
-              } else {
-                weights.push(
-                  (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
-                    TIMESTAMPS_IN_SECONDS.DAY
-                );
-                break;
-              }
-            }
-
-            for (let i = 0; i < weights.length; i++) {
-              newAPRs.push(APRs[i] * weights[i]);
-            }
-
-            dailyAPR =
-              newAPRs.reduce((acc, value) => (acc += value), 0) /
-              newAPRs.length;
-            assetsWithApr.push("Pool swap fees");
-            assetsAprs.push(Number(dailyAPR).toFixed(2));
-          }
-          const APR = (
-            formatFromBigInt(String(vault.apr), 3, "withDecimals") +
-            Number(dailyAPR)
-          ).toFixed(2);
-
-          const APY = calculateAPY(APR).toFixed(2);
-
-          const APRWithoutFees = formatFromBigInt(
-            String(vault.apr),
-            3,
-            "withDecimals"
-          ).toFixed(2);
-          const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
-
-          const assetsProportions = vault.assetsProportions
-            ? vault.assetsProportions.map((proportion: any) =>
-                Math.round(Number(formatUnits(proportion, 16)))
-              )
-            : [];
-
-          const assetsPromise = Promise.all(
-            vault.strategyAssets.map(async (strategyAsset: any) => {
-              const token = getTokenData(strategyAsset);
-              if (token) {
-                const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-                  tokenAsset.addresses.includes(token.address as TAddress)
-                );
-                return {
-                  address: token?.address,
-                  logo: token?.logoURI,
-                  symbol: token?.symbol,
-                  name: token?.name,
-                  color: tokenExtended?.color,
-                };
-              }
-            })
-          );
-
-          const assets = await assetsPromise;
-
-          vaults[vault.id] = {
-            address: vault.id,
-            name: vault.name,
-            symbol: vault.symbol,
-            type: vault.vaultType,
-            strategy: vault.strategyId,
-            shareprice: vault.sharePrice,
-            tvl: vault.tvl,
-            apr: String(APR),
-            apy: APY,
-            aprWithoutFees: APRWithoutFees,
-            apyWithoutFees: APYWithoutFees,
-            strategyApr: vault.apr,
-            strategySpecific: vault.strategySpecific,
-            balance: "",
-            lastHardWork: vault.lastHardWork,
-            daily: (Number(APR) / 365).toFixed(2),
-            monthlyUnderlyingApr: dailyAPR,
-            assets,
-            assetsProportions,
-            assetsWithApr: assetsWithApr,
-            assetsAprs: assetsAprs,
-            strategyInfo: strategyInfo,
-            il: strategyInfo?.il?.rate,
-            underlying: vault.underlying,
-            strategyAddress: vault.strategy,
-            strategyDescription: vault.strategyDescription,
-            status: Number(vault.vaultStatus),
-            version: vault.version,
-            strategyVersion: strategyEntity.version,
-            rebalances: rebalances,
-          };
-
-          return vaults;
-        },
-        Promise.resolve({})
-      );
-
-      tokens.set(graphResponse.data.data.platformEntities[0].bcAssets);
-      vaults.set(graphVaults);
-      isVaultsLoaded.set(true);
     }
+
     const strategyTypeEntities =
       graphResponse.data.data.strategyConfigEntities.reduce(
         (versions: any, version: any) => {
@@ -627,9 +652,9 @@ const AppStore = (props: React.PropsWithChildren) => {
       },
       {}
     );
-
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
+
     if (graphResponse?.data?.data?.platformEntities[0]?.version)
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
