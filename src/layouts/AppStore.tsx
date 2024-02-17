@@ -26,6 +26,8 @@ import {
   strategyTypes,
   transactionSettings,
   hideFeeApr,
+  reload,
+  error,
 } from "@store";
 import {
   wagmiConfig,
@@ -64,6 +66,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
+  const $reload = useStore(reload);
 
   let stabilityAPIData: any;
   const getLocalStorageData = () => {
@@ -292,6 +295,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const getData = async () => {
     let graphResponse: any;
     let retries = 0;
+    let apiError: string = "";
     const maxRetries = 2;
 
     while (retries < maxRetries) {
@@ -303,13 +307,15 @@ const AppStore = (props: React.PropsWithChildren) => {
           throw new Error("GRAPH API ERROR");
         }
         break;
-      } catch (error) {
+      } catch (error: any) {
         retries++;
+        apiError = error.message as string;
         console.log("GRAPH API ERROR:", error);
       }
     }
 
     if (retries >= maxRetries) {
+      error.set(apiError);
       throw new Error(
         "Maximum number of retry attempts reached for graph request"
       );
@@ -659,6 +665,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
   const fetchAllData = async () => {
+    error.set("");
     getLocalStorageData();
     await getDataFromStabilityAPI();
     getData();
@@ -670,7 +677,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   useEffect(() => {
     fetchAllData();
-  }, [address, chain?.id, isConnected, $lastTx]);
+  }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (
     <WagmiConfig config={wagmiConfig}>

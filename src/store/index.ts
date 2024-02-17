@@ -37,6 +37,9 @@ const tokens = atom<TAddress[] | undefined>();
 
 const connected = atom<boolean | undefined>();
 
+const reload = atom<boolean>(false);
+const error = atom<string>("");
+
 const apiData = atom<any>();
 const vaultTypes = atom();
 const strategyTypes = atom();
@@ -72,4 +75,6 @@ export {
   transactionSettings,
   platformVersion,
   hideFeeApr,
+  reload,
+  error,
 };

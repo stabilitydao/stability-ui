@@ -12,6 +12,7 @@ import {
   Loader,
   AssetsSkeleton,
   ShareSkeleton,
+  ErrorMessage,
 } from "./VaultUtils";
 
 import { Toast } from "./VaultUtils/Toast";
@@ -30,4 +31,5 @@ export {
   ShareSkeleton,
   AssetsSkeleton,
   Toast,
+  ErrorMessage,
 };
