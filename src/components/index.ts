@@ -13,6 +13,7 @@ import {
   AssetsSkeleton,
   ShareSkeleton,
   ErrorMessage,
+  Skeleton,
 } from "./VaultUtils";
 
 import { Toast } from "./VaultUtils/Toast";
@@ -32,4 +33,5 @@ export {
   AssetsSkeleton,
   Toast,
   ErrorMessage,
+  Skeleton,
 };

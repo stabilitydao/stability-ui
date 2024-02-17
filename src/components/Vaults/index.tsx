@@ -16,7 +16,7 @@ import {
   ErrorMessage,
 } from "@components";
 
-import { vaults, isVaultsLoaded, hideFeeApr } from "@store";
+import { vaults, isVaultsLoaded, hideFeeApr, error } from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -36,6 +36,7 @@ import type {
 const Vaults = () => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
+  const $error = useStore(error);
   const $hideFeeAPR = useStore(hideFeeApr);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
@@ -288,7 +289,7 @@ const Vaults = () => {
 
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <Loader width="100" height="100" color="#ccb3f3" />
+      {!$error && <Loader width="100" height="100" color="#ccb3f3" />}
       <ErrorMessage />
     </div>
   ) : localVaults?.length ? (

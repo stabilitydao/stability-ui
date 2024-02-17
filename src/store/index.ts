@@ -39,6 +39,7 @@ const connected = atom<boolean | undefined>();
 
 const reload = atom<boolean>(false);
 const error = atom<string>("");
+const isWeb3Load = atom<boolean>(false);
 
 const apiData = atom<any>();
 const vaultTypes = atom();
@@ -77,4 +78,5 @@ export {
   hideFeeApr,
   reload,
   error,
+  isWeb3Load,
 };

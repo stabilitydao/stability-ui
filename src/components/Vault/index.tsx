@@ -10,9 +10,9 @@ import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
 import { HistoricalRate } from "./HistoricalRate";
-import { Toast, Loader } from "@components";
+import { Toast, Loader, ErrorMessage } from "@components";
 
-import { vaultData, vaults, vaultAssets } from "@store";
+import { vaultData, vaults, vaultAssets, error } from "@store";
 
 import { wagmiConfig } from "@web3";
 
@@ -26,6 +26,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   const $vaultData = useStore(vaultData);
   const $vaultAssets: any = useStore(vaultAssets);
   const $vaults = useStore(vaults);
+
+  const $error = useStore(error);
 
   const [localVault, setLocalVault] = useState<any>();
 
@@ -62,7 +64,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     </WagmiConfig>
   ) : (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <Loader width="100" height="100" color="#ccb3f3" />
+      {!$error && <Loader width="100" height="100" color="#ccb3f3" />}
+      <ErrorMessage />
     </div>
   );
 };
