@@ -36,8 +36,18 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
+
+  if ($error.state && $error.type === "API") {
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <ErrorMessage type="API" />
+      </div>
+    );
+  }
+
   return vault && localVault ? (
     <WagmiConfig config={wagmiConfig}>
+      <ErrorMessage type="WEB3" />
       <main className="w-full mx-auto">
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
@@ -64,8 +74,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     </WagmiConfig>
   ) : (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      {!$error && <Loader width="100" height="100" color="#ccb3f3" />}
-      <ErrorMessage />
+      <Loader width="100" height="100" color="#ccb3f3" />
     </div>
   );
 };

@@ -287,13 +287,21 @@ const Vaults = () => {
     initVaults();
   }, [$vaults]);
 
+  if ($error.state && $error.type === "API") {
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <ErrorMessage type="API" />
+      </div>
+    );
+  }
+
   return !$isVaultsLoaded || !isLocalVaultsLoaded ? (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      {!$error && <Loader width="100" height="100" color="#ccb3f3" />}
-      <ErrorMessage />
+      <Loader width="100" height="100" color="#ccb3f3" />
     </div>
   ) : localVaults?.length ? (
     <>
+      <ErrorMessage type="WEB3" />
       <Portfolio vaults={localVaults} />
       <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input

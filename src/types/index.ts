@@ -296,6 +296,14 @@ type TIQMFAlm = {
   totalUSD: string;
 };
 
+//// EVENTS
+
+type TError = {
+  state: boolean;
+  type: string;
+  description: string;
+};
+
 export type {
   TPlatformData,
   TUserBalance,
@@ -337,4 +345,5 @@ export type {
   TToast,
   TIQMFAlm,
   TChartData,
+  TError,
 };

@@ -12,6 +12,7 @@ import type {
   TVaultAssets,
   TAddress,
   TSettings,
+  TError,
 } from "@types";
 
 // atoms
@@ -38,7 +39,7 @@ const tokens = atom<TAddress[] | undefined>();
 const connected = atom<boolean | undefined>();
 
 const reload = atom<boolean>(false);
-const error = atom<string>("");
+const error = atom<TError>({ state: false, type: "", description: "" });
 const isWeb3Load = atom<boolean>(false);
 
 const apiData = atom<any>();

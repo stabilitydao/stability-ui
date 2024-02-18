@@ -316,7 +316,8 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
 
     if (retries >= maxRetries) {
-      error.set(apiError);
+      error.set({ state: true, type: "API", description: apiError });
+
       throw new Error(
         "Maximum number of retry attempts reached for graph request"
       );
@@ -644,7 +645,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         isVaultsLoaded.set(true);
       } catch (txError: any) {
         console.log("BLOCKCHAIN ERROR:", txError);
-        error.set(txError.message);
+        error.set({ state: true, type: "WEB3", description: txError.message });
       }
       isWeb3Load.set(false);
     }
@@ -673,7 +674,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
   const fetchAllData = async () => {
-    error.set("");
+    error.set({ state: false, type: "", description: "" });
     getLocalStorageData();
     await getDataFromStabilityAPI();
     getData();
