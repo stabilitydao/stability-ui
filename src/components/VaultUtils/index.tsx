@@ -5,6 +5,8 @@ import { VaultType } from "./VaultType";
 import { Loader } from "./Loader";
 import { AssetsSkeleton } from "./AssetsSkeleton";
 import { ShareSkeleton } from "./ShareSkeleton";
+import { Skeleton } from "./Skeleton";
+import { ErrorMessage } from "./ErrorMessage";
 
 export {
   AssetsProportion,
@@ -14,4 +16,6 @@ export {
   Loader,
   AssetsSkeleton,
   ShareSkeleton,
+  ErrorMessage,
+  Skeleton,
 };

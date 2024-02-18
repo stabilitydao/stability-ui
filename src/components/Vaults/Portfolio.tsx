@@ -5,7 +5,15 @@ import { formatUnits } from "viem";
 
 import { FeeAPRModal } from "./FeeAPRModal";
 
-import { connected, visible, platformVersion, hideFeeApr } from "@store";
+import { Skeleton } from "@components";
+
+import {
+  connected,
+  visible,
+  platformVersion,
+  hideFeeApr,
+  isWeb3Load,
+} from "@store";
 
 import { formatNumber, formatFromBigInt, calculateAPY } from "@utils";
 
@@ -20,6 +28,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const $visible = useStore(visible);
   const $platformVersion = useStore(platformVersion);
   const $hideFeeAPR = useStore(hideFeeApr);
+  const $isWeb3Load = useStore(isWeb3Load);
 
   const [hideFee, setHideFee] = useState($hideFeeAPR);
   const [feeAPRModal, setFeeAPRModal] = useState(false);
@@ -214,15 +223,21 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           </div>
         </div>
         <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
-          <div className="flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
+          <div className="hidden md:flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DEPOSITED
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible
-                  ? `$${formatNumber(portfolio.deposited, "format")}`
-                  : "****"}
+                {$isWeb3Load ? (
+                  <Skeleton height={28.8} width={100} />
+                ) : (
+                  <>
+                    {$visible
+                      ? `$${formatNumber(portfolio.deposited, "format")}`
+                      : "****"}
+                  </>
+                )}
               </p>
             </div>
             <div className="max-w-[130px] w-full md:max-w-[150px]  flex flex-col items-start">
@@ -230,7 +245,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 DAILY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? dailyYield : "****"}
+                {$isWeb3Load ? (
+                  <Skeleton height={28.8} width={100} />
+                ) : (
+                  <>{$visible ? dailyYield : "****"}</>
+                )}
               </p>
             </div>
             <div className="w-[120px] md:w-[180px] flex flex-col items-start">
@@ -238,7 +257,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 MONTHLY YIELD
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? monthlyYield : "****"}
+                {$isWeb3Load ? (
+                  <Skeleton height={28.8} width={100} />
+                ) : (
+                  <>{$visible ? monthlyYield : "****"}</>
+                )}
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
@@ -246,7 +269,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 AVG. APR
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? avgApr : "****"}
+                {$isWeb3Load ? (
+                  <Skeleton height={28.8} width={100} />
+                ) : (
+                  <>{$visible ? avgApr : "****"}</>
+                )}
               </p>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
@@ -254,8 +281,82 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 AVG. APY
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">
-                {$visible ? avgApy : "****"}
+                {$isWeb3Load ? (
+                  <Skeleton height={28.8} width={100} />
+                ) : (
+                  <>{$visible ? avgApy : "****"}</>
+                )}
               </p>
+            </div>
+          </div>
+          <div className="md:hidden flex items-start justify-between whitespace-nowrap w-full">
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col items-start">
+                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                  DEPOSITED
+                </h2>
+                <p className="text-[1rem] md:text-[1.125rem]">
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    <>
+                      {$visible
+                        ? `$${formatNumber(portfolio.deposited, "format")}`
+                        : "****"}
+                    </>
+                  )}
+                </p>
+              </div>
+              <div className="flex flex-col items-start">
+                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                  MONTHLY YIELD
+                </h2>
+                <p className="text-[1rem] md:text-[1.125rem]">
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    <>{$visible ? monthlyYield : "****"}</>
+                  )}
+                </p>
+              </div>
+              <div className="flex flex-col items-start">
+                <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
+                  AVG. APY
+                </h2>
+                <p className="text-[1rem] md:text-[1.125rem]">
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    <>{$visible ? avgApy : "****"}</>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col items-start">
+                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                  DAILY YIELD
+                </h2>
+                <p className="text-[1rem] md:text-[1.125rem]">
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    <>{$visible ? dailyYield : "****"}</>
+                  )}
+                </p>
+              </div>
+              <div className="flex flex-col items-start">
+                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                  AVG. APR
+                </h2>
+                <p className="text-[1rem] md:text-[1.125rem]">
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    <>{$visible ? avgApr : "****"}</>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
           <div>

@@ -10,9 +10,9 @@ import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
 import { HistoricalRate } from "./HistoricalRate";
-import { Toast, Loader } from "@components";
+import { Toast, Loader, ErrorMessage } from "@components";
 
-import { vaultData, vaults, vaultAssets } from "@store";
+import { vaultData, vaults, vaultAssets, error } from "@store";
 
 import { wagmiConfig } from "@web3";
 
@@ -27,6 +27,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   const $vaultAssets: any = useStore(vaultAssets);
   const $vaults = useStore(vaults);
 
+  const $error = useStore(error);
+
   const [localVault, setLocalVault] = useState<any>();
 
   useEffect(() => {
@@ -34,8 +36,18 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
   }, [$vaults, $vaultData, $vaultAssets]);
+
+  if ($error.state && $error.type === "API") {
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <ErrorMessage type="API" />
+      </div>
+    );
+  }
+
   return vault && localVault ? (
     <WagmiConfig config={wagmiConfig}>
+      <ErrorMessage type="WEB3" />
       <main className="w-full mx-auto">
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">

@@ -71,8 +71,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   };
 
   useEffect(() => {
-    if (!$connected || !vault) return;
-
+    if (!$connected || !vault || !$vaultTypes || !$strategyTypes) return;
     // @ts-ignore
     if ($vaultTypes[vault?.type] !== vault.version) {
       setNeedVaultUpgrade(true);

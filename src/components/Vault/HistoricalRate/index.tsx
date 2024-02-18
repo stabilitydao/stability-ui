@@ -26,7 +26,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   };
 
   const [chartData, setChartData] = useState<any>([]);
-  const [activeChart, setActiveChart] = useState<any>({});
+  const [activeChart, setActiveChart] = useState<any>(false);
   const [timeline, setTimeline] = useState<TSegment>(
     timelineSegments.WEEK as TSegment
   );
@@ -250,7 +250,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       </div>
 
       <div className="py-3 px-4">
-        <Chart chart={activeChart} APRType={APRType} />
+        {activeChart && <Chart chart={activeChart} APRType={APRType} />}
       </div>
       <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p
