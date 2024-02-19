@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { useNetwork, useSwitchNetwork } from "wagmi";
+import { useNetwork, useSwitchNetwork, useAccount } from "wagmi";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import {
   account,
   assetsBalances,
@@ -22,9 +23,9 @@ import type { TAddress } from "@types";
 
 const Wallet = () => {
   const { open } = useWeb3Modal();
-
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
+  const { connector } = useAccount();
 
   const $account = useStore(account);
   const $network = useStore(network);
@@ -35,6 +36,7 @@ const Wallet = () => {
 
   const [userBalance, setUserBalance] = useState<number>(0);
   const [userAssets, setUserAssets] = useState<any>();
+  const [providerImage, setProviderImage] = useState<string>("");
 
   const maticChain = CHAINS.find((item) => item.name === $network);
 
@@ -146,8 +148,13 @@ const Wallet = () => {
 
   useEffect(() => {
     initProfile();
+    if (connector) {
+      setProviderImage(
+        //@ts-ignore
+        connector.storage["@w3m/connected_wallet_image_url"] as string
+      );
+    }
   }, [$assetsBalances]);
-
   return (
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
       {maticChain && (
@@ -173,9 +180,12 @@ const Wallet = () => {
         </button>
       )}
       <button
-        className="bg-button py-1 px-2 rounded-md sm:mx-4 w-[120px]"
+        className="bg-button py-1 px-2 rounded-md sm:mx-4 w-[120px] flex items-center gap-1 text-[14px]"
         onClick={() => openProfile()}
       >
+        {providerImage && (
+          <img className="w-5" src={providerImage} alt="providerImage" />
+        )}
         {$account
           ? `${
               $visible
