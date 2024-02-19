@@ -135,42 +135,93 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
     const NOW = Math.floor(Date.now() / 1000);
     const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
+
     switch (chartType) {
       case "APR":
-        const APRChartData = chartData
-          .filter(
-            (obj: TChartData) =>
-              obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
-          )
-          .map((obj: TChartData) => ({
-            unixTimestamp: obj.unixTimestamp,
-            timestamp: obj.timestamp,
-            date: obj.date,
-            APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
-          }));
+        const APRArr = chartData.filter(
+          (obj: TChartData) =>
+            obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        const APRWidthPercent =
+          (APRArr[APRArr.length - 1].unixTimestamp - APRArr[0].unixTimestamp) /
+          500;
+
+        let sum = 0;
+        const APRDifferences = APRArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = APRArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          sum += diff;
+          return Math.floor(sum / APRWidthPercent);
+        });
+
+        const APRChartData = APRArr.map((obj: TChartData, index: number) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
+          x: APRDifferences[index],
+          y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
+        }));
         setActiveChart({
           name: "APR",
           data: APRChartData,
         });
         break;
       case "TVL":
-        const TVLChartData = chartData
-          .filter((obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME)
-          .map((obj: TChartData) => ({
-            unixTimestamp: obj.unixTimestamp,
-            timestamp: obj.timestamp,
-            date: obj.date,
-            TVL: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
-          }));
+        const TVLArr = chartData.filter(
+          (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+        );
+        const TVLWidthPercent =
+          (TVLArr[TVLArr.length - 1].unixTimestamp - TVLArr[0].unixTimestamp) /
+          500;
+
+        let TSum = 0;
+
+        const TVLDifferences = TVLArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = TVLArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          TSum += diff;
+          return Math.floor(TSum / TVLWidthPercent);
+        });
+
+        const TVLChartData = TVLArr.map((obj: TChartData, index: number) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          TVL: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+          x: TVLDifferences[index],
+          y: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+        }));
         setActiveChart({
           name: "TVL",
           data: TVLChartData,
         });
         break;
       case "sharePrice":
-        const priceChartData = chartData
-          .filter((obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME)
-          .map((obj: TChartData) => ({
+        const PriceArr = chartData.filter(
+          (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        const PriceWidthPercent =
+          (PriceArr[PriceArr.length - 1].unixTimestamp -
+            PriceArr[0].unixTimestamp) /
+          500;
+
+        let PSum = 0;
+
+        const PriceDifferences = PriceArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = PriceArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          PSum += diff;
+          return Math.floor(PSum / PriceWidthPercent);
+        });
+
+        const priceChartData = PriceArr.map(
+          (obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
             date: obj.date,
@@ -179,7 +230,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               18,
               "withDecimals"
             ),
-          }));
+            x: PriceDifferences[index],
+            y: formatFromBigInt(obj.sharePrice as number, 18, "withDecimals"),
+          })
+        );
         setActiveChart({
           name: "sharePrice",
           data: priceChartData,
