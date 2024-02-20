@@ -460,7 +460,7 @@ const Vaults = () => {
                             >
                               {vault.strategyInfo.shortName}
                             </span>
-                            <span className="px-2 rounded-r-[10px] bg-[#2b3139] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
+                            <span className="px-2 rounded-r-[10px] bg-[#272451] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
                               <span className="flex min-w-[50px] justify-center w-[50px]">
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (

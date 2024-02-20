@@ -152,7 +152,7 @@ const Wallet = () => {
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
       {maticChain && (
         <button
-          className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
+          className="bg-[#272451] sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
@@ -172,18 +172,25 @@ const Wallet = () => {
           <p>Switch Network</p>
         </button>
       )}
-      <button
-        className="bg-button py-1 px-2 rounded-md sm:mx-4 w-[120px]"
-        onClick={() => openProfile()}
-      >
-        {$account
-          ? `${
+      {$account ? (
+        <button
+          className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] lowercase"
+          onClick={() => openProfile()}
+        >
+          {`${
               $visible
                 ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
                 : "*************"
-            }`
-          : "Connect wallet"}
-      </button>
+            }`}
+        </button>
+      ) : (
+        <button
+          className="bg-[#603bdb] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] lowercase pb-1.5"
+          onClick={() => openProfile()}
+        >
+         Connect wallet
+        </button>
+      )}
     </div>
   );
 };
