@@ -1,4 +1,4 @@
-import { configureChains, createConfig, useConfig } from "wagmi";
+import { configureChains, createConfig } from "wagmi";
 import { defineChain } from "viem";
 import { publicProvider } from "wagmi/providers/public";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
@@ -73,7 +73,12 @@ const wagmiConfig = createConfig({
       },
     }),
     new EIP6963Connector({ chains }),
-    new InjectedConnector({ chains, options: { shimDisconnect: true } }),
+    new InjectedConnector({
+      chains,
+      options: {
+        shimDisconnect: true,
+      },
+    }),
     new CoinbaseWalletConnector({
       chains,
       options: { appName: metadata.name },
@@ -81,7 +86,6 @@ const wagmiConfig = createConfig({
   ],
   publicClient,
 });
-
 export {
   platform,
   walletConnectProjectId,
