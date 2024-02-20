@@ -455,12 +455,12 @@ const Vaults = () => {
                                 backgroundColor: vault.strategyInfo.bgColor,
                                 color: vault.strategyInfo.color,
                               }}
-                              className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
+                              className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[58px]"
                               title={vault.strategyInfo.name}
                             >
                               {vault.strategyInfo.shortName}
                             </span>
-                            <span className="px-2 rounded-r-[10px] bg-[#272451] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
+                            <span className="px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
                               <span className="flex min-w-[50px] justify-center w-[50px]">
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (

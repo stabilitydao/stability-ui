@@ -152,12 +152,12 @@ const Wallet = () => {
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
       {maticChain && (
         <button
-          className="bg-[#272451] sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
+          className="bg-[#272451] sm:py-1 px-3 rounded-xl mx-2 sm:mx-4 flex items-center sm:gap-1"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
           <img
-            className="w-6 h-6 rounded-full sm:mx-1"
+            className="w-5 h-5 rounded-full sm:mx-1"
             src={maticChain?.logoURI}
             alt={maticChain?.name}
           />
@@ -166,7 +166,7 @@ const Wallet = () => {
       )}
       {chain && chain?.id !== 137 && (
         <button
-          className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
+          className="bg-button sm:py-1 px-2 rounded-xl mx-2 sm:mx-4 flex items-center sm:gap-1"
           onClick={() => switchNetwork?.(137)}
         >
           <p>Switch Network</p>
