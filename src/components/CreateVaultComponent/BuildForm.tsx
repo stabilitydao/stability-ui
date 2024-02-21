@@ -2,9 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { useStore } from "@nanostores/react";
 
 import { usePublicClient } from "wagmi";
-import { writeContract } from "@wagmi/core";
 import { formatUnits, parseUnits, maxUint256 } from "viem";
-import { readContract } from "viem/actions";
+import {
+  readContract,
+  writeContract,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
 
 import { Loader } from "@components";
 
@@ -20,6 +23,8 @@ import {
 
 import type { TInitParams, TAddress, TInputItem } from "@types";
 import { getTokenData } from "@utils";
+
+import { wagmiConfig } from "@web3";
 
 import tokensJson from "../../stability.tokenlist.json";
 
@@ -138,7 +143,7 @@ const BuildForm = ({
     if ($platformData) {
       const allowances: any[] = await Promise.all(
         tokens.map(async (token: any) => {
-          const response: any = await readContract(_publicClient, {
+          const response: any = await readContract(wagmiConfig, {
             address: token.address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -166,16 +171,16 @@ const BuildForm = ({
     if ($platformData && rewardingVaultApprove?.length) {
       try {
         rewardingVaultApprove.map(async (token: any) => {
-          const approve = await writeContract({
+          const approve = await writeContract(wagmiConfig, {
             address: token.address,
             abi: ERC20ABI,
             functionName: "approve",
             args: [$platformData.factory, maxUint256],
           });
           setLoader(true);
-          const transaction = await _publicClient.waitForTransactionReceipt(
-            approve
-          );
+          const transaction = await waitForTransactionReceipt(wagmiConfig, {
+            approve,
+          });
           if (transaction.status === "success") {
             lastTx.set(transaction?.transactionHash);
             setLoader(false);
@@ -199,7 +204,7 @@ const BuildForm = ({
 
     if ($platformData) {
       try {
-        const deployVaultAndStrategy = await writeContract({
+        const deployVaultAndStrategy = await writeContract(wagmiConfig, {
           address: $platformData.factory,
           abi: FactoryABI,
           functionName: "deployVaultAndStrategy",
@@ -214,9 +219,9 @@ const BuildForm = ({
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          deployVaultAndStrategy
-        );
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          deployVaultAndStrategy,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -235,7 +240,7 @@ const BuildForm = ({
   //// compounding vault
   const checkAllowance = async () => {
     if (needCheckAllowance && $platformData) {
-      const allowance = await readContract(_publicClient, {
+      const allowance = await readContract(wagmiConfig, {
         address: $platformData.buildingPayPerVaultToken,
         abi: ERC20ABI,
         functionName: "allowance",
@@ -248,7 +253,7 @@ const BuildForm = ({
     //todo combine deploy and deployRewardingVault
     if ($platformData) {
       try {
-        const deployVaultAndStrategy = await writeContract({
+        const deployVaultAndStrategy = await writeContract(wagmiConfig, {
           address: $platformData.factory,
           abi: FactoryABI,
           functionName: "deployVaultAndStrategy",
@@ -263,9 +268,9 @@ const BuildForm = ({
           ],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          deployVaultAndStrategy
-        );
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          deployVaultAndStrategy,
+        });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -284,20 +289,20 @@ const BuildForm = ({
   const approve = async () => {
     if ($platformData) {
       try {
-        const approve = await writeContract({
+        const approve = await writeContract(wagmiConfig, {
           address: $platformData.buildingPayPerVaultToken,
           abi: ERC20ABI,
           functionName: "approve",
           args: [$platformData.factory, maxUint256],
         });
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt(
-          approve
-        );
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          approve,
+        });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
           setAllowance(
-            (await readContract(_publicClient, {
+            (await readContract(wagmiConfig, {
               address: $platformData.buildingPayPerVaultToken,
               abi: ERC20ABI,
               functionName: "allowance",

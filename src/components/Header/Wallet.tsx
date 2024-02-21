@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { useNetwork, useSwitchNetwork, useAccount, useConnect } from "wagmi";
+import { useSwitchChain, useAccount } from "wagmi";
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useWalletClient } from "wagmi";
 
 import {
   account,
@@ -24,8 +24,8 @@ import type { TAddress } from "@types";
 
 const Wallet = () => {
   const { open } = useWeb3Modal();
-  const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { chain } = useAccount();
+  const { switchChain } = useSwitchChain();
   const { connector } = useAccount();
 
   const $account = useStore(account);
@@ -40,8 +40,6 @@ const Wallet = () => {
   const [providerImage, setProviderImage] = useState<string>("");
 
   const maticChain = CHAINS.find((item) => item.name === $network);
-
-  const result = useWalletClient();
 
   const checkPM = async () => {
     const balance = (await $publicClient?.readContract({
@@ -135,13 +133,27 @@ const Wallet = () => {
 
   useEffect(() => {
     initProfile();
-    if (connector) {
-      setProviderImage(
-        //@ts-ignore
-        connector.storage["@w3m/connected_wallet_image_url"] as string
-      );
-    }
   }, [$assetsBalances]);
+  useEffect(() => {
+    if (connector) {
+      const connectorIdToImage = {
+        walletConnect: "/public/wallet-connect.svg",
+        "io.metamask": "/public/metamask.svg",
+        "com.trustwallet.app": "/public/trustwallet.svg",
+      };
+
+      const defaultImage = connector?.icon || "";
+
+      const providerImage =
+        connectorIdToImage[connector.id as keyof typeof connectorIdToImage] ||
+        defaultImage;
+
+      setProviderImage(providerImage);
+    }
+  }, [$assetsBalances, $account, connector]);
+  useEffect(() => {
+    localStorage.removeItem("@w3m/connected_wallet_image_url");
+  }, []);
   return (
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
       {maticChain && (
@@ -161,7 +173,7 @@ const Wallet = () => {
       {chain && chain?.id !== 137 && (
         <button
           className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
-          onClick={() => switchNetwork?.(137)}
+          onClick={() => switchChain({ chainId: 137 })}
         >
           <p>Switch Network</p>
         </button>
