@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import { WagmiProvider } from "wagmi";
-
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-
 import { VaultBar } from "./VaultBar";
 import { VaultActionForm } from "./VaultActionForm";
 import { StatisticBar } from "./StatisticBar";
@@ -12,18 +8,10 @@ import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
 import { HistoricalRate } from "./HistoricalRate";
+import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
 
-import {
-  vaultData,
-  vaults,
-  vaultAssets,
-  error,
-  queryClient,
-  persister,
-} from "@store";
-
-import { wagmiConfig } from "@web3";
+import { vaultData, vaults, vaultAssets, error } from "@store";
 
 import type { TAddress } from "@types";
 
@@ -55,37 +43,32 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   }
 
   return vault && localVault ? (
-    <WagmiProvider config={wagmiConfig}>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{ persister }}
-      >
-        <main className="w-full mx-auto">
-          <VaultBar vault={localVault} />
-          <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
-            <div className="w-full md:w-1/2 lg:w-3/5 ">
-              <StatisticBar vault={localVault} />
+    <WagmiLayout>
+      <main className="w-full mx-auto">
+        <VaultBar vault={localVault} />
+        <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
+          <div className="w-full md:w-1/2 lg:w-3/5 ">
+            <StatisticBar vault={localVault} />
 
-              <HistoricalRate
-                address={vault.toLowerCase() as TAddress}
-                vaultStrategy={localVault.strategy}
-              />
+            <HistoricalRate
+              address={vault.toLowerCase() as TAddress}
+              vaultStrategy={localVault.strategy}
+            />
 
-              <Strategy vault={localVault} />
+            <Strategy vault={localVault} />
 
-              <Assets assets={localVault?.assets} />
-              <Toast />
-            </div>
-            <div className="w-full md:w-1/2 lg:w-2/5">
-              <UserBar vault={localVault} />
-
-              <VaultActionForm vault={localVault} />
-            </div>
+            <Assets assets={localVault?.assets} />
+            <Toast />
           </div>
-        </main>
-        <ErrorMessage type="WEB3" />
-      </PersistQueryClientProvider>
-    </WagmiProvider>
+          <div className="w-full md:w-1/2 lg:w-2/5">
+            <UserBar vault={localVault} />
+
+            <VaultActionForm vault={localVault} />
+          </div>
+        </div>
+      </main>
+      <ErrorMessage type="WEB3" />
+    </WagmiLayout>
   ) : (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <Loader width="100" height="100" color="#ccb3f3" />

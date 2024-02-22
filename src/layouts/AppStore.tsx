@@ -1,13 +1,16 @@
 import type React from "react";
+
 import { useEffect } from "react";
 import { formatUnits } from "viem";
+
 import axios from "axios";
+
 import { useStore } from "@nanostores/react";
 
-import { useAccount, usePublicClient, WagmiProvider } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { simulateContract, readContract } from "@wagmi/core";
 
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { WagmiLayout } from "@layouts";
 
 import {
   account,
@@ -31,8 +34,6 @@ import {
   reload,
   error,
   isWeb3Load,
-  queryClient,
-  persister,
 } from "@store";
 import {
   wagmiConfig,
@@ -149,7 +150,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           );
           const timestamps = data.lastFeeAMLEntities[0].timestamps;
 
-          const collectFees = await simulateContract(wagmiConfig, {
+          const collectFees = await _publicClient.simulateContract({
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "collectFees",
@@ -694,14 +695,9 @@ const AppStore = (props: React.PropsWithChildren) => {
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{ persister }}
-      >
-        <div className="flex flex-col flex-1">{props.children}</div>
-      </PersistQueryClientProvider>
-    </WagmiProvider>
+    <WagmiLayout>
+      <div className="flex flex-col flex-1">{props.children}</div>
+    </WagmiLayout>
   );
 };
 

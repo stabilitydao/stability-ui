@@ -179,7 +179,7 @@ const BuildForm = ({
           });
           setLoader(true);
           const transaction = await waitForTransactionReceipt(wagmiConfig, {
-            approve,
+            hash: approve,
           });
           if (transaction.status === "success") {
             lastTx.set(transaction?.transactionHash);
@@ -220,7 +220,7 @@ const BuildForm = ({
         });
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          deployVaultAndStrategy,
+          hash: deployVaultAndStrategy,
         });
 
         if (transaction.status === "success") {
@@ -269,7 +269,7 @@ const BuildForm = ({
         });
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          deployVaultAndStrategy,
+          hash: deployVaultAndStrategy,
         });
 
         if (transaction.status === "success") {
@@ -297,7 +297,7 @@ const BuildForm = ({
         });
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          approve,
+          hash: approve,
         });
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);

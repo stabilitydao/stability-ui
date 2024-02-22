@@ -569,7 +569,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           setLoader(true);
           const transaction = await waitForTransactionReceipt(wagmiConfig, {
             confirmations: 5,
-            hash: assetApprove?.hash,
+            hash: assetApprove,
           });
 
           if (transaction.status === "success") {
@@ -626,7 +626,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: assetApprove?.hash,
+          hash: assetApprove,
         });
 
         if (transaction.status === "success") {
@@ -672,7 +672,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         const out = shares - (shares * decimalPercent) / 100n;
 
-        const txToken = {
+        const txToken: any = {
           [underlyingToken?.address]: {
             amount: amount,
             symbol: underlyingToken?.symbol,
@@ -713,11 +713,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: depositAssets?.hash,
+          hash: depositAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: depositAssets?.hash,
+          hash: depositAssets,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
@@ -780,7 +780,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ],
           account: $account as TAddress,
         });
-        console.log("gas", gas);
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
         setNeedConfirm(true);
         zapDeposit = await writeContract(wagmiConfig, {
@@ -800,17 +799,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        console.log("zap", zapDeposit);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: zapDeposit?.hash,
+          hash: zapDeposit,
         });
-
-        console.log("tx", transaction);
 
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: zapDeposit?.hash,
+          hash: zapDeposit,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
@@ -944,6 +940,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         args: [$platformData.zap, approveSum],
         account: $account as TAddress,
       });
+
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(settings.gasLimit))
       );
@@ -959,7 +956,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setLoader(true);
       const transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: assetApprove?.hash,
+        hash: assetApprove,
       });
 
       if (transaction.status === "success") {
@@ -1053,7 +1050,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: assetApprove?.hash,
+          hash: assetApprove,
         });
 
         if (transaction.status === "success") {
@@ -1213,14 +1210,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setLoader(true);
       transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: depositAssets?.hash,
+        hash: depositAssets,
       });
       if (transaction.status === "success") {
         resetFormAfterTx();
       }
       setLocalStoreHash({
         timestamp: new Date().getTime(),
-        hash: depositAssets?.hash,
+        hash: depositAssets,
         status: transaction?.status || "reverted",
         type: "deposit",
         vault: vault.address,
@@ -1302,11 +1299,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
@@ -1381,11 +1378,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
@@ -1465,11 +1462,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: zapWithdraw?.hash,
+          hash: zapWithdraw,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: zapWithdraw?.hash,
+          hash: zapWithdraw,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
