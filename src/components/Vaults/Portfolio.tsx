@@ -129,7 +129,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
       <div className="p-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h3 className="text-[1.5rem] font-medium">Portfolio</h3>
+            <h3 className="text-[1.4rem] font-medium">Portfolio</h3>
             <div className="cursor-pointer">
               {!$visible && (
                 <svg
@@ -181,7 +181,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 ) : (
                   <div className="w-[10px] h-[10px] rounded-full blur-[2px] bg-[#443C28]"></div>
                 )}
-                <p className="text-[12px]">Hide swap fee APR</p>
+                <p className="text-[12px]">Hide swap fees</p>
                 <div className="tooltip">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +203,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                   </svg>
                   <div className="visible__tooltip toLeft">
                     <div className="flex items-start flex-col">
-                      <p className="text-[14px] flex flex-col gap-1 w-full">
+                      <p className="text-[14px] flex flex-col gap-1 w-full text-left">
                         During times of high volatility, the majority of pool
                         swap fees may be used to cover Impermanent Losses (IL)
                         once ALMs rebalance positions. Excluding swap fees
@@ -217,12 +217,24 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </div>
             </button>
 
-            <p className="text-end text-[1rem] lg:block hidden font-bold w-[250px]">
-              Stability Platform {$platformVersion}
+            <p className="text-end text-[1.4rem] lg:flex items-center hidden font-medium w-[130px] relative justify-end">
+              <span>Platform</span>
+              <div className="tooltip-info inline-flex">
+                <div className="ml-1.5 cursor-default flex rounded-full border-[2px] border-[#65656e] text-[#65656e] text-[12px] w-[18px] h-[18px] justify-center items-center">i</div>
+                  <div className="visible__tooltip toLeft-info">
+                    <div className="flex items-start flex-col">
+                      <p className="text-[14px] flex flex-col gap-1 w-full text-left">
+                        <div>Stability Platform v{$platformVersion}</div>
+                        <div></div>
+                      </p>
+                    </div>
+                    <i></i>
+                  </div>
+                </div>
             </p>
           </div>
         </div>
-        <div className="flex items-center justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
+        <div className="flex items-start justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
           <div className="hidden md:flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
@@ -360,15 +372,18 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
           <div>
-            <p className="text-[1rem] text-end font-bold lg:hidden block">
-              Stability Platform {$platformVersion}
+            <p className="text-[1.25rem] text-start font-bold lg:hidden block mb-1.5">
+              Platform
             </p>
+            <div className="flex items-start self-start">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start lg:items-end">
               <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                 TVL
               </h2>
               <p className="text-[1rem] md:text-[1.125rem]">{portfolio.tvl}</p>
             </div>
+            </div>
+            
           </div>
         </div>
       </div>
