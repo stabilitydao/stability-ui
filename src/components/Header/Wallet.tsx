@@ -137,9 +137,9 @@ const Wallet = () => {
   useEffect(() => {
     if (connector) {
       const connectorIdToImage = {
-        walletConnect: "/public/wallet-connect.svg",
-        "io.metamask": "/public/metamask.svg",
-        "com.trustwallet.app": "/public/trustwallet.svg",
+        walletConnect: "/wallet-connect.svg",
+        "io.metamask": "/metamask.svg",
+        "com.trustwallet.app": "/trustwallet.svg",
       };
 
       const defaultImage = connector?.icon || "";
