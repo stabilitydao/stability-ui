@@ -1,10 +1,8 @@
 import { useState } from "react";
 
-import { WagmiConfig } from "wagmi";
-
-import { wagmiConfig } from "@web3";
-
 import { Wallet } from "./Wallet";
+
+import { WagmiLayout } from "@layouts";
 
 import "./header.css";
 
@@ -21,7 +19,7 @@ const Header = () => {
   };
 
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiLayout>
       <header>
         <span className="title w-1/3">
           <a href="/" title="Stability">
@@ -34,8 +32,8 @@ const Header = () => {
             Vaults
           </a>
           {/* <a className={currentPath === "dao" ? "active" : ""} href="/dao">
-        DAO
-      </a> */}
+      DAO
+    </a> */}
         </div>
         <div className="flex sm:w-1/3 justify-end">
           <Wallet />
@@ -52,7 +50,7 @@ const Header = () => {
           <a href="/">Vaults</a>
         </nav>
       </header>
-    </WagmiConfig>
+    </WagmiLayout>
   );
 };
 

@@ -21,7 +21,7 @@ const { title } = Astro.props as IProps;
 		<title>{title} - Stability</title>
 	</head>
 	<body>
-		<App client:load>
+		<App client:only>
 			<Header client:only/>
 			<main>
 				<slot />

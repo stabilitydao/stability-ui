@@ -1,11 +1,16 @@
 import type React from "react";
+
 import { useEffect } from "react";
 import { formatUnits } from "viem";
+
 import axios from "axios";
+
 import { useStore } from "@nanostores/react";
 
-import { readContract } from "viem/actions";
-import { useAccount, usePublicClient, useNetwork, WagmiConfig } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
+import { simulateContract, readContract } from "@wagmi/core";
+
+import { WagmiLayout } from "@layouts";
 
 import {
   account,
@@ -63,7 +68,8 @@ import type { TAddress, TIQMFAlm } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
+
+  const { chain } = useAccount();
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
@@ -149,22 +155,22 @@ const AppStore = (props: React.PropsWithChildren) => {
             abi: ICHIABI,
             functionName: "collectFees",
           });
-          const token0 = await readContract(_publicClient, {
+          const token0 = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "token0",
           });
-          const token1 = await readContract(_publicClient, {
+          const token1 = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "token1",
           });
-          const getTotalAmounts = await readContract(_publicClient, {
+          const getTotalAmounts = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "getTotalAmounts",
           });
-          const price = await readContract(_publicClient, {
+          const price = await readContract(wagmiConfig, {
             address: priceReader,
             abi: PriceReaderABI,
             functionName: "getAssetsPrice",
@@ -328,7 +334,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     if (isConnected) {
       isWeb3Load.set(true);
       try {
-        const contractData: any = await readContract(_publicClient, {
+        const contractData: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
           functionName: "getData",
@@ -357,7 +363,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        const contractBalance: any = await readContract(_publicClient, {
+        const contractBalance: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
           functionName: "getBalance",
@@ -390,7 +396,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        const contractVaults: any = await readContract(_publicClient, {
+        const contractVaults: any = await readContract(wagmiConfig, {
           address: contractBalance[6][1],
           abi: IVaultManagerABI,
           functionName: "vaults",
@@ -398,7 +404,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const vaultInfoes: any[] = await Promise.all(
           contractVaults[0].map(async (vault: string) => {
-            const response: any = await readContract(_publicClient, {
+            const response: any = await readContract(wagmiConfig, {
               address: contractBalance[6][1],
               abi: IVaultManagerABI,
               functionName: "vaultInfo",
@@ -411,7 +417,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           if (vaultInfo[3]?.length) {
             for (let i = 0; i < vaultInfo[3]?.length; i++) {
               const assetWithApr = vaultInfo[3][i];
-              const symbol = await readContract(_publicClient, {
+              const symbol = await readContract(wagmiConfig, {
                 address: assetWithApr,
                 abi: ERC20MetadataUpgradeableABI,
                 functionName: "symbol",
@@ -497,22 +503,22 @@ const AppStore = (props: React.PropsWithChildren) => {
                   abi: ICHIABI,
                   functionName: "collectFees",
                 });
-                const token0 = await readContract(_publicClient, {
+                const token0 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "token0",
                 });
-                const token1 = await readContract(_publicClient, {
+                const token1 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "token1",
                 });
-                const getTotalAmounts = await readContract(_publicClient, {
+                const getTotalAmounts = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "getTotalAmounts",
                 });
-                const price = await readContract(_publicClient, {
+                const price = await readContract(wagmiConfig, {
                   address: priceReader,
                   abi: PriceReaderABI,
                   functionName: "getAssetsPrice",
@@ -689,9 +695,9 @@ const AppStore = (props: React.PropsWithChildren) => {
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiLayout>
       <div className="flex flex-col flex-1">{props.children}</div>
-    </WagmiConfig>
+    </WagmiLayout>
   );
 };
 

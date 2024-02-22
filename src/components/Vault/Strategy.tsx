@@ -1,12 +1,12 @@
 import { useState, useEffect, memo } from "react";
 import { formatUnits } from "viem";
-import { usePublicClient } from "wagmi";
-import { writeContract } from "@wagmi/core";
+
+import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
 import { connected, platformData, vaultTypes, strategyTypes } from "@store";
 
-import { FactoryABI } from "@web3";
+import { FactoryABI, wagmiConfig } from "@web3";
 
 import type { TAddress, TPlatformData, TVault } from "@types";
 
@@ -15,8 +15,6 @@ interface IProps {
 }
 
 const Strategy: React.FC<IProps> = memo(({ vault }) => {
-  const _publicClient = usePublicClient();
-
   const $connected = useStore(connected);
   const $platformData: TPlatformData | any = useStore(platformData);
   const $vaultTypes = useStore(vaultTypes);
@@ -28,16 +26,16 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
 
   const upgradeVault = async () => {
     try {
-      const upgradeVaultProxy = await writeContract({
+      const upgradeVaultProxy = await writeContract(wagmiConfig, {
         address: $platformData.factory,
         abi: FactoryABI,
         functionName: "upgradeVaultProxy",
         args: [vault?.address as TAddress],
       });
 
-      const transaction = await _publicClient.waitForTransactionReceipt({
+      const transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: upgradeVaultProxy?.hash,
+        hash: upgradeVaultProxy,
       });
 
       if (transaction.status === "success") {
@@ -50,16 +48,16 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
 
   const upgradeStrategy = async () => {
     try {
-      const upgradeStrategyProxy = await writeContract({
+      const upgradeStrategyProxy = await writeContract(wagmiConfig, {
         address: $platformData.factory,
         abi: FactoryABI,
         functionName: "upgradeStrategyProxy",
         args: [vault.strategyAddress as TAddress],
       });
 
-      const transaction = await _publicClient.waitForTransactionReceipt({
+      const transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: upgradeStrategyProxy?.hash,
+        hash: upgradeStrategyProxy,
       });
 
       if (transaction.status === "success") {

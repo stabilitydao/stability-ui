@@ -1,5 +1,9 @@
 import { atom, deepMap } from "nanostores";
-import type { PublicClient } from "wagmi";
+
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { QueryClient } from "@tanstack/react-query";
+
+import { deserialize, serialize } from "wagmi";
 
 import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
@@ -18,7 +22,7 @@ import type {
 // atoms
 const account = atom<string | undefined>();
 const network = atom<string | undefined>();
-const publicClient = atom<PublicClient | undefined>();
+const publicClient = atom<any>();
 const platformData = atom<TPlatformData | undefined>();
 const platformVersion = atom<string>("24.01.1-alpha");
 const userBalance = atom<TUserBalance | undefined>();
@@ -53,6 +57,21 @@ const vaults = deepMap<any>();
 // temp hide fee APR condition
 const hideFeeApr = atom(false);
 
+//// tanstack query
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: 1_000 * 60 * 60 * 24,
+    },
+  },
+});
+const persister = createSyncStoragePersister({
+  serialize,
+  storage: window.localStorage,
+  deserialize,
+});
+
 export {
   account,
   network,
@@ -80,4 +99,6 @@ export {
   reload,
   error,
   isWeb3Load,
+  queryClient,
+  persister,
 };
