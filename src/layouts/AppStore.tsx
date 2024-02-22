@@ -498,7 +498,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const timestamps =
                   graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
 
-                const collectFees = await simulateContract(wagmiConfig, {
+                const collectFees = await _publicClient.simulateContract({
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "collectFees",
