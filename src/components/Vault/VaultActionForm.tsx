@@ -175,9 +175,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       }
 
       const button = checkButtonApproveDeposit(apprDepo);
+
       if (button) {
         if (vault.strategyInfo.shortName === "IQMF") {
-          setIsApprove(1);
+          setIsApprove(apprDepo[0]);
         } else {
           setIsApprove(apprDepo[apprDepo.length - 1]);
         }
@@ -2294,6 +2295,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           onClick={deposit}
                         >
                           <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
+
                           {transactionInProgress && (
                             <Loader color={"#486556"} />
                           )}

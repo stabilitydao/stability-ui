@@ -59,7 +59,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
         confirmations: 5,
         hash: upgradeStrategyProxy,
       });
-
+      console.log(transaction);
       if (transaction.status === "success") {
         setNeedStrategyUpgrade(false);
       }
@@ -70,12 +70,16 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     if (!$connected || !vault || !$vaultTypes || !$strategyTypes) return;
-    // @ts-ignore
-    if ($vaultTypes[vault?.type] !== vault.version) {
+
+    const vaultTypesKey = vault?.type as keyof typeof $vaultTypes;
+    const strategyTypesKey =
+      vault.strategy.toLowerCase() as keyof typeof $strategyTypes;
+
+    if ($vaultTypes[vaultTypesKey] !== vault.version) {
       setNeedVaultUpgrade(true);
     }
-    // @ts-ignore
-    if ($strategyTypes[vault.strategy] !== vault.strategyVersion) {
+
+    if ($strategyTypes[strategyTypesKey] !== vault.strategyVersion) {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, $vaultTypes, $strategyTypes]);

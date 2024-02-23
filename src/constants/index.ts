@@ -246,6 +246,7 @@ const GRAPH_QUERY = `
           assetsWithApr
           assetsAprs
           vaultStatus
+          AssetsPricesOnCreation
         }
         platformEntities {
           version
@@ -278,6 +279,7 @@ const GRAPH_QUERY = `
           APRFromLastEvent
         }
         lastFeeAMLEntities {
+          id
           timestamps
           APRS
         }
