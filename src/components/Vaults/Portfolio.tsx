@@ -74,8 +74,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
 
-        const apr = hideFee ? Number(v.aprWithoutFees) : Number(v.apr);
+        let apr = hideFee ? Number(v.aprWithoutFees) : Number(v.apr);
         const balance = vaultBalance * vaultSharePrice;
+        if (!apr) {
+          apr = 0
+        }
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
       }
