@@ -116,7 +116,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         const assetsWithApr: string[] = [];
         const assetsAprs: string[] = [];
         let rebalances = {};
-
         if (APIData?.apr?.daily) {
           dailyAPR = APIData.apr.daily;
           assetsWithApr.push("Pool swap fees");
@@ -210,11 +209,14 @@ const AppStore = (props: React.PropsWithChildren) => {
           for (let i = 0; i < weights.length; i++) {
             newAPRs.push(APRs[i] * weights[i]);
           }
+          if (newAPRs.length) {
+            dailyAPR =
+              newAPRs.reduce((acc, value) => (acc += value), 0) /
+              newAPRs.length;
 
-          dailyAPR =
-            newAPRs.reduce((acc, value) => (acc += value), 0) / newAPRs.length;
-          assetsWithApr.push("Pool swap fees");
-          assetsAprs.push(Number(dailyAPR).toFixed(2));
+            assetsWithApr.push("Pool swap fees");
+            assetsAprs.push(Number(dailyAPR).toFixed(2));
+          }
         }
         const APR = (
           formatFromBigInt(String(vault.apr), 3, "withDecimals") +
@@ -255,7 +257,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         );
 
         const assets = await assetsPromise;
-
         vaults[vault.id] = {
           address: vault.id,
           name: vault.name,
@@ -562,12 +563,13 @@ const AppStore = (props: React.PropsWithChildren) => {
                 for (let i = 0; i < weights.length; i++) {
                   newAPRs.push(APRs[i] * weights[i]);
                 }
-
-                dailyAPR =
-                  newAPRs.reduce((acc, value) => (acc += value), 0) /
-                  newAPRs.length;
-                assetsWithApr.push("Pool swap fees");
-                assetsAprs.push(Number(dailyAPR).toFixed(2));
+                if (newAPRs.length) {
+                  dailyAPR =
+                    newAPRs.reduce((acc, value) => (acc += value), 0) /
+                    newAPRs.length;
+                  assetsWithApr.push("Pool swap fees");
+                  assetsAprs.push(Number(dailyAPR).toFixed(2));
+                }
               }
 
               const APR = (

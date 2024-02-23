@@ -73,7 +73,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
       if (v.balance) {
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
-
         const apr = hideFee ? Number(v.aprWithoutFees) : Number(v.apr);
         const balance = vaultBalance * vaultSharePrice;
         deposited += balance;
