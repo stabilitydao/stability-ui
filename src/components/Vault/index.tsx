@@ -41,7 +41,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </div>
     );
   }
-
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">
@@ -57,7 +56,11 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
             <Strategy vault={localVault} />
 
-            <Assets assets={localVault?.assets} />
+            <Assets
+              assets={localVault?.assets}
+              created={localVault.created}
+              pricesOnCreation={localVault.assetsPricesOnCreation}
+            />
             <Toast />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">

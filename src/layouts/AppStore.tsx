@@ -111,7 +111,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
-
         let dailyAPR = 0;
         const assetsWithApr: string[] = [];
         const assetsAprs: string[] = [];
@@ -127,6 +126,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           const newAPRs = [];
           const weights = [];
           let threshold = 0;
+
+          const lastFeeAMLEntitity = data.lastFeeAMLEntities.find(
+            (entity) => entity.id === vault.underlying
+          );
 
           const IQMFAlms = data.almrebalanceEntities
             .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
@@ -144,10 +147,11 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
-          const APRs = data.lastFeeAMLEntities[0].APRS.map(
+          const APRs = lastFeeAMLEntitity.APRS.map(
             (value: string) => (Number(value) / 100000) * 100
           );
-          const timestamps = data.lastFeeAMLEntities[0].timestamps;
+
+          const timestamps = lastFeeAMLEntitity.timestamps;
 
           const collectFees = await _publicClient.simulateContract({
             address: vault.underlying,
@@ -261,6 +265,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           address: vault.id,
           name: vault.name,
           symbol: vault.symbol,
+          created: vault.created,
+          assetsPricesOnCreation: vault.AssetsPricesOnCreation,
           type: vault.vaultType,
           strategy: vault.strategyId,
           shareprice: vault.sharePrice,
@@ -476,6 +482,11 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const weights = [];
                 let threshold = 0;
 
+                const lastFeeAMLEntitity =
+                  graphResponse.data.data.lastFeeAMLEntities.find(
+                    (entity) => entity.id === graphVault.underlying
+                  );
+
                 const IQMFAlms = graphResponse.data.data.almrebalanceEntities
                   .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
                   .sort(
@@ -492,14 +503,12 @@ const AppStore = (props: React.PropsWithChildren) => {
 
                 rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
-                const APRs =
-                  graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
-                    (value: string) => (Number(value) / 100000) * 100
-                  );
-                const timestamps =
-                  graphResponse.data.data.lastFeeAMLEntities[0].timestamps?.map(
-                    (timestamp: number | string) => Number(timestamp)
-                  );
+                const APRs = lastFeeAMLEntitity.APRS.map(
+                  (value: string) => (Number(value) / 100000) * 100
+                );
+                const timestamps = lastFeeAMLEntitity.timestamps?.map(
+                  (timestamp: number | string) => Number(timestamp)
+                );
 
                 const collectFees = await _publicClient.simulateContract({
                   address: graphVault.underlying,
@@ -619,6 +628,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                   address: vault.toLowerCase(),
                   name: contractVaults[1][index],
                   symbol: contractVaults[2][index],
+                  created: graphVault.created,
+                  assetsPricesOnCreation: graphVault.AssetsPricesOnCreation,
                   type: contractVaults[3][index],
                   strategy: contractVaults[4][index].toLowerCase(),
                   shareprice: String(contractVaults[5][index]),

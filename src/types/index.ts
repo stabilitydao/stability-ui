@@ -110,6 +110,8 @@ type TVault = {
   address: TAddress;
   name: string;
   symbol: string;
+  created: string;
+  assetsPricesOnCreation: string[];
   type: string;
   strategy: string;
   shareprice: string;
