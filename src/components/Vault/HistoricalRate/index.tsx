@@ -73,6 +73,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 skip: ${entities}
             ) {
                 APR
+                APR24H
                 address
                 sharePrice
                 TVL
@@ -104,6 +105,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         timestamp: obj.timestamp,
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
+        APR24H: obj.APR24H,
       }));
     setChartData(workedData);
     setActiveChart({ name: "APR", data: APRChartData });
@@ -255,7 +257,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     getData();
   }, []);
 
-  return (
+  return activeChart && activeChart?.data?.length ? (
     <div className="rounded-md mt-5 bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
         <h2 className="text-start text-[1rem] min-[380px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem]">
@@ -308,11 +310,11 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       </div>
       <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p
-          onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
-          className="opacity-50 hover:opacity-100 cursor-pointer"
-        >
-          1D
-        </p> */}
+      onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
+      className="opacity-50 hover:opacity-100 cursor-pointer"
+    >
+      1D
+    </p> */}
         <p
           onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
           className={`hover:opacity-100 cursor-pointer ${
@@ -339,6 +341,8 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         </p>
       </div>
     </div>
+  ) : (
+    <></>
   );
 });
 
