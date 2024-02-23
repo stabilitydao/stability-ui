@@ -497,13 +497,16 @@ const AppStore = (props: React.PropsWithChildren) => {
                     (value: string) => (Number(value) / 100000) * 100
                   );
                 const timestamps =
-                  graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
+                  graphResponse.data.data.lastFeeAMLEntities[0].timestamps?.map(
+                    (timestamp: number | string) => Number(timestamp)
+                  );
 
                 const collectFees = await _publicClient.simulateContract({
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "collectFees",
                 });
+
                 const token0 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
@@ -536,7 +539,9 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const totalPrice = Number(price[1][2] + price[1][3]);
 
                 let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+
                 let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+
                 APRs.push(apr);
                 timestamps.push(NOW);
 
@@ -563,6 +568,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 for (let i = 0; i < weights.length; i++) {
                   newAPRs.push(APRs[i] * weights[i]);
                 }
+
                 if (newAPRs.length) {
                   dailyAPR =
                     newAPRs.reduce((acc, value) => (acc += value), 0) /
