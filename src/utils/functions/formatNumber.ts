@@ -56,6 +56,10 @@ export const formatNumber = (value: string | number, type: string) => {
       changedValue = formattedValue;
 
       break;
+    case "smallNumbers":
+      value = Number(value);
+      changedValue = value > 0.1 ? value.toFixed(2) : value;
+      break;
     default:
       break;
   }

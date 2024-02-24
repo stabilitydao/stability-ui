@@ -1,27 +1,72 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { assetsPrices } from "@store";
+import { readContract } from "@wagmi/core";
 
-import { getTokenData, getDate } from "@utils";
+import { assetsPrices, connected } from "@store";
+
+import { StrategyABI, wagmiConfig } from "@web3";
+
+import { getTokenData, getDate, formatNumber } from "@utils";
 
 import { TOKENS_ASSETS } from "@constants";
 
-import type { TAsset, TToken } from "@types";
+import type { TAddress, TAsset, TToken } from "@types";
 
 interface IProps {
   assets: TAsset[];
   created: string;
   pricesOnCreation: string[];
+  strategy: TAddress;
 }
 
 const Assets: React.FC<IProps> = memo(
-  ({ assets, created, pricesOnCreation }) => {
+  ({ assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
+    const $connected = useStore(connected);
+
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)
     );
+
+    const [invested, setInvested] = useState<any>(false);
+
+    const getInvested = async () => {
+      const userAssets = await readContract(wagmiConfig, {
+        address: strategy,
+        abi: StrategyABI,
+        functionName: "assetsAmounts",
+      });
+      if (!userAssets || !$assetsPrices) return;
+      const tokens = userAssets[0].map((token) => getTokenData(token));
+      console.log(tokens);
+      const amounts = userAssets[1].map((amount, index) =>
+        formatUnits(amount, tokens[index]?.decimals as number)
+      );
+      const amountsInUSD = amounts.map((amount, index) => {
+        const tokenAddress: any = tokens[index]?.address;
+
+        const tokenPrice: bigint = $assetsPrices[tokenAddress];
+        return Number(formatUnits(tokenPrice, 18)) * Number(amount);
+      });
+
+      const sum = amountsInUSD.reduce((acc: number, num: any) => acc + num, 0);
+
+      const investedAssets = amountsInUSD.map((amount, index) => ({
+        symbol: tokens[index]?.symbol,
+        amount: amounts[index],
+        amountInUSD: amount,
+        percent: (Number(amount) / sum) * 100,
+      }));
+
+      setInvested(investedAssets);
+    };
+
+    useEffect(() => {
+      if ($connected) getInvested();
+    }, [$connected, $assetsPrices]);
+
     return (
       <div className="rounded-md p-3 mt-5 bg-button">
         <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
@@ -158,14 +203,31 @@ const Assets: React.FC<IProps> = memo(
                       <div className="flex justify-start items-center text-[16px]">
                         <p>
                           Price: $
-                          {formatUnits($assetsPrices[asset.address], 18)}
+                          {formatNumber(
+                            formatUnits($assetsPrices[asset.address], 18),
+                            "smallNumbers"
+                          )}
                         </p>
                       </div>
                     )}
                     {priceOnCreation && (
                       <div className="flex justify-start items-center text-[16px]">
                         <p>
-                          Price at creation: ${priceOnCreation} ({creationDate})
+                          Price at creation: $
+                          {formatNumber(priceOnCreation, "smallNumbers")} (
+                          {creationDate})
+                        </p>
+                      </div>
+                    )}
+
+                    {invested && (
+                      <div className="flex justify-start items-center text-[16px]">
+                        <p>
+                          Invested:{" "}
+                          {formatNumber(invested[index].amount, "format")}{" "}
+                          {invested[index].symbol} / $
+                          {formatNumber(invested[index].amountInUSD, "format")}{" "}
+                          / {invested[index].percent.toFixed(2)}%
                         </p>
                       </div>
                     )}

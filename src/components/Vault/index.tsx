@@ -60,6 +60,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
               assets={localVault?.assets}
               created={localVault.created}
               pricesOnCreation={localVault.assetsPricesOnCreation}
+              strategy={localVault?.strategyAddress}
             />
             <Toast />
           </div>

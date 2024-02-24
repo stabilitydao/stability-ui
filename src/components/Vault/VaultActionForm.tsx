@@ -8,7 +8,6 @@ import {
   readContract,
   writeContract,
   waitForTransactionReceipt,
-  estimateGas,
 } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
