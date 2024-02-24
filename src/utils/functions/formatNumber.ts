@@ -56,6 +56,32 @@ export const formatNumber = (value: string | number, type: string) => {
       changedValue = formattedValue;
 
       break;
+    case "formatWithLongDecimalPart":
+      value = String(value);
+
+      const [integerPartSecond, decimalPartSecond] = value.split(".");
+      let formattedValueSecond;
+
+      const roundedDecimalPartSecond = decimalPartSecond
+        ? parseFloat(`0.${decimalPartSecond}`).toFixed(4).slice(2)
+        : "";
+
+      const formattedIntegerSecond = integerPartSecond.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        " "
+      );
+
+      formattedValueSecond = roundedDecimalPartSecond
+        ? `${formattedIntegerSecond}.${roundedDecimalPartSecond}`
+        : formattedIntegerSecond;
+
+      changedValue = formattedValueSecond;
+
+      break;
+    case "smallNumbers":
+      value = Number(value);
+      changedValue = value > 0.1 ? value.toFixed(2) : value;
+      break;
     default:
       break;
   }
