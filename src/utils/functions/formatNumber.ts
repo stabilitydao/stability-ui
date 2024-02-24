@@ -79,8 +79,20 @@ export const formatNumber = (value: string | number, type: string) => {
 
       break;
     case "smallNumbers":
-      value = Number(value);
-      changedValue = value > 0.1 ? value.toFixed(2) : value;
+      if (Number(value) > 0.1) value = Number(value).toFixed(2);
+      value = String(value);
+      const [smallIntegerPart, smallDecimalPart] = value.split(".");
+
+      const smallFormattedInteger = smallIntegerPart.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        " "
+      );
+
+      const smallFormattedValue = smallDecimalPart
+        ? `${smallFormattedInteger}.${smallDecimalPart}`
+        : smallFormattedInteger;
+
+      changedValue = smallFormattedValue;
       break;
     default:
       break;
