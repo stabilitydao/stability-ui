@@ -40,7 +40,7 @@ const Assets: React.FC<IProps> = memo(
       });
       if (!userAssets || !$assetsPrices) return;
       const tokens = userAssets[0].map((token) => getTokenData(token));
-      console.log(tokens);
+
       const amounts = userAssets[1].map((amount, index) =>
         formatUnits(amount, tokens[index]?.decimals as number)
       );
@@ -81,6 +81,9 @@ const Assets: React.FC<IProps> = memo(
             });
 
             const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+            const price: number = $assetsPrices
+              ? Number(formatUnits($assetsPrices[asset.address], 18))
+              : 0;
 
             const creationDate = getDate(Number(created));
             return (
@@ -199,17 +202,11 @@ const Assets: React.FC<IProps> = memo(
                       </div>
                     </div>
 
-                    {$assetsPrices && (
+                    {price ? (
                       <div className="flex justify-start items-center text-[16px]">
-                        <p>
-                          Price: $
-                          {formatNumber(
-                            formatUnits($assetsPrices[asset.address], 18),
-                            "smallNumbers"
-                          )}
-                        </p>
+                        <p>Price: ${formatNumber(price, "smallNumbers")}</p>
                       </div>
-                    )}
+                    ) : null}
                     {priceOnCreation && (
                       <div className="flex justify-start items-center text-[16px]">
                         <p>
@@ -224,7 +221,12 @@ const Assets: React.FC<IProps> = memo(
                       <div className="flex justify-start items-center text-[16px]">
                         <p>
                           Invested:{" "}
-                          {formatNumber(invested[index].amount, "format")}{" "}
+                          {formatNumber(
+                            invested[index].amount,
+                            price > 1000
+                              ? "formatWithLongDecimalPart"
+                              : "format"
+                          )}{" "}
                           {invested[index].symbol} / $
                           {formatNumber(invested[index].amountInUSD, "format")}{" "}
                           / {invested[index].percent.toFixed(2)}%
