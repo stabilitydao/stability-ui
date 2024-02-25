@@ -57,7 +57,7 @@ const Assets: React.FC<IProps> = memo(
         symbol: tokens[index]?.symbol,
         amount: amounts[index],
         amountInUSD: amount,
-        percent: (Number(amount) / sum) * 100,
+        percent: amount ? (Number(amount) / sum) * 100 : 0,
       }));
 
       setInvested(investedAssets);

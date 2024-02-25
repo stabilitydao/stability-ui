@@ -139,7 +139,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     !underlyingToken || option[0] !== underlyingToken?.address;
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       if (apprDepo.includes(1)) return true;
     }
     if (apprDepo.length < 2) {
@@ -176,7 +179,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const button = checkButtonApproveDeposit(apprDepo);
 
       if (button) {
-        if (vault.strategyInfo.shortName === "IQMF") {
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        ) {
           setIsApprove(apprDepo[0]);
         } else {
           setIsApprove(apprDepo[apprDepo.length - 1]);
@@ -324,7 +330,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const logo =
           vault.strategyInfo.shortName === "DQMF"
             ? "/protocols/DefiEdge.svg"
-            : vault.strategyInfo.shortName === "IQMF"
+            : vault.strategyInfo.shortName === "IQMF" ||
+              vault.strategyInfo.shortName === "IRMF"
             ? "/protocols/Ichi.png"
             : "/protocols/Gamma.png";
         if ($connected) {
@@ -763,7 +770,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         let txData = zapTokens.map((tokens: any) => tokens.txData);
 
-        if (vault.strategyInfo.shortName === "IQMF") txData.push("");
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        )
+          txData.push("");
 
         gas = await _publicClient.estimateContractGas({
           address: $platformData.zap,
@@ -864,7 +875,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       let outData = await Promise.all(promises);
 
-      if (vault.strategyInfo.shortName === "IQMF") {
+      if (
+        vault.strategyInfo.shortName === "IQMF" ||
+        vault.strategyInfo.shortName === "IRMF"
+      ) {
         outData = outData.filter(
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
@@ -872,12 +886,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setZapTokens(outData);
       let assets: TAddress[] = vault.assets.map((asset) => asset.address);
       let amounts;
-      if (vault.strategyInfo.shortName === "IQMF") {
+
+      if (
+        vault.strategyInfo.shortName === "IQMF" ||
+        vault.strategyInfo.shortName === "IRMF"
+      ) {
         amounts = vault.assetsProportions.map((proportion, index) =>
           proportion
             ? parseUnits(
-                outData[index]?.amountOut as string,
-                getTokenData(outData[index]?.address as TAddress)
+                outData[0]?.amountOut as string,
+                getTokenData(outData[0]?.address as TAddress)
                   ?.decimals as number
               )
             : 0n
@@ -1164,7 +1182,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       }
     }
     try {
-      if (vault.strategyInfo.shortName !== "IQMF") {
+      if (
+        vault.strategyInfo.shortName !== "IQMF" ||
+        vault.strategyInfo.shortName === "IRMF"
+      ) {
         gas = await _publicClient.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
@@ -1257,7 +1278,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
     let assets = $assets;
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       assets = vault.assets.map((asset) => asset.address);
     }
     if (underlyingToken?.address === option[0]) {
@@ -1559,7 +1583,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       } else {
         let assetsLength = $assets.map((_: any) => 0n);
         let assets = $assets;
-        if (vault.strategyInfo.shortName === "IQMF") {
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        ) {
           assetsLength = [0n, 0n];
           assets = vault.assets.map((asset) => asset.address);
         }
@@ -1684,7 +1711,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
         try {
           let previewDepositAssets: any;
-          if (vault.strategyInfo.shortName !== "IQMF") {
+          if (
+            vault.strategyInfo.shortName !== "IQMF" ||
+            vault.strategyInfo.shortName !== "IRMF"
+          ) {
             previewDepositAssets = await readContract(wagmiConfig, {
               address: vault.address,
               abi: VaultABI,
@@ -1755,7 +1785,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   }, []);
 
   useEffect(() => {
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       let assetsData;
       switch (tab) {
         case "Deposit":
@@ -2027,7 +2060,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         underlyingToken?.address,
                         vault.strategyInfo.shortName === "DQMF"
                           ? "/protocols/DefiEdge.svg"
-                          : vault.strategyInfo.shortName === "IQMF"
+                          : vault.strategyInfo.shortName === "IQMF" ||
+                            vault.strategyInfo.shortName === "IRMF"
                           ? "/protocols/Ichi.png"
                           : "/protocols/Gamma.png"
                       );

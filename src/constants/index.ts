@@ -212,6 +212,10 @@ const PROTOCOLS = {
     name: "Ichi",
     logoSrc: "/protocols/Ichi.png",
   },
+  retro: {
+    name: "Retro",
+    logoSrc: "/protocols/Retro.webp",
+  },
 };
 
 const GRAPH_ENDPOINT =
