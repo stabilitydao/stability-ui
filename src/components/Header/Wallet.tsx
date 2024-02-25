@@ -86,7 +86,7 @@ const Wallet = () => {
     }
   };
   const initProfile = async () => {
-    if (!$assetsBalances) return;
+    if (!$assetsBalances) return; // dublicated for TS
     let profileBalance = 0;
     const assets = Object.entries($assetsBalances)
       .filter((token) => token[1] && getTokenData(token[0]))
@@ -132,8 +132,10 @@ const Wallet = () => {
   };
 
   useEffect(() => {
-    initProfile();
-  }, [$assetsBalances]);
+    if ($account && $assetsBalances) {
+      initProfile();
+    }
+  }, [$assetsBalances, $account]);
   useEffect(() => {
     if (connector) {
       const connectorIdToImage = {

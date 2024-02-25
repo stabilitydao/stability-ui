@@ -336,7 +336,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
 
-    setGraphData(graphResponse.data.data);
+    await setGraphData(graphResponse.data.data);
 
     if (isConnected) {
       isWeb3Load.set(true);
