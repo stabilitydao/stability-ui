@@ -62,8 +62,8 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     ammAdapter: "",
     sourceCode: "",
   };
-
-  const { quickSwap, gamma, compound, defiedge, merkl, ichi } = PROTOCOLS;
+  const { quickSwap, gamma, compound, defiedge, merkl, ichi, retro } =
+    PROTOCOLS;
 
   const farm: IFeature = {
     name: "Farming",
@@ -165,6 +165,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "Algebra",
       il: il,
       sourceCode: "",
+    };
+  } else if (vaultSymbol.match(/IRMF\d+$/)) {
+    strategyInfo = {
+      name: "Ichi Retro Merkl Farm",
+      shortName: "IRMF",
+      protocols: [ichi, retro, merkl],
+      features: [farm],
+      color: "#28fffb",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.IQMF,
     };
   }
 

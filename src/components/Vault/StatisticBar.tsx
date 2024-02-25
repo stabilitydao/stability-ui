@@ -15,8 +15,10 @@ const StatisticBar: React.FC<IProps> = memo(({ vault }) => {
     <div className="flex flex-wrap justify-between gap-2 md:gap-0 items-center bg-button p-4 rounded-md md:h-[80px] mt-[-40px] md:mt-0">
       <VaultType type={vault.type} />
       <div>
-        <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">TVL</p>
-        <p>
+        <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+          TVL
+        </p>
+        <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
           {formatNumber(
             formatFromBigInt(vault.tvl, 18, "withFloor"),
             "abbreviate"
@@ -24,16 +26,18 @@ const StatisticBar: React.FC<IProps> = memo(({ vault }) => {
         </p>
       </div>
       <div>
-        <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+        <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
           SHARE PRICE
         </p>
-        <p>${formatFromBigInt(vault.shareprice, 18, "withDecimals")}</p>
+        <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
+          ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+        </p>
       </div>
       <div>
-        <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+        <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
           APR / APY
         </p>
-        <p>
+        <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
           {vault.apr}% / {vault.apy}%
         </p>
       </div>
