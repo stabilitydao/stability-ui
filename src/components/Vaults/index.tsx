@@ -475,6 +475,11 @@ const Vaults = () => {
                                       src={protocol.logoSrc}
                                       alt={protocol.name}
                                       title={protocol.name}
+                                      style={{
+                                        zIndex:
+                                          vault.strategyInfo.protocols.length -
+                                          index,
+                                      }}
                                     />
                                   )
                                 )}

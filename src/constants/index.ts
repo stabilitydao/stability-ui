@@ -214,7 +214,7 @@ const PROTOCOLS = {
   },
   retro: {
     name: "Retro",
-    logoSrc: "/protocols/Retro.webp",
+    logoSrc: "/protocols/Retro.svg",
   },
 };
 
