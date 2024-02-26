@@ -163,16 +163,30 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     if (!change) {
       for (let i = 0; i < input.length; i++) {
-        if (
-          allowance &&
-          $assets &&
-          $assetsBalances &&
-          input[i] <= $assetsBalances[$assets[i]] &&
-          allowance[$assets[i]]?.allowance[0] >= input[i]
-        ) {
-          apprDepo.push(1);
+        if (vault.strategyInfo.shortName === "IRMF") {
+          if (
+            allowance &&
+            $assets &&
+            $assetsBalances &&
+            input[i] <= $assetsBalances[$assets[0]] &&
+            allowance[$assets[0]]?.allowance[0] >= input[i]
+          ) {
+            apprDepo.push(1);
+          } else {
+            apprDepo.push(2);
+          }
         } else {
-          apprDepo.push(2);
+          if (
+            allowance &&
+            $assets &&
+            $assetsBalances &&
+            input[i] <= $assetsBalances[$assets[i]] &&
+            allowance[$assets[i]]?.allowance[0] >= input[i]
+          ) {
+            apprDepo.push(1);
+          } else {
+            apprDepo.push(2);
+          }
         }
       }
 
@@ -183,7 +197,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           vault.strategyInfo.shortName === "IQMF" ||
           vault.strategyInfo.shortName === "IRMF"
         ) {
-          setIsApprove(apprDepo[0]);
+          const index =
+            input.findIndex((amount) => amount) > 0
+              ? input.findIndex((amount) => amount)
+              : 0;
+          setIsApprove(apprDepo[index]);
         } else {
           setIsApprove(apprDepo[apprDepo.length - 1]);
         }
@@ -1183,8 +1201,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     try {
       if (
-        vault.strategyInfo.shortName !== "IQMF" ||
-        vault.strategyInfo.shortName === "IRMF"
+        vault.strategyInfo.shortName !== "IQMF" &&
+        vault.strategyInfo.shortName !== "IRMF"
       ) {
         gas = await _publicClient.estimateContractGas({
           address: vault.address,
@@ -1206,7 +1224,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       } else {
         // IQMF strategy only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
-
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
           proportion ? amounts[0] : 0n
         );
@@ -1712,7 +1729,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         try {
           let previewDepositAssets: any;
           if (
-            vault.strategyInfo.shortName !== "IQMF" ||
+            vault.strategyInfo.shortName !== "IQMF" &&
             vault.strategyInfo.shortName !== "IRMF"
           ) {
             previewDepositAssets = await readContract(wagmiConfig, {
@@ -1724,11 +1741,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           } else {
             // IQMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
-
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
-
             previewDepositAssets = await readContract(wagmiConfig, {
               address: vault.address,
               abi: VaultABI,
