@@ -794,6 +794,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         )
           txData.push("");
 
+        if (vault.strategyInfo.shortName === "IRMF") {
+          txData.reverse();
+        }
+
         gas = await _publicClient.estimateContractGas({
           address: $platformData.zap,
           abi: ZapABI,
