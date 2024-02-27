@@ -99,7 +99,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
-  const setGraphData = async (data: any) => {
+  const setGraphData = async (data: any, history: any) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
@@ -120,6 +120,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           assetsWithApr.push("Pool swap fees");
           assetsAprs.push(Number(dailyAPR).toFixed(2));
         }
+
         if (strategyInfo?.shortName === "IQMF") {
           const YEAR = 525600;
           const NOW = Math.floor(Date.now() / 1000);
@@ -217,11 +218,11 @@ const AppStore = (props: React.PropsWithChildren) => {
             dailyAPR =
               newAPRs.reduce((acc, value) => (acc += value), 0) /
               newAPRs.length;
-
             assetsWithApr.push("Pool swap fees");
             assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
         }
+
         const APR = (
           formatFromBigInt(String(vault.apr), 3, "withDecimals") +
           Number(dailyAPR)
@@ -294,6 +295,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           version: vault.version,
           strategyVersion: strategyEntity.version,
           rebalances: rebalances,
+          aprData: history.filter((data) => data.address === vault.id)[0],
         };
 
         return vaults;
@@ -327,7 +329,36 @@ const AppStore = (props: React.PropsWithChildren) => {
         console.log("GRAPH API ERROR:", error);
       }
     }
+    /////
+    const DATA = [];
+    let entities = 0;
+    let status = true;
 
+    while (status) {
+      const HISTORY_QUERY = `{
+            vaultHistoryEntities(
+                skip: ${entities}
+            ) {
+                address
+                timestamp
+                APR24H
+                APRWeekly
+            }}`;
+
+      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+        query: HISTORY_QUERY,
+      });
+      DATA.push(...graphResponse.data.data.vaultHistoryEntities);
+
+      if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
+        status = false;
+      }
+      entities += 100;
+    }
+    const historyData = DATA.sort(
+      (a, b) => Number(b.timestamp) - Number(a.timestamp)
+    );
+    /////
     if (retries >= maxRetries) {
       error.set({ state: true, type: "API", description: apiError });
 
@@ -336,7 +367,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
 
-    await setGraphData(graphResponse.data.data);
+    await setGraphData(graphResponse.data.data, historyData);
     if (isConnected) {
       isWeb3Load.set(true);
       try {
@@ -576,7 +607,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 for (let i = 0; i < weights.length; i++) {
                   newAPRs.push(APRs[i] * weights[i]);
                 }
-
                 if (newAPRs.length) {
                   dailyAPR =
                     newAPRs.reduce((acc, value) => (acc += value), 0) /
@@ -656,6 +686,9 @@ const AppStore = (props: React.PropsWithChildren) => {
                   version: graphVault.version,
                   strategyVersion: strategyEntity.version,
                   rebalances: rebalances,
+                  aprData: historyData.filter(
+                    (data) => data.address === vault.toLowerCase()
+                  )[0],
                 },
               };
             })
@@ -693,7 +726,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     );
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
-
     if (graphResponse?.data?.data?.platformEntities[0]?.version)
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
