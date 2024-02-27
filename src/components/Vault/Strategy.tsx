@@ -4,7 +4,15 @@ import { formatUnits } from "viem";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import { connected, platformData, vaultTypes, strategyTypes } from "@store";
+import {
+  connected,
+  platformData,
+  vaultTypes,
+  strategyTypes,
+  apiData,
+} from "@store";
+
+import { calculateAPY } from "@utils";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
@@ -19,6 +27,17 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const $platformData: TPlatformData | any = useStore(platformData);
   const $vaultTypes = useStore(vaultTypes);
   const $strategyTypes = useStore(strategyTypes);
+
+  const $apiData = useStore(apiData);
+
+  const [farmAprs, setFarmAprs] = useState({ daily: "-", weekly: "-" });
+  const [strategyData, setStrategyData] = useState({
+    apr: {
+      daily: "-",
+      weekly: "-",
+    },
+    apy: { daily: "-", weekly: "-" },
+  });
 
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
   const [needStrategyUpgrade, setNeedStrategyUpgrade] =
@@ -45,7 +64,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
       console.error("UPGRADE VAULT PROXY ERROR:", err);
     }
   };
-
   const upgradeStrategy = async () => {
     try {
       const upgradeStrategyProxy = await writeContract(wagmiConfig, {
@@ -59,7 +77,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
         confirmations: 5,
         hash: upgradeStrategyProxy,
       });
-      console.log(transaction);
       if (transaction.status === "success") {
         setNeedStrategyUpgrade(false);
       }
@@ -83,6 +100,33 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, $vaultTypes, $strategyTypes]);
+
+  useEffect(() => {
+    if (vault?.aprData?.APR24H && vault.aprData.APRWeekly) {
+      setFarmAprs({
+        daily: Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(2),
+        weekly: Number(formatUnits(vault.aprData.APRWeekly, 3)).toFixed(2),
+      });
+    }
+  }, [vault]);
+
+  useEffect(() => {
+    const API = $apiData.underlyings?.["137"]?.[vault.underlying];
+
+    if (API) {
+      const weekly = API.apr.weekly ? API.apr.weekly : API.apr.monthly;
+      setStrategyData({
+        apr: {
+          daily: `${API.apr.daily.toFixed(2)}%`,
+          weekly: `${weekly.toFixed(2)}%`,
+        },
+        apy: {
+          daily: `${calculateAPY(API.apr.daily).toFixed(2)}%`,
+          weekly: `${calculateAPY(weekly).toFixed(2)}%`,
+        },
+      });
+    }
+  }, [$apiData]);
 
   return (
     <div className="rounded-md mt-5 bg-button">
@@ -240,7 +284,50 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
           </div>
         )}
-        <div className="mt-2">
+        <table className="table table-auto w-full rounded-lg select-none">
+          <thead className="bg-[#0b0e11]">
+            <tr>
+              <th></th>
+              <th>Latest</th>
+              <th>24h</th>
+              <th>Week</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total APY</td>
+              <td className="text-center">{vault.apy}%</td>
+              <td className="text-center">{strategyData.apy.daily}</td>
+              <td className="text-center">{strategyData.apy.weekly}</td>
+            </tr>
+            <tr>
+              <td>Total APR</td>
+              <td className="text-center">{vault.apr}%</td>
+              <td className="text-center">{strategyData.apr.daily}</td>
+              <td className="text-center">{strategyData.apr.weekly}</td>
+            </tr>
+            <tr>
+              <td>Pool swap fees APR</td>
+              <td className="text-center">{vault.assetsAprs[0]}%</td>
+              <td className="text-center">-</td>
+              <td className="text-center">-</td>
+            </tr>
+            <tr>
+              {vault.strategy === "compound farm" ? (
+                <td>Strategy APR</td>
+              ) : (
+                <td>Farm APR</td>
+              )}
+              <td className="text-center">
+                {Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%
+              </td>
+              <td className="text-center">{farmAprs.daily}%</td>
+              <td className="text-center">{farmAprs.weekly}%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/*<div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
             Total APR / APY
           </p>
@@ -264,12 +351,11 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
         )}
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            {/* APR 24h / Strategy APR latest */}
+             APR 24h / Strategy APR latest 
             strategy apr
           </p>
           <p>{Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%</p>
-        </div>
-
+        </div> */}
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
             Impermanent Loss

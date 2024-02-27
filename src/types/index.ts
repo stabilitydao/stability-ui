@@ -139,6 +139,7 @@ type TVault = {
   version: string;
   strategyVersion: string;
   rebalances: any;
+  aprData: any; // todo type
 };
 
 type TVaultAssets = [string, string];
