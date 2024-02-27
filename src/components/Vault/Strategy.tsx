@@ -32,11 +32,15 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
 
   const [farmAprs, setFarmAprs] = useState({ daily: "-", weekly: "-" });
   const [strategyData, setStrategyData] = useState({
-    apr: {
+    feesAPR: {
       daily: "-",
       weekly: "-",
     },
-    apy: { daily: "-", weekly: "-" },
+    totalAPR: { daily: "-", weekly: "-" },
+    totalAPY: {
+      daily: "-",
+      weekly: "-",
+    },
   });
 
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
@@ -112,20 +116,43 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     const API = $apiData.underlyings?.["137"]?.[vault.underlying];
+    // don't use from farmAprs
+    const dailyFarmApr = Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(
+      2
+    );
+    const weeklyFarmApr = Number(
+      formatUnits(vault.aprData.APRWeekly, 3)
+    ).toFixed(2);
+
+    let poolSwapFeesAPRDaily = 0;
+    let poolSwapFeesAPRWeekly = 0;
 
     if (API) {
-      const weekly = API.apr.weekly ? API.apr.weekly : API.apr.monthly;
-      setStrategyData({
-        apr: {
-          daily: `${API.apr.daily.toFixed(2)}%`,
-          weekly: `${weekly.toFixed(2)}%`,
-        },
-        apy: {
-          daily: `${calculateAPY(API.apr.daily).toFixed(2)}%`,
-          weekly: `${calculateAPY(weekly).toFixed(2)}%`,
-        },
-      });
+      poolSwapFeesAPRDaily = API?.apr.daily || 0;
+      poolSwapFeesAPRWeekly = API?.apr.weekly || API.apr.monthly || 0;
     }
+    if (vault.strategyInfo.shortName === "IQMF") {
+      poolSwapFeesAPRDaily = Number(vault.assetsAprs[0]);
+      poolSwapFeesAPRWeekly = Number(vault.assetsAprs[1]);
+    }
+
+    const dailyTotalAPR = Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
+    const weeklyTotalAPR =
+      Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
+    setStrategyData({
+      feesAPR: {
+        daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
+        weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
+      },
+      totalAPR: {
+        daily: `${dailyTotalAPR.toFixed(2)}%`,
+        weekly: `${weeklyTotalAPR.toFixed(2)}%`,
+      },
+      totalAPY: {
+        daily: `${calculateAPY(dailyTotalAPR).toFixed(2)}%`,
+        weekly: `${calculateAPY(weeklyTotalAPR).toFixed(2)}%`,
+      },
+    });
   }, [$apiData]);
 
   return (
@@ -296,33 +323,39 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
           <tbody>
             <tr>
               <td>Total APY</td>
-              <td className="text-center">{vault.apy}%</td>
-              <td className="text-center">{strategyData.apy.daily}</td>
-              <td className="text-center">{strategyData.apy.weekly}</td>
+              <td className="text-right">{vault.apy}%</td>
+              <td className="text-right">{strategyData.totalAPY.daily}</td>
+              <td className="text-right">{strategyData.totalAPY.weekly}</td>
             </tr>
             <tr>
               <td>Total APR</td>
-              <td className="text-center">{vault.apr}%</td>
-              <td className="text-center">{strategyData.apr.daily}</td>
-              <td className="text-center">{strategyData.apr.weekly}</td>
+              <td className="text-right">{vault.apr}%</td>
+              <td className="text-right">{strategyData.totalAPR.daily}</td>
+              <td className="text-right">{strategyData.totalAPR.weekly}</td>
             </tr>
+            {vault.strategyInfo.shortName != "CF" && (
+              <tr>
+                <td>Pool swap fees APR</td>
+                {vault.strategyInfo.shortName === "IQMF" ? (
+                  <td className="text-right">{vault.assetsAprs[2]}%</td>
+                ) : (
+                  <td className="text-right">{vault.assetsAprs[0]}%</td>
+                )}
+                <td className="text-right">{strategyData.feesAPR.daily}</td>
+                <td className="text-right">{strategyData.feesAPR.weekly}</td>
+              </tr>
+            )}
             <tr>
-              <td>Pool swap fees APR</td>
-              <td className="text-center">{vault.assetsAprs[0]}%</td>
-              <td className="text-center">-</td>
-              <td className="text-center">-</td>
-            </tr>
-            <tr>
-              {vault.strategy === "compound farm" ? (
+              {vault.strategyInfo.shortName === "CF" ? (
                 <td>Strategy APR</td>
               ) : (
                 <td>Farm APR</td>
               )}
-              <td className="text-center">
+              <td className="text-right">
                 {Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%
               </td>
-              <td className="text-center">{farmAprs.daily}%</td>
-              <td className="text-center">{farmAprs.weekly}%</td>
+              <td className="text-right">{farmAprs.daily}%</td>
+              <td className="text-right">{farmAprs.weekly}%</td>
             </tr>
           </tbody>
         </table>
