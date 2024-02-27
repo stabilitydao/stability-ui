@@ -138,7 +138,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               (a: TIQMFAlm, b: TIQMFAlm) =>
                 Number(b.timestamp) - Number(a.timestamp)
             );
-
           const _24HRebalances = IQMFAlms.filter(
             (obj: any) => Number(obj.timestamp) >= NOW - 86400
           ).length;
@@ -149,9 +148,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
           const APRs = lastFeeAMLEntitity.APRS.map(
-            (value: string) => (Number(value) / 100000) * 100
+            (value: string) => (Number(value) / 10000000000) * 100
           );
-
           const timestamps = lastFeeAMLEntitity.timestamps;
 
           const collectFees = await _publicClient.simulateContract({
