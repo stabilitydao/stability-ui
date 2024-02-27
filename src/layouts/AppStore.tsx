@@ -124,9 +124,12 @@ const AppStore = (props: React.PropsWithChildren) => {
         if (strategyInfo?.shortName === "IQMF") {
           const YEAR = 525600;
           const NOW = Math.floor(Date.now() / 1000);
-          const newAPRs = [];
-          const weights = [];
-          let threshold = 0;
+          const dailyAPRs = [];
+          const dailyWeights = [];
+          const weeklyAPRs = [];
+          const weeklyWeights = [];
+          let dailyThreshold = 0;
+          let weeklyThreshold = 0;
 
           const lastFeeAMLEntitity = data.lastFeeAMLEntities.find(
             (entity) => entity.id === vault.underlying
@@ -192,33 +195,61 @@ const AppStore = (props: React.PropsWithChildren) => {
           APRs.reverse();
           timestamps.reverse();
 
+          // daily
           for (let i = 0; i < APRs.length; i++) {
             if (APRs.length === i + 1) {
               break;
             }
             let diff = timestamps[i] - timestamps[i + 1];
-            if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-              threshold += diff;
-              weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+            if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+              dailyThreshold += diff;
+              dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
             } else {
-              weights.push(
-                (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+              dailyWeights.push(
+                (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
                   TIMESTAMPS_IN_SECONDS.DAY
               );
               break;
             }
           }
-
-          for (let i = 0; i < weights.length; i++) {
-            newAPRs.push(APRs[i] * weights[i]);
+          for (let i = 0; i < dailyWeights.length; i++) {
+            dailyAPRs.push(APRs[i] * dailyWeights[i]);
           }
-          if (newAPRs.length) {
-            dailyAPR =
-              newAPRs.reduce((acc, value) => (acc += value), 0) /
-              newAPRs.length;
+          // weekly
+          for (let i = 0; i < APRs.length; i++) {
+            if (APRs.length === i + 1) {
+              break;
+            }
+            let diff = timestamps[i] - timestamps[i + 1];
+            if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+              weeklyThreshold += diff;
+              weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+            } else {
+              weeklyWeights.push(
+                (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+                  TIMESTAMPS_IN_SECONDS.WEEK
+              );
+              break;
+            }
+          }
+          for (let i = 0; i < weeklyWeights.length; i++) {
+            weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
+          }
+
+          if (dailyAPRs.length) {
+            dailyAPR = dailyAPRs.reduce((acc, value) => (acc += value), 0);
+
             assetsWithApr.push("Pool swap fees");
             assetsAprs.push(Number(dailyAPR).toFixed(2));
           }
+          if (weeklyAPRs.length) {
+            let weeklyAPR = weeklyAPRs.reduce(
+              (acc, value) => (acc += value),
+              0
+            );
+            assetsAprs.push(Number(weeklyAPR).toFixed(2));
+          }
+          assetsAprs.push(Number(apr).toFixed(2));
         }
 
         const APR = (
@@ -502,13 +533,15 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
-
               if (strategyInfo?.shortName === "IQMF") {
                 const YEAR = 525600;
                 const NOW = Math.floor(Date.now() / 1000);
-                const newAPRs = [];
-                const weights = [];
-                let threshold = 0;
+                const dailyAPRs = [];
+                const dailyWeights = [];
+                const weeklyAPRs = [];
+                const weeklyWeights = [];
+                let dailyThreshold = 0;
+                let weeklyThreshold = 0;
 
                 const lastFeeAMLEntitity =
                   graphResponse.data.data.lastFeeAMLEntities.find(
@@ -534,6 +567,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const APRs = lastFeeAMLEntitity.APRS.map(
                   (value: string) => (Number(value) / 100000) * 100
                 );
+
                 const timestamps = lastFeeAMLEntitity.timestamps?.map(
                   (timestamp: number | string) => Number(timestamp)
                 );
@@ -585,33 +619,63 @@ const AppStore = (props: React.PropsWithChildren) => {
                 APRs.reverse();
                 timestamps.reverse();
 
+                //   // daily
                 for (let i = 0; i < APRs.length; i++) {
                   if (APRs.length === i + 1) {
                     break;
                   }
                   let diff = timestamps[i] - timestamps[i + 1];
-                  if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-                    threshold += diff;
-                    weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+                  if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+                    dailyThreshold += diff;
+                    dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
                   } else {
-                    weights.push(
-                      (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                    dailyWeights.push(
+                      (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
                         TIMESTAMPS_IN_SECONDS.DAY
                     );
                     break;
                   }
                 }
-
-                for (let i = 0; i < weights.length; i++) {
-                  newAPRs.push(APRs[i] * weights[i]);
+                for (let i = 0; i < dailyWeights.length; i++) {
+                  dailyAPRs.push(APRs[i] * dailyWeights[i]);
                 }
-                if (newAPRs.length) {
-                  dailyAPR =
-                    newAPRs.reduce((acc, value) => (acc += value), 0) /
-                    newAPRs.length;
+                // weekly
+                for (let i = 0; i < APRs.length; i++) {
+                  if (APRs.length === i + 1) {
+                    break;
+                  }
+                  let diff = timestamps[i] - timestamps[i + 1];
+                  if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+                    weeklyThreshold += diff;
+                    weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+                  } else {
+                    weeklyWeights.push(
+                      (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+                        TIMESTAMPS_IN_SECONDS.WEEK
+                    );
+                    break;
+                  }
+                }
+                for (let i = 0; i < weeklyWeights.length; i++) {
+                  weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
+                }
+
+                if (dailyAPRs.length) {
+                  dailyAPR = dailyAPRs.reduce(
+                    (acc, value) => (acc += value),
+                    0
+                  );
                   assetsWithApr.push("Pool swap fees");
                   assetsAprs.push(Number(dailyAPR).toFixed(2));
                 }
+                if (weeklyAPRs.length) {
+                  let weeklyAPR = weeklyAPRs.reduce(
+                    (acc, value) => (acc += value),
+                    0
+                  );
+                  assetsAprs.push(Number(weeklyAPR).toFixed(2));
+                }
+                assetsAprs.push(Number(apr).toFixed(2));
               }
 
               const APR = (
