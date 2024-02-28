@@ -12,6 +12,7 @@ import { get1InchRoutes } from "./functions/get1InchRoutes";
 import { debounce } from "./functions/debounce";
 import { decodeHex } from "./functions/decodeHex";
 import { setLocalStoreHash } from "./functions/setLocalStoreHash";
+import { getDate } from "./functions/getDate";
 
 export {
   getTokenData,
@@ -28,4 +29,5 @@ export {
   addVaultData,
   decodeHex,
   setLocalStoreHash,
+  getDate,
 };

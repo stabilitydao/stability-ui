@@ -16,47 +16,75 @@ interface IProps {
   APRType: string;
 }
 
+// const CustomizedAxisTick = ({
+//   x,
+//   y,
+//   payload,
+//   fontSize,
+// }: {
+//   x: number;
+//   y: number;
+//   payload: any;
+//   fontSize: number;
+// }) => {
+//   return (
+//     <>
+//       {/* {payload.value === "10.02" ? (
+//         <g transform={`translate(${10},${y})`}>
+//           <text
+//             x={0}
+//             y={0}
+//             dy={10}
+//             textAnchor="middle"
+//             fill="#8d8e96"
+//             fontSize={fontSize}
+//           >
+//             {payload.value}
+//           </text>
+//         </g>
+//       ) : ( */}
+//       <g transform={`translate(${x},${y})`}>
+//         <text
+//           x={0}
+//           y={0}
+//           dy={10}
+//           textAnchor="middle"
+//           fill="#8d8e96"
+//           fontSize={fontSize}
+//         >
+//           {payload.value}
+//         </text>
+//       </g>
+//       {/* )} */}
+//     </>
+//   );
+// };
 const CustomizedAxisTick = ({
   x,
   y,
   payload,
   fontSize,
+  timestampDifferences,
 }: {
   x: number;
   y: number;
   payload: any;
   fontSize: number;
+  timestampDifferences: number[];
 }) => {
   return (
-    <>
-      {/* {payload.value === "10.02" ? (
-        <g transform={`translate(${10},${y})`}>
-          <text
-            x={0}
-            y={0}
-            dy={10}
-            textAnchor="middle"
-            fill="#8d8e96"
-            fontSize={fontSize}
-          >
-            {payload.value}
-          </text>
-        </g>
-      ) : ( */}
-      <g transform={`translate(${x},${y})`}>
-        <text
-          x={0}
-          y={0}
-          dy={10}
-          textAnchor="middle"
-          fill="#8d8e96"
-          fontSize={fontSize}
-        >
-          {payload.value}
-        </text>
-      </g>
-      {/* )} */}
-    </>
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="middle"
+        fill="#8d8e96"
+        fontSize={fontSize}
+      >
+        {payload.value}
+      </text>
+    </g>
   );
 };
 const CustomTooltip = ({
@@ -102,6 +130,10 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
     }
   }, [chart]);
 
+  const [timestampDifferences, setTimestampDifferences] = useState<number[]>(
+    []
+  );
+
   return (
     <ResponsiveContainer width="100%" height={200}>
       <AreaChart
@@ -114,7 +146,15 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
         <XAxis
           dataKey="timestamp"
           tickLine={false}
-          tick={<CustomizedAxisTick fontSize={12} />}
+          tick={({ x, y, payload }) => (
+            <CustomizedAxisTick
+              x={x}
+              y={y}
+              payload={payload}
+              fontSize={12}
+              timestampDifferences={timestampDifferences}
+            />
+          )}
         />
         <YAxis
           domain={chart.name === "sharePrice" ? [0.9, "auto"] : [min, "auto"]}
@@ -142,13 +182,10 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
           dataKey={chart.name}
           stroke="#fff"
           fill="#414141"
-          // points={chart.data.map((entry: any) => {
-          //   let xCoordinate = entry.x;
-          //   if (entry.timestamp === "10.02") {
-          //     xCoordinate += 10;
-          //   }
-          //   return { x: 10, y: entry.y };
-          // })}
+          points={chart.data.map((entry) => ({
+            x: entry.x,
+            y: entry.y,
+          }))}
         />
       </AreaChart>
     </ResponsiveContainer>

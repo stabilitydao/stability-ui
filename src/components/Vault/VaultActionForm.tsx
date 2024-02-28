@@ -2,10 +2,13 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
-import { readContract } from "viem/actions";
 
-import { usePublicClient, useNetwork, useSwitchNetwork } from "wagmi";
-import { writeContract } from "@wagmi/core";
+import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
+import {
+  readContract,
+  writeContract,
+  waitForTransactionReceipt,
+} from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 
@@ -35,6 +38,7 @@ import {
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
+  wagmiConfig,
 } from "@web3";
 
 import {
@@ -66,8 +70,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const { open } = useWeb3Modal();
 
-  const { chain } = useNetwork();
-  const { switchNetwork } = useSwitchNetwork();
+  const { chain } = useAccount();
+  const { switchChain } = useSwitchChain();
 
   const $vaultData = useStore(vaultData);
   const $assets: any = useStore(assets);
@@ -135,7 +139,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     !underlyingToken || option[0] !== underlyingToken?.address;
 
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       if (apprDepo.includes(1)) return true;
     }
     if (apprDepo.length < 2) {
@@ -156,23 +163,45 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     if (!change) {
       for (let i = 0; i < input.length; i++) {
-        if (
-          allowance &&
-          $assets &&
-          $assetsBalances &&
-          input[i] <= $assetsBalances[$assets[i]] &&
-          allowance[$assets[i]]?.allowance[0] >= input[i]
-        ) {
-          apprDepo.push(1);
+        if (vault.strategyInfo.shortName === "IRMF") {
+          if (
+            allowance &&
+            $assets &&
+            $assetsBalances &&
+            input[i] <= $assetsBalances[$assets[0]] &&
+            allowance[$assets[0]]?.allowance[0] >= input[i]
+          ) {
+            apprDepo.push(1);
+          } else {
+            apprDepo.push(2);
+          }
         } else {
-          apprDepo.push(2);
+          if (
+            allowance &&
+            $assets &&
+            $assetsBalances &&
+            input[i] <= $assetsBalances[$assets[i]] &&
+            allowance[$assets[i]]?.allowance[0] >= input[i]
+          ) {
+            apprDepo.push(1);
+          } else {
+            apprDepo.push(2);
+          }
         }
       }
 
       const button = checkButtonApproveDeposit(apprDepo);
+
       if (button) {
-        if (vault.strategyInfo.shortName === "IQMF") {
-          setIsApprove(1);
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        ) {
+          const index =
+            input.findIndex((amount) => amount) > 0
+              ? input.findIndex((amount) => amount)
+              : 0;
+          setIsApprove(apprDepo[index]);
         } else {
           setIsApprove(apprDepo[apprDepo.length - 1]);
         }
@@ -319,39 +348,40 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         const logo =
           vault.strategyInfo.shortName === "DQMF"
             ? "/protocols/DefiEdge.svg"
-            : vault.strategyInfo.shortName === "IQMF"
+            : vault.strategyInfo.shortName === "IQMF" ||
+              vault.strategyInfo.shortName === "IRMF"
             ? "/protocols/Ichi.png"
             : "/protocols/Gamma.png";
         if ($connected) {
           let underlyingSymbol = "";
 
           if (vault.strategyInfo.shortName === "DQMF") {
-            underlyingSymbol = await readContract(_publicClient, {
+            underlyingSymbol = await readContract(wagmiConfig, {
               address: vault.underlying,
               abi: ERC20DQMFABI,
               functionName: "symbol",
             });
             underlyingSymbol = decodeHex(underlyingSymbol);
           } else {
-            underlyingSymbol = await readContract(_publicClient, {
+            underlyingSymbol = await readContract(wagmiConfig, {
               address: vault.underlying,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
             });
           }
 
-          const underlyingDecimals = await readContract(_publicClient, {
+          const underlyingDecimals = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "decimals",
           });
-          const underlyingAllowance = await readContract(_publicClient, {
+          const underlyingAllowance = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "allowance",
             args: [$account as TAddress, vault.address],
           });
-          const underlyingBalance = await readContract(_publicClient, {
+          const underlyingBalance = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "balanceOf",
@@ -390,14 +420,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     let allowanceData;
     if (tab === "Deposit") {
       if (asset === underlyingToken?.address) {
-        allowanceData = await readContract(_publicClient, {
+        allowanceData = await readContract(wagmiConfig, {
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, vault.address],
         });
       } else {
-        allowanceData = await readContract(_publicClient, {
+        allowanceData = await readContract(wagmiConfig, {
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -405,7 +435,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
       }
     } else {
-      allowanceData = await readContract(_publicClient, {
+      allowanceData = await readContract(wagmiConfig, {
         address: vault.address,
         abi: ERC20ABI,
         functionName: "allowance",
@@ -443,7 +473,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       if (asset === underlyingToken?.address) {
         try {
-          const previewDepositAssets = await readContract(_publicClient, {
+          const previewDepositAssets = await readContract(wagmiConfig, {
             address: vault.address,
             abi: VaultABI,
             functionName: "previewDepositAssets",
@@ -451,7 +481,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           });
 
           setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-          const allowanceData = (await readContract(_publicClient, {
+          const allowanceData = (await readContract(wagmiConfig, {
             address: option[0] as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -553,7 +583,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             Math.trunc(Number(gas) * Number(settings.gasLimit))
           );
           setNeedConfirm(true);
-          const assetApprove = await writeContract({
+          const assetApprove = await writeContract(wagmiConfig, {
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
@@ -562,9 +592,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           });
           setNeedConfirm(false);
           setLoader(true);
-          const transaction = await _publicClient.waitForTransactionReceipt({
+          const transaction = await waitForTransactionReceipt(wagmiConfig, {
             confirmations: 5,
-            hash: assetApprove?.hash,
+            hash: assetApprove,
           });
 
           if (transaction.status === "success") {
@@ -609,7 +639,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        const assetApprove = await writeContract({
+        const assetApprove = await writeContract(wagmiConfig, {
           address: underlyingToken?.address,
           abi: ERC20ABI,
           functionName: "approve",
@@ -619,9 +649,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setNeedConfirm(false);
         setLoader(true);
 
-        const transaction = await _publicClient.waitForTransactionReceipt({
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: assetApprove?.hash,
+          hash: assetApprove,
         });
 
         if (transaction.status === "success") {
@@ -667,7 +697,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         const out = shares - (shares * decimalPercent) / 100n;
 
-        const txToken = {
+        const txToken: any = {
           [underlyingToken?.address]: {
             amount: amount,
             symbol: underlyingToken?.symbol,
@@ -691,7 +721,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        depositAssets = await writeContract({
+        depositAssets = await writeContract(wagmiConfig, {
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -706,13 +736,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setNeedConfirm(false);
         setLoader(true);
 
-        transaction = await _publicClient.waitForTransactionReceipt({
+        transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: depositAssets?.hash,
+          hash: depositAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: depositAssets?.hash,
+          hash: depositAssets,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
@@ -758,7 +788,15 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
         let txData = zapTokens.map((tokens: any) => tokens.txData);
 
-        if (vault.strategyInfo.shortName === "IQMF") txData.push("");
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        )
+          txData.push("");
+
+        if (vault.strategyInfo.shortName === "IRMF") {
+          txData.reverse();
+        }
 
         gas = await _publicClient.estimateContractGas({
           address: $platformData.zap,
@@ -777,7 +815,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
         setNeedConfirm(true);
-        zapDeposit = await writeContract({
+        zapDeposit = await writeContract(wagmiConfig, {
           address: $platformData.zap,
           abi: ZapABI,
           functionName: "deposit",
@@ -794,15 +832,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-
-        transaction = await _publicClient.waitForTransactionReceipt({
+        transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: zapDeposit?.hash,
+          hash: zapDeposit,
         });
 
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: zapDeposit?.hash,
+          hash: zapDeposit,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
@@ -839,7 +876,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
       const allowanceData = await getZapAllowance(option[0]);
-      const zapAmounts = await readContract(_publicClient, {
+      const zapAmounts = await readContract(wagmiConfig, {
         address: $platformData.zap,
         abi: ZapABI,
         functionName: "getDepositSwapAmounts",
@@ -860,7 +897,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       let outData = await Promise.all(promises);
 
-      if (vault.strategyInfo.shortName === "IQMF") {
+      if (
+        vault.strategyInfo.shortName === "IQMF" ||
+        vault.strategyInfo.shortName === "IRMF"
+      ) {
         outData = outData.filter(
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
@@ -868,12 +908,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       setZapTokens(outData);
       let assets: TAddress[] = vault.assets.map((asset) => asset.address);
       let amounts;
-      if (vault.strategyInfo.shortName === "IQMF") {
+
+      if (
+        vault.strategyInfo.shortName === "IQMF" ||
+        vault.strategyInfo.shortName === "IRMF"
+      ) {
         amounts = vault.assetsProportions.map((proportion, index) =>
           proportion
             ? parseUnits(
-                outData[index]?.amountOut as string,
-                getTokenData(outData[index]?.address as TAddress)
+                outData[0]?.amountOut as string,
+                getTokenData(outData[0]?.address as TAddress)
                   ?.decimals as number
               )
             : 0n
@@ -892,7 +936,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
-      const previewDepositAssets = await readContract(_publicClient, {
+      const previewDepositAssets = await readContract(wagmiConfig, {
         address: vault.address,
         abi: VaultABI,
         functionName: "previewDepositAssets",
@@ -936,11 +980,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         args: [$platformData.zap, approveSum],
         account: $account as TAddress,
       });
+
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(settings.gasLimit))
       );
       setNeedConfirm(true);
-      const assetApprove = await writeContract({
+      const assetApprove = await writeContract(wagmiConfig, {
         address: vault.address,
         abi: ERC20ABI,
         functionName: "approve",
@@ -949,14 +994,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       });
       setNeedConfirm(false);
       setLoader(true);
-      const transaction = await _publicClient.waitForTransactionReceipt({
+      const transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: assetApprove?.hash,
+        hash: assetApprove,
       });
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
-        const newAllowance = await readContract(_publicClient, {
+        const newAllowance = await readContract(wagmiConfig, {
           address: option[0] as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -1034,7 +1079,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        const assetApprove = await writeContract({
+        const assetApprove = await writeContract(wagmiConfig, {
           address: asset,
           abi: ERC20ABI,
           functionName: "approve",
@@ -1043,14 +1088,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        const transaction = await _publicClient.waitForTransactionReceipt({
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: assetApprove?.hash,
+          hash: assetApprove,
         });
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
-          const newAllowance = (await readContract(_publicClient, {
+          const newAllowance = (await readContract(wagmiConfig, {
             address: asset,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -1076,7 +1121,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
       } catch (err) {
         lastTx.set("No approve hash...");
-        const newAllowance = (await readContract(_publicClient, {
+        const newAllowance = (await readContract(wagmiConfig, {
           address: asset,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -1159,7 +1204,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       }
     }
     try {
-      if (vault.strategyInfo.shortName !== "IQMF") {
+      if (
+        vault.strategyInfo.shortName !== "IQMF" &&
+        vault.strategyInfo.shortName !== "IRMF"
+      ) {
         gas = await _publicClient.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
@@ -1169,7 +1217,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
         setNeedConfirm(true);
-        depositAssets = await writeContract({
+        depositAssets = await writeContract(wagmiConfig, {
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -1180,7 +1228,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       } else {
         // IQMF strategy only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
-
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
           proportion ? amounts[0] : 0n
         );
@@ -1193,7 +1240,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
         setNeedConfirm(true);
-        depositAssets = await writeContract({
+        depositAssets = await writeContract(wagmiConfig, {
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -1203,16 +1250,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         setNeedConfirm(false);
       }
       setLoader(true);
-      transaction = await _publicClient.waitForTransactionReceipt({
+      transaction = await waitForTransactionReceipt(wagmiConfig, {
         confirmations: 5,
-        hash: depositAssets?.hash,
+        hash: depositAssets,
       });
       if (transaction.status === "success") {
         resetFormAfterTx();
       }
       setLocalStoreHash({
         timestamp: new Date().getTime(),
-        hash: depositAssets?.hash,
+        hash: depositAssets,
         status: transaction?.status || "reverted",
         type: "deposit",
         vault: vault.address,
@@ -1252,7 +1299,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
     let assets = $assets;
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       assets = vault.assets.map((asset) => asset.address);
     }
     if (underlyingToken?.address === option[0]) {
@@ -1283,7 +1333,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        withdrawAssets = await writeContract({
+        withdrawAssets = await writeContract(wagmiConfig, {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1292,13 +1342,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        transaction = await _publicClient.waitForTransactionReceipt({
+        transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
@@ -1362,7 +1412,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        withdrawAssets = await writeContract({
+        withdrawAssets = await writeContract(wagmiConfig, {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1371,13 +1421,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        transaction = await _publicClient.waitForTransactionReceipt({
+        transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: withdrawAssets?.hash,
+          hash: withdrawAssets,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
@@ -1439,7 +1489,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Math.trunc(Number(gas) * Number(settings.gasLimit))
         );
         setNeedConfirm(true);
-        zapWithdraw = await writeContract({
+        zapWithdraw = await writeContract(wagmiConfig, {
           address: $platformData.zap,
           abi: ZapABI,
           functionName: "withdraw",
@@ -1455,13 +1505,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        transaction = await _publicClient.waitForTransactionReceipt({
+        transaction = await waitForTransactionReceipt(wagmiConfig, {
           confirmations: 5,
-          hash: zapWithdraw?.hash,
+          hash: zapWithdraw,
         });
         setLocalStoreHash({
           timestamp: new Date().getTime(),
-          hash: zapWithdraw?.hash,
+          hash: zapWithdraw,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
@@ -1554,7 +1604,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       } else {
         let assetsLength = $assets.map((_: any) => 0n);
         let assets = $assets;
-        if (vault.strategyInfo.shortName === "IQMF") {
+        if (
+          vault.strategyInfo.shortName === "IQMF" ||
+          vault.strategyInfo.shortName === "IRMF"
+        ) {
           assetsLength = [0n, 0n];
           assets = vault.assets.map((asset) => asset.address);
         }
@@ -1636,7 +1689,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     const allowanceResult: TVaultAllowance | any = {};
 
     for (let i = 0; i < option.length; i++) {
-      const allowanceData = (await readContract(_publicClient, {
+      const allowanceData = (await readContract(wagmiConfig, {
         address: option[i] as TAddress,
         abi: ERC20ABI,
         functionName: "allowance",
@@ -1679,8 +1732,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         }
         try {
           let previewDepositAssets: any;
-          if (vault.strategyInfo.shortName !== "IQMF") {
-            previewDepositAssets = await readContract(_publicClient, {
+          if (
+            vault.strategyInfo.shortName !== "IQMF" &&
+            vault.strategyInfo.shortName !== "IRMF"
+          ) {
+            previewDepositAssets = await readContract(wagmiConfig, {
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
@@ -1689,12 +1745,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           } else {
             // IQMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
-
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
-
-            previewDepositAssets = await readContract(_publicClient, {
+            previewDepositAssets = await readContract(wagmiConfig, {
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
@@ -1750,7 +1804,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   }, []);
 
   useEffect(() => {
-    if (vault.strategyInfo.shortName === "IQMF") {
+    if (
+      vault.strategyInfo.shortName === "IQMF" ||
+      vault.strategyInfo.shortName === "IRMF"
+    ) {
       let assetsData;
       switch (tab) {
         case "Deposit":
@@ -2022,7 +2079,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         underlyingToken?.address,
                         vault.strategyInfo.shortName === "DQMF"
                           ? "/protocols/DefiEdge.svg"
-                          : vault.strategyInfo.shortName === "IQMF"
+                          : vault.strategyInfo.shortName === "IQMF" ||
+                            vault.strategyInfo.shortName === "IRMF"
                           ? "/protocols/Ichi.png"
                           : "/protocols/Gamma.png"
                       );
@@ -2289,6 +2347,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           onClick={deposit}
                         >
                           <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
+
                           {transactionInProgress && (
                             <Loader color={"#486556"} />
                           )}
@@ -2347,7 +2406,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </>
                   ) : (
                     <button
-                      onClick={() => switchNetwork?.(137)}
+                      onClick={() => switchChain({ chainId: 137 })}
                       className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                       type="button"
                     >
@@ -2666,7 +2725,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </>
                   ) : (
                     <button
-                      onClick={() => switchNetwork?.(137)}
+                      onClick={() => switchChain({ chainId: 137 })}
                       className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                       type="button"
                     >
@@ -3025,7 +3084,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </>
               ) : (
                 <button
-                  onClick={() => switchNetwork?.(137)}
+                  onClick={() => switchChain({ chainId: 137 })}
                   className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                   type="button"
                 >

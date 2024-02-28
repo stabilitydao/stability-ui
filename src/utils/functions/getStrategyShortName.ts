@@ -30,6 +30,9 @@ export const getStrategyShortName = (vaultSymbol: string): string => {
       : "Unknown";
     return symbol;
   }
+  if (vaultSymbol.match(/IRMF\d+$/)) {
+    return "IRMF";
+  }
 
   return "Unknown";
 };

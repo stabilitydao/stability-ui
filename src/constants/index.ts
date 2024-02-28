@@ -212,6 +212,10 @@ const PROTOCOLS = {
     name: "Ichi",
     logoSrc: "/protocols/Ichi.png",
   },
+  retro: {
+    name: "Retro",
+    logoSrc: "/protocols/Retro.svg",
+  },
 };
 
 const GRAPH_ENDPOINT =
@@ -246,6 +250,7 @@ const GRAPH_QUERY = `
           assetsWithApr
           assetsAprs
           vaultStatus
+          AssetsPricesOnCreation
         }
         platformEntities {
           version
@@ -278,6 +283,7 @@ const GRAPH_QUERY = `
           APRFromLastEvent
         }
         lastFeeAMLEntities {
+          id
           timestamps
           APRS
         }

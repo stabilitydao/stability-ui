@@ -13,6 +13,8 @@ import {
   connected,
 } from "@store";
 
+import { WagmiLayout } from "@layouts";
+
 import { BuildForm } from "./BuildForm";
 
 import type {
@@ -213,10 +215,10 @@ const CreateVaultComponent = () => {
   }, [$balances]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
-    variant => variant.vaultType === "Compounding"
+    (variant) => variant.vaultType === "Compounding"
   ).length;
   return (
-    <>
+    <WagmiLayout>
       {$connected ? (
         <div>
           <h2 className="text-[22px] mb-3">Compounding vault</h2>
@@ -241,7 +243,8 @@ const CreateVaultComponent = () => {
                         variant.strategyDesc +
                         variant.vaultType +
                         variant.strategyId
-                      }>
+                      }
+                    >
                       <td>{variant.strategyId}</td>
                       <td>{variant.strategyDesc}</td>
                       <td>
@@ -250,7 +253,8 @@ const CreateVaultComponent = () => {
                             className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                             onClick={() => {
                               setBuildIndex(i);
-                            }}>
+                            }}
+                          >
                             Assemble
                           </button>
                         )}
@@ -276,12 +280,13 @@ const CreateVaultComponent = () => {
                     rewarding vaults can be created:
                   </p>
                   <div className="flex flex-col">
-                    {Object.keys(allowedBBTokenVaults).map(token => {
+                    {Object.keys(allowedBBTokenVaults).map((token) => {
                       const tokenData = getTokenData(token);
                       return (
                         <div
                           key={token}
-                          className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md">
+                          className="flex items-center justify-center gap-1 text-[16px] border-[2px] bg-[#485069] text-[#B4BFDF] border-[#6376AF] rounded-md"
+                        >
                           <div className="flex items-center justify-center px-1 py-1">
                             {tokenData && (
                               <img
@@ -351,7 +356,8 @@ const CreateVaultComponent = () => {
                       variant.vaultType +
                       variant.strategyId
                     }
-                    className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]">
+                    className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                  >
                     <td>{variant.vaultType}</td>
                     <td>
                       {
@@ -368,7 +374,8 @@ const CreateVaultComponent = () => {
                           className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                           onClick={() => {
                             setBuildIndex(i);
-                          }}>
+                          }}
+                        >
                           Assemble
                         </button>
                       )}
@@ -390,7 +397,8 @@ const CreateVaultComponent = () => {
                     variant.vaultType +
                     variant.strategyId
                   }
-                  className="flex flex-col items-center justify-center py-[10px] transition delay-[10ms] bg-[#2C2F38] w-full px-5 rounded-md">
+                  className="flex flex-col items-center justify-center py-[10px] transition delay-[10ms] bg-[#2C2F38] w-full px-5 rounded-md"
+                >
                   <div className="flex justify-between border-b w-full border-[#4f5158] text-[16px] text-[#8f8f8f]">
                     <p className="w-1/2 border-r border-[#4f5158]">
                       Vault type
@@ -427,7 +435,8 @@ const CreateVaultComponent = () => {
                       className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
                       onClick={() => {
                         setBuildIndex(i);
-                      }}>
+                      }}
+                    >
                       Assemble
                     </button>
                   )}
@@ -444,13 +453,15 @@ const CreateVaultComponent = () => {
               className="overlay"
               onClick={() => {
                 setBuildIndex(undefined);
-              }}>
+              }}
+            >
               <div
                 className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[10px] sm:px-[30px] rounded-md bg-modal mr-0 md:mr-5 "
-                onClick={e => {
+                onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                }}>
+                }}
+              >
                 <div className="font-bold text-[1.2rem] sm:text-[1.5rem] flex justify-center">
                   Assembling
                 </div>
@@ -479,11 +490,12 @@ const CreateVaultComponent = () => {
         <button
           type="button"
           className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-          onClick={() => open()}>
+          onClick={() => open()}
+        >
           CONNECT WALLET
         </button>
       )}
-    </>
+    </WagmiLayout>
   );
 };
 export { CreateVaultComponent };

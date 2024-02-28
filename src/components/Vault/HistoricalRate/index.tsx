@@ -73,6 +73,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 skip: ${entities}
             ) {
                 APR
+                APR24H
                 address
                 sharePrice
                 TVL
@@ -104,6 +105,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         timestamp: obj.timestamp,
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
+        APR24H: obj.APR24H,
       }));
     setChartData(workedData);
     setActiveChart({ name: "APR", data: APRChartData });
@@ -135,42 +137,93 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
     const NOW = Math.floor(Date.now() / 1000);
     const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
+
     switch (chartType) {
       case "APR":
-        const APRChartData = chartData
-          .filter(
-            (obj: TChartData) =>
-              obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
-          )
-          .map((obj: TChartData) => ({
-            unixTimestamp: obj.unixTimestamp,
-            timestamp: obj.timestamp,
-            date: obj.date,
-            APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
-          }));
+        const APRArr = chartData.filter(
+          (obj: TChartData) =>
+            obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        const APRWidthPercent =
+          (APRArr[APRArr.length - 1].unixTimestamp - APRArr[0].unixTimestamp) /
+          500;
+
+        let sum = 0;
+        const APRDifferences = APRArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = APRArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          sum += diff;
+          return Math.floor(sum / APRWidthPercent);
+        });
+
+        const APRChartData = APRArr.map((obj: TChartData, index: number) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
+          x: APRDifferences[index],
+          y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
+        }));
         setActiveChart({
           name: "APR",
           data: APRChartData,
         });
         break;
       case "TVL":
-        const TVLChartData = chartData
-          .filter((obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME)
-          .map((obj: TChartData) => ({
-            unixTimestamp: obj.unixTimestamp,
-            timestamp: obj.timestamp,
-            date: obj.date,
-            TVL: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
-          }));
+        const TVLArr = chartData.filter(
+          (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+        );
+        const TVLWidthPercent =
+          (TVLArr[TVLArr.length - 1].unixTimestamp - TVLArr[0].unixTimestamp) /
+          500;
+
+        let TSum = 0;
+
+        const TVLDifferences = TVLArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = TVLArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          TSum += diff;
+          return Math.floor(TSum / TVLWidthPercent);
+        });
+
+        const TVLChartData = TVLArr.map((obj: TChartData, index: number) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          TVL: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+          x: TVLDifferences[index],
+          y: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+        }));
         setActiveChart({
           name: "TVL",
           data: TVLChartData,
         });
         break;
       case "sharePrice":
-        const priceChartData = chartData
-          .filter((obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME)
-          .map((obj: TChartData) => ({
+        const PriceArr = chartData.filter(
+          (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        const PriceWidthPercent =
+          (PriceArr[PriceArr.length - 1].unixTimestamp -
+            PriceArr[0].unixTimestamp) /
+          500;
+
+        let PSum = 0;
+
+        const PriceDifferences = PriceArr.map((entry, index) => {
+          if (index === 0) return 0;
+          const prevEntry = PriceArr[index - 1];
+          const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+          PSum += diff;
+          return Math.floor(PSum / PriceWidthPercent);
+        });
+
+        const priceChartData = PriceArr.map(
+          (obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
             date: obj.date,
@@ -179,7 +232,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               18,
               "withDecimals"
             ),
-          }));
+            x: PriceDifferences[index],
+            y: formatFromBigInt(obj.sharePrice as number, 18, "withDecimals"),
+          })
+        );
         setActiveChart({
           name: "sharePrice",
           data: priceChartData,
@@ -201,7 +257,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     getData();
   }, []);
 
-  return (
+  return activeChart && activeChart?.data?.length ? (
     <div className="rounded-md mt-5 bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
         <h2 className="text-start text-[1rem] min-[380px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem]">
@@ -254,11 +310,11 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       </div>
       <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p
-          onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
-          className="opacity-50 hover:opacity-100 cursor-pointer"
-        >
-          1D
-        </p> */}
+      onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
+      className="opacity-50 hover:opacity-100 cursor-pointer"
+    >
+      1D
+    </p> */}
         <p
           onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
           className={`hover:opacity-100 cursor-pointer ${
@@ -285,6 +341,8 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         </p>
       </div>
     </div>
+  ) : (
+    <></>
   );
 });
 

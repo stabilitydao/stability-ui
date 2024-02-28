@@ -1,11 +1,16 @@
 import type React from "react";
+
 import { useEffect } from "react";
 import { formatUnits } from "viem";
+
 import axios from "axios";
+
 import { useStore } from "@nanostores/react";
 
-import { readContract } from "viem/actions";
-import { useAccount, usePublicClient, useNetwork, WagmiConfig } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
+import { simulateContract, readContract } from "@wagmi/core";
+
+import { WagmiLayout } from "@layouts";
 
 import {
   account,
@@ -63,7 +68,8 @@ import type { TAddress, TIQMFAlm } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
-  const { chain } = useNetwork();
+
+  const { chain } = useAccount();
 
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
@@ -93,7 +99,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
-  const setGraphData = async (data: any) => {
+  const setGraphData = async (data: any, history: any) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
@@ -105,23 +111,29 @@ const AppStore = (props: React.PropsWithChildren) => {
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
-
         let dailyAPR = 0;
         const assetsWithApr: string[] = [];
         const assetsAprs: string[] = [];
         let rebalances = {};
-
         if (APIData?.apr?.daily) {
           dailyAPR = APIData.apr.daily;
           assetsWithApr.push("Pool swap fees");
           assetsAprs.push(Number(dailyAPR).toFixed(2));
         }
+
         if (strategyInfo?.shortName === "IQMF") {
           const YEAR = 525600;
           const NOW = Math.floor(Date.now() / 1000);
-          const newAPRs = [];
-          const weights = [];
-          let threshold = 0;
+          const dailyAPRs = [];
+          const dailyWeights = [];
+          const weeklyAPRs = [];
+          const weeklyWeights = [];
+          let dailyThreshold = 0;
+          let weeklyThreshold = 0;
+
+          const lastFeeAMLEntitity = data.lastFeeAMLEntities.find(
+            (entity) => entity.id === vault.underlying
+          );
 
           const IQMFAlms = data.almrebalanceEntities
             .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
@@ -129,7 +141,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               (a: TIQMFAlm, b: TIQMFAlm) =>
                 Number(b.timestamp) - Number(a.timestamp)
             );
-
           const _24HRebalances = IQMFAlms.filter(
             (obj: any) => Number(obj.timestamp) >= NOW - 86400
           ).length;
@@ -139,32 +150,32 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
-          const APRs = data.lastFeeAMLEntities[0].APRS.map(
-            (value: string) => (Number(value) / 100000) * 100
+          const APRs = lastFeeAMLEntitity.APRS.map(
+            (value: string) => (Number(value) / 10000000000) * 100
           );
-          const timestamps = data.lastFeeAMLEntities[0].timestamps;
+          const timestamps = lastFeeAMLEntitity.timestamps;
 
           const collectFees = await _publicClient.simulateContract({
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "collectFees",
           });
-          const token0 = await readContract(_publicClient, {
+          const token0 = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "token0",
           });
-          const token1 = await readContract(_publicClient, {
+          const token1 = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "token1",
           });
-          const getTotalAmounts = await readContract(_publicClient, {
+          const getTotalAmounts = await readContract(wagmiConfig, {
             address: vault.underlying,
             abi: ICHIABI,
             functionName: "getTotalAmounts",
           });
-          const price = await readContract(_publicClient, {
+          const price = await readContract(wagmiConfig, {
             address: priceReader,
             abi: PriceReaderABI,
             functionName: "getAssetsPrice",
@@ -184,32 +195,63 @@ const AppStore = (props: React.PropsWithChildren) => {
           APRs.reverse();
           timestamps.reverse();
 
+          // daily
           for (let i = 0; i < APRs.length; i++) {
             if (APRs.length === i + 1) {
               break;
             }
             let diff = timestamps[i] - timestamps[i + 1];
-            if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-              threshold += diff;
-              weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+            if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+              dailyThreshold += diff;
+              dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
             } else {
-              weights.push(
-                (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+              dailyWeights.push(
+                (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
                   TIMESTAMPS_IN_SECONDS.DAY
               );
               break;
             }
           }
-
-          for (let i = 0; i < weights.length; i++) {
-            newAPRs.push(APRs[i] * weights[i]);
+          for (let i = 0; i < dailyWeights.length; i++) {
+            dailyAPRs.push(APRs[i] * dailyWeights[i]);
+          }
+          // weekly
+          for (let i = 0; i < APRs.length; i++) {
+            if (APRs.length === i + 1) {
+              break;
+            }
+            let diff = timestamps[i] - timestamps[i + 1];
+            if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+              weeklyThreshold += diff;
+              weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+            } else {
+              weeklyWeights.push(
+                (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+                  TIMESTAMPS_IN_SECONDS.WEEK
+              );
+              break;
+            }
+          }
+          for (let i = 0; i < weeklyWeights.length; i++) {
+            weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
           }
 
-          dailyAPR =
-            newAPRs.reduce((acc, value) => (acc += value), 0) / newAPRs.length;
-          assetsWithApr.push("Pool swap fees");
-          assetsAprs.push(Number(dailyAPR).toFixed(2));
+          if (dailyAPRs.length) {
+            dailyAPR = dailyAPRs.reduce((acc, value) => (acc += value), 0);
+
+            assetsWithApr.push("Pool swap fees");
+            assetsAprs.push(Number(dailyAPR).toFixed(2));
+          }
+          if (weeklyAPRs.length) {
+            let weeklyAPR = weeklyAPRs.reduce(
+              (acc, value) => (acc += value),
+              0
+            );
+            assetsAprs.push(Number(weeklyAPR).toFixed(2));
+          }
+          assetsAprs.push(Number(apr).toFixed(2));
         }
+
         const APR = (
           formatFromBigInt(String(vault.apr), 3, "withDecimals") +
           Number(dailyAPR)
@@ -249,11 +291,12 @@ const AppStore = (props: React.PropsWithChildren) => {
         );
 
         const assets = await assetsPromise;
-
         vaults[vault.id] = {
           address: vault.id,
           name: vault.name,
           symbol: vault.symbol,
+          created: vault.created,
+          assetsPricesOnCreation: vault.AssetsPricesOnCreation,
           type: vault.vaultType,
           strategy: vault.strategyId,
           shareprice: vault.sharePrice,
@@ -281,6 +324,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           version: vault.version,
           strategyVersion: strategyEntity.version,
           rebalances: rebalances,
+          aprData: history.filter((data) => data.address === vault.id)[0],
         };
 
         return vaults;
@@ -314,7 +358,36 @@ const AppStore = (props: React.PropsWithChildren) => {
         console.log("GRAPH API ERROR:", error);
       }
     }
+    /////
+    const DATA = [];
+    let entities = 0;
+    let status = true;
 
+    while (status) {
+      const HISTORY_QUERY = `{
+            vaultHistoryEntities(
+                skip: ${entities}
+            ) {
+                address
+                timestamp
+                APR24H
+                APRWeekly
+            }}`;
+
+      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+        query: HISTORY_QUERY,
+      });
+      DATA.push(...graphResponse.data.data.vaultHistoryEntities);
+
+      if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
+        status = false;
+      }
+      entities += 100;
+    }
+    const historyData = DATA.sort(
+      (a, b) => Number(b.timestamp) - Number(a.timestamp)
+    );
+    /////
     if (retries >= maxRetries) {
       error.set({ state: true, type: "API", description: apiError });
 
@@ -323,12 +396,11 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
 
-    setGraphData(graphResponse.data.data);
-
+    await setGraphData(graphResponse.data.data, historyData);
     if (isConnected) {
       isWeb3Load.set(true);
       try {
-        const contractData: any = await readContract(_publicClient, {
+        const contractData: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
           functionName: "getData",
@@ -357,7 +429,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        const contractBalance: any = await readContract(_publicClient, {
+        const contractBalance: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
           functionName: "getBalance",
@@ -390,7 +462,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        const contractVaults: any = await readContract(_publicClient, {
+        const contractVaults: any = await readContract(wagmiConfig, {
           address: contractBalance[6][1],
           abi: IVaultManagerABI,
           functionName: "vaults",
@@ -398,7 +470,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const vaultInfoes: any[] = await Promise.all(
           contractVaults[0].map(async (vault: string) => {
-            const response: any = await readContract(_publicClient, {
+            const response: any = await readContract(wagmiConfig, {
               address: contractBalance[6][1],
               abi: IVaultManagerABI,
               functionName: "vaultInfo",
@@ -411,7 +483,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           if (vaultInfo[3]?.length) {
             for (let i = 0; i < vaultInfo[3]?.length; i++) {
               const assetWithApr = vaultInfo[3][i];
-              const symbol = await readContract(_publicClient, {
+              const symbol = await readContract(wagmiConfig, {
                 address: assetWithApr,
                 abi: ERC20MetadataUpgradeableABI,
                 functionName: "symbol",
@@ -461,13 +533,20 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
-
               if (strategyInfo?.shortName === "IQMF") {
                 const YEAR = 525600;
                 const NOW = Math.floor(Date.now() / 1000);
-                const newAPRs = [];
-                const weights = [];
-                let threshold = 0;
+                const dailyAPRs = [];
+                const dailyWeights = [];
+                const weeklyAPRs = [];
+                const weeklyWeights = [];
+                let dailyThreshold = 0;
+                let weeklyThreshold = 0;
+
+                const lastFeeAMLEntitity =
+                  graphResponse.data.data.lastFeeAMLEntities.find(
+                    (entity) => entity.id === graphVault.underlying
+                  );
 
                 const IQMFAlms = graphResponse.data.data.almrebalanceEntities
                   .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
@@ -485,34 +564,36 @@ const AppStore = (props: React.PropsWithChildren) => {
 
                 rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
-                const APRs =
-                  graphResponse.data.data.lastFeeAMLEntities[0].APRS.map(
-                    (value: string) => (Number(value) / 100000) * 100
-                  );
-                const timestamps =
-                  graphResponse.data.data.lastFeeAMLEntities[0].timestamps;
+                const APRs = lastFeeAMLEntitity.APRS.map(
+                  (value: string) => (Number(value) / 100000) * 100
+                );
+
+                const timestamps = lastFeeAMLEntitity.timestamps?.map(
+                  (timestamp: number | string) => Number(timestamp)
+                );
 
                 const collectFees = await _publicClient.simulateContract({
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "collectFees",
                 });
-                const token0 = await readContract(_publicClient, {
+
+                const token0 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "token0",
                 });
-                const token1 = await readContract(_publicClient, {
+                const token1 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "token1",
                 });
-                const getTotalAmounts = await readContract(_publicClient, {
+                const getTotalAmounts = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "getTotalAmounts",
                 });
-                const price = await readContract(_publicClient, {
+                const price = await readContract(wagmiConfig, {
                   address: priceReader,
                   abi: PriceReaderABI,
                   functionName: "getAssetsPrice",
@@ -529,39 +610,72 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const totalPrice = Number(price[1][2] + price[1][3]);
 
                 let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+
                 let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+
                 APRs.push(apr);
                 timestamps.push(NOW);
 
                 APRs.reverse();
                 timestamps.reverse();
 
+                //   // daily
                 for (let i = 0; i < APRs.length; i++) {
                   if (APRs.length === i + 1) {
                     break;
                   }
                   let diff = timestamps[i] - timestamps[i + 1];
-                  if (threshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-                    threshold += diff;
-                    weights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+                  if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+                    dailyThreshold += diff;
+                    dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
                   } else {
-                    weights.push(
-                      (TIMESTAMPS_IN_SECONDS.DAY - threshold) /
+                    dailyWeights.push(
+                      (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
                         TIMESTAMPS_IN_SECONDS.DAY
                     );
                     break;
                   }
                 }
-
-                for (let i = 0; i < weights.length; i++) {
-                  newAPRs.push(APRs[i] * weights[i]);
+                for (let i = 0; i < dailyWeights.length; i++) {
+                  dailyAPRs.push(APRs[i] * dailyWeights[i]);
+                }
+                // weekly
+                for (let i = 0; i < APRs.length; i++) {
+                  if (APRs.length === i + 1) {
+                    break;
+                  }
+                  let diff = timestamps[i] - timestamps[i + 1];
+                  if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+                    weeklyThreshold += diff;
+                    weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+                  } else {
+                    weeklyWeights.push(
+                      (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+                        TIMESTAMPS_IN_SECONDS.WEEK
+                    );
+                    break;
+                  }
+                }
+                for (let i = 0; i < weeklyWeights.length; i++) {
+                  weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
                 }
 
-                dailyAPR =
-                  newAPRs.reduce((acc, value) => (acc += value), 0) /
-                  newAPRs.length;
-                assetsWithApr.push("Pool swap fees");
-                assetsAprs.push(Number(dailyAPR).toFixed(2));
+                if (dailyAPRs.length) {
+                  dailyAPR = dailyAPRs.reduce(
+                    (acc, value) => (acc += value),
+                    0
+                  );
+                  assetsWithApr.push("Pool swap fees");
+                  assetsAprs.push(Number(dailyAPR).toFixed(2));
+                }
+                if (weeklyAPRs.length) {
+                  let weeklyAPR = weeklyAPRs.reduce(
+                    (acc, value) => (acc += value),
+                    0
+                  );
+                  assetsAprs.push(Number(weeklyAPR).toFixed(2));
+                }
+                assetsAprs.push(Number(apr).toFixed(2));
               }
 
               const APR = (
@@ -605,6 +719,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                   address: vault.toLowerCase(),
                   name: contractVaults[1][index],
                   symbol: contractVaults[2][index],
+                  created: graphVault.created,
+                  assetsPricesOnCreation: graphVault.AssetsPricesOnCreation,
                   type: contractVaults[3][index],
                   strategy: contractVaults[4][index].toLowerCase(),
                   shareprice: String(contractVaults[5][index]),
@@ -632,6 +748,9 @@ const AppStore = (props: React.PropsWithChildren) => {
                   version: graphVault.version,
                   strategyVersion: strategyEntity.version,
                   rebalances: rebalances,
+                  aprData: historyData.filter(
+                    (data) => data.address === vault.toLowerCase()
+                  )[0],
                 },
               };
             })
@@ -669,7 +788,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     );
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
-
     if (graphResponse?.data?.data?.platformEntities[0]?.version)
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
   };
@@ -689,9 +807,9 @@ const AppStore = (props: React.PropsWithChildren) => {
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiLayout>
       <div className="flex flex-col flex-1">{props.children}</div>
-    </WagmiConfig>
+    </WagmiLayout>
   );
 };
 

@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import { WagmiConfig } from "wagmi";
-
 import { VaultBar } from "./VaultBar";
 import { VaultActionForm } from "./VaultActionForm";
 import { StatisticBar } from "./StatisticBar";
@@ -10,11 +8,10 @@ import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
 import { HistoricalRate } from "./HistoricalRate";
+import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
 
 import { vaultData, vaults, vaultAssets, error } from "@store";
-
-import { wagmiConfig } from "@web3";
 
 import type { TAddress } from "@types";
 
@@ -44,10 +41,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </div>
     );
   }
-
   return vault && localVault ? (
-    <WagmiConfig config={wagmiConfig}>
-      <ErrorMessage type="WEB3" />
+    <WagmiLayout>
       <main className="w-full mx-auto">
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
@@ -61,7 +56,12 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
             <Strategy vault={localVault} />
 
-            <Assets assets={localVault?.assets} />
+            <Assets
+              assets={localVault?.assets}
+              created={localVault.created}
+              pricesOnCreation={localVault.assetsPricesOnCreation}
+              strategy={localVault?.strategyAddress}
+            />
             <Toast />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">
@@ -71,7 +71,8 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           </div>
         </div>
       </main>
-    </WagmiConfig>
+      <ErrorMessage type="WEB3" />
+    </WagmiLayout>
   ) : (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
       <Loader width="100" height="100" />

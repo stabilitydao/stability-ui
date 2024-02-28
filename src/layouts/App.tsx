@@ -1,18 +1,20 @@
 import type React from "react";
 
-import { WagmiConfig } from "wagmi";
-
 import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { AppStore } from "./AppStore";
-import { walletConnectProjectId, wagmiConfig, chains } from "@web3";
 
-createWeb3Modal({ wagmiConfig, projectId: walletConnectProjectId, chains });
+import { AppStore } from "./AppStore";
+
+import { WagmiLayout } from "@layouts";
+
+import { walletConnectProjectId, wagmiConfig } from "@web3";
+
+createWeb3Modal({ wagmiConfig, projectId: walletConnectProjectId });
 
 const App = (props: React.PropsWithChildren) => {
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiLayout>
       <AppStore>{props.children}</AppStore>
-    </WagmiConfig>
+    </WagmiLayout>
   );
 };
 
