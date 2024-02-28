@@ -175,30 +175,26 @@ const Wallet = () => {
       {chain && chain?.id !== 137 && (
         <button
           className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
-          onClick={() => switchNetwork?.(137)}
+          onClick={() => switchChain({ chainId: 137 })}
         >
           <p>Switch Network</p>
         </button>
       )}
       <button
-        className="bg-button py-1 px-2 rounded-md sm:mx-4 w-[120px]"
+        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] lowercase flex items-center justify-center gap-1"
         onClick={() => openProfile()}
       >
+        {$account && providerImage && (
+          <img className="w-5" src={providerImage} alt="providerImage" />
+        )}
         {$account
           ? `${
               $visible
                 ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
                 : "*************"
-            }`}
-        </button>
-      ) : (
-        <button
-          className="bg-[#603bdb] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] lowercase pb-1.5"
-          onClick={() => openProfile()}
-        >
-         Connect wallet
-        </button>
-      )}
+            }`
+          : "Connect wallet"}
+      </button>
     </div>
   );
 };

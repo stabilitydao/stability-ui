@@ -359,36 +359,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             </tr>
           </tbody>
         </table>
-
-        {/*<div className="mt-2">
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            Total APR / APY
-          </p>
-          <p>
-            {vault.apr}% / {vault.apy}%
-          </p>
-        </div>
-        {!!vault.assetsWithApr?.length && (
-          <div>
-            {vault.assetsAprs.map((apr: string, index: number) => {
-              return (
-                <div className="mt-2" key={index}>
-                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                    {vault.assetsWithApr[index]} APR
-                  </p>
-                  <p>{apr}%</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <div className="mt-2">
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-             APR 24h / Strategy APR latest 
-            strategy apr
-          </p>
-          <p>{Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%</p>
-        </div> */}
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
             Impermanent Loss

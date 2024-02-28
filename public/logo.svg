@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 512 512" xml:space="preserve">
-<polygon style="fill:#ceb7f3;" points="480,112 256,0 32,112 32,400 256,512 480,400 "/>
-<polygon style="fill:#8e68c9;" points="256,224 32,112 32,400 256,512 480,400 480,112 "/>
-<polygon style="fill:#624096;" points="256,224 256,512 480,400 480,112 "/>
+<svg width="406" height="415" viewBox="0 0 406 415" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M405.66 310.72L200.57 414.3V207.15L405.66 103.58V310.72Z" fill="#612FFB"/>
+<path d="M200.57 207.15L0 103.58L200.57 0L405.66 103.58L200.57 207.15Z" fill="#8076FF"/>
+<path d="M0 310.72L200.57 414.3V207.15L0 103.58V310.72Z" fill="#151554"/>
 </svg>

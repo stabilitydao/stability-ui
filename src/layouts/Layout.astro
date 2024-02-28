@@ -305,6 +305,10 @@ const { title } = Astro.props as IProps;
 		top:230px !important;
 		left:-140px !important;
 	}
+	.toLeftPlatform {
+		top:70px !important;
+		left:-140px !important;
+	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
 	}
@@ -332,59 +336,12 @@ const { title } = Astro.props as IProps;
 	.toLeft i::after {
   		display: none !important;
 	}
-
-	/* tooltip for platform info */
-	.tooltip-info {
-    	position:relative;
-	}
-
-	.tooltip-info .visible__tooltip {
-		width:300px;
-		left:50%;
-		top:-17px;
-		transform:translate(-30%,-100%);
-		padding:10px 20px;
-		color:#ffffff;
-		background-color:#26282f;
-		font-size:14px;
-		border-radius:8px;
-		position:absolute;
-		z-index:99999999;
-		box-sizing:border-box;
-		box-shadow:0 1px 8px rgba(0,0,0,0.5);
-		display:none;
-	}
-	 .toLeft-info {
-		top:78px !important;
-		left:-190px !important;
-	}
-	.tooltip-info:hover .visible__tooltip {
-		display:block;
+	.toLeftPlatform i::after {
+  		display: none !important;
 	}
 	.visible__tooltip:hover {
 		display: none !important;
 	}
-	.tooltip-info .visible__tooltip i {
-		position:absolute;
-		top:99%;
-		left:30%;
-		margin-left:-15px;
-		width:30px;
-		height:15px;
-		overflow:hidden;
-	}
-	.tooltip-info .visible__tooltip i::after {
-		content:'';
-		position:absolute;
-		width:15px;
-		height:15px;
-		left:50%;
-		transform:translate(-50%,-50%) rotate(45deg);
-		background-color:#26282f;
-	}
-
-
-
 	@media screen and (max-width:767px) {
 		.tooltip:hover .visible__tooltip {
 			display:none !important;

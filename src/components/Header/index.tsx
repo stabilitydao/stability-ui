@@ -23,7 +23,7 @@ const Header = () => {
       <header>
         <span className="title sm:w-4/12 md:w-5/12">
           <a href="/" title="Stability">
-            <img src="/logo8.png" alt="Stability logo"/>
+            <img src="/logo.svg" alt="Stability logo" />
             <span className="hidden sm:flex">Stability</span>
           </a>
         </span>
