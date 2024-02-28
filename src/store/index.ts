@@ -54,8 +54,9 @@ const strategyTypes = atom();
 
 const vaults = deepMap<any>();
 
-// temp hide fee APR condition
+// portfolio
 const hideFeeApr = atom(false);
+const aprFilter = atom("24h");
 
 //// tanstack query
 
@@ -101,4 +102,5 @@ export {
   isWeb3Load,
   queryClient,
   persister,
+  aprFilter,
 };

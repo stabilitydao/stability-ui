@@ -16,7 +16,7 @@ import {
   ErrorMessage,
 } from "@components";
 
-import { vaults, isVaultsLoaded, hideFeeApr, error } from "@store";
+import { vaults, isVaultsLoaded, hideFeeApr, error, aprFilter } from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -38,6 +38,7 @@ const Vaults = () => {
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $error = useStore(error);
   const $hideFeeAPR = useStore(hideFeeApr);
+  const $aprFilter = useStore(aprFilter);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
@@ -534,10 +535,35 @@ const Vaults = () => {
                           });
                         }}
                       >
-                        <p>{$hideFeeAPR ? vault.aprWithoutFees : vault.apr}%</p>
+                        <p>
+                          {$hideFeeAPR
+                            ? $aprFilter === "24h"
+                              ? vault.feesData.apr.withoutFees.daily
+                              : $aprFilter === "week"
+                              ? vault.feesData.apr.withoutFees.weekly
+                              : vault.feesData.apr.withFees[$aprFilter]
+                            : $aprFilter === "24h"
+                            ? vault.feesData.apr.withFees.daily
+                            : $aprFilter === "week"
+                            ? vault.feesData.apr.withFees.weekly
+                            : vault.feesData.apr.withFees[$aprFilter]}
+                          %
+                        </p>
                         {window.innerWidth > 915 && (
                           <p>
-                            / {$hideFeeAPR ? vault.apyWithoutFees : vault.apy}%
+                            /{" "}
+                            {$hideFeeAPR
+                              ? $aprFilter === "24h"
+                                ? vault.feesData.apy.withoutFees.daily
+                                : $aprFilter === "week"
+                                ? vault.feesData.apy.withoutFees.weekly
+                                : vault.feesData.apy.withFees[$aprFilter]
+                              : $aprFilter === "24h"
+                              ? vault.feesData.apy.withFees.daily
+                              : $aprFilter === "week"
+                              ? vault.feesData.apy.withFees.weekly
+                              : vault.feesData.apy.withFees[$aprFilter]}
+                            %
                           </p>
                         )}
                       </div>

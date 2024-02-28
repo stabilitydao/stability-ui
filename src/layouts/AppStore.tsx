@@ -8,7 +8,7 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 
 import { useAccount, usePublicClient } from "wagmi";
-import { simulateContract, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 
 import { WagmiLayout } from "@layouts";
 
@@ -291,6 +291,76 @@ const AppStore = (props: React.PropsWithChildren) => {
         );
 
         const assets = await assetsPromise;
+        /////
+        const strategyName = strategyInfo?.shortName;
+
+        const aprData = history.filter((data) => data.address === vault.id)[0];
+
+        let poolSwapFeesAPRDaily = 0;
+        let poolSwapFeesAPRWeekly = 0;
+
+        const dailyFarmApr = aprData?.APR24H
+          ? Number(formatUnits(aprData.APR24H, 3)).toFixed(2)
+          : 0;
+
+        const weeklyFarmApr = aprData?.APRWeekly
+          ? Number(formatUnits(aprData.APRWeekly, 3)).toFixed(2)
+          : 0;
+
+        if (APIData) {
+          poolSwapFeesAPRDaily = APIData?.apr?.daily || 0;
+          poolSwapFeesAPRWeekly =
+            APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
+        }
+        if (strategyName === "IQMF") {
+          poolSwapFeesAPRDaily = Number(assetsAprs[0]);
+          poolSwapFeesAPRWeekly = Number(assetsAprs[1]);
+        }
+
+        const dailyTotalAPRWithFees =
+          Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
+        const weeklyTotalAPRWithFees =
+          Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
+
+        const APRArray = {
+          withFees: {
+            latest: String(APR),
+            daily: `${dailyTotalAPRWithFees.toFixed(2)}`,
+            weekly: `${weeklyTotalAPRWithFees.toFixed(2)}`,
+          },
+          withoutFees: {
+            latest: APRWithoutFees,
+            daily: `${Number(dailyFarmApr).toFixed(2)}`,
+            weekly: `${Number(weeklyFarmApr).toFixed(2)}`,
+          },
+        };
+        const APYArray = {
+          withFees: {
+            latest: APY,
+            daily: `${calculateAPY(dailyTotalAPRWithFees).toFixed(2)}`,
+            weekly: `${calculateAPY(weeklyTotalAPRWithFees).toFixed(2)}`,
+          },
+          withoutFees: {
+            latest: APYWithoutFees,
+            daily: `${calculateAPY(dailyFarmApr).toFixed(2)}`,
+            weekly: `${calculateAPY(weeklyFarmApr).toFixed(2)}`,
+          },
+        };
+
+        const poolSwapFeesAPR =
+          strategyName != "CF"
+            ? {
+                latest: strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
+                daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
+                weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
+              }
+            : { latest: "-", daily: "-", weekly: "-" };
+        const farmAPR = {
+          latest: String(Number(formatUnits(BigInt(vault.apr), 3)).toFixed(2)),
+          daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
+          weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
+        };
+        /////
         vaults[vault.id] = {
           address: vault.id,
           name: vault.name,
@@ -324,7 +394,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           version: vault.version,
           strategyVersion: strategyEntity.version,
           rebalances: rebalances,
-          aprData: history.filter((data) => data.address === vault.id)[0],
+          aprData: aprData,
+          feesData: { apr: APRArray, apy: APYArray },
         };
 
         return vaults;
@@ -714,6 +785,84 @@ const AppStore = (props: React.PropsWithChildren) => {
                   }
                 });
               }
+
+              /////
+              const strategyName = strategyInfo?.shortName;
+              const aprData = historyData.filter(
+                (data) => data.address === vault.toLowerCase()
+              )[0];
+
+              let poolSwapFeesAPRDaily = 0;
+              let poolSwapFeesAPRWeekly = 0;
+
+              const dailyFarmApr = aprData?.APR24H
+                ? Number(formatUnits(aprData.APR24H, 3)).toFixed(2)
+                : 0;
+
+              const weeklyFarmApr = aprData?.APRWeekly
+                ? Number(formatUnits(aprData.APRWeekly, 3)).toFixed(2)
+                : 0;
+
+              if (APIData) {
+                poolSwapFeesAPRDaily = APIData?.apr?.daily || 0;
+                poolSwapFeesAPRWeekly =
+                  APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
+              }
+              if (strategyName === "IQMF") {
+                poolSwapFeesAPRDaily = Number(assetsAprs[0]);
+                poolSwapFeesAPRWeekly = Number(assetsAprs[1]);
+              }
+
+              const dailyTotalAPRWithFees =
+                Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
+              const weeklyTotalAPRWithFees =
+                Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
+
+              const APRArray = {
+                withFees: {
+                  latest: String(APR),
+                  daily: `${dailyTotalAPRWithFees.toFixed(2)}`,
+                  weekly: `${weeklyTotalAPRWithFees.toFixed(2)}`,
+                },
+                withoutFees: {
+                  latest: APRWithoutFees,
+                  daily: `${Number(dailyFarmApr).toFixed(2)}`,
+                  weekly: `${Number(weeklyFarmApr).toFixed(2)}`,
+                },
+              };
+              const APYArray = {
+                withFees: {
+                  latest: APY,
+                  daily: `${calculateAPY(dailyTotalAPRWithFees).toFixed(2)}`,
+                  weekly: `${calculateAPY(weeklyTotalAPRWithFees).toFixed(2)}`,
+                },
+                withoutFees: {
+                  latest: APYWithoutFees,
+                  daily: `${calculateAPY(dailyFarmApr).toFixed(2)}`,
+                  weekly: `${calculateAPY(weeklyFarmApr).toFixed(2)}`,
+                },
+              };
+
+              const poolSwapFeesAPR =
+                strategyName != "CF"
+                  ? {
+                      latest:
+                        strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
+                      daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
+                      weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
+                    }
+                  : { latest: "-", daily: "-", weekly: "-" };
+              const farmAPR = {
+                latest: String(
+                  Number(
+                    formatUnits(BigInt(contractVaults[8][index]), 3)
+                  ).toFixed(2)
+                ),
+                daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
+                weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
+              };
+              /////
+
               return {
                 [vault.toLowerCase()]: {
                   address: vault.toLowerCase(),
@@ -748,9 +897,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                   version: graphVault.version,
                   strategyVersion: strategyEntity.version,
                   rebalances: rebalances,
-                  aprData: historyData.filter(
-                    (data) => data.address === vault.toLowerCase()
-                  )[0],
+                  aprData: aprData,
+                  feesData: { apr: APRArray, apy: APYArray },
                 },
               };
             })

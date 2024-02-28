@@ -14,6 +14,7 @@ import {
   platformVersion,
   hideFeeApr,
   isWeb3Load,
+  aprFilter,
 } from "@store";
 
 import { formatNumber, formatFromBigInt, calculateAPY } from "@utils";
@@ -30,6 +31,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const $platformVersion = useStore(platformVersion);
   const $hideFeeAPR = useStore(hideFeeApr);
   const $isWeb3Load = useStore(isWeb3Load);
+  const $aprFilter = useStore(aprFilter);
 
   const dropDownRef = useRef(null);
 
@@ -41,7 +43,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
   const [dropDownSelector, setDropDownSelector] = useState(false);
 
-  const [activeAPRs, setActiveAPRs] = useState(APRs[1]);
+  const [activeAPRs, setActiveAPRs] = useState($aprFilter);
 
   const [portfolio, setPortfolio] = useState({
     deposited: "0",
@@ -81,9 +83,26 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
+        let apr = 0;
+        if (hideFee) {
+          apr =
+            activeAPRs === "24h"
+              ? v.feesData.apr.withoutFees.daily
+              : activeAPRs === "week"
+              ? v.feesData.apr.withoutFees.weekly
+              : v.feesData.apr.withoutFees[activeAPRs];
+        } else {
+          apr =
+            activeAPRs === "24h"
+              ? v.feesData.apr.withFees.daily
+              : activeAPRs === "week"
+              ? v.feesData.apr.withFees.weekly
+              : v.feesData.apr.withFees[activeAPRs];
+        }
+
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
-        const apr = hideFee ? Number(v.aprWithoutFees) : Number(v.apr);
+        apr = Number(apr);
         const balance = vaultBalance * vaultSharePrice;
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
@@ -111,6 +130,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   };
 
   const APRsHandler = (APRType: string) => {
+    aprFilter.set(APRType);
     setActiveAPRs(APRType);
     setDropDownSelector(false);
   };
@@ -136,7 +156,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
     if (vaults) {
       initPortfolio();
     }
-  }, [hideFee, vaults]);
+  }, [hideFee, activeAPRs, vaults]);
 
   return (
     <div className="my-2 rounded-sm">
