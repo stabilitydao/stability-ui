@@ -34,6 +34,7 @@ import {
   reload,
   error,
   isWeb3Load,
+  aprFilter,
 } from "@store";
 import {
   wagmiConfig,
@@ -79,6 +80,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const getLocalStorageData = () => {
     const savedSettings = localStorage.getItem("transactionSettings");
     const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
+    const APRsFiler = localStorage.getItem("APRsFiler");
     if (savedSettings) {
       const savedData = JSON.parse(savedSettings);
       transactionSettings.set(savedData);
@@ -87,6 +89,10 @@ const AppStore = (props: React.PropsWithChildren) => {
     if (savedHideFeeAPR) {
       const savedData = JSON.parse(savedHideFeeAPR);
       hideFeeApr.set(savedData);
+    }
+    if (APRsFiler) {
+      const savedData = JSON.parse(APRsFiler);
+      aprFilter.set(savedData);
     }
   };
   const getDataFromStabilityAPI = async () => {

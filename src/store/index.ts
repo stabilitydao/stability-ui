@@ -5,7 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS, APRsType } from "@constants";
 
 import type {
   TPlatformData,
@@ -56,7 +56,7 @@ const vaults = deepMap<any>();
 
 // portfolio
 const hideFeeApr = atom(false);
-const aprFilter = atom("24h");
+const aprFilter = atom(APRsType[1]);
 
 //// tanstack query
 

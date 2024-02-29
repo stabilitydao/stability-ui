@@ -13,6 +13,8 @@ import {
   TREASURY,
 } from "./tokens";
 
+const APRsType = ["latest", "24h", "week"];
+
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
   { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
@@ -293,6 +295,7 @@ const GRAPH_QUERY = `
 const STABILITY_API = "https://api.stabilitydao.org/";
 
 export {
+  APRsType,
   TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,

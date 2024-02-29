@@ -19,6 +19,8 @@ import {
 
 import { formatNumber, formatFromBigInt, calculateAPY } from "@utils";
 
+import { APRsType } from "@constants";
+
 import type { TVault } from "@types";
 
 interface IProps {
@@ -35,15 +37,13 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
   const dropDownRef = useRef(null);
 
-  const APRs = ["latest", "24h", "week"];
-
   const [hideFee, setHideFee] = useState($hideFeeAPR);
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [platformModal, setPlatformModal] = useState(false);
 
   const [dropDownSelector, setDropDownSelector] = useState(false);
 
-  const [activeAPRs, setActiveAPRs] = useState($aprFilter);
+  const [activeAPRType, setActiveAPRType] = useState($aprFilter);
 
   const [portfolio, setPortfolio] = useState({
     deposited: "0",
@@ -86,18 +86,18 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         let apr = 0;
         if (hideFee) {
           apr =
-            activeAPRs === "24h"
+            activeAPRType === "24h"
               ? v.feesData.apr.withoutFees.daily
-              : activeAPRs === "week"
+              : activeAPRType === "week"
               ? v.feesData.apr.withoutFees.weekly
-              : v.feesData.apr.withoutFees[activeAPRs];
+              : v.feesData.apr.withoutFees[activeAPRType];
         } else {
           apr =
-            activeAPRs === "24h"
+            activeAPRType === "24h"
               ? v.feesData.apr.withFees.daily
-              : activeAPRs === "week"
+              : activeAPRType === "week"
               ? v.feesData.apr.withFees.weekly
-              : v.feesData.apr.withFees[activeAPRs];
+              : v.feesData.apr.withFees[activeAPRType];
         }
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
@@ -131,7 +131,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
   const APRsHandler = (APRType: string) => {
     aprFilter.set(APRType);
-    setActiveAPRs(APRType);
+    setActiveAPRType(APRType);
     setDropDownSelector(false);
   };
 
@@ -151,12 +151,30 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const avgApy = $connected ? `${formatNumber(portfolio.apy, "format")}%` : "-";
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropDownRef.current &&
+        !dropDownRef.current.contains(event.target as Node)
+      ) {
+        setDropDownSelector(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropDownRef]);
+
+  useEffect(() => {
+    localStorage.setItem("APRsFiler", JSON.stringify(activeAPRType));
     localStorage.setItem("hideFeeAPR", JSON.stringify(hideFee));
     hideFeeApr.set(hideFee);
     if (vaults) {
       initPortfolio();
     }
-  }, [hideFee, activeAPRs, vaults]);
+  }, [hideFee, activeAPRType, vaults]);
 
   return (
     <div className="my-2 rounded-sm">
@@ -204,7 +222,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               )}
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2 flex-col md:flex-row">
             <button
               onClick={() => setHideFee((prev) => !prev)}
               className="bg-[#262830] rounded-md"
@@ -251,7 +269,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </div>
               </div>
             </button>
-            <div className="relative select-none w-[160px]">
+            <div className="relative select-none w-[140px]" ref={dropDownRef}>
               <div
                 onClick={(e) => {
                   e.stopPropagation();
@@ -259,7 +277,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 }}
                 className="flex items-center justify-between gap-3 rounded-md px-3 h-[30px] bg-button cursor-pointer"
               >
-                <p className="text-[16px]">APRs: {activeAPRs}</p>
+                <p className="text-[16px]">APRs: {activeAPRType}</p>
                 <svg
                   width="15"
                   height="9"
@@ -274,7 +292,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </svg>
               </div>
               <div
-                ref={dropDownRef}
                 className={`bg-button mt-1 rounded-md w-full z-20 ${
                   dropDownSelector
                     ? "absolute transition delay-[50ms]"
@@ -282,12 +299,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 } `}
               >
                 <div className="flex flex-col items-start">
-                  {APRs.map((APRType) => (
+                  {APRsType.map((APRType) => (
                     <p
                       key={APRType}
                       onClick={() => APRsHandler(APRType)}
-                      className={`py-2 px-3 cursor-pointer text-[16px] ${
-                        APRType === activeAPRs
+                      className={`py-2 px-3 cursor-pointer text-[16px] w-full ${
+                        APRType === activeAPRType
                           ? "opacity-100"
                           : "opacity-70 hover:opacity-80"
                       }`}
