@@ -294,7 +294,9 @@ const AppStore = (props: React.PropsWithChildren) => {
         /////
         const strategyName = strategyInfo?.shortName;
 
-        const aprData = history.filter((data) => data.address === vault.id)[0];
+        const aprData = history.filter(
+          (data) => data.address === vault.id && data.APR24H && data.APRWeekly
+        )[0];
 
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
@@ -351,8 +353,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategyName != "CF"
             ? {
                 latest: strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
-                daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
-                weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
+                daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+                weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
               }
             : { latest: "-", daily: "-", weekly: "-" };
         const farmAPR = {
@@ -395,7 +397,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategyVersion: strategyEntity.version,
           rebalances: rebalances,
           aprData: aprData,
-          feesData: { apr: APRArray, apy: APYArray },
+          feesData: { apr: APRArray, apy: APYArray, poolSwapFeesAPR, farmAPR },
         };
 
         return vaults;
@@ -604,6 +606,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
+
               if (strategyInfo?.shortName === "IQMF") {
                 const YEAR = 525600;
                 const NOW = Math.floor(Date.now() / 1000);
@@ -625,7 +628,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                     (a: TIQMFAlm, b: TIQMFAlm) =>
                       Number(b.timestamp) - Number(a.timestamp)
                   );
-
                 const _24HRebalances = IQMFAlms.filter(
                   (obj: any) => Number(obj.timestamp) >= NOW - 86400
                 ).length;
@@ -636,19 +638,15 @@ const AppStore = (props: React.PropsWithChildren) => {
                 rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
                 const APRs = lastFeeAMLEntitity.APRS.map(
-                  (value: string) => (Number(value) / 100000) * 100
+                  (value: string) => (Number(value) / 10000000000) * 100
                 );
-
-                const timestamps = lastFeeAMLEntitity.timestamps?.map(
-                  (timestamp: number | string) => Number(timestamp)
-                );
+                const timestamps = lastFeeAMLEntitity.timestamps;
 
                 const collectFees = await _publicClient.simulateContract({
                   address: graphVault.underlying,
                   abi: ICHIABI,
                   functionName: "collectFees",
                 });
-
                 const token0 = await readContract(wagmiConfig, {
                   address: graphVault.underlying,
                   abi: ICHIABI,
@@ -681,16 +679,14 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const totalPrice = Number(price[1][2] + price[1][3]);
 
                 let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
-
                 let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
-
                 APRs.push(apr);
                 timestamps.push(NOW);
 
                 APRs.reverse();
                 timestamps.reverse();
 
-                //   // daily
+                // daily
                 for (let i = 0; i < APRs.length; i++) {
                   if (APRs.length === i + 1) {
                     break;
@@ -736,6 +732,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                     (acc, value) => (acc += value),
                     0
                   );
+
                   assetsWithApr.push("Pool swap fees");
                   assetsAprs.push(Number(dailyAPR).toFixed(2));
                 }
@@ -789,7 +786,10 @@ const AppStore = (props: React.PropsWithChildren) => {
               /////
               const strategyName = strategyInfo?.shortName;
               const aprData = historyData.filter(
-                (data) => data.address === vault.toLowerCase()
+                (data) =>
+                  data.address === vault.toLowerCase() &&
+                  data.APR24H &&
+                  data.APRWeekly
               )[0];
 
               let poolSwapFeesAPRDaily = 0;
@@ -808,6 +808,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 poolSwapFeesAPRWeekly =
                   APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
               }
+
               if (strategyName === "IQMF") {
                 poolSwapFeesAPRDaily = Number(assetsAprs[0]);
                 poolSwapFeesAPRWeekly = Number(assetsAprs[1]);
@@ -848,8 +849,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                   ? {
                       latest:
                         strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
-                      daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
-                      weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
+                      daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+                      weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
                     }
                   : { latest: "-", daily: "-", weekly: "-" };
               const farmAPR = {
@@ -898,7 +899,12 @@ const AppStore = (props: React.PropsWithChildren) => {
                   strategyVersion: strategyEntity.version,
                   rebalances: rebalances,
                   aprData: aprData,
-                  feesData: { apr: APRArray, apy: APYArray },
+                  feesData: {
+                    apr: APRArray,
+                    apy: APYArray,
+                    poolSwapFeesAPR,
+                    farmAPR,
+                  },
                 },
               };
             })

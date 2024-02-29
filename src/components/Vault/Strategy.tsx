@@ -117,12 +117,12 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   useEffect(() => {
     const API = $apiData.underlyings?.["137"]?.[vault.underlying];
     // don't use from farmAprs
-    const dailyFarmApr = Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(
-      2
-    );
-    const weeklyFarmApr = Number(
-      formatUnits(vault.aprData.APRWeekly, 3)
-    ).toFixed(2);
+    const dailyFarmApr = vault?.aprData?.APR24H
+      ? Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(2)
+      : 0;
+    const weeklyFarmApr = vault?.aprData?.APRWeekly
+      ? Number(formatUnits(vault.aprData.APRWeekly, 3)).toFixed(2)
+      : 0;
 
     let poolSwapFeesAPRDaily = 0;
     let poolSwapFeesAPRWeekly = 0;
@@ -131,6 +131,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
       poolSwapFeesAPRDaily = API?.apr.daily || 0;
       poolSwapFeesAPRWeekly = API?.apr.weekly || API.apr.monthly || 0;
     }
+
     if (vault.strategyInfo.shortName === "IQMF") {
       poolSwapFeesAPRDaily = Number(vault.assetsAprs[0]);
       poolSwapFeesAPRWeekly = Number(vault.assetsAprs[1]);

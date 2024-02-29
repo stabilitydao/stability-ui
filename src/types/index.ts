@@ -165,10 +165,7 @@ type TTableFilters = {
 };
 
 type TAPRModal = {
-  apr: string;
-  apy: string;
-  aprWithoutFees: string;
-  apyWithoutFees: string;
+  feesData: any; // todo type for feesData
   assetsWithApr: any;
   daily: number;
   assetsAprs: number;
