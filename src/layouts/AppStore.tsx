@@ -105,7 +105,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
-  const setGraphData = async (data: any, history: any) => {
+  const setGraphData = async (data: any) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
@@ -159,8 +159,9 @@ const AppStore = (props: React.PropsWithChildren) => {
           const APRs = lastFeeAMLEntitity.APRS.map(
             (value: string) => (Number(value) / 10000000000) * 100
           );
-          const timestamps = lastFeeAMLEntitity.timestamps;
 
+          const timestamps = lastFeeAMLEntitity.timestamps;
+          console.log(vault.underlying);
           const collectFees = await _publicClient.simulateContract({
             address: vault.underlying,
             abi: ICHIABI,
@@ -207,6 +208,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               break;
             }
             let diff = timestamps[i] - timestamps[i + 1];
+
             if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
               dailyThreshold += diff;
               dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
@@ -227,6 +229,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               break;
             }
             let diff = timestamps[i] - timestamps[i + 1];
+
             if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
               weeklyThreshold += diff;
               weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
@@ -241,7 +244,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           for (let i = 0; i < weeklyWeights.length; i++) {
             weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
           }
-
           if (dailyAPRs.length) {
             dailyAPR = dailyAPRs.reduce((acc, value) => (acc += value), 0);
 
@@ -300,9 +302,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         /////
         const strategyName = strategyInfo?.shortName;
 
-        const aprData = history.filter(
-          (data) => data.address === vault.id && data.APR24H && data.APRWeekly
-        )[0];
+        const aprData = vault.vaultHistoryEntity[0];
 
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
@@ -437,36 +437,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         console.log("GRAPH API ERROR:", error);
       }
     }
-    /////
-    const DATA = [];
-    let entities = 0;
-    let status = true;
-
-    while (status) {
-      const HISTORY_QUERY = `{
-            vaultHistoryEntities(
-                skip: ${entities}
-            ) {
-                address
-                timestamp
-                APR24H
-                APRWeekly
-            }}`;
-
-      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
-        query: HISTORY_QUERY,
-      });
-      DATA.push(...graphResponse.data.data.vaultHistoryEntities);
-
-      if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
-        status = false;
-      }
-      entities += 100;
-    }
-    const historyData = DATA.sort(
-      (a, b) => Number(b.timestamp) - Number(a.timestamp)
-    );
-    /////
     if (retries >= maxRetries) {
       error.set({ state: true, type: "API", description: apiError });
 
@@ -474,8 +444,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         "Maximum number of retry attempts reached for graph request"
       );
     }
-
-    await setGraphData(graphResponse.data.data, historyData);
+    await setGraphData(graphResponse.data.data);
     if (isConnected) {
       isWeb3Load.set(true);
       try {
@@ -484,7 +453,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           abi: PlatformABI,
           functionName: "getData",
         });
-        console.log("getData", contractData);
         if (contractData[1]) {
           tokens.set(
             contractData[1].map((address: TAddress) =>
@@ -515,7 +483,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           args: [address as TAddress],
         });
 
-        console.log("getBalance", contractBalance);
         if (contractBalance?.length) {
           const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
           const erc20Balance: { [token: string]: bigint } = {};
@@ -646,6 +613,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 const APRs = lastFeeAMLEntitity.APRS.map(
                   (value: string) => (Number(value) / 10000000000) * 100
                 );
+
                 const timestamps = lastFeeAMLEntitity.timestamps;
 
                 const collectFees = await _publicClient.simulateContract({
@@ -691,15 +659,16 @@ const AppStore = (props: React.PropsWithChildren) => {
 
                 APRs.reverse();
                 timestamps.reverse();
-
                 // daily
                 for (let i = 0; i < APRs.length; i++) {
                   if (APRs.length === i + 1) {
                     break;
                   }
                   let diff = timestamps[i] - timestamps[i + 1];
+
                   if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
                     dailyThreshold += diff;
+
                     dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
                   } else {
                     dailyWeights.push(
@@ -718,6 +687,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                     break;
                   }
                   let diff = timestamps[i] - timestamps[i + 1];
+
                   if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
                     weeklyThreshold += diff;
                     weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
@@ -729,6 +699,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                     break;
                   }
                 }
+
                 for (let i = 0; i < weeklyWeights.length; i++) {
                   weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
                 }
@@ -738,7 +709,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                     (acc, value) => (acc += value),
                     0
                   );
-
                   assetsWithApr.push("Pool swap fees");
                   assetsAprs.push(Number(dailyAPR).toFixed(2));
                 }
@@ -791,12 +761,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
               /////
               const strategyName = strategyInfo?.shortName;
-              const aprData = historyData.filter(
-                (data) =>
-                  data.address === vault.toLowerCase() &&
-                  data.APR24H &&
-                  data.APRWeekly
-              )[0];
+              const aprData = graphVault.vaultHistoryEntity[0];
 
               let poolSwapFeesAPRDaily = 0;
               let poolSwapFeesAPRWeekly = 0;
