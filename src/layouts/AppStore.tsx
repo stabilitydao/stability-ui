@@ -374,7 +374,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             ? {
                 latest:
                   strategyName === "IQMF" || strategyName === "IRMF"
-                    ? lastPoolSwapFeesAPR
+                    ? lastPoolSwapFeesAPR.toFixed(2)
                     : assetsAprs[0],
                 daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
                 weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
@@ -848,7 +848,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                   ? {
                       latest:
                         strategyName === "IQMF" || strategyName === "IRMF"
-                          ? lastPoolSwapFeesAPR
+                          ? lastPoolSwapFeesAPR.toFixed(2)
                           : assetsAprs[0],
                       daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
                       weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
