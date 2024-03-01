@@ -132,7 +132,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
         if (strategyName === "IQMF" || strategyName === "IRMF") {
           dailyAPR = Number(
-            formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+            formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
           );
           assetsWithApr.push("Pool swap fees");
           assetsAprs.push(Number(dailyAPR).toFixed(2));
@@ -329,13 +329,13 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
         if (strategyName === "IQMF" || strategyName === "IRMF") {
           lastPoolSwapFeesAPR = Number(
-            formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+            formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
           );
           poolSwapFeesAPRDaily = Number(
-            formatUnits(almRebalanceEntity.APR24H, 7)
+            formatUnits(almRebalanceEntity.APR24H, 8)
           );
           poolSwapFeesAPRWeekly = Number(
-            formatUnits(almRebalanceEntity.APRWeekly, 7)
+            formatUnits(almRebalanceEntity.APRWeekly, 8)
           );
         }
 
@@ -600,7 +600,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
               if (strategyName === "IQMF" || strategyName === "IRMF") {
                 dailyAPR = Number(
-                  formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+                  formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
                 );
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
@@ -803,13 +803,13 @@ const AppStore = (props: React.PropsWithChildren) => {
 
               if (strategyName === "IQMF" || strategyName === "IRMF") {
                 lastPoolSwapFeesAPR = Number(
-                  formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+                  formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
                 );
                 poolSwapFeesAPRDaily = Number(
-                  formatUnits(almRebalanceEntity.APR24H, 7)
+                  formatUnits(almRebalanceEntity.APR24H, 8)
                 );
                 poolSwapFeesAPRWeekly = Number(
-                  formatUnits(almRebalanceEntity.APRWeekly, 7)
+                  formatUnits(almRebalanceEntity.APRWeekly, 8)
                 );
               }
 
