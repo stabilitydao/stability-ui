@@ -254,7 +254,11 @@ const GRAPH_QUERY = `
           vaultStatus
           AssetsPricesOnCreation
           vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
-            timestamp
+            APR24H
+            APRWeekly
+          }
+          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
+            APRFromLastEvent
             APR24H
             APRWeekly
           }
@@ -281,13 +285,6 @@ const GRAPH_QUERY = `
           price
           timestamp
           address
-        }
-        almrebalanceEntities {
-          alm
-          timestamp
-          feeUSD
-          totalUSD
-          APRFromLastEvent
         }
         lastFeeAMLEntities {
           id

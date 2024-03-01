@@ -110,6 +110,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
         const strategyInfo = getStrategyInfo(vault.symbol);
+        const strategyName = strategyInfo?.shortName;
         const APIData =
           stabilityAPIData?.underlyings?.["137"]?.[
             vault.underlying.toLowerCase()
@@ -117,148 +118,155 @@ const AppStore = (props: React.PropsWithChildren) => {
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
+        const almRebalanceEntity = vault.almRebalanceEntity[0];
+
         let dailyAPR = 0;
         const assetsWithApr: string[] = [];
         const assetsAprs: string[] = [];
         let rebalances = {};
+
         if (APIData?.apr?.daily) {
           dailyAPR = APIData.apr.daily;
           assetsWithApr.push("Pool swap fees");
           assetsAprs.push(Number(dailyAPR).toFixed(2));
         }
-
-        if (strategyInfo?.shortName === "IQMF") {
-          const YEAR = 525600;
-          const NOW = Math.floor(Date.now() / 1000);
-          const dailyAPRs = [];
-          const dailyWeights = [];
-          const weeklyAPRs = [];
-          const weeklyWeights = [];
-          let dailyThreshold = 0;
-          let weeklyThreshold = 0;
-
-          const lastFeeAMLEntitity = data.lastFeeAMLEntities.find(
-            (entity) => entity.id === vault.underlying
+        if (strategyName === "IQMF" || strategyName === "IRMF") {
+          dailyAPR = Number(
+            formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
           );
-
-          const IQMFAlms = data.almrebalanceEntities
-            .filter((obj: TIQMFAlm) => obj.alm === vault.underlying)
-            .sort(
-              (a: TIQMFAlm, b: TIQMFAlm) =>
-                Number(b.timestamp) - Number(a.timestamp)
-            );
-          const _24HRebalances = IQMFAlms.filter(
-            (obj: any) => Number(obj.timestamp) >= NOW - 86400
-          ).length;
-          const _7DRebalances = IQMFAlms.filter(
-            (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
-          ).length;
-
-          rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-
-          const APRs = lastFeeAMLEntitity.APRS.map(
-            (value: string) => (Number(value) / 10000000000) * 100
-          );
-
-          const timestamps = lastFeeAMLEntitity.timestamps;
-          console.log(vault.underlying);
-          const collectFees = await _publicClient.simulateContract({
-            address: vault.underlying,
-            abi: ICHIABI,
-            functionName: "collectFees",
-          });
-          const token0 = await readContract(wagmiConfig, {
-            address: vault.underlying,
-            abi: ICHIABI,
-            functionName: "token0",
-          });
-          const token1 = await readContract(wagmiConfig, {
-            address: vault.underlying,
-            abi: ICHIABI,
-            functionName: "token1",
-          });
-          const getTotalAmounts = await readContract(wagmiConfig, {
-            address: vault.underlying,
-            abi: ICHIABI,
-            functionName: "getTotalAmounts",
-          });
-          const price = await readContract(wagmiConfig, {
-            address: priceReader,
-            abi: PriceReaderABI,
-            functionName: "getAssetsPrice",
-            args: [
-              [token0, token1, token0, token1],
-              [...collectFees.result, getTotalAmounts[0], getTotalAmounts[1]],
-            ],
-          });
-          const feePrice = Number(price[1][0] + price[1][1]);
-          const totalPrice = Number(price[1][2] + price[1][3]);
-
-          let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
-          let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
-          APRs.push(apr);
-          timestamps.push(NOW);
-
-          APRs.reverse();
-          timestamps.reverse();
-
-          // daily
-          for (let i = 0; i < APRs.length; i++) {
-            if (APRs.length === i + 1) {
-              break;
-            }
-            let diff = timestamps[i] - timestamps[i + 1];
-
-            if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-              dailyThreshold += diff;
-              dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
-            } else {
-              dailyWeights.push(
-                (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
-                  TIMESTAMPS_IN_SECONDS.DAY
-              );
-              break;
-            }
-          }
-          for (let i = 0; i < dailyWeights.length; i++) {
-            dailyAPRs.push(APRs[i] * dailyWeights[i]);
-          }
-          // weekly
-          for (let i = 0; i < APRs.length; i++) {
-            if (APRs.length === i + 1) {
-              break;
-            }
-            let diff = timestamps[i] - timestamps[i + 1];
-
-            if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
-              weeklyThreshold += diff;
-              weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
-            } else {
-              weeklyWeights.push(
-                (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
-                  TIMESTAMPS_IN_SECONDS.WEEK
-              );
-              break;
-            }
-          }
-          for (let i = 0; i < weeklyWeights.length; i++) {
-            weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
-          }
-          if (dailyAPRs.length) {
-            dailyAPR = dailyAPRs.reduce((acc, value) => (acc += value), 0);
-
-            assetsWithApr.push("Pool swap fees");
-            assetsAprs.push(Number(dailyAPR).toFixed(2));
-          }
-          if (weeklyAPRs.length) {
-            let weeklyAPR = weeklyAPRs.reduce(
-              (acc, value) => (acc += value),
-              0
-            );
-            assetsAprs.push(Number(weeklyAPR).toFixed(2));
-          }
-          assetsAprs.push(Number(apr).toFixed(2));
+          assetsWithApr.push("Pool swap fees");
+          assetsAprs.push(Number(dailyAPR).toFixed(2));
         }
+
+        // if (strategyInfo?.shortName === "IQMF") {
+        //   console.log(vault);
+        //   const YEAR = 525600;
+        //   const NOW = Math.floor(Date.now() / 1000);
+        //   const dailyAPRs = [];
+        //   const dailyWeights = [];
+        //   const weeklyAPRs = [];
+        //   const weeklyWeights = [];
+        //   let dailyThreshold = 0;
+        //   let weeklyThreshold = 0;
+
+        //   const lastFeeAMLEntitity = data.lastFeeAMLEntities.find(
+        //     (entity) => entity.id === vault.underlying
+        //   );
+
+        //   const IQMFAlms = vault.almRebalanceEntity;
+
+        //   const _24HRebalances = IQMFAlms.filter(
+        //     (obj: any) => Number(obj.timestamp) >= NOW - 86400
+        //   ).length;
+        //   const _7DRebalances = IQMFAlms.filter(
+        //     (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+        //   ).length;
+
+        //   rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
+
+        //   const APRs = lastFeeAMLEntitity.APRS.map(
+        //     (value: string) => (Number(value) / 10000000000) * 100
+        //   );
+
+        //   const timestamps = lastFeeAMLEntitity.timestamps;
+
+        //   const collectFees = await _publicClient.simulateContract({
+        //     address: vault.underlying,
+        //     abi: ICHIABI,
+        //     functionName: "collectFees",
+        //   });
+        //   const token0 = await readContract(wagmiConfig, {
+        //     address: vault.underlying,
+        //     abi: ICHIABI,
+        //     functionName: "token0",
+        //   });
+        //   const token1 = await readContract(wagmiConfig, {
+        //     address: vault.underlying,
+        //     abi: ICHIABI,
+        //     functionName: "token1",
+        //   });
+        //   const getTotalAmounts = await readContract(wagmiConfig, {
+        //     address: vault.underlying,
+        //     abi: ICHIABI,
+        //     functionName: "getTotalAmounts",
+        //   });
+        //   const price = await readContract(wagmiConfig, {
+        //     address: priceReader,
+        //     abi: PriceReaderABI,
+        //     functionName: "getAssetsPrice",
+        //     args: [
+        //       [token0, token1, token0, token1],
+        //       [...collectFees.result, getTotalAmounts[0], getTotalAmounts[1]],
+        //     ],
+        //   });
+        //   const feePrice = Number(price[1][0] + price[1][1]);
+        //   const totalPrice = Number(price[1][2] + price[1][3]);
+
+        //   let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+        //   let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+        //   APRs.push(apr);
+        //   timestamps.push(NOW);
+
+        //   APRs.reverse();
+        //   timestamps.reverse();
+
+        //   // daily
+        //   for (let i = 0; i < APRs.length; i++) {
+        //     if (APRs.length === i + 1) {
+        //       break;
+        //     }
+        //     let diff = timestamps[i] - timestamps[i + 1];
+
+        //     if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+        //       dailyThreshold += diff;
+        //       dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+        //     } else {
+        //       dailyWeights.push(
+        //         (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
+        //           TIMESTAMPS_IN_SECONDS.DAY
+        //       );
+        //       break;
+        //     }
+        //   }
+        //   for (let i = 0; i < dailyWeights.length; i++) {
+        //     dailyAPRs.push(APRs[i] * dailyWeights[i]);
+        //   }
+        //   // weekly
+        //   for (let i = 0; i < APRs.length; i++) {
+        //     if (APRs.length === i + 1) {
+        //       break;
+        //     }
+        //     let diff = timestamps[i] - timestamps[i + 1];
+
+        //     if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+        //       weeklyThreshold += diff;
+        //       weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+        //     } else {
+        //       weeklyWeights.push(
+        //         (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+        //           TIMESTAMPS_IN_SECONDS.WEEK
+        //       );
+        //       break;
+        //     }
+        //   }
+        //   for (let i = 0; i < weeklyWeights.length; i++) {
+        //     weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
+        //   }
+        //   if (dailyAPRs.length) {
+        //     dailyAPR = dailyAPRs.reduce((acc, value) => (acc += value), 0);
+
+        //     assetsWithApr.push("Pool swap fees");
+        //     assetsAprs.push(Number(dailyAPR).toFixed(2));
+        //   }
+        //   if (weeklyAPRs.length) {
+        //     let weeklyAPR = weeklyAPRs.reduce(
+        //       (acc, value) => (acc += value),
+        //       0
+        //     );
+        //     assetsAprs.push(Number(weeklyAPR).toFixed(2));
+        //   }
+        //   assetsAprs.push(Number(apr).toFixed(2));
+        // }
 
         const APR = (
           formatFromBigInt(String(vault.apr), 3, "withDecimals") +
@@ -300,10 +308,9 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const assets = await assetsPromise;
         /////
-        const strategyName = strategyInfo?.shortName;
-
         const aprData = vault.vaultHistoryEntity[0];
 
+        let lastPoolSwapFeesAPR = 0;
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 
@@ -320,9 +327,16 @@ const AppStore = (props: React.PropsWithChildren) => {
           poolSwapFeesAPRWeekly =
             APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
         }
-        if (strategyName === "IQMF") {
-          poolSwapFeesAPRDaily = Number(assetsAprs[0]);
-          poolSwapFeesAPRWeekly = Number(assetsAprs[1]);
+        if (strategyName === "IQMF" || strategyName === "IRMF") {
+          lastPoolSwapFeesAPR = Number(
+            formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+          );
+          poolSwapFeesAPRDaily = Number(
+            formatUnits(almRebalanceEntity.APR24H, 7)
+          );
+          poolSwapFeesAPRWeekly = Number(
+            formatUnits(almRebalanceEntity.APRWeekly, 7)
+          );
         }
 
         const dailyTotalAPRWithFees =
@@ -358,7 +372,10 @@ const AppStore = (props: React.PropsWithChildren) => {
         const poolSwapFeesAPR =
           strategyName != "CF"
             ? {
-                latest: strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
+                latest:
+                  strategyName === "IQMF" || strategyName === "IRMF"
+                    ? lastPoolSwapFeesAPR
+                    : assetsAprs[0],
                 daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
                 weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
               }
@@ -549,6 +566,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           const vaultsPromise = await Promise.all(
             contractVaults[0].map(async (vault: any, index: number) => {
               const strategyInfo = getStrategyInfo(contractVaults[2][index]);
+              const strategyName = strategyInfo?.shortName;
               const assetsWithApr: string[] = [];
               const assetsAprs: string[] = [];
               let dailyAPR = 0;
@@ -557,6 +575,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               const graphVault = graphResponse.data.data.vaultEntities.find(
                 (obj: any) => obj.id === vault.toLowerCase()
               );
+              const almRebalanceEntity = graphVault.almRebalanceEntity[0];
 
               const strategyEntity =
                 graphResponse.data.data.strategyEntities.find(
@@ -579,148 +598,150 @@ const AppStore = (props: React.PropsWithChildren) => {
                 assetsWithApr.push("Pool swap fees");
                 assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
-
-              if (strategyInfo?.shortName === "IQMF") {
-                const YEAR = 525600;
-                const NOW = Math.floor(Date.now() / 1000);
-                const dailyAPRs = [];
-                const dailyWeights = [];
-                const weeklyAPRs = [];
-                const weeklyWeights = [];
-                let dailyThreshold = 0;
-                let weeklyThreshold = 0;
-
-                const lastFeeAMLEntitity =
-                  graphResponse.data.data.lastFeeAMLEntities.find(
-                    (entity) => entity.id === graphVault.underlying
-                  );
-
-                const IQMFAlms = graphResponse.data.data.almrebalanceEntities
-                  .filter((obj: TIQMFAlm) => obj.alm === graphVault.underlying)
-                  .sort(
-                    (a: TIQMFAlm, b: TIQMFAlm) =>
-                      Number(b.timestamp) - Number(a.timestamp)
-                  );
-                const _24HRebalances = IQMFAlms.filter(
-                  (obj: any) => Number(obj.timestamp) >= NOW - 86400
-                ).length;
-                const _7DRebalances = IQMFAlms.filter(
-                  (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
-                ).length;
-
-                rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-
-                const APRs = lastFeeAMLEntitity.APRS.map(
-                  (value: string) => (Number(value) / 10000000000) * 100
+              if (strategyName === "IQMF" || strategyName === "IRMF") {
+                dailyAPR = Number(
+                  formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
                 );
-
-                const timestamps = lastFeeAMLEntitity.timestamps;
-
-                const collectFees = await _publicClient.simulateContract({
-                  address: graphVault.underlying,
-                  abi: ICHIABI,
-                  functionName: "collectFees",
-                });
-                const token0 = await readContract(wagmiConfig, {
-                  address: graphVault.underlying,
-                  abi: ICHIABI,
-                  functionName: "token0",
-                });
-                const token1 = await readContract(wagmiConfig, {
-                  address: graphVault.underlying,
-                  abi: ICHIABI,
-                  functionName: "token1",
-                });
-                const getTotalAmounts = await readContract(wagmiConfig, {
-                  address: graphVault.underlying,
-                  abi: ICHIABI,
-                  functionName: "getTotalAmounts",
-                });
-                const price = await readContract(wagmiConfig, {
-                  address: priceReader,
-                  abi: PriceReaderABI,
-                  functionName: "getAssetsPrice",
-                  args: [
-                    [token0, token1, token0, token1],
-                    [
-                      ...collectFees.result,
-                      getTotalAmounts[0],
-                      getTotalAmounts[1],
-                    ],
-                  ],
-                });
-                const feePrice = Number(price[1][0] + price[1][1]);
-                const totalPrice = Number(price[1][2] + price[1][3]);
-
-                let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
-                let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
-                APRs.push(apr);
-                timestamps.push(NOW);
-
-                APRs.reverse();
-                timestamps.reverse();
-                // daily
-                for (let i = 0; i < APRs.length; i++) {
-                  if (APRs.length === i + 1) {
-                    break;
-                  }
-                  let diff = timestamps[i] - timestamps[i + 1];
-
-                  if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
-                    dailyThreshold += diff;
-
-                    dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
-                  } else {
-                    dailyWeights.push(
-                      (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
-                        TIMESTAMPS_IN_SECONDS.DAY
-                    );
-                    break;
-                  }
-                }
-                for (let i = 0; i < dailyWeights.length; i++) {
-                  dailyAPRs.push(APRs[i] * dailyWeights[i]);
-                }
-                // weekly
-                for (let i = 0; i < APRs.length; i++) {
-                  if (APRs.length === i + 1) {
-                    break;
-                  }
-                  let diff = timestamps[i] - timestamps[i + 1];
-
-                  if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
-                    weeklyThreshold += diff;
-                    weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
-                  } else {
-                    weeklyWeights.push(
-                      (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
-                        TIMESTAMPS_IN_SECONDS.WEEK
-                    );
-                    break;
-                  }
-                }
-
-                for (let i = 0; i < weeklyWeights.length; i++) {
-                  weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
-                }
-
-                if (dailyAPRs.length) {
-                  dailyAPR = dailyAPRs.reduce(
-                    (acc, value) => (acc += value),
-                    0
-                  );
-                  assetsWithApr.push("Pool swap fees");
-                  assetsAprs.push(Number(dailyAPR).toFixed(2));
-                }
-                if (weeklyAPRs.length) {
-                  let weeklyAPR = weeklyAPRs.reduce(
-                    (acc, value) => (acc += value),
-                    0
-                  );
-                  assetsAprs.push(Number(weeklyAPR).toFixed(2));
-                }
-                assetsAprs.push(Number(apr).toFixed(2));
+                assetsWithApr.push("Pool swap fees");
+                assetsAprs.push(Number(dailyAPR).toFixed(2));
               }
+
+              // if (strategyInfo?.shortName === "IQMF") {
+              //   const YEAR = 525600;
+              //   const NOW = Math.floor(Date.now() / 1000);
+              //   const dailyAPRs = [];
+              //   const dailyWeights = [];
+              //   const weeklyAPRs = [];
+              //   const weeklyWeights = [];
+              //   let dailyThreshold = 0;
+              //   let weeklyThreshold = 0;
+
+              //   const lastFeeAMLEntitity =
+              //     graphResponse.data.data.lastFeeAMLEntities.find(
+              //       (entity) => entity.id === graphVault.underlying
+              //     );
+              //   const IQMFAlms = graphVault.almRebalanceEntity;
+
+              //   const _24HRebalances = IQMFAlms.filter(
+              //     (obj: any) => Number(obj.timestamp) >= NOW - 86400
+              //   ).length;
+              //   const _7DRebalances = IQMFAlms.filter(
+              //     (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+              //   ).length;
+
+              //   rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
+
+              //   const APRs = lastFeeAMLEntitity.APRS.map(
+              //     (value: string) => (Number(value) / 10000000000) * 100
+              //   );
+
+              //   const timestamps = lastFeeAMLEntitity.timestamps;
+
+              //   const collectFees = await _publicClient.simulateContract({
+              //     address: graphVault.underlying,
+              //     abi: ICHIABI,
+              //     functionName: "collectFees",
+              //   });
+              //   const token0 = await readContract(wagmiConfig, {
+              //     address: graphVault.underlying,
+              //     abi: ICHIABI,
+              //     functionName: "token0",
+              //   });
+              //   const token1 = await readContract(wagmiConfig, {
+              //     address: graphVault.underlying,
+              //     abi: ICHIABI,
+              //     functionName: "token1",
+              //   });
+              //   const getTotalAmounts = await readContract(wagmiConfig, {
+              //     address: graphVault.underlying,
+              //     abi: ICHIABI,
+              //     functionName: "getTotalAmounts",
+              //   });
+              //   const price = await readContract(wagmiConfig, {
+              //     address: priceReader,
+              //     abi: PriceReaderABI,
+              //     functionName: "getAssetsPrice",
+              //     args: [
+              //       [token0, token1, token0, token1],
+              //       [
+              //         ...collectFees.result,
+              //         getTotalAmounts[0],
+              //         getTotalAmounts[1],
+              //       ],
+              //     ],
+              //   });
+              //   const feePrice = Number(price[1][0] + price[1][1]);
+              //   const totalPrice = Number(price[1][2] + price[1][3]);
+
+              //   let minutes = (NOW - timestamps[timestamps.length - 1]) / 60;
+              //   let apr = (feePrice / totalPrice / minutes) * YEAR * 100;
+              //   APRs.push(apr);
+              //   timestamps.push(NOW);
+
+              //   APRs.reverse();
+              //   timestamps.reverse();
+              //   // daily
+              //   for (let i = 0; i < APRs.length; i++) {
+              //     if (APRs.length === i + 1) {
+              //       break;
+              //     }
+              //     let diff = timestamps[i] - timestamps[i + 1];
+
+              //     if (dailyThreshold + diff <= TIMESTAMPS_IN_SECONDS.DAY) {
+              //       dailyThreshold += diff;
+
+              //       dailyWeights.push(diff / TIMESTAMPS_IN_SECONDS.DAY);
+              //     } else {
+              //       dailyWeights.push(
+              //         (TIMESTAMPS_IN_SECONDS.DAY - dailyThreshold) /
+              //           TIMESTAMPS_IN_SECONDS.DAY
+              //       );
+              //       break;
+              //     }
+              //   }
+              //   for (let i = 0; i < dailyWeights.length; i++) {
+              //     dailyAPRs.push(APRs[i] * dailyWeights[i]);
+              //   }
+              //   // weekly
+              //   for (let i = 0; i < APRs.length; i++) {
+              //     if (APRs.length === i + 1) {
+              //       break;
+              //     }
+              //     let diff = timestamps[i] - timestamps[i + 1];
+
+              //     if (weeklyThreshold + diff <= TIMESTAMPS_IN_SECONDS.WEEK) {
+              //       weeklyThreshold += diff;
+              //       weeklyWeights.push(diff / TIMESTAMPS_IN_SECONDS.WEEK);
+              //     } else {
+              //       weeklyWeights.push(
+              //         (TIMESTAMPS_IN_SECONDS.WEEK - weeklyThreshold) /
+              //           TIMESTAMPS_IN_SECONDS.WEEK
+              //       );
+              //       break;
+              //     }
+              //   }
+
+              //   for (let i = 0; i < weeklyWeights.length; i++) {
+              //     weeklyAPRs.push(APRs[i] * weeklyWeights[i]);
+              //   }
+
+              //   if (dailyAPRs.length) {
+              //     dailyAPR = dailyAPRs.reduce(
+              //       (acc, value) => (acc += value),
+              //       0
+              //     );
+              //     assetsWithApr.push("Pool swap fees");
+              //     assetsAprs.push(Number(dailyAPR).toFixed(2));
+              //   }
+              //   if (weeklyAPRs.length) {
+              //     let weeklyAPR = weeklyAPRs.reduce(
+              //       (acc, value) => (acc += value),
+              //       0
+              //     );
+              //     assetsAprs.push(Number(weeklyAPR).toFixed(2));
+              //   }
+              //   assetsAprs.push(Number(apr).toFixed(2));
+              // }
 
               const APR = (
                 formatFromBigInt(
@@ -760,9 +781,9 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
 
               /////
-              const strategyName = strategyInfo?.shortName;
               const aprData = graphVault.vaultHistoryEntity[0];
 
+              let lastPoolSwapFeesAPR = 0;
               let poolSwapFeesAPRDaily = 0;
               let poolSwapFeesAPRWeekly = 0;
 
@@ -780,9 +801,16 @@ const AppStore = (props: React.PropsWithChildren) => {
                   APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
               }
 
-              if (strategyName === "IQMF") {
-                poolSwapFeesAPRDaily = Number(assetsAprs[0]);
-                poolSwapFeesAPRWeekly = Number(assetsAprs[1]);
+              if (strategyName === "IQMF" || strategyName === "IRMF") {
+                lastPoolSwapFeesAPR = Number(
+                  formatUnits(almRebalanceEntity.APRFromLastEvent, 7)
+                );
+                poolSwapFeesAPRDaily = Number(
+                  formatUnits(almRebalanceEntity.APR24H, 7)
+                );
+                poolSwapFeesAPRWeekly = Number(
+                  formatUnits(almRebalanceEntity.APRWeekly, 7)
+                );
               }
 
               const dailyTotalAPRWithFees =
@@ -819,7 +847,9 @@ const AppStore = (props: React.PropsWithChildren) => {
                 strategyName != "CF"
                   ? {
                       latest:
-                        strategyName === "IQMF" ? assetsAprs[2] : assetsAprs[0],
+                        strategyName === "IQMF" || strategyName === "IRMF"
+                          ? lastPoolSwapFeesAPR
+                          : assetsAprs[0],
                       daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
                       weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
                     }
