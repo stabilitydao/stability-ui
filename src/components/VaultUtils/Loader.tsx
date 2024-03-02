@@ -7,7 +7,7 @@ interface LoaderProps {
 const Loader: React.FC<LoaderProps> = ({
   width = "16",
   height = "16",
-  color = "#4A63AD",
+  color = "#7c76ee",
 }) => {
   return (
     <div className="flex items-center justify-center">

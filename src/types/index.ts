@@ -140,6 +140,7 @@ type TVault = {
   strategyVersion: string;
   rebalances: any;
   aprData: any; // todo type
+  feesData: any; // todo type
 };
 
 type TVaultAssets = [string, string];
@@ -164,10 +165,7 @@ type TTableFilters = {
 };
 
 type TAPRModal = {
-  apr: string;
-  apy: string;
-  aprWithoutFees: string;
-  apyWithoutFees: string;
+  feesData: any; // todo type for feesData
   assetsWithApr: any;
   daily: number;
   assetsAprs: number;

@@ -28,21 +28,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const $vaultTypes = useStore(vaultTypes);
   const $strategyTypes = useStore(strategyTypes);
 
-  const $apiData = useStore(apiData);
-
-  const [farmAprs, setFarmAprs] = useState({ daily: "-", weekly: "-" });
-  const [strategyData, setStrategyData] = useState({
-    feesAPR: {
-      daily: "-",
-      weekly: "-",
-    },
-    totalAPR: { daily: "-", weekly: "-" },
-    totalAPY: {
-      daily: "-",
-      weekly: "-",
-    },
-  });
-
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
   const [needStrategyUpgrade, setNeedStrategyUpgrade] =
     useState<boolean>(false);
@@ -104,56 +89,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, $vaultTypes, $strategyTypes]);
-
-  useEffect(() => {
-    if (vault?.aprData?.APR24H && vault.aprData.APRWeekly) {
-      setFarmAprs({
-        daily: Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(2),
-        weekly: Number(formatUnits(vault.aprData.APRWeekly, 3)).toFixed(2),
-      });
-    }
-  }, [vault]);
-
-  useEffect(() => {
-    const API = $apiData.underlyings?.["137"]?.[vault.underlying];
-    // don't use from farmAprs
-    const dailyFarmApr = Number(formatUnits(vault.aprData.APR24H, 3)).toFixed(
-      2
-    );
-    const weeklyFarmApr = Number(
-      formatUnits(vault.aprData.APRWeekly, 3)
-    ).toFixed(2);
-
-    let poolSwapFeesAPRDaily = 0;
-    let poolSwapFeesAPRWeekly = 0;
-
-    if (API) {
-      poolSwapFeesAPRDaily = API?.apr.daily || 0;
-      poolSwapFeesAPRWeekly = API?.apr.weekly || API.apr.monthly || 0;
-    }
-    if (vault.strategyInfo.shortName === "IQMF") {
-      poolSwapFeesAPRDaily = Number(vault.assetsAprs[0]);
-      poolSwapFeesAPRWeekly = Number(vault.assetsAprs[1]);
-    }
-
-    const dailyTotalAPR = Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
-    const weeklyTotalAPR =
-      Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
-    setStrategyData({
-      feesAPR: {
-        daily: `${poolSwapFeesAPRDaily.toFixed(2)}%`,
-        weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}%`,
-      },
-      totalAPR: {
-        daily: `${dailyTotalAPR.toFixed(2)}%`,
-        weekly: `${weeklyTotalAPR.toFixed(2)}%`,
-      },
-      totalAPY: {
-        daily: `${calculateAPY(dailyTotalAPR).toFixed(2)}%`,
-        weekly: `${calculateAPY(weeklyTotalAPR).toFixed(2)}%`,
-      },
-    });
-  }, [$apiData]);
 
   return (
     <div className="rounded-md mt-5 bg-button">
@@ -311,84 +246,77 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
           </div>
         )}
-        <table className="table table-auto w-full rounded-lg select-none">
-          <thead className="bg-[#0b0e11]">
-            <tr>
-              <th></th>
-              <th>Latest</th>
-              <th>24h</th>
-              <th>Week</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Total APY</td>
-              <td className="text-right">{vault.apy}%</td>
-              <td className="text-right">{strategyData.totalAPY.daily}</td>
-              <td className="text-right">{strategyData.totalAPY.weekly}</td>
-            </tr>
-            <tr>
-              <td>Total APR</td>
-              <td className="text-right">{vault.apr}%</td>
-              <td className="text-right">{strategyData.totalAPR.daily}</td>
-              <td className="text-right">{strategyData.totalAPR.weekly}</td>
-            </tr>
-            {vault.strategyInfo.shortName != "CF" && (
+        {vault?.feesData ? (
+          <table className="table table-auto w-full rounded-lg select-none">
+            <thead className="bg-[#0b0e11]">
               <tr>
-                <td>Pool swap fees APR</td>
-                {vault.strategyInfo.shortName === "IQMF" ? (
-                  <td className="text-right">{vault.assetsAprs[2]}%</td>
-                ) : (
-                  <td className="text-right">{vault.assetsAprs[0]}%</td>
-                )}
-                <td className="text-right">{strategyData.feesAPR.daily}</td>
-                <td className="text-right">{strategyData.feesAPR.weekly}</td>
+                <th></th>
+                <th>Latest</th>
+                <th>24h</th>
+                <th>Week</th>
               </tr>
-            )}
-            <tr>
-              {vault.strategyInfo.shortName === "CF" ? (
-                <td>Strategy APR</td>
-              ) : (
-                <td>Farm APR</td>
-              )}
-              <td className="text-right">
-                {Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%
-              </td>
-              <td className="text-right">{farmAprs.daily}%</td>
-              <td className="text-right">{farmAprs.weekly}%</td>
-            </tr>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Total APY</td>
+                <td className="text-right">
+                  {vault?.feesData?.apy?.withFees?.latest}%
+                </td>
+                <td className="text-right">
+                  {vault?.feesData?.apy?.withFees?.daily}%
+                </td>
+                <td className="text-right">
+                  {vault?.feesData?.apy?.withFees?.weekly}%
+                </td>
+              </tr>
+              <tr>
+                <td>Total APR</td>
+                <td className="text-right">
+                  {vault?.feesData?.apr?.withFees?.latest}%
+                </td>
+                <td className="text-right">
+                  {vault?.feesData?.apr?.withFees?.daily}%
+                </td>
+                <td className="text-right">
+                  {vault?.feesData?.apr?.withFees?.weekly}%
+                </td>
+              </tr>
+              {vault.strategyInfo.shortName != "CF" && (
+                <tr>
+                  <td>Pool swap fees APR</td>
 
-        {/*<div className="mt-2">
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            Total APR / APY
-          </p>
-          <p>
-            {vault.apr}% / {vault.apy}%
-          </p>
-        </div>
-        {!!vault.assetsWithApr?.length && (
-          <div>
-            {vault.assetsAprs.map((apr: string, index: number) => {
-              return (
-                <div className="mt-2" key={index}>
-                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                    {vault.assetsWithApr[index]} APR
-                  </p>
-                  <p>{apr}%</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <div className="mt-2">
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-             APR 24h / Strategy APR latest 
-            strategy apr
-          </p>
-          <p>{Number(formatUnits(BigInt(vault.strategyApr), 3)).toFixed(2)}%</p>
-        </div> */}
+                  <td className="text-right">
+                    {vault?.feesData?.poolSwapFeesAPR?.latest}%
+                  </td>
+                  <td className="text-right">
+                    {vault?.feesData?.poolSwapFeesAPR?.daily}%
+                  </td>
+                  <td className="text-right">
+                    {vault?.feesData?.poolSwapFeesAPR?.weekly}%
+                  </td>
+                </tr>
+              )}
+              <tr>
+                {vault.strategyInfo.shortName === "CF" ? (
+                  <td>Strategy APR</td>
+                ) : (
+                  <td>Farm APR</td>
+                )}
+                <td className="text-right">
+                  {vault?.feesData?.farmAPR?.latest}%
+                </td>
+
+                <td className="text-right">
+                  {vault?.feesData?.farmAPR?.daily}%
+                </td>
+                <td className="text-right">
+                  {vault?.feesData?.farmAPR?.weekly}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        ) : null}
+
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
             Impermanent Loss

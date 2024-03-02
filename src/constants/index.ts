@@ -13,6 +13,8 @@ import {
   TREASURY,
 } from "./tokens";
 
+const APRsType = ["latest", "24h", "week"];
+
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
   { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
@@ -251,6 +253,15 @@ const GRAPH_QUERY = `
           assetsAprs
           vaultStatus
           AssetsPricesOnCreation
+          vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
+            APR24H
+            APRWeekly
+          }
+          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
+            APRFromLastEvent
+            APR24H
+            APRWeekly
+          }
         }
         platformEntities {
           version
@@ -275,13 +286,6 @@ const GRAPH_QUERY = `
           timestamp
           address
         }
-        almrebalanceEntities {
-          alm
-          timestamp
-          feeUSD
-          totalUSD
-          APRFromLastEvent
-        }
         lastFeeAMLEntities {
           id
           timestamps
@@ -293,6 +297,7 @@ const GRAPH_QUERY = `
 const STABILITY_API = "https://api.stabilitydao.org/";
 
 export {
+  APRsType,
   TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,

@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { TimeDifferenceIndicator } from "@components";
 
-import { hideFeeApr } from "@store";
+import { aprFilter, hideFeeApr } from "@store";
 
 import { formatFromBigInt } from "@utils";
 import type { TAPRModal } from "@types";
@@ -18,14 +18,12 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const modalRef: any = useRef(null);
 
   const $hideFeeAPR = useStore(hideFeeApr);
+  const $aprFilter = useStore(aprFilter);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       setModalState({
-        apr: "",
-        apy: "",
-        aprWithoutFees: "",
-        apyWithoutFees: "",
+        feesData: "",
         assetsWithApr: "",
         daily: 0,
         assetsAprs: 0,
@@ -57,10 +55,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         <svg
           onClick={() => {
             setModalState({
-              apr: "",
-              apy: "",
-              aprWithoutFees: "",
-              apyWithoutFees: "",
+              feesData: "",
               assetsWithApr: "",
               daily: 0,
               assetsAprs: 0,
@@ -132,36 +127,69 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           <div className="text-[16px] w-full">
             <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APY</p>
-
               <p className="text-end">
-                {$hideFeeAPR ? state.apyWithoutFees : state.apy}%
+                {$hideFeeAPR
+                  ? $aprFilter === "24h"
+                    ? state.feesData.apy.withoutFees.daily
+                    : $aprFilter === "week"
+                    ? state.feesData.apy.withoutFees.weekly
+                    : state.feesData.apy.withFees[$aprFilter]
+                  : $aprFilter === "24h"
+                  ? state.feesData.apy.withFees.daily
+                  : $aprFilter === "week"
+                  ? state.feesData.apy.withFees.weekly
+                  : state.feesData.apy.withFees[$aprFilter]}
+                %
               </p>
             </div>
 
             <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APR</p>
               <p className="text-end">
-                {$hideFeeAPR ? state.aprWithoutFees : state.apr}%
+                {$hideFeeAPR
+                  ? $aprFilter === "24h"
+                    ? state.feesData.apr.withoutFees.daily
+                    : $aprFilter === "week"
+                    ? state.feesData.apr.withoutFees.weekly
+                    : state.feesData.apr.withoutFees[$aprFilter]
+                  : $aprFilter === "24h"
+                  ? state.feesData.apr.withFees.daily
+                  : $aprFilter === "week"
+                  ? state.feesData.apr.withFees.weekly
+                  : state.feesData.apr.withFees[$aprFilter]}
+                %
               </p>
             </div>
             {!!state.assetsAprs && (
               <div className="flex items-center justify-between mb-1">
                 <p>Pool swap fees APR</p>
                 <p className={`${$hideFeeAPR && "line-through"} text-end`}>
-                  {state.assetsAprs.toFixed(2)}%
+                  {$aprFilter === "24h"
+                    ? state.feesData.poolSwapFeesAPR.daily
+                    : $aprFilter === "week"
+                    ? state.feesData.poolSwapFeesAPR.weekly
+                    : state.feesData.poolSwapFeesAPR[$aprFilter]}
+                  %
                 </p>
               </div>
             )}
             <div className="flex items-center justify-between mb-1">
               <p>Strategy APR</p>
-              <p className="text-end">{strategyAPR}%</p>
+              <p className="text-end">
+                {$aprFilter === "24h"
+                  ? state.feesData.farmAPR.daily
+                  : $aprFilter === "week"
+                  ? state.feesData.farmAPR.weekly
+                  : state.feesData.farmAPR[$aprFilter]}
+                %
+              </p>
             </div>
             <div className="flex items-center justify-between">
               <p>Daily yield</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? (Number(state.aprWithoutFees) / 365).toFixed(2)
-                  : state.daily}
+                  ? state.feesData.apr.withoutFees.daily
+                  : state.feesData.apr.withFees.daily}
                 %
               </p>
             </div>

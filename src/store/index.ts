@@ -5,7 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS, APRsType } from "@constants";
 
 import type {
   TPlatformData,
@@ -54,8 +54,9 @@ const strategyTypes = atom();
 
 const vaults = deepMap<any>();
 
-// temp hide fee APR condition
+// portfolio
 const hideFeeApr = atom(false);
+const aprFilter = atom(APRsType[1]);
 
 //// tanstack query
 
@@ -101,4 +102,5 @@ export {
   isWeb3Load,
   queryClient,
   persister,
+  aprFilter,
 };

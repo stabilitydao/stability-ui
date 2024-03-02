@@ -16,7 +16,7 @@ const { title } = Astro.props as IProps;
 		<meta charset="UTF-8" />
 		<meta name="description" content="Asset Management Platform" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title} - Stability</title>
 	</head>
@@ -58,7 +58,7 @@ const { title } = Astro.props as IProps;
 	}
 	html {
 		font-family: system-ui, sans-serif;
-		background: #181A20;
+		background: #0C0C1C;
 		background-size: 224px;
 	}
 	body {
@@ -66,7 +66,7 @@ const { title } = Astro.props as IProps;
 	}
 	header {
 		color: aliceblue; 
-		background-color: #23262d;
+		/* background-color: #23262d; */
 		display: flex; 
 		justify-content: space-between;
 		align-items: center;
@@ -75,19 +75,23 @@ const { title } = Astro.props as IProps;
 	.title {
 		display: flex;
 		align-items: center;
-		/* padding-top: 2px; */
+		padding-bottom: 4px;
 	}
 	.title > a {
+		color: #a995ff;
+		/* font-family: "Manrope", sans-serif; */
+  		font-optical-sizing: auto;
+		letter-spacing: 0.1px;
 		display: inline-flex;
 		align-items: center;
 		flex-wrap: nowrap;
-		font-size: 18px;
+		font-size: 20px;
 		font-weight: bold;
-		text-transform: uppercase;
+		/* text-transform: uppercase; */
 	}
 	.title img {
-		margin: 0 6px 0 10px;
-		height: 34px;
+		margin: auto 6px auto 10px;
+		height: 32px;
 	}
 	.menu {
 		display: flex;
@@ -105,7 +109,7 @@ const { title } = Astro.props as IProps;
 		margin: 0;
 		min-width: 90px;
 		height: 60px;
-		color: white;
+		color: #fcf3f6;
 		display: flex;
 		align-self: center;
 		align-items: center;
@@ -116,7 +120,7 @@ const { title } = Astro.props as IProps;
 		padding-top: 3px;
 	}
 	.menu > a.active {
-		border-bottom: 3px solid #ccb3f3;
+		border-bottom: 3px solid #9b7ff7;
 	}
 	.menu > a:hover {
 		background-color: #3e294c;
@@ -301,6 +305,10 @@ const { title } = Astro.props as IProps;
 		top:230px !important;
 		left:-140px !important;
 	}
+	.toLeftPlatform {
+		top:70px !important;
+		left:-140px !important;
+	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
 	}
@@ -327,6 +335,12 @@ const { title } = Astro.props as IProps;
 	}
 	.toLeft i::after {
   		display: none !important;
+	}
+	.toLeftPlatform i::after {
+  		display: none !important;
+	}
+	.visible__tooltip:hover {
+		display: none !important;
 	}
 	@media screen and (max-width:767px) {
 		.tooltip:hover .visible__tooltip {

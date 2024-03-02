@@ -21,13 +21,13 @@ const Header = () => {
   return (
     <WagmiLayout>
       <header>
-        <span className="title w-1/3">
+        <span className="title sm:w-4/12 md:w-5/12">
           <a href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
             <span className="hidden sm:flex">Stability</span>
           </a>
         </span>
-        <div className="menu w-1/3">
+        <div className="menu w-2/12">
           <a className={currentPath === "" ? "active font-bold" : ""} href="/">
             Vaults
           </a>
@@ -35,7 +35,7 @@ const Header = () => {
       DAO
     </a> */}
         </div>
-        <div className="flex sm:w-1/3 justify-end">
+        <div className="flex sm:w-8/12 md:w-5/12 justify-end">
           <Wallet />
           <div
             className={`burger-menu ${menu && "active"}`}
