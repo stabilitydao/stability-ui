@@ -551,7 +551,7 @@ const Vaults = () => {
                                 ? vault.feesData.apy.withoutFees.daily
                                 : $aprFilter === "week"
                                 ? vault.feesData.apy.withoutFees.weekly
-                                : vault.feesData.apy.withFees[$aprFilter]
+                                : vault.feesData.apy.withoutFees[$aprFilter]
                               : $aprFilter === "24h"
                               ? vault.feesData.apy.withFees.daily
                               : $aprFilter === "week"
