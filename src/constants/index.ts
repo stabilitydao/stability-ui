@@ -30,7 +30,12 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "string",
   },
-  { name: "APR / APY", keyName: "apy", sortType: "none", dataType: "number" },
+  {
+    name: "APR / APY",
+    keyName: "apy",
+    sortType: "none",
+    dataType: "number",
+  },
   {
     name: "IL",
     keyName: "il",
@@ -257,7 +262,8 @@ const GRAPH_QUERY = `
             APR24H
             APRWeekly
           }
-          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
+          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
+            timestamp
             APRFromLastEvent
             APR24H
             APRWeekly

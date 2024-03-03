@@ -116,20 +116,13 @@ type TVault = {
   strategy: string;
   shareprice: string;
   tvl: string;
-  apr: string;
-  apy: string;
-  aprWithoutFees: string;
-  apyWithoutFees: string;
-  strategyApr: string;
   strategySpecific: string;
   balance: string;
   lastHardWork: bigint;
+  apy: number;
   daily: number;
-  monthlyUnderlyingApr: number;
   assets: TAsset[];
   assetsProportions: number[];
-  assetsWithApr: string[];
-  assetsAprs: string[];
   strategyInfo: IStrategyInfo;
   il: number;
   underlying: TAddress;
@@ -139,11 +132,8 @@ type TVault = {
   version: string;
   strategyVersion: string;
   rebalances: any;
-  aprData: any; // todo type
-  feesData: any; // todo type
+  earningData: any; // todo type
 };
-
-type TVaultAssets = [string, string];
 
 type TTableColumn = {
   name: string;
@@ -165,12 +155,9 @@ type TTableFilters = {
 };
 
 type TAPRModal = {
-  feesData: any; // todo type for feesData
-  assetsWithApr: any;
+  earningData: any; // todo type for earningData
   daily: number;
-  assetsAprs: number;
   lastHardWork: any;
-  strategyApr: number;
   state: boolean;
 };
 
@@ -317,7 +304,6 @@ export type {
   TAssetPrices,
   TBalances,
   TVault,
-  TVaultAssets,
   TAsset,
   TTableColumn,
   TAPRModal,

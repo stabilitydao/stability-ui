@@ -246,39 +246,39 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
           </div>
         )}
-        {vault?.feesData ? (
+        {!!vault?.earningData && (
           <table className="table table-auto w-full rounded-lg select-none">
             <thead className="bg-[#0b0e11]">
-              <tr>
+              <tr className="text-[18px] md:text-[16px] lg:text-[20px]">
                 <th></th>
                 <th>Latest</th>
                 <th>24h</th>
                 <th>Week</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-[14px] min-[450px]:text-[16px] md:text-[14px] lg:text-[20px]">
               <tr>
                 <td>Total APY</td>
                 <td className="text-right">
-                  {vault?.feesData?.apy?.withFees?.latest}%
+                  {vault?.earningData?.apy?.withFees?.latest}%
                 </td>
                 <td className="text-right">
-                  {vault?.feesData?.apy?.withFees?.daily}%
+                  {vault?.earningData?.apy?.withFees?.daily}%
                 </td>
                 <td className="text-right">
-                  {vault?.feesData?.apy?.withFees?.weekly}%
+                  {vault?.earningData?.apy?.withFees?.weekly}%
                 </td>
               </tr>
               <tr>
                 <td>Total APR</td>
                 <td className="text-right">
-                  {vault?.feesData?.apr?.withFees?.latest}%
+                  {vault?.earningData?.apr?.withFees?.latest}%
                 </td>
                 <td className="text-right">
-                  {vault?.feesData?.apr?.withFees?.daily}%
+                  {vault?.earningData?.apr?.withFees?.daily}%
                 </td>
                 <td className="text-right">
-                  {vault?.feesData?.apr?.withFees?.weekly}%
+                  {vault?.earningData?.apr?.withFees?.weekly}%
                 </td>
               </tr>
               {vault.strategyInfo.shortName != "CF" && (
@@ -286,13 +286,13 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
                   <td>Pool swap fees APR</td>
 
                   <td className="text-right">
-                    {vault?.feesData?.poolSwapFeesAPR?.latest}%
+                    {vault?.earningData?.poolSwapFeesAPR?.latest}%
                   </td>
                   <td className="text-right">
-                    {vault?.feesData?.poolSwapFeesAPR?.daily}%
+                    {vault?.earningData?.poolSwapFeesAPR?.daily}%
                   </td>
                   <td className="text-right">
-                    {vault?.feesData?.poolSwapFeesAPR?.weekly}%
+                    {vault?.earningData?.poolSwapFeesAPR?.weekly}%
                   </td>
                 </tr>
               )}
@@ -303,19 +303,19 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
                   <td>Farm APR</td>
                 )}
                 <td className="text-right">
-                  {vault?.feesData?.farmAPR?.latest}%
+                  {vault?.earningData?.farmAPR?.latest}%
                 </td>
 
                 <td className="text-right">
-                  {vault?.feesData?.farmAPR?.daily}%
+                  {vault?.earningData?.farmAPR?.daily}%
                 </td>
                 <td className="text-right">
-                  {vault?.feesData?.farmAPR?.weekly}%
+                  {vault?.earningData?.farmAPR?.weekly}%
                 </td>
               </tr>
             </tbody>
           </table>
-        ) : null}
+        )}
 
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
@@ -331,7 +331,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
           </div>
         </div>
-        {vault?.rebalances?.daily ? (
+        {!!vault?.rebalances?.daily && (
           <div className="mt-2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               Rebalances 24H / 7D
@@ -340,7 +340,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
               {vault?.rebalances?.daily} / {vault?.rebalances?.weekly}
             </p>
           </div>
-        ) : null}
+        )}
 
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           {needVaultUpgrade && (

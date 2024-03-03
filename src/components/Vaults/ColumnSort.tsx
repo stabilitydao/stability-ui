@@ -18,7 +18,6 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
 
   const tabController = () => {
     let nextCase: string = "";
-
     switch (table[index].sortType) {
       case "none":
         nextCase = "ascendentic";
@@ -63,7 +62,9 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
             <p className="inline-block">{value}</p>
           ) : (
             <p className="inline-block">
-              {window.innerWidth > 915 ? value : "APR"}
+              {window.innerWidth > 915 || window.innerWidth < 767
+                ? value
+                : "APR"}
             </p>
           )}
           <svg
