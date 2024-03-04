@@ -114,7 +114,6 @@
   integrity sha512-uU27kfDRlhfKl+w1U6vp16IuvSLtjAxdArVXPa9BvLkrr7CYIsxH5adpHObeAGY/41+syctUWOZ140a2Rvkgjw==
 
 "@babel/core@^7.0.0", "@babel/core@^7.0.0-0", "@babel/core@^7.0.0-0 || ^8.0.0-0 <8.0.0", "@babel/core@^7.12.0", "@babel/core@^7.13.0", "@babel/core@^7.13.16", "@babel/core@^7.20.0", "@babel/core@^7.22.10", "@babel/core@^7.23.5", "@babel/core@^7.4.0 || ^8.0.0-0 <8.0.0":
-"@babel/core@^7.0.0", "@babel/core@^7.0.0-0", "@babel/core@^7.22.10", "@babel/core@^7.23.5":
   version "7.23.7"
   resolved "https://registry.npmjs.org/@babel/core/-/core-7.23.7.tgz"
   integrity sha512-+UpDgowcmqe36d4NwqvKsyPMlOLNGMsfMmQ5WGCu+siCe3t3dfe9njrzGfdN4qq+bcNUt0+Vw6haRxBOycs4dw==
@@ -10432,11 +10431,6 @@ tiny-invariant@^1.3.1:
 tmpl@1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/tmpl/-/tmpl-1.0.5.tgz"
-tmpl@1.0.5:
-  version "1.0.5"
-  resolved "https://registry.npmjs.org/tmpl/-/tmpl-1.0.5.tgz"
-  integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
-
   integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
 
 to-fast-properties@^2.0.0:
