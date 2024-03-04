@@ -19,7 +19,7 @@ const Skeleton = (props) => {
       <rect x="0" y="0" rx="10" ry="10" width="320" height="63" fill="#a995ff">
         <animate
           attributeName="opacity"
-          dur="1s"
+          dur="2s"
           values="0.2; 1; 0.2"
           repeatCount="indefinite"
           begin="0.1"
