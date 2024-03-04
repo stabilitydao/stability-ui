@@ -12,8 +12,8 @@ const AssetsSkeleton = () => {
         rx="10"
         ry="10"
         width="320"
-        height="63"
-        fill="#262830"
+        height="100"
+        fill="#15113A"
       />
       <rect x="0" y="0" rx="10" ry="10" width="320" height="100" fill="#a995ff">
         <animate

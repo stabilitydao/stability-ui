@@ -14,7 +14,7 @@ const ShareSkeleton = (props) => {
         ry="10"
         width="320"
         height="63"
-        fill="#262830"
+        fill="#15113A"
       />
       <rect x="0" y="0" rx="10" ry="10" width="320" height="63" fill="#a995ff">
         <animate
