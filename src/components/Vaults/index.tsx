@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import { useStore } from "@nanostores/react";
 
 import { APRModal } from "./APRModal";
@@ -16,7 +18,14 @@ import {
   ErrorMessage,
 } from "@components";
 
-import { vaults, isVaultsLoaded, hideFeeApr, error, aprFilter } from "@store";
+import {
+  vaults,
+  isVaultsLoaded,
+  hideFeeApr,
+  error,
+  aprFilter,
+  connected,
+} from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -34,11 +43,14 @@ import type {
 } from "@types";
 
 const Vaults = () => {
+  const { open } = useWeb3Modal();
+
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $error = useStore(error);
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
+  const $connected = useStore(connected);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
@@ -54,20 +66,17 @@ const Vaults = () => {
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [currentTab, setCurrentTab] = useState(1);
-  const [sortSelector, setSortSelector] = useState(false);
 
   const [tableStates, setTableStates] = useState(TABLE);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
-  const [mobileActiveSort, setMobileActiveSort] = useState<TTableColumn>({
-    name: "",
-    keyName: "",
-    sortType: "",
-    dataType: "",
-  });
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
+
+  const userVaultsCondition =
+    tableFilters.find((filter) => filter.name === "My vaults")?.state &&
+    !$connected;
 
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
@@ -232,7 +241,6 @@ const Vaults = () => {
 
     setFilteredVaults(sortedVaults);
     setTableStates(table);
-    setSortSelector(false);
   };
 
   const initFilters = (vaults: TVault[]) => {
@@ -262,22 +270,6 @@ const Vaults = () => {
       setIsLocalVaultsLoaded(true);
     }
   };
-
-  useEffect(() => {
-    const activeTableState = tableStates.find(
-      (state) => state.sortType != "none"
-    );
-    if (activeTableState) {
-      setMobileActiveSort(activeTableState);
-    } else {
-      setMobileActiveSort({
-        name: "",
-        keyName: "",
-        sortType: "",
-        dataType: "",
-      });
-    }
-  }, [tableStates]);
 
   useEffect(() => {
     tableHandler();
@@ -313,25 +305,26 @@ const Vaults = () => {
         />
         <Filters filters={tableFilters} setFilters={setTableFilters} />
       </div>
-      {currentTabVaults.length ? (
-        <div className="overflow-x-auto md:overflow-x-visible">
-          <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
-            <thead className="bg-[#0b0e11]">
-              <tr className="text-[12px] text-[#8f8f8f] uppercase">
-                {tableStates.map((value: any, index: number) => (
-                  <ColumnSort
-                    key={value.name}
-                    index={index}
-                    value={value.name}
-                    table={tableStates}
-                    type="table"
-                    sort={tableHandler}
-                  />
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentTabVaults.map((vault: TVault) => {
+
+      <div className="overflow-x-auto md:overflow-x-visible">
+        <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
+          <thead className="bg-[#0b0e11]">
+            <tr className="text-[12px] text-[#8f8f8f] uppercase">
+              {tableStates.map((value: any, index: number) => (
+                <ColumnSort
+                  key={value.name}
+                  index={index}
+                  value={value.name}
+                  table={tableStates}
+                  type="table"
+                  sort={tableHandler}
+                />
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {currentTabVaults?.length ? (
+              currentTabVaults.map((vault: TVault) => {
                 return (
                   <tr
                     className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
@@ -609,15 +602,35 @@ const Vaults = () => {
                     </td>
                   </tr>
                 );
-              })}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center mt-5 md:mt-0">
-          No results found...
-        </div>
-      )}
+              })
+            ) : (
+              <tr className="text-start text-[14px] h-[60px] font-medium">
+                {userVaultsCondition ? (
+                  <td>
+                    <p className="text-[18px]">
+                      You haven't connected your wallet.
+                    </p>
+                    <p>Connect to view your vaults.</p>
+                    <button
+                      className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-md min-w-[120px] mt-2"
+                      onClick={() => open()}
+                    >
+                      Connect Wallet
+                    </button>
+                  </td>
+                ) : (
+                  <td>
+                    <p className="text-[18px]">No results found.</p>
+                    <p>
+                      Try clearing your filters or changing your search term.
+                    </p>
+                  </td>
+                )}
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
         vaults={filteredVaults}
