@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import { useStore } from "@nanostores/react";
 
 import { APRModal } from "./APRModal";
@@ -16,7 +18,14 @@ import {
   ErrorMessage,
 } from "@components";
 
-import { vaults, isVaultsLoaded, hideFeeApr, error, aprFilter } from "@store";
+import {
+  vaults,
+  isVaultsLoaded,
+  hideFeeApr,
+  error,
+  aprFilter,
+  connected,
+} from "@store";
 
 import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
 
@@ -34,43 +43,40 @@ import type {
 } from "@types";
 
 const Vaults = () => {
+  const { open } = useWeb3Modal();
+
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $error = useStore(error);
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
+  const $connected = useStore(connected);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
-    feesData: "",
-    assetsWithApr: "",
+    earningData: "",
     daily: 0,
-    assetsAprs: 0,
     lastHardWork: 0,
-    strategyApr: 0,
     state: false,
   });
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [currentTab, setCurrentTab] = useState(1);
-  const [sortSelector, setSortSelector] = useState(false);
 
   const [tableStates, setTableStates] = useState(TABLE);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
-  const [mobileActiveSort, setMobileActiveSort] = useState<TTableColumn>({
-    name: "",
-    keyName: "",
-    sortType: "",
-    dataType: "",
-  });
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
+
+  const userVaultsCondition =
+    tableFilters.find((filter) => filter.name === "My vaults")?.state &&
+    !$connected;
 
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
@@ -228,9 +234,13 @@ const Vaults = () => {
     sortedVaults = sortedVaults.filter((vault: TVault) =>
       vault.symbol.toLowerCase().includes(searchValue)
     );
+    // pagination upd
+    if (currentTab != 1) {
+      setCurrentTab(1);
+    }
+
     setFilteredVaults(sortedVaults);
     setTableStates(table);
-    setSortSelector(false);
   };
 
   const initFilters = (vaults: TVault[]) => {
@@ -260,22 +270,6 @@ const Vaults = () => {
       setIsLocalVaultsLoaded(true);
     }
   };
-
-  useEffect(() => {
-    const activeTableState = tableStates.find(
-      (state) => state.sortType != "none"
-    );
-    if (activeTableState) {
-      setMobileActiveSort(activeTableState);
-    } else {
-      setMobileActiveSort({
-        name: "",
-        keyName: "",
-        sortType: "",
-        dataType: "",
-      });
-    }
-  }, [tableStates]);
 
   useEffect(() => {
     tableHandler();
@@ -312,96 +306,25 @@ const Vaults = () => {
         <Filters filters={tableFilters} setFilters={setTableFilters} />
       </div>
 
-      {/* <div className="flex md:hidden items-center mt-4 gap-3 relative ">
-        <div className="relative select-none w-full">
-          <div
-            onClick={() => {
-              setSortSelector((prevState) => !prevState);
-            }}
-            className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-button text-[20px] cursor-pointer"
-          >
-            <div className="flex items-center justify-center gap-2">
-              <p className="text-[16px] md:text-[15px] lg:text-[20px]">
-                Sort by:
-              </p>
-              <div>
-                {mobileActiveSort.name && (
-                  <div className="px-0 md:px-2 min-[1130px]:px-4 py-2 text-center cursor-pointer">
-                    <p className="inline-block">{mobileActiveSort?.name}</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="7"
-                      viewBox="0 0 12 7"
-                      fill="none"
-                      className={`inline-block ml-[10px] transition duration-300 ease-in-out ${
-                        mobileActiveSort?.sortType === "ascendentic" &&
-                        "rotate-[180deg]"
-                      }`}
-                    >
-                      <path
-                        d="M6 7L11.1962 0.25H0.803848L6 7Z"
-                        fill="white"
-                        fillOpacity="0.6"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <svg
-              width="15"
-              height="9"
-              viewBox="0 0 15 9"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className={`transition delay-[50ms] ${
-                sortSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-              }`}
-            >
-              <path d="M1 1L7.5 7.5L14 1" stroke="white" />
-            </svg>
-          </div>
-          <div
-            className={`bg-button mt-1 rounded-md w-full z-10 ${
-              sortSelector ? "absolute transition delay-[50ms]" : "hidden"
-            } `}
-          >
-            <div className="flex flex-col items-center">
+      <div className="overflow-x-auto md:overflow-x-visible">
+        <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
+          <thead className="bg-[#0b0e11]">
+            <tr className="text-[12px] text-[#8f8f8f] uppercase">
               {tableStates.map((value: any, index: number) => (
                 <ColumnSort
                   key={value.name}
                   index={index}
                   value={value.name}
                   table={tableStates}
-                  type="tile"
+                  type="table"
                   sort={tableHandler}
                 />
               ))}
-            </div>
-          </div>
-        </div>
-      </div> */}
-      {currentTabVaults.length ? (
-        <div className="overflow-x-auto md:overflow-x-visible">
-          <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
-            <thead className="bg-[#0b0e11]">
-              <tr className="text-[12px] text-[#8f8f8f] uppercase">
-                {tableStates.map((value: any, index: number) => (
-                  <ColumnSort
-                    key={value.name}
-                    index={index}
-                    value={value.name}
-                    table={tableStates}
-                    type="table"
-                    sort={tableHandler}
-                  />
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentTabVaults.map((vault: TVault) => {
+            </tr>
+          </thead>
+          <tbody>
+            {currentTabVaults?.length ? (
+              currentTabVaults.map((vault: TVault) => {
                 return (
                   <tr
                     className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
@@ -513,18 +436,15 @@ const Vaults = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[80px] min-[915px]:w-[160px]">
+                    <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]">
                       <div
-                        className="text-[13px] whitespace-nowrap w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                        className="text-[13px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
-                            feesData: vault.feesData,
-                            assetsWithApr: vault.assetsWithApr as any,
+                            earningData: vault.earningData,
                             daily: vault.daily,
-                            assetsAprs: vault.monthlyUnderlyingApr,
                             lastHardWork: vault.lastHardWork as any,
-                            strategyApr: Number(vault.strategyApr),
                             state: true,
                           });
                         }}
@@ -532,31 +452,32 @@ const Vaults = () => {
                         <p>
                           {$hideFeeAPR
                             ? $aprFilter === "24h"
-                              ? vault.feesData.apr.withoutFees.daily
+                              ? vault.earningData.apr.withoutFees.daily
                               : $aprFilter === "week"
-                              ? vault.feesData.apr.withoutFees.weekly
-                              : vault.feesData.apr.withoutFees[$aprFilter]
+                              ? vault.earningData.apr.withoutFees.weekly
+                              : vault.earningData.apr.withoutFees[$aprFilter]
                             : $aprFilter === "24h"
-                            ? vault.feesData.apr.withFees.daily
+                            ? vault.earningData.apr.withFees.daily
                             : $aprFilter === "week"
-                            ? vault.feesData.apr.withFees.weekly
-                            : vault.feesData.apr.withFees[$aprFilter]}
+                            ? vault.earningData.apr.withFees.weekly
+                            : vault.earningData.apr.withFees[$aprFilter]}
                           %
                         </p>
-                        {window.innerWidth > 915 && (
+                        {(window.innerWidth > 915 ||
+                          window.innerWidth < 767) && (
                           <p>
                             /{" "}
                             {$hideFeeAPR
                               ? $aprFilter === "24h"
-                                ? vault.feesData.apy.withoutFees.daily
+                                ? vault.earningData.apy.withoutFees.daily
                                 : $aprFilter === "week"
-                                ? vault.feesData.apy.withoutFees.weekly
-                                : vault.feesData.apy.withoutFees[$aprFilter]
+                                ? vault.earningData.apy.withoutFees.weekly
+                                : vault.earningData.apy.withoutFees[$aprFilter]
                               : $aprFilter === "24h"
-                              ? vault.feesData.apy.withFees.daily
+                              ? vault.earningData.apy.withFees.daily
                               : $aprFilter === "week"
-                              ? vault.feesData.apy.withFees.weekly
-                              : vault.feesData.apy.withFees[$aprFilter]}
+                              ? vault.earningData.apy.withFees.weekly
+                              : vault.earningData.apy.withFees[$aprFilter]}
                             %
                           </p>
                         )}
@@ -569,15 +490,15 @@ const Vaults = () => {
                               <p className="text-end">
                                 {$hideFeeAPR
                                   ? $aprFilter === "24h"
-                                    ? vault.feesData.apy.withoutFees.daily
+                                    ? vault.earningData.apy.withoutFees.daily
                                     : $aprFilter === "week"
-                                    ? vault.feesData.apy.withoutFees.weekly
-                                    : vault.feesData.apy.withFees[$aprFilter]
+                                    ? vault.earningData.apy.withoutFees.weekly
+                                    : vault.earningData.apy.withFees[$aprFilter]
                                   : $aprFilter === "24h"
-                                  ? vault.feesData.apy.withFees.daily
+                                  ? vault.earningData.apy.withFees.daily
                                   : $aprFilter === "week"
-                                  ? vault.feesData.apy.withFees.weekly
-                                  : vault.feesData.apy.withFees[$aprFilter]}
+                                  ? vault.earningData.apy.withFees.weekly
+                                  : vault.earningData.apy.withFees[$aprFilter]}
                                 %
                               </p>
                             </div>
@@ -586,20 +507,22 @@ const Vaults = () => {
                               <p className="text-end">
                                 {$hideFeeAPR
                                   ? $aprFilter === "24h"
-                                    ? vault.feesData.apr.withoutFees.daily
+                                    ? vault.earningData.apr.withoutFees.daily
                                     : $aprFilter === "week"
-                                    ? vault.feesData.apr.withoutFees.weekly
-                                    : vault.feesData.apr.withoutFees[$aprFilter]
+                                    ? vault.earningData.apr.withoutFees.weekly
+                                    : vault.earningData.apr.withoutFees[
+                                        $aprFilter
+                                      ]
                                   : $aprFilter === "24h"
-                                  ? vault.feesData.apr.withFees.daily
+                                  ? vault.earningData.apr.withFees.daily
                                   : $aprFilter === "week"
-                                  ? vault.feesData.apr.withFees.weekly
-                                  : vault.feesData.apr.withFees[$aprFilter]}
+                                  ? vault.earningData.apr.withFees.weekly
+                                  : vault.earningData.apr.withFees[$aprFilter]}
                                 %
                               </p>
                             </div>
 
-                            {!!vault.monthlyUnderlyingApr && (
+                            {!!vault?.earningData?.poolSwapFeesAPR && (
                               <div className="font-bold flex items-center justify-between">
                                 <p>Pool swap fees APR</p>
                                 <p
@@ -608,10 +531,10 @@ const Vaults = () => {
                                   } text-end`}
                                 >
                                   {$aprFilter === "24h"
-                                    ? vault.feesData.poolSwapFeesAPR.daily
+                                    ? vault.earningData.poolSwapFeesAPR.daily
                                     : $aprFilter === "week"
-                                    ? vault.feesData.poolSwapFeesAPR.weekly
-                                    : vault.feesData.poolSwapFeesAPR[
+                                    ? vault.earningData.poolSwapFeesAPR.weekly
+                                    : vault.earningData.poolSwapFeesAPR[
                                         $aprFilter
                                       ]}
                                   %
@@ -622,10 +545,10 @@ const Vaults = () => {
                               <p>Strategy APR</p>
                               <p className="text-end">
                                 {$aprFilter === "24h"
-                                  ? vault.feesData.farmAPR.daily
+                                  ? vault.earningData.farmAPR.daily
                                   : $aprFilter === "week"
-                                  ? vault.feesData.farmAPR.weekly
-                                  : vault.feesData.farmAPR[$aprFilter]}
+                                  ? vault.earningData.farmAPR.weekly
+                                  : vault.earningData.farmAPR[$aprFilter]}
                                 %
                               </p>
                             </div>
@@ -633,8 +556,8 @@ const Vaults = () => {
                               <p>Daily</p>
                               <p className="text-end">
                                 {$hideFeeAPR
-                                  ? vault.feesData.apr.withoutFees.daily
-                                  : vault.feesData.apr.withFees.daily}
+                                  ? vault.earningData.apr.withoutFees.daily
+                                  : vault.earningData.apr.withFees.daily}
                                 %
                               </p>
                             </div>
@@ -679,182 +602,35 @@ const Vaults = () => {
                     </td>
                   </tr>
                 );
-              })}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center mt-5 md:mt-0">
-          No results found...
-        </div>
-      )}
-      {/* <div className="md:hidden block">
-        {currentTabVaults.map((vault: TVault, index: number) => {
-          return (
-            <div
-              key={vault.name}
-              className="my-3 w-full bg-[#2C2F38] rounded-md"
-            >
-              <div className="flex flex-col items-center justify-center p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center flex-wrap gap-1">
-                    {vault.assets && (
-                      <AssetsProportion
-                        proportions={vault.assetsProportions as number[]}
-                        assets={vault.assets}
-                        type="vaults"
-                      />
-                    )}
-                    <p
-                      title={vault.name}
-                      className="whitespace-nowrap text-[14px]"
-                    >
-                      {vault.symbol}
+              })
+            ) : (
+              <tr className="text-start text-[14px] h-[60px] font-medium">
+                {userVaultsCondition ? (
+                  <td>
+                    <p className="text-[18px]">
+                      You haven't connected your wallet.
                     </p>
-                  </div>
-
-                  <VaultType type={vault.type} />
-                </div>
-                <div className="flex items-center rounded-[8px] my-3 border-[#935ec2]">
-                  <VaultState status={vault.status} />
-                  {vault.strategyInfo && (
-                    <>
-                      <span
-                        style={{
-                          backgroundColor: vault.strategyInfo.bgColor,
-                          color: vault.strategyInfo.color,
-                        }}
-                        className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[52px]"
-                        title={vault.strategyInfo.name}
-                      >
-                        {vault.strategyInfo.shortName}
-                      </span>
-                      <span className="px-2 rounded-r-[10px] bg-[#41465a] d-none flex h-8 items-center min-w-[170px]">
-                        <span className="flex min-w-[42px] justify-center">
-                          {vault.strategyInfo.protocols.map(
-                            (protocol, index) => (
-                              <img
-                                className={`h-6 w-6 rounded-full ${
-                                  vault.strategyInfo.protocols.length > 1 &&
-                                  index &&
-                                  "ml-[-8px]"
-                                }`}
-                                key={index}
-                                src={protocol.logoSrc}
-                                alt={protocol.name}
-                                title={protocol.name}
-                              />
-                            )
-                          )}
-                        </span>
-                        <span className="flex">
-                          {vault.strategyInfo.features.map((feature, i) => (
-                            <img
-                              key={i}
-                              title={feature.name}
-                              alt={feature.name}
-                              className="w-6 h-6 ml-1"
-                              src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                feature.svg
-                              )}`}
-                            />
-                          ))}
-                        </span>
-                        {vault.strategySpecific && (
-                          <span
-                            className={
-                              vault.strategySpecific.length > 10
-                                ? `ml-0.5 lowercase font-bold text-[10px] pl-[6px] rounded-[4px] text-[#b6bdd7] inline`
-                                : `ml-0.5 uppercase font-bold text-[11px] px-[6px] rounded-[4px] text-[#b6bdd7] inline`
-                            }
-                          >
-                            {vault.strategySpecific}
-                          </span>
-                        )}
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div className="flex justify-between border-b border-[#4f5158] w-full text-[#8f8f8f]">
-                  <p className="w-1/3 border-r border-[#4f5158]">APR / APY</p>
-                  <div className="w-2/3 flex items-center justify-end">
+                    <p>Connect to view your vaults.</p>
+                    <button
+                      className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-md min-w-[120px] mt-2"
+                      onClick={() => open()}
+                    >
+                      Connect Wallet
+                    </button>
+                  </td>
+                ) : (
+                  <td>
+                    <p className="text-[18px]">No results found.</p>
                     <p>
-                      {vault.apr}% / {vault.apy}%
+                      Try clearing your filters or changing your search term.
                     </p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      className="mt-[4px] ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setAprModal({
-                          apr: vault.apr,
-                          apy: vault.apy,
-                          aprWithoutFees: vault.aprWithoutFees,
-                          apyWithoutFees: vault.apyWithoutFees,
-                          assetsWithApr: vault.assetsWithApr as any,
-                          daily: vault.daily,
-                          assetsAprs: vault.monthlyUnderlyingApr,
-                          lastHardWork: vault.lastHardWork as any,
-                          strategyApr: Number(vault.strategyApr),
-                          state: true,
-                        });
-                      }}
-                    >
-                      <circle cx="8" cy="8" r="7.5" stroke="white" />
-                      <path
-                        d="M7.34516 9.37249V9.3266C7.35011 8.83967 7.39958 8.45216 7.49359 8.16408C7.58759 7.876 7.72117 7.64273 7.89433 7.46427C8.06749 7.28581 8.27528 7.12138 8.5177 6.97096C8.66365 6.87918 8.79476 6.77083 8.91103 6.64591C9.02729 6.51844 9.11882 6.37185 9.18561 6.20614C9.25487 6.04043 9.2895 5.85688 9.2895 5.65547C9.2895 5.40563 9.23261 5.18893 9.11882 5.00538C9.00503 4.82182 8.85289 4.68033 8.66242 4.5809C8.47194 4.48148 8.26044 4.43176 8.02791 4.43176C7.82506 4.43176 7.62964 4.4751 7.44164 4.56178C7.25364 4.64846 7.09655 4.78485 6.9704 4.97096C6.84424 5.15707 6.77126 5.40053 6.75147 5.70136H5.81641C5.8362 5.26797 5.94504 4.89703 6.14294 4.58855C6.34331 4.28007 6.60676 4.04426 6.93329 3.88109C7.26229 3.71793 7.62717 3.63635 8.02791 3.63635C8.46328 3.63635 8.84176 3.72558 9.16335 3.90404C9.4874 4.0825 9.73725 4.32724 9.91288 4.63826C10.091 4.94929 10.18 5.30366 10.18 5.70136C10.18 5.9818 10.138 6.23546 10.0539 6.46236C9.97225 6.68925 9.85351 6.89193 9.69767 7.07039C9.5443 7.24884 9.35877 7.40691 9.14108 7.54457C8.92339 7.68479 8.749 7.83266 8.61789 7.98817C8.48678 8.14113 8.39155 8.32341 8.33218 8.53501C8.27281 8.74661 8.24065 9.01048 8.2357 9.3266V9.37249H7.34516ZM7.82012 11.6364C7.63706 11.6364 7.47998 11.5688 7.34887 11.4337C7.21777 11.2986 7.15221 11.1367 7.15221 10.948C7.15221 10.7594 7.21777 10.5975 7.34887 10.4624C7.47998 10.3272 7.63706 10.2597 7.82012 10.2597C8.00317 10.2597 8.16025 10.3272 8.29136 10.4624C8.42247 10.5975 8.48802 10.7594 8.48802 10.948C8.48802 11.0729 8.4571 11.1877 8.39526 11.2922C8.33589 11.3967 8.25549 11.4808 8.15407 11.5446C8.05512 11.6058 7.9438 11.6364 7.82012 11.6364Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex justify-between border-b w-full border-[#4f5158] text-[#8f8f8f]">
-                  <p className="w-1/3 border-r border-[#4f5158]">PRICE</p>
-                  <p className="w-2/3 text-end">
-                    ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
-                  </p>
-                </div>
-                <div className="flex justify-between border-b w-full border-[#4f5158] text-[#8f8f8f]">
-                  <p className="w-1/3 border-r border-[#4f5158]">TVL</p>
-                  <p className="w-2/3 text-end">
-                    {formatNumber(
-                      formatFromBigInt(vault.tvl, 18, "withFloor"),
-                      "abbreviate"
-                    )}
-                  </p>
-                </div>
-                <div className="flex justify-between border-b w-full border-[#4f5158] text-[#8f8f8f]">
-                  <p className="w-1/3 border-r border-[#4f5158]">IL</p>
-                  <p
-                    className="w-2/3 text-end uppercase font-bold text-[12px]"
-                    style={{ color: vault.strategyInfo.il?.color }}
-                  >
-                    {vault.strategyInfo.il?.title}
-                  </p>
-                </div>
-                <div className="flex justify-between border-b w-full border-[#4f5158] text-[#8f8f8f]">
-                  <p className="w-1/3 border-r border-[#4f5158]">BALANCE</p>
-                  <p className="w-2/3 text-end">
-                    {formatNumber(
-                      formatFromBigInt(vault.balance, 18),
-                      "format"
-                    )}
-                  </p>
-                </div>
-                <a href={`/vault/${vault.address}`}>
-                  <button className="bg-button px-3 py-2 rounded-md mt-3">
-                    Manage
-                  </button>
-                </a>
-              </div>
-            </div>
-          );
-        })}
-      </div> */}
+                  </td>
+                )}
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <Pagination
         vaults={filteredVaults}

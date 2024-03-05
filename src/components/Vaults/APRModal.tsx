@@ -23,18 +23,13 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       setModalState({
-        feesData: "",
-        assetsWithApr: "",
+        earningData: "",
         daily: 0,
-        assetsAprs: 0,
         lastHardWork: 0,
-        strategyApr: 0,
         state: false,
       });
     }
   };
-
-  const strategyAPR = formatFromBigInt(state.strategyApr, 3).toFixed(2);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -55,12 +50,9 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         <svg
           onClick={() => {
             setModalState({
-              feesData: "",
-              assetsWithApr: "",
+              earningData: "",
               daily: 0,
-              assetsAprs: 0,
               lastHardWork: 0,
-              strategyApr: 0,
               state: false,
             });
           }}
@@ -130,15 +122,15 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p className="text-end">
                 {$hideFeeAPR
                   ? $aprFilter === "24h"
-                    ? state.feesData.apy.withoutFees.daily
+                    ? state.earningData.apy.withoutFees.daily
                     : $aprFilter === "week"
-                    ? state.feesData.apy.withoutFees.weekly
-                    : state.feesData.apy.withFees[$aprFilter]
+                    ? state.earningData.apy.withoutFees.weekly
+                    : state.earningData.apy.withFees[$aprFilter]
                   : $aprFilter === "24h"
-                  ? state.feesData.apy.withFees.daily
+                  ? state.earningData.apy.withFees.daily
                   : $aprFilter === "week"
-                  ? state.feesData.apy.withFees.weekly
-                  : state.feesData.apy.withFees[$aprFilter]}
+                  ? state.earningData.apy.withFees.weekly
+                  : state.earningData.apy.withFees[$aprFilter]}
                 %
               </p>
             </div>
@@ -148,27 +140,27 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p className="text-end">
                 {$hideFeeAPR
                   ? $aprFilter === "24h"
-                    ? state.feesData.apr.withoutFees.daily
+                    ? state.earningData.apr.withoutFees.daily
                     : $aprFilter === "week"
-                    ? state.feesData.apr.withoutFees.weekly
-                    : state.feesData.apr.withoutFees[$aprFilter]
+                    ? state.earningData.apr.withoutFees.weekly
+                    : state.earningData.apr.withoutFees[$aprFilter]
                   : $aprFilter === "24h"
-                  ? state.feesData.apr.withFees.daily
+                  ? state.earningData.apr.withFees.daily
                   : $aprFilter === "week"
-                  ? state.feesData.apr.withFees.weekly
-                  : state.feesData.apr.withFees[$aprFilter]}
+                  ? state.earningData.apr.withFees.weekly
+                  : state.earningData.apr.withFees[$aprFilter]}
                 %
               </p>
             </div>
-            {!!state.assetsAprs && (
+            {!!state.earningData.poolSwapFeesAPR && (
               <div className="flex items-center justify-between mb-1">
                 <p>Pool swap fees APR</p>
                 <p className={`${$hideFeeAPR && "line-through"} text-end`}>
                   {$aprFilter === "24h"
-                    ? state.feesData.poolSwapFeesAPR.daily
+                    ? state.earningData.poolSwapFeesAPR.daily
                     : $aprFilter === "week"
-                    ? state.feesData.poolSwapFeesAPR.weekly
-                    : state.feesData.poolSwapFeesAPR[$aprFilter]}
+                    ? state.earningData.poolSwapFeesAPR.weekly
+                    : state.earningData.poolSwapFeesAPR[$aprFilter]}
                   %
                 </p>
               </div>
@@ -177,10 +169,10 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Strategy APR</p>
               <p className="text-end">
                 {$aprFilter === "24h"
-                  ? state.feesData.farmAPR.daily
+                  ? state.earningData.farmAPR.daily
                   : $aprFilter === "week"
-                  ? state.feesData.farmAPR.weekly
-                  : state.feesData.farmAPR[$aprFilter]}
+                  ? state.earningData.farmAPR.weekly
+                  : state.earningData.farmAPR[$aprFilter]}
                 %
               </p>
             </div>
@@ -188,8 +180,8 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Daily yield</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? state.feesData.apr.withoutFees.daily
-                  : state.feesData.apr.withFees.daily}
+                  ? state.earningData.apr.withoutFees.daily
+                  : state.earningData.apr.withFees.daily}
                 %
               </p>
             </div>

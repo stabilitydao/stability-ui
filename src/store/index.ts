@@ -13,7 +13,6 @@ import type {
   TVaults,
   TAssetPrices,
   TBalances,
-  TVaultAssets,
   TAddress,
   TSettings,
   TError,
@@ -35,7 +34,6 @@ const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
 const balances = atom<any>();
 const visible = atom<boolean>(true);
-const vaultAssets = atom<TVaultAssets[] | undefined>();
 const isVaultsLoaded = atom<boolean>(false);
 
 const tokens = atom<TAddress[] | undefined>();
@@ -85,7 +83,6 @@ export {
   assetsBalances,
   vaultData,
   vaults,
-  vaultAssets,
   isVaultsLoaded,
   balances,
   visible,

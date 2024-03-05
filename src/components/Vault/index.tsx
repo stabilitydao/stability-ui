@@ -11,7 +11,7 @@ import { HistoricalRate } from "./HistoricalRate";
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
 
-import { vaultData, vaults, vaultAssets, error } from "@store";
+import { vaultData, vaults, error } from "@store";
 
 import type { TAddress } from "@types";
 
@@ -21,7 +21,6 @@ interface IProps {
 
 const Vault: React.FC<IProps> = ({ vault }) => {
   const $vaultData = useStore(vaultData);
-  const $vaultAssets: any = useStore(vaultAssets);
   const $vaults = useStore(vaults);
 
   const $error = useStore(error);
@@ -32,7 +31,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
     if ($vaults && vault) {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
-  }, [$vaults, $vaultData, $vaultAssets]);
+  }, [$vaults, $vaultData]);
 
   if ($error.state && $error.type === "API") {
     return (

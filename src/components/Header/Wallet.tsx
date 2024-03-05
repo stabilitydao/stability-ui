@@ -181,7 +181,7 @@ const Wallet = () => {
         </button>
       )}
       <button
-        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] lowercase flex items-center justify-center gap-1"
+        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] flex items-center justify-center gap-1"
         onClick={() => openProfile()}
       >
         {$account && providerImage && (
@@ -193,7 +193,7 @@ const Wallet = () => {
                 ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
                 : "*************"
             }`
-          : "Connect wallet"}
+          : "Connect Wallet"}
       </button>
     </div>
   );

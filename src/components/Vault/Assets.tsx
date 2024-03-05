@@ -202,11 +202,11 @@ const Assets: React.FC<IProps> = memo(
                       </div>
                     </div>
 
-                    {price ? (
+                    {!!price && (
                       <div className="flex justify-start items-center text-[16px]">
                         <p>Price: ${formatNumber(price, "smallNumbers")}</p>
                       </div>
-                    ) : null}
+                    )}
                     {priceOnCreation && (
                       <div className="flex justify-start items-center text-[16px]">
                         <p>
