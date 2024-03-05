@@ -13,15 +13,15 @@ const AssetsSkeleton = () => {
         ry="10"
         width="320"
         height="100"
-        fill="#15113A"
+        fill="#a995ff"
       />
-      <rect x="0" y="0" rx="10" ry="10" width="320" height="100" fill="#a995ff">
+      <rect x="0" y="0" rx="10" ry="10" width="320" height="100" fill="#15113A">
         <animate
           attributeName="opacity"
           dur="2s"
-          values="0.2; 1; 0.2"
+          values="1; 0.5; 1"
           repeatCount="indefinite"
-          begin="0.1"
+          begin="1"
         />
       </rect>
     </svg>
