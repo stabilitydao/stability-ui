@@ -179,6 +179,26 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.IQMF,
     };
+  } else if (vaultSymbol.match(/GRMF(S|N|W)$/)) {
+    const il = vaultSymbol.match(/GRMFS$/)
+      ? IL.GQFS
+      : vaultSymbol.match(/GRMFN$/)
+      ? IL.GQFN
+      : vaultSymbol.match(/GRMFW$/)
+      ? IL.GQFW
+      : { rate: 0, title: "None", desc: "None", color: "#000000" };
+    strategyInfo = {
+      name: "Gamma Retro Merkl Farm",
+      shortName: "GRMF",
+      protocols: [gamma, retro, merkl],
+      features: [farm],
+      color: "#ff0000",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il,
+    };
   }
 
   return strategyInfo;
