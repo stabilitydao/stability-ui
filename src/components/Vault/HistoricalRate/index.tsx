@@ -3,6 +3,7 @@ import { memo, useState, useEffect } from "react";
 import axios from "axios";
 
 import { Chart } from "./Chart";
+import { ChartBar } from "./ChartBar";
 
 import { formatFromBigInt } from "@utils";
 
@@ -17,7 +18,7 @@ interface IProps {
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
 const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
-  const APRType = vaultStrategy === "compound farm" ? "APR" : "Farm APR";
+  const APRType = vaultStrategy === "Compound Farm" ? "APR" : "Farm APR";
   const timelineSegments = {
     DAY: "DAY",
     WEEK: "WEEK",
@@ -33,6 +34,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
   function formatData(obj: any) {
     const date = new Date(Number(obj.timestamp) * 1000);
+
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const formattedDate = `${day.toString().padStart(2, "0")}.${month
@@ -51,18 +53,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       date: formattedTime,
     };
   }
-  // function calculateTimeDifference(start, end) {
-  //   const startDate = new Date(start * 1000);
-  //   const endDate = new Date(end * 1000);
-  //   const difference = endDate.getTime() - startDate.getTime();
-  //   const hours = Math.floor(difference / (1000 * 60 * 60));
-  //   const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-  //   return { hours, minutes };
-  // }
 
   const getData = async () => {
     const NOW = Math.floor(Date.now() / 1000);
+    let time = NOW - TIMESTAMPS_IN_SECONDS.WEEK;
     const DATA = [];
+    let weeklyAPRs = [];
     let entities = 0;
     let status = true;
 
@@ -91,10 +87,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       }
       entities += 100;
     }
+
     const workedData = DATA.map(formatData).sort(
       (a, b) => a.unixTimestamp - b.unixTimestamp
     );
-    const APRChartData = workedData
+
+    let APRChartData = workedData
       .filter(
         (obj) =>
           obj.APR &&
@@ -107,31 +105,25 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
       }));
+
+    for (let i = 0; i < 168; i++) {
+      let sortedAPRs = APRChartData.filter(
+        (obj: any) => Number(obj.unixTimestamp) < time
+      );
+
+      let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRChartData[0];
+
+      const newAPR = { ...lastEl, timestamp: time };
+
+      weeklyAPRs.push(newAPR);
+
+      time += 3600;
+    }
+
+    APRChartData = weeklyAPRs.map(formatData);
+
     setChartData(workedData);
     setActiveChart({ name: "APR", data: APRChartData });
-    //////////////////////////////////
-
-    //let num = Number(APRChartData[0].unixTimestamp);
-
-    //let numbers = [];
-    //while (NOW > num) {
-    //let apr = APRChartData;
-    // console.log(
-    //   calculateTimeDifference(
-    //     a,
-    //     APRChartData.filter((obj) => obj.unixTimestamp > a)[0].unixTimestamp
-    //   )
-    // );
-    // let obj = {
-    //   APR: "222891",
-    //   TVL: "10168010705680305384469",
-    //   address: "0xf9a20fdb3fb3db0b1951ba57bf82a7c899adb7d6",
-    //   sharePrice: "1010875230232836106",
-    //   timestamp: a,
-    // };
-    // ne.push(obj);
-    //a += TIMESTAMPS_IN_SECONDS.HOUR;
-    //}
   };
 
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
@@ -140,16 +132,39 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
     switch (chartType) {
       case "APR":
-        const APRArr = chartData.filter(
+        let APRArr = chartData.filter(
           (obj: TChartData) =>
             obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
         );
+
+        if (segment === "WEEK") {
+          let weeklyAPRs = [];
+
+          let time = NOW - TIME;
+
+          for (let i = 0; i < 168; i++) {
+            let sortedAPRs = APRArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) < time
+            );
+
+            let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
+
+            const newAPR = { ...lastEl, timestamp: time };
+
+            weeklyAPRs.push(newAPR);
+
+            time += 3600;
+          }
+
+          APRArr = weeklyAPRs.map(formatData);
+        }
 
         const APRWidthPercent =
           (APRArr[APRArr.length - 1].unixTimestamp - APRArr[0].unixTimestamp) /
           500;
 
         let sum = 0;
+
         const APRDifferences = APRArr.map((entry, index) => {
           if (index === 0) return 0;
           const prevEntry = APRArr[index - 1];
@@ -207,19 +222,19 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
         );
 
-        const PriceWidthPercent =
+        const priceWidthPercent =
           (PriceArr[PriceArr.length - 1].unixTimestamp -
             PriceArr[0].unixTimestamp) /
           500;
 
         let PSum = 0;
 
-        const PriceDifferences = PriceArr.map((entry, index) => {
+        const priceDifferences = PriceArr.map((entry, index) => {
           if (index === 0) return 0;
           const prevEntry = PriceArr[index - 1];
           const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
           PSum += diff;
-          return Math.floor(PSum / PriceWidthPercent);
+          return Math.floor(PSum / priceWidthPercent);
         });
 
         const priceChartData = PriceArr.map(
@@ -232,7 +247,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               18,
               "withDecimals"
             ),
-            x: PriceDifferences[index],
+            x: priceDifferences[index],
             y: formatFromBigInt(obj.sharePrice as number, 18, "withDecimals"),
           })
         );
@@ -279,7 +294,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             }}
           ></div>
           <p
-            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "APR" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("APR")}
@@ -287,7 +302,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             {APRType}
           </p>
           <p
-            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("TVL")}
@@ -295,7 +310,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             TVL
           </p>
           <p
-            className={`cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
               activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
             }`}
             onClick={() => chartHandler("sharePrice")}
@@ -306,7 +321,15 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       </div>
 
       <div className="py-3 px-4">
-        {activeChart && <Chart chart={activeChart} APRType={APRType} />}
+        {activeChart && (
+          <>
+            {activeChart.name === "APR" ? (
+              <ChartBar chart={activeChart} APRType={APRType} />
+            ) : (
+              <Chart chart={activeChart} APRType={APRType} />
+            )}
+          </>
+        )}
       </div>
       <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
         {/* <p

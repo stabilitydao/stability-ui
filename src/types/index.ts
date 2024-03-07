@@ -71,6 +71,25 @@ type TTokenData = {
 
 //New types
 
+type TAPRData = {
+  latest: string;
+  daily: string;
+  weekly: string;
+};
+
+type TEarningData = {
+  apr: {
+    withFees: TAPRData;
+    withoutFees: TAPRData;
+  };
+  apy: {
+    withFees: TAPRData;
+    withoutFees: TAPRData;
+  };
+  poolSwapFeesAPR: TAPRData;
+  farmAPR: TAPRData;
+};
+
 type TVaults = {
   [vaultAddress: string]: TVaultData;
 };
@@ -132,7 +151,7 @@ type TVault = {
   version: string;
   strategyVersion: string;
   rebalances: any;
-  earningData: any; // todo type
+  earningData: TEarningData | any;
 };
 
 type TTableColumn = {
@@ -155,7 +174,7 @@ type TTableFilters = {
 };
 
 type TAPRModal = {
-  earningData: any; // todo type for earningData
+  earningData: TEarningData | any;
   daily: number;
   lastHardWork: any;
   state: boolean;

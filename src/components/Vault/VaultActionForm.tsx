@@ -2205,74 +2205,76 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           <p>{balances[asset]}</p>
                         </div>
 
-                        <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                          <div className="absolute end-5 bottom-4">
-                            <div className="flex items-center">
-                              <button
-                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                type="button"
-                                onClick={() =>
-                                  balances[asset] &&
-                                  handleInputChange(balances[asset], asset)
+                        <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
+                          <div className="py-3 w-full flex items-center px-4">
+                            <label
+                              htmlFor={asset}
+                              className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
+                            >
+                              {tokensJson.tokens.map((token) => {
+                                if (token.address.toLowerCase() === asset) {
+                                  return (
+                                    <div
+                                      className="flex items-center gap-2"
+                                      key={token.address}
+                                    >
+                                      <img
+                                        className="rounded-full w-[25px] h-[25px] "
+                                        src={token.logoURI}
+                                        alt={token.name}
+                                      />
+                                    </div>
+                                  );
                                 }
-                              >
-                                MAX
-                              </button>
-                            </div>
-                          </div>
-                          <input
-                            className="w-[75%] pl-[50px] py-3 flex items-center h-full text-[25px] bg-transparent"
-                            list="amount"
-                            id={asset}
-                            name="amount"
-                            placeholder="0"
-                            value={
-                              inputs && inputs[asset] && inputs[asset].amount
-                            }
-                            onChange={(e) =>
-                              handleInputChange(e.target.value, e.target.id)
-                            }
-                            type="text"
-                            onKeyDown={(evt) => {
-                              const currentValue =
-                                inputs && inputs[asset] && inputs[asset].amount;
+                              })}
+                            </label>
+                            <input
+                              className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
+                              list="amount"
+                              id={asset}
+                              name="amount"
+                              placeholder="0"
+                              value={
+                                inputs && inputs[asset] && inputs[asset].amount
+                              }
+                              onChange={(e) =>
+                                handleInputChange(e.target.value, e.target.id)
+                              }
+                              type="text"
+                              onKeyDown={(evt) => {
+                                const currentValue =
+                                  inputs &&
+                                  inputs[asset] &&
+                                  inputs[asset].amount;
 
-                              if (
-                                !/[\d.]/.test(evt.key) &&
-                                evt.key !== "Backspace" &&
-                                evt.key !== "ArrowLeft" &&
-                                evt.key !== "ArrowRight"
-                              ) {
-                                evt.preventDefault();
-                              }
+                                if (
+                                  !/[\d.]/.test(evt.key) &&
+                                  evt.key !== "Backspace" &&
+                                  evt.key !== "ArrowLeft" &&
+                                  evt.key !== "ArrowRight"
+                                ) {
+                                  evt.preventDefault();
+                                }
 
-                              if (
-                                evt.key === "." &&
-                                currentValue &&
-                                currentValue.includes(".")
-                              ) {
-                                evt.preventDefault();
+                                if (
+                                  evt.key === "." &&
+                                  currentValue &&
+                                  currentValue.includes(".")
+                                ) {
+                                  evt.preventDefault();
+                                }
+                              }}
+                            />
+                            <button
+                              className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
+                              onClick={() =>
+                                balances[asset] &&
+                                handleInputChange(balances[asset], asset)
                               }
-                            }}
-                          />
-                          <div className="absolute top-[25%] left-[5%]  bg-[#4e46e521] rounded-xl ">
-                            {tokensJson.tokens.map((token) => {
-                              if (token.address.toLowerCase() === asset) {
-                                return (
-                                  <div
-                                    className="flex items-center gap-2"
-                                    key={token.address}
-                                  >
-                                    {/* <p className="my-auto">{token.symbol}</p> */}
-                                    <img
-                                      className="rounded-full w-[25px] h-[25px] "
-                                      src={token.logoURI}
-                                      alt={token.name}
-                                    />
-                                  </div>
-                                );
-                              }
-                            })}
+                              type="button"
+                            >
+                              MAX
+                            </button>
                           </div>
                         </div>
 
@@ -2421,99 +2423,83 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       <div className="text-left text-[gray] ml-2">
                         Balance: {balances[option[0]]}
                       </div>
-                    ) : (
-                      ""
-                    )}
+                    ) : null}
+                    <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
+                      <div className="py-3 w-full flex items-center px-4">
+                        <label
+                          htmlFor={option[0]}
+                          className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
+                        >
+                          {tokensJson.tokens.map((token) => {
+                            if (token.address === option[0]) {
+                              return (
+                                <div
+                                  className="flex items-center"
+                                  key={token.address}
+                                >
+                                  <img
+                                    className="w-[25px] h-[25px] rounded-full"
+                                    src={token.logoURI}
+                                    alt={token.name}
+                                  />
+                                </div>
+                              );
+                            }
+                          })}
+                        </label>
 
-                    <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                      <div className="absolute top-[30%] left-[5%]">
-                        {tokensJson.tokens.map((token) => {
-                          if (token.address === option[0]) {
-                            return (
-                              <div
-                                className="flex items-center"
-                                key={token.address}
-                              >
-                                <img
-                                  className="w-[25px] h-[25px] rounded-full"
-                                  src={token.logoURI}
-                                  alt={token.name}
-                                />
-                              </div>
-                            );
-                          }
-                        })}
-                      </div>
-                      {$connected && balances[option[0]] ? (
-                        <div>
-                          <div
-                            className={`absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 ${
+                        {option && (
+                          <input
+                            list="amount"
+                            id={option[0]}
+                            value={inputs[option[0]]?.amount}
+                            name="amount"
+                            type="text"
+                            placeholder="0"
+                            onChange={(e) =>
+                              zapInputHandler(e.target.value, e.target.id)
+                            }
+                            onKeyDown={(evt) => {
+                              const currentValue =
+                                inputs &&
+                                inputs[option[0]] &&
+                                inputs[option[0]].amount;
+
+                              if (
+                                !/[\d.]/.test(evt.key) &&
+                                evt.key !== "Backspace"
+                              ) {
+                                evt.preventDefault();
+                              }
+
+                              if (
+                                evt.key === "." &&
+                                currentValue &&
+                                currentValue.includes(".")
+                              ) {
+                                evt.preventDefault();
+                              }
+                            }}
+                            className={`ml-2 flex items-center h-full   bg-transparent ${
                               underlyingToken?.address === option[0]
-                                ? "bottom-[-9%]"
-                                : "bottom-0"
-                            }`}
+                                ? "text-[16px] w-[70%]"
+                                : "text-[25px] w-[58%]"
+                            } `}
+                          />
+                        )}
+                        {$connected && balances[option[0]] ? (
+                          <button
+                            onClick={() =>
+                              zapInputHandler(balances[option[0]], option[0])
+                            }
+                            className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-auto"
+                            type="button"
                           >
-                            <div className="flex items-center">
-                              <button
-                                onClick={() =>
-                                  zapInputHandler(
-                                    balances[option[0]],
-                                    option[0]
-                                  )
-                                }
-                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                                type="button"
-                              >
-                                MAX
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        ""
-                      )}
-
-                      {option && (
-                        <input
-                          list="amount"
-                          id={option[0]}
-                          value={inputs[option[0]]?.amount}
-                          name="amount"
-                          type="text"
-                          placeholder="0"
-                          onChange={(e) =>
-                            zapInputHandler(e.target.value, e.target.id)
-                          }
-                          onKeyDown={(evt) => {
-                            const currentValue =
-                              inputs &&
-                              inputs[option[0]] &&
-                              inputs[option[0]].amount;
-
-                            if (
-                              !/[\d.]/.test(evt.key) &&
-                              evt.key !== "Backspace"
-                            ) {
-                              evt.preventDefault();
-                            }
-
-                            if (
-                              evt.key === "." &&
-                              currentValue &&
-                              currentValue.includes(".")
-                            ) {
-                              evt.preventDefault();
-                            }
-                          }}
-                          className={` py-3 flex items-center h-full   bg-transparent ${
-                            underlyingToken?.address === option[0]
-                              ? "text-[16px] w-[70%] pl-[10px]"
-                              : "text-[25px] w-[58%] pl-[50px]"
-                          } `}
-                        />
-                      )}
+                            MAX
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
-
                     <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                       <p>
                         $
@@ -2528,7 +2514,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           : 0}
                       </p>
                     </div>
-
                     <div className="my-2 ml-2 flex flex-col gap-2">
                       {underlyingCondition && (
                         <>
@@ -2749,7 +2734,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           ($connected ? (
             <>
               <div className="grid mt-[15px] text-[15px] w-full">
-                {balances[option[0]] ? (
+                {!!balances[option[0]] && (
                   <div className="text-left text-[gray] ml-2">
                     Balance:{" "}
                     {parseFloat(
@@ -2759,12 +2744,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       )
                     )}
                   </div>
-                ) : (
-                  ""
                 )}
 
                 <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                  {balances[option[0]] ? (
+                  {!!balances[option[0]] && (
                     <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
                       <div className="flex items-center">
                         <button
@@ -2790,8 +2773,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    ""
                   )}
 
                   <input
