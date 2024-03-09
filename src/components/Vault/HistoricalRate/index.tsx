@@ -363,7 +363,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           </>
         )}
       </div>
-      <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
+      <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
         {/* <p
       onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
       className="opacity-50 hover:opacity-100 cursor-pointer"
@@ -372,27 +372,27 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     </p> */}
         <p
           onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "WEEK" ? "opacity-100" : "opacity-30"
           }`}
         >
-          1W
+          WEEK
         </p>
         <p
           onClick={() => timelineHandler(timelineSegments.MONTH as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "MONTH" ? "opacity-100" : "opacity-30"
           }`}
         >
-          1M
+          MONTH
         </p>
         <p
           onClick={() => timelineHandler(timelineSegments.YEAR as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "YEAR" ? "opacity-100" : "opacity-30"
           }`}
         >
-          All
+          ALL
         </p>
       </div>
     </div>
