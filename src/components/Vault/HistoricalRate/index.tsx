@@ -139,27 +139,20 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
         );
 
-        if (segment === "WEEK") {
-          let weeklyAPRs = [];
+        newData = [];
+        time = Number(APRArr[0].unixTimestamp);
 
-          let time = NOW - TIME;
+        while (time < NOW) {
+          let sortedAPRs = APRArr.filter(
+            (obj: any) => Number(obj.unixTimestamp) < time
+          );
+          let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
 
-          for (let i = 0; i < 168; i++) {
-            let sortedAPRs = APRArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) < time
-            );
-
-            let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
-
-            const newAPR = { ...lastEl, timestamp: time };
-
-            weeklyAPRs.push(newAPR);
-
-            time += 3600;
-          }
-
-          APRArr = weeklyAPRs.map(formatData);
+          newData.push({ ...lastEl, timestamp: time });
+          time += 3600;
         }
+
+        APRArr = newData.map(formatData);
 
         const APRWidthPercent =
           (APRArr[APRArr.length - 1].unixTimestamp - APRArr[0].unixTimestamp) /
