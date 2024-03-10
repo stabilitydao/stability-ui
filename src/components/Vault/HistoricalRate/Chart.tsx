@@ -15,62 +15,16 @@ interface IProps {
   chart: any;
   APRType: string;
 }
-
-// const CustomizedAxisTick = ({
-//   x,
-//   y,
-//   payload,
-//   fontSize,
-// }: {
-//   x: number;
-//   y: number;
-//   payload: any;
-//   fontSize: number;
-// }) => {
-//   return (
-//     <>
-//       {/* {payload.value === "10.02" ? (
-//         <g transform={`translate(${10},${y})`}>
-//           <text
-//             x={0}
-//             y={0}
-//             dy={10}
-//             textAnchor="middle"
-//             fill="#8d8e96"
-//             fontSize={fontSize}
-//           >
-//             {payload.value}
-//           </text>
-//         </g>
-//       ) : ( */}
-//       <g transform={`translate(${x},${y})`}>
-//         <text
-//           x={0}
-//           y={0}
-//           dy={10}
-//           textAnchor="middle"
-//           fill="#8d8e96"
-//           fontSize={fontSize}
-//         >
-//           {payload.value}
-//         </text>
-//       </g>
-//       {/* )} */}
-//     </>
-//   );
-// };
 const CustomizedAxisTick = ({
   x,
   y,
   payload,
   fontSize,
-  timestampDifferences,
 }: {
   x: number;
   y: number;
   payload: any;
   fontSize: number;
-  timestampDifferences: number[];
 }) => {
   return (
     <g transform={`translate(${x},${y})`}>
@@ -122,17 +76,23 @@ const CustomTooltip = ({
 const Chart: React.FC<IProps> = ({ chart, APRType }) => {
   const WIDTH = 500;
 
-  let min = 0;
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100);
 
   useEffect(() => {
     if (chart.data) {
-      min = Math.min(...chart.data.map((item: any) => item[chart.name]));
+      let min: number = Math.min(
+        ...chart.data.map((item: any) => item[chart.name])
+      );
+      let max: number = Math.max(
+        ...chart.data.map((item: any) => item[chart.name])
+      );
+      min = Number((min - min / 10).toFixed(4));
+      max = Number((max + max / 10).toFixed(4));
+      setMinValue(min);
+      setMaxValue(max);
     }
   }, [chart]);
-
-  const [timestampDifferences, setTimestampDifferences] = useState<number[]>(
-    []
-  );
 
   return (
     <ResponsiveContainer width="100%" height={200}>
@@ -147,17 +107,15 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
           dataKey="timestamp"
           tickLine={false}
           tick={({ x, y, payload }) => (
-            <CustomizedAxisTick
-              x={x}
-              y={y}
-              payload={payload}
-              fontSize={12}
-              timestampDifferences={timestampDifferences}
-            />
+            <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
         />
         <YAxis
-          domain={chart.name === "sharePrice" ? [0.9, "auto"] : [min, "auto"]}
+          domain={
+            chart.name === "sharePrice"
+              ? [minValue, maxValue]
+              : [minValue, "auto"]
+          }
           tickFormatter={(value) =>
             value === 0
               ? ""
@@ -165,7 +123,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
               ? `${value}%`
               : chart.name === "TVL"
               ? `${formatNumber(value, "abbreviateInteger")}`
-              : `$${value}`
+              : `$${value.toFixed(1)}`
           }
           width={10}
           tickLine={false}
@@ -181,7 +139,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
           type="monotone"
           dataKey={chart.name}
           stroke="#fff"
-          fill="#414141"
+          fill="#3A0E82"
           points={chart.data.map((entry) => ({
             x: entry.x,
             y: entry.y,

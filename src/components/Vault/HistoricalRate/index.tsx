@@ -129,6 +129,8 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
     const NOW = Math.floor(Date.now() / 1000);
     const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
+    let time = 0,
+      newData;
 
     switch (chartType) {
       case "APR":
@@ -137,27 +139,42 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
         );
 
-        if (segment === "WEEK") {
-          let weeklyAPRs = [];
+        newData = [];
+        time = Number(APRArr[0].unixTimestamp);
 
-          let time = NOW - TIME;
-
-          for (let i = 0; i < 168; i++) {
+        if (segment === "MONTH") {
+          while (time < NOW) {
             let sortedAPRs = APRArr.filter(
               (obj: any) => Number(obj.unixTimestamp) < time
             );
-
             let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
 
-            const newAPR = { ...lastEl, timestamp: time };
+            newData.push({ ...lastEl, timestamp: time });
+            time += 7200;
+          }
+        } else if (segment === "YEAR") {
+          while (time < NOW) {
+            let sortedAPRs = APRArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) < time
+            );
+            let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
 
-            weeklyAPRs.push(newAPR);
+            newData.push({ ...lastEl, timestamp: time });
+            time += 14400;
+          }
+        } else {
+          while (time < NOW) {
+            let sortedAPRs = APRArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) < time
+            );
+            let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRArr[0];
 
+            newData.push({ ...lastEl, timestamp: time });
             time += 3600;
           }
-
-          APRArr = weeklyAPRs.map(formatData);
         }
+
+        APRArr = newData.map(formatData);
 
         const APRWidthPercent =
           (APRArr[APRArr.length - 1].unixTimestamp - APRArr[0].unixTimestamp) /
@@ -165,7 +182,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
         let sum = 0;
 
-        const APRDifferences = APRArr.map((entry, index) => {
+        const APRDifferences = APRArr.map((entry: any, index: number) => {
           if (index === 0) return 0;
           const prevEntry = APRArr[index - 1];
           const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
@@ -187,16 +204,32 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         });
         break;
       case "TVL":
-        const TVLArr = chartData.filter(
+        let TVLArr = chartData.filter(
           (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
         );
+
+        newData = [];
+        time = Number(TVLArr[0].unixTimestamp);
+
+        while (time < NOW) {
+          let sortedAPRs = TVLArr.filter(
+            (obj: any) => Number(obj.unixTimestamp) < time
+          );
+          let lastEl = sortedAPRs[sortedAPRs.length - 1] || TVLArr[0];
+
+          newData.push({ ...lastEl, timestamp: time });
+          time += 3600;
+        }
+
+        TVLArr = newData.map(formatData);
+
         const TVLWidthPercent =
           (TVLArr[TVLArr.length - 1].unixTimestamp - TVLArr[0].unixTimestamp) /
           500;
 
         let TSum = 0;
 
-        const TVLDifferences = TVLArr.map((entry, index) => {
+        const TVLDifferences = TVLArr.map((entry: any, index: number) => {
           if (index === 0) return 0;
           const prevEntry = TVLArr[index - 1];
           const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
@@ -218,26 +251,40 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         });
         break;
       case "sharePrice":
-        const PriceArr = chartData.filter(
+        let priceArr = chartData.filter(
           (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
         );
 
+        newData = [];
+        time = Number(priceArr[0].unixTimestamp);
+
+        while (time < NOW) {
+          let sortedData = priceArr.filter(
+            (obj: any) => Number(obj.unixTimestamp) < time
+          );
+          let lastEl = sortedData[sortedData.length - 1] || priceArr[0];
+          newData.push({ ...lastEl, timestamp: time });
+          time += 3600;
+        }
+
+        priceArr = newData.map(formatData);
+
         const priceWidthPercent =
-          (PriceArr[PriceArr.length - 1].unixTimestamp -
-            PriceArr[0].unixTimestamp) /
+          (priceArr[priceArr.length - 1].unixTimestamp -
+            priceArr[0].unixTimestamp) /
           500;
 
         let PSum = 0;
 
-        const priceDifferences = PriceArr.map((entry, index) => {
+        const priceDifferences = priceArr.map((entry: any, index: number) => {
           if (index === 0) return 0;
-          const prevEntry = PriceArr[index - 1];
+          const prevEntry = priceArr[index - 1];
           const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
           PSum += diff;
           return Math.floor(PSum / priceWidthPercent);
         });
 
-        const priceChartData = PriceArr.map(
+        const priceChartData = priceArr.map(
           (obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
@@ -331,7 +378,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           </>
         )}
       </div>
-      <div className="px-4 flex items-center justify-end gap-2 text-[16px] pb-1 sm:pb-3">
+      <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
         {/* <p
       onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
       className="opacity-50 hover:opacity-100 cursor-pointer"
@@ -340,27 +387,27 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     </p> */}
         <p
           onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "WEEK" ? "opacity-100" : "opacity-30"
           }`}
         >
-          1W
+          WEEK
         </p>
         <p
           onClick={() => timelineHandler(timelineSegments.MONTH as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "MONTH" ? "opacity-100" : "opacity-30"
           }`}
         >
-          1M
+          MONTH
         </p>
         <p
           onClick={() => timelineHandler(timelineSegments.YEAR as TSegment)}
-          className={`hover:opacity-100 cursor-pointer ${
+          className={`hover:opacity-100 cursor-pointer px-2 ${
             timeline === "YEAR" ? "opacity-100" : "opacity-30"
           }`}
         >
-          All
+          ALL
         </p>
       </div>
     </div>
