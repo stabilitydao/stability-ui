@@ -85,7 +85,7 @@ const Footer = () => {
         <a
           className="px-3 py-2"
           target="_blank"
-          href="https://stability-1.gitbook.io/stability/"
+          href="https://stabilitydao.gitbook.io/"
           title="Stability Book"
         >
           <svg

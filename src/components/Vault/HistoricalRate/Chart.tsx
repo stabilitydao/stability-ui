@@ -123,7 +123,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
               ? `${value}%`
               : chart.name === "TVL"
               ? `${formatNumber(value, "abbreviateInteger")}`
-              : `$${value}`
+              : `$${value.toFixed(1)}`
           }
           width={10}
           tickLine={false}
