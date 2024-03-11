@@ -1,4 +1,10 @@
-const VaultType = ({ type }: { type: string }) => {
+const VaultType = ({
+  type,
+  text = "short",
+}: {
+  type: string;
+  text: string;
+}) => {
   const vaultTypes = [
     {
       type: "Compounding",
@@ -15,12 +21,19 @@ const VaultType = ({ type }: { type: string }) => {
 
   const currentType = vaultTypes.find((elem) => elem.type === type);
 
-  return (
+  return text === "short" ? (
     <span
       title={`${currentType?.type} vault`}
       className={`text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full ${currentType?.styles}`}
     >
       {currentType?.symbol}
+    </span>
+  ) : (
+    <span
+      title={`${currentType?.type} vault`}
+      className={`text-[17px] flex font-bold w-full py-2 px-4 rounded-full uppercase ${currentType?.styles}`}
+    >
+      {currentType?.type}
     </span>
   );
 };

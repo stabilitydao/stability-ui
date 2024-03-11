@@ -2,7 +2,7 @@ import { useState, useEffect, memo } from "react";
 
 import { usePublicClient } from "wagmi";
 
-import { AssetsProportion, VaultState } from "@components";
+import { AssetsProportion } from "@components";
 import { CHAINS } from "@constants";
 
 import type { TVault } from "@types";
@@ -28,7 +28,6 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
       <div className="flex flex-col w-full">
         <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
           <div className="flex items-center">
-            <VaultState status={vault?.status} />
             {vault?.assets && (
               <AssetsProportion
                 proportions={vault.assetsProportions}

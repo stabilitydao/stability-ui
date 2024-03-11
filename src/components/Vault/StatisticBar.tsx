@@ -1,7 +1,5 @@
 import { memo } from "react";
 
-import { VaultType } from "@components";
-
 import { formatNumber, formatFromBigInt } from "@utils";
 
 import type { TVault } from "@types";
@@ -13,7 +11,6 @@ interface IProps {
 const StatisticBar: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="flex flex-wrap justify-between gap-2 md:gap-0 items-center bg-button p-4 rounded-md md:h-[80px] mt-[-40px] md:mt-0">
-      <VaultType type={vault.type} />
       <div>
         <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
           TVL

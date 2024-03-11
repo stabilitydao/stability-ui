@@ -8,6 +8,8 @@ import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
 import { UserBar } from "./UserBar";
 import { HistoricalRate } from "./HistoricalRate";
+import { VaultInfo } from "./VaultInfo";
+
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
 
@@ -52,6 +54,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
               address={vault.toLowerCase() as TAddress}
               vaultStrategy={localVault.strategy}
             />
+            <VaultInfo vault={localVault} />
 
             <Strategy vault={localVault} />
 

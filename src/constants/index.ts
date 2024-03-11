@@ -254,10 +254,13 @@ const GRAPH_QUERY = `
           name
           strategyAssets
           lastHardWork
+          hardWorkOnDeposit
           assetsWithApr
           assetsAprs
           vaultStatus
           AssetsPricesOnCreation
+          gasReserve
+          NFTtokenID
           vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
             APR24H
             APRWeekly

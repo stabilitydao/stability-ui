@@ -1,0 +1,114 @@
+import { memo, useState, useEffect } from "react";
+
+// import { walletClient } from "@web3";
+
+import { VaultState, VaultType } from "@components";
+
+import { getTimeDifference, getDate } from "@utils";
+
+import { VAULT_STATUSES } from "@constants";
+
+import type { TVault } from "@types";
+
+interface IProps {
+  vault: TVault;
+}
+
+const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
+  const [created, setCreated] = useState<any>();
+  const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
+
+  useEffect(() => {
+    if (vault) {
+      const date = getDate(Number(vault?.created));
+
+      setHardWorkOnDeposit(vault?.hardWorkOnDeposit ? "YES" : "NO");
+      setCreated({ time: date, days: getTimeDifference(vault?.created)?.days });
+    }
+  }, [vault]);
+
+  // const addVaultToken = async () => {
+  //   let symbol = vault?.symbol.split("");
+  //   let newArr = [];
+  //   let lastSymbol = "";
+  //   console.log(symbol);
+  //   for (let i = 0; i < symbol.length; i++) {
+  //     if (!i) {
+  //       newArr.push(symbol[0]);
+  //     }
+  //     if (lastSymbol === "-") {
+  //       newArr.push(lastSymbol);
+  //       newArr.push(symbol[i]);
+  //     }
+
+  //     lastSymbol = symbol[i];
+  //   }
+  //   symbol = newArr.join("");
+  //   if (symbol) {
+  //     const success = await walletClient.watchAsset({
+  //       type: "ERC20",
+  //       options: {
+  //         address: vault?.address,
+  //         decimals: 18,
+  //         symbol: "C-E-U-I",
+  //       },
+  //     });
+  //   }
+  // };
+
+  return (
+    <div className="rounded-md mt-5 bg-button">
+      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
+        <h2 className="text-[24px] text-start ml-4">Vault Info</h2>
+      </div>
+
+      <div className="flex flex-col items-start gap-5 p-4">
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96] mb-2">
+            VAULT TYPE
+          </p>
+          <p className="text-[16px] mt-1">
+            <VaultType text="long" type={vault?.type} />
+          </p>
+        </div>
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            VAULT STATUS
+          </p>
+          <div className="text-[16px] mt-1 flex items-center gap-1">
+            <VaultState status={vault?.status} />
+            <span> {VAULT_STATUSES[vault?.status]}</span>
+          </div>
+        </div>
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            HARD WORK ON DEPOSIT
+          </p>
+          <p className="text-[16px] mt-1">{hardWorkOnDeposit}</p>
+        </div>
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            CREATED
+          </p>
+          <p className="text-[16px] mt-1">
+            {created?.time} / {created?.days} days ago
+          </p>
+        </div>
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            NFT TOKEN ID
+          </p>
+          <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
+        </div>
+        <div>
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            GAS RESERVE
+          </p>
+          <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export { VaultInfo };

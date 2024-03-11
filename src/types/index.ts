@@ -138,6 +138,7 @@ type TVault = {
   strategySpecific: string;
   balance: string;
   lastHardWork: bigint;
+  hardWorkOnDeposit: boolean;
   apy: number;
   daily: number;
   assets: TAsset[];
@@ -150,6 +151,8 @@ type TVault = {
   status: number;
   version: string;
   strategyVersion: string;
+  NFTtokenID: string;
+  gasReserve: string;
   rebalances: any;
   earningData: TEarningData | any;
 };

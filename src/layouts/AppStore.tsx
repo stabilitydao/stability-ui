@@ -115,6 +115,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
+
         const NOW = Math.floor(Date.now() / 1000);
 
         const almRebalanceEntity = vault.almRebalanceEntity[0];
@@ -252,7 +253,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
           weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
         };
-
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -267,6 +267,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategySpecific: vault.strategySpecific,
           balance: "",
           lastHardWork: vault.lastHardWork,
+          hardWorkOnDeposit: vault?.hardWorkOnDeposit,
           apy: Number(APY).toFixed(2),
           daily: (Number(APR) / 365).toFixed(2),
           assets,
@@ -279,6 +280,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           status: Number(vault.vaultStatus),
           version: vault.version,
           strategyVersion: strategyEntity.version,
+          NFTtokenID: vault.NFTtokenID,
+          gasReserve: vault.gasReserve,
           rebalances,
           earningData: {
             apr: APRArray,
