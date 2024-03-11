@@ -72,109 +72,79 @@ const Assets: React.FC<IProps> = memo(
         <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>
-        {assets &&
-          assets.map((asset: any, index: number) => {
-            const assetData: TToken | any = getTokenData(asset.address);
+        <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
+          {assets &&
+            assets.map((asset: any, index: number) => {
+              const assetData: TToken | any = getTokenData(asset.address);
 
-            const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
-              return tokenAsset.addresses.includes(assetData?.address);
-            });
+              const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
+                return tokenAsset.addresses.includes(assetData?.address);
+              });
 
-            const priceOnCreation = formatUnits(onCreationPrice[index], 18);
-            const price: number = $assetsPrices
-              ? Number(formatUnits($assetsPrices[asset.address], 18))
-              : 0;
+              const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+              const price: number = $assetsPrices
+                ? Number(formatUnits($assetsPrices[asset.address], 18))
+                : 0;
 
-            const creationDate = getDate(Number(created));
-            return (
-              assetData && (
-                <article
-                  className="rounded-md p-3 mb-4 flex bg-[#32343f]"
-                  key={asset.address}
-                >
-                  <div className="flex w-full flex-col gap-3">
-                    <div className="flex w-full justify-between items-center  flex-wrap">
-                      <div className="inline-flex items-center mb-2">
-                        <img
-                          className="rounded-full w-[30px] m-auto mr-2"
-                          src={assetData.logoURI}
-                        />
-                        <span className="mr-5 font-bold text-[18px]">
-                          {assetData.symbol}
-                        </span>
-                        <span className="text-[18px]">{assetData.name}</span>
-                      </div>
-                      <div className="flex flex-row flex-wrap gap-1 md:gap-3 md:mt-0 mt-2">
-                        {tokenAssets?.website && (
-                          <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                            <a
-                              className="flex items-center"
-                              href={tokenAssets?.website}
-                              target="_blank"
-                            >
-                              Website
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-external-link ms-1"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path
-                                  stroke="none"
-                                  d="M0 0h24v24H0z"
-                                  fill="none"
-                                ></path>
-                                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                <path d="M11 13l9 -9"></path>
-                                <path d="M15 4h5v5"></path>
-                              </svg>
-                            </a>
-                          </div>
-                        )}
-                        <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                          <a
-                            className="flex items-center"
-                            href={`https://polygonscan.com/token/${asset.address}`}
-                            target="_blank"
-                          >
-                            Contract
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="icon icon-tabler icon-tabler-external-link ms-1"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2"
-                              stroke="currentColor"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"
-                              ></path>
-                              <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                              <path d="M11 13l9 -9"></path>
-                              <path d="M15 4h5v5"></path>
-                            </svg>
-                          </a>
+              const creationDate = getDate(Number(created));
+              return (
+                assetData && (
+                  <article
+                    className="rounded-md p-3 flex bg-[#32343f] w-full"
+                    key={asset.address}
+                  >
+                    <div className="flex w-full flex-col gap-3">
+                      <div className="flex w-full justify-between items-center  flex-wrap">
+                        <div className="inline-flex items-center mb-2">
+                          <img
+                            className="rounded-full w-[30px] m-auto mr-2"
+                            src={assetData.logoURI}
+                          />
+                          <span className="mr-5 font-bold text-[18px]">
+                            {assetData.symbol}
+                          </span>
+                          <span className="text-[18px]">{assetData.name}</span>
                         </div>
-                        {tokenAssets?.docs && (
+                        <div className="flex flex-row flex-wrap gap-1 md:gap-3 md:mt-0 mt-2">
+                          {tokenAssets?.website && (
+                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
+                              <a
+                                className="flex items-center"
+                                href={tokenAssets?.website}
+                                target="_blank"
+                              >
+                                Website
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="icon icon-tabler icon-tabler-external-link ms-1"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"
+                                  ></path>
+                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                                  <path d="M11 13l9 -9"></path>
+                                  <path d="M15 4h5v5"></path>
+                                </svg>
+                              </a>
+                            </div>
+                          )}
                           <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
                             <a
                               className="flex items-center"
-                              href={tokenAssets?.docs}
+                              href={`https://polygonscan.com/token/${asset.address}`}
                               target="_blank"
                             >
-                              Docs
+                              Contract
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="icon icon-tabler icon-tabler-external-link ms-1"
@@ -198,60 +168,95 @@ const Assets: React.FC<IProps> = memo(
                               </svg>
                             </a>
                           </div>
-                        )}
+                          {tokenAssets?.docs && (
+                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
+                              <a
+                                className="flex items-center"
+                                href={tokenAssets?.docs}
+                                target="_blank"
+                              >
+                                Docs
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="icon icon-tabler icon-tabler-external-link ms-1"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path
+                                    stroke="none"
+                                    d="M0 0h24v24H0z"
+                                    fill="none"
+                                  ></path>
+                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                                  <path d="M11 13l9 -9"></path>
+                                  <path d="M15 4h5v5"></path>
+                                </svg>
+                              </a>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {!!price && (
-                      <div className="flex justify-start items-center text-[16px]">
-                        <p>Price: ${formatNumber(price, "smallNumbers")}</p>
-                      </div>
-                    )}
-                    {priceOnCreation && (
-                      <div className="flex justify-start items-center text-[16px]">
-                        <p>
-                          Price at creation: $
-                          {formatNumber(priceOnCreation, "smallNumbers")} (
-                          {creationDate})
-                        </p>
-                      </div>
-                    )}
-
-                    {invested && (
-                      <div className="flex justify-start items-center text-[16px]">
-                        <p>
-                          Invested:{" "}
-                          {formatNumber(
-                            invested[index].amount,
-                            price > 1000
-                              ? "formatWithLongDecimalPart"
-                              : "format"
-                          )}{" "}
-                          {invested[index].symbol} / $
-                          {formatNumber(invested[index].amountInUSD, "format")}{" "}
-                          / {invested[index].percent.toFixed(2)}%
-                        </p>
-                      </div>
-                    )}
-
-                    <p className="text-[16px]">{tokenAssets?.description}</p>
-                    {assetData?.tags && (
-                      <div className="flex items-center gap-3 flex-wrap">
-                        {assetData.tags.map((tag: string) => (
-                          <p
-                            className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
-                            key={tag}
-                          >
-                            {tag}
+                      {!!price && (
+                        <div className="flex justify-start items-center text-[16px]">
+                          <p>Price: ${formatNumber(price, "smallNumbers")}</p>
+                        </div>
+                      )}
+                      {priceOnCreation && (
+                        <div className="flex justify-start items-center text-[16px]">
+                          <p>
+                            Price at creation: $
+                            {formatNumber(priceOnCreation, "smallNumbers")} (
+                            {creationDate})
                           </p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </article>
-              )
-            );
-          })}
+                        </div>
+                      )}
+
+                      {invested && (
+                        <div className="flex justify-start items-center text-[16px]">
+                          <p>
+                            Invested:{" "}
+                            {formatNumber(
+                              invested[index].amount,
+                              price > 1000
+                                ? "formatWithLongDecimalPart"
+                                : "format"
+                            )}{" "}
+                            {invested[index].symbol} / $
+                            {formatNumber(
+                              invested[index].amountInUSD,
+                              "format"
+                            )}{" "}
+                            / {invested[index].percent.toFixed(2)}%
+                          </p>
+                        </div>
+                      )}
+
+                      <p className="text-[16px]">{tokenAssets?.description}</p>
+                      {assetData?.tags && (
+                        <div className="flex items-center gap-3 flex-wrap">
+                          {assetData.tags.map((tag: string) => (
+                            <p
+                              className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
+                              key={tag}
+                            >
+                              {tag}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                )
+              );
+            })}
+        </div>
       </div>
     );
   }

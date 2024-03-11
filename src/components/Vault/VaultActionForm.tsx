@@ -1942,7 +1942,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     };
   }, [tokenSelectorRef]);
   return (
-    <div className="mt-5 bg-button rounded-md">
+    <div className="bg-button rounded-md">
       <div className="flex">
         <button
           className={`h-[60px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
@@ -1969,7 +1969,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Withdraw
         </button>
       </div>
-      <form autoComplete="off" className="w-full px-4 mb-10 pb-5">
+      <form autoComplete="off" className="w-full px-4 pb-5">
         <div className="flex items-center mt-4 gap-3 relative">
           {optionTokens && (
             <div className="relative select-none w-full" ref={tokenSelectorRef}>

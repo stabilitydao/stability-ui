@@ -50,28 +50,30 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           <div className="w-full md:w-1/2 lg:w-3/5 ">
             <StatisticBar vault={localVault} />
 
+            <UserBar vault={localVault} />
+
             <HistoricalRate
               address={vault.toLowerCase() as TAddress}
               vaultStrategy={localVault.strategy}
             />
-            <VaultInfo vault={localVault} />
-
-            <Strategy vault={localVault} />
-
-            <Assets
-              assets={localVault?.assets}
-              created={localVault.created}
-              pricesOnCreation={localVault.assetsPricesOnCreation}
-              strategy={localVault?.strategyAddress}
-            />
             <Toast />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">
-            <UserBar vault={localVault} />
-
             <VaultActionForm vault={localVault} />
           </div>
         </div>
+        <div className="mt-5">
+          <VaultInfo vault={localVault} />
+        </div>
+
+        <Strategy vault={localVault} />
+
+        <Assets
+          assets={localVault?.assets}
+          created={localVault.created}
+          pricesOnCreation={localVault.assetsPricesOnCreation}
+          strategy={localVault?.strategyAddress}
+        />
       </main>
       <ErrorMessage type="WEB3" />
     </WagmiLayout>

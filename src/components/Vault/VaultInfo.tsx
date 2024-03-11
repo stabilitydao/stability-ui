@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from "react";
 
-// import { walletClient } from "@web3";
+import { walletClient } from "@web3";
 
 import { VaultState, VaultType } from "@components";
 
@@ -17,6 +17,7 @@ interface IProps {
 const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   const [created, setCreated] = useState<any>();
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
+  const [timeDifference, setTimeDifference] = useState<any>();
 
   useEffect(() => {
     if (vault) {
@@ -24,6 +25,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
 
       setHardWorkOnDeposit(vault?.hardWorkOnDeposit ? "YES" : "NO");
       setCreated({ time: date, days: getTimeDifference(vault?.created)?.days });
+      setTimeDifference(getTimeDifference(vault?.lastHardWork));
     }
   }, [vault]);
 
@@ -50,14 +52,14 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   //       options: {
   //         address: vault?.address,
   //         decimals: 18,
-  //         symbol: "C-E-U-I",
+  //         symbol: vault?.symbol,
   //       },
   //     });
   //   }
   // };
 
   return (
-    <div className="rounded-md mt-5 bg-button">
+    <div className="rounded-md bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
         <h2 className="text-[24px] text-start ml-4">Vault Info</h2>
       </div>
@@ -105,6 +107,42 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             GAS RESERVE
           </p>
           <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
+        </div>
+        <div className="flex flex-col">
+          {timeDifference && (
+            <div className="flex flex-col justify-between">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
+                Last Hard Work
+              </p>
+              {timeDifference?.days ? (
+                <>
+                  {timeDifference?.days < 1000 ? (
+                    <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
+                      {timeDifference.days}
+                      {timeDifference.days > 1 ? " days" : " day"}{" "}
+                      {timeDifference.hours}h ago
+                    </div>
+                  ) : (
+                    <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2  rounded-lg border-[2px] border-[#AE642E] text-center">
+                      None
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div
+                  className={`text-[14px] px-2 rounded-lg border-[2px] text-center  ${
+                    timeDifference.hours > 4
+                      ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
+                      : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                  }`}
+                >
+                  {timeDifference?.hours
+                    ? `${timeDifference.hours}h ago`
+                    : "<1h ago"}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
