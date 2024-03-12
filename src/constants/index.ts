@@ -275,6 +275,7 @@ const GRAPH_QUERY = `
         platformEntities {
           version
           bcAssets
+          zap
         }
         vaultTypeEntities {
           version

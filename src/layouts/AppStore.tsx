@@ -17,6 +17,7 @@ import {
   network,
   platformData,
   platformVersion,
+  platformZAP,
   publicClient,
   userBalance,
   vaults,
@@ -35,13 +36,7 @@ import {
   isWeb3Load,
   aprFilter,
 } from "@store";
-import {
-  wagmiConfig,
-  platform,
-  PlatformABI,
-  IVaultManagerABI,
-  ERC20MetadataUpgradeableABI,
-} from "@web3";
+import { wagmiConfig, platform, PlatformABI, IVaultManagerABI } from "@web3";
 
 import {
   addAssetsPrice,
@@ -451,8 +446,12 @@ const AppStore = (props: React.PropsWithChildren) => {
     );
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
-    if (graphResponse?.data?.data?.platformEntities[0]?.version)
+    if (graphResponse?.data?.data?.platformEntities[0]?.version) {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
+    }
+    if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
+      platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
+    }
   };
 
   const fetchAllData = async () => {
