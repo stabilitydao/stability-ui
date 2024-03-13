@@ -284,6 +284,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             poolSwapFeesAPR,
             farmAPR,
           },
+          strategyPool: strategyEntity.pool,
         };
 
         return vaults;

@@ -3,13 +3,12 @@ import { useStore } from "@nanostores/react";
 
 import { VaultBar } from "./VaultBar";
 import { VaultActionForm } from "./VaultActionForm";
-import { StatisticBar } from "./StatisticBar";
 import { Strategy } from "./Strategy";
 import { Assets } from "./Assets";
-import { UserBar } from "./UserBar";
+import { InfoBar } from "./InfoBar";
 import { HistoricalRate } from "./HistoricalRate";
 import { VaultInfo } from "./VaultInfo";
-import { ContractsInfo } from "./ContractsInfo";
+import { Contracts } from "./Contracts";
 
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
@@ -49,9 +48,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
           <div className="w-full md:w-1/2 lg:w-3/5 ">
-            <StatisticBar vault={localVault} />
-
-            <UserBar vault={localVault} />
+            <InfoBar vault={localVault} />
 
             <HistoricalRate
               address={vault.toLowerCase() as TAddress}
@@ -68,7 +65,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <VaultInfo vault={localVault} />
           </div>
           <div className="w-1/2">
-            <ContractsInfo vault={localVault} />
+            <Contracts vault={localVault} />
           </div>
         </div>
 

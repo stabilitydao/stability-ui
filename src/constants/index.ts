@@ -284,6 +284,7 @@ const GRAPH_QUERY = `
         strategyEntities {
           strategyId
           version
+          pool
           id
         }
         strategyConfigEntities {

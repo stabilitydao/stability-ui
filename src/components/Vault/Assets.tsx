@@ -33,15 +33,15 @@ const Assets: React.FC<IProps> = memo(
     const [invested, setInvested] = useState<any>(false);
 
     const getInvested = async () => {
-      const userAssets = await readContract(wagmiConfig, {
+      const assetsAmounts = await readContract(wagmiConfig, {
         address: strategy,
         abi: StrategyABI,
         functionName: "assetsAmounts",
       });
-      if (!userAssets || !$assetsPrices) return;
-      const tokens = userAssets[0].map((token) => getTokenData(token));
+      if (!assetsAmounts || !$assetsPrices) return;
+      const tokens = assetsAmounts[0].map((token) => getTokenData(token));
 
-      const amounts = userAssets[1].map((amount, index) =>
+      const amounts = assetsAmounts[1].map((amount, index) =>
         formatUnits(amount, tokens[index]?.decimals as number)
       );
       const amountsInUSD = amounts.map((amount, index) => {
@@ -90,7 +90,7 @@ const Assets: React.FC<IProps> = memo(
               return (
                 assetData && (
                   <article
-                    className="rounded-md p-3 flex bg-[#32343f] w-full"
+                    className="rounded-md p-3 flex w-full"
                     key={asset.address}
                   >
                     <div className="flex w-full flex-col gap-3">
@@ -104,102 +104,6 @@ const Assets: React.FC<IProps> = memo(
                             {assetData.symbol}
                           </span>
                           <span className="text-[18px]">{assetData.name}</span>
-                        </div>
-                        <div className="flex flex-row flex-wrap gap-1 md:gap-3 md:mt-0 mt-2">
-                          {tokenAssets?.website && (
-                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                              <a
-                                className="flex items-center"
-                                href={tokenAssets?.website}
-                                target="_blank"
-                              >
-                                Website
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="icon icon-tabler icon-tabler-external-link ms-1"
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path
-                                    stroke="none"
-                                    d="M0 0h24v24H0z"
-                                    fill="none"
-                                  ></path>
-                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                  <path d="M11 13l9 -9"></path>
-                                  <path d="M15 4h5v5"></path>
-                                </svg>
-                              </a>
-                            </div>
-                          )}
-                          <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                            <a
-                              className="flex items-center"
-                              href={`https://polygonscan.com/token/${asset.address}`}
-                              target="_blank"
-                            >
-                              Contract
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-external-link ms-1"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path
-                                  stroke="none"
-                                  d="M0 0h24v24H0z"
-                                  fill="none"
-                                ></path>
-                                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                <path d="M11 13l9 -9"></path>
-                                <path d="M15 4h5v5"></path>
-                              </svg>
-                            </a>
-                          </div>
-                          {tokenAssets?.docs && (
-                            <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px]">
-                              <a
-                                className="flex items-center"
-                                href={tokenAssets?.docs}
-                                target="_blank"
-                              >
-                                Docs
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="icon icon-tabler icon-tabler-external-link ms-1"
-                                  width="20"
-                                  height="20"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="2"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path
-                                    stroke="none"
-                                    d="M0 0h24v24H0z"
-                                    fill="none"
-                                  ></path>
-                                  <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                                  <path d="M11 13l9 -9"></path>
-                                  <path d="M15 4h5v5"></path>
-                                </svg>
-                              </a>
-                            </div>
-                          )}
                         </div>
                       </div>
 

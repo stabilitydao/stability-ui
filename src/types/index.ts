@@ -155,6 +155,7 @@ type TVault = {
   gasReserve: string;
   rebalances: any;
   earningData: TEarningData | any;
+  strategyPool: TAddress;
 };
 
 type TTableColumn = {

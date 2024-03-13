@@ -61,7 +61,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="rounded-md bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
-        <h2 className="text-[24px] text-start ml-4">Vault Info</h2>
+        <h2 className="text-[24px] text-start ml-4">Vault</h2>
       </div>
 
       <div className="flex flex-col items-start gap-5 p-4">
