@@ -293,82 +293,85 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </td>
             </tr>
           )}
-          <tr className="border-b border-[#4f5158]">
-            <td>
-              <img
-                className="ml-3 w-8 h-8"
-                src={vault.strategyInfo.protocols[1].logoSrc}
-                alt={vault.strategyInfo.protocols[1].name}
-              />
-            </td>
-            <td>
-              <div className="flex items-center">
-                {vault?.assets[0]?.symbol}
-                {vault?.assets.length > 1 && (
-                  <p className="ml-[6px]"> / {vault.assets[1].symbol}</p>
-                )}
-              </div>
-            </td>
-            <td className="flex items-center justify-end gap-5 h-[60px]">
-              <span className="whitespace-nowrap">
-                {vault?.strategyPool.slice(0, 7)}...
-                {vault?.strategyPool.slice(-4)}
-              </span>
-              <div className="flex items-center">
-                <div
-                  onClick={() => copyAddress(vault?.strategyPool)}
-                  className="cursor-pointer px-1 py-1"
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
-                      stroke="white"
-                      strokeWidth="2"
-                    />
-                    <rect
-                      x="10"
-                      y="10"
-                      width="10"
-                      height="10"
-                      rx="2"
-                      stroke="white"
-                      strokeWidth="2"
-                    />
-                  </svg>
+          {vault?.strategyPool && (
+            <tr className="border-b border-[#4f5158]">
+              <td>
+                <img
+                  className="ml-3 w-8 h-8"
+                  src={vault.strategyInfo.protocols[1].logoSrc}
+                  alt={vault.strategyInfo.protocols[1].name}
+                />
+              </td>
+              <td>
+                <div className="flex items-center">
+                  {vault?.assets[0]?.symbol}
+                  {vault?.assets.length > 1 && (
+                    <p className="ml-[6px]"> / {vault.assets[1].symbol}</p>
+                  )}
                 </div>
+              </td>
 
-                <a
-                  className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
-                  href={`https://polygonscan.com/address/${vault?.strategyPool}`}
-                  target="_blank"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-external-link ms-1"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <td className="flex items-center justify-end gap-5 h-[60px]">
+                <span className="whitespace-nowrap">
+                  {vault?.strategyPool.slice(0, 7)}...
+                  {vault?.strategyPool.slice(-4)}
+                </span>
+                <div className="flex items-center">
+                  <div
+                    onClick={() => copyAddress(vault?.strategyPool)}
+                    className="cursor-pointer px-1 py-1"
                   >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                    <path d="M11 13l9 -9"></path>
-                    <path d="M15 4h5v5"></path>
-                  </svg>
-                </a>
-              </div>
-            </td>
-          </tr>
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
+                        stroke="white"
+                        strokeWidth="2"
+                      />
+                      <rect
+                        x="10"
+                        y="10"
+                        width="10"
+                        height="10"
+                        rx="2"
+                        stroke="white"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </div>
+
+                  <a
+                    className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                    href={`https://polygonscan.com/address/${vault?.strategyPool}`}
+                    target="_blank"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="icon icon-tabler icon-tabler-external-link ms-1"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      stroke="currentColor"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                      <path d="M11 13l9 -9"></path>
+                      <path d="M15 4h5v5"></path>
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          )}
           {vault?.assets.map((asset) => (
             <tr key={asset?.address} className="border-b border-[#4f5158]">
               <td>
