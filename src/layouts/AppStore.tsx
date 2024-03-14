@@ -328,37 +328,37 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
     await setGraphData(graphResponse.data.data);
 
+    const contractData: any = await readContract(wagmiConfig, {
+      address: platform,
+      abi: PlatformABI,
+      functionName: "getData",
+    });
+    if (contractData[1]) {
+      tokens.set(
+        contractData[1].map((address: TAddress) =>
+          address.toLowerCase()
+        ) as TAddress[]
+      );
+    }
+
+    if (contractData?.length) {
+      const buildingPrices: { [vaultType: string]: bigint } = {};
+      for (let i = 0; i < contractData[1].length; i++) {
+        buildingPrices[contractData[3][i]] = contractData[5][i];
+      }
+      platformData.set({
+        platform,
+        factory: contractData[0][0],
+        buildingPermitToken: contractData[0][3],
+        buildingPayPerVaultToken: contractData[0][4],
+        zap: contractData[0][7],
+        buildingPrices,
+      });
+    }
+
     if (isConnected) {
       isWeb3Load.set(true);
       try {
-        const contractData: any = await readContract(wagmiConfig, {
-          address: platform,
-          abi: PlatformABI,
-          functionName: "getData",
-        });
-        if (contractData[1]) {
-          tokens.set(
-            contractData[1].map((address: TAddress) =>
-              address.toLowerCase()
-            ) as TAddress[]
-          );
-        }
-
-        if (contractData && Array.isArray(contractData)) {
-          const buildingPrices: { [vaultType: string]: bigint } = {};
-          for (let i = 0; i < contractData[1].length; i++) {
-            buildingPrices[contractData[3][i]] = contractData[5][i]; //buildingPrices[vaultType] = buildingPrice
-          }
-          platformData.set({
-            platform,
-            factory: contractData[0][0],
-            buildingPermitToken: contractData[0][3],
-            buildingPayPerVaultToken: contractData[0][4],
-            zap: contractData[0][7],
-            buildingPrices,
-          });
-        }
-
         const contractBalance: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
