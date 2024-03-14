@@ -55,7 +55,7 @@ const vaults = deepMap<any>();
 
 // portfolio
 const hideFeeApr = atom(false);
-const aprFilter = atom(APRsType[1]);
+const aprFilter = atom<string>(APRsType[1]);
 
 //// tanstack query
 

@@ -301,7 +301,14 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 alt={vault.strategyInfo.protocols[1].name}
               />
             </td>
-            <td>symbol</td>
+            <td>
+              <div className="flex items-center">
+                {vault?.assets[0]?.symbol}
+                {vault?.assets.length > 1 && (
+                  <p className="ml-[6px]"> / {vault.assets[1].symbol}</p>
+                )}
+              </div>
+            </td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
               <span className="whitespace-nowrap">
                 {vault?.strategyPool.slice(0, 7)}...

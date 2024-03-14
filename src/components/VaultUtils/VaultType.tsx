@@ -3,7 +3,7 @@ const VaultType = ({
   text = "short",
 }: {
   type: string;
-  text: string;
+  text?: string;
 }) => {
   const vaultTypes = [
     {

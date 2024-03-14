@@ -7,6 +7,9 @@ import { AssetsSkeleton } from "./AssetsSkeleton";
 import { ShareSkeleton } from "./ShareSkeleton";
 import { Skeleton } from "./Skeleton";
 import { ErrorMessage } from "./ErrorMessage";
+import { HideFeesHandler } from "./HideFeesHandler";
+import { APRtimeSwitcher } from "./APRtimeSwitcher";
+import { FeeAPRModal } from "./FeeAPRModal";
 
 export {
   AssetsProportion,
@@ -18,4 +21,7 @@ export {
   ShareSkeleton,
   ErrorMessage,
   Skeleton,
+  HideFeesHandler,
+  APRtimeSwitcher,
+  FeeAPRModal,
 };
