@@ -327,6 +327,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
     await setGraphData(graphResponse.data.data);
+
     if (isConnected) {
       isWeb3Load.set(true);
       try {
@@ -426,6 +427,17 @@ const AppStore = (props: React.PropsWithChildren) => {
         error.set({ state: true, type: "WEB3", description: txError.message });
       }
       isWeb3Load.set(false);
+    } else {
+      // before backend
+      const randomAddress: TAddress =
+        "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
+      const contractBalance: any = await readContract(wagmiConfig, {
+        address: platform,
+        abi: PlatformABI,
+        functionName: "getBalance",
+        args: [randomAddress],
+      });
+      addAssetsPrice(contractBalance);
     }
 
     const strategyTypeEntities =

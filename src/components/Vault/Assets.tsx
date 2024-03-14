@@ -64,7 +64,7 @@ const Assets: React.FC<IProps> = memo(
     };
 
     useEffect(() => {
-      if ($connected) getInvested();
+      getInvested();
     }, [$connected, $assetsPrices]);
 
     return (
@@ -87,6 +87,22 @@ const Assets: React.FC<IProps> = memo(
                 : 0;
 
               const creationDate = getDate(Number(created));
+
+              let investedInTokens = "";
+              let investedInUSD = "";
+
+              if (invested) {
+                investedInTokens = formatNumber(
+                  invested[index].amount,
+                  price > 1000 ? "formatWithLongDecimalPart" : "format"
+                ) as string;
+
+                investedInUSD = formatNumber(
+                  invested[index].amountInUSD,
+                  "format"
+                ) as string;
+              }
+
               return (
                 assetData && (
                   <article
@@ -125,19 +141,9 @@ const Assets: React.FC<IProps> = memo(
                       {invested && (
                         <div className="flex justify-start items-center text-[16px]">
                           <p>
-                            Invested:{" "}
-                            {formatNumber(
-                              invested[index].amount,
-                              price > 1000
-                                ? "formatWithLongDecimalPart"
-                                : "format"
-                            )}{" "}
-                            {invested[index].symbol} / $
-                            {formatNumber(
-                              invested[index].amountInUSD,
-                              "format"
-                            )}{" "}
-                            / {invested[index].percent.toFixed(2)}%
+                            Invested: {investedInTokens}{" "}
+                            {invested[index].symbol} / ${investedInUSD} /{" "}
+                            {invested[index].percent.toFixed(2)}%
                           </p>
                         </div>
                       )}
