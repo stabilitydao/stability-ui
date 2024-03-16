@@ -89,70 +89,73 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   }, [$hideFeeAPR, $aprFilter]);
   return (
     <div className="bg-button rounded-md">
-      <div className="flex flex-wrap justify-between gap-2 md:gap-0 items-center p-4 md:h-[80px] mt-[-40px] md:mt-0">
-        <div className="flex items-center gap-5">
-          <div>
-            <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-              TVL
-            </p>
-            <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
-              {formatNumber(
-                formatFromBigInt(vault.tvl, 18, "withFloor"),
-                "abbreviate"
-              )}
-            </p>
+      <div className="flex items-start min-[1150px]:items-center flex-col min-[1150px]:flex-row justify-between py-8 px-2 min-[1150px]:p-4">
+        <div className="flex items-center gap-5 h-[90px]">
+          <div className="flex flex-col items-start gap-2">
+            <div>
+              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+                TVL
+              </p>
+              <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
+                {formatNumber(
+                  formatFromBigInt(vault.tvl, 18, "withFloor"),
+                  "abbreviate"
+                )}
+              </p>
+            </div>
+            <div className="flex flex-col my-2 md:my-0">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                DEPOSITED
+              </p>
+              <div className="text-[18px] h-8 flex">
+                <p className="mr-1">{shareBalance}</p>
+                <p className="whitespace-nowrap md:hidden lg:block">
+                  / ${USDBalance}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-              SHARE PRICE
-            </p>
-            <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
-              ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <HideFeesHandler setModalState={setFeeAPRModal} />
-          <APRtimeSwitcher />
-        </div>
-      </div>
-      <div className="flex justify-between flex-wrap items-center px-5 py-2 md:py-4 md:h-[80px] mt-3">
-        <div className="flex items-center gap-5">
-          <div className="flex flex-col my-2 md:my-0">
-            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-              DEPOSITED
-            </p>
-            <div className="text-[18px] h-8 flex">
-              <p className="mr-1">{shareBalance}</p>
-              <p className="whitespace-nowrap md:hidden lg:block">
-                / ${USDBalance}
+          <div className="flex flex-col items-start gap-2">
+            <div>
+              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+                SHARE PRICE
+              </p>
+              <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
+                ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+              </p>
+            </div>
+            <div className="flex flex-col my-2 md:my-0">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                Daily
+              </p>
+              <p className="text-[18px]">
+                {earnData.dailyAPR}% / {earnData.dailyEarn}$
               </p>
             </div>
           </div>
-          <div className="flex flex-col my-2 md:my-0">
-            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-              Daily
-            </p>
-            <p className="text-[18px]">
-              {earnData.dailyAPR}% / {earnData.dailyEarn}$
-            </p>
+        </div>
+        <div className="flex flex-col items-center justify-between h-[90px] mt-5 min-[1150px]:mt-0">
+          <div className="flex items-center justify-start gap-3">
+            <HideFeesHandler setModalState={setFeeAPRModal} />
+            <APRtimeSwitcher />
           </div>
-          <div className="flex flex-col my-2 md:my-0">
-            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-              MONTHLY
-            </p>
-            <p className="text-[18px]">
-              {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
-            </p>
-          </div>
-          <div className="flex flex-col my-2 md:my-0">
-            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-              APR / APY
-            </p>
-            <p className="text-[18px]">
-              {earnData.apr}% / {earnData.apy}%
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col my-2 md:my-0">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                MONTHLY
+              </p>
+              <p className="text-[18px]">
+                {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
+              </p>
+            </div>
+            <div className="flex flex-col my-2 md:my-0">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                APR / APY
+              </p>
+              <p className="text-[18px]">
+                {earnData.apr}% / {earnData.apy}%
+              </p>
+            </div>
           </div>
         </div>
       </div>

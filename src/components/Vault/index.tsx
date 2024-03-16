@@ -60,11 +60,11 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <VaultActionForm vault={localVault} />
           </div>
         </div>
-        <div className="mt-5 flex gap-5 w-full">
-          <div className="w-1/2">
+        <div className="mt-5 flex flex-col lg:flex-row gap-5 w-full">
+          <div className="w-full lg:w-1/2">
             <VaultInfo vault={localVault} />
           </div>
-          <div className="w-1/2">
+          <div className="w-full lg:w-1/2">
             <Contracts vault={localVault} />
           </div>
         </div>

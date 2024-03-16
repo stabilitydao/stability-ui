@@ -71,13 +71,28 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       console.error("Error copying address:", error);
     }
   };
+
+  //   <svg
+  //   width="24"
+  //   height="24"
+  //   viewBox="0 0 24 24"
+  //   fill="none"
+  //   xmlns="http://www.w3.org/2000/svg"
+  // >
+  //   <path
+  //     d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
+  //     stroke="white"
+  //     strokeWidth="2"
+  //     strokeLinecap="round"
+  //   />
+  // </svg>
   return (
     <div className="rounded-md bg-button h-full">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
         <h2 className="text-[24px] text-start ml-4">Contracts</h2>
       </div>
 
-      <table className="w-full mx-auto max-w-[500px] text-[16px]">
+      <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">
         <tbody>
           <tr className="border-b border-[#4f5158] h-[60px]">
             <td>
@@ -227,7 +242,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
             <tr className="border-b border-[#4f5158]">
               <td>
                 <img
-                  className="ml-3 w-8 h-8"
+                  className="ml-3 w-8 h-8 rounded-full"
                   src={underlyingToken.logo}
                   alt={underlyingToken.symbol}
                 />
@@ -392,7 +407,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                     onClick={() => copyAddress(asset?.address)}
                     className="cursor-pointer px-1 py-1"
                   >
-                    {/* <svg
+                    <svg
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
@@ -412,20 +427,6 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                         rx="2"
                         stroke="white"
                         strokeWidth="2"
-                      />
-                    </svg> */}
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
-                        stroke="white"
-                        strokeWidth="2"
-                        strokeLinecap="round"
                       />
                     </svg>
                   </div>
