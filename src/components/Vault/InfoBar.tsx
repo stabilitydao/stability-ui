@@ -20,7 +20,10 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   const $aprFilter = useStore(aprFilter);
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
-  const [balances, setBalances] = useState({ shareBalance: 0, USDBalance: 0 });
+  const [userBalances, setUserBalances] = useState({
+    shareBalance: 0,
+    USDBalance: 0,
+  });
   const [earnData, setEarnData] = useState({
     apr: "",
     apy: "",
@@ -65,35 +68,34 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
       }
     }
     monthlyAPR = Number(apr) / 12;
-    monthlyEarn = String(((balances.USDBalance * monthlyAPR) / 100).toFixed(2));
+    monthlyEarn = String(
+      ((userBalances.USDBalance * monthlyAPR) / 100).toFixed(2)
+    );
     monthlyAPR = String(monthlyAPR.toFixed(2));
 
     dailyAPR = Number(apr) / 365;
-    dailyEarn = String(((balances.USDBalance * dailyAPR) / 100).toFixed(2));
+    dailyEarn = String(((userBalances.USDBalance * dailyAPR) / 100).toFixed(2));
     dailyAPR = String(dailyAPR.toFixed(2));
 
     setEarnData({ apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn });
-  }, [$hideFeeAPR, $aprFilter, balances]);
+  }, [$hideFeeAPR, $aprFilter, userBalances]);
 
   useEffect(() => {
     if (vault?.balance && vault?.shareprice) {
       const vaultBalance = BigInt(vault?.balance);
 
       const shareBalance = Number(
-        formatNumber(formatFromBigInt(vault?.balance, 18).toFixed(5), "format")
+        formatFromBigInt(vault?.balance, 18).toFixed(5)
       );
 
       const USDBalance = Number(
-        formatNumber(
-          (
-            formatFromBigInt(vault.shareprice, 18, "withDecimals") *
-            Number(formatUnits(vaultBalance, 18))
-          ).toFixed(2),
-          "format"
-        )
+        (
+          formatFromBigInt(vault.shareprice, 18, "withDecimals") *
+          Number(formatUnits(vaultBalance, 18))
+        ).toFixed(2)
       );
 
-      setBalances({ shareBalance, USDBalance });
+      setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
   return (
@@ -117,9 +119,11 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 DEPOSITED
               </p>
               <div className="text-[18px] h-8 flex">
-                <p className="mr-1">{balances.shareBalance}</p>
+                <p className="mr-1">
+                  {formatNumber(userBalances.shareBalance, "format")}
+                </p>
                 <p className="whitespace-nowrap md:hidden lg:block">
-                  / ${balances.USDBalance}
+                  / ${formatNumber(userBalances.USDBalance, "format")}
                 </p>
               </div>
             </div>
