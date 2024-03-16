@@ -10,7 +10,7 @@ import { AssetsProportion } from "@components";
 
 import { decodeHex } from "@utils";
 
-import { connected, platformZAP } from "@store";
+import { platformZAP } from "@store";
 
 import { wagmiConfig, ERC20DQMFABI, ERC20MetadataUpgradeableABI } from "@web3";
 
@@ -21,8 +21,7 @@ interface IProps {
 }
 
 const Contracts: React.FC<IProps> = memo(({ vault }) => {
-  // const $connected = useStore(connected);
-  const $platformZAP = useStore(platformZAP);
+  //const $platformZAP = useStore(platformZAP);
 
   const [underlyingToken, setUnderlyingToken] = useState({
     symbol: "",
@@ -58,11 +57,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
     setUnderlyingToken({ symbol: underlyingSymbol, logo: logo });
   };
 
-  useEffect(() => {
-    if (vault.underlying != zeroAddress) {
-      underlyingHandler();
-    }
-  }, [vault]);
+  // const copyHandler = (index: number) => {};
 
   const copyAddress = async (address: TAddress) => {
     try {
@@ -71,6 +66,12 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       console.error("Error copying address:", error);
     }
   };
+
+  useEffect(() => {
+    if (vault.underlying != zeroAddress) {
+      underlyingHandler();
+    }
+  }, [vault]);
 
   //   <svg
   //   width="24"
@@ -104,7 +105,12 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 />
               </div>
             </td>
-            <td>{vault?.symbol}</td>
+            <td>
+              <div className="flex flex-col items-start">
+                <span>{vault?.symbol}</span>
+                <span>Vault</span>
+              </div>
+            </td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
               <span className="whitespace-nowrap font-mono">
                 {vault?.address.slice(0, 6)}...{vault?.address.slice(-4)}
@@ -168,15 +174,17 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               <img className="w-8 h-8 ml-3" src="/logo.svg" alt="logo" />
             </td>
             <td>
-              <span
-                style={{
-                  backgroundColor: vault.strategyInfo.bgColor,
-                  color: vault.strategyInfo.color,
-                }}
-                className="inline-flex text-[18px] font-bold whitespace-nowrap px-2 py-1 rounded-md"
-              >
-                {vault?.strategyInfo?.shortName}
-              </span>
+              <div className="flex flex-col items-start">
+                <span
+                  style={{
+                    color: vault.strategyInfo.color,
+                  }}
+                  className="inline-flex text-[18px] font-bold whitespace-nowrap rounded-md"
+                >
+                  {vault?.strategyInfo?.shortName}
+                </span>
+                <span>Strategy</span>
+              </div>
             </td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
               <span className="font-mono whitespace-nowrap">
@@ -211,7 +219,6 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                     />
                   </svg>
                 </div>
-
                 <a
                   className="flex items-center px-1 py-1 whitespace-nowrap"
                   href={`https://polygonscan.com/address/${vault?.strategyAddress}`}
@@ -247,7 +254,12 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                   alt={underlyingToken.symbol}
                 />
               </td>
-              <td> {underlyingToken.symbol}</td>
+              <td>
+                <div className="flex flex-col items-start">
+                  <span>{underlyingToken.symbol}</span>
+                  <span>ALM</span>
+                </div>
+              </td>
               <td className="flex items-center justify-end gap-5 h-[60px]">
                 <span className="font-mono whitespace-nowrap">
                   {vault?.underlying.slice(0, 6)}...
@@ -318,11 +330,14 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 />
               </td>
               <td>
-                <div className="flex items-center">
-                  {vault?.assets[0]?.symbol}
-                  {vault?.assets.length > 1 && (
-                    <p className="ml-[6px]"> / {vault.assets[1].symbol}</p>
-                  )}
+                <div className="flex flex-col items-start">
+                  <p>
+                    {vault?.assets[0]?.symbol}
+                    {vault?.assets.length > 1 && (
+                      <span>-{vault.assets[1].symbol}</span>
+                    )}
+                  </p>
+                  <span>Pool</span>
                 </div>
               </td>
 
@@ -397,7 +412,12 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 />
               </td>
 
-              <td>{asset.symbol}</td>
+              <td>
+                <div className="flex flex-col items-start">
+                  <span>{asset.symbol}</span>
+                  <span>Asset</span>
+                </div>
+              </td>
               <td className="flex items-center justify-end gap-5 h-[60px]">
                 <span className="font-mono whitespace-nowrap">
                   {asset?.address.slice(0, 6)}...{asset?.address.slice(-4)}

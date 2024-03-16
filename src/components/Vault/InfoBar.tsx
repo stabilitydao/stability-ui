@@ -19,6 +19,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   const $aprFilter = useStore(aprFilter);
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
+  const [balances, setBalances] = useState({ shareBalance: 0, USDBalance: 0 });
   const [earnData, setEarnData] = useState({
     apr: "",
     apy: "",
@@ -27,21 +28,6 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
     dailyAPR: "",
     dailyEarn: "",
   });
-
-  const shareBalance = formatNumber(
-    formatFromBigInt(vault.balance, 18).toFixed(5),
-    "format"
-  );
-
-  const USDBalance = Number(
-    formatNumber(
-      (
-        formatFromBigInt(vault.shareprice, 18, "withDecimals") *
-        Number(formatFromBigInt(vault.balance, 18, "withDecimals"))
-      ).toFixed(2),
-      "format"
-    )
-  );
 
   useEffect(() => {
     let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
@@ -78,19 +64,39 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
       }
     }
     monthlyAPR = Number(apr) / 12;
-    monthlyEarn = String(((USDBalance * monthlyAPR) / 100).toFixed(2));
+    monthlyEarn = String(((balances.USDBalance * monthlyAPR) / 100).toFixed(2));
     monthlyAPR = String(monthlyAPR.toFixed(2));
 
     dailyAPR = Number(apr) / 365;
-    dailyEarn = String(((USDBalance * dailyAPR) / 100).toFixed(2));
+    dailyEarn = String(((balances.USDBalance * dailyAPR) / 100).toFixed(2));
     dailyAPR = String(dailyAPR.toFixed(2));
 
     setEarnData({ apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn });
-  }, [$hideFeeAPR, $aprFilter]);
+  }, [$hideFeeAPR, $aprFilter, balances]);
+
+  useEffect(() => {
+    if (vault?.balance && vault?.shareprice) {
+      const shareBalance = Number(
+        formatNumber(formatFromBigInt(vault.balance, 18).toFixed(5), "format")
+      );
+
+      const USDBalance = Number(
+        formatNumber(
+          (
+            formatFromBigInt(vault.shareprice, 18, "withDecimals") *
+            Number(formatFromBigInt(vault.balance, 18, "withDecimals"))
+          ).toFixed(2),
+          "format"
+        )
+      );
+
+      setBalances({ shareBalance, USDBalance });
+    }
+  }, [vault]);
   return (
     <div className="bg-button rounded-md">
       <div className="flex items-start min-[1150px]:items-center flex-col min-[1150px]:flex-row justify-between py-8 px-2 min-[1150px]:p-4">
-        <div className="flex items-center gap-5 h-[90px]">
+        <div className="flex items-center gap-5">
           <div className="flex flex-col items-start gap-2 h-[90px]">
             <div>
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
@@ -108,9 +114,9 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 DEPOSITED
               </p>
               <div className="text-[18px] h-8 flex">
-                <p className="mr-1">{shareBalance}</p>
+                <p className="mr-1">{balances.shareBalance}</p>
                 <p className="whitespace-nowrap md:hidden lg:block">
-                  / ${USDBalance}
+                  / ${balances.USDBalance}
                 </p>
               </div>
             </div>
