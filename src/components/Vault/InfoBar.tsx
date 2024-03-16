@@ -91,7 +91,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
     <div className="bg-button rounded-md">
       <div className="flex items-start min-[1150px]:items-center flex-col min-[1150px]:flex-row justify-between py-8 px-2 min-[1150px]:p-4">
         <div className="flex items-center gap-5 h-[90px]">
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-2 h-[90px]">
             <div>
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 TVL
@@ -115,7 +115,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-2 h-[90px]">
             <div>
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 SHARE PRICE
