@@ -19,7 +19,14 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   const $aprFilter = useStore(aprFilter);
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
-  const [earnData, setEarnData] = useState({ apr: "", apy: "" });
+  const [earnData, setEarnData] = useState({
+    apr: "",
+    apy: "",
+    monthlyAPR: "",
+    monthlyEarn: "",
+    dailyAPR: "",
+    dailyEarn: "",
+  });
 
   const shareBalance = formatNumber(
     formatFromBigInt(vault.balance, 18).toFixed(5),
@@ -36,15 +43,14 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
     )
   );
 
-  const dailyEarn = ((USDBalance * vault.daily) / 100).toFixed(2);
-
   useEffect(() => {
-    let apr, apy;
+    let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
     if ($hideFeeAPR) {
       switch ($aprFilter) {
         case "24h":
           apr = vault.earningData.apr.withoutFees.daily;
           apy = vault.earningData.apy.withoutFees.daily;
+
           break;
         case "week":
           apr = vault.earningData.apr.withoutFees.weekly;
@@ -71,47 +77,53 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
           break;
       }
     }
-    setEarnData({ apr: apr, apy: apy });
-  }, [$hideFeeAPR, $aprFilter]);
+    monthlyAPR = Number(apr) / 12;
+    monthlyEarn = String(((USDBalance * monthlyAPR) / 100).toFixed(2));
+    monthlyAPR = String(monthlyAPR.toFixed(2));
 
+    dailyAPR = Number(apr) / 365;
+    dailyEarn = String(((USDBalance * dailyAPR) / 100).toFixed(2));
+    dailyAPR = String(dailyAPR.toFixed(2));
+
+    setEarnData({ apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn });
+  }, [$hideFeeAPR, $aprFilter]);
   return (
     <div className="bg-button rounded-md">
       <div className="flex flex-wrap justify-between gap-2 md:gap-0 items-center p-4 md:h-[80px] mt-[-40px] md:mt-0">
-        <div>
-          <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-            TVL
-          </p>
-          <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
-            {formatNumber(
-              formatFromBigInt(vault.tvl, 18, "withFloor"),
-              "abbreviate"
-            )}
-          </p>
+        <div className="flex items-center gap-5">
+          <div>
+            <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+              TVL
+            </p>
+            <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
+              {formatNumber(
+                formatFromBigInt(vault.tvl, 18, "withFloor"),
+                "abbreviate"
+              )}
+            </p>
+          </div>
+          <div>
+            <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+              SHARE PRICE
+            </p>
+            <p className="text-[18px] md:text-[14px] min-[950px]:text-[18px]">
+              ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-            SHARE PRICE
-          </p>
-          <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
-            ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
-          </p>
-        </div>
-        <div>
-          <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-            APR / APY
-          </p>
-          <p className="text-[20px] md:text-[14px] min-[950px]:text-[20px]">
-            {earnData.apr}% / {earnData.apy}%
-          </p>
+
+        <div className="flex items-center gap-2">
+          <HideFeesHandler setModalState={setFeeAPRModal} />
+          <APRtimeSwitcher />
         </div>
       </div>
       <div className="flex justify-between flex-wrap items-center px-5 py-2 md:py-4 md:h-[80px] mt-3">
         <div className="flex items-center gap-5">
           <div className="flex flex-col my-2 md:my-0">
             <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-              Your Balance
+              DEPOSITED
             </p>
-            <div className="text-[20px] h-8 flex">
+            <div className="text-[18px] h-8 flex">
               <p className="mr-1">{shareBalance}</p>
               <p className="whitespace-nowrap md:hidden lg:block">
                 / ${USDBalance}
@@ -122,14 +134,26 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
             <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
               Daily
             </p>
-            <p>
-              {vault.daily}% / {dailyEarn}$
+            <p className="text-[18px]">
+              {earnData.dailyAPR}% / {earnData.dailyEarn}$
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <HideFeesHandler setModalState={setFeeAPRModal} />
-          <APRtimeSwitcher />
+          <div className="flex flex-col my-2 md:my-0">
+            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              MONTHLY
+            </p>
+            <p className="text-[18px]">
+              {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
+            </p>
+          </div>
+          <div className="flex flex-col my-2 md:my-0">
+            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              APR / APY
+            </p>
+            <p className="text-[18px]">
+              {earnData.apr}% / {earnData.apy}%
+            </p>
+          </div>
         </div>
       </div>
       {feeAPRModal && <FeeAPRModal setModalState={setFeeAPRModal} />}

@@ -263,7 +263,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           balance: "",
           lastHardWork: vault.lastHardWork,
           hardWorkOnDeposit: vault?.hardWorkOnDeposit,
-          apy: Number(APY).toFixed(2),
           daily: (Number(APR) / 365).toFixed(2),
           assets,
           assetsProportions,

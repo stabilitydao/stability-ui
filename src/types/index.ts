@@ -139,7 +139,6 @@ type TVault = {
   balance: string;
   lastHardWork: bigint;
   hardWorkOnDeposit: boolean;
-  apy: number;
   daily: number;
   assets: TAsset[];
   assetsProportions: number[];

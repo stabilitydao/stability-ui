@@ -77,7 +77,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
         <h2 className="text-[24px] text-start ml-4">Contracts</h2>
       </div>
 
-      <table className="w-full mx-auto max-w-[500px]">
+      <table className="w-full mx-auto max-w-[500px] text-[16px]">
         <tbody>
           <tr className="border-b border-[#4f5158] h-[60px]">
             <td>
@@ -91,8 +91,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
             </td>
             <td>{vault?.symbol}</td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
-              <span className="whitespace-nowrap">
-                {vault?.address.slice(0, 7)}...{vault?.address.slice(-4)}
+              <span className="whitespace-nowrap font-mono">
+                {vault?.address.slice(0, 6)}...{vault?.address.slice(-4)}
               </span>
               <div className="flex items-center">
                 <div
@@ -123,7 +123,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                   </svg>
                 </div>
                 <a
-                  className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                  className="flex items-center px-1 py-1 whitespace-nowrap"
                   href={`https://polygonscan.com/address/${vault?.address}`}
                   target="_blank"
                 >
@@ -164,8 +164,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </span>
             </td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
-              <span className="whitespace-nowrap">
-                {vault?.strategyAddress.slice(0, 7)}...
+              <span className="font-mono whitespace-nowrap">
+                {vault?.strategyAddress.slice(0, 6)}...
                 {vault?.strategyAddress.slice(-4)}
               </span>
               <div className="flex items-center">
@@ -198,7 +198,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 </div>
 
                 <a
-                  className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                  className="flex items-center px-1 py-1 whitespace-nowrap"
                   href={`https://polygonscan.com/address/${vault?.strategyAddress}`}
                   target="_blank"
                 >
@@ -234,8 +234,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </td>
               <td> {underlyingToken.symbol}</td>
               <td className="flex items-center justify-end gap-5 h-[60px]">
-                <span className="whitespace-nowrap">
-                  {vault?.underlying.slice(0, 7)}...
+                <span className="font-mono whitespace-nowrap">
+                  {vault?.underlying.slice(0, 6)}...
                   {vault?.underlying.slice(-4)}
                 </span>
                 <div className="flex items-center">
@@ -267,7 +267,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                     </svg>
                   </div>
                   <a
-                    className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                    className="flex items-center px-1 py-1 whitespace-nowrap"
                     href={`https://polygonscan.com/address/${vault?.underlying}`}
                     target="_blank"
                   >
@@ -312,8 +312,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </td>
 
               <td className="flex items-center justify-end gap-5 h-[60px]">
-                <span className="whitespace-nowrap">
-                  {vault?.strategyPool.slice(0, 7)}...
+                <span className="font-mono whitespace-nowrap">
+                  {vault?.strategyPool.slice(0, 6)}...
                   {vault?.strategyPool.slice(-4)}
                 </span>
                 <div className="flex items-center">
@@ -346,7 +346,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                   </div>
 
                   <a
-                    className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                    className="flex items-center px-1 py-1 whitespace-nowrap"
                     href={`https://polygonscan.com/address/${vault?.strategyPool}`}
                     target="_blank"
                   >
@@ -384,15 +384,15 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
 
               <td>{asset.symbol}</td>
               <td className="flex items-center justify-end gap-5 h-[60px]">
-                <span className="whitespace-nowrap">
-                  {asset?.address.slice(0, 7)}...{asset?.address.slice(-4)}
+                <span className="font-mono whitespace-nowrap">
+                  {asset?.address.slice(0, 6)}...{asset?.address.slice(-4)}
                 </span>
                 <div className="flex items-center">
                   <div
                     onClick={() => copyAddress(asset?.address)}
                     className="cursor-pointer px-1 py-1"
                   >
-                    <svg
+                    {/* <svg
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
@@ -413,11 +413,25 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                         stroke="white"
                         strokeWidth="2"
                       />
+                    </svg> */}
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
                     </svg>
                   </div>
 
                   <a
-                    className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                    className="flex items-center px-1 py-1 whitespace-nowrap"
                     href={`https://polygonscan.com/address/${asset?.address}`}
                     target="_blank"
                   >
@@ -443,14 +457,14 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </td>
             </tr>
           ))}
-          <tr>
+          {/* <tr>
             <td>
               <img className="ml-3 w-8 h-8" src="/logo.svg" alt="logo" />
             </td>
             <td>ZAP</td>
             <td className="flex items-center justify-end gap-5 h-[60px]">
-              <span className="whitespace-nowrap">
-                {$platformZAP.slice(0, 7)}...{$platformZAP.slice(-4)}
+              <span className="font-mono whitespace-nowrap">
+                {$platformZAP.slice(0, 6)}...{$platformZAP.slice(-4)}
               </span>
               <div className="flex items-center">
                 <div
@@ -482,7 +496,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 </div>
 
                 <a
-                  className="flex items-center px-1 py-1 text-[15px] whitespace-nowrap"
+                  className="flex items-center px-1 py-1 whitespace-nowrap"
                   href={`https://polygonscan.com/address/${$platformZAP}`}
                   target="_blank"
                 >
@@ -506,7 +520,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                 </a>
               </div>
             </td>
-          </tr>
+          </tr> */}
         </tbody>
       </table>
     </div>
