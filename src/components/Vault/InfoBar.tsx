@@ -9,6 +9,7 @@ import { hideFeeApr, aprFilter } from "@store";
 import { formatFromBigInt, formatNumber } from "@utils";
 
 import type { TVault } from "@types";
+import { formatUnits, parseUnits } from "viem";
 
 interface IProps {
   vault: TVault;
@@ -76,15 +77,17 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     if (vault?.balance && vault?.shareprice) {
+      const vaultBalance = BigInt(vault?.balance);
+
       const shareBalance = Number(
-        formatNumber(formatFromBigInt(vault.balance, 18).toFixed(5), "format")
+        formatNumber(formatFromBigInt(vault?.balance, 18).toFixed(5), "format")
       );
 
       const USDBalance = Number(
         formatNumber(
           (
             formatFromBigInt(vault.shareprice, 18, "withDecimals") *
-            Number(formatFromBigInt(vault.balance, 18, "withDecimals"))
+            Number(formatUnits(vaultBalance, 18))
           ).toFixed(2),
           "format"
         )

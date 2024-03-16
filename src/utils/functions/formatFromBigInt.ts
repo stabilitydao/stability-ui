@@ -1,7 +1,7 @@
 import { formatUnits } from "viem/utils";
 
 export const formatFromBigInt = (
-  value: number | string,
+  value: number | string | bigint,
   decimals: number,
   type: string = ""
 ) => {

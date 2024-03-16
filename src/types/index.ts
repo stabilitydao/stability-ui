@@ -136,7 +136,7 @@ type TVault = {
   shareprice: string;
   tvl: string;
   strategySpecific: string;
-  balance: string;
+  balance: string | bigint;
   lastHardWork: bigint;
   hardWorkOnDeposit: boolean;
   daily: number;
