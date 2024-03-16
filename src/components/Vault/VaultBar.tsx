@@ -24,11 +24,19 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
     }
   }, [_publicClient]);
   return (
-    <div className="flex justify-between items-center p-4 bg-button rounded-md">
+    <div className="flex justify-between items-center p-0">
       <div className="flex flex-col w-full">
-        <div className="flex items-center gap-4 w-full lg:justify-between flex-wrap">
+        <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap">
+          <div className="flex items-start">
+            
+            <span className="inline-flex text-[32px] font-medium whitespace-nowrap">
+              {vault.symbol}
+            </span>
+          </div>
+
           <div className="flex items-center">
-            {vault?.assets && (
+
+          {vault?.assets && (
               <AssetsProportion
                 proportions={vault.assetsProportions}
                 assets={vault?.assets}
@@ -36,21 +44,20 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
               />
             )}
 
-            <span className="inline-flex text-[18px] font-bold whitespace-nowrap">
-              {vault.symbol}
-            </span>
-          </div>
-
-          <div className="flex items-center">
-            <span className="text-[18px] lg:text-[20px]">{vault.name}</span>
-          </div>
           <img
-            className="w-8 h-8 rounded-full mx-1 hidden lg:flex"
+            className="w-7 h-7 rounded-full mr-3 hidden lg:flex"
             src={currentChain?.logoURI}
             alt={currentChain?.name}
             title={currentChain?.name}
           />
+
+          <div className="flex items-center">
+            <span className="text-[18px] lg:text-[20px]">{vault.name}</span>
+          </div>
+          
         </div>
+        </div>
+          
       </div>
     </div>
   );
