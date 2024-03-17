@@ -6,6 +6,7 @@ import { Loader } from "./Loader";
 import { AssetsSkeleton } from "./AssetsSkeleton";
 import { ShareSkeleton } from "./ShareSkeleton";
 import { Skeleton } from "./Skeleton";
+import { ChartSkeleton } from "./ChartSkeleton";
 import { ErrorMessage } from "./ErrorMessage";
 import { HideFeesHandler } from "./HideFeesHandler";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
@@ -24,4 +25,5 @@ export {
   HideFeesHandler,
   APRtimeSwitcher,
   FeeAPRModal,
+  ChartSkeleton,
 };

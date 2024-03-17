@@ -1852,7 +1852,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   useEffect(() => {
     previewDeposit();
-  }, [lastKeyPress, $connected]);
+  }, [lastKeyPress]);
 
   useEffect(() => {
     setZapButton("none");

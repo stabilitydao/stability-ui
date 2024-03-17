@@ -234,6 +234,14 @@ type TToast = {
   vault: string;
 };
 
+type TContractInfo = {
+  address: TAddress;
+  logo: string;
+  symbol: string;
+  type: string;
+  isCopy: boolean;
+};
+
 //// CHART
 type TChartData = {
   APR?: number;
@@ -355,4 +363,5 @@ export type {
   TIQMFAlm,
   TChartData,
   TError,
+  TContractInfo,
 };

@@ -5,6 +5,8 @@ import axios from "axios";
 import { Chart } from "./Chart";
 import { ChartBar } from "./ChartBar";
 
+import { ChartSkeleton } from "@components";
+
 import { formatFromBigInt } from "@utils";
 
 import { GRAPH_ENDPOINT, MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
@@ -32,7 +34,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     timelineSegments.WEEK as TSegment
   );
 
-  function formatData(obj: any) {
+  const formatData = (obj: any) => {
     const date = new Date(Number(obj.timestamp) * 1000);
 
     const day = date.getDate();
@@ -52,13 +54,14 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       timestamp: formattedDate,
       date: formattedTime,
     };
-  }
+  };
 
   const getData = async () => {
     const NOW = Math.floor(Date.now() / 1000);
-    let time = NOW - TIMESTAMPS_IN_SECONDS.WEEK;
     const DATA = [];
-    let weeklyAPRs = [];
+
+    let newData = [];
+    let time = NOW - TIMESTAMPS_IN_SECONDS.WEEK;
     let entities = 0;
     let status = true;
 
@@ -106,21 +109,27 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         APR24H: obj.APR24H,
       }));
 
-    for (let i = 0; i < 168; i++) {
+    const lastTimestamp = APRChartData[APRChartData.length - 1].unixTimestamp;
+
+    time = Number(APRChartData[0].unixTimestamp);
+
+    while (time < lastTimestamp) {
       let sortedAPRs = APRChartData.filter(
         (obj: any) => Number(obj.unixTimestamp) < time
       );
-
       let lastEl = sortedAPRs[sortedAPRs.length - 1] || APRChartData[0];
 
-      const newAPR = { ...lastEl, timestamp: time };
-
-      weeklyAPRs.push(newAPR);
-
+      newData.push({ ...lastEl, timestamp: time });
       time += 3600;
+      if (time >= lastTimestamp) {
+        newData.push({
+          ...APRChartData[APRChartData.length - 1],
+          timestamp: APRChartData[APRChartData.length - 1].unixTimestamp,
+        });
+      }
     }
 
-    APRChartData = weeklyAPRs.map(formatData);
+    APRChartData = newData.map(formatData);
 
     setChartData(workedData);
     setActiveChart({ name: "APR", data: APRChartData });
@@ -129,8 +138,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
     const NOW = Math.floor(Date.now() / 1000);
     const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
+
     let time = 0,
       newData;
+    const lastTimestamp = chartData[chartData.length - 1].unixTimestamp;
 
     switch (chartType) {
       case "APR":
@@ -143,7 +154,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         time = Number(APRArr[0].unixTimestamp);
 
         if (segment === "MONTH") {
-          while (time < NOW) {
+          while (time < lastTimestamp) {
             let sortedAPRs = APRArr.filter(
               (obj: any) => Number(obj.unixTimestamp) < time
             );
@@ -151,9 +162,15 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
             newData.push({ ...lastEl, timestamp: time });
             time += 7200;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...APRArr[APRArr.length - 1],
+                timestamp: APRArr[APRArr.length - 1].unixTimestamp,
+              });
+            }
           }
         } else if (segment === "YEAR") {
-          while (time < NOW) {
+          while (time < lastTimestamp) {
             let sortedAPRs = APRArr.filter(
               (obj: any) => Number(obj.unixTimestamp) < time
             );
@@ -161,9 +178,15 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
             newData.push({ ...lastEl, timestamp: time });
             time += 14400;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...APRArr[APRArr.length - 1],
+                timestamp: APRArr[APRArr.length - 1].unixTimestamp,
+              });
+            }
           }
         } else {
-          while (time < NOW) {
+          while (time < lastTimestamp) {
             let sortedAPRs = APRArr.filter(
               (obj: any) => Number(obj.unixTimestamp) < time
             );
@@ -171,6 +194,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
             newData.push({ ...lastEl, timestamp: time });
             time += 3600;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...APRArr[APRArr.length - 1],
+                timestamp: APRArr[APRArr.length - 1].unixTimestamp,
+              });
+            }
           }
         }
 
@@ -207,11 +236,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         let TVLArr = chartData.filter(
           (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
         );
-
         newData = [];
         time = Number(TVLArr[0].unixTimestamp);
 
-        while (time < NOW) {
+        while (time < lastTimestamp) {
           let sortedAPRs = TVLArr.filter(
             (obj: any) => Number(obj.unixTimestamp) < time
           );
@@ -219,10 +247,15 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
           newData.push({ ...lastEl, timestamp: time });
           time += 3600;
+          if (time >= lastTimestamp) {
+            newData.push({
+              ...TVLArr[TVLArr.length - 1],
+              timestamp: TVLArr[TVLArr.length - 1].unixTimestamp,
+            });
+          }
         }
 
         TVLArr = newData.map(formatData);
-
         const TVLWidthPercent =
           (TVLArr[TVLArr.length - 1].unixTimestamp - TVLArr[0].unixTimestamp) /
           500;
@@ -258,13 +291,19 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         newData = [];
         time = Number(priceArr[0].unixTimestamp);
 
-        while (time < NOW) {
+        while (time < lastTimestamp) {
           let sortedData = priceArr.filter(
             (obj: any) => Number(obj.unixTimestamp) < time
           );
           let lastEl = sortedData[sortedData.length - 1] || priceArr[0];
           newData.push({ ...lastEl, timestamp: time });
           time += 3600;
+          if (time >= lastTimestamp) {
+            newData.push({
+              ...priceArr[priceArr.length - 1],
+              timestamp: priceArr[priceArr.length - 1].unixTimestamp,
+            });
+          }
         }
 
         priceArr = newData.map(formatData);
@@ -308,6 +347,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         break;
     }
   };
+
   const timelineHandler = (segment: TSegment) => {
     const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
     if (TIME === timeline) return;
@@ -319,56 +359,58 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     getData();
   }, []);
 
-  return activeChart && activeChart?.data?.length ? (
+  return (
     <div className="rounded-md mt-5 bg-button">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
         <h2 className="text-start text-[1rem] min-[380px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem]">
           Historical rate
         </h2>
-        <div className="flex items-center border border-[#6376AF] rounded-md text-[1rem] relative sm:px-2 px-1 sm:gap-3 gap-2">
-          <div
-            className="absolute bg-[#6376AF] rounded-sm"
-            style={{
-              width: "33.33%",
-              height: "100%",
-              left:
-                activeChart.name === "sharePrice"
-                  ? "66.7%"
-                  : activeChart.name === "TVL"
-                  ? "33.3%"
-                  : "0%",
-              transition: "left 0.3s ease",
-            }}
-          ></div>
-          <p
-            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
-              activeChart.name === "APR" ? "opacity-100" : "opacity-80"
-            }`}
-            onClick={() => chartHandler("APR")}
-          >
-            {APRType}
-          </p>
-          <p
-            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
-              activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
-            }`}
-            onClick={() => chartHandler("TVL")}
-          >
-            TVL
-          </p>
-          <p
-            className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
-              activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
-            }`}
-            onClick={() => chartHandler("sharePrice")}
-          >
-            Price
-          </p>
-        </div>
+        {activeChart && (
+          <div className="flex items-center border border-[#6376AF] rounded-md text-[1rem] relative sm:px-2 px-1 sm:gap-3 gap-2">
+            <div
+              className="absolute bg-[#6376AF] rounded-sm"
+              style={{
+                width: "33.33%",
+                height: "100%",
+                left:
+                  activeChart.name === "sharePrice"
+                    ? "66.7%"
+                    : activeChart.name === "TVL"
+                    ? "33.3%"
+                    : "0%",
+                transition: "left 0.3s ease",
+              }}
+            ></div>
+            <p
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+                activeChart.name === "APR" ? "opacity-100" : "opacity-80"
+              }`}
+              onClick={() => chartHandler("APR")}
+            >
+              {APRType}
+            </p>
+            <p
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+                activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
+              }`}
+              onClick={() => chartHandler("TVL")}
+            >
+              TVL
+            </p>
+            <p
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[45px] sm:w-[55px] min-[960px]:w-[60px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+                activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
+              }`}
+              onClick={() => chartHandler("sharePrice")}
+            >
+              Price
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="py-3 px-4">
-        {activeChart && (
+        {activeChart ? (
           <>
             {activeChart.name === "APR" ? (
               <ChartBar chart={activeChart} APRType={APRType} />
@@ -376,43 +418,45 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               <Chart chart={activeChart} APRType={APRType} />
             )}
           </>
+        ) : (
+          <ChartSkeleton />
         )}
       </div>
-      <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
-        {/* <p
+      {activeChart && (
+        <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
+          {/* <p
       onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
       className="opacity-50 hover:opacity-100 cursor-pointer"
     >
       1D
     </p> */}
-        <p
-          onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
-          className={`hover:opacity-100 cursor-pointer px-2 ${
-            timeline === "WEEK" ? "opacity-100" : "opacity-30"
-          }`}
-        >
-          WEEK
-        </p>
-        <p
-          onClick={() => timelineHandler(timelineSegments.MONTH as TSegment)}
-          className={`hover:opacity-100 cursor-pointer px-2 ${
-            timeline === "MONTH" ? "opacity-100" : "opacity-30"
-          }`}
-        >
-          MONTH
-        </p>
-        <p
-          onClick={() => timelineHandler(timelineSegments.YEAR as TSegment)}
-          className={`hover:opacity-100 cursor-pointer px-2 ${
-            timeline === "YEAR" ? "opacity-100" : "opacity-30"
-          }`}
-        >
-          ALL
-        </p>
-      </div>
+          <p
+            onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
+            className={`hover:opacity-100 cursor-pointer px-2 ${
+              timeline === "WEEK" ? "opacity-100" : "opacity-30"
+            }`}
+          >
+            WEEK
+          </p>
+          <p
+            onClick={() => timelineHandler(timelineSegments.MONTH as TSegment)}
+            className={`hover:opacity-100 cursor-pointer px-2 ${
+              timeline === "MONTH" ? "opacity-100" : "opacity-30"
+            }`}
+          >
+            MONTH
+          </p>
+          <p
+            onClick={() => timelineHandler(timelineSegments.YEAR as TSegment)}
+            className={`hover:opacity-100 cursor-pointer px-2 ${
+              timeline === "YEAR" ? "opacity-100" : "opacity-30"
+            }`}
+          >
+            ALL
+          </p>
+        </div>
+      )}
     </div>
-  ) : (
-    <></>
   );
 });
 
