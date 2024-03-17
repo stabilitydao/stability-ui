@@ -68,7 +68,7 @@ const Assets: React.FC<IProps> = memo(
     }, [$connected, $assetsPrices]);
 
     return (
-      <div className="rounded-md p-3 mt-5 bg-button">
+      <div className="p-3 mt-5">
         <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>

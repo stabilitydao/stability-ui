@@ -35,6 +35,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
+
     if ($hideFeeAPR) {
       switch ($aprFilter) {
         case "24h":
@@ -101,13 +102,13 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="bg-button rounded-md">
       <div className="flex items-start min-[1150px]:items-center flex-col min-[1150px]:flex-row justify-between py-8 px-2 min-[1150px]:p-4">
-        <div className="flex items-center gap-5">
+        <div className="flex items-center justify-between gap-5">
           <div className="flex flex-col items-start justify-between gap-2 h-[90px]">
             <div>
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 TVL
               </p>
-              <p className="text-[15px] whitespace-nowrap">
+              <p className="text-[16px] whitespace-nowrap">
                 {formatNumber(
                   formatFromBigInt(vault.tvl, 18, "withFloor"),
                   "abbreviate"
@@ -118,7 +119,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 DEPOSITED
               </p>
-              <div className="text-[15px] flex whitespace-nowrap">
+              <div className="text-[16px] flex whitespace-nowrap">
                 <p className="mr-1">
                   {formatNumber(userBalances.shareBalance, "format")}
                 </p>
@@ -128,13 +129,12 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col items-start justify-between gap-2 h-[90px]">
+          <div className="flex min-[1150px]:hidden flex-col items-start justify-between gap-2 h-[90px]">
             <div>
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 SHARE PRICE
               </p>
-              <p className="text-[15px] whitespace-nowrap">
+              <p className="text-[16px] whitespace-nowrap">
                 ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
               </p>
             </div>
@@ -142,10 +142,28 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 Daily
               </p>
-              <p className="text-[15px] whitespace-nowrap">
+              <p className="text-[16px] whitespace-nowrap">
                 {earnData.dailyAPR}% / {earnData.dailyEarn}$
               </p>
             </div>
+          </div>
+        </div>
+        <div className="hidden min-[1150px]:flex flex-col items-start justify-between gap-2 h-[90px]">
+          <div>
+            <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+              SHARE PRICE
+            </p>
+            <p className="text-[16px] whitespace-nowrap">
+              ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+            </p>
+          </div>
+          <div className="flex flex-col my-2 md:my-0">
+            <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              Daily
+            </p>
+            <p className="text-[16px] whitespace-nowrap">
+              {earnData.dailyAPR}% / {earnData.dailyEarn}$
+            </p>
           </div>
         </div>
         <div className="flex flex-col items-start justify-between h-[90px] mt-5 min-[1150px]:mt-0">
@@ -153,12 +171,12 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
             <HideFeesHandler setModalState={setFeeAPRModal} />
             <APRtimeSwitcher />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between w-full">
             <div className="flex flex-col my-2 md:my-0">
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 MONTHLY
               </p>
-              <p className="text-[15px] whitespace-nowrap">
+              <p className="text-[16px] whitespace-nowrap">
                 {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
               </p>
             </div>
@@ -166,7 +184,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 APR / APY
               </p>
-              <p className="text-[15px] whitespace-nowrap">
+              <p className="text-[16px] whitespace-nowrap">
                 {earnData.apr}% / {earnData.apy}%
               </p>
             </div>

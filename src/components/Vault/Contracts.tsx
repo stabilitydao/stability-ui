@@ -135,8 +135,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   }, [vault]);
 
   return (
-    <div className="rounded-md bg-button h-full">
-      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
+    <div className="rounded-md h-full">
+      <div className="flex justify-between items-center h-[60px]">
         <h2 className="text-[24px] text-start ml-4">Contracts</h2>
       </div>
 

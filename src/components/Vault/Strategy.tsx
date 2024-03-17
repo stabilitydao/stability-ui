@@ -91,8 +91,8 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   }, [vault, $vaultTypes, $strategyTypes]);
 
   return (
-    <div className="rounded-md mt-5 bg-button">
-      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
+    <div className="mt-5">
+      <div className="flex justify-between items-center h-[60px]">
         <h2 className=" text-[24px] text-start ml-4">Strategy</h2>
       </div>
       <div className="flex flex-col items-start gap-3 p-4">
