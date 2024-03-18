@@ -10,13 +10,13 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[24px] text-start ml-4">Yield rates</h2>
+        <h2 className="text-[28px] text-start ml-4">Yield rates</h2>
       </div>
       <div className="p-4">
         {!!vault?.earningData && (
-          <table className="table table-auto w-full rounded-lg select-none">
+          <table className="table table-auto w-full rounded-lg">
             <thead className="bg-[#0b0e11]">
-              <tr className="text-[18px] md:text-[16px] lg:text-[20px]">
+              <tr className="text-[18px] md:text-[16px] lg:text-[20px] text-[#8f8f8f] uppercase">
                 <th></th>
                 <th>Latest</th>
                 <th>24h</th>
@@ -24,7 +24,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
               </tr>
             </thead>
             <tbody className="text-[14px] min-[450px]:text-[16px] md:text-[14px] lg:text-[20px]">
-              <tr>
+              <tr className="hover:bg-[#2B3139]">
                 <td>Total APY</td>
                 <td className="text-right">
                   {vault?.earningData?.apy?.withFees?.latest}%
@@ -36,7 +36,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                   {vault?.earningData?.apy?.withFees?.weekly}%
                 </td>
               </tr>
-              <tr>
+              <tr className="hover:bg-[#2B3139]">
                 <td>Total APR</td>
                 <td className="text-right">
                   {vault?.earningData?.apr?.withFees?.latest}%
@@ -49,7 +49,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 </td>
               </tr>
               {vault.strategyInfo.shortName != "CF" && (
-                <tr>
+                <tr className="hover:bg-[#2B3139]">
                   <td>Pool swap fees APR</td>
 
                   <td className="text-right">
@@ -63,7 +63,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                   </td>
                 </tr>
               )}
-              <tr>
+              <tr className="hover:bg-[#2B3139]">
                 {vault.strategyInfo.shortName === "CF" ? (
                   <td>Strategy APR</td>
                 ) : (

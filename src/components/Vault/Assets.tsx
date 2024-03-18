@@ -69,7 +69,7 @@ const Assets: React.FC<IProps> = memo(
 
     return (
       <div className="p-3 mt-5">
-        <h2 className="mb-2 text-[24px] text-start h-[50px] flex items-center ml-1">
+        <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>
         <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
@@ -110,7 +110,7 @@ const Assets: React.FC<IProps> = memo(
                     key={asset.address}
                   >
                     <div className="flex w-full flex-col gap-3">
-                      <div className="flex w-full justify-between items-center  flex-wrap">
+                      <div className="flex w-full justify-between items-center flex-wrap">
                         <div className="inline-flex items-center mb-2">
                           <img
                             className="rounded-full w-[30px] m-auto mr-2"
@@ -154,27 +154,38 @@ const Assets: React.FC<IProps> = memo(
                           </div>
                         )}
                       </div>
-
-                      {!!price && (
-                        <div className="flex justify-start items-center text-[16px]">
-                          <p>Price: ${formatNumber(price, "smallNumbers")}</p>
-                        </div>
-                      )}
-                      {priceOnCreation && (
-                        <div className="flex justify-start items-center text-[16px]">
-                          <p>
-                            Price at creation: $
-                            {formatNumber(priceOnCreation, "smallNumbers")} (
-                            {creationDate})
-                          </p>
-                        </div>
-                      )}
+                      <div className="flex w-full">
+                        {!!price && (
+                          <div className="w-1/2">
+                            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                              PRICE
+                            </p>
+                            <p className="text-[16px] mt-1">
+                              ${formatNumber(price, "smallNumbers")}
+                            </p>
+                          </div>
+                        )}
+                        {priceOnCreation && (
+                          <div className="w-1/2">
+                            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                              PRICE AT CREATION
+                            </p>
+                            <p className="text-[16px] mt-1">
+                              ${formatNumber(priceOnCreation, "smallNumbers")} (
+                              {creationDate})
+                            </p>
+                          </div>
+                        )}
+                      </div>
 
                       {invested && (
-                        <div className="flex justify-start items-center text-[16px]">
-                          <p>
-                            Invested: {investedInTokens}{" "}
-                            {invested[index].symbol} / ${investedInUSD} /{" "}
+                        <div className="mt-1">
+                          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                            INVESTED
+                          </p>
+                          <p className="text-[16px] mt-1">
+                            {investedInTokens} {invested[index].symbol} / $
+                            {investedInUSD} /{" "}
                             {invested[index].percent.toFixed(2)}%
                           </p>
                         </div>

@@ -23,6 +23,8 @@ interface IProps {
 const Contracts: React.FC<IProps> = memo(({ vault }) => {
   //const $platformZAP = useStore(platformZAP);
 
+  const [timeoutId, setTimeoutId] = useState<any>();
+
   const [underlyingToken, setUnderlyingToken] = useState({
     symbol: "",
     logo: "",
@@ -64,14 +66,26 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
     } catch (error) {
       console.error("Error copying address:", error);
     }
-    const contractsInfo = contracts.map((contract) => {
-      if (contract?.address === address) {
-        return { ...contract, isCopy: true };
-      } else {
-        return { ...contract, isCopy: false };
-      }
-    });
+
+    const contractsInfo = contracts.map((contract) => ({
+      ...contract,
+      isCopy: contract?.address === address,
+    }));
+
     setContracts(contractsInfo);
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    const newTimeoutId = setTimeout(() => {
+      const updatedContractsInfo = contracts.map((contract) => ({
+        ...contract,
+        isCopy: false,
+      }));
+      setContracts(updatedContractsInfo);
+    }, 3000);
+    setTimeoutId(newTimeoutId);
   };
 
   useEffect(() => {
@@ -137,7 +151,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="rounded-md h-full">
       <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[24px] text-start ml-4">Contracts</h2>
+        <h2 className="text-[28px] text-start ml-4">Contracts</h2>
       </div>
 
       <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">

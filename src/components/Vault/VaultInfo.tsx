@@ -61,7 +61,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[24px] text-start ml-4">Vault</h2>
+        <h2 className="text-[28px] text-start ml-4">Vault</h2>
       </div>
 
       <div className="flex flex-col items-start gap-5 p-4">
