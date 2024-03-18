@@ -65,84 +65,91 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
       </div>
 
       <div className="flex flex-col items-start gap-5 p-4">
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96] mb-2">
-            VAULT TYPE
-          </p>
-          <p className="text-[16px] mt-1">
+        <div className="flex flex-col gap-3">
+          <p className="text-[16px]">
             <VaultType text="long" type={vault?.type} />
           </p>
-        </div>
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            VAULT STATUS
+          <p className="text-[18px]">
+            All income is automatically reinvested into vault
           </p>
-          <div className="text-[16px] mt-1 flex items-center gap-1">
-            <VaultState status={vault?.status} />
-            <span> {VAULT_STATUSES[vault?.status]}</span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 justify-between items-start w-full">
+          <div>
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              VAULT STATUS
+            </p>
+            <div className="text-[16px] mt-1 flex items-center gap-1">
+              <VaultState status={vault?.status} />
+              <span> {VAULT_STATUSES[vault?.status]}</span>
+            </div>
+          </div>
+          <div className="sm:w-1/2">
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              GAS RESERVE
+            </p>
+            <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
           </div>
         </div>
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            HARD WORK ON DEPOSIT
-          </p>
-          <p className="text-[16px] mt-1">{hardWorkOnDeposit}</p>
+        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
+          <div className="flex flex-col">
+            {timeDifference && (
+              <div className="flex flex-col justify-between">
+                <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
+                  Last Hard Work
+                </p>
+                {timeDifference?.days ? (
+                  <>
+                    {timeDifference?.days < 1000 ? (
+                      <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
+                        {timeDifference.days}
+                        {timeDifference.days > 1 ? " days" : " day"}{" "}
+                        {timeDifference.hours}h ago
+                      </div>
+                    ) : (
+                      <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2  rounded-lg border-[2px] border-[#AE642E] text-center">
+                        None
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div
+                    className={`text-[14px] px-2 rounded-lg border-[2px] text-center  ${
+                      timeDifference.hours > 4
+                        ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
+                        : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
+                    }`}
+                  >
+                    {timeDifference?.hours
+                      ? `${timeDifference.hours}h ago`
+                      : "<1h ago"}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="sm:w-1/2">
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              HARD WORK ON DEPOSIT
+            </p>
+            <p className="text-[16px] mt-1">{hardWorkOnDeposit}</p>
+          </div>
         </div>
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            CREATED
-          </p>
-          <p className="text-[16px] mt-1">
-            {created?.time} / {created?.days} days ago
-          </p>
-        </div>
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            NFT TOKEN ID
-          </p>
-          <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
-        </div>
-        <div>
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            GAS RESERVE
-          </p>
-          <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
-        </div>
-        <div className="flex flex-col">
-          {timeDifference && (
-            <div className="flex flex-col justify-between">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
-                Last Hard Work
-              </p>
-              {timeDifference?.days ? (
-                <>
-                  {timeDifference?.days < 1000 ? (
-                    <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
-                      {timeDifference.days}
-                      {timeDifference.days > 1 ? " days" : " day"}{" "}
-                      {timeDifference.hours}h ago
-                    </div>
-                  ) : (
-                    <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2  rounded-lg border-[2px] border-[#AE642E] text-center">
-                      None
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div
-                  className={`text-[14px] px-2 rounded-lg border-[2px] text-center  ${
-                    timeDifference.hours > 4
-                      ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
-                      : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                  }`}
-                >
-                  {timeDifference?.hours
-                    ? `${timeDifference.hours}h ago`
-                    : "<1h ago"}
-                </div>
-              )}
-            </div>
-          )}
+        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
+          <div>
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              CREATED
+            </p>
+            <p className="text-[16px] mt-1">
+              {created?.time} / {created?.days} days ago
+            </p>
+          </div>
+          <div className="sm:w-1/2">
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              NFT TOKEN ID
+            </p>
+            <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
+          </div>
         </div>
       </div>
     </div>

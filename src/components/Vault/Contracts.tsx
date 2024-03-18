@@ -145,7 +145,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
           {contracts.map(({ address, logo, symbol, type, isCopy }) => (
             <tr key={address} className="border-b border-[#4f5158] h-[60px]">
               <td>
-                <div className="ml-3">
+                <div className="ml-3 hidden sm:block">
                   {logo === "proportions" ? (
                     <AssetsProportion
                       proportions={vault.assetsProportions}
@@ -154,7 +154,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                     />
                   ) : (
                     <img
-                      className={`w-8 h-8 ${
+                      className={`w-[26px] h-[26px] ${
                         type != "Strategy" && "rounded-full"
                       }`}
                       src={logo}
@@ -173,8 +173,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                     }
                     className={
                       type === "Strategy"
-                        ? "inline-flex text-[18px] font-bold whitespace-nowrap"
-                        : ""
+                        ? "inline-flex text-[14px] sm:text-[18px] font-bold whitespace-nowrap"
+                        : "text-[14px] sm:text-[18px]"
                     }
                   >
                     {symbol}
@@ -184,8 +184,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
                   </span>
                 </div>
               </td>
-              <td className="flex items-center justify-end gap-5 h-[60px]">
-                <span className="whitespace-nowrap font-mono">
+              <td className="flex items-center justify-end gap-3 sm:gap-5 h-[60px]">
+                <span className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]">
                   {address.slice(0, 6)}...{address.slice(-4)}
                 </span>
                 <div className="flex items-center">

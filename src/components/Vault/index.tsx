@@ -9,6 +9,7 @@ import { InfoBar } from "./InfoBar";
 import { HistoricalRate } from "./HistoricalRate";
 import { VaultInfo } from "./VaultInfo";
 import { Contracts } from "./Contracts";
+import { YieldBar } from "./YieldBar";
 
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
@@ -60,16 +61,23 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <VaultActionForm vault={localVault} />
           </div>
         </div>
-        <div className="mt-5 flex flex-col lg:flex-row gap-5 w-full">
+
+        <div className="my-8 flex flex-col lg:flex-row items-start justify-start gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            <VaultInfo vault={localVault} />
+            <YieldBar vault={localVault} />
           </div>
           <div className="w-full lg:w-1/2">
             <Contracts vault={localVault} />
           </div>
         </div>
-
-        <Strategy vault={localVault} />
+        <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
+          <div className="w-full lg:w-1/2">
+            <VaultInfo vault={localVault} />
+          </div>
+          <div className="w-full lg:w-1/2">
+            <Strategy vault={localVault} />
+          </div>
+        </div>
 
         <Assets
           assets={localVault?.assets}

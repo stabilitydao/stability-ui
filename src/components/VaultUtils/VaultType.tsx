@@ -31,7 +31,7 @@ const VaultType = ({
   ) : (
     <span
       title={`${currentType?.type} vault`}
-      className={`text-[17px] flex font-bold w-full py-2 px-4 rounded-full uppercase ${currentType?.styles}`}
+      className={`text-[17px] flex font-bold h-8 px-4 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
     >
       {currentType?.type}
     </span>
