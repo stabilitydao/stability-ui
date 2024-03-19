@@ -3,6 +3,8 @@ import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
+import packageData from "../../../package.json";
+
 import { PlatformModal } from "./PlatformModal";
 
 import {
@@ -220,10 +222,14 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <div className="visible__tooltip toLeftPlatform">
                   <div className="flex items-start flex-col">
                     <div className="text-[14px] flex flex-col gap-1 w-full text-left">
-                      <p>
-                        Smart Contracts: Stability Platform v{$platformVersion}
-                      </p>
-                      <p>User Interface: stability-ui</p>
+                      <div className="flex flex-col">
+                        <span className="text-[#848E9C]">Smart Contracts</span>
+                        <span>Stability Platform v{$platformVersion}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[#848E9C]">User Interface</span>
+                        <span>stability-ui v{packageData.version}</span>
+                      </div>
                     </div>
                   </div>
                   <i></i>

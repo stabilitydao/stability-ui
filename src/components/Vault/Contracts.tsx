@@ -92,7 +92,9 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
     if (vault.underlying != zeroAddress) {
       underlyingHandler();
     }
+  }, [vault]);
 
+  useEffect(() => {
     if (vault?.address) {
       const contractsInfo = [
         {
@@ -146,7 +148,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       }
       setContracts(contractsInfo);
     }
-  }, [vault]);
+  }, [vault, underlyingToken]);
 
   return (
     <div className="rounded-md h-full">
