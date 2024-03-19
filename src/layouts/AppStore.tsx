@@ -113,8 +113,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault.almRebalanceEntity[0];
-
+        const almRebalanceEntity = vault.almRebalanceHistoryEntity[0];
         let dailyAPR = 0;
         let rebalances = {};
 
@@ -126,7 +125,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
           );
           // rebalances
-          const totalRebalances = vault.almRebalanceEntity;
+          const totalRebalances = vault.almRebalanceHistoryEntity;
 
           const _24HRebalances = totalRebalances.filter(
             (obj: any) => Number(obj.timestamp) >= NOW - 86400

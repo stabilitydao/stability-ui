@@ -265,7 +265,7 @@ const GRAPH_QUERY = `
             APR24H
             APRWeekly
           }
-          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
+          almRebalanceHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
             timestamp
             APRFromLastEvent
             APR24H
