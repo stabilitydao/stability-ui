@@ -145,7 +145,7 @@ const Assets: React.FC<IProps> = memo(
                       className="w-2 h-8 rounded-md"
                     ></div>
                     <img
-                      className="w-8 rounded-full"
+                      className="w-[30px] rounded-full"
                       src={data.logo}
                       alt={data.symbol}
                     />
