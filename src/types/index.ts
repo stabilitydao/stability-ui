@@ -253,6 +253,17 @@ type TChartData = {
   date: string;
 };
 
+type TPieChartData = {
+  address: TAddress;
+  amount: string;
+  amountInUSD: number;
+  color: string;
+  formatedAmountInUSD: string;
+  logo: string;
+  percent: number;
+  symbol: string;
+};
+
 //// DAO
 type TDAOData = {
   platformVersion: string;
@@ -364,4 +375,5 @@ export type {
   TChartData,
   TError,
   TContractInfo,
+  TPieChartData,
 };

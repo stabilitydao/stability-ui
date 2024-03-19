@@ -4,6 +4,8 @@ import { formatUnits } from "viem";
 
 import { readContract } from "@wagmi/core";
 
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
+
 import { assetsPrices, connected } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
@@ -12,7 +14,7 @@ import { getTokenData, getDate, formatNumber } from "@utils";
 
 import { TOKENS_ASSETS } from "@constants";
 
-import type { TAddress, TAsset, TToken } from "@types";
+import type { TAddress, TAsset, TToken, TPieChartData } from "@types";
 
 interface IProps {
   assets: TAsset[];
@@ -20,6 +22,49 @@ interface IProps {
   pricesOnCreation: string[];
   strategy: TAddress;
 }
+
+const ChartTooltip = ({
+  active,
+  payload,
+}: {
+  active: boolean;
+  payload: any;
+}) => {
+  if (active && payload) {
+    return (
+      <div className="bg-[#1c1c23] text-[#fff] rounded-md text-[14px]">
+        <div className="px-5 py-3">
+          <p>${payload[0].payload.formatedAmountInUSD}</p>
+          <p>{`${payload[0].payload.amount} ${payload[0].payload.symbol}`}</p>
+          <p>{payload[0].payload.percent.toFixed(2)}%</p>
+        </div>
+      </div>
+    );
+  }
+};
+
+const Chart = ({ data }: { data: TPieChartData[] }) => {
+  return (
+    <PieChart width={170} height={170}>
+      <Pie
+        data={data}
+        cx={80}
+        cy={80}
+        innerRadius={60}
+        outerRadius={80}
+        paddingAngle={5}
+        dataKey="amountInUSD"
+        isAnimationActive={true}
+        stroke="none"
+      >
+        {data.map((obj: TPieChartData, index: number) => (
+          <Cell key={`cell-${index}`} fill={obj.color} />
+        ))}
+      </Pie>
+      <Tooltip content={<ChartTooltip />} />
+    </PieChart>
+  );
+};
 
 const Assets: React.FC<IProps> = memo(
   ({ assets, created, pricesOnCreation, strategy }) => {
@@ -30,20 +75,23 @@ const Assets: React.FC<IProps> = memo(
       BigInt(price)
     );
 
-    const [invested, setInvested] = useState<any>(false);
+    const [investedData, setInvestedData] = useState<any>(false);
 
-    const getInvested = async () => {
+    const getInvestedData = async () => {
       const assetsAmounts = await readContract(wagmiConfig, {
         address: strategy,
         abi: StrategyABI,
         functionName: "assetsAmounts",
       });
+
       if (!assetsAmounts || !$assetsPrices) return;
+
       const tokens = assetsAmounts[0].map((token) => getTokenData(token));
 
       const amounts = assetsAmounts[1].map((amount, index) =>
         formatUnits(amount, tokens[index]?.decimals as number)
       );
+
       const amountsInUSD = amounts.map((amount, index) => {
         const tokenAddress: any = tokens[index]?.address;
 
@@ -53,28 +101,66 @@ const Assets: React.FC<IProps> = memo(
 
       const sum = amountsInUSD.reduce((acc: number, num: any) => acc + num, 0);
 
-      const investedAssets = amountsInUSD.map((amount, index) => ({
-        symbol: tokens[index]?.symbol,
-        amount: amounts[index],
-        amountInUSD: amount,
-        percent: amount ? (Number(amount) / sum) * 100 : 0,
-      }));
-
-      setInvested(investedAssets);
+      const investedAssets = amountsInUSD.map((amount, index) => {
+        const address = tokens[index]?.address as TAddress;
+        const price: number = $assetsPrices
+          ? Number(formatUnits($assetsPrices[address], 18))
+          : 0;
+        return {
+          address: address,
+          symbol: tokens[index]?.symbol,
+          color: assets.find((asset) => asset.symbol === tokens[index]?.symbol)
+            ?.color,
+          logo: tokens[index]?.logoURI,
+          amount: formatNumber(
+            amounts[index],
+            price > 1000 ? "formatWithLongDecimalPart" : "format"
+          ),
+          amountInUSD: amount,
+          formatedAmountInUSD: formatNumber(amount, "format"),
+          percent: amount ? (Number(amount) / sum) * 100 : 0,
+        };
+      });
+      setInvestedData(investedAssets);
     };
 
     useEffect(() => {
-      getInvested();
+      getInvestedData();
     }, [$connected, $assetsPrices]);
-
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>
+        <div className="flex flex-col items-center gap-5 mb-5">
+          {investedData && <Chart data={investedData} />}
+
+          <div className="flex items-center gap-5">
+            {investedData &&
+              investedData.map((data: TPieChartData) => {
+                return (
+                  <div className="flex items-center gap-2" key={data.color}>
+                    <div
+                      style={{ background: data.color }}
+                      className="w-2 h-8 rounded-md"
+                    ></div>
+                    <img
+                      className="w-8 rounded-full"
+                      src={data.logo}
+                      alt={data.symbol}
+                    />
+                    <p className="text-[18px] text-[#8D8E96]">
+                      {data?.percent.toFixed(2)}%
+                    </p>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
-          {assets &&
-            assets.map((asset: any, index: number) => {
+          {investedData &&
+            investedData.map((asset: TPieChartData, index: number) => {
               const assetData: TToken | any = getTokenData(asset.address);
 
               const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
@@ -87,26 +173,10 @@ const Assets: React.FC<IProps> = memo(
                 : 0;
 
               const creationDate = getDate(Number(created));
-
-              let investedInTokens = "";
-              let investedInUSD = "";
-
-              if (invested) {
-                investedInTokens = formatNumber(
-                  invested[index].amount,
-                  price > 1000 ? "formatWithLongDecimalPart" : "format"
-                ) as string;
-
-                investedInUSD = formatNumber(
-                  invested[index].amountInUSD,
-                  "format"
-                ) as string;
-              }
-
               return (
                 assetData && (
                   <article
-                    className="rounded-md p-3 flex w-full"
+                    className="rounded-md p-3 flex  w-full"
                     key={asset.address}
                   >
                     <div className="flex w-full flex-col gap-3">
@@ -178,15 +248,15 @@ const Assets: React.FC<IProps> = memo(
                         )}
                       </div>
 
-                      {invested && (
+                      {asset && (
                         <div className="mt-1">
                           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                             INVESTED
                           </p>
                           <p className="text-[16px] mt-1">
-                            {investedInTokens} {invested[index].symbol} / $
-                            {investedInUSD} /{" "}
-                            {invested[index].percent.toFixed(2)}%
+                            {`${asset.amount} ${asset.symbol} / $${
+                              asset.formatedAmountInUSD
+                            } / ${asset.percent.toFixed(2)}%`}
                           </p>
                         </div>
                       )}
