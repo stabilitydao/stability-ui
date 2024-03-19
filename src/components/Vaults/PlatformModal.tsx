@@ -33,7 +33,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[100px] w-[320px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[120px] w-[320px] md:w-[420px]"
       >
         <svg
           onClick={() => {
@@ -98,10 +98,10 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
           </defs>
         </svg>
 
-        <div className="p-10 flex items-start justify-center flex-col gap-4">
+        <div className="px-6 py-8 flex items-start justify-center flex-col gap-4">
           <div className="text-[12px] sm:text-[16px] w-full">
-            {" "}
-            Stability Platform v{$platformVersion}
+            <p>Smart Contracts: Stability Platform v{$platformVersion}</p>
+            <p>User Interface: stability-ui</p>
           </div>
         </div>
       </div>

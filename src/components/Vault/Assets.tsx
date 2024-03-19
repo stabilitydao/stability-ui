@@ -132,10 +132,10 @@ const Assets: React.FC<IProps> = memo(
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>
-        <div className="flex flex-col items-center gap-5 mb-5">
+        <div className="flex justify-center items-center gap-5 mb-5">
           {investedData && <Chart data={investedData} />}
 
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col items-center gap-5">
             {investedData &&
               investedData.map((data: TPieChartData) => {
                 return (
@@ -247,20 +247,6 @@ const Assets: React.FC<IProps> = memo(
                           </div>
                         )}
                       </div>
-
-                      {asset && (
-                        <div className="mt-1">
-                          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                            INVESTED
-                          </p>
-                          <p className="text-[16px] mt-1">
-                            {`${asset.amount} ${asset.symbol} / $${
-                              asset.formatedAmountInUSD
-                            } / ${asset.percent.toFixed(2)}%`}
-                          </p>
-                        </div>
-                      )}
-
                       {assetData?.tags && (
                         <div className="flex items-center gap-3 flex-wrap">
                           {assetData.tags.map((tag: string) => (

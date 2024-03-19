@@ -219,9 +219,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </svg>
                 <div className="visible__tooltip toLeftPlatform">
                   <div className="flex items-start flex-col">
-                    <p className="text-[14px] flex flex-col gap-1 w-full text-left">
-                      Stability Platform v{$platformVersion}
-                    </p>
+                    <div className="text-[14px] flex flex-col gap-1 w-full text-left">
+                      <p>
+                        Smart Contracts: Stability Platform v{$platformVersion}
+                      </p>
+                      <p>User Interface: stability-ui</p>
+                    </div>
                   </div>
                   <i></i>
                 </div>
