@@ -91,104 +91,12 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   }, [vault, $vaultTypes, $strategyTypes]);
 
   return (
-    <div className="rounded-md mt-5 bg-button">
-      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px]">
-        <h2 className=" text-[24px] text-start ml-4">Strategy</h2>
-        <div className="hidden lg:flex items-center gap-5 mr-3 ">
-          <button className="rounded-md bg-button flex justify-center items-center min-w-[140px]">
-            <a
-              className="flex items-center text-[15px] py-2 px-4 whitespace-nowrap"
-              href={`https://polygonscan.com/address/${vault.strategyAddress}`}
-              target="_blank"
-            >
-              Strategy contract
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-external-link ms-1"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                <path d="M11 13l9 -9"></path>
-                <path d="M15 4h5v5"></path>
-              </svg>
-            </a>
-          </button>
-          <button className="rounded-md bg-button flex justify-center items-center  w-[140px]">
-            <a
-              className="flex items-center text-[15px] py-2 px-1"
-              href={`https://polygonscan.com/token/${vault.address}`}
-              target="_blank"
-            >
-              Vault contract
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-external-link ms-1"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                <path d="M11 13l9 -9"></path>
-                <path d="M15 4h5v5"></path>
-              </svg>
-            </a>
-          </button>
-          <button className="rounded-md bg-button justify-center items-center w-[140px] hidden">
-            <a
-              className="flex items-center text-[15px] py-2 px-1"
-              href={vault.strategyInfo.sourceCode}
-              target="_blank"
-            >
-              Github
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-external-link ms-1"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                strokeWidth="2"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                <path d="M11 13l9 -9"></path>
-                <path d="M15 4h5v5"></path>
-              </svg>
-            </a>
-          </button>
-        </div>
+    <div>
+      <div className="flex justify-between items-center h-[60px]">
+        <h2 className="text-[28px] text-start ml-4">Strategy</h2>
       </div>
       <div className="flex flex-col items-start gap-3 p-4">
         <div className="flex items-start flex-col gap-3">
-          <div
-            style={{
-              backgroundColor: vault.strategyInfo.bgColor,
-              color: vault.strategyInfo.color,
-            }}
-            className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
-          >
-            <p>
-              {vault.strategyInfo.name}
-              {vault.strategySpecific ? " " + vault.strategySpecific : ""}
-            </p>
-          </div>
           <div className="flex">
             <span
               style={{
@@ -236,6 +144,18 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
               )}
             </span>
           </div>
+          <div
+            style={{
+              backgroundColor: vault.strategyInfo.bgColor,
+              color: vault.strategyInfo.color,
+            }}
+            className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
+          >
+            <p>
+              {vault.strategyInfo.name}
+              {vault.strategySpecific ? " " + vault.strategySpecific : ""}
+            </p>
+          </div>
         </div>
 
         {vault.strategyDescription && (
@@ -246,77 +166,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
           </div>
         )}
-        {!!vault?.earningData && (
-          <table className="table table-auto w-full rounded-lg select-none">
-            <thead className="bg-[#0b0e11]">
-              <tr className="text-[18px] md:text-[16px] lg:text-[20px]">
-                <th></th>
-                <th>Latest</th>
-                <th>24h</th>
-                <th>Week</th>
-              </tr>
-            </thead>
-            <tbody className="text-[14px] min-[450px]:text-[16px] md:text-[14px] lg:text-[20px]">
-              <tr>
-                <td>Total APY</td>
-                <td className="text-right">
-                  {vault?.earningData?.apy?.withFees?.latest}%
-                </td>
-                <td className="text-right">
-                  {vault?.earningData?.apy?.withFees?.daily}%
-                </td>
-                <td className="text-right">
-                  {vault?.earningData?.apy?.withFees?.weekly}%
-                </td>
-              </tr>
-              <tr>
-                <td>Total APR</td>
-                <td className="text-right">
-                  {vault?.earningData?.apr?.withFees?.latest}%
-                </td>
-                <td className="text-right">
-                  {vault?.earningData?.apr?.withFees?.daily}%
-                </td>
-                <td className="text-right">
-                  {vault?.earningData?.apr?.withFees?.weekly}%
-                </td>
-              </tr>
-              {vault.strategyInfo.shortName != "CF" && (
-                <tr>
-                  <td>Pool swap fees APR</td>
-
-                  <td className="text-right">
-                    {vault?.earningData?.poolSwapFeesAPR?.latest}%
-                  </td>
-                  <td className="text-right">
-                    {vault?.earningData?.poolSwapFeesAPR?.daily}%
-                  </td>
-                  <td className="text-right">
-                    {vault?.earningData?.poolSwapFeesAPR?.weekly}%
-                  </td>
-                </tr>
-              )}
-              <tr>
-                {vault.strategyInfo.shortName === "CF" ? (
-                  <td>Strategy APR</td>
-                ) : (
-                  <td>Farm APR</td>
-                )}
-                <td className="text-right">
-                  {vault?.earningData?.farmAPR?.latest}%
-                </td>
-
-                <td className="text-right">
-                  {vault?.earningData?.farmAPR?.daily}%
-                </td>
-                <td className="text-right">
-                  {vault?.earningData?.farmAPR?.weekly}%
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        )}
-
         <div className="mt-2">
           <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
             Impermanent Loss

@@ -136,9 +136,9 @@ type TVault = {
   shareprice: string;
   tvl: string;
   strategySpecific: string;
-  balance: string;
+  balance: string | bigint;
   lastHardWork: bigint;
-  apy: number;
+  hardWorkOnDeposit: boolean;
   daily: number;
   assets: TAsset[];
   assetsProportions: number[];
@@ -150,8 +150,11 @@ type TVault = {
   status: number;
   version: string;
   strategyVersion: string;
+  NFTtokenID: string;
+  gasReserve: string;
   rebalances: any;
   earningData: TEarningData | any;
+  strategyPool: TAddress;
 };
 
 type TTableColumn = {
@@ -231,6 +234,14 @@ type TToast = {
   vault: string;
 };
 
+type TContractInfo = {
+  address: TAddress;
+  logo: string;
+  symbol: string;
+  type: string;
+  isCopy: boolean;
+};
+
 //// CHART
 type TChartData = {
   APR?: number;
@@ -240,6 +251,17 @@ type TChartData = {
   timestamp: string;
   unixTimestamp?: string;
   date: string;
+};
+
+type TPieChartData = {
+  address: TAddress;
+  amount: string;
+  amountInUSD: number;
+  color: string;
+  formatedAmountInUSD: string;
+  logo: string;
+  percent: number;
+  symbol: string;
 };
 
 //// DAO
@@ -352,4 +374,6 @@ export type {
   TIQMFAlm,
   TChartData,
   TError,
+  TContractInfo,
+  TPieChartData,
 };

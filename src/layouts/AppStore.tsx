@@ -17,6 +17,7 @@ import {
   network,
   platformData,
   platformVersion,
+  platformZAP,
   publicClient,
   userBalance,
   vaults,
@@ -35,13 +36,7 @@ import {
   isWeb3Load,
   aprFilter,
 } from "@store";
-import {
-  wagmiConfig,
-  platform,
-  PlatformABI,
-  IVaultManagerABI,
-  ERC20MetadataUpgradeableABI,
-} from "@web3";
+import { wagmiConfig, platform, PlatformABI, IVaultManagerABI } from "@web3";
 
 import {
   addAssetsPrice,
@@ -115,10 +110,10 @@ const AppStore = (props: React.PropsWithChildren) => {
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
+
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault.almRebalanceEntity[0];
-
+        const almRebalanceEntity = vault.almRebalanceHistoryEntity[0];
         let dailyAPR = 0;
         let rebalances = {};
 
@@ -130,7 +125,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
           );
           // rebalances
-          const totalRebalances = vault.almRebalanceEntity;
+          const totalRebalances = vault.almRebalanceHistoryEntity;
 
           const _24HRebalances = totalRebalances.filter(
             (obj: any) => Number(obj.timestamp) >= NOW - 86400
@@ -252,7 +247,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
           weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
         };
-
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -267,7 +261,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategySpecific: vault.strategySpecific,
           balance: "",
           lastHardWork: vault.lastHardWork,
-          apy: Number(APY).toFixed(2),
+          hardWorkOnDeposit: vault?.hardWorkOnDeposit,
           daily: (Number(APR) / 365).toFixed(2),
           assets,
           assetsProportions,
@@ -279,6 +273,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           status: Number(vault.vaultStatus),
           version: vault.version,
           strategyVersion: strategyEntity.version,
+          NFTtokenID: vault.NFTtokenID,
+          gasReserve: vault.gasReserve,
           rebalances,
           earningData: {
             apr: APRArray,
@@ -286,6 +282,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             poolSwapFeesAPR,
             farmAPR,
           },
+          strategyPool: strategyEntity.pool,
         };
 
         return vaults;
@@ -328,37 +325,38 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
     await setGraphData(graphResponse.data.data);
+
+    const contractData: any = await readContract(wagmiConfig, {
+      address: platform,
+      abi: PlatformABI,
+      functionName: "getData",
+    });
+    if (contractData[1]) {
+      tokens.set(
+        contractData[1].map((address: TAddress) =>
+          address.toLowerCase()
+        ) as TAddress[]
+      );
+    }
+
+    if (contractData?.length) {
+      const buildingPrices: { [vaultType: string]: bigint } = {};
+      for (let i = 0; i < contractData[1].length; i++) {
+        buildingPrices[contractData[3][i]] = contractData[5][i];
+      }
+      platformData.set({
+        platform,
+        factory: contractData[0][0],
+        buildingPermitToken: contractData[0][3],
+        buildingPayPerVaultToken: contractData[0][4],
+        zap: contractData[0][7],
+        buildingPrices,
+      });
+    }
+
     if (isConnected) {
       isWeb3Load.set(true);
       try {
-        const contractData: any = await readContract(wagmiConfig, {
-          address: platform,
-          abi: PlatformABI,
-          functionName: "getData",
-        });
-        if (contractData[1]) {
-          tokens.set(
-            contractData[1].map((address: TAddress) =>
-              address.toLowerCase()
-            ) as TAddress[]
-          );
-        }
-
-        if (contractData && Array.isArray(contractData)) {
-          const buildingPrices: { [vaultType: string]: bigint } = {};
-          for (let i = 0; i < contractData[1].length; i++) {
-            buildingPrices[contractData[3][i]] = contractData[5][i]; //buildingPrices[vaultType] = buildingPrice
-          }
-          platformData.set({
-            platform,
-            factory: contractData[0][0],
-            buildingPermitToken: contractData[0][3],
-            buildingPayPerVaultToken: contractData[0][4],
-            zap: contractData[0][7],
-            buildingPrices,
-          });
-        }
-
         const contractBalance: any = await readContract(wagmiConfig, {
           address: platform,
           abi: PlatformABI,
@@ -427,6 +425,17 @@ const AppStore = (props: React.PropsWithChildren) => {
         error.set({ state: true, type: "WEB3", description: txError.message });
       }
       isWeb3Load.set(false);
+    } else {
+      // before backend
+      const randomAddress: TAddress =
+        "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
+      const contractBalance: any = await readContract(wagmiConfig, {
+        address: platform,
+        abi: PlatformABI,
+        functionName: "getBalance",
+        args: [randomAddress],
+      });
+      addAssetsPrice(contractBalance);
     }
 
     const strategyTypeEntities =
@@ -448,8 +457,12 @@ const AppStore = (props: React.PropsWithChildren) => {
     );
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
-    if (graphResponse?.data?.data?.platformEntities[0]?.version)
+    if (graphResponse?.data?.data?.platformEntities[0]?.version) {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
+    }
+    if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
+      platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
+    }
   };
 
   const fetchAllData = async () => {

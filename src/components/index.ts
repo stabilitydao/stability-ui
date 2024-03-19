@@ -14,6 +14,10 @@ import {
   ShareSkeleton,
   ErrorMessage,
   Skeleton,
+  HideFeesHandler,
+  APRtimeSwitcher,
+  FeeAPRModal,
+  ChartSkeleton,
 } from "./VaultUtils";
 
 import { Toast } from "./VaultUtils/Toast";
@@ -34,4 +38,8 @@ export {
   Toast,
   ErrorMessage,
   Skeleton,
+  ChartSkeleton,
+  HideFeesHandler,
+  APRtimeSwitcher,
+  FeeAPRModal,
 };

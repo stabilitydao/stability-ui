@@ -1,5 +1,7 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
+import { createWalletClient, custom } from "viem";
+
 import { polygon } from "wagmi/chains";
 
 import ERC20ABI from "./abi/ERC20ABI.ts";
@@ -35,9 +37,16 @@ const wagmiConfig = defaultWagmiConfig({
   projectId: walletConnectProjectId,
   metadata,
 });
+
+const walletClient = createWalletClient({
+  chain: polygon,
+  transport: custom(window?.ethereum!),
+});
+
 export {
   platform,
   walletConnectProjectId,
+  walletClient,
   priceReader,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,

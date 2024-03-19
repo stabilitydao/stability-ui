@@ -514,6 +514,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         try {
           const decimals = Number(getTokenData(asset)?.decimals);
 
+          if (!$connected) {
+            getZapDepositSwapAmounts(amount);
+            return;
+          }
+
           const allowanceData = await getZapAllowance(asset);
 
           if (tab === "Withdraw" && option.length === 1) {
@@ -875,7 +880,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setLoader(true);
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
-      const allowanceData = await getZapAllowance(option[0]);
+
       const zapAmounts = await readContract(wagmiConfig, {
         address: $platformData.zap,
         abi: ZapABI,
@@ -944,18 +949,22 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       });
 
       setZapShares(formatUnits(previewDepositAssets[1], 18));
-      if (
-        Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
-        Number(amount) <= Number(balances[option[0]])
-      ) {
-        setZapButton("needApprove");
+      if ($connected) {
+        const allowanceData = await getZapAllowance(option[0]);
+        if (
+          Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
+          Number(amount) <= Number(balances[option[0]])
+        ) {
+          setZapButton("needApprove");
+        }
+        if (
+          Number(formatUnits(allowanceData, decimals)) >= Number(amount) &&
+          Number(amount) <= Number(balances[option[0]])
+        ) {
+          setZapButton("deposit");
+        }
       }
-      if (
-        Number(formatUnits(allowanceData, decimals)) >= Number(amount) &&
-        Number(amount) <= Number(balances[option[0]])
-      ) {
-        setZapButton("deposit");
-      }
+
       setLoader(false);
     } catch (error) {
       setLoader(false);
@@ -1570,7 +1579,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       const balance = Number(
         formatUnits($vaultData[vault.address].vaultUserBalance, 18)
       );
-
       if (!Number(value)) {
         setWithdrawAmount(false);
         setZapPreviewWithdraw(false);
@@ -1856,7 +1864,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setZapError(false);
     setZapPreviewWithdraw(false);
     setLoader(false);
-  }, [option]);
+  }, [option, $connected]);
+
+  useEffect(() => {
+    resetInputs(option);
+  }, [$connected]);
 
   useEffect(() => {
     if (vault) {
@@ -1942,7 +1954,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     };
   }, [tokenSelectorRef]);
   return (
-    <div className="mt-5 bg-button rounded-md">
+    <div className="bg-button rounded-md">
       <div className="flex">
         <button
           className={`h-[60px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
@@ -1969,7 +1981,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           Withdraw
         </button>
       </div>
-      <form autoComplete="off" className="w-full px-4 mb-10 pb-5">
+      <form autoComplete="off" className="w-full px-4 pb-5">
         <div className="flex items-center mt-4 gap-3 relative">
           {optionTokens && (
             <div className="relative select-none w-full" ref={tokenSelectorRef}>
@@ -2191,283 +2203,66 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           )}
         </div>
 
-        {tab === "Deposit" &&
-          ($connected ? (
-            <>
-              {option?.length > 1 ||
-              (defaultOptionAssets === option[0] && option.length < 2) ? (
-                <>
-                  <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
-                    {option.map((asset: any) => (
-                      <div className="w-full" key={asset}>
+        {tab === "Deposit" && (
+          <>
+            {option?.length > 1 ||
+            (defaultOptionAssets === option[0] && option.length < 2) ? (
+              <>
+                <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
+                  {option.map((asset: any) => (
+                    <div className="w-full" key={asset}>
+                      {!!balances[asset] && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                           <p>Balance: </p>
                           <p>{balances[asset]}</p>
                         </div>
-
-                        <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
-                          <div className="py-3 w-full flex items-center px-4">
-                            <label
-                              htmlFor={asset}
-                              className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
-                            >
-                              {tokensJson.tokens.map((token) => {
-                                if (token.address.toLowerCase() === asset) {
-                                  return (
-                                    <div
-                                      className="flex items-center gap-2"
-                                      key={token.address}
-                                    >
-                                      <img
-                                        className="rounded-full w-[25px] h-[25px] "
-                                        src={token.logoURI}
-                                        alt={token.name}
-                                      />
-                                    </div>
-                                  );
-                                }
-                              })}
-                            </label>
-                            <input
-                              className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
-                              list="amount"
-                              id={asset}
-                              name="amount"
-                              placeholder="0"
-                              value={
-                                inputs && inputs[asset] && inputs[asset].amount
-                              }
-                              onChange={(e) =>
-                                handleInputChange(e.target.value, e.target.id)
-                              }
-                              type="text"
-                              onKeyDown={(evt) => {
-                                const currentValue =
-                                  inputs &&
-                                  inputs[asset] &&
-                                  inputs[asset].amount;
-
-                                if (
-                                  !/[\d.]/.test(evt.key) &&
-                                  evt.key !== "Backspace" &&
-                                  evt.key !== "ArrowLeft" &&
-                                  evt.key !== "ArrowRight"
-                                ) {
-                                  evt.preventDefault();
-                                }
-
-                                if (
-                                  evt.key === "." &&
-                                  currentValue &&
-                                  currentValue.includes(".")
-                                ) {
-                                  evt.preventDefault();
-                                }
-                              }}
-                            />
-                            <button
-                              className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
-                              onClick={() =>
-                                balances[asset] &&
-                                handleInputChange(balances[asset], asset)
-                              }
-                              type="button"
-                            >
-                              MAX
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                          <p>
-                            $
-                            {$assetsPrices &&
-                            inputs[asset]?.amount > 0 &&
-                            underlyingToken?.address != option[0]
-                              ? (
-                                  Number(
-                                    formatUnits($assetsPrices[asset], 18)
-                                  ) * inputs[asset].amount
-                                ).toFixed(2)
-                              : 0}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-5">
-                    {loader && !transactionInProgress ? (
-                      <ShareSkeleton />
-                    ) : (
-                      <div className="h-[63px] text-[18px]">
-                        {sharesOut && (
-                          <div>
-                            <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
-                              YOU RECEIVE
-                            </p>
-                            <div className="flex items-center">
-                              <AssetsProportion
-                                proportions={vault.assetsProportions}
-                                assets={vault?.assets}
-                                type="vault"
-                              />
-                              {Number(
-                                formatUnits(sharesOut * BigInt(100), 18)
-                              ).toFixed(12)}{" "}
-                              ($
-                              {(
-                                Number(
-                                  formatUnits(
-                                    BigInt(sharesOut) * BigInt(100),
-                                    18
-                                  )
-                                ) *
-                                formatFromBigInt(
-                                  vault.shareprice,
-                                  18,
-                                  "withDecimals"
-                                )
-                              ).toFixed(2)}
-                              )
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {chain?.id === 137 ? (
-                    <>
-                      {isApprove === 1 ? (
-                        <button
-                          disabled={transactionInProgress}
-                          className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                            transactionInProgress
-                              ? "bg-transparent flex items-center justify-center gap-2"
-                              : "bg-[#486556]"
-                          }`}
-                          type="button"
-                          onClick={deposit}
-                        >
-                          <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
-
-                          {transactionInProgress && (
-                            <Loader color={"#486556"} />
-                          )}
-                        </button>
-                      ) : isApprove === 2 ? (
-                        <div className="flex gap-3">
-                          {option.map(
-                            (asset: any, index: number) =>
-                              allowance &&
-                              formatUnits(
-                                allowance[asset]?.allowance[0],
-                                Number(getTokenData(asset)?.decimals)
-                              ) < inputs[asset].amount && (
-                                <button
-                                  disabled={approveIndex !== false}
-                                  className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                    approveIndex === index
-                                      ? "bg-transparent flex items-center justify-center gap-1"
-                                      : "bg-[#486556]"
-                                  }`}
-                                  key={asset}
-                                  type="button"
-                                  onClick={() =>
-                                    approve(asset as TAddress, index)
-                                  }
-                                >
-                                  <p>
-                                    {needConfirm
-                                      ? "Confirm in wallet"
-                                      : `Approve ${
-                                          getTokenData(asset)?.symbol
-                                        }`}
-                                  </p>
-                                  {approveIndex === index && (
-                                    <Loader color={"#486556"} />
-                                  )}
-                                </button>
-                              )
-                          )}
-                        </div>
-                      ) : isApprove === 0 ? (
-                        <button
-                          disabled
-                          className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                        >
-                          INSUFFICIENT BALANCE
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                        >
-                          {loader ? "LOADING..." : "ENTER AMOUNT"}
-                        </button>
                       )}
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => switchChain({ chainId: 137 })}
-                      className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                      type="button"
-                    >
-                      <p>SWITCH NETWORK</p>
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div>
-                  <div className="flex flex-col mt-[15px] text-[15px] w-full">
-                    {balances[option[0]] ? (
-                      <div className="text-left text-[gray] ml-2">
-                        Balance: {balances[option[0]]}
-                      </div>
-                    ) : null}
-                    <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
-                      <div className="py-3 w-full flex items-center px-4">
-                        <label
-                          htmlFor={option[0]}
-                          className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
-                        >
-                          {tokensJson.tokens.map((token) => {
-                            if (token.address === option[0]) {
-                              return (
-                                <div
-                                  className="flex items-center"
-                                  key={token.address}
-                                >
-                                  <img
-                                    className="w-[25px] h-[25px] rounded-full"
-                                    src={token.logoURI}
-                                    alt={token.name}
-                                  />
-                                </div>
-                              );
-                            }
-                          })}
-                        </label>
 
-                        {option && (
+                      <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
+                        <div className="py-3 w-full flex items-center px-4">
+                          <label
+                            htmlFor={asset}
+                            className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
+                          >
+                            {tokensJson.tokens.map((token) => {
+                              if (token.address.toLowerCase() === asset) {
+                                return (
+                                  <div
+                                    className="flex items-center gap-2"
+                                    key={token.address}
+                                  >
+                                    <img
+                                      className="rounded-full w-[25px] h-[25px] "
+                                      src={token.logoURI}
+                                      alt={token.name}
+                                    />
+                                  </div>
+                                );
+                              }
+                            })}
+                          </label>
                           <input
+                            className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
                             list="amount"
-                            id={option[0]}
-                            value={inputs[option[0]]?.amount}
+                            id={asset}
                             name="amount"
-                            type="text"
                             placeholder="0"
-                            onChange={(e) =>
-                              zapInputHandler(e.target.value, e.target.id)
+                            value={
+                              inputs && inputs[asset] && inputs[asset].amount
                             }
+                            onChange={(e) =>
+                              handleInputChange(e.target.value, e.target.id)
+                            }
+                            type="text"
                             onKeyDown={(evt) => {
                               const currentValue =
-                                inputs &&
-                                inputs[option[0]] &&
-                                inputs[option[0]].amount;
+                                inputs && inputs[asset] && inputs[asset].amount;
 
                               if (
                                 !/[\d.]/.test(evt.key) &&
-                                evt.key !== "Backspace"
+                                evt.key !== "Backspace" &&
+                                evt.key !== "ArrowLeft" &&
+                                evt.key !== "ArrowRight"
                               ) {
                                 evt.preventDefault();
                               }
@@ -2480,255 +2275,487 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                 evt.preventDefault();
                               }
                             }}
-                            className={`ml-2 flex items-center h-full   bg-transparent ${
-                              underlyingToken?.address === option[0]
-                                ? "text-[16px] w-[70%]"
-                                : "text-[25px] w-[58%]"
-                            } `}
                           />
-                        )}
-                        {$connected && balances[option[0]] ? (
                           <button
+                            className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
                             onClick={() =>
-                              zapInputHandler(balances[option[0]], option[0])
+                              balances[asset] &&
+                              handleInputChange(balances[asset], asset)
                             }
-                            className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-auto"
                             type="button"
                           >
                             MAX
                           </button>
-                        ) : null}
+                        </div>
+                      </div>
+
+                      <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                        <p>
+                          $
+                          {$assetsPrices &&
+                          inputs[asset]?.amount > 0 &&
+                          underlyingToken?.address != option[0]
+                            ? (
+                                Number(formatUnits($assetsPrices[asset], 18)) *
+                                inputs[asset].amount
+                              ).toFixed(2)
+                            : 0}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                      <p>
-                        $
-                        {$assetsPrices &&
-                        inputs[option[0]]?.amount > 0 &&
-                        underlyingToken?.address !== option[0]
-                          ? (
-                              Number(
-                                formatUnits($assetsPrices[option[0]], 18)
-                              ) * inputs[option[0]]?.amount
-                            ).toFixed(2)
-                          : 0}
-                      </p>
-                    </div>
-                    <div className="my-2 ml-2 flex flex-col gap-2">
-                      {underlyingCondition && (
-                        <>
-                          <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                            SWAPS
-                          </p>
-                          {loader && !transactionInProgress ? (
-                            <AssetsSkeleton />
-                          ) : (
-                            <div className="h-[100px]">
-                              {zapTokens && (
-                                <div>
-                                  {zapTokens.map((token: any) => (
-                                    <div
-                                      className="text-[18px]  flex items-center gap-1 ml-2"
-                                      key={token.address}
-                                    >
-                                      {token.address.toLowerCase() !==
-                                        option[0].toLowerCase() && (
-                                        <div className="flex items-center gap-1 mt-2">
-                                          <img
-                                            src="/oneInch.svg"
-                                            alt="1inch logo"
-                                            title="1inch"
-                                          />
-                                          {zapError ? (
-                                            <img
-                                              src="/error.svg"
-                                              alt="error img"
-                                              title="error"
-                                            />
-                                          ) : (
-                                            <>
-                                              <div className="flex items-center gap-1">
-                                                <p>
-                                                  {Number(
-                                                    token.amountIn
-                                                  ).toFixed(6)}
-                                                </p>
-                                                <img
-                                                  src={
-                                                    getTokenData(option[0])
-                                                      ?.logoURI
-                                                  }
-                                                  title={
-                                                    getTokenData(option[0])
-                                                      ?.symbol
-                                                  }
-                                                  alt={
-                                                    getTokenData(option[0])
-                                                      ?.symbol
-                                                  }
-                                                  className="w-6 h-6 rounded-full"
-                                                />
-                                              </div>
-                                              -&gt;
-                                              <div className="flex items-center gap-1">
-                                                <p>
-                                                  {Number(
-                                                    token.amountOut
-                                                  ).toFixed(6)}
-                                                </p>
-                                                <img
-                                                  src={token.img}
-                                                  title={token.symbol}
-                                                  alt={token.symbol}
-                                                  className="w-6 h-6 rounded-full"
-                                                />
-                                              </div>
-                                            </>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </>
-                      )}
-                      <div className="mt-5">
-                        <div className="h-[63px]">
-                          <p className="uppercase text-left text-[18px] leading-3 text-[#8D8E96] mb-3">
+                  ))}
+                </div>
+                <div className="mt-5">
+                  {loader && !transactionInProgress ? (
+                    <ShareSkeleton />
+                  ) : (
+                    <div className="h-[63px] text-[18px]">
+                      {sharesOut && (
+                        <div>
+                          <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
                             YOU RECEIVE
                           </p>
-                          <div className="h-[63px]">
-                            <div className="text-left text-[18px]">
-                              <div className="flex items-center">
-                                <AssetsProportion
-                                  proportions={vault.assetsProportions}
-                                  assets={vault?.assets}
-                                  type="vault"
+                          <div className="flex items-center">
+                            <AssetsProportion
+                              proportions={vault.assetsProportions}
+                              assets={vault?.assets}
+                              type="vault"
+                            />
+                            {Number(
+                              formatUnits(sharesOut * BigInt(100), 18)
+                            ).toFixed(12)}{" "}
+                            ($
+                            {(
+                              Number(
+                                formatUnits(BigInt(sharesOut) * BigInt(100), 18)
+                              ) *
+                              formatFromBigInt(
+                                vault.shareprice,
+                                18,
+                                "withDecimals"
+                              )
+                            ).toFixed(2)}
+                            )
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {$connected ? (
+                  <>
+                    {chain?.id === 137 ? (
+                      <>
+                        {isApprove === 1 ? (
+                          <button
+                            disabled={transactionInProgress}
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            type="button"
+                            onClick={deposit}
+                          >
+                            <p>
+                              {needConfirm ? "Confirm in wallet" : "Deposit"}
+                            </p>
+
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : isApprove === 2 ? (
+                          <div className="flex gap-3">
+                            {option.map(
+                              (asset: any, index: number) =>
+                                allowance &&
+                                allowance[asset]?.allowance[0] &&
+                                formatUnits(
+                                  allowance[asset]?.allowance[0],
+                                  Number(getTokenData(asset)?.decimals)
+                                ) < inputs[asset].amount && (
+                                  <button
+                                    disabled={approveIndex !== false}
+                                    className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                      approveIndex === index
+                                        ? "bg-transparent flex items-center justify-center gap-1"
+                                        : "bg-[#486556]"
+                                    }`}
+                                    key={asset}
+                                    type="button"
+                                    onClick={() =>
+                                      approve(asset as TAddress, index)
+                                    }
+                                  >
+                                    <p>
+                                      {needConfirm
+                                        ? "Confirm in wallet"
+                                        : `Approve ${
+                                            getTokenData(asset)?.symbol
+                                          }`}
+                                    </p>
+                                    {approveIndex === index && (
+                                      <Loader color={"#486556"} />
+                                    )}
+                                  </button>
+                                )
+                            )}
+                          </div>
+                        ) : isApprove === 0 ? (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                          >
+                            INSUFFICIENT BALANCE
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                          >
+                            {loader ? "LOADING..." : "ENTER AMOUNT"}
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => switchChain({ chainId: 137 })}
+                        className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
+                        type="button"
+                      >
+                        <p>SWITCH NETWORK</p>
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                    onClick={() => open()}
+                  >
+                    CONNECT WALLET
+                  </button>
+                )}
+              </>
+            ) : (
+              <div>
+                <div className="flex flex-col mt-[15px] text-[15px] w-full">
+                  {!!balances[option[0]] && (
+                    <div className="text-left text-[gray] ml-2">
+                      Balance: {balances[option[0]]}
+                    </div>
+                  )}
+                  <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
+                    <div className="py-3 w-full flex items-center px-4">
+                      <label
+                        htmlFor={option[0]}
+                        className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
+                      >
+                        {tokensJson.tokens.map((token) => {
+                          if (token.address === option[0]) {
+                            return (
+                              <div
+                                className="flex items-center"
+                                key={token.address}
+                              >
+                                <img
+                                  className="w-[25px] h-[25px] rounded-full"
+                                  src={token.logoURI}
+                                  alt={token.name}
                                 />
-                                {loader && !transactionInProgress ? (
-                                  <ShareSkeleton height={30} width={300} />
-                                ) : (
-                                  <div>
-                                    {(underlyingShares &&
-                                      inputs[option[0]]?.amount > 0) ||
-                                    (zapShares &&
-                                      inputs[option[0]]?.amount > 0) ? (
-                                      <p>
-                                        {underlyingShares &&
-                                        inputs[option[0]]?.amount > 0
-                                          ? `${underlyingShares} ($${(
-                                              underlyingShares *
-                                              formatFromBigInt(
-                                                vault.shareprice,
-                                                18,
-                                                "withDecimals"
-                                              )
-                                            ).toFixed(2)})`
-                                          : zapShares &&
-                                            inputs[option[0]]?.amount > 0 &&
-                                            `${zapShares} ($${(
-                                              zapShares *
-                                              formatFromBigInt(
-                                                vault.shareprice,
-                                                18,
-                                                "withDecimals"
-                                              )
-                                            ).toFixed(2)})`}
-                                      </p>
-                                    ) : (
-                                      <p>0 ($0.0)</p>
+                              </div>
+                            );
+                          }
+                        })}
+                      </label>
+
+                      {option && (
+                        <input
+                          list="amount"
+                          id={option[0]}
+                          value={inputs[option[0]]?.amount}
+                          name="amount"
+                          type="text"
+                          placeholder="0"
+                          onChange={(e) =>
+                            zapInputHandler(e.target.value, e.target.id)
+                          }
+                          onKeyDown={(evt) => {
+                            const currentValue =
+                              inputs &&
+                              inputs[option[0]] &&
+                              inputs[option[0]].amount;
+
+                            if (
+                              !/[\d.]/.test(evt.key) &&
+                              evt.key !== "Backspace"
+                            ) {
+                              evt.preventDefault();
+                            }
+
+                            if (
+                              evt.key === "." &&
+                              currentValue &&
+                              currentValue.includes(".")
+                            ) {
+                              evt.preventDefault();
+                            }
+                          }}
+                          className={`ml-2 flex items-center h-full   bg-transparent ${
+                            underlyingToken?.address === option[0]
+                              ? "text-[16px] w-[70%]"
+                              : "text-[25px] w-[58%]"
+                          } `}
+                        />
+                      )}
+                      {$connected && balances[option[0]] ? (
+                        <button
+                          onClick={() =>
+                            zapInputHandler(balances[option[0]], option[0])
+                          }
+                          className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-auto"
+                          type="button"
+                        >
+                          MAX
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                    <p>
+                      $
+                      {$assetsPrices &&
+                      inputs[option[0]]?.amount > 0 &&
+                      underlyingToken?.address !== option[0]
+                        ? (
+                            Number(formatUnits($assetsPrices[option[0]], 18)) *
+                            inputs[option[0]]?.amount
+                          ).toFixed(2)
+                        : 0}
+                    </p>
+                  </div>
+                  <div className="my-2 ml-2 flex flex-col gap-2">
+                    {underlyingCondition && (
+                      <>
+                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                          SWAPS
+                        </p>
+                        {loader && !transactionInProgress ? (
+                          <AssetsSkeleton />
+                        ) : (
+                          <div className="h-[100px]">
+                            {zapTokens && (
+                              <div>
+                                {zapTokens.map((token: any) => (
+                                  <div
+                                    className="text-[18px]  flex items-center gap-1 ml-2"
+                                    key={token.address}
+                                  >
+                                    {token.address.toLowerCase() !==
+                                      option[0].toLowerCase() && (
+                                      <div className="flex items-center gap-1 mt-2">
+                                        <img
+                                          src="/oneInch.svg"
+                                          alt="1inch logo"
+                                          title="1inch"
+                                        />
+                                        {zapError ? (
+                                          <img
+                                            src="/error.svg"
+                                            alt="error img"
+                                            title="error"
+                                          />
+                                        ) : (
+                                          <>
+                                            <div className="flex items-center gap-1">
+                                              <p>
+                                                {Number(token.amountIn).toFixed(
+                                                  6
+                                                )}
+                                              </p>
+                                              <img
+                                                src={
+                                                  getTokenData(option[0])
+                                                    ?.logoURI
+                                                }
+                                                title={
+                                                  getTokenData(option[0])
+                                                    ?.symbol
+                                                }
+                                                alt={
+                                                  getTokenData(option[0])
+                                                    ?.symbol
+                                                }
+                                                className="w-6 h-6 rounded-full"
+                                              />
+                                            </div>
+                                            -&gt;
+                                            <div className="flex items-center gap-1">
+                                              <p>
+                                                {Number(
+                                                  token.amountOut
+                                                ).toFixed(6)}
+                                              </p>
+                                              <img
+                                                src={token.img}
+                                                title={token.symbol}
+                                                alt={token.symbol}
+                                                className="w-6 h-6 rounded-full"
+                                              />
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
                                     )}
                                   </div>
-                                )}
+                                ))}
                               </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                    <div className="mt-5">
+                      <div className="h-[63px]">
+                        <p className="uppercase text-left text-[18px] leading-3 text-[#8D8E96] mb-3">
+                          YOU RECEIVE
+                        </p>
+                        <div className="h-[63px]">
+                          <div className="text-left text-[18px]">
+                            <div className="flex items-center">
+                              <AssetsProportion
+                                proportions={vault.assetsProportions}
+                                assets={vault?.assets}
+                                type="vault"
+                              />
+                              {loader && !transactionInProgress ? (
+                                <ShareSkeleton height={30} width={300} />
+                              ) : (
+                                <div>
+                                  {(underlyingShares &&
+                                    inputs[option[0]]?.amount > 0) ||
+                                  (zapShares &&
+                                    inputs[option[0]]?.amount > 0) ? (
+                                    <p>
+                                      {underlyingShares &&
+                                      inputs[option[0]]?.amount > 0
+                                        ? `${underlyingShares} ($${(
+                                            underlyingShares *
+                                            formatFromBigInt(
+                                              vault.shareprice,
+                                              18,
+                                              "withDecimals"
+                                            )
+                                          ).toFixed(2)})`
+                                        : zapShares &&
+                                          inputs[option[0]]?.amount > 0 &&
+                                          `${zapShares} ($${(
+                                            zapShares *
+                                            formatFromBigInt(
+                                              vault.shareprice,
+                                              18,
+                                              "withDecimals"
+                                            )
+                                          ).toFixed(2)})`}
+                                    </p>
+                                  ) : (
+                                    <p>0 ($0.0)</p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  {chain?.id === 137 ? (
-                    <>
-                      {zapButton === "insufficientBalance" ? (
-                        <button
-                          disabled
-                          className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                        >
-                          INSUFFICIENT BALANCE
-                        </button>
-                      ) : zapButton === "needApprove" ? (
-                        <button
-                          disabled={transactionInProgress}
-                          className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                            transactionInProgress
-                              ? "bg-transparent flex items-center justify-center gap-2"
-                              : "bg-[#486556]"
-                          }`}
-                          type="button"
-                          onClick={zapApprove}
-                        >
-                          <p>
-                            {needConfirm
-                              ? "Confirm in wallet"
-                              : `Approve ${
-                                  underlyingToken?.address === option[0]
-                                    ? underlyingToken.symbol
-                                    : getTokenData(option[0])?.symbol
-                                }`}
-                          </p>
-                          {transactionInProgress && (
-                            <Loader color={"#486556"} />
-                          )}
-                        </button>
-                      ) : zapButton === "deposit" ? (
-                        <button
-                          disabled={transactionInProgress}
-                          className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                            transactionInProgress
-                              ? "bg-transparent flex items-center justify-center gap-2"
-                              : "bg-[#486556]"
-                          }`}
-                          type="button"
-                          onClick={zapDeposit}
-                        >
-                          <p>{needConfirm ? "Confirm in wallet" : "Deposit"}</p>
-                          {transactionInProgress && (
-                            <Loader color={"#486556"} />
-                          )}
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                        >
-                          {loader ? "LOADING..." : "ENTER AMOUNT"}
-                        </button>
-                      )}
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => switchChain({ chainId: 137 })}
-                      className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                      type="button"
-                    >
-                      <p>SWITCH NETWORK</p>
-                    </button>
-                  )}
                 </div>
-              )}
-            </>
-          ) : (
-            <button
-              type="button"
-              className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-              onClick={() => open()}
-            >
-              CONNECT WALLET
-            </button>
-          ))}
+                {$connected ? (
+                  <>
+                    {chain?.id === 137 ? (
+                      <>
+                        {zapButton === "insufficientBalance" ? (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                          >
+                            INSUFFICIENT BALANCE
+                          </button>
+                        ) : zapButton === "needApprove" ? (
+                          <button
+                            disabled={transactionInProgress}
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            type="button"
+                            onClick={zapApprove}
+                          >
+                            <p>
+                              {needConfirm
+                                ? "Confirm in wallet"
+                                : `Approve ${
+                                    underlyingToken?.address === option[0]
+                                      ? underlyingToken.symbol
+                                      : getTokenData(option[0])?.symbol
+                                  }`}
+                            </p>
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : zapButton === "deposit" ? (
+                          <button
+                            disabled={transactionInProgress}
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            type="button"
+                            onClick={zapDeposit}
+                          >
+                            <p>
+                              {needConfirm ? "Confirm in wallet" : "Deposit"}
+                            </p>
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                          >
+                            {loader ? "LOADING..." : "ENTER AMOUNT"}
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => switchChain({ chainId: 137 })}
+                        className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
+                        type="button"
+                      >
+                        <p>SWITCH NETWORK</p>
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                    onClick={() => open()}
+                  >
+                    CONNECT WALLET
+                  </button>
+                )}
+              </div>
+            )}
+          </>
+        )}
 
         {tab === "Withdraw" &&
           ($connected ? (
