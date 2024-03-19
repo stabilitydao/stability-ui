@@ -2,17 +2,7 @@ import { memo, useState, useEffect } from "react";
 
 import { zeroAddress } from "viem";
 
-import { readContract } from "@wagmi/core";
-
-import { useStore } from "@nanostores/react";
-
 import { AssetsProportion } from "@components";
-
-import { decodeHex } from "@utils";
-
-import { platformZAP } from "@store";
-
-import { wagmiConfig, ERC20DQMFABI, ERC20MetadataUpgradeableABI } from "@web3";
 
 import type { TAddress, TVault, TContractInfo } from "@types";
 
@@ -31,7 +21,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   });
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
 
-  const underlyingHandler = async () => {
+  const initUnderlying = async () => {
     const logo =
       vault.strategyInfo.shortName === "DQMF"
         ? "/protocols/DefiEdge.svg"
@@ -40,24 +30,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
         ? "/protocols/Ichi.png"
         : "/protocols/Gamma.png";
 
-    let underlyingSymbol = "";
-
-    if (vault.strategyInfo.shortName === "DQMF") {
-      underlyingSymbol = await readContract(wagmiConfig, {
-        address: vault.underlying,
-        abi: ERC20DQMFABI,
-        functionName: "symbol",
-      });
-      underlyingSymbol = decodeHex(underlyingSymbol);
-    } else {
-      underlyingSymbol = await readContract(wagmiConfig, {
-        address: vault.underlying,
-        abi: ERC20MetadataUpgradeableABI,
-        functionName: "symbol",
-      });
-    }
-
-    setUnderlyingToken({ symbol: underlyingSymbol, logo: logo });
+    setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
   };
 
   const copyHandler = async (address: TAddress) => {
@@ -90,7 +63,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     if (vault.underlying != zeroAddress) {
-      underlyingHandler();
+      initUnderlying();
     }
   }, [vault]);
 

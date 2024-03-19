@@ -150,6 +150,7 @@ type TVault = {
   status: number;
   version: string;
   strategyVersion: string;
+  underlyingSymbol: string;
   NFTtokenID: string;
   gasReserve: string;
   rebalances: any;
