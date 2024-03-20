@@ -1,6 +1,6 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { createWalletClient, custom } from "viem";
+import { createWalletClient, http } from "viem";
 
 import { polygon } from "wagmi/chains";
 
@@ -37,10 +37,9 @@ const wagmiConfig = defaultWagmiConfig({
   projectId: walletConnectProjectId,
   metadata,
 });
-
 const walletClient = createWalletClient({
   chain: polygon,
-  transport: custom(window?.ethereum!),
+  transport: http(),
 });
 
 export {

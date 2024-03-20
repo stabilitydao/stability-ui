@@ -273,6 +273,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           status: Number(vault.vaultStatus),
           version: vault.version,
           strategyVersion: strategyEntity.version,
+          underlyingSymbol: strategyEntity.underlyingSymbol,
           NFTtokenID: vault.NFTtokenID,
           gasReserve: vault.gasReserve,
           rebalances,

@@ -285,6 +285,7 @@ const GRAPH_QUERY = `
           strategyId
           version
           pool
+          underlyingSymbol
           id
         }
         strategyConfigEntities {

@@ -53,7 +53,6 @@ const Toast = () => {
         initialTx.status === "success"
           ? setColor("#9FC6A7")
           : setColor("#B34D61");
-
         const array = Object.entries(
           initialTx.tokens as Record<
             string,

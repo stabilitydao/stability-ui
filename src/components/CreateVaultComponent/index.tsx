@@ -13,6 +13,8 @@ import {
   connected,
 } from "@store";
 
+import { getTokenData } from "@utils";
+
 import { WagmiLayout } from "@layouts";
 
 import { BuildForm } from "./BuildForm";
@@ -23,7 +25,6 @@ import type {
   TBuildVariant,
   TAddress,
 } from "@types";
-import { getTokenData } from "@utils";
 
 const CreateVaultComponent = () => {
   const $publicClient = useStore(publicClient);
