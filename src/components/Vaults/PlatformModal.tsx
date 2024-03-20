@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import packageData from "../../../package.json";
+import packageJson from "../../../package.json";
 
 import { platformVersion } from "@store";
 
@@ -108,7 +108,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
             </div>
             <div className="flex flex-col">
               <span className="text-[#848E9C]">User Interface</span>
-              <span>stability-ui v{packageData.version}</span>
+              <span>stability-ui v{packageJson.version}</span>
             </div>
           </div>
         </div>

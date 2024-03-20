@@ -3,7 +3,7 @@ import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import packageData from "../../../package.json";
+import packageJson from "../../../package.json";
 
 import { PlatformModal } from "./PlatformModal";
 
@@ -228,7 +228,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[#848E9C]">User Interface</span>
-                        <span>stability-ui v{packageData.version}</span>
+                        <span>stability-ui v{packageJson.version}</span>
                       </div>
                     </div>
                   </div>
