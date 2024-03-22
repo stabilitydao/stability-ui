@@ -3,6 +3,7 @@ import { Vault } from "./Vault";
 import { Vaults } from "./Vaults";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { PriceWidget } from "./PriceWidget";
 
 import {
   AssetsProportion,
@@ -42,4 +43,5 @@ export {
   HideFeesHandler,
   APRtimeSwitcher,
   FeeAPRModal,
+  PriceWidget,
 };
