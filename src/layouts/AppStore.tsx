@@ -242,6 +242,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
               }
             : { latest: "-", daily: "-", weekly: "-" };
+
         const farmAPR = {
           latest: String(Number(formatUnits(BigInt(vault.apr), 3)).toFixed(2)),
           daily: aprData?.APR24H ? String(dailyFarmApr) : "-",

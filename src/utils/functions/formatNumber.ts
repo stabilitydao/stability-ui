@@ -36,6 +36,12 @@ export const formatNumber = (value: string | number, type: string) => {
       }
       changedValue = "$" + rounded;
       break;
+    case "formatWithoutDecimalPart":
+      value = String(value);
+
+      changedValue = value.split(".")[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+      break;
     case "format":
       value = String(value);
 
