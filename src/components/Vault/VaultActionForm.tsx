@@ -1466,14 +1466,20 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         console.error("WITHDRAW ERROR:", err);
       }
     } else {
-      const optionAmount = Number(inputs[option[0]]?.amount);
+      const optionAmount = zapPreviewWithdraw.reduce(
+        (acc, obj) => (acc += Number(obj.amountOut)),
+        0
+      );
+
       const calculatedValue =
         optionAmount -
         (optionAmount * Math.floor(Number(settings.slippage))) / 100;
+
       const minAmountOut = parseUnits(
         String(calculatedValue),
         getTokenData(option[0])?.decimals as number
       );
+
       const router =
         zapPreviewWithdraw[0]?.router || zapPreviewWithdraw[1]?.router;
 

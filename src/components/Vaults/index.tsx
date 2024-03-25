@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
+import { formatUnits } from "viem";
+
 import { useStore } from "@nanostores/react";
 
 import { APRModal } from "./APRModal";
@@ -25,15 +27,24 @@ import {
   error,
   aprFilter,
   connected,
+  assetsPrices,
 } from "@store";
 
-import { formatNumber, getStrategyShortName, formatFromBigInt } from "@utils";
+import {
+  formatNumber,
+  getStrategyShortName,
+  formatFromBigInt,
+  getTokenData,
+} from "@utils";
 
 import {
   TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
+  WBTC,
+  WETH,
+  WMATIC,
 } from "@constants";
 import type {
   TVault,
@@ -41,6 +52,11 @@ import type {
   TTableFilters,
   TTAbleFiltersVariant,
 } from "@types";
+
+type TToken = {
+  logo: string;
+  price: string;
+};
 
 const Vaults = () => {
   const { open } = useWeb3Modal();
@@ -51,6 +67,9 @@ const Vaults = () => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
+  const $assetsPrices = useStore(assetsPrices);
+
+  const [tokens, setTokens] = useState<TToken[]>([]);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
@@ -81,6 +100,7 @@ const Vaults = () => {
   const toVault = (address: string) => {
     window.location.href = `/vault/${address}`;
   };
+
   const compareHandler = (
     a: any,
     b: any,
@@ -258,6 +278,7 @@ const Vaults = () => {
     );
     setURLFilters(newFilters);
   };
+
   const initVaults = async () => {
     if ($vaults) {
       const vaults: TVault[] = Object.values($vaults);
@@ -270,6 +291,35 @@ const Vaults = () => {
       setIsLocalVaultsLoaded(true);
     }
   };
+
+  // useEffect(() => {
+  //   if ($assetsPrices) {
+  //     const BTC_LOGO = getTokenData(WBTC[0])?.logoURI as string;
+  //     const ETH_LOGO = getTokenData(WETH[0])?.logoURI as string;
+  //     const MATIC_LOGO = getTokenData(WMATIC[0])?.logoURI as string;
+
+  //     const BTC_PRICE = formatNumber(
+  //       formatUnits($assetsPrices[WBTC[0]], 18),
+  //       "formatWithoutDecimalPart"
+  //     ) as string;
+
+  //     const ETH_PRICE = formatNumber(
+  //       formatUnits($assetsPrices[WETH[0]], 18),
+  //       "formatWithoutDecimalPart"
+  //     ) as string;
+
+  //     const MATIC_PRICE = formatNumber(
+  //       formatUnits($assetsPrices[WMATIC[0]], 18),
+  //       "format"
+  //     ) as string;
+
+  //     setTokens([
+  //       { logo: BTC_LOGO, price: BTC_PRICE },
+  //       { logo: ETH_LOGO, price: ETH_PRICE },
+  //       { logo: MATIC_LOGO, price: MATIC_PRICE },
+  //     ]);
+  //   }
+  // }, [$assetsPrices]);
 
   useEffect(() => {
     tableHandler();
@@ -295,6 +345,19 @@ const Vaults = () => {
     <>
       <ErrorMessage type="WEB3" />
       <Portfolio vaults={localVaults} />
+      {/* <div className="flex items-center gap-5 p-2 flex-wrap">
+        {!!tokens &&
+          tokens.map((token) => (
+            <div key={token.logo} className="flex items-center gap-2">
+              <img
+                src={token.logo}
+                alt="logo"
+                className="w-6 h-6 rounded-full"
+              />
+              <p className="text-[#848e9c] text-[18px]">${token.price}</p>
+            </div>
+          ))}
+      </div> */}
       <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input
           type="text"
@@ -522,7 +585,8 @@ const Vaults = () => {
                               </p>
                             </div>
 
-                            {!!vault?.earningData?.poolSwapFeesAPR && (
+                            {vault?.earningData?.poolSwapFeesAPR.daily !=
+                              "-" && (
                               <div className="font-bold flex items-center justify-between">
                                 <p>Pool swap fees APR</p>
                                 <p
