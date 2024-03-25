@@ -152,7 +152,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
                 %
               </p>
             </div>
-            {!!state.earningData.poolSwapFeesAPR && (
+            {state.earningData.poolSwapFeesAPR.daily != "-" && (
               <div className="flex items-center justify-between mb-1">
                 <p>Pool swap fees APR</p>
                 <p className={`${$hideFeeAPR && "line-through"} text-end`}>

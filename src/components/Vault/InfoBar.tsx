@@ -118,7 +118,6 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
       setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
-
   return (
     <div className="bg-button rounded-md">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">

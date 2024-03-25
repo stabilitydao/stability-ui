@@ -585,7 +585,8 @@ const Vaults = () => {
                               </p>
                             </div>
 
-                            {!!vault?.earningData?.poolSwapFeesAPR && (
+                            {vault?.earningData?.poolSwapFeesAPR.daily !=
+                              "-" && (
                               <div className="font-bold flex items-center justify-between">
                                 <p>Pool swap fees APR</p>
                                 <p
