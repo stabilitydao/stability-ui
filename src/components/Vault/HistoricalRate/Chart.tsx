@@ -104,10 +104,10 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
         <defs>
           <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
             <stop offset={0} stopColor="#1A2A84" stopOpacity={1} />
-            <stop offset={1} stopColor="#6873B5" stopOpacity={0} />
+            <stop offset={1} stopColor="#0c0c1b" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="1 1" />
+        <CartesianGrid strokeDasharray="1 1" stroke="#434395" />
         <XAxis
           dataKey="timestamp"
           tickLine={false}
@@ -143,7 +143,8 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
         <Area
           type="monotone"
           dataKey={chart.name}
-          stroke="#0C2EEF"
+          stroke="#3047ff"
+          strokeWidth="2"
           fill="url(#colorUv)"
           points={chart.data.map((entry) => ({
             x: entry.x,

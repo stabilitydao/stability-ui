@@ -155,16 +155,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               <td>
                 <div className="flex flex-col items-start">
                   <span
-                    style={
-                      type === "Strategy"
-                        ? { color: vault.strategyInfo.color }
-                        : {}
-                    }
-                    className={
-                      type === "Strategy"
-                        ? "inline-flex text-[14px] sm:text-[18px] font-bold whitespace-nowrap"
-                        : "text-[14px] sm:text-[18px]"
-                    }
+                    className="text-[14px] sm:text-[18px]"
                   >
                     {symbol}
                   </span>

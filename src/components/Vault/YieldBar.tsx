@@ -26,25 +26,25 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[14px] min-[450px]:text-[16px] md:text-[14px] lg:text-[20px]">
               <tr className="hover:bg-[#2B3139]">
                 <td>Total APY</td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apy?.withFees?.latest}%
                 </td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apy?.withFees?.daily}%
                 </td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apy?.withFees?.weekly}%
                 </td>
               </tr>
               <tr className="hover:bg-[#2B3139]">
                 <td>Total APR</td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apr?.withFees?.latest}%
                 </td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apr?.withFees?.daily}%
                 </td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.apr?.withFees?.weekly}%
                 </td>
               </tr>
@@ -52,13 +52,13 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 <tr className="hover:bg-[#2B3139]">
                   <td>Pool swap fees APR</td>
 
-                  <td className="text-right">
+                  <td className="text-right py-1">
                     {vault?.earningData?.poolSwapFeesAPR?.latest}%
                   </td>
-                  <td className="text-right">
+                  <td className="text-right py-1">
                     {vault?.earningData?.poolSwapFeesAPR?.daily}%
                   </td>
-                  <td className="text-right">
+                  <td className="text-right py-1">
                     {vault?.earningData?.poolSwapFeesAPR?.weekly}%
                   </td>
                 </tr>
@@ -69,14 +69,14 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 ) : (
                   <td>Farm APR</td>
                 )}
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.farmAPR?.latest}%
                 </td>
 
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.farmAPR?.daily}%
                 </td>
-                <td className="text-right">
+                <td className="text-right py-1">
                   {vault?.earningData?.farmAPR?.weekly}%
                 </td>
               </tr>

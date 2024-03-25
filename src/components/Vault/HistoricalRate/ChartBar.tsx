@@ -81,7 +81,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
         data={chart.data}
         margin={{ left: 50 }}
       >
-        <CartesianGrid strokeDasharray="1 1" />
+        <CartesianGrid strokeDasharray="1 1" stroke="#434395" />
         <XAxis
           dataKey="timestamp"
           tickLine={false}
@@ -103,7 +103,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
         <Tooltip content={<CustomTooltip APRType={APRType} />} />
         <Bar dataKey={chart.name}>
           {chart.data.map((_: any, index: number) => (
-            <Cell cursor="pointer" fill="#7746FC" key={`cell-${index}`} />
+            <Cell cursor="pointer" fill="#4626bc" key={`cell-${index}`} />
           ))}
         </Bar>
       </BarChart>
