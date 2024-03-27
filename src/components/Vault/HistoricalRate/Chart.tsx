@@ -87,8 +87,10 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
       let max: number = Math.max(
         ...chart.data.map((item: any) => item[chart.name])
       );
-      min = Number((min - min / 10).toFixed(4));
-      max = Number((max + max / 10).toFixed(4));
+      let difference = (max - min) / 10;
+      min = Number((min - difference).toFixed(4));
+      max = Number((max + difference).toFixed(4));
+      if (min < 0) min = 0;
       setMinValue(min);
       setMaxValue(max);
     }
@@ -122,13 +124,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
               : [minValue, "auto"]
           }
           tickFormatter={(value) =>
-            value === 0
-              ? ""
-              : chart.name === "APR"
-              ? `${value}%`
-              : chart.name === "TVL"
-              ? `${formatNumber(value, "abbreviateInteger")}`
-              : `$${value.toFixed(1)}`
+            value === 0 ? "" : `${formatNumber(value, "chartAbbreviate")}`
           }
           width={10}
           tickLine={false}

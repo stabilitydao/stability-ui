@@ -36,6 +36,36 @@ export const formatNumber = (value: string | number, type: string) => {
       }
       changedValue = "$" + rounded;
       break;
+    case "chartAbbreviate":
+      value = Number(value);
+      if (value <= 0) return 0;
+
+      let newValue;
+
+      if (value >= 1000) {
+        while (value >= 1000) {
+          value /= 1000;
+          suffixNum++;
+        }
+        newValue = value.toFixed();
+      } else {
+        if (value < 10) {
+          newValue = value.toFixed(2);
+        } else if (value < 50) {
+          newValue = value.toFixed(1);
+        } else if (value > 100) {
+          newValue = Math.floor(value / 10) * 10;
+        } else {
+          newValue = value.toFixed();
+        }
+      }
+
+      if (suffixNum > 0) {
+        newValue += suffixes[suffixNum];
+      }
+
+      changedValue = "$" + newValue;
+      break;
     case "formatWithoutDecimalPart":
       value = String(value);
 
