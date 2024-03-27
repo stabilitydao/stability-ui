@@ -87,10 +87,14 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
       let max: number = Math.max(
         ...chart.data.map((item: any) => item[chart.name])
       );
+
       let difference = (max - min) / 10;
+
       min = Number((min - difference).toFixed(4));
       max = Number((max + difference).toFixed(4));
+
       if (min < 0) min = 0;
+
       setMinValue(min);
       setMaxValue(max);
     }
