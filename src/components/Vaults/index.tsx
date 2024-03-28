@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import { formatUnits } from "viem";
+// import { formatUnits } from "viem";
 
 import { useStore } from "@nanostores/react";
 
@@ -27,14 +27,14 @@ import {
   error,
   aprFilter,
   connected,
-  assetsPrices,
+  // assetsPrices,
 } from "@store";
 
 import {
   formatNumber,
   getStrategyShortName,
   formatFromBigInt,
-  getTokenData,
+  // getTokenData,
 } from "@utils";
 
 import {
@@ -42,9 +42,9 @@ import {
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
-  WBTC,
-  WETH,
-  WMATIC,
+  // WBTC,
+  // WETH,
+  // WMATIC,
 } from "@constants";
 import type {
   TVault,
@@ -67,9 +67,9 @@ const Vaults = () => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
-  const $assetsPrices = useStore(assetsPrices);
+  // const $assetsPrices = useStore(assetsPrices);
 
-  const [tokens, setTokens] = useState<TToken[]>([]);
+  // const [tokens, setTokens] = useState<TToken[]>([]);
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
@@ -645,18 +645,10 @@ const Vaults = () => {
                       </span>
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
-                      $
-                      {formatFromBigInt(
-                        vault.shareprice,
-                        18,
-                        "withDecimals"
-                      ).toFixed(3)}
+                      ${Number(vault.shareprice).toFixed(2)}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
-                      {formatNumber(
-                        formatFromBigInt(vault.tvl, 18, "withFloor"),
-                        "abbreviate"
-                      )}
+                      {formatNumber(vault.tvl, "abbreviate")}
                     </td>
                     <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
                       {formatNumber(

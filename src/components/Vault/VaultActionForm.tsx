@@ -2334,12 +2334,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             {(
                               Number(
                                 formatUnits(BigInt(sharesOut) * BigInt(100), 18)
-                              ) *
-                              formatFromBigInt(
-                                vault.shareprice,
-                                18,
-                                "withDecimals"
-                              )
+                              ) * Number(vault.shareprice)
                             ).toFixed(2)}
                             )
                           </div>
@@ -2648,21 +2643,12 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                       inputs[option[0]]?.amount > 0
                                         ? `${underlyingShares} ($${(
                                             underlyingShares *
-                                            formatFromBigInt(
-                                              vault.shareprice,
-                                              18,
-                                              "withDecimals"
-                                            )
+                                            Number(vault.shareprice)
                                           ).toFixed(2)})`
                                         : zapShares &&
                                           inputs[option[0]]?.amount > 0 &&
                                           `${zapShares} ($${(
-                                            zapShares *
-                                            formatFromBigInt(
-                                              vault.shareprice,
-                                              18,
-                                              "withDecimals"
-                                            )
+                                            zapShares * Number(vault.shareprice)
                                           ).toFixed(2)})`}
                                     </p>
                                   ) : (
@@ -2846,11 +2832,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     $
                     {$assetsPrices && inputs[option[0]]?.amount > 0
                       ? (
-                          formatFromBigInt(
-                            vault.shareprice,
-                            18,
-                            "withDecimals"
-                          ) * inputs[option[0]]?.amount
+                          Number(vault.shareprice) * inputs[option[0]]?.amount
                         ).toFixed(2)
                       : 0}
                   </p>

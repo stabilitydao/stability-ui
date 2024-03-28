@@ -56,9 +56,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const initPortfolio = () => {
     if (!$connected) {
       const totalTvl = vaults.reduce((accumulator, v) => {
-        return (
-          accumulator + (v.tvl ? formatFromBigInt(v.tvl, 18, "withFloor") : 0)
-        );
+        return accumulator + (v.tvl ? Number(v.tvl) : 0);
       }, 0);
       setPortfolio({
         deposited: "0",
@@ -98,7 +96,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         }
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
-        let vaultSharePrice = Number(formatUnits(BigInt(v.shareprice), 18));
+        let vaultSharePrice = Number(v.shareprice);
         apr = Number(apr);
         const balance = vaultBalance * vaultSharePrice;
         deposited += balance;
@@ -106,7 +104,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
       }
 
       if (v.tvl) {
-        tvl += formatFromBigInt(v.tvl, 18, "withFloor");
+        tvl += Number(v.tvl);
       }
     });
     const dailySum = monthly / 30;

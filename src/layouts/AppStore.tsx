@@ -107,6 +107,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           stabilityAPIData?.underlyings?.["137"]?.[
             vault.underlying.toLowerCase()
           ];
+
+        const APIVault =
+          stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
@@ -257,8 +261,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           assetsPricesOnCreation: vault.AssetsPricesOnCreation,
           type: vault.vaultType,
           strategy: vault.strategyId,
-          shareprice: vault.sharePrice,
-          tvl: vault.tvl,
+          shareprice: APIVault.sharePrice,
+          tvl: APIVault.tvl,
           strategySpecific: vault.strategySpecific,
           balance: "",
           lastHardWork: vault.lastHardWork,
@@ -408,8 +412,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 [vault.toLowerCase()]: {
                   ...localVaults[vault.toLowerCase()],
                   balance: contractBalance[5][index],
-                  shareprice: String(contractVaults[5][index]),
-                  tvl: String(contractVaults[6][index]),
                 },
               };
             })

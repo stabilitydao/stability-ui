@@ -233,8 +233,6 @@ const GRAPH_QUERY = `
         vaultEntities {
           id
           apr
-          tvl
-          sharePrice
           assetsProportions
           strategy
           strategyId

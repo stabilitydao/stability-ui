@@ -110,8 +110,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
 
       const USDBalance = Number(
         (
-          formatFromBigInt(vault.shareprice, 18, "withDecimals") *
-          Number(formatUnits(vaultBalance, 18))
+          Number(vault.shareprice) * Number(formatUnits(vaultBalance, 18))
         ).toFixed(2)
       );
 
@@ -147,10 +146,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 TVL
               </p>
               <p className="text-[16px] whitespace-nowrap">
-                {formatNumber(
-                  formatFromBigInt(vault.tvl, 18, "withFloor"),
-                  "abbreviate"
-                )}
+                {formatNumber(vault.tvl, "abbreviate")}
               </p>
             </div>
             <div className="hidden lg:block">
@@ -176,7 +172,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 SHARE PRICE
               </p>
               <p className="text-[16px] whitespace-nowrap">
-                ${formatFromBigInt(vault.shareprice, 18, "withDecimals")}
+                ${Number(vault.shareprice).toFixed(5)}
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
