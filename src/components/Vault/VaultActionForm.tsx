@@ -201,6 +201,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             input.findIndex((amount) => amount) > 0
               ? input.findIndex((amount) => amount)
               : 0;
+
           setIsApprove(apprDepo[index]);
         } else {
           setIsApprove(apprDepo[apprDepo.length - 1]);
@@ -1757,7 +1758,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
               args: [$assets as TAddress[], amounts],
             });
           } else {
-            // IQMF strategy only
+            // IQMF & IRMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
@@ -2371,7 +2372,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             {option.map(
                               (asset: any, index: number) =>
                                 allowance &&
-                                allowance[asset]?.allowance[0] &&
                                 formatUnits(
                                   allowance[asset]?.allowance[0],
                                   Number(getTokenData(asset)?.decimals)

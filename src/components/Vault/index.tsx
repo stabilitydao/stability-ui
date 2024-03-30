@@ -10,6 +10,8 @@ import { HistoricalRate } from "./HistoricalRate";
 import { VaultInfo } from "./VaultInfo";
 import { Contracts } from "./Contracts";
 import { YieldBar } from "./YieldBar";
+import { LiquidityPool } from "./LiquidityPool";
+import { UnderlyingALM } from "./UnderlyingALM";
 
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
@@ -43,7 +45,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </div>
     );
   }
-
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">
@@ -79,6 +80,17 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <Strategy vault={localVault} />
           </div>
         </div>
+
+        {/* {localVault.assets.length > 1 && (
+          <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
+            <div className="w-full lg:w-1/2">
+              <LiquidityPool vault={localVault} />
+            </div>
+            <div className="w-full lg:w-1/2">
+              <UnderlyingALM vault={localVault} />
+            </div>
+          </div>
+        )} */}
 
         <Assets
           assets={localVault?.assets}
