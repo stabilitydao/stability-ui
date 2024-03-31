@@ -430,6 +430,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       }
       isWeb3Load.set(false);
     } else {
+      isWeb3Load.set(false);
       // before backend
       const randomAddress: TAddress =
         "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
