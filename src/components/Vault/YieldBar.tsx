@@ -1,4 +1,10 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
+import { useStore } from "@nanostores/react";
+import { formatUnits } from "viem";
+
+import { assetsPrices, connected } from "@store";
+
+import { getTimeDifference } from "@utils";
 
 import type { TVault } from "@types";
 
@@ -6,7 +12,51 @@ interface IProps {
   vault: TVault;
 }
 
+interface IvsAPR {
+  symbol: string;
+  latestAPR: string;
+  APR: string;
+}
+
 const YieldBar: React.FC<IProps> = memo(({ vault }) => {
+  const $assetsPrices = useStore(assetsPrices);
+  const $connected = useStore(connected);
+
+  const [vaultVsAPR, setVaultVsAPR] = useState<IvsAPR[]>([]);
+
+  const getHoldData = async () => {
+    if (!$assetsPrices) return;
+    const tokensHold = vault.assets.map((asset, index) => {
+      const sharePriceOnCreation = 1;
+      const sharePrice = Number(vault.shareprice);
+
+      const price = Number(formatUnits($assetsPrices[asset.address], 18));
+      const priceOnCreation = Number(
+        formatUnits(BigInt(vault.assetsPricesOnCreation[index]), 18)
+      );
+
+      const difference = getTimeDifference(vault.created).days;
+
+      const assetsDifference =
+        ((price - priceOnCreation) / priceOnCreation) * 100;
+      const sharePriceDifference = (sharePrice - sharePriceOnCreation) * 100;
+
+      const percentDiff = assetsDifference + sharePriceDifference;
+      const yearPercentDiff = (percentDiff / difference) * 365;
+
+      return {
+        symbol: asset.symbol,
+        latestAPR: percentDiff.toFixed(2),
+        APR: yearPercentDiff.toFixed(2),
+      };
+    });
+
+    setVaultVsAPR(tokensHold);
+  };
+
+  useEffect(() => {
+    getHoldData();
+  }, [$connected, $assetsPrices]);
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -83,6 +133,31 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             </tbody>
           </table>
         )}
+        {!!vaultVsAPR &&
+          vaultVsAPR.map((aprsData: IvsAPR) => (
+            <div key={aprsData.latestAPR} className="mt-5">
+              <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                VAULT VS {aprsData?.symbol} HOLD / APR
+              </p>
+              <div
+                className={`text-[16px] flex gap-1 mt-1 ${
+                  Number(aprsData.latestAPR) > 0
+                    ? "text-[#b0ddb8]"
+                    : "text-[#eb7979]"
+                }`}
+              >
+                <span>
+                  {Number(aprsData.latestAPR) > 0 ? "+" : "-"}
+                  {aprsData.latestAPR}%
+                </span>{" "}
+                /
+                <span>
+                  {Number(aprsData.APR) > 0 ? "+" : "-"}
+                  {aprsData.APR}%
+                </span>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );

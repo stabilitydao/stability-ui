@@ -127,6 +127,7 @@ const Assets: React.FC<IProps> = memo(
     useEffect(() => {
       getInvestedData();
     }, [$connected, $assetsPrices]);
+
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
