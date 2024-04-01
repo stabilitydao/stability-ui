@@ -147,12 +147,12 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 }`}
               >
                 <span>
-                  {Number(aprsData.latestAPR) > 0 ? "+" : "-"}
+                  {Number(aprsData.latestAPR) > 0 ? "+" : ""}
                   {aprsData.latestAPR}%
                 </span>{" "}
                 /
                 <span>
-                  {Number(aprsData.APR) > 0 ? "+" : "-"}
+                  {Number(aprsData.APR) > 0 ? "+" : ""}
                   {aprsData.APR}%
                 </span>
               </div>
