@@ -53,10 +53,10 @@ import type {
   TTAbleFiltersVariant,
 } from "@types";
 
-type TToken = {
-  logo: string;
-  price: string;
-};
+// type TToken = {
+//   logo: string;
+//   price: string;
+// };
 
 const Vaults = () => {
   const { open } = useWeb3Modal();

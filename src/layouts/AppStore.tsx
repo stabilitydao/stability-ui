@@ -101,8 +101,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
-        const strategyInfo = getStrategyInfo(vault.symbol);
-        const strategyName = strategyInfo?.shortName;
         const APIData =
           stabilityAPIData?.underlyings?.["137"]?.[
             vault.underlying.toLowerCase()
@@ -110,6 +108,9 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const APIVault =
           stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+        const strategyInfo = getStrategyInfo(APIVault.symbol);
+
+        const strategyName = strategyInfo?.shortName;
 
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
@@ -160,7 +161,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               Math.round(Number(formatUnits(proportion, 16)))
             )
           : [];
-
         const assetsPromise = Promise.all(
           vault.strategyAssets.map(async (strategyAsset: any) => {
             const token = getTokenData(strategyAsset);
@@ -182,7 +182,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         const assets = await assetsPromise;
         /////
         const aprData = vault.vaultHistoryEntity[0];
-
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 

@@ -11,6 +11,7 @@ import { ErrorMessage } from "./ErrorMessage";
 import { HideFeesHandler } from "./HideFeesHandler";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
 import { FeeAPRModal } from "./FeeAPRModal";
+import { HoldModal } from "./HoldModal";
 
 export {
   AssetsProportion,
@@ -26,4 +27,5 @@ export {
   APRtimeSwitcher,
   FeeAPRModal,
   ChartSkeleton,
+  HoldModal,
 };
