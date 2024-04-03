@@ -15,7 +15,6 @@ import { getTokenData, getDate, formatNumber } from "@utils";
 import { TOKENS_ASSETS } from "@constants";
 
 import type { TAddress, TAsset, TToken, TPieChartData } from "@types";
-import { useErc20Balance } from "./useErc20Balance";
 
 interface IProps {
   assets: TAsset[];
@@ -76,13 +75,6 @@ const Assets: React.FC<IProps> = memo(
       BigInt(price)
     );
 
-    const account = false;
-    const tokenAddress = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
-    const bal = useErc20Balance({
-      account,
-      tokenAddress,
-    });
-
     const [investedData, setInvestedData] = useState<any>(false);
 
     const getInvestedData = async () => {
@@ -132,10 +124,6 @@ const Assets: React.FC<IProps> = memo(
       setInvestedData(investedAssets);
     };
 
-    const balance = async () => {
-      console.log(bal);
-    };
-
     useEffect(() => {
       getInvestedData();
     }, [$connected, $assetsPrices]);
@@ -145,7 +133,6 @@ const Assets: React.FC<IProps> = memo(
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
           Assets
         </h2>
-        <div onClick={balance}>123</div>
         <div className="flex justify-center items-center gap-5 mb-5">
           {investedData && <Chart data={investedData} />}
 
