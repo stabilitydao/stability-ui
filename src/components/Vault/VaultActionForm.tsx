@@ -522,10 +522,11 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
           const allowanceData = await getZapAllowance(asset);
 
-          if (tab === "Withdraw" && option.length === 1) {
+          if (tab === "Withdraw") {
             if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
               setZapButton("needApprove");
             }
+            previewWithdraw(amount);
           }
           if (tab === "Deposit") {
             if (
@@ -965,7 +966,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           setZapButton("deposit");
         }
       }
-
       setLoader(false);
     } catch (error) {
       setLoader(false);
@@ -1634,7 +1634,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           args: [assets, currentValue, assetsLength],
           account: $account as TAddress,
         });
-
         if (
           (defaultOptionAssets === option[0] && option.length < 2) ||
           option.length > 1

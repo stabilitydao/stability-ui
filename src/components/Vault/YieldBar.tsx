@@ -233,7 +233,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
                 height="18"
-                viewBox="0 0 16 16"
+                viewBox="0 0 18 18"
                 fill="none"
                 className="ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms] tooltip"
                 onClick={(e) => {
