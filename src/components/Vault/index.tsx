@@ -81,7 +81,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           </div>
         </div>
 
-        {/* {localVault.assets.length > 1 && (
+        {localVault.assets.length > 1 && (
           <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
             <div className="w-full lg:w-1/2">
               <LiquidityPool vault={localVault} />
@@ -90,7 +90,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
               <UnderlyingALM vault={localVault} />
             </div>
           </div>
-        )} */}
+        )}
 
         <Assets
           assets={localVault?.assets}

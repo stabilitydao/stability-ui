@@ -288,6 +288,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             farmAPR,
           },
           strategyPool: strategyEntity.pool,
+          pool: APIVault.pool,
         };
 
         return vaults;

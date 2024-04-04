@@ -125,6 +125,17 @@ type TAsset = {
   symbol: string;
 };
 
+type TPool = {
+  address: TAddress;
+  ammAlgoName: string;
+  ammName: string;
+  amountToken0: number;
+  amountToken1: number;
+  fee: number;
+  tick: number;
+  tvl: number;
+};
+
 type TVault = {
   address: TAddress;
   name: string;
@@ -156,6 +167,7 @@ type TVault = {
   rebalances: any;
   earningData: TEarningData | any;
   strategyPool: TAddress;
+  pool: TPool;
 };
 
 type TTableColumn = {

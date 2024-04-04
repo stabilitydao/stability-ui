@@ -56,7 +56,7 @@ const HoldTable = ({
         )}
         {!!holdData &&
           holdData.map((aprsData) => (
-            <tr key={aprsData.price} className="hover:bg-[#2B3139]">
+            <tr key={aprsData.symbol} className="hover:bg-[#2B3139]">
               <td>{aprsData.symbol}</td>
               <td className="text-right py-1">{aprsData.initPrice}</td>
               <td className="text-right py-1">{aprsData.price}</td>
