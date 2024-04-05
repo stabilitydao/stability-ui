@@ -1,13 +1,13 @@
 import { memo, useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
+import { formatUnits } from "viem";
 
 import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
 
 import type { TVault } from "@types";
-import { formatUnits } from "viem";
 
 interface IProps {
   vault: TVault;
@@ -60,7 +60,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
   }, [vault]);
 
   return (
-    <div>
+    <>
       <div className="flex justify-between items-center h-[60px]">
         <h2 className="text-[28px] text-start ml-4">Liquidity pool</h2>
       </div>
@@ -108,7 +108,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });
 

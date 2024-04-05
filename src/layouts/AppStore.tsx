@@ -108,6 +108,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const APIVault =
           stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+
         const strategyInfo = getStrategyInfo(APIVault.symbol);
 
         const strategyName = strategyInfo?.shortName;
@@ -287,8 +288,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             poolSwapFeesAPR,
             farmAPR,
           },
-          strategyPool: strategyEntity.pool,
           pool: APIVault.pool,
+          alm: APIVault.alm,
         };
 
         return vaults;
