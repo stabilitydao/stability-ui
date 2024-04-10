@@ -1,11 +1,16 @@
 import { memo, useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
+
 import { formatUnits } from "viem";
+
+import { readContract } from "@wagmi/core";
 
 import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
+
+import { wagmiConfig, defiedgeFactory } from "@web3";
 
 import type { TVault } from "@types";
 
@@ -23,8 +28,69 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
+  const [almFee, setAlmFee] = useState<string>("");
+
+  const getAlmFee = async () => {
+    let fee = "";
+    if (vault.alm.protocol === "Gamma") {
+      const contractFee = await readContract(wagmiConfig, {
+        address: vault.underlying,
+        abi: [
+          {
+            inputs: [],
+            name: "fee",
+            outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+            stateMutability: "view",
+            type: "function",
+          },
+        ],
+        functionName: "fee",
+      });
+
+      if (contractFee) {
+        fee = `${100 / contractFee}%`;
+      }
+    } else if (vault.alm.protocol === "DefiEdge") {
+      const contractFee = await readContract(wagmiConfig, {
+        address: defiedgeFactory,
+        abi: [
+          {
+            inputs: [],
+            name: "maximumManagerPerformanceFeeRate",
+            outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+            stateMutability: "view",
+            type: "function",
+          },
+        ],
+        functionName: "maximumManagerPerformanceFeeRate",
+      });
+      const poolFee = await readContract(wagmiConfig, {
+        address: defiedgeFactory,
+        abi: [
+          {
+            inputs: [
+              { internalType: "address", name: "pool", type: "address" },
+              { internalType: "address", name: "strategy", type: "address" },
+            ],
+            name: "getProtocolPerformanceFeeRate",
+            outputs: [
+              { internalType: "uint256", name: "_feeRate", type: "uint256" },
+            ],
+            stateMutability: "view",
+            type: "function",
+          },
+        ],
+        functionName: "getProtocolPerformanceFeeRate",
+        args: [vault.pool.address, vault.strategyAddress],
+      });
+    }
+
+    if (fee) setAlmFee(fee);
+  };
 
   useEffect(() => {
+    getAlmFee();
+    // ASSETS
     if (!$assetsPrices) return;
     const assets = vault.assets.map((asset, index) => {
       const price = Number(formatUnits($assetsPrices[asset.address], 18));
@@ -48,6 +114,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
 
     setAlmAssets(assetsWithPercents);
   }, [vault]);
+
   return (
     <>
       <div className="flex justify-between items-center h-[60px]">
@@ -102,45 +169,38 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
                 </div>
               ))}
           </div>
+          {!!almFee && (
+            <div className="flex flex-col">
+              <span className="text-[14px] text-[#8d8e96]">FEE</span>
+              <span className="text-[16px]">{almFee}</span>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          {!!vault?.alm?.positions &&
-            vault.alm.positions.map((position, index) => (
-              <div
-                key={index}
-                className="flex gap-3 border border-gray-300 rounded-lg  p-2"
-              >
-                <div>
-                  <div className="flex flex-col">
-                    <span className="text-[14px] text-[#8d8e96]">
-                      Upper Tick
-                    </span>
-                    <span className="text-[16px]">{position.upperTick}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[14px] text-[#8d8e96]">
-                      Lower Tick
-                    </span>
-                    <span className="text-[16px]">{position.lowerTick}</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex flex-col">
-                    <span className="text-[14px] text-[#8d8e96]">In Range</span>
-                    <span className="text-[16px]">
-                      {position.inRange ? "Yes" : "No"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[14px] text-[#8d8e96]">TVL</span>
-                    <span className="text-[16px]">
-                      {formatNumber(position.tvl, "abbreviate")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
+        <table className="table table-auto w-full rounded-lg">
+          <thead className="bg-[#0b0e11]">
+            <tr className="text-[16px] text-[#8f8f8f] uppercase">
+              <th>Upper Tick</th>
+              <th>Lower Tick</th>
+              <th>In Range</th>
+              <th>TVL</th>
+            </tr>
+          </thead>
+          <tbody className="text-[16px]">
+            {vault?.alm?.positions &&
+              vault.alm.positions.map((position, index) => (
+                <tr key={position.tvl} className="hover:bg-[#2B3139]">
+                  <td>{position.upperTick}</td>
+                  <td className="text-right py-1">{position.lowerTick}</td>
+                  <td className="text-right py-1">
+                    {position.inRange ? "Yes" : "No"}
+                  </td>
+                  <td className="text-right py-1">
+                    {formatNumber(position.tvl, "abbreviate")}
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

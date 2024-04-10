@@ -6,7 +6,7 @@ import { readContract } from "@wagmi/core";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { assetsPrices, connected } from "@store";
+import { assetsPrices, connected, account } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
@@ -70,6 +70,7 @@ const Assets: React.FC<IProps> = memo(
   ({ assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
+    const $account = useStore(account);
 
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)
@@ -127,7 +128,6 @@ const Assets: React.FC<IProps> = memo(
     useEffect(() => {
       getInvestedData();
     }, [$connected, $assetsPrices]);
-
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
