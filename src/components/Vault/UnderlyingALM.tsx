@@ -10,7 +10,7 @@ import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
 
-import { wagmiConfig, defiedgeFactory } from "@web3";
+import { wagmiConfig, defiedgeFactory, ichiFactory } from "@web3";
 
 import type { TVault } from "@types";
 
@@ -24,74 +24,162 @@ type TAlmAsset = {
   percent: number;
 };
 
+type TAlmTable = {
+  amounts: string[];
+  inRange: string;
+  lowerTick: number;
+  upperTick: number;
+  tvl: string;
+};
+
 const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
   const [almFee, setAlmFee] = useState<string>("");
+  const [defiedgeFee, setDefiedgeFee] = useState<any>();
+  const [tableData, setTableData] = useState<TAlmTable[]>([]);
 
   const getAlmFee = async () => {
     let fee = "";
-    if (vault.alm.protocol === "Gamma") {
-      const contractFee = await readContract(wagmiConfig, {
-        address: vault.underlying,
-        abi: [
-          {
-            inputs: [],
-            name: "fee",
-            outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-            stateMutability: "view",
-            type: "function",
-          },
-        ],
-        functionName: "fee",
-      });
+    switch (vault.alm.protocol) {
+      case "Gamma":
+        const contractFee = await readContract(wagmiConfig, {
+          address: vault.underlying,
+          abi: [
+            {
+              inputs: [],
+              name: "fee",
+              outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
+              stateMutability: "view",
+              type: "function",
+            },
+          ],
+          functionName: "fee",
+        });
 
-      if (contractFee) {
-        fee = `${100 / contractFee}%`;
-      }
-    } else if (vault.alm.protocol === "DefiEdge") {
-      const contractFee = await readContract(wagmiConfig, {
-        address: defiedgeFactory,
-        abi: [
-          {
-            inputs: [],
-            name: "maximumManagerPerformanceFeeRate",
-            outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-            stateMutability: "view",
-            type: "function",
-          },
-        ],
-        functionName: "maximumManagerPerformanceFeeRate",
-      });
-      const poolFee = await readContract(wagmiConfig, {
-        address: defiedgeFactory,
-        abi: [
-          {
-            inputs: [
-              { internalType: "address", name: "pool", type: "address" },
-              { internalType: "address", name: "strategy", type: "address" },
-            ],
-            name: "getProtocolPerformanceFeeRate",
-            outputs: [
-              { internalType: "uint256", name: "_feeRate", type: "uint256" },
-            ],
-            stateMutability: "view",
-            type: "function",
-          },
-        ],
-        functionName: "getProtocolPerformanceFeeRate",
-        args: [vault.pool.address, vault.strategyAddress],
-      });
+        if (contractFee) {
+          fee = `${100 / contractFee}%`;
+        }
+        break;
+      case "DefiEdge":
+        const managerFee = await readContract(wagmiConfig, {
+          address: defiedgeFactory,
+          abi: [
+            {
+              inputs: [],
+              name: "maximumManagerPerformanceFeeRate",
+              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+              stateMutability: "view",
+              type: "function",
+            },
+          ],
+          functionName: "maximumManagerPerformanceFeeRate",
+        });
+        const protocolPerformanceFee = await readContract(wagmiConfig, {
+          address: defiedgeFactory,
+          abi: [
+            {
+              inputs: [
+                { internalType: "address", name: "pool", type: "address" },
+                { internalType: "address", name: "strategy", type: "address" },
+              ],
+              name: "getProtocolPerformanceFeeRate",
+              outputs: [
+                { internalType: "uint256", name: "_feeRate", type: "uint256" },
+              ],
+              stateMutability: "view",
+              type: "function",
+            },
+          ],
+          functionName: "getProtocolPerformanceFeeRate",
+          args: [vault.pool.address, vault.strategyAddress],
+        });
+        const defiedgeFees = `${formatUnits(
+          managerFee + protocolPerformanceFee,
+          8
+        )}%`;
+        setDefiedgeFee({
+          rebalance: defiedgeFees,
+          withdraw: defiedgeFees,
+          deposit: `${formatUnits(protocolPerformanceFee, 8)}%`,
+          poolSwapFee: "0%",
+        });
+        break;
+      case "Ichi":
+        const ammFee = await readContract(wagmiConfig, {
+          address: ichiFactory,
+          abi: [
+            {
+              inputs: [],
+              name: "ammFee",
+              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+              stateMutability: "view",
+              type: "function",
+            },
+          ],
+          functionName: "ammFee",
+        });
+        const baseFee = await readContract(wagmiConfig, {
+          address: ichiFactory,
+          abi: [
+            {
+              inputs: [],
+              name: "baseFee",
+              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+              stateMutability: "view",
+              type: "function",
+            },
+          ],
+          functionName: "baseFee",
+        });
+        fee = `${formatUnits(ammFee + baseFee, 18)}%`;
+        break;
+      default:
+        break;
     }
 
     if (fee) setAlmFee(fee);
+  };
+  const getTableData = async () => {
+    if (!$assetsPrices) return;
+    const prices = vault.assets.map((asset, index) =>
+      Number(formatUnits($assetsPrices[asset.address], 18))
+    );
+
+    const data = vault?.alm?.positions.map((position) => {
+      let amounts: string[] | number[] = prices.map(
+        //@ts-ignore
+        (price, index) => Number(position[`amountToken${index}`]) * price
+      );
+
+      const inRange = position.inRange ? "Yes" : "No";
+
+      const tvl = formatNumber(
+        amounts.reduce((acc, value) => (acc += value), 0),
+        "abbreviate"
+      );
+
+      amounts = amounts.map((amount) =>
+        formatNumber(amount, "abbreviate")
+      ) as string[];
+
+      return {
+        amounts,
+        inRange,
+        lowerTick: position.lowerTick,
+        upperTick: position.upperTick,
+        tvl: tvl as string,
+      };
+    });
+    if (data) setTableData(data);
   };
 
   useEffect(() => {
     getAlmFee();
     // ASSETS
     if (!$assetsPrices) return;
+    getTableData();
     const assets = vault.assets.map((asset, index) => {
       const price = Number(formatUnits($assetsPrices[asset.address], 18));
 
@@ -175,27 +263,68 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
               <span className="text-[16px]">{almFee}</span>
             </div>
           )}
+          {!!defiedgeFee && (
+            <div className="flex gap-5 flex-wrap md:flex-nowrap">
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col">
+                  <span className="text-[14px] text-[#8d8e96]">
+                    POOL SWAP FEE
+                  </span>
+                  <span className="text-[16px]">{defiedgeFee.poolSwapFee}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[14px] text-[#8d8e96]">
+                    REBALANCE FEE
+                  </span>
+                  <span className="text-[16px]">{defiedgeFee.rebalance}</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-5">
+                <div className="flex flex-col">
+                  <span className="text-[14px] text-[#8d8e96]">
+                    DEPOSIT FEE
+                  </span>
+                  <span className="text-[16px]">{defiedgeFee.deposit}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[14px] text-[#8d8e96]">
+                    WITHDRAW FEE
+                  </span>
+                  <span className="text-[16px]">{defiedgeFee.withdraw}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
         <table className="table table-auto w-full rounded-lg">
           <thead className="bg-[#0b0e11]">
             <tr className="text-[16px] text-[#8f8f8f] uppercase">
-              <th>Upper Tick</th>
-              <th>Lower Tick</th>
+              <th>Ticks</th>
               <th>In Range</th>
-              <th>TVL</th>
+              {!!vault?.assets &&
+                vault?.assets?.map((asset) => (
+                  <th key={asset.symbol}>{asset.symbol}</th>
+                ))}
+              <th className="hidden md:block">TVL</th>
             </tr>
           </thead>
           <tbody className="text-[16px]">
-            {vault?.alm?.positions &&
-              vault.alm.positions.map((position, index) => (
+            {tableData &&
+              tableData.map((position) => (
                 <tr key={position.tvl} className="hover:bg-[#2B3139]">
-                  <td>{position.upperTick}</td>
-                  <td className="text-right py-1">{position.lowerTick}</td>
-                  <td className="text-right py-1">
-                    {position.inRange ? "Yes" : "No"}
+                  <td>
+                    <span className="mr-4"> {position.lowerTick}</span>
+                    <span>{position.upperTick}</span>
                   </td>
-                  <td className="text-right py-1">
-                    {formatNumber(position.tvl, "abbreviate")}
+                  <td className="text-right py-1">{position.inRange}</td>
+                  {position.amounts.map((amount) => (
+                    <td key={amount} className="text-right py-1">
+                      {amount}
+                    </td>
+                  ))}
+                  <td className="text-right py-1 hidden md:block">
+                    {position.tvl}
                   </td>
                 </tr>
               ))}
