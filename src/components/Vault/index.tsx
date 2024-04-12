@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { VaultBar } from "./VaultBar";
@@ -31,6 +31,13 @@ const Vault: React.FC<IProps> = ({ vault }) => {
   const $error = useStore(error);
 
   const [localVault, setLocalVault] = useState<any>();
+
+  const isALM = useMemo(
+    () =>
+      localVault?.alm &&
+      ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
+    [localVault]
+  );
 
   useEffect(() => {
     if ($vaults && vault) {
@@ -81,16 +88,16 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           </div>
         </div>
 
-        {localVault.assets.length > 1 && (
-          <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
-            <div className="w-full lg:w-1/2">
+        <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
+          <div className="w-full lg:w-1/2">
+            {localVault.assets.length > 1 && (
               <LiquidityPool vault={localVault} />
-            </div>
-            <div className="w-full lg:w-1/2">
-              <UnderlyingALM vault={localVault} />
-            </div>
+            )}
           </div>
-        )}
+          <div className="w-full lg:w-1/2">
+            {isALM && <UnderlyingALM vault={localVault} />}
+          </div>
+        </div>
 
         <Assets
           assets={localVault?.assets}

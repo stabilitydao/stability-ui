@@ -223,6 +223,14 @@ const PROTOCOLS = {
     name: "Retro",
     logoSrc: "/protocols/Retro.svg",
   },
+  curve: {
+    name: "Curve",
+    logoSrc: "/protocols/Curve.png",
+  },
+  convex: {
+    name: "Convex",
+    logoSrc: "/protocols/Convex.png",
+  },
 };
 
 const GRAPH_ENDPOINT =

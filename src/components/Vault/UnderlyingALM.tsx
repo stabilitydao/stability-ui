@@ -177,9 +177,10 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     getAlmFee();
+    getTableData();
     // ASSETS
     if (!$assetsPrices) return;
-    getTableData();
+
     const assets = vault.assets.map((asset, index) => {
       const price = Number(formatUnits($assetsPrices[asset.address], 18));
 
@@ -201,7 +202,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     });
 
     setAlmAssets(assetsWithPercents);
-  }, [vault]);
+  }, [vault, $assetsPrices]);
 
   return (
     <>

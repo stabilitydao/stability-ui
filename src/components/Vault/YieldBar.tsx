@@ -235,8 +235,8 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
               </tr>
             </thead>
             <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
-              {holdData.map((aprsData: IHoldData) => (
-                <tr key={aprsData.latestAPR} className="hover:bg-[#2B3139]">
+              {holdData.map((aprsData: IHoldData, index: number) => (
+                <tr key={index} className="hover:bg-[#2B3139]">
                   <td>VAULT VS {aprsData?.symbol} HOLD</td>
                   <td
                     className={`text-right ${
