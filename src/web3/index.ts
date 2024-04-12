@@ -27,7 +27,9 @@ const priceReader = "0xcCef9C4459d73F9A997ff50AC34364555A3274Aa";
 
 const defiedgeFactory = "0x730d158D29165C55aBF368e9608Af160DD21Bd80";
 
-const ichiFactory = "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a";
+const quickSwapIchiFactory = "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a";
+
+const retroIchiFactory = "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7";
 
 const metadata = {
   name: "Stability",
@@ -49,7 +51,8 @@ const walletClient = createWalletClient({
 export {
   platform,
   defiedgeFactory,
-  ichiFactory,
+  quickSwapIchiFactory,
+  retroIchiFactory,
   walletConnectProjectId,
   walletClient,
   priceReader,

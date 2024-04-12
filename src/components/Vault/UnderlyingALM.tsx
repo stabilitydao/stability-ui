@@ -10,7 +10,12 @@ import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
 
-import { wagmiConfig, defiedgeFactory, ichiFactory } from "@web3";
+import {
+  wagmiConfig,
+  defiedgeFactory,
+  quickSwapIchiFactory,
+  retroIchiFactory,
+} from "@web3";
 
 import type { TVault } from "@types";
 
@@ -107,38 +112,62 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
         });
         break;
       case "Ichi":
-        const ammFee = await readContract(wagmiConfig, {
-          address: ichiFactory,
-          abi: [
-            {
-              inputs: [],
-              name: "ammFee",
-              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-              stateMutability: "view",
-              type: "function",
-            },
-          ],
-          functionName: "ammFee",
-        });
-        const baseFee = await readContract(wagmiConfig, {
-          address: ichiFactory,
-          abi: [
-            {
-              inputs: [],
-              name: "baseFee",
-              outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-              stateMutability: "view",
-              type: "function",
-            },
-          ],
-          functionName: "baseFee",
-        });
-        fee = `${formatUnits(ammFee + baseFee, 18)}%`;
+        if (vault.strategy.includes("Retro")) {
+          const baseFee = await readContract(wagmiConfig, {
+            address: retroIchiFactory,
+            abi: [
+              {
+                inputs: [],
+                name: "baseFee",
+                outputs: [
+                  { internalType: "uint256", name: "", type: "uint256" },
+                ],
+                stateMutability: "view",
+                type: "function",
+              },
+            ],
+            functionName: "baseFee",
+          });
+          fee = `${formatUnits(baseFee, 16)}%`;
+        }
+        if (vault.strategy.includes("QuickSwap")) {
+          const ammFee = await readContract(wagmiConfig, {
+            address: quickSwapIchiFactory,
+            abi: [
+              {
+                inputs: [],
+                name: "ammFee",
+                outputs: [
+                  { internalType: "uint256", name: "", type: "uint256" },
+                ],
+                stateMutability: "view",
+                type: "function",
+              },
+            ],
+            functionName: "ammFee",
+          });
+          const baseFee = await readContract(wagmiConfig, {
+            address: quickSwapIchiFactory,
+            abi: [
+              {
+                inputs: [],
+                name: "baseFee",
+                outputs: [
+                  { internalType: "uint256", name: "", type: "uint256" },
+                ],
+                stateMutability: "view",
+                type: "function",
+              },
+            ],
+            functionName: "baseFee",
+          });
+          fee = `${formatUnits(ammFee + baseFee, 16)}%`;
+        }
+
         break;
       default:
         break;
     }
-
     if (fee) setAlmFee(fee);
   };
   const getTableData = async () => {
