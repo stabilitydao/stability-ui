@@ -138,9 +138,12 @@ const Assets: React.FC<IProps> = memo(
 
           <div className="flex flex-col items-center gap-5">
             {investedData &&
-              investedData.map((data: TPieChartData) => {
+              investedData.map((data: TPieChartData, index: number) => {
                 return (
-                  <div className="flex items-center gap-2" key={data.color}>
+                  <div
+                    className="flex items-center gap-2"
+                    key={data.color + index}
+                  >
                     <div
                       style={{ background: data.color }}
                       className="w-2 h-8 rounded-md"
@@ -178,7 +181,7 @@ const Assets: React.FC<IProps> = memo(
                 assetData && (
                   <article
                     className="rounded-md p-3 flex  w-full"
-                    key={asset.address}
+                    key={asset.address + index}
                   >
                     <div className="flex w-full flex-col gap-3">
                       <div className="flex w-full justify-between items-center flex-wrap">
@@ -250,10 +253,10 @@ const Assets: React.FC<IProps> = memo(
                       </div>
                       {assetData?.tags && (
                         <div className="flex items-center gap-3 flex-wrap">
-                          {assetData.tags.map((tag: string) => (
+                          {assetData.tags.map((tag: string, index: number) => (
                             <p
                               className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
-                              key={tag}
+                              key={tag + index}
                             >
                               {tag}
                             </p>

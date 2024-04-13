@@ -99,9 +99,11 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
           vault?.assets.length > 1
             ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
             : vault?.assets[0]?.symbol;
-
+        //todo: rewrite
         contractsInfo.push({
-          logo: vault.strategyInfo.protocols[1].logoSrc,
+          logo: vault.strategyInfo.protocols[
+            vault.strategyInfo.protocols.length - 1
+          ].logoSrc,
           symbol: poolSymbol,
           type: "Pool",
           address: vault?.pool?.address,
@@ -131,114 +133,123 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
 
       <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">
         <tbody>
-          {contracts.map(({ address, logo, symbol, type, isCopy }) => (
-            <tr key={address} className="border-b border-[#4f5158] h-[60px]">
-              <td>
-                <div className="ml-3 hidden sm:block">
-                  {logo === "proportions" ? (
-                    <AssetsProportion
-                      proportions={vault.assetsProportions}
-                      assets={vault?.assets}
-                      type="vault"
-                    />
-                  ) : (
-                    <img
-                      className={`w-[26px] h-[26px] ${
-                        type != "Strategy" && "rounded-full"
-                      }`}
-                      src={logo}
-                      alt="logo"
-                    />
-                  )}
-                </div>
-              </td>
-              <td>
-                <div className="flex flex-col items-start">
-                  <span className="text-[14px] sm:text-[18px]">{symbol}</span>
-                  <span className="text-[#8D8E96] text-[14px] mt-[-6px]">
-                    {type}
+          {contracts.map(
+            ({ address, logo, symbol, type, isCopy }, index: number) => (
+              <tr
+                key={address + index}
+                className="border-b border-[#4f5158] h-[60px]"
+              >
+                <td>
+                  <div className="ml-3 hidden sm:block">
+                    {logo === "proportions" ? (
+                      <AssetsProportion
+                        proportions={vault.assetsProportions}
+                        assets={vault?.assets}
+                        type="vault"
+                      />
+                    ) : (
+                      <img
+                        className={`w-[26px] h-[26px] ${
+                          type != "Strategy" && "rounded-full"
+                        }`}
+                        src={logo}
+                        alt="logo"
+                      />
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[14px] sm:text-[18px]">{symbol}</span>
+                    <span className="text-[#8D8E96] text-[14px] mt-[-6px]">
+                      {type}
+                    </span>
+                  </div>
+                </td>
+                <td className="flex items-center justify-end gap-3 sm:gap-5 h-[60px]">
+                  <span className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]">
+                    {address.slice(0, 6)}...{address.slice(-4)}
                   </span>
-                </div>
-              </td>
-              <td className="flex items-center justify-end gap-3 sm:gap-5 h-[60px]">
-                <span className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]">
-                  {address.slice(0, 6)}...{address.slice(-4)}
-                </span>
-                <div className="flex items-center">
-                  {isCopy ? (
-                    <div className="px-1 py-1">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                  <div className="flex items-center">
+                    {isCopy ? (
+                      <div className="px-1 py-1">
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => copyHandler(address)}
+                        className="cursor-pointer px-1 py-1"
                       >
-                        <path
-                          d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => copyHandler(address)}
-                      className="cursor-pointer px-1 py-1"
-                    >
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
-                          stroke="white"
-                          strokeWidth="2"
-                        />
-                        <rect
-                          x="10"
-                          y="10"
-                          width="10"
-                          height="10"
-                          rx="2"
-                          stroke="white"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    </div>
-                  )}
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
+                            stroke="white"
+                            strokeWidth="2"
+                          />
+                          <rect
+                            x="10"
+                            y="10"
+                            width="10"
+                            height="10"
+                            rx="2"
+                            stroke="white"
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      </div>
+                    )}
 
-                  <a
-                    className="flex items-center px-1 py-1 whitespace-nowrap"
-                    href={`https://polygonscan.com/address/${address}`}
-                    target="_blank"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="icon icon-tabler icon-tabler-external-link ms-1"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                    <a
+                      className="flex items-center px-1 py-1 whitespace-nowrap"
+                      href={`https://polygonscan.com/address/${address}`}
+                      target="_blank"
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                      <path d="M11 13l9 -9"></path>
-                      <path d="M15 4h5v5"></path>
-                    </svg>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          ))}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-external-link ms-1"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
+                        <path d="M11 13l9 -9"></path>
+                        <path d="M15 4h5v5"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            )
+          )}
 
           {/* <tr>
             <td>
