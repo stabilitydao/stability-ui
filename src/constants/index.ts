@@ -11,6 +11,7 @@ import {
   PM,
   MULTISIG,
   TREASURY,
+  CRV,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
@@ -162,6 +163,15 @@ const TOKENS_ASSETS = [
     website: "https://stabilitydao.org/tokens",
     docs: "https://book.stabilitydao.org/tokens.html#sdiv",
     color: "#232323",
+  },
+  {
+    symbol: "crvUSD",
+    addresses: CRV,
+    description:
+      "crvUSD is a collateralized-debt-position (CDP) stablecoin pegged to the US Dollar",
+    website: "https://curve.fi/",
+    docs: "https://resources.curve.fi/",
+    color: "#000000",
   },
 ];
 

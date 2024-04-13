@@ -121,6 +121,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode:
         "https://github.com/stabilitydao/stability-contracts/blob/main/src/strategies/QuickswapV3StaticFarmStrategy.sol",
     };
+  } else if (vaultSymbol.match(/CCF$/)) {
+    strategyInfo = {
+      name: "Curve Convex Farm",
+      shortName: "CCF",
+      protocols: [curve, convex],
+      features: [farm],
+      color: "#dddddd",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.CCF,
+    };
   } else if (vaultSymbol.match(/CF$/)) {
     strategyInfo = {
       name: "Compound Farm",
@@ -213,19 +226,6 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il,
-    };
-  } else if (vaultSymbol.match(/CCF$/)) {
-    strategyInfo = {
-      name: "Curve Convex Farm",
-      shortName: "CCF",
-      protocols: [curve, convex],
-      features: [farm],
-      color: "#dddddd",
-      bgColor: "#000000",
-      baseStrategies: ["Farming"],
-      ammAdapter: "",
-      sourceCode: "",
-      il: IL.CCF,
     };
   }
 
