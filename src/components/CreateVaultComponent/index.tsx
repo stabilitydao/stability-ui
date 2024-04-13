@@ -240,11 +240,7 @@ const CreateVaultComponent = () => {
                   return (
                     <tr
                       className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
-                      key={
-                        variant.strategyDesc +
-                        variant.vaultType +
-                        variant.strategyId
-                      }
+                      key={variant.strategyDesc + i}
                     >
                       <td>{variant.strategyId}</td>
                       <td>{variant.strategyDesc}</td>
