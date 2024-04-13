@@ -182,7 +182,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
         //@ts-ignore
         (price, index) => Number(position[`amountToken${index}`]) * price
       );
-      let amounts: string[] | number[] = vault?.alm?.positions.map(
+      let amounts: string[] | number[] = prices.map(
         //@ts-ignore
         (_, index) => Number(position[`amountToken${index}`])
       );
@@ -350,10 +350,10 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
           </thead>
           <tbody className="text-[16px]">
             {tableData &&
-              tableData.map((position) => (
-                <tr key={position.tvl} className="hover:bg-[#2B3139]">
+              tableData.map((position, index) => (
+                <tr key={position.tvl + index} className="hover:bg-[#2B3139]">
                   <td>
-                    <span className="mr-4"> {position.lowerTick}</span>
+                    <span className="mr-4">{position.lowerTick}</span>
                     <span>{position.upperTick}</span>
                   </td>
                   <td className="text-right py-1">{position.inRange}</td>
