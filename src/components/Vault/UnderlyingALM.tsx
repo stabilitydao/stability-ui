@@ -31,6 +31,7 @@ type TAlmAsset = {
 
 type TAlmTable = {
   amounts: string[];
+  amountsInUSD: string[];
   inRange: string;
   lowerTick: number;
   upperTick: number;
@@ -171,30 +172,38 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     if (fee) setAlmFee(fee);
   };
   const getTableData = async () => {
-    if (!$assetsPrices) return;
-    const prices = vault.assets.map((asset, index) =>
+    if (!$assetsPrices || !vault?.alm?.positions) return;
+    const prices = vault.assets.map((asset) =>
       Number(formatUnits($assetsPrices[asset.address], 18))
     );
 
     const data = vault?.alm?.positions.map((position) => {
-      let amounts: string[] | number[] = prices.map(
+      let amountsInUSD: string[] | number[] = prices.map(
         //@ts-ignore
         (price, index) => Number(position[`amountToken${index}`]) * price
       );
+      let amounts: string[] | number[] = vault?.alm?.positions.map(
+        //@ts-ignore
+        (_, index) => Number(position[`amountToken${index}`])
+      );
+      amounts = amounts.map((amount) =>
+        formatNumber(amount, "format")
+      ) as string[];
 
       const inRange = position.inRange ? "Yes" : "No";
 
       const tvl = formatNumber(
-        amounts.reduce((acc, value) => (acc += value), 0),
+        amountsInUSD.reduce((acc, value) => (acc += value), 0),
         "abbreviate"
       );
 
-      amounts = amounts.map((amount) =>
+      amountsInUSD = amountsInUSD.map((amount) =>
         formatNumber(amount, "abbreviate")
       ) as string[];
 
       return {
         amounts,
+        amountsInUSD,
         inRange,
         lowerTick: position.lowerTick,
         upperTick: position.upperTick,
