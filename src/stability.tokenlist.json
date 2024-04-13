@@ -91,6 +91,15 @@
       "name": "Stability Dividend",
       "decimals": 18,
       "logoURI": "https://stabilitydao.org/SDIV.svg"
+    },
+    {
+      "chainId": 137,
+      "address": "0xc4Ce1D6F5D98D65eE25Cf85e9F2E9DcFEe6Cb5d6",
+      "symbol": "crvUSD",
+      "name": "Curve.Fi USD",
+      "decimals": 18,
+      "logoURI": "/protocols/Curve.png",
+      "tags": ["stablecoin"]
     }
   ],
   "version": {

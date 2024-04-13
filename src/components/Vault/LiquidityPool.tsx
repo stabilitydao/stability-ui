@@ -58,7 +58,6 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
 
     setPoolAssets(assetsWithPercents);
   }, [vault, $assetsPrices]);
-
   return (
     <>
       <div className="flex justify-between items-center h-[60px]">

@@ -90,9 +90,11 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            {localVault.assets.length > 1 && localVault?.pool && (
-              <LiquidityPool vault={localVault} />
-            )}
+            {localVault.assets.length > 1 &&
+              localVault?.pool &&
+              localVault?.strategy != "Curve Convex Farm" && (
+                <LiquidityPool vault={localVault} />
+              )}
           </div>
           <div className="w-full lg:w-1/2">
             {isALM && <UnderlyingALM vault={localVault} />}
