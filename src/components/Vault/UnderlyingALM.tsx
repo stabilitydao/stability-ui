@@ -218,16 +218,16 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
 
       const amountInUSD = price * amount;
 
-      return { symbol: asset.symbol, amount: amountInUSD };
+      return { symbol: asset.symbol, amountInUSD: amountInUSD, amount: amount };
     });
 
     const vaultLiquidity = assets.reduce(
-      (acc, curr) => (acc += curr.amount),
+      (acc, curr) => (acc += curr.amountInUSD),
       0
     );
 
     const assetsWithPercents = assets.map((asset) => {
-      return { ...asset, percent: (asset.amount / vaultLiquidity) * 100 };
+      return { ...asset, percent: (asset.amountInUSD / vaultLiquidity) * 100 };
     });
 
     setAlmAssets(assetsWithPercents);
@@ -281,7 +281,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
                     {almAsset.symbol}
                   </span>
                   <span className="text-[16px]">
-                    {formatNumber(almAsset.amount, "abbreviate")} (
+                    {formatNumber(almAsset.amount, "format")} (
                     {almAsset.percent.toFixed(2)}%)
                   </span>
                 </div>

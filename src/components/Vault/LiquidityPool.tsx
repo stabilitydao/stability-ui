@@ -44,20 +44,20 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
 
       const amountInUSD = price * amount;
 
-      return { symbol: asset.symbol, amount: amountInUSD };
+      return { symbol: asset.symbol, amountInUSD: amountInUSD, amount: amount };
     });
 
     const vaultLiquidity = assets.reduce(
-      (acc, curr) => (acc += curr.amount),
+      (acc, curr) => (acc += curr.amountInUSD),
       0
     );
 
     const assetsWithPercents = assets.map((asset) => {
-      return { ...asset, percent: (asset.amount / vaultLiquidity) * 100 };
+      return { ...asset, percent: (asset.amountInUSD / vaultLiquidity) * 100 };
     });
 
     setPoolAssets(assetsWithPercents);
-  }, [vault]);
+  }, [vault, $assetsPrices]);
 
   return (
     <>
@@ -100,7 +100,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
                     {poolAsset.symbol}
                   </span>
                   <span className="text-[16px]">
-                    {formatNumber(poolAsset.amount, "abbreviate")} (
+                    {formatNumber(poolAsset.amount, "format")} (
                     {poolAsset.percent.toFixed(2)}%)
                   </span>
                 </div>
