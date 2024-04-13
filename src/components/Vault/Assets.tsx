@@ -6,7 +6,7 @@ import { readContract } from "@wagmi/core";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { assetsPrices, connected } from "@store";
+import { assetsPrices, connected, account } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
@@ -70,6 +70,7 @@ const Assets: React.FC<IProps> = memo(
   ({ assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
+    const $account = useStore(account);
 
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)

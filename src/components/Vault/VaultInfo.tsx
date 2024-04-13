@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from "react";
 
-import { walletClient } from "@web3";
+//import { walletClient } from "@web3";
 
 import { VaultState, VaultType } from "@components";
 

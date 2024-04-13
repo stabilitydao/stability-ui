@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { VaultBar } from "./VaultBar";
@@ -10,6 +10,8 @@ import { HistoricalRate } from "./HistoricalRate";
 import { VaultInfo } from "./VaultInfo";
 import { Contracts } from "./Contracts";
 import { YieldBar } from "./YieldBar";
+import { LiquidityPool } from "./LiquidityPool";
+import { UnderlyingALM } from "./UnderlyingALM";
 
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
@@ -30,6 +32,13 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
   const [localVault, setLocalVault] = useState<any>();
 
+  const isALM = useMemo(
+    () =>
+      localVault?.alm &&
+      ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
+    [localVault]
+  );
+
   useEffect(() => {
     if ($vaults && vault) {
       setLocalVault($vaults[vault.toLowerCase()]);
@@ -43,7 +52,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       </div>
     );
   }
-
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">
@@ -77,6 +85,17 @@ const Vault: React.FC<IProps> = ({ vault }) => {
           </div>
           <div className="w-full lg:w-1/2">
             <Strategy vault={localVault} />
+          </div>
+        </div>
+
+        <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
+          <div className="w-full lg:w-1/2">
+            {localVault.assets.length > 1 && localVault?.pool && (
+              <LiquidityPool vault={localVault} />
+            )}
+          </div>
+          <div className="w-full lg:w-1/2">
+            {isALM && <UnderlyingALM vault={localVault} />}
           </div>
         </div>
 

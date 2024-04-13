@@ -18,6 +18,7 @@ import {
   APRtimeSwitcher,
   FeeAPRModal,
   ChartSkeleton,
+  HoldModal,
 } from "./VaultUtils";
 
 import { Toast } from "./VaultUtils/Toast";
@@ -42,4 +43,5 @@ export {
   HideFeesHandler,
   APRtimeSwitcher,
   FeeAPRModal,
+  HoldModal,
 };

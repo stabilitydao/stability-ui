@@ -16,5 +16,6 @@
       "@constants": ["src/constants"],
       "@types": ["src/types"]
     }
-  }
+  },
+  "strict": true
 }

@@ -180,16 +180,6 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
           </div>
         </div>
-        {!!vault?.rebalances?.daily && (
-          <div className="mt-2">
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-              Rebalances 24H / 7D
-            </p>
-            <p>
-              {vault?.rebalances?.daily} / {vault?.rebalances?.weekly}
-            </p>
-          </div>
-        )}
 
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           {needVaultUpgrade && (

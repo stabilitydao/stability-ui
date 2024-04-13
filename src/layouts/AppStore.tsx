@@ -101,12 +101,18 @@ const AppStore = (props: React.PropsWithChildren) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
-        const strategyInfo = getStrategyInfo(vault.symbol);
-        const strategyName = strategyInfo?.shortName;
         const APIData =
           stabilityAPIData?.underlyings?.["137"]?.[
             vault.underlying.toLowerCase()
           ];
+
+        const APIVault =
+          stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+
+        const strategyInfo = getStrategyInfo(APIVault.symbol);
+
+        const strategyName = strategyInfo?.shortName;
+
         const strategyEntity = data.strategyEntities.find(
           (obj: any) => obj.id === vault.strategy
         );
@@ -156,7 +162,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               Math.round(Number(formatUnits(proportion, 16)))
             )
           : [];
-
         const assetsPromise = Promise.all(
           vault.strategyAssets.map(async (strategyAsset: any) => {
             const token = getTokenData(strategyAsset);
@@ -178,7 +183,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         const assets = await assetsPromise;
         /////
         const aprData = vault.vaultHistoryEntity[0];
-
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 
@@ -257,8 +261,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           assetsPricesOnCreation: vault.AssetsPricesOnCreation,
           type: vault.vaultType,
           strategy: vault.strategyId,
-          shareprice: vault.sharePrice,
-          tvl: vault.tvl,
+          shareprice: APIVault.sharePrice,
+          tvl: APIVault.tvl,
           strategySpecific: vault.strategySpecific,
           balance: "",
           lastHardWork: vault.lastHardWork,
@@ -284,7 +288,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             poolSwapFeesAPR,
             farmAPR,
           },
-          strategyPool: strategyEntity.pool,
+          pool: APIVault.pool,
+          alm: APIVault.alm,
         };
 
         return vaults;
@@ -408,8 +413,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 [vault.toLowerCase()]: {
                   ...localVaults[vault.toLowerCase()],
                   balance: contractBalance[5][index],
-                  shareprice: String(contractVaults[5][index]),
-                  tvl: String(contractVaults[6][index]),
                 },
               };
             })
@@ -428,6 +431,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       }
       isWeb3Load.set(false);
     } else {
+      isWeb3Load.set(false);
       // before backend
       const randomAddress: TAddress =
         "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";

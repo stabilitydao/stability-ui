@@ -33,6 +33,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
   const [timeline, setTimeline] = useState<TSegment>(
     timelineSegments.WEEK as TSegment
   );
+  const [isData, setIsData] = useState(true);
 
   const formatData = (obj: any) => {
     const date = new Date(Number(obj.timestamp) * 1000);
@@ -90,7 +91,6 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       }
       entities += 100;
     }
-
     const workedData = DATA.map(formatData).sort(
       (a, b) => a.unixTimestamp - b.unixTimestamp
     );
@@ -108,7 +108,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
       }));
-
+    if (!APRChartData.length) {
+      setIsData(false);
+      return;
+    }
     const lastTimestamp = APRChartData[APRChartData.length - 1].unixTimestamp;
 
     time = Number(APRChartData[0].unixTimestamp);
@@ -408,53 +411,66 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           </div>
         )}
       </div>
-
-      <div className="py-3 px-4">
-        {activeChart ? (
-          <>
-            {activeChart.name === "APR" ? (
-              <ChartBar chart={activeChart} APRType={APRType} />
+      {isData ? (
+        <>
+          <div className="py-3 px-4">
+            {activeChart ? (
+              <>
+                {activeChart.name === "APR" ? (
+                  <ChartBar chart={activeChart} APRType={APRType} />
+                ) : (
+                  <Chart chart={activeChart} APRType={APRType} />
+                )}
+              </>
             ) : (
-              <Chart chart={activeChart} APRType={APRType} />
+              <ChartSkeleton />
             )}
-          </>
-        ) : (
-          <ChartSkeleton />
-        )}
-      </div>
-      {activeChart && (
-        <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
-          {/* <p
+          </div>
+          {activeChart && (
+            <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
+              {/* <p
       onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
       className="opacity-50 hover:opacity-100 cursor-pointer"
     >
       1D
     </p> */}
-          <p
-            onClick={() => timelineHandler(timelineSegments.WEEK as TSegment)}
-            className={`hover:opacity-100 cursor-pointer px-2 ${
-              timeline === "WEEK" ? "opacity-100" : "opacity-30"
-            }`}
-          >
-            WEEK
-          </p>
-          <p
-            onClick={() => timelineHandler(timelineSegments.MONTH as TSegment)}
-            className={`hover:opacity-100 cursor-pointer px-2 ${
-              timeline === "MONTH" ? "opacity-100" : "opacity-30"
-            }`}
-          >
-            MONTH
-          </p>
-          <p
-            onClick={() => timelineHandler(timelineSegments.YEAR as TSegment)}
-            className={`hover:opacity-100 cursor-pointer px-2 ${
-              timeline === "YEAR" ? "opacity-100" : "opacity-30"
-            }`}
-          >
-            ALL
-          </p>
-        </div>
+              <p
+                onClick={() =>
+                  timelineHandler(timelineSegments.WEEK as TSegment)
+                }
+                className={`hover:opacity-100 cursor-pointer px-2 ${
+                  timeline === "WEEK" ? "opacity-100" : "opacity-30"
+                }`}
+              >
+                WEEK
+              </p>
+              <p
+                onClick={() =>
+                  timelineHandler(timelineSegments.MONTH as TSegment)
+                }
+                className={`hover:opacity-100 cursor-pointer px-2 ${
+                  timeline === "MONTH" ? "opacity-100" : "opacity-30"
+                }`}
+              >
+                MONTH
+              </p>
+              <p
+                onClick={() =>
+                  timelineHandler(timelineSegments.YEAR as TSegment)
+                }
+                className={`hover:opacity-100 cursor-pointer px-2 ${
+                  timeline === "YEAR" ? "opacity-100" : "opacity-30"
+                }`}
+              >
+                ALL
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <h3 className="flex items-center justify-center h-[320px]">
+          No available data
+        </h3>
       )}
     </div>
   );

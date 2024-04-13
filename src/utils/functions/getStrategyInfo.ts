@@ -48,6 +48,12 @@ const IL = {
     desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the wide range, not often rebalancing the position.",
     color: "#F5DA5B",
   },
+  CCF: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
+    color: "#7af996",
+  },
 };
 
 export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
@@ -62,8 +68,17 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     ammAdapter: "",
     sourceCode: "",
   };
-  const { quickSwap, gamma, compound, defiedge, merkl, ichi, retro } =
-    PROTOCOLS;
+  const {
+    quickSwap,
+    gamma,
+    compound,
+    defiedge,
+    merkl,
+    ichi,
+    retro,
+    curve,
+    convex,
+  } = PROTOCOLS;
 
   const farm: IFeature = {
     name: "Farming",
@@ -198,6 +213,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il,
+    };
+  } else if (vaultSymbol.match(/CCF$/)) {
+    strategyInfo = {
+      name: "Curve Convex Farm",
+      shortName: "CCF",
+      protocols: [curve, convex],
+      features: [farm],
+      color: "#dddddd",
+      bgColor: "#000000",
+      baseStrategies: ["Farming"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.CCF,
     };
   }
 

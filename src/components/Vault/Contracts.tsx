@@ -94,7 +94,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
           isCopy: false,
         });
       }
-      if (vault?.strategyPool) {
+      if (vault?.pool?.address) {
         const poolSymbol =
           vault?.assets.length > 1
             ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
@@ -104,7 +104,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
           logo: vault.strategyInfo.protocols[1].logoSrc,
           symbol: poolSymbol,
           type: "Pool",
-          address: vault?.strategyPool,
+          address: vault?.pool?.address,
           isCopy: false,
         });
       }
@@ -154,11 +154,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
               </td>
               <td>
                 <div className="flex flex-col items-start">
-                  <span
-                    className="text-[14px] sm:text-[18px]"
-                  >
-                    {symbol}
-                  </span>
+                  <span className="text-[14px] sm:text-[18px]">{symbol}</span>
                   <span className="text-[#8D8E96] text-[14px] mt-[-6px]">
                     {type}
                   </span>

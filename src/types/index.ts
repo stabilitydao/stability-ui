@@ -125,6 +125,34 @@ type TAsset = {
   symbol: string;
 };
 
+type TPool = {
+  address: TAddress;
+  ammAlgoName: string;
+  ammName: string;
+  amountToken0: number;
+  amountToken1: number;
+  fee: number;
+  tick: number;
+  tvl: number;
+};
+
+type TAlmPosition = {
+  amountToken0: number;
+  amountToken1: number;
+  inRange: boolean;
+  lowerTick: number;
+  tvl: number;
+  upperTick: number;
+};
+
+type TAlm = {
+  protocol: string;
+  amountToken0: number;
+  amountToken1: number;
+  tvl: number;
+  positions: TAlmPosition[];
+};
+
 type TVault = {
   address: TAddress;
   name: string;
@@ -155,7 +183,8 @@ type TVault = {
   gasReserve: string;
   rebalances: any;
   earningData: TEarningData | any;
-  strategyPool: TAddress;
+  pool: TPool;
+  alm: TAlm;
 };
 
 type TTableColumn = {
