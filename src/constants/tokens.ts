@@ -14,6 +14,7 @@ const SDIV: TAddress[] = ["0x9844a1c30462b55cd383a2c06f90bb4171f9d4bb"];
 const PM: TAddress[] = ["0xAA3e3709C79a133e56C17a7ded87802adF23083B"];
 const TREASURY: TAddress[] = ["0xC82676D6025bbA6Df3585d2450EF6D0eE9b8607E"];
 const MULTISIG: TAddress[] = ["0x36780E69D38c8b175761c6C5F8eD42E61ee490E9"];
+const CRV: TAddress[] = ["0xc4ce1d6f5d98d65ee25cf85e9f2e9dcfee6cb5d6"];
 
 export {
   USDC,
@@ -27,4 +28,5 @@ export {
   PM,
   TREASURY,
   MULTISIG,
+  CRV,
 };

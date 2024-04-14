@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useMemo, useState, useEffect } from "react";
 
 import { zeroAddress } from "viem";
 
@@ -22,15 +22,17 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
 
   const initUnderlying = async () => {
-    const logo =
-      vault.strategyInfo.shortName === "DQMF"
-        ? "/protocols/DefiEdge.svg"
-        : vault.strategyInfo.shortName === "IQMF" ||
-          vault.strategyInfo.shortName === "IRMF"
-        ? "/protocols/Ichi.png"
-        : "/protocols/Gamma.png";
+    if (isALM) {
+      const logo =
+        vault.strategyInfo.shortName === "DQMF"
+          ? "/protocols/DefiEdge.svg"
+          : vault.strategyInfo.shortName === "IQMF" ||
+            vault.strategyInfo.shortName === "IRMF"
+          ? "/protocols/Ichi.png"
+          : "/protocols/Gamma.png";
 
-    setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
+      setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
+    }
   };
 
   const copyHandler = async (address: TAddress) => {
@@ -124,6 +126,12 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       setContracts(contractsInfo);
     }
   }, [vault, underlyingToken]);
+
+  const isALM = useMemo(
+    () =>
+      vault?.alm && ["Ichi", "DefiEdge", "Gamma"].includes(vault.alm.protocol),
+    [vault]
+  );
 
   return (
     <div className="rounded-md h-full">

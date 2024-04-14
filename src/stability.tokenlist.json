@@ -94,12 +94,12 @@
     },
     {
       "chainId": 137,
-      "address": "0xc4Ce1D6F5D98D65eE25Cf85e9F2E9DcFEe6Cb5d6",
+      "address": "0xc4ce1d6f5d98d65ee25cf85e9f2e9dcfee6cb5d6",
       "symbol": "crvUSD",
       "name": "Curve.Fi USD",
       "decimals": 18,
       "logoURI": "/protocols/Curve.png",
-      "tags": ["stablecoin"]
+      "tags": ["stablecoin", "bridged"]
     }
   ],
   "version": {

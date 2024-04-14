@@ -108,7 +108,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const APIVault =
           stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
-
         const strategyInfo = getStrategyInfo(APIVault.symbol);
 
         const strategyName = strategyInfo?.shortName;
