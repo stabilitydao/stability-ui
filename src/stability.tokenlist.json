@@ -98,7 +98,7 @@
       "symbol": "crvUSD",
       "name": "Curve.Fi USD",
       "decimals": 18,
-      "logoURI": "/protocols/Curve.png",
+      "logoURI": "https://polygonscan.com/token/images/crvusd_32.png",
       "tags": ["stablecoin", "bridged"]
     }
   ],

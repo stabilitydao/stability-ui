@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
@@ -137,6 +137,12 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   useEffect(() => {
     getHoldData();
   }, [$connected, $assetsPrices]);
+
+  const isActive = useMemo(
+    () =>
+      getTimeDifference(vault.created).days > 2 && !!Number(vault.shareprice),
+    [vault]
+  );
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -276,7 +282,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 <tr key={index} className="hover:bg-[#2B3139]">
                   <td>VAULT VS {aprsData?.symbol} HOLD</td>
 
-                  {!!Number(vault.shareprice) ? (
+                  {isActive ? (
                     <td
                       className={`text-right ${
                         Number(aprsData.latestAPR) > 0
@@ -291,7 +297,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     <td className="text-right">-</td>
                   )}
 
-                  {!!Number(vault.shareprice) ? (
+                  {isActive ? (
                     <td
                       className={`text-right ${
                         Number(aprsData.latestAPR) > 0

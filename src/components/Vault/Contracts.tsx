@@ -4,6 +4,8 @@ import { zeroAddress } from "viem";
 
 import { AssetsProportion } from "@components";
 
+import { DEXes } from "@constants";
+
 import type { TAddress, TVault, TContractInfo } from "@types";
 
 interface IProps {
@@ -62,7 +64,6 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
     }, 3000);
     setTimeoutId(newTimeoutId);
   };
-
   useEffect(() => {
     if (vault.underlying != zeroAddress) {
       initUnderlying();
@@ -101,11 +102,15 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
           vault?.assets.length > 1
             ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
             : vault?.assets[0]?.symbol;
-        //todo: rewrite
+
+        const dexPool = DEXes.find((dex) =>
+          vault.strategyInfo.protocols.some(
+            (protocol) => protocol.name === dex.name
+          )
+        );
+
         contractsInfo.push({
-          logo: vault.strategyInfo.protocols[
-            vault.strategyInfo.protocols.length - 1
-          ].logoSrc,
+          logo: dexPool?.img as string,
           symbol: poolSymbol,
           type: "Pool",
           address: vault?.pool?.address,
@@ -132,7 +137,6 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       vault?.alm && ["Ichi", "DefiEdge", "Gamma"].includes(vault.alm.protocol),
     [vault]
   );
-
   return (
     <div className="rounded-md h-full">
       <div className="flex justify-between items-center h-[60px]">
