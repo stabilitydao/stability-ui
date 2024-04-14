@@ -64,7 +64,7 @@ const TABLE_FILTERS: TTableFilters[] = [
   { name: "Active", type: "sample", state: true },
 ];
 
-const STABLECOINS = [...USDC, ...USDT, ...DAI];
+const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV];
 
 const PAGINATION_VAULTS = 20;
 
@@ -173,6 +173,12 @@ const TOKENS_ASSETS = [
     docs: "https://resources.curve.fi/",
     color: "#397949",
   },
+];
+
+const DEXes = [
+  { name: "QuickSwap", algo: "AlgebraV1", img: "/protocols/QuickSwap.svg" },
+  { name: "Retro", algo: "Uniswap V3", img: "/protocols/Retro.svg" },
+  { name: "Curve", algo: "StableSwapNG", img: "/protocols/Curve.png" },
 ];
 
 const CHAINS = [
@@ -349,4 +355,5 @@ export {
   TREASURY,
   MONTHS,
   TIMESTAMPS_IN_SECONDS,
+  DEXes,
 };

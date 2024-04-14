@@ -126,13 +126,29 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
             assets={vault?.assets}
             type="vault"
           />
-          <img
-            className="w-7 h-7 rounded-full mr-3 hidden lg:flex"
-            src={currentChain?.logoURI}
-            alt={currentChain?.name}
-            title={currentChain?.name}
-          />
+          <div className="flex gap-3">
+            <img
+              className="w-7 h-7 rounded-full hidden lg:flex"
+              src={currentChain?.logoURI}
+              alt={currentChain?.name}
+              title={currentChain?.name}
+            />
+            {!!vault?.strategyInfo?.protocols.length && (
+              <div className="lg:flex items-start gap-3 hidden">
+                {vault?.strategyInfo?.protocols.map((protocol, index) => (
+                  <img
+                    key={protocol?.name + index}
+                    className="w-7 h-7 rounded-full "
+                    src={protocol?.logoSrc}
+                    alt={protocol?.name}
+                    title={protocol?.name}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
         <div className="flex items-center gap-3">
           <HideFeesHandler setModalState={setFeeAPRModal} />
           <APRtimeSwitcher />

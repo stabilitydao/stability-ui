@@ -352,6 +352,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             : vault.strategyInfo.shortName === "IQMF" ||
               vault.strategyInfo.shortName === "IRMF"
             ? "/protocols/Ichi.png"
+            : vault.strategyInfo.shortName === "CCF"
+            ? "/protocols/Curve.png"
             : "/protocols/Gamma.png";
         if ($connected) {
           let underlyingSymbol = "";
@@ -2116,6 +2118,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           : vault.strategyInfo.shortName === "IQMF" ||
                             vault.strategyInfo.shortName === "IRMF"
                           ? "/protocols/Ichi.png"
+                          : vault.strategyInfo.shortName === "CCF"
+                          ? "/protocols/Curve.png"
                           : "/protocols/Gamma.png"
                       );
                     }}
