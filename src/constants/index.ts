@@ -169,9 +169,9 @@ const TOKENS_ASSETS = [
     addresses: CRV,
     description:
       "crvUSD is a collateralized-debt-position (CDP) stablecoin pegged to the US Dollar",
-    website: "https://curve.fi/",
+    website: "https://crvusd.curve.fi/",
     docs: "https://resources.curve.fi/",
-    color: "#000000",
+    color: "#397949",
   },
 ];
 

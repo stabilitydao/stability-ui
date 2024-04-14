@@ -1735,13 +1735,29 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
               )
             );
           } else {
-            const token = tokensJson.tokens.find(
-              (token) => token.address === option[changedInput ? 0 : 1]
-            );
+            if (vault.strategyInfo.shortName === "CCF") {
+              //todo: add decimals logic
+              let value;
+              for (const key in inputs) {
+                if (key !== lastKeyPress.key1) {
+                  value = inputs[key];
+                  break;
+                }
+              }
+              if (value?.amount) {
+                amounts.push(parseUnits(value?.amount, 18));
+              } else {
+                amounts.push(parseUnits("0", 18));
+              }
+            } else {
+              const token = tokensJson.tokens.find(
+                (token) => token.address === option[changedInput ? 0 : 1]
+              );
 
-            const decimals = token ? token.decimals + 18 : 24;
+              const decimals = token ? token.decimals + 18 : 24;
 
-            amounts.push(parseUnits("1", decimals));
+              amounts.push(parseUnits("1", decimals));
+            }
           }
         }
         try {
