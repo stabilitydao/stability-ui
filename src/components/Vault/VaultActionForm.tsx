@@ -138,6 +138,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const underlyingCondition =
     !underlyingToken || option[0] !== underlyingToken?.address;
 
+  let isAnyCCFOptionVisible = false;
+
   const checkButtonApproveDeposit = (apprDepo: number[]) => {
     if (
       vault.strategyInfo.shortName === "IQMF" ||
@@ -693,10 +695,20 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     setTransactionInProgress(false);
   };
   const zapDeposit = async () => {
+    // break point for curve
+    if (
+      vault?.strategyInfo?.shortName === "CCF" &&
+      defaultOptionAssets.includes(option[0])
+    ) {
+      deposit();
+      return;
+    }
+
     ///// UNDERLYING
     setError(false);
     setTransactionInProgress(true);
     setLoader(true);
+
     let transaction, depositAssets: any, zapDeposit: any, gas, gasLimit;
     const amount = inputs[option[0]]?.amount;
     if (underlyingToken?.address === option[0]) {
@@ -882,8 +894,38 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     setTransactionInProgress(false);
   };
+  // Temp function for CCF strategyes before 1inch curve update
+  const depositCCF = async (amount: string) => {
+    const decimals = getTokenData(option[0])?.decimals || 18;
+    if (option) {
+      let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
+      try {
+        let previewDepositAssets: any;
+        previewDepositAssets = await readContract(wagmiConfig, {
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "previewDepositAssets",
+          args: [$assets as TAddress[], amounts],
+        });
+        setZapShares(formatUnits(previewDepositAssets[1], 18));
+        checkInputsAllowance(option[0]);
+      } catch (error) {
+        console.error("Error: the asset balance is too low to convert.", error);
+      }
+    }
+
+    setLoader(false);
+  };
+
   const getZapDepositSwapAmounts = async (amount: string) => {
     setLoader(true);
+    if (
+      vault?.strategyInfo?.shortName === "CCF" &&
+      defaultOptionAssets.includes(option[0])
+    ) {
+      depositCCF(amount);
+      return;
+    }
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
@@ -893,6 +935,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         functionName: "getDepositSwapAmounts",
         args: [vault.address, option[0], parseUnits(amount, decimals)],
       });
+
       let promises;
       let outData;
       if (vault?.strategyInfo?.shortName === "CCF") {
@@ -966,7 +1009,6 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         functionName: "previewDepositAssets",
         args: [assets as TAddress[], amounts],
       });
-
       setZapShares(formatUnits(previewDepositAssets[1], 18));
       if ($connected) {
         const allowanceData = await getZapAllowance(option[0]);
@@ -1194,6 +1236,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     let assets: string[] = [];
     let input: any = [];
 
+    const lastAsset = lastKeyPress.key1 ? lastKeyPress.key1 : option[0];
+    // only for CCF strategy
+    const shares = sharesOut
+      ? sharesOut
+      : (parseUnits(zapShares, 18) * BigInt(1)) / BigInt(100);
+
+    if (vault?.strategyInfo?.shortName === "CCF") {
+      input.push(0n);
+    }
+
     for (let i = 0; i < option.length; i++) {
       assets.push(option[i]);
 
@@ -1201,9 +1253,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
       input.push(parseUnits(inputs[option[i]].amount, token.decimals));
     }
-    const changedInput = $assets?.indexOf(lastKeyPress.key1);
+    const changedInput = $assets?.indexOf(lastAsset);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
-    const out = sharesOut - (sharesOut * decimalPercent) / 100n;
+    const out = shares - (shares * decimalPercent) / 100n;
 
     let transaction,
       depositAssets: any,
@@ -1216,8 +1268,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       if (i === changedInput) {
         amounts.push(
           parseUnits(
-            inputs[lastKeyPress.key1 as string].amount,
-            Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
+            inputs[lastAsset as string].amount,
+            Number(getTokenData(lastAsset as string)?.decimals)
           )
         );
       } else {
@@ -1835,6 +1887,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     }
     setLoader(false);
   };
+
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
@@ -2769,86 +2822,220 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </div>
                   </div>
                 </div>
-                {$connected ? (
+                {vault?.strategyInfo?.shortName === "CCF" &&
+                defaultOptionAssets.includes(option[0]) ? (
                   <>
-                    {chain?.id === 137 ? (
+                    {$connected ? (
                       <>
-                        {zapButton === "insufficientBalance" ? (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                          >
-                            INSUFFICIENT BALANCE
-                          </button>
-                        ) : zapButton === "needApprove" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            type="button"
-                            onClick={zapApprove}
-                          >
-                            <p>
-                              {needConfirm
-                                ? "Confirm in wallet"
-                                : `Approve ${
-                                    underlyingToken?.address === option[0]
-                                      ? underlyingToken.symbol
-                                      : getTokenData(option[0])?.symbol
-                                  }`}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
+                        {chain?.id === 137 ? (
+                          <>
+                            {isApprove === 1 ? (
+                              <button
+                                disabled={transactionInProgress}
+                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                  transactionInProgress
+                                    ? "bg-transparent flex items-center justify-center gap-2"
+                                    : "bg-[#486556]"
+                                }`}
+                                type="button"
+                                onClick={deposit}
+                              >
+                                <p>
+                                  {needConfirm
+                                    ? "Confirm in wallet"
+                                    : "Deposit"}
+                                </p>
+
+                                {transactionInProgress && (
+                                  <Loader color={"#486556"} />
+                                )}
+                              </button>
+                            ) : isApprove === 2 ? (
+                              <div className="flex gap-3">
+                                {option.map((asset: any, index: number) => {
+                                  if (
+                                    allowance &&
+                                    formatUnits(
+                                      allowance[asset]?.allowance[0],
+                                      Number(getTokenData(asset)?.decimals)
+                                    ) < inputs[asset].amount
+                                  ) {
+                                    isAnyCCFOptionVisible = true;
+                                    return (
+                                      <button
+                                        disabled={approveIndex !== false}
+                                        className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                          approveIndex === index
+                                            ? "bg-transparent flex items-center justify-center gap-1"
+                                            : "bg-[#486556]"
+                                        }`}
+                                        key={asset}
+                                        type="button"
+                                        onClick={() =>
+                                          approve(asset as TAddress, index)
+                                        }
+                                      >
+                                        <p>
+                                          {needConfirm
+                                            ? "Confirm in wallet"
+                                            : `Approve ${
+                                                getTokenData(asset)?.symbol
+                                              }`}
+                                        </p>
+                                        {approveIndex === index && (
+                                          <Loader color={"#486556"} />
+                                        )}
+                                      </button>
+                                    );
+                                  } else {
+                                    return null;
+                                  }
+                                })}
+                                {!isAnyCCFOptionVisible && (
+                                  <button
+                                    disabled={transactionInProgress}
+                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                      transactionInProgress
+                                        ? "bg-transparent flex items-center justify-center gap-2"
+                                        : "bg-[#486556]"
+                                    }`}
+                                    type="button"
+                                    onClick={deposit}
+                                  >
+                                    <p>
+                                      {needConfirm
+                                        ? "Confirm in wallet"
+                                        : "Deposit"}
+                                    </p>
+
+                                    {transactionInProgress && (
+                                      <Loader color={"#486556"} />
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                            ) : isApprove === 0 ? (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                              >
+                                INSUFFICIENT BALANCE
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                              >
+                                {loader ? "LOADING..." : "ENTER AMOUNT"}
+                              </button>
                             )}
-                          </button>
-                        ) : zapButton === "deposit" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            type="button"
-                            onClick={zapDeposit}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Deposit"}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
-                            )}
-                          </button>
+                          </>
                         ) : (
                           <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                            onClick={() => switchChain({ chainId: 137 })}
+                            className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
+                            type="button"
                           >
-                            {loader ? "LOADING..." : "ENTER AMOUNT"}
+                            <p>SWITCH NETWORK</p>
                           </button>
                         )}
                       </>
                     ) : (
                       <button
-                        onClick={() => switchChain({ chainId: 137 })}
-                        className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                         type="button"
+                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                        onClick={() => open()}
                       >
-                        <p>SWITCH NETWORK</p>
+                        CONNECT WALLET
                       </button>
                     )}
                   </>
                 ) : (
-                  <button
-                    type="button"
-                    className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                    onClick={() => open()}
-                  >
-                    CONNECT WALLET
-                  </button>
+                  <>
+                    {$connected ? (
+                      <>
+                        {chain?.id === 137 ? (
+                          <>
+                            {zapButton === "insufficientBalance" ? (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                              >
+                                INSUFFICIENT BALANCE
+                              </button>
+                            ) : zapButton === "needApprove" ? (
+                              <button
+                                disabled={transactionInProgress}
+                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                  transactionInProgress
+                                    ? "bg-transparent flex items-center justify-center gap-2"
+                                    : "bg-[#486556]"
+                                }`}
+                                type="button"
+                                onClick={zapApprove}
+                              >
+                                <p>
+                                  {needConfirm
+                                    ? "Confirm in wallet"
+                                    : `Approve ${
+                                        underlyingToken?.address === option[0]
+                                          ? underlyingToken.symbol
+                                          : getTokenData(option[0])?.symbol
+                                      }`}
+                                </p>
+                                {transactionInProgress && (
+                                  <Loader color={"#486556"} />
+                                )}
+                              </button>
+                            ) : zapButton === "deposit" ? (
+                              <button
+                                disabled={transactionInProgress}
+                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                  transactionInProgress
+                                    ? "bg-transparent flex items-center justify-center gap-2"
+                                    : "bg-[#486556]"
+                                }`}
+                                type="button"
+                                onClick={zapDeposit}
+                              >
+                                <p>
+                                  {needConfirm
+                                    ? "Confirm in wallet"
+                                    : "Deposit"}
+                                </p>
+                                {transactionInProgress && (
+                                  <Loader color={"#486556"} />
+                                )}
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                              >
+                                {loader ? "LOADING..." : "ENTER AMOUNT"}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => switchChain({ chainId: 137 })}
+                            className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
+                            type="button"
+                          >
+                            <p>SWITCH NETWORK</p>
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+                        onClick={() => open()}
+                      >
+                        CONNECT WALLET
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             )}
