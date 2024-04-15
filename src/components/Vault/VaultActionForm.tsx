@@ -1738,18 +1738,20 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             );
           } else {
             if (vault.strategyInfo.shortName === "CCF") {
-              //todo: add decimals logic
               let value;
+              let decimals = 18;
               for (const key in inputs) {
                 if (key !== lastKeyPress.key1) {
                   value = inputs[key];
+                  decimals = getTokenData(key)?.decimals || 18;
+
                   break;
                 }
               }
               if (value?.amount) {
-                amounts.push(parseUnits(value?.amount, 18));
+                amounts.push(parseUnits(value?.amount, decimals));
               } else {
-                amounts.push(parseUnits("0", 18));
+                amounts.push(parseUnits("0", decimals));
               }
             } else {
               const token = tokensJson.tokens.find(

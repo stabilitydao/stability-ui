@@ -19,12 +19,12 @@ const APRsType = ["latest", "24h", "week"];
 const TABLE: TTableColumn[] = [
   { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
   { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
-  {
-    name: "Type",
-    keyName: "type",
-    sortType: "none",
-    dataType: "string",
-  },
+  // {
+  //   name: "Type",
+  //   keyName: "type",
+  //   sortType: "none",
+  //   dataType: "string",
+  // },
   {
     name: "Strategy",
     keyName: "strategy",

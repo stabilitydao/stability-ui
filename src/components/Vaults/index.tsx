@@ -426,9 +426,9 @@ const Vaults = () => {
                         <VaultState status={vault.status} />
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
+                    {/* <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                       <VaultType type={vault.type} />
-                    </td>
+                    </td> */}
                     <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
                       <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                         {vault.strategyInfo && (
@@ -443,17 +443,19 @@ const Vaults = () => {
                             >
                               {vault.strategyInfo.shortName}
                             </span>
-                            <span className="px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
-                              <span className="flex min-w-[50px] justify-center w-[50px]">
+                            <span
+                              className={`px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center ${
+                                vault.strategySpecific ||
+                                vault.strategyInfo.protocols.length > 2
+                                  ? "min-w-[100px] w-[160px]"
+                                  : ""
+                              }`}
+                            >
+                              <span className="flex min-w-[50px]">
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (
                                     <img
-                                      className={`h-6 w-6 rounded-full ${
-                                        vault.strategyInfo.protocols.length >
-                                          1 &&
-                                        index &&
-                                        "ml-[-8px]"
-                                      }`}
+                                      className="h-6 w-6 rounded-full mx-[1px]"
                                       key={index}
                                       src={protocol.logoSrc}
                                       alt={protocol.name}
@@ -467,7 +469,7 @@ const Vaults = () => {
                                   )
                                 )}
                               </span>
-                              <span className="flex">
+                              {/* <span className="flex">
                                 {vault.strategyInfo.features.map(
                                   (feature, i) => (
                                     <img
@@ -481,7 +483,7 @@ const Vaults = () => {
                                     />
                                   )
                                 )}
-                              </span>
+                              </span> */}
                               {vault.strategySpecific && (
                                 <span
                                   className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
