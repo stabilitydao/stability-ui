@@ -408,7 +408,7 @@ const Vaults = () => {
                         <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                           <p
                             title={vault.name}
-                            className="whitespace-nowrap text-[12px] md:text-[14px]"
+                            className="whitespace-nowrap text-[12px] md:text-[15px]"
                           >
                             {vault.symbol}
                           </p>
@@ -447,7 +447,7 @@ const Vaults = () => {
                               className={`px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center ${
                                 vault.strategySpecific ||
                                 vault.strategyInfo.protocols.length > 2
-                                  ? "min-w-[100px] w-[160px]"
+                                  ? "min-w-[100px] w-[170px]"
                                   : ""
                               }`}
                             >
@@ -455,7 +455,7 @@ const Vaults = () => {
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (
                                     <img
-                                      className="h-6 w-6 rounded-full mx-[1px]"
+                                      className="h-6 w-6 rounded-full mx-[2px]"
                                       key={index}
                                       src={protocol.logoSrc}
                                       alt={protocol.name}
@@ -502,7 +502,7 @@ const Vaults = () => {
                     </td>
                     <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]">
                       <div
-                        className="text-[13px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                        className="text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -648,10 +648,10 @@ const Vaults = () => {
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
                       ${Number(vault.shareprice).toFixed(2)}
                     </td>
-                    <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px] text-[15px]">
                       {formatNumber(vault.tvl, "abbreviate")}
                     </td>
-                    <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
+                    <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px] text-[15px]">
                       {formatNumber(
                         formatFromBigInt(vault.balance, 18),
                         "format"

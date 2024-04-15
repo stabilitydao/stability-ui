@@ -806,6 +806,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         if (vault.strategyInfo.shortName === "IRMF") {
           txData.reverse();
         }
+        if (vault.strategyInfo.shortName === "CCF") txData[1] = "";
 
         gas = await _publicClient.estimateContractGas({
           address: $platformData.zap,
@@ -824,6 +825,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         });
         gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
         setNeedConfirm(true);
+
         zapDeposit = await writeContract(wagmiConfig, {
           address: $platformData.zap,
           abi: ZapABI,
@@ -891,20 +893,33 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         functionName: "getDepositSwapAmounts",
         args: [vault.address, option[0], parseUnits(amount, decimals)],
       });
-      const promises = zapAmounts[0].map(
-        async (toAddress, index) =>
-          vault.assetsProportions[index] &&
-          (await get1InchRoutes(
-            option[0],
-            toAddress,
-            decimals,
-            String(zapAmounts[1][index]),
-            setZapError,
-            "deposit"
-          ))
-      );
-
-      let outData = await Promise.all(promises);
+      let promises;
+      let outData;
+      if (vault?.strategyInfo?.shortName === "CCF") {
+        promises = await get1InchRoutes(
+          option[0],
+          zapAmounts[0][1],
+          decimals,
+          String(zapAmounts[1][0] + zapAmounts[1][1]),
+          setZapError,
+          "deposit"
+        );
+        outData = [promises, promises];
+      } else {
+        promises = zapAmounts[0].map(
+          async (toAddress, index) =>
+            vault.assetsProportions[index] &&
+            (await get1InchRoutes(
+              option[0],
+              toAddress,
+              decimals,
+              String(zapAmounts[1][index]),
+              setZapError,
+              "deposit"
+            ))
+        );
+        outData = await Promise.all(promises);
+      }
 
       if (
         vault.strategyInfo.shortName === "IQMF" ||
@@ -2138,38 +2153,46 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     </p>
                   </div>
                 )}
-                {optionTokens.map(
-                  ({
-                    address,
-                    symbol,
-                    logoURI,
-                  }: {
-                    address: TAddress;
-                    symbol: string;
-                    logoURI: string;
-                  }) => {
-                    return (
-                      <div
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
-                        key={address}
-                        onClick={() => {
-                          optionHandler([address], symbol, address, logoURI);
-                        }}
-                      >
-                        {logoURI && (
-                          <img
-                            className="max-w-6 max-h-6 rounded-full"
-                            src={logoURI}
-                            alt="logo"
-                          />
-                        )}
-                        <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                          {symbol}
-                        </p>
-                      </div>
-                    );
-                  }
-                )}
+                {/* CRV Strategy don't have zap withdraw */}
+                {vault?.strategyInfo?.shortName === "CCF" && tab === "Withdraw"
+                  ? null
+                  : optionTokens.map(
+                      ({
+                        address,
+                        symbol,
+                        logoURI,
+                      }: {
+                        address: TAddress;
+                        symbol: string;
+                        logoURI: string;
+                      }) => {
+                        return (
+                          <div
+                            className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                            key={address}
+                            onClick={() => {
+                              optionHandler(
+                                [address],
+                                symbol,
+                                address,
+                                logoURI
+                              );
+                            }}
+                          >
+                            {logoURI && (
+                              <img
+                                className="max-w-6 max-h-6 rounded-full"
+                                src={logoURI}
+                                alt="logo"
+                              />
+                            )}
+                            <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
+                              {symbol}
+                            </p>
+                          </div>
+                        );
+                      }
+                    )}
               </div>
             </div>
           )}
@@ -2344,11 +2367,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             YOU RECEIVE
                           </p>
                           <div className="flex items-center">
-                            <AssetsProportion
-                              proportions={vault.assetsProportions}
-                              assets={vault?.assets}
-                              type="vault"
-                            />
+                            <div className="mr-4">
+                              <AssetsProportion
+                                proportions={vault.assetsProportions}
+                                assets={vault?.assets}
+                                type="vault"
+                              />
+                            </div>
                             {Number(
                               formatUnits(sharesOut * BigInt(100), 18)
                             ).toFixed(12)}{" "}
@@ -2568,71 +2593,128 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         ) : (
                           <div className="h-[100px]">
                             {zapTokens && (
-                              <div>
-                                {zapTokens.map((token: any) => (
-                                  <div
-                                    className="text-[18px]  flex items-center gap-1 ml-2"
-                                    key={token.address}
-                                  >
-                                    {token.address.toLowerCase() !==
-                                      option[0].toLowerCase() && (
-                                      <div className="flex items-center gap-1 mt-2">
-                                        <img
-                                          src="/oneInch.svg"
-                                          alt="1inch logo"
-                                          title="1inch"
-                                        />
-                                        {zapError ? (
-                                          <img
-                                            src="/error.svg"
-                                            alt="error img"
-                                            title="error"
-                                          />
-                                        ) : (
-                                          <>
-                                            <div className="flex items-center gap-1">
-                                              <p>
-                                                {Number(token.amountIn).toFixed(
-                                                  6
-                                                )}
-                                              </p>
+                              <>
+                                {vault?.strategyInfo?.shortName !== "CCF" ? (
+                                  <div>
+                                    {zapTokens.map((token: any) => (
+                                      <div
+                                        className="text-[18px]  flex items-center gap-1 ml-2"
+                                        key={token.address}
+                                      >
+                                        {token.address.toLowerCase() !==
+                                          option[0].toLowerCase() && (
+                                          <div className="flex items-center gap-1 mt-2">
+                                            <img
+                                              src="/oneInch.svg"
+                                              alt="1inch logo"
+                                              title="1inch"
+                                            />
+                                            {zapError ? (
                                               <img
-                                                src={
-                                                  getTokenData(option[0])
-                                                    ?.logoURI
-                                                }
-                                                title={
-                                                  getTokenData(option[0])
-                                                    ?.symbol
-                                                }
-                                                alt={
-                                                  getTokenData(option[0])
-                                                    ?.symbol
-                                                }
-                                                className="w-6 h-6 rounded-full"
+                                                src="/error.svg"
+                                                alt="error img"
+                                                title="error"
                                               />
-                                            </div>
-                                            -&gt;
-                                            <div className="flex items-center gap-1">
-                                              <p>
-                                                {Number(
-                                                  token.amountOut
-                                                ).toFixed(6)}
-                                              </p>
-                                              <img
-                                                src={token.img}
-                                                title={token.symbol}
-                                                alt={token.symbol}
-                                                className="w-6 h-6 rounded-full"
-                                              />
-                                            </div>
-                                          </>
+                                            ) : (
+                                              <>
+                                                <div className="flex items-center gap-1">
+                                                  <p>
+                                                    {Number(
+                                                      token.amountIn
+                                                    ).toFixed(6)}
+                                                  </p>
+                                                  <img
+                                                    src={
+                                                      getTokenData(option[0])
+                                                        ?.logoURI
+                                                    }
+                                                    title={
+                                                      getTokenData(option[0])
+                                                        ?.symbol
+                                                    }
+                                                    alt={
+                                                      getTokenData(option[0])
+                                                        ?.symbol
+                                                    }
+                                                    className="w-6 h-6 rounded-full"
+                                                  />
+                                                </div>
+                                                -&gt;
+                                                <div className="flex items-center gap-1">
+                                                  <p>
+                                                    {Number(
+                                                      token.amountOut
+                                                    ).toFixed(6)}
+                                                  </p>
+                                                  <img
+                                                    src={token.img}
+                                                    title={token.symbol}
+                                                    alt={token.symbol}
+                                                    className="w-6 h-6 rounded-full"
+                                                  />
+                                                </div>
+                                              </>
+                                            )}
+                                          </div>
                                         )}
                                       </div>
-                                    )}
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
+                                ) : (
+                                  <div className="text-[18px]  flex items-center gap-1 ml-2">
+                                    <div className="flex items-center gap-1 mt-2">
+                                      <img
+                                        src="/oneInch.svg"
+                                        alt="1inch logo"
+                                        title="1inch"
+                                      />
+                                      {zapError ? (
+                                        <img
+                                          src="/error.svg"
+                                          alt="error img"
+                                          title="error"
+                                        />
+                                      ) : (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(
+                                                zapTokens[0].amountIn
+                                              ).toFixed(6)}
+                                            </p>
+                                            <img
+                                              src={
+                                                getTokenData(option[0])?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                          -&gt;
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(
+                                                zapTokens[0].amountOut
+                                              ).toFixed(6)}
+                                            </p>
+                                            <img
+                                              src={zapTokens[0].img}
+                                              title={zapTokens[0].symbol}
+                                              alt={zapTokens[0].symbol}
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
                             )}
                           </div>
                         )}
@@ -2646,11 +2728,14 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         <div className="h-[63px]">
                           <div className="text-left text-[18px]">
                             <div className="flex items-center">
-                              <AssetsProportion
-                                proportions={vault.assetsProportions}
-                                assets={vault?.assets}
-                                type="vault"
-                              />
+                              <div className="mr-4">
+                                <AssetsProportion
+                                  proportions={vault.assetsProportions}
+                                  assets={vault?.assets}
+                                  type="vault"
+                                />
+                              </div>
+
                               {loader && !transactionInProgress ? (
                                 <ShareSkeleton height={30} width={300} />
                               ) : (
