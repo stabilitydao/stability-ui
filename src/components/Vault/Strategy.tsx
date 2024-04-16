@@ -179,28 +179,36 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
           </div>
         </div>
-        {
-          <div className="mt-2">
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-              RISK
-            </p>
-            <div>
+
+        <div className="mt-2">
+          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">RISK</p>
+          <div>
+            {vault?.risk?.symbol === "REKT" ||
+            vault?.risk?.symbol === "REKT+" ? (
               <p className="text-[20px] font-bold text-[#f52a11] mb-2">
                 {vault?.risk?.symbol}
               </p>
-              <div className="flex items-center gap-5 flex-wrap">
-                {vault?.risk?.factors.map((factor) => (
-                  <div
-                    key={factor}
-                    className="text-[14px] border border-[#b75457] text-[#f2aeae] bg-[#3f1f24] rounded-md"
-                  >
-                    <p className="px-2 py-1">{factor}</p>
-                  </div>
-                ))}
-              </div>
+            ) : (
+              <p
+                style={{ color: vault?.strategyInfo?.il?.color }}
+                className="text-[20px] font-bold mb-2"
+              >
+                {vault?.risk?.symbol}
+              </p>
+            )}
+
+            <div className="flex items-center gap-5 flex-wrap">
+              {vault?.risk?.factors.map((factor) => (
+                <div
+                  key={factor}
+                  className="text-[14px] border border-[#b75457] text-[#f2aeae] bg-[#3f1f24] rounded-md"
+                >
+                  <p className="px-2 py-1">{factor}</p>
+                </div>
+              ))}
             </div>
           </div>
-        }
+        </div>
 
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           {needVaultUpgrade && (
