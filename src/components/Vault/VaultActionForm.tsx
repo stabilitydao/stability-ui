@@ -1242,7 +1242,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       ? sharesOut
       : (parseUnits(zapShares, 18) * BigInt(1)) / BigInt(100);
 
-    if (vault?.strategyInfo?.shortName === "CCF") {
+    if (vault?.strategyInfo?.shortName === "CCF" && option.length < 2) {
       input.push(0n);
     }
 

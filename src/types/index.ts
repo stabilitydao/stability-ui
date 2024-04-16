@@ -216,6 +216,7 @@ type TAPRModal = {
   earningData: TEarningData | any;
   daily: number;
   lastHardWork: any;
+  symbol: string;
   state: boolean;
 };
 
@@ -412,4 +413,5 @@ export type {
   TError,
   TContractInfo,
   TPieChartData,
+  TRisk,
 };

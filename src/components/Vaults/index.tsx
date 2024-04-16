@@ -79,6 +79,7 @@ const Vaults = () => {
     earningData: "",
     daily: 0,
     lastHardWork: 0,
+    symbol: "",
     state: false,
   });
 
@@ -415,7 +416,11 @@ const Vaults = () => {
                         <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                           <p
                             title={vault.name}
-                            className="whitespace-nowrap text-[12px] md:text-[15px]"
+                            className={`whitespace-nowrap text-[12px] md:text-[15px] ${
+                              vault?.risk?.isRektStrategy
+                                ? "text-[#818181]"
+                                : "text-[#fff]"
+                            }`}
                           >
                             {vault.symbol}
                           </p>
@@ -520,6 +525,7 @@ const Vaults = () => {
                             earningData: vault.earningData,
                             daily: vault.daily,
                             lastHardWork: vault.lastHardWork as any,
+                            symbol: vault?.risk?.symbol as string,
                             state: true,
                           });
                         }}
@@ -560,8 +566,22 @@ const Vaults = () => {
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
                           <div className="text-[14px] flex flex-col gap-1 w-full">
+                            {!!vault?.risk?.isRektStrategy && (
+                              <div className="flex flex-col items-center gap-2 mb-[10px]">
+                                <h3 className="text-[#f52a11] font-bold">
+                                  {vault?.risk?.symbol} VAULT
+                                </h3>
+                                <p className="text-[12px] text-start">
+                                  Rekt vault regularly incurs losses,
+                                  potentially leading to rapid USD value
+                                  decline, with returns insufficient to offset
+                                  the losses.
+                                </p>
+                              </div>
+                            )}
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APY</p>
+
                               <p className="text-end">
                                 {$hideFeeAPR
                                   ? $aprFilter === "24h"
