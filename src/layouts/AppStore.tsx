@@ -325,6 +325,20 @@ const AppStore = (props: React.PropsWithChildren) => {
           daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
           weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
         };
+
+        // IL
+        let IL = strategyInfo?.il?.rate || 0;
+        switch (APIVault?.risk?.symbol) {
+          case "REKT":
+            IL = 9;
+            break;
+          case "REKT+":
+            IL = 10;
+            break;
+          default:
+            break;
+        }
+
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -344,7 +358,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           assets,
           assetsProportions,
           strategyInfo,
-          il: strategyInfo?.il?.rate,
+          il: IL,
           underlying: vault.underlying,
           strategyAddress: vault.strategy,
           strategyDescription: vault.strategyDescription,
@@ -363,7 +377,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           },
           pool: APIVault.pool,
           alm: APIVault.alm,
-          isRektStrategy: APIVault?.isRektStrategy,
+          risk: APIVault?.risk,
         };
 
         return vaults;

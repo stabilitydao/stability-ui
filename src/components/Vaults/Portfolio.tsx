@@ -186,7 +186,13 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             <HideFeesHandler setModalState={setFeeAPRModal} />
             <APRtimeSwitcher />
 
-            <div className="text-end text-[1.4rem] lg:flex items-center hidden font-medium w-[130px] relative justify-end">
+            <div
+              className="text-end text-[1.4rem] lg:flex items-center hidden font-medium w-[130px] relative justify-end cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPlatformModal(true);
+              }}
+            >
               <span>Platform</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -194,11 +200,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 height="18"
                 viewBox="0 0 16 16"
                 fill="none"
-                className="ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms] tooltip"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPlatformModal(true);
-                }}
+                className="ml-1 opacity-40 hover:opacity-100 transition delay-[40ms] tooltip"
               >
                 <circle cx="8" cy="8" r="7.5" stroke="white" />
                 <path
@@ -347,7 +349,13 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
           <div className="flex flex-col items-start md:gap-0 md:mt-1 gap-3 mt-1">
-            <div className="text-[1.25rem] text-start font-bold lg:hidden flex items-center gap-1">
+            <div
+              className="text-[1.25rem] text-start font-bold lg:hidden flex items-center gap-1  cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPlatformModal(true);
+              }}
+            >
               <span>Platform</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -355,11 +363,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 height="18"
                 viewBox="0 0 16 16"
                 fill="none"
-                className="ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPlatformModal(true);
-                }}
+                className="ml-1 opacity-40 hover:opacity-100 transition delay-[40ms]"
               >
                 <circle cx="8" cy="8" r="7.5" stroke="white" />
                 <path

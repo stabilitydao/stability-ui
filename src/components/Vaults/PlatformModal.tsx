@@ -36,7 +36,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[200px] w-[320px] md:w-[420px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[250px] w-[320px] md:w-[420px]"
       >
         <svg
           onClick={() => {
@@ -100,7 +100,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
             </filter>
           </defs>
         </svg>
-        <div className="px-6 py-8 flex items-start justify-center flex-col gap-4">
+        <div className="px-6 py-8 flex items-start justify-center">
           <div className="text-[12px] sm:text-[16px] w-full">
             <div className="flex flex-col">
               <span className="text-[#848E9C]">Smart Contracts</span>
@@ -111,8 +111,17 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
               <span>stability-ui v{packageJson.version}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[#848E9C]">{$apiData?.title}</span>
+              <span className="text-[#848E9C]">API</span>
               <span>{$apiData?.about}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#848E9C]">Subgraph</span>
+              <a
+                target="_blank"
+                href="https://thegraph.com/hosted-service/subgraph/jodsmigel/stability"
+              >
+                jodsmigel/stability
+              </a>
             </div>
           </div>
         </div>
