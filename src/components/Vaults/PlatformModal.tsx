@@ -22,13 +22,21 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setModalState(false);
+    }
+  };
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflowY = "unset";
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
   return (
