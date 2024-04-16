@@ -79,6 +79,7 @@ const Vaults = () => {
     earningData: "",
     daily: 0,
     lastHardWork: 0,
+    symbol: "",
     state: false,
   });
 
@@ -396,7 +397,14 @@ const Vaults = () => {
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                       <div className="flex items-center justify-start">
                         <div className="hidden md:block">
-                          <VaultState status={vault.status} />
+                          {vault?.risk?.isRektStrategy ? (
+                            <div
+                              className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
+                              title={vault?.risk?.isRektStrategy as string}
+                            ></div>
+                          ) : (
+                            <VaultState status={vault.status} />
+                          )}
                         </div>
                         {vault.assets && (
                           <AssetsProportion
@@ -408,7 +416,11 @@ const Vaults = () => {
                         <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                           <p
                             title={vault.name}
-                            className="whitespace-nowrap text-[12px] md:text-[14px]"
+                            className={`whitespace-nowrap text-[12px] md:text-[15px] ${
+                              vault?.risk?.isRektStrategy
+                                ? "text-[#818181]"
+                                : "text-[#fff]"
+                            }`}
                           >
                             {vault.symbol}
                           </p>
@@ -426,9 +438,9 @@ const Vaults = () => {
                         <VaultState status={vault.status} />
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
+                    {/* <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                       <VaultType type={vault.type} />
-                    </td>
+                    </td> */}
                     <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
                       <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                         {vault.strategyInfo && (
@@ -443,17 +455,19 @@ const Vaults = () => {
                             >
                               {vault.strategyInfo.shortName}
                             </span>
-                            <span className="px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center min-w-[100px] w-[160px]">
-                              <span className="flex min-w-[50px] justify-center w-[50px]">
+                            <span
+                              className={`px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center ${
+                                vault.strategySpecific ||
+                                vault.strategyInfo.protocols.length > 2
+                                  ? "min-w-[100px] w-[170px]"
+                                  : ""
+                              }`}
+                            >
+                              <span className="flex min-w-[50px]">
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (
                                     <img
-                                      className={`h-6 w-6 rounded-full ${
-                                        vault.strategyInfo.protocols.length >
-                                          1 &&
-                                        index &&
-                                        "ml-[-8px]"
-                                      }`}
+                                      className="h-6 w-6 rounded-full mx-[2px]"
                                       key={index}
                                       src={protocol.logoSrc}
                                       alt={protocol.name}
@@ -467,7 +481,7 @@ const Vaults = () => {
                                   )
                                 )}
                               </span>
-                              <span className="flex">
+                              {/* <span className="flex">
                                 {vault.strategyInfo.features.map(
                                   (feature, i) => (
                                     <img
@@ -481,7 +495,7 @@ const Vaults = () => {
                                     />
                                   )
                                 )}
-                              </span>
+                              </span> */}
                               {vault.strategySpecific && (
                                 <span
                                   className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
@@ -500,13 +514,18 @@ const Vaults = () => {
                     </td>
                     <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]">
                       <div
-                        className="text-[13px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                        className={`text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline flex items-center justify-end gap-[2px] ${
+                          vault?.risk?.isRektStrategy
+                            ? "text-[#818181]"
+                            : "text-[#eaecef]"
+                        }`}
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
                             earningData: vault.earningData,
                             daily: vault.daily,
                             lastHardWork: vault.lastHardWork as any,
+                            symbol: vault?.risk?.symbol as string,
                             state: true,
                           });
                         }}
@@ -547,8 +566,22 @@ const Vaults = () => {
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
                           <div className="text-[14px] flex flex-col gap-1 w-full">
+                            {!!vault?.risk?.isRektStrategy && (
+                              <div className="flex flex-col items-center gap-2 mb-[10px]">
+                                <h3 className="text-[#f52a11] font-bold">
+                                  {vault?.risk?.symbol} VAULT
+                                </h3>
+                                <p className="text-[12px] text-start">
+                                  Rekt vault regularly incurs losses,
+                                  potentially leading to rapid USD value
+                                  decline, with returns insufficient to offset
+                                  the losses.
+                                </p>
+                              </div>
+                            )}
                             <div className="font-bold flex items-center justify-between">
                               <p>Total APY</p>
+
                               <p className="text-end">
                                 {$hideFeeAPR
                                   ? $aprFilter === "24h"
@@ -636,20 +669,26 @@ const Vaults = () => {
                       </div>
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
-                      <span
-                        className="uppercase"
-                        style={{ color: vault.strategyInfo.il?.color }}
-                      >
-                        {vault.strategyInfo.il?.title}
-                      </span>
+                      {vault?.risk?.isRektStrategy ? (
+                        <span className="uppercase text-[#F52A11]">
+                          {vault?.risk?.symbol}
+                        </span>
+                      ) : (
+                        <span
+                          className="uppercase"
+                          style={{ color: vault.strategyInfo.il?.color }}
+                        >
+                          {vault.strategyInfo.il?.title}
+                        </span>
+                      )}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
                       ${Number(vault.shareprice).toFixed(2)}
                     </td>
-                    <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px]">
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px] text-[15px]">
                       {formatNumber(vault.tvl, "abbreviate")}
                     </td>
-                    <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px]">
+                    <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px] text-[15px]">
                       {formatNumber(
                         formatFromBigInt(vault.balance, 18),
                         "format"

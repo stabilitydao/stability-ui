@@ -120,7 +120,7 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="bg-button rounded-md">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
-        <div className="hidden lg:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-[17px]">
           <AssetsProportion
             proportions={vault.assetsProportions}
             assets={vault?.assets}
@@ -165,42 +165,6 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 {formatNumber(vault.tvl, "abbreviate")}
               </p>
             </div>
-            <div className="hidden lg:block">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                DAILY
-              </p>
-              <p className="text-[16px] whitespace-nowrap">
-                {earnData.dailyAPR}% / {earnData.dailyEarn}$
-              </p>
-            </div>
-            <div className="block lg:hidden w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                APR / APY
-              </p>
-              <p className="text-[16px] whitespace-nowrap">
-                {earnData.apr}% / {earnData.apy}%
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
-                SHARE PRICE
-              </p>
-              <p className="text-[16px] whitespace-nowrap">
-                ${Number(vault.shareprice).toFixed(5)}
-              </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
-                MONTHLY
-              </p>
-              <p className="text-[16px] whitespace-nowrap">
-                {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 DEPOSITED
@@ -214,7 +178,17 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 </p>
               </div>
             </div>
-            <div className="block lg:hidden w-1/2 lg:w-auto">
+          </div>
+          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+                SHARE PRICE
+              </p>
+              <p className="text-[16px] whitespace-nowrap">
+                ${Number(vault.shareprice).toFixed(5)}
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 DAILY
               </p>
@@ -222,12 +196,22 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 {earnData.dailyAPR}% / {earnData.dailyEarn}$
               </p>
             </div>
-            <div className="hidden lg:block">
+          </div>
+          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
+            <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 APR / APY
               </p>
               <p className="text-[16px] whitespace-nowrap">
                 {earnData.apr}% / {earnData.apy}%
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+                MONTHLY
+              </p>
+              <p className="text-[16px] whitespace-nowrap">
+                {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
               </p>
             </div>
           </div>

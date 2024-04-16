@@ -36,7 +36,14 @@ import {
   isWeb3Load,
   aprFilter,
 } from "@store";
-import { wagmiConfig, platform, PlatformABI, IVaultManagerABI } from "@web3";
+import {
+  wagmiConfig,
+  platform,
+  PlatformABI,
+  IVaultManagerABI,
+  retroIchiFactory,
+  quickSwapIchiFactory,
+} from "@web3";
 
 import {
   addAssetsPrice,
@@ -108,6 +115,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const APIVault =
           stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+
         const strategyInfo = getStrategyInfo(APIVault.symbol);
 
         const strategyName = strategyInfo?.shortName;
@@ -125,10 +133,126 @@ const AppStore = (props: React.PropsWithChildren) => {
         if (APIData?.apr?.daily) {
           dailyAPR = APIData.apr.daily;
         }
+
+        ///////
+        const assetsProportions = vault.assetsProportions
+          ? vault.assetsProportions.map((proportion: any) =>
+              Math.round(Number(formatUnits(proportion, 16)))
+            )
+          : [];
+        const assetsPromise = Promise.all(
+          vault.strategyAssets.map(async (strategyAsset: any) => {
+            const token = getTokenData(strategyAsset);
+            if (token) {
+              const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
+                tokenAsset.addresses.includes(token.address as TAddress)
+              );
+              return {
+                address: token?.address,
+                logo: token?.logoURI,
+                symbol: token?.symbol,
+                name: token?.name,
+                color: tokenExtended?.color,
+              };
+            }
+          })
+        );
+
+        const assets = await assetsPromise;
+        ///// APR DATA CALCULATION
+
+        const aprData = vault.vaultHistoryEntity[0];
+        let poolSwapFeesAPRDaily = 0;
+        let poolSwapFeesAPRWeekly = 0;
+
+        const dailyFarmApr = aprData?.APR24H
+          ? Number(formatUnits(aprData.APR24H, 3)).toFixed(2)
+          : 0;
+
+        const weeklyFarmApr = aprData?.APRWeekly
+          ? Number(formatUnits(aprData.APRWeekly, 3)).toFixed(2)
+          : 0;
+
+        if (APIData) {
+          poolSwapFeesAPRDaily = APIData?.apr?.daily || 0;
+          poolSwapFeesAPRWeekly =
+            APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
+        }
         if (strategyName === "IQMF" || strategyName === "IRMF") {
-          dailyAPR = Number(
-            formatUnits(almRebalanceEntity.APRFromLastEvent, 8)
-          );
+          let fee = 0;
+          if (strategyName === "IRMF") {
+            try {
+              const baseFee = await readContract(wagmiConfig, {
+                address: retroIchiFactory,
+                abi: [
+                  {
+                    inputs: [],
+                    name: "baseFee",
+                    outputs: [
+                      { internalType: "uint256", name: "", type: "uint256" },
+                    ],
+                    stateMutability: "view",
+                    type: "function",
+                  },
+                ],
+                functionName: "baseFee",
+              });
+              fee = Number(formatUnits(baseFee, 16));
+            } catch (error) {
+              console.log("Retro fee error:", error);
+            }
+          }
+          if (strategyName === "IQMF") {
+            try {
+              const ammFee = await readContract(wagmiConfig, {
+                address: quickSwapIchiFactory,
+                abi: [
+                  {
+                    inputs: [],
+                    name: "ammFee",
+                    outputs: [
+                      { internalType: "uint256", name: "", type: "uint256" },
+                    ],
+                    stateMutability: "view",
+                    type: "function",
+                  },
+                ],
+                functionName: "ammFee",
+              });
+              const baseFee = await readContract(wagmiConfig, {
+                address: quickSwapIchiFactory,
+                abi: [
+                  {
+                    inputs: [],
+                    name: "baseFee",
+                    outputs: [
+                      { internalType: "uint256", name: "", type: "uint256" },
+                    ],
+                    stateMutability: "view",
+                    type: "function",
+                  },
+                ],
+                functionName: "baseFee",
+              });
+              fee = Number(formatUnits(ammFee + baseFee, 16));
+            } catch (error) {
+              console.log("Ichi fee error:", error);
+            }
+          }
+          //////
+          poolSwapFeesAPRDaily =
+            Number(formatUnits(almRebalanceEntity.APR24H, 8)) - fee;
+
+          poolSwapFeesAPRWeekly =
+            Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) - fee;
+
+          dailyAPR =
+            Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) - fee;
+
+          if (poolSwapFeesAPRDaily < 0) poolSwapFeesAPRDaily = 0;
+          if (poolSwapFeesAPRWeekly < 0) poolSwapFeesAPRWeekly = 0;
+          if (dailyAPR < 0) dailyAPR = 0;
+
           // rebalances
           const totalRebalances = vault.almRebalanceHistoryEntity;
 
@@ -156,57 +280,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         ).toFixed(2);
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
-        const assetsProportions = vault.assetsProportions
-          ? vault.assetsProportions.map((proportion: any) =>
-              Math.round(Number(formatUnits(proportion, 16)))
-            )
-          : [];
-        const assetsPromise = Promise.all(
-          vault.strategyAssets.map(async (strategyAsset: any) => {
-            const token = getTokenData(strategyAsset);
-            if (token) {
-              const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token.address as TAddress)
-              );
-              return {
-                address: token?.address,
-                logo: token?.logoURI,
-                symbol: token?.symbol,
-                name: token?.name,
-                color: tokenExtended?.color,
-              };
-            }
-          })
-        );
-
-        const assets = await assetsPromise;
-        /////
-        const aprData = vault.vaultHistoryEntity[0];
-        let poolSwapFeesAPRDaily = 0;
-        let poolSwapFeesAPRWeekly = 0;
-
-        const dailyFarmApr = aprData?.APR24H
-          ? Number(formatUnits(aprData.APR24H, 3)).toFixed(2)
-          : 0;
-
-        const weeklyFarmApr = aprData?.APRWeekly
-          ? Number(formatUnits(aprData.APRWeekly, 3)).toFixed(2)
-          : 0;
-
-        if (APIData) {
-          poolSwapFeesAPRDaily = APIData?.apr?.daily || 0;
-          poolSwapFeesAPRWeekly =
-            APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
-        }
-        if (strategyName === "IQMF" || strategyName === "IRMF") {
-          poolSwapFeesAPRDaily = Number(
-            formatUnits(almRebalanceEntity.APR24H, 8)
-          );
-          poolSwapFeesAPRWeekly = Number(
-            formatUnits(almRebalanceEntity.APRWeekly, 8)
-          );
-        }
-
+        ///////
         const dailyTotalAPRWithFees =
           Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
         const weeklyTotalAPRWithFees =
@@ -251,6 +325,20 @@ const AppStore = (props: React.PropsWithChildren) => {
           daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
           weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
         };
+
+        // IL
+        let IL = strategyInfo?.il?.rate || 0;
+        switch (APIVault?.risk?.symbol) {
+          case "REKT":
+            IL = 9;
+            break;
+          case "REKT+":
+            IL = 10;
+            break;
+          default:
+            break;
+        }
+
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -270,7 +358,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           assets,
           assetsProportions,
           strategyInfo,
-          il: strategyInfo?.il?.rate,
+          il: IL,
           underlying: vault.underlying,
           strategyAddress: vault.strategy,
           strategyDescription: vault.strategyDescription,
@@ -289,6 +377,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           },
           pool: APIVault.pool,
           alm: APIVault.alm,
+          risk: APIVault?.risk,
         };
 
         return vaults;

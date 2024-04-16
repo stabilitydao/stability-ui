@@ -16,7 +16,7 @@ const IL = {
     rate: 8,
     title: "High",
     desc: "The strategy of the underlying liquidity provider (Gamma Narrow LP) provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#F52A11",
+    color: "#f55e11",
   },
   GQFW: {
     rate: 5,
@@ -40,7 +40,7 @@ const IL = {
     rate: 8,
     title: "High",
     desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#F52A11",
+    color: "#f55e11",
   },
   IQMF: {
     rate: 4,

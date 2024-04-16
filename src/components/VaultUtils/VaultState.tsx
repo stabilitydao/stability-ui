@@ -41,7 +41,7 @@ const VaultState: React.FC<IProps> = ({ status }) => {
       {tooltip && (
         <div
           ref={tooltipRef}
-          className="absolute bottom-[-55px] right-[-50px] py-2 px-3 rounded-md bg-button z-[150]"
+          className="absolute bottom-[-55px] right-[-50px] py-2 px-3 rounded-md bg-button"
         >
           {VAULT_STATUSES[status]}
         </div>

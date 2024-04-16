@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import packageJson from "../../../package.json";
 
-import { platformVersion } from "@store";
+import { apiData, platformVersion } from "@store";
 
 interface IProps {
   setModalState: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,6 +14,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
   const modalRef: any = useRef(null);
 
   const $platformVersion = useStore(platformVersion);
+  const $apiData = useStore(apiData);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -21,13 +22,21 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setModalState(false);
+    }
+  };
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflowY = "unset";
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
   return (
@@ -35,7 +44,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[150px] w-[320px] md:w-[420px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-[250px] w-[320px] md:w-[420px]"
       >
         <svg
           onClick={() => {
@@ -99,8 +108,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
             </filter>
           </defs>
         </svg>
-
-        <div className="px-6 py-8 flex items-start justify-center flex-col gap-4">
+        <div className="px-6 py-8 flex items-start justify-center">
           <div className="text-[12px] sm:text-[16px] w-full">
             <div className="flex flex-col">
               <span className="text-[#848E9C]">Smart Contracts</span>
@@ -109,6 +117,19 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
             <div className="flex flex-col">
               <span className="text-[#848E9C]">User Interface</span>
               <span>stability-ui v{packageJson.version}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#848E9C]">API</span>
+              <span>{$apiData?.about}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[#848E9C]">Subgraph</span>
+              <a
+                target="_blank"
+                href="https://thegraph.com/hosted-service/subgraph/jodsmigel/stability"
+              >
+                jodsmigel/stability
+              </a>
             </div>
           </div>
         </div>

@@ -152,6 +152,11 @@ type TAlm = {
   tvl: number;
   positions: TAlmPosition[];
 };
+type TRisk = {
+  factors: string[];
+  isRektStrategy: boolean | string;
+  symbol: string;
+};
 
 type TVault = {
   address: TAddress;
@@ -185,6 +190,7 @@ type TVault = {
   earningData: TEarningData | any;
   pool: TPool;
   alm: TAlm;
+  risk: TRisk;
 };
 
 type TTableColumn = {
@@ -210,6 +216,7 @@ type TAPRModal = {
   earningData: TEarningData | any;
   daily: number;
   lastHardWork: any;
+  symbol: string;
   state: boolean;
 };
 
@@ -406,4 +413,5 @@ export type {
   TError,
   TContractInfo,
   TPieChartData,
+  TRisk,
 };

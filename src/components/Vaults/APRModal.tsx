@@ -6,7 +6,6 @@ import { TimeDifferenceIndicator } from "@components";
 
 import { aprFilter, hideFeeApr } from "@store";
 
-import { formatFromBigInt } from "@utils";
 import type { TAPRModal } from "@types";
 
 interface IProps {
@@ -26,6 +25,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         earningData: "",
         daily: 0,
         lastHardWork: 0,
+        symbol: "",
         state: false,
       });
     }
@@ -40,12 +40,17 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <div>
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-[#26282f] rounded-[10px] h-[250px]"
+        className={`text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] w-[300px] bg-[#26282f] rounded-[10px] ${
+          state.symbol === "REKT" || state.symbol === "REKT+"
+            ? "h-[400px]"
+            : "h-[250px]"
+        }`}
       >
         <svg
           onClick={() => {
@@ -53,6 +58,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               earningData: "",
               daily: 0,
               lastHardWork: 0,
+              symbol: "",
               state: false,
             });
           }}
@@ -116,6 +122,16 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         </svg>
 
         <div className="p-10 flex items-start justify-center flex-col gap-4">
+          {state.symbol === "REKT" || state.symbol === "REKT+" ? (
+            <div className="flex flex-col items-center gap-2 mb-[10px]">
+              <h3 className="text-[#f52a11] font-bold">{state.symbol} VAULT</h3>
+              <p className="text-[12px] text-start">
+                Rekt vault regularly incurs losses, potentially leading to rapid
+                USD value decline, with returns insufficient to offset the
+                losses.
+              </p>
+            </div>
+          ) : null}
           <div className="text-[16px] w-full">
             <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APY</p>

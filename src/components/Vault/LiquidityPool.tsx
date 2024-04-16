@@ -3,6 +3,8 @@ import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
+import { DEXes } from "@constants";
+
 import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
@@ -58,6 +60,13 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
 
     setPoolAssets(assetsWithPercents);
   }, [vault, $assetsPrices]);
+  const dexPool = useMemo(() => {
+    return DEXes.find((dex) =>
+      vault.strategyInfo.protocols.some(
+        (protocol) => protocol.name === dex.name
+      )
+    );
+  }, [vault.strategyInfo.protocols]);
   return (
     <>
       <div className="flex justify-between items-center h-[60px]">
@@ -78,7 +87,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-10">
+        <div className="flex items-start gap-10 flex-wrap">
           <div className="flex flex-col gap-5">
             <div className="flex flex-col">
               <span className="text-[14px] text-[#8d8e96]">TVL</span>
@@ -105,6 +114,15 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
                 </div>
               ))}
           </div>
+
+          {!!dexPool && (
+            <div>
+              <div className="flex flex-col">
+                <span className="text-[14px] text-[#8d8e96]">ALGO</span>
+                <span className="text-[16px]">{dexPool.algo}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

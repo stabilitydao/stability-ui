@@ -13,7 +13,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
     Type: "hidden xl:table-cell",
     Strategy: "hidden min-[1130px]:table-cell",
     Status: "table-cell md:hidden",
-    IL: "text-start pl-2",
+    RISK: "text-start pl-2",
   };
 
   const tabController = () => {
@@ -56,7 +56,9 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
                     : "px-0 md:px-2  min-[1130px]:px-4"
                 }`
               : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
-          } py-2 text-center cursor-pointer ${styles[value] || ""}`}
+          } py-2 text-center cursor-pointer whitespace-nowrap ${
+            styles[value] || ""
+          }`}
         >
           {value !== "APR / APY" ? (
             <p className="inline-block">{value}</p>
