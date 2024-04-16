@@ -185,6 +185,7 @@ type TVault = {
   earningData: TEarningData | any;
   pool: TPool;
   alm: TAlm;
+  isRektStrategy: boolean | string;
 };
 
 type TTableColumn = {

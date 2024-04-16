@@ -396,7 +396,14 @@ const Vaults = () => {
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                       <div className="flex items-center justify-start">
                         <div className="hidden md:block">
-                          <VaultState status={vault.status} />
+                          {vault?.isRektStrategy ? (
+                            <div
+                              className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
+                              title={vault?.isRektStrategy as string}
+                            ></div>
+                          ) : (
+                            <VaultState status={vault.status} />
+                          )}
                         </div>
                         {vault.assets && (
                           <AssetsProportion
@@ -502,7 +509,11 @@ const Vaults = () => {
                     </td>
                     <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]">
                       <div
-                        className="text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline text-[#eaecef] flex items-center justify-end gap-[2px]"
+                        className={`text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline flex items-center justify-end gap-[2px] ${
+                          vault?.isRektStrategy
+                            ? "text-[#818181]"
+                            : "text-[#eaecef]"
+                        }`}
                         onClick={(e) => {
                           e.stopPropagation();
                           setAprModal({
@@ -638,12 +649,16 @@ const Vaults = () => {
                       </div>
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
-                      <span
-                        className="uppercase"
-                        style={{ color: vault.strategyInfo.il?.color }}
-                      >
-                        {vault.strategyInfo.il?.title}
-                      </span>
+                      {vault?.isRektStrategy ? (
+                        <span className="uppercase text-[#F52A11]">REKT</span>
+                      ) : (
+                        <span
+                          className="uppercase"
+                          style={{ color: vault.strategyInfo.il?.color }}
+                        >
+                          {vault.strategyInfo.il?.title}
+                        </span>
+                      )}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
                       ${Number(vault.shareprice).toFixed(2)}
