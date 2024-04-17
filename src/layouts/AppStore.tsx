@@ -180,6 +180,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
         if (strategyName === "IQMF" || strategyName === "IRMF") {
           let fee = 0;
+
           if (strategyName === "IRMF") {
             try {
               const baseFee = await readContract(wagmiConfig, {
@@ -241,17 +242,22 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
           //////
           poolSwapFeesAPRDaily =
-            Number(formatUnits(almRebalanceEntity.APR24H, 8)) - fee;
+            Number(formatUnits(almRebalanceEntity.APR24H, 8)) -
+            (Number(formatUnits(almRebalanceEntity.APR24H, 8)) / 100) * fee;
 
           poolSwapFeesAPRWeekly =
-            Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) - fee;
+            Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) -
+            (Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) / 100) * fee;
 
           dailyAPR =
-            Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) - fee;
+            Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) -
+            (Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) /
+              100) *
+              fee;
 
-          if (poolSwapFeesAPRDaily < 0) poolSwapFeesAPRDaily = 0;
-          if (poolSwapFeesAPRWeekly < 0) poolSwapFeesAPRWeekly = 0;
-          if (dailyAPR < 0) dailyAPR = 0;
+          if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
+          if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
+          if (!dailyAPR) dailyAPR = 0;
 
           // rebalances
           const totalRebalances = vault.almRebalanceHistoryEntity;

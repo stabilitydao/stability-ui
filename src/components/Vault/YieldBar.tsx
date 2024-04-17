@@ -2,11 +2,15 @@ import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
+import { readContract } from "@wagmi/core";
+
 import { HoldModal } from "@components";
 
 import { assetsPrices, connected } from "@store";
 
-import { getTimeDifference } from "@utils";
+import { getTimeDifference, getTokenData } from "@utils";
+
+import { StrategyABI, wagmiConfig } from "@web3";
 
 import type { TVault } from "@types";
 
@@ -77,10 +81,44 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
 
   const [holdData, setHoldData] = useState<IHoldData[]>([]);
-  const [vsData, setVsData] = useState();
+
+  const [vsData, setVsData] = useState({
+    percentDiff: "-",
+    yearPercentDiff: "-",
+  });
+
   const [shareData, setShareData] = useState<any>();
 
   const [modal, setModal] = useState<boolean>(false);
+
+  const getProportionsData = async (): Promise<number[]> => {
+    const assetsAmounts = await readContract(wagmiConfig, {
+      address: vault?.strategyAddress,
+      abi: StrategyABI,
+      functionName: "assetsAmounts",
+    });
+
+    if (!assetsAmounts || !$assetsPrices || !assetsAmounts) return [0, 0];
+
+    const tokens = assetsAmounts[0].map((token) => getTokenData(token));
+
+    const amounts = assetsAmounts[1].map((amount, index) =>
+      formatUnits(amount, tokens[index]?.decimals as number)
+    );
+
+    const amountsInUSD = amounts.map((amount, index) => {
+      const tokenAddress: any = tokens[index]?.address;
+
+      const tokenPrice: bigint = $assetsPrices[tokenAddress];
+      return Number(formatUnits(tokenPrice, 18)) * Number(amount);
+    });
+
+    const sum = amountsInUSD.reduce((acc: number, num: any) => acc + num, 0);
+
+    return amountsInUSD.map((amount) =>
+      amount ? (Number(amount) / sum) * 100 : 0
+    );
+  };
 
   const getHoldData = async () => {
     if (!Number(vault.shareprice) || !$assetsPrices) {
@@ -101,8 +139,12 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
     const sharePriceOnCreation = 1;
     const sharePrice = Number(vault.shareprice);
+
     const sharePriceDifference = (sharePrice - sharePriceOnCreation) * 100;
+
     const daysFromCreation = getTimeDifference(vault.created).days;
+
+    const proportions: number[] = await getProportionsData();
 
     const tokensHold = vault.assets.map((asset, index) => {
       const price = Number(formatUnits($assetsPrices[asset.address], 18));
@@ -110,7 +152,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
         formatUnits(BigInt(vault.assetsPricesOnCreation[index]), 18)
       );
 
-      const startProportion = (1 / 100) * vault?.assetsProportions[index];
+      const startProportion = (1 / 100) * proportions[index];
 
       const proportionPrice = startProportion / priceOnCreation;
 
