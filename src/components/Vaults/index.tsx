@@ -390,8 +390,8 @@ const Vaults = () => {
               currentTabVaults.map((vault: TVault) => {
                 return (
                   <tr
-                    className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
                     key={vault.name}
+                    className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
                     onClick={() => toVault(vault.address)}
                   >
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
@@ -439,8 +439,8 @@ const Vaults = () => {
                       </div>
                     </td>
                     {/* <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
-                      <VaultType type={vault.type} />
-                    </td> */}
+                    <VaultType type={vault.type} />
+                  </td> */}
                     <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
                       <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                         {vault.strategyInfo && (
@@ -482,20 +482,20 @@ const Vaults = () => {
                                 )}
                               </span>
                               {/* <span className="flex">
-                                {vault.strategyInfo.features.map(
-                                  (feature, i) => (
-                                    <img
-                                      key={i}
-                                      title={feature.name}
-                                      alt={feature.name}
-                                      className="w-6 h-6 ml-1"
-                                      src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                                        feature.svg
-                                      )}`}
-                                    />
-                                  )
-                                )}
-                              </span> */}
+                              {vault.strategyInfo.features.map(
+                                (feature, i) => (
+                                  <img
+                                    key={i}
+                                    title={feature.name}
+                                    alt={feature.name}
+                                    className="w-6 h-6 ml-1"
+                                    src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                                      feature.svg
+                                    )}`}
+                                  />
+                                )
+                              )}
+                            </span> */}
                               {vault.strategySpecific && (
                                 <span
                                   className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
