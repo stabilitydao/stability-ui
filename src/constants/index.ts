@@ -37,12 +37,12 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "VS HOLD APR",
-    keyName: "sortAPR",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "VS HOLD APR",
+  //   keyName: "sortAPR",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   {
     name: "RISK",
     keyName: "il",

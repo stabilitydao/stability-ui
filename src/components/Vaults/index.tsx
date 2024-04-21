@@ -650,11 +650,11 @@ const Vaults = () => {
                         <i></i>
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-3 py-2 w-[150px] md:w-[80px] min-[915px]:w-[160px]">
+                    {/* <td className="px-2 min-[1130px]:px-3 py-2 w-[150px] md:w-[80px] min-[915px]:w-[160px]">
                       <p className="text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end flex items-center justify-end gap-[2px] text-[#eaecef]">
                         123%
                       </p>
-                    </td>
+                    </td> */}
                     <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
                       {vault?.risk?.isRektStrategy ? (
                         <span className="uppercase text-[#F52A11]">
