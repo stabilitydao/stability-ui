@@ -98,7 +98,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
       functionName: "assetsAmounts",
     });
 
-    if (!assetsAmounts || !$assetsPrices || !assetsAmounts) return [0, 0];
+    if (!assetsAmounts || !$assetsPrices) return [0, 0];
 
     const tokens = assetsAmounts[0].map((token) => getTokenData(token));
 

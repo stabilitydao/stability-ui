@@ -32,8 +32,14 @@ const TABLE: TTableColumn[] = [
     dataType: "string",
   },
   {
-    name: "APR / APY",
-    keyName: "apy",
+    name: "Income APR",
+    keyName: "sortAPR",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "VS HOLD APR",
+    keyName: "sortAPR",
     sortType: "none",
     dataType: "number",
   },
@@ -209,7 +215,6 @@ const VAULT_STATUSES: TVaultStatuses = {
   4: "DISABLED",
   5: "DEPOSITS_UNAVAILABLE",
 };
-
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
@@ -248,9 +253,9 @@ const PROTOCOLS = {
     logoSrc: "/protocols/Convex.png",
   },
 };
-
-const GRAPH_ENDPOINT =
-  "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
+const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
+  import.meta.env.PUBLIC_GRAPH_API_KEY
+}/subgraphs/id/3ZoXLL5NpCo7FxY5wNzVYuNAA7qF6AHsyhZLrEAensJG`;
 
 const GRAPH_QUERY = `
       {

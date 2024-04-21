@@ -76,6 +76,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   let localVaults: any = {};
 
   let stabilityAPIData: any;
+
   const getLocalStorageData = () => {
     const savedSettings = localStorage.getItem("transactionSettings");
     const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
@@ -94,6 +95,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       aprFilter.set(savedData);
     }
   };
+
   const getDataFromStabilityAPI = async () => {
     try {
       const response = await axios.get(STABILITY_API);
@@ -381,6 +383,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             poolSwapFeesAPR,
             farmAPR,
           },
+          sortAPR: APRArray?.withFees?.latest,
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
