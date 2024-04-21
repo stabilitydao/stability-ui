@@ -34,5 +34,8 @@
     "vercel": "^32.5.0",
     "viem": "^2.9.6",
     "wagmi": "^2.5.7"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
   }
 }

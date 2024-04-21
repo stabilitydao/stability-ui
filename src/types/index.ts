@@ -188,6 +188,7 @@ type TVault = {
   gasReserve: string;
   rebalances: any;
   earningData: TEarningData | any;
+  sortAPR: string;
   pool: TPool;
   alm: TAlm;
   risk: TRisk;

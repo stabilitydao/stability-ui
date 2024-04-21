@@ -544,24 +544,6 @@ const Vaults = () => {
                             : vault.earningData.apr.withFees[$aprFilter]}
                           %
                         </p>
-                        {(window.innerWidth > 915 ||
-                          window.innerWidth < 767) && (
-                          <p>
-                            /{" "}
-                            {$hideFeeAPR
-                              ? $aprFilter === "24h"
-                                ? vault.earningData.apy.withoutFees.daily
-                                : $aprFilter === "week"
-                                ? vault.earningData.apy.withoutFees.weekly
-                                : vault.earningData.apy.withoutFees[$aprFilter]
-                              : $aprFilter === "24h"
-                              ? vault.earningData.apy.withFees.daily
-                              : $aprFilter === "week"
-                              ? vault.earningData.apy.withFees.weekly
-                              : vault.earningData.apy.withFees[$aprFilter]}
-                            %
-                          </p>
-                        )}
                       </div>
                       <div className="visible__tooltip">
                         <div className="flex items-start flex-col gap-4">
@@ -668,6 +650,11 @@ const Vaults = () => {
                         <i></i>
                       </div>
                     </td>
+                    {/* <td className="px-2 min-[1130px]:px-3 py-2 w-[150px] md:w-[80px] min-[915px]:w-[160px]">
+                      <p className="text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end flex items-center justify-end gap-[2px] text-[#eaecef]">
+                        123%
+                      </p>
+                    </td> */}
                     <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
                       {vault?.risk?.isRektStrategy ? (
                         <span className="uppercase text-[#F52A11]">
