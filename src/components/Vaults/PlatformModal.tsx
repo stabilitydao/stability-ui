@@ -13,8 +13,8 @@ interface IProps {
 const GitHub: React.FC<{}> = () => {
   return (
     <svg
-      width="15"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 15 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +31,7 @@ const GitHub: React.FC<{}> = () => {
 
 const TheGraph: React.FC<{}> = () => {
   return (
-    <div className="inline-flex w-[16px] h-[16px]">
+    <div className="inline-flex w-[18px] h-[18px]">
       <svg
         fill="#808080"
         aria-hidden="true"
@@ -83,7 +83,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
       <div
         ref={modalRef}
-        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-min-[250px] w-[320px] sm:w-[520px] lg:w-[640px]"
+        className="text-[#fff] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[51] bg-modal rounded-[10px] h-min-[250px] w-[320px] sm:w-[520px] lg:w-[500px]"
       >
         <svg
           onClick={() => {
@@ -149,28 +149,24 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
         </svg>
         <div className="px-6 py-8 flex items-start justify-center">
           <div className="text-[12px] sm:text-[16px] w-full">
+
             <div className="flex flex-col mb-2">
-              <span className="text-[#848E9C]">Smart contracts</span>
+              <span className="text-[#848E9C]">Network</span>
               <div className="flex items-center gap-2">
-                <a
-                  href="https://github.com/stabilitydao/stability-contracts"
-                  target="_blank"
-                  title="Smart contracts source code"
-                  className="flex items-center gap-1 hover:bg-[#2a2c49]"
-                >
-                  <GitHub />
-                  <span>stability-contracts</span>
-                </a>
+                <div className="inline-flex items-center gap-1">
+                  <img src="/networks/polygon.jpg" className="w-[20px] h-[20px] rounded-[6px]" />
+                  <span>Polygon [137]</span>
+                </div>
                 
               </div>
-              
             </div>
+
             <div className="flex flex-col mb-0.5">
               <span className="text-[#848E9C]">Core deployment</span>
               <div className="flex items-center gap-2">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
-                  <img src= "/logo.svg" alt="Stability" className="w-[16px] h-[16px]" />
+                  <img src= "/logo.svg" alt="Stability" className="w-[20px] h-[20px]" />
                   <span>Stability Platform {$platformVersion}</span>
                 </div>
                 <div className="flex flex-wrap mt-2">
@@ -182,7 +178,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                         target="_blank"
                         href={`https://polygonscan.com/address/${address}`}
                         title={`Go to ${moduleContract} contract address at Polygonscan`}
-                        className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-1.5 lg:px-2 lg:py-[2px] mr-1 mb-2"
+                        className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-2 lg:px-3 md:py-[3px] mr-1 mb-2"
                       >
                         <span className="inline-flex text-[#d3d0d0] ">{moduleContract}</span>
                         {/* <span className="inline-flex bg-[#666888] rounded-l-full pl-1.5 pr-1">{moduleContract}</span> */}
@@ -205,7 +201,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                     return (
                       <img
                         key={protocol?.name + index}
-                        className="w-6 h-6 rounded-full m-1"
+                        className="w-[24px] h-[24px] rounded-full m-1"
                         src={protocol?.logoSrc}
                         alt={protocol?.name}
                         title={protocol?.name}
@@ -215,6 +211,22 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                 )}
               </div>
             </div>
+
+            <div className="flex flex-col mb-2">
+              <span className="text-[#848E9C]">Smart contracts</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://github.com/stabilitydao/stability-contracts"
+                  target="_blank"
+                  title="Smart contracts source code"
+                  className="flex items-center gap-1 hover:bg-[#2a2c49]"
+                >
+                  <GitHub />
+                  <span>stability-contracts</span>
+                </a>
+              </div>
+            </div>
+
             <div className="flex flex-col mb-2">
               <span className="text-[#848E9C]">User Interface</span>
               <div className="flex flex-col gap-2 w-full">
@@ -229,15 +241,6 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                 </a>
                 
               </div>
-            </div>
-            <div className="flex flex-col mb-2">
-              <span className="text-[#848E9C]">API</span>
-              <span>{$apiData?.about}</span>
-              <a
-                href="https://api.stabilitydao.org"
-                target="_blank"
-                className="flex items-center gap-1 hover:bg-[#2a2c49]"
-              >api.stabilitydao.org</a>
             </div>
             <div className="flex flex-col mb-2">
               <span className="text-[#848E9C]">Subgraph</span>
@@ -262,6 +265,15 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                 </a>
 
               </div>
+            </div>
+            <div className="flex flex-col mb-2">
+              <span className="text-[#848E9C]">API</span>
+              <span>{$apiData?.about}</span>
+              <a
+                href="https://api.stabilitydao.org"
+                target="_blank"
+                className="flex items-center gap-1 hover:bg-[#2a2c49]"
+              >api.stabilitydao.org</a>
             </div>
           </div>
         </div>
