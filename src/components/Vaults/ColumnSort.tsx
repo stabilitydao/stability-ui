@@ -11,7 +11,7 @@ type TProps = {
 const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
   const styles: Record<string, string> = {
     Type: "hidden xl:table-cell",
-    Strategy: "hidden min-[1130px]:table-cell",
+    Strategy: "hidden min-[1200px]:table-cell",
     Status: "table-cell md:hidden",
     RISK: "text-start pl-2",
   };

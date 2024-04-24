@@ -2,15 +2,13 @@ import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { readContract } from "@wagmi/core";
-
 import { HoldModal } from "@components";
 
 import { assetsPrices, connected } from "@store";
 
 import { getTimeDifference, getTokenData } from "@utils";
 
-import { StrategyABI, wagmiConfig } from "@web3";
+import { STRATEGYES_ASSETS_AMOUNTS } from "@constants";
 
 import type { TVault } from "@types";
 
@@ -92,17 +90,16 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const [modal, setModal] = useState<boolean>(false);
 
   const getProportionsData = async (): Promise<number[]> => {
-    const assetsAmounts = await readContract(wagmiConfig, {
-      address: vault?.strategyAddress,
-      abi: StrategyABI,
-      functionName: "assetsAmounts",
-    });
+    const assetsAmounts =
+      STRATEGYES_ASSETS_AMOUNTS[
+        vault?.strategyAddress as keyof typeof STRATEGYES_ASSETS_AMOUNTS
+      ];
 
     if (!assetsAmounts || !$assetsPrices) return [0, 0];
 
-    const tokens = assetsAmounts[0].map((token) => getTokenData(token));
+    const tokens = assetsAmounts.assets.map((token) => getTokenData(token));
 
-    const amounts = assetsAmounts[1].map((amount, index) =>
+    const amounts = assetsAmounts.assetsAmounts.map((amount, index) =>
       formatUnits(amount, tokens[index]?.decimals as number)
     );
 
@@ -355,7 +352,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
               {!!vsData && (
                 <tr className="hover:bg-[#2B3139]">
-                  <td>VAULT VS HOLD</td>
+                  <td>VAULT VS HODL</td>
 
                   {isActive ? (
                     <td
@@ -391,7 +388,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
               {holdData.map((aprsData: IHoldData, index: number) => (
                 <tr key={index} className="hover:bg-[#2B3139]">
-                  <td>VAULT VS {aprsData?.symbol} HOLD</td>
+                  <td>VAULT VS {aprsData?.symbol} HODL</td>
 
                   {isActive ? (
                     <td

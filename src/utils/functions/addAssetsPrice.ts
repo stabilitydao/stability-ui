@@ -13,6 +13,7 @@ export const addAssetsPrice = (data: any) => {
       }
       assetsPrices.set(assetPrice);
     }
+    return assetPrice;
   } catch (error) {
     console.error("Error:", error);
   }

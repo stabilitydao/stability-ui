@@ -441,7 +441,7 @@ const Vaults = () => {
                     {/* <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                     <VaultType type={vault.type} />
                   </td> */}
-                    <td className="pl-2 py-2 hidden min-[1130px]:table-cell whitespace-nowrap w-[250px]">
+                    <td className="pl-2 py-2 hidden min-[1200px]:table-cell whitespace-nowrap w-[250px]">
                       <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                         {vault.strategyInfo && (
                           <>
@@ -650,11 +650,18 @@ const Vaults = () => {
                         <i></i>
                       </div>
                     </td>
-                    {/* <td className="px-2 min-[1130px]:px-3 py-2 w-[150px] md:w-[80px] min-[915px]:w-[160px]">
-                      <p className="text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end flex items-center justify-end gap-[2px] text-[#eaecef]">
-                        123%
+                    <td className="px-2 min-[1130px]:px-3 py-2 w-[80px]">
+                      <p
+                        className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                          Number(vault.holdYearPercentDiff) > 0
+                            ? "text-[#b0ddb8]"
+                            : "text-[#eb7979]"
+                        }`}
+                      >
+                        {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
+                        {vault.holdYearPercentDiff.toFixed(2)}%
                       </p>
-                    </td> */}
+                    </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
                       {vault?.risk?.isRektStrategy ? (
                         <span className="uppercase text-[#F52A11]">

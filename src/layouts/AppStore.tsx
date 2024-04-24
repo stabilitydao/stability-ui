@@ -10,6 +10,8 @@ import { useStore } from "@nanostores/react";
 import { useAccount, usePublicClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
+import { STRATEGYES_ASSETS_AMOUNTS } from "@constants";
+
 import { WagmiLayout } from "@layouts";
 
 import {
@@ -35,6 +37,7 @@ import {
   error,
   isWeb3Load,
   aprFilter,
+  assetsPrices,
 } from "@store";
 import {
   wagmiConfig,
@@ -53,6 +56,7 @@ import {
   getTokenData,
   addAssetsBalance,
   addVaultData,
+  getTimeDifference,
 } from "@utils";
 
 import {
@@ -62,7 +66,7 @@ import {
   TOKENS_ASSETS,
 } from "@constants";
 
-import type { TAddress } from "@types";
+import type { TAddress, TAssetPrices } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -72,6 +76,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
+  const $assetsPrices: any = useStore(assetsPrices);
 
   let localVaults: any = {};
 
@@ -106,7 +111,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
-  const setGraphData = async (data: any) => {
+  const setGraphData = async (data: any, prices: TAssetPrices) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
@@ -347,6 +352,81 @@ const AppStore = (props: React.PropsWithChildren) => {
             break;
         }
 
+        ///// VS HODL
+        const strategyAmounts =
+          STRATEGYES_ASSETS_AMOUNTS[
+            vault.strategy as keyof typeof STRATEGYES_ASSETS_AMOUNTS
+          ];
+        let holdYearPercentDiff = 0;
+        if (strategyAmounts && prices) {
+          const tokens = strategyAmounts.assets.map((token) =>
+            getTokenData(token)
+          );
+          const amounts = strategyAmounts.assetsAmounts.map((amount, index) =>
+            formatUnits(amount, tokens[index]?.decimals as number)
+          );
+
+          const amountsInUSD = amounts.map((amount, index) => {
+            const tokenAddress: any = tokens[index]?.address;
+
+            const tokenPrice: bigint = prices[tokenAddress];
+            return Number(formatUnits(tokenPrice, 18)) * Number(amount);
+          });
+
+          const sum = amountsInUSD.reduce(
+            (acc: number, num: any) => acc + num,
+            0
+          );
+
+          const proportions = amountsInUSD.map((amount) =>
+            amount ? (Number(amount) / sum) * 100 : 0
+          );
+
+          const sharePriceOnCreation = 1;
+          const sharePrice = Number(APIVault.sharePrice);
+
+          const sharePriceDifference =
+            (sharePrice - sharePriceOnCreation) * 100;
+
+          const daysFromCreation = getTimeDifference(vault.created).days;
+          const tokensHold = strategyAmounts.assets.map((asset, index) => {
+            const price = Number(formatUnits(prices[asset.toLowerCase()], 18));
+            const priceOnCreation = Number(
+              formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
+            );
+
+            const startProportion = (1 / 100) * proportions[index];
+
+            const proportionPrice = startProportion / priceOnCreation;
+
+            const presentAmount = proportionPrice * price;
+
+            const priceDifference =
+              ((price - priceOnCreation) / priceOnCreation) * 100;
+
+            const percentDiff = sharePriceDifference - priceDifference;
+
+            let yearPercentDiff = (percentDiff / daysFromCreation) * 365;
+
+            if (yearPercentDiff < -100) {
+              yearPercentDiff = -99.99;
+            }
+            return presentAmount;
+          });
+
+          const holdPrice = tokensHold.reduce((acc, cur) => (acc += cur), 0);
+
+          const priceDifference =
+            ((holdPrice - sharePriceOnCreation) / sharePriceOnCreation) * 100;
+          const holdPercentDiff = sharePriceDifference - priceDifference;
+
+          holdYearPercentDiff = (holdPercentDiff / daysFromCreation) * 365;
+
+          if (holdYearPercentDiff < -100) {
+            holdYearPercentDiff = -99.99;
+          }
+        }
+
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -387,6 +467,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
+          holdYearPercentDiff,
         };
 
         return vaults;
@@ -428,7 +509,25 @@ const AppStore = (props: React.PropsWithChildren) => {
         "Maximum number of retry attempts reached for graph request"
       );
     }
-    await setGraphData(graphResponse.data.data);
+
+    //// ASSETS PRICE (before backend)
+    let prices: TAssetPrices = {};
+    try {
+      const randomAddress: TAddress =
+        "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
+      const contractBalance: any = await readContract(wagmiConfig, {
+        address: platform,
+        abi: PlatformABI,
+        functionName: "getBalance",
+        args: [randomAddress],
+      });
+
+      prices = addAssetsPrice(contractBalance) as TAssetPrices;
+    } catch (error) {
+      console.log("ASSETS PRICE ERROR:", error);
+    }
+    //todo: change this to data from backend
+    await setGraphData(graphResponse.data.data, prices);
 
     const contractData: any = await readContract(wagmiConfig, {
       address: platform,
@@ -474,7 +573,6 @@ const AppStore = (props: React.PropsWithChildren) => {
           const erc721Balance: { [token: string]: bigint } = {};
           //function -> .set vault/
           addVaultData(contractBalance);
-          addAssetsPrice(contractBalance);
           addAssetsBalance(contractBalance);
           //
 
@@ -529,16 +627,6 @@ const AppStore = (props: React.PropsWithChildren) => {
       isWeb3Load.set(false);
     } else {
       isWeb3Load.set(false);
-      // before backend
-      const randomAddress: TAddress =
-        "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
-      const contractBalance: any = await readContract(wagmiConfig, {
-        address: platform,
-        abi: PlatformABI,
-        functionName: "getBalance",
-        args: [randomAddress],
-      });
-      addAssetsPrice(contractBalance);
     }
 
     const strategyTypeEntities =

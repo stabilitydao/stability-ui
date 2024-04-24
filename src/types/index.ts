@@ -192,6 +192,7 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
+  holdYearPercentDiff: number;
 };
 
 type TTableColumn = {
