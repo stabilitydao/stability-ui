@@ -66,7 +66,7 @@ import {
   TOKENS_ASSETS,
 } from "@constants";
 
-import type { TAddress, TAssetPrices } from "@types";
+import type { TAddress, TAssetPrices, THoldData } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -358,6 +358,9 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.strategy as keyof typeof STRATEGYES_ASSETS_AMOUNTS
           ];
         let holdYearPercentDiff = 0;
+        let holdPercentDiff = 0;
+        let tokensHold: THoldData[] = [];
+
         if (strategyAmounts && prices) {
           const tokens = strategyAmounts.assets.map((token) =>
             getTokenData(token)
@@ -389,7 +392,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             (sharePrice - sharePriceOnCreation) * 100;
 
           const daysFromCreation = getTimeDifference(vault.created).days;
-          const tokensHold = strategyAmounts.assets.map((asset, index) => {
+          tokensHold = strategyAmounts.assets.map((asset, index) => {
             const price = Number(formatUnits(prices[asset.toLowerCase()], 18));
             const priceOnCreation = Number(
               formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
@@ -411,14 +414,25 @@ const AppStore = (props: React.PropsWithChildren) => {
             if (yearPercentDiff < -100) {
               yearPercentDiff = -99.99;
             }
-            return presentAmount;
+            return {
+              symbol: getTokenData(asset)?.symbol || "",
+              initPrice: priceOnCreation.toFixed(2),
+              price: price.toFixed(2),
+              priceDifference: priceDifference.toFixed(2),
+              presentProportion: presentAmount,
+              latestAPR: percentDiff.toFixed(2),
+              APR: yearPercentDiff.toFixed(2),
+            };
           });
 
-          const holdPrice = tokensHold.reduce((acc, cur) => (acc += cur), 0);
+          const holdPrice = tokensHold.reduce(
+            (acc, cur) => (acc += cur.presentProportion),
+            0
+          );
 
           const priceDifference =
             ((holdPrice - sharePriceOnCreation) / sharePriceOnCreation) * 100;
-          const holdPercentDiff = sharePriceDifference - priceDifference;
+          holdPercentDiff = sharePriceDifference - priceDifference;
 
           holdYearPercentDiff = (holdPercentDiff / daysFromCreation) * 365;
 
@@ -426,6 +440,10 @@ const AppStore = (props: React.PropsWithChildren) => {
             holdYearPercentDiff = -99.99;
           }
         }
+
+        const isVsActive =
+          getTimeDifference(vault.created).days > 2 &&
+          !!Number(APIVault.sharePrice);
 
         /////
         vaults[vault.id] = {
@@ -467,7 +485,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
-          holdYearPercentDiff,
+          holdPercentDiff: Number(holdPercentDiff.toFixed(2)),
+          holdYearPercentDiff: Number(holdYearPercentDiff.toFixed(2)),
+          tokensHold,
+          isVsActive,
         };
 
         return vaults;

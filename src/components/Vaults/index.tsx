@@ -7,6 +7,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useStore } from "@nanostores/react";
 
 import { APRModal } from "./APRModal";
+import { VSHoldModal } from "./VSHoldModal";
 import { ColumnSort } from "./ColumnSort";
 import { Pagination } from "./Pagination";
 import { Filters } from "./Filters";
@@ -34,6 +35,7 @@ import {
   formatNumber,
   getStrategyShortName,
   formatFromBigInt,
+  getTimeDifference,
   // getTokenData,
 } from "@utils";
 
@@ -51,6 +53,7 @@ import type {
   TTableColumn,
   TTableFilters,
   TTAbleFiltersVariant,
+  THoldData,
 } from "@types";
 
 // type TToken = {
@@ -81,6 +84,14 @@ const Vaults = () => {
     lastHardWork: 0,
     symbol: "",
     state: false,
+  });
+  const [vsHoldModal, setVsHoldModal] = useState({
+    tokensHold: [],
+    holdPercentDiff: 0,
+    holdYearPercentDiff: 0,
+    created: 0,
+    state: false,
+    isVsActive: false,
   });
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
@@ -512,23 +523,25 @@ const Vaults = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]">
+                    <td
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAprModal({
+                          earningData: vault.earningData,
+                          daily: vault.daily,
+                          lastHardWork: vault.lastHardWork as any,
+                          symbol: vault?.risk?.symbol as string,
+                          state: true,
+                        });
+                      }}
+                      className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]"
+                    >
                       <div
                         className={`text-[14px] whitespace-nowrap w-full md:w-[60px] min-[915px]:w-[120px] text-end dotted-underline flex items-center justify-end gap-[2px] ${
                           vault?.risk?.isRektStrategy
                             ? "text-[#818181]"
                             : "text-[#eaecef]"
                         }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAprModal({
-                            earningData: vault.earningData,
-                            daily: vault.daily,
-                            lastHardWork: vault.lastHardWork as any,
-                            symbol: vault?.risk?.symbol as string,
-                            state: true,
-                          });
-                        }}
                       >
                         <p>
                           {$hideFeeAPR
@@ -650,7 +663,20 @@ const Vaults = () => {
                         <i></i>
                       </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-3 py-2 w-[80px]">
+                    <td
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setVsHoldModal({
+                          tokensHold: vault.tokensHold as THoldData[],
+                          holdPercentDiff: vault.holdPercentDiff,
+                          holdYearPercentDiff: vault.holdYearPercentDiff,
+                          created: getTimeDifference(vault.created)?.days,
+                          state: true,
+                          isVsActive: vault.isVsActive,
+                        });
+                      }}
+                      className="px-2 min-[1130px]:px-3 py-2 w-[80px] tooltip cursor-help"
+                    >
                       <p
                         className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                           Number(vault.holdYearPercentDiff) > 0
@@ -659,10 +685,103 @@ const Vaults = () => {
                         }`}
                       >
                         {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
-                        {vault.holdYearPercentDiff.toFixed(2)}%
+                        {vault.holdYearPercentDiff}%
                       </p>
+                      <div className="visible__tooltip !w-[450px]">
+                        <table className="table table-auto w-full rounded-lg">
+                          <thead className="bg-[#0b0e11]">
+                            <tr className="text-[16px] text-[#8f8f8f] uppercase">
+                              <th></th>
+                              <th>
+                                {getTimeDifference(vault.created).days} days
+                              </th>
+                              <th className="text-right">est Annual</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-[14px]">
+                            <tr className="hover:bg-[#2B3139]">
+                              <td className="text-left">VAULT VS HODL</td>
+
+                              {vault.isVsActive ? (
+                                <td
+                                  className={`text-right ${
+                                    Number(vault.holdPercentDiff) > 0
+                                      ? "text-[#b0ddb8]"
+                                      : "text-[#eb7979]"
+                                  }`}
+                                >
+                                  {Number(vault.holdPercentDiff) > 0 ? "+" : ""}
+                                  {vault.holdPercentDiff}%
+                                </td>
+                              ) : (
+                                <td className="text-right">-</td>
+                              )}
+
+                              {vault.isVsActive ? (
+                                <td
+                                  className={`text-right ${
+                                    Number(vault.holdYearPercentDiff) > 0
+                                      ? "text-[#b0ddb8]"
+                                      : "text-[#eb7979]"
+                                  }`}
+                                >
+                                  {Number(vault.holdYearPercentDiff) > 0
+                                    ? "+"
+                                    : ""}
+                                  {vault.holdYearPercentDiff}%
+                                </td>
+                              ) : (
+                                <td className="text-right">-</td>
+                              )}
+                            </tr>
+
+                            {vault.tokensHold.map(
+                              (aprsData: THoldData, index: number) => (
+                                <tr key={index} className="hover:bg-[#2B3139]">
+                                  <td className="text-left">
+                                    VAULT VS {aprsData?.symbol} HODL
+                                  </td>
+
+                                  {vault.isVsActive ? (
+                                    <td
+                                      className={`text-right ${
+                                        Number(aprsData.latestAPR) > 0
+                                          ? "text-[#b0ddb8]"
+                                          : "text-[#eb7979]"
+                                      }`}
+                                    >
+                                      {Number(aprsData.latestAPR) > 0
+                                        ? "+"
+                                        : ""}
+                                      {aprsData.latestAPR}%
+                                    </td>
+                                  ) : (
+                                    <td className="text-right">-</td>
+                                  )}
+
+                                  {vault.isVsActive ? (
+                                    <td
+                                      className={`text-right ${
+                                        Number(aprsData.latestAPR) > 0
+                                          ? "text-[#b0ddb8]"
+                                          : "text-[#eb7979]"
+                                      }`}
+                                    >
+                                      {Number(aprsData.APR) > 0 ? "+" : ""}
+                                      {aprsData.APR}%
+                                    </td>
+                                  ) : (
+                                    <td className="text-right">-</td>
+                                  )}
+                                </tr>
+                              )
+                            )}
+                          </tbody>
+                        </table>
+                        <i></i>
+                      </div>
                     </td>
-                    <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px]">
+                    <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] md:w-[100px] whitespace-nowrap">
                       {vault?.risk?.isRektStrategy ? (
                         <span className="uppercase text-[#F52A11]">
                           {vault?.risk?.symbol}
@@ -727,6 +846,9 @@ const Vaults = () => {
       />
       {aprModal.state && (
         <APRModal state={aprModal} setModalState={setAprModal} />
+      )}
+      {vsHoldModal.state && (
+        <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
       <a href="/create-vault">
         <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
