@@ -187,7 +187,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             <APRtimeSwitcher />
 
             <div
-              className="text-end text-[1.4rem] lg:flex items-center hidden font-medium w-[130px] relative justify-end cursor-pointer"
+              className="text-end text-[1.4rem] lg:flex items-center hidden font-medium w-[130px] relative justify-center cursor-pointer hover:bg-[#2a2c49] rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
                 setPlatformModal(true);
@@ -200,7 +200,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 height="18"
                 viewBox="0 0 16 16"
                 fill="none"
-                className="ml-1 opacity-40 hover:opacity-100 transition delay-[40ms] tooltip"
+                className="ml-1 opacity-80 transition delay-[40ms] tooltip"
               >
                 <circle cx="8" cy="8" r="7.5" stroke="white" />
                 <path
