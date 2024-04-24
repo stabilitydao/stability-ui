@@ -158,6 +158,16 @@ type TRisk = {
   symbol: string;
 };
 
+type THoldData = {
+  symbol: string;
+  initPrice: string;
+  price: string;
+  priceDifference: string;
+  presentProportion: number;
+  latestAPR: string;
+  APR: string;
+};
+
 type TVault = {
   address: TAddress;
   name: string;
@@ -192,7 +202,10 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
+  holdPercentDiff: number;
   holdYearPercentDiff: number;
+  tokensHold: THoldData[];
+  isVsActive: boolean;
 };
 
 type TTableColumn = {
@@ -212,6 +225,15 @@ type TTableFilters = {
   type: string;
   variants?: TTAbleFiltersVariant[];
   state: boolean;
+};
+
+type TVsHoldModal = {
+  tokensHold: THoldData[];
+  holdPercentDiff: number;
+  holdYearPercentDiff: number;
+  created: number;
+  state: boolean;
+  isVsActive: boolean;
 };
 
 type TAPRModal = {
@@ -410,10 +432,12 @@ export type {
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,
   TToast,
+  TVsHoldModal,
   TIQMFAlm,
   TChartData,
   TError,
   TContractInfo,
   TPieChartData,
   TRisk,
+  THoldData,
 };

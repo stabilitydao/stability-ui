@@ -1,29 +1,16 @@
-import { memo, useState, useEffect, useMemo } from "react";
+import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
-import { formatUnits } from "viem";
 
 import { HoldModal } from "@components";
 
 import { assetsPrices, connected } from "@store";
 
-import { getTimeDifference, getTokenData } from "@utils";
+import { getTimeDifference } from "@utils";
 
-import { STRATEGYES_ASSETS_AMOUNTS } from "@constants";
-
-import type { TVault } from "@types";
+import type { TVault, THoldData } from "@types";
 
 interface IProps {
   vault: TVault;
-}
-
-interface IHoldData {
-  symbol: string;
-  initPrice: string;
-  price: string;
-  priceDifference: string;
-  presentProportion: number;
-  latestAPR: string;
-  APR: string;
 }
 
 const HoldTable = ({
@@ -31,7 +18,7 @@ const HoldTable = ({
   holdData,
 }: {
   shareData: any;
-  holdData: IHoldData[];
+  holdData: THoldData[];
 }) => {
   return (
     <table className="table table-auto w-full rounded-lg">
@@ -78,142 +65,29 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const $assetsPrices = useStore(assetsPrices);
   const $connected = useStore(connected);
 
-  const [holdData, setHoldData] = useState<IHoldData[]>([]);
-
-  const [vsData, setVsData] = useState({
-    percentDiff: "-",
-    yearPercentDiff: "-",
-  });
-
   const [shareData, setShareData] = useState<any>();
 
   const [modal, setModal] = useState<boolean>(false);
 
-  const getProportionsData = async (): Promise<number[]> => {
-    const assetsAmounts =
-      STRATEGYES_ASSETS_AMOUNTS[
-        vault?.strategyAddress as keyof typeof STRATEGYES_ASSETS_AMOUNTS
-      ];
-
-    if (!assetsAmounts || !$assetsPrices) return [0, 0];
-
-    const tokens = assetsAmounts.assets.map((token) => getTokenData(token));
-
-    const amounts = assetsAmounts.assetsAmounts.map((amount, index) =>
-      formatUnits(amount, tokens[index]?.decimals as number)
-    );
-
-    const amountsInUSD = amounts.map((amount, index) => {
-      const tokenAddress: any = tokens[index]?.address;
-
-      const tokenPrice: bigint = $assetsPrices[tokenAddress];
-      return Number(formatUnits(tokenPrice, 18)) * Number(amount);
-    });
-
-    const sum = amountsInUSD.reduce((acc: number, num: any) => acc + num, 0);
-
-    return amountsInUSD.map((amount) =>
-      amount ? (Number(amount) / sum) * 100 : 0
-    );
-  };
-
-  const getHoldData = async () => {
+  const getShareData = async () => {
     if (!Number(vault.shareprice) || !$assetsPrices) {
-      const tokensHold = vault.assets.map((asset, index) => {
-        return {
-          symbol: asset.symbol,
-          initPrice: "-",
-          price: "-",
-          priceDifference: "-",
-          presentProportion: 0,
-          latestAPR: "-",
-          APR: "-",
-        };
-      });
-      setHoldData(tokensHold);
       return;
     }
-
     const sharePriceOnCreation = 1;
     const sharePrice = Number(vault.shareprice);
 
     const sharePriceDifference = (sharePrice - sharePriceOnCreation) * 100;
-
-    const daysFromCreation = getTimeDifference(vault.created).days;
-
-    const proportions: number[] = await getProportionsData();
-
-    const tokensHold = vault.assets.map((asset, index) => {
-      const price = Number(formatUnits($assetsPrices[asset.address], 18));
-      const priceOnCreation = Number(
-        formatUnits(BigInt(vault.assetsPricesOnCreation[index]), 18)
-      );
-
-      const startProportion = (1 / 100) * proportions[index];
-
-      const proportionPrice = startProportion / priceOnCreation;
-
-      const presentAmount = proportionPrice * price;
-
-      const priceDifference =
-        ((price - priceOnCreation) / priceOnCreation) * 100;
-
-      const percentDiff = sharePriceDifference - priceDifference;
-
-      let yearPercentDiff = (percentDiff / daysFromCreation) * 365;
-
-      if (yearPercentDiff < -100) {
-        yearPercentDiff = -99.99;
-      }
-      return {
-        symbol: asset.symbol,
-        initPrice: priceOnCreation.toFixed(2),
-        price: price.toFixed(2),
-        priceDifference: priceDifference.toFixed(2),
-        presentProportion: presentAmount,
-        latestAPR: percentDiff.toFixed(2),
-        APR: yearPercentDiff.toFixed(2),
-      };
-    });
-
-    const holdPrice = tokensHold.reduce(
-      (acc, cur) => (acc += cur.presentProportion),
-      0
-    );
-
-    const priceDifference =
-      ((holdPrice - sharePriceOnCreation) / sharePriceOnCreation) * 100;
-
-    const holdPercentDiff = sharePriceDifference - priceDifference;
-
-    let holdYearPercentDiff = (holdPercentDiff / daysFromCreation) * 365;
-
-    if (holdYearPercentDiff < -100) {
-      holdYearPercentDiff = -99.99;
-    }
-    setVsData({
-      percentDiff: holdPercentDiff.toFixed(2),
-      yearPercentDiff: holdYearPercentDiff.toFixed(2),
-    });
 
     setShareData({
       sharePriceOnCreation: "1",
       sharePrice: sharePrice.toFixed(2),
       yieldPercent: sharePriceDifference.toFixed(2),
     });
-
-    setHoldData(tokensHold);
   };
 
   useEffect(() => {
-    getHoldData();
+    getShareData();
   }, [$connected, $assetsPrices]);
-
-  const isActive = useMemo(
-    () =>
-      getTimeDifference(vault.created).days > 2 && !!Number(vault.shareprice),
-    [vault]
-  );
 
   return (
     <div>
@@ -316,7 +190,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
           </table>
         )}
 
-        {!!holdData && (
+        {!!vault.tokensHold && (
           <table className="table table-auto w-full rounded-lg mt-5">
             <thead className="bg-[#0b0e11]">
               <tr className="text-[17px] md:text-[15px] lg:text-[19px] text-[#8f8f8f] uppercase">
@@ -341,7 +215,10 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                       />
                     </svg>
                     <div className="visible__tooltip toCenter">
-                      <HoldTable shareData={shareData} holdData={holdData} />
+                      <HoldTable
+                        shareData={shareData}
+                        holdData={vault.tokensHold}
+                      />
                     </div>
                   </div>
                 </th>
@@ -350,47 +227,45 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
               </tr>
             </thead>
             <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
-              {!!vsData && (
-                <tr className="hover:bg-[#2B3139]">
-                  <td>VAULT VS HODL</td>
+              <tr className="hover:bg-[#2B3139]">
+                <td>VAULT VS HODL</td>
 
-                  {isActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(vsData.percentDiff) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(vsData.percentDiff) > 0 ? "+" : ""}
-                      {vsData.percentDiff}%
-                    </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
+                {vault.isVsActive ? (
+                  <td
+                    className={`text-right ${
+                      Number(vault.holdPercentDiff) > 0
+                        ? "text-[#b0ddb8]"
+                        : "text-[#eb7979]"
+                    }`}
+                  >
+                    {Number(vault.holdPercentDiff) > 0 ? "+" : ""}
+                    {vault.holdPercentDiff}%
+                  </td>
+                ) : (
+                  <td className="text-right">-</td>
+                )}
 
-                  {isActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(vsData.yearPercentDiff) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(vsData.yearPercentDiff) > 0 ? "+" : ""}
-                      {vsData.yearPercentDiff}%
-                    </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
-                </tr>
-              )}
+                {vault.isVsActive ? (
+                  <td
+                    className={`text-right ${
+                      Number(vault.holdYearPercentDiff) > 0
+                        ? "text-[#b0ddb8]"
+                        : "text-[#eb7979]"
+                    }`}
+                  >
+                    {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
+                    {vault.holdYearPercentDiff}%
+                  </td>
+                ) : (
+                  <td className="text-right">-</td>
+                )}
+              </tr>
 
-              {holdData.map((aprsData: IHoldData, index: number) => (
+              {vault.tokensHold.map((aprsData: THoldData, index: number) => (
                 <tr key={index} className="hover:bg-[#2B3139]">
                   <td>VAULT VS {aprsData?.symbol} HODL</td>
 
-                  {isActive ? (
+                  {vault.isVsActive ? (
                     <td
                       className={`text-right ${
                         Number(aprsData.latestAPR) > 0
@@ -405,7 +280,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     <td className="text-right">-</td>
                   )}
 
-                  {isActive ? (
+                  {vault.isVsActive ? (
                     <td
                       className={`text-right ${
                         Number(aprsData.latestAPR) > 0
@@ -428,7 +303,9 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
       {modal && (
         <HoldModal
           setModalState={setModal}
-          table={<HoldTable shareData={shareData} holdData={holdData} />}
+          table={
+            <HoldTable shareData={shareData} holdData={vault.tokensHold} />
+          }
         />
       )}
     </div>
