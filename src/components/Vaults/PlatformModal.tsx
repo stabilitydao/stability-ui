@@ -178,8 +178,6 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                   <div className="flex flex-wrap mt-2">
                     {Object.keys(deployments[137]).map((moduleContract) => {
                       const address = deployments[137][moduleContract];
-                      console.log(moduleContract);
-                      console.log(address);
                       return (
                         <a
                           key={moduleContract}

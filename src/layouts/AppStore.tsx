@@ -538,7 +538,6 @@ const AppStore = (props: React.PropsWithChildren) => {
         graphResponse?.data?.data?.platformEntities[0]?.factory
       );
     }
-
     if (graphResponse?.data?.data?.platformEntities[0]?.version) {
       platformVersion.set(graphResponse.data.data.platformEntities[0].version);
     }
