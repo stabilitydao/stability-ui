@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { ShortAddress } from "./ShortAddress";
-
-import { Loader } from "@components";
+import { Loader, ShortAddress } from "@components";
 import { publicClient } from "@store";
 import { ERC20ABI } from "@web3";
 import { PROFIT, TREASURY } from "@constants";

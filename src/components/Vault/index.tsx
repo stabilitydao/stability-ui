@@ -100,7 +100,6 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             {isALM && <UnderlyingALM vault={localVault} />}
           </div>
         </div>
-
         <Assets
           assets={localVault?.assets}
           created={localVault.created}

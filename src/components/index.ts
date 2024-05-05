@@ -19,6 +19,7 @@ import {
   FeeAPRModal,
   ChartSkeleton,
   HoldModal,
+  ShortAddress,
 } from "./VaultUtils";
 
 import { Toast } from "./VaultUtils/Toast";
@@ -44,4 +45,5 @@ export {
   APRtimeSwitcher,
   FeeAPRModal,
   HoldModal,
+  ShortAddress,
 };

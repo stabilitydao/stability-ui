@@ -3,10 +3,8 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { ShortAddress } from "./ShortAddress";
-
 import { publicClient, network } from "@store";
-import { Loader } from "@components";
+import { Loader, ShortAddress } from "@components";
 import { GRAPH_ENDPOINT } from "@constants";
 import { PlatformABI, FactoryABI, platform } from "@web3";
 import { getStrategyInfo } from "@utils";
@@ -272,7 +270,7 @@ const Platform = () => {
 
           {platformUpdates?.newVersion && (
             <div className="p-3 hover:ring-1 ring-purple-400 ring-opacity-50 mt-3 rounded-md bg-[#2c2f38] shadow-md border border-gray-700 bg-opacity-75">
-              <h2 className="w-full font-thin text-lg text-left text-gray-400   py-1">
+              <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
                 <em className="text-xl font-medium">New version:</em>{" "}
                 {platformUpdates?.newVersion}
               </h2>

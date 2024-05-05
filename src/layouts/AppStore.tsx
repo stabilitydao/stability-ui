@@ -19,6 +19,7 @@ import {
   network,
   platformData,
   platformVersion,
+  platformFactory,
   platformZAP,
   publicClient,
   userBalance,
@@ -104,6 +105,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const getDataFromStabilityAPI = async () => {
     try {
       const response = await axios.get(STABILITY_API);
+
       stabilityAPIData = response.data;
       apiData.set(stabilityAPIData);
     } catch (error) {
@@ -167,7 +169,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const assets = await assetsPromise;
         ///// APR DATA CALCULATION
-
         const aprData = vault.vaultHistoryEntity[0];
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
@@ -531,6 +532,20 @@ const AppStore = (props: React.PropsWithChildren) => {
       );
     }
 
+    /////***** SET PLATFORM DATA *****/////
+    if (graphResponse?.data?.data?.platformEntities[0]?.factory) {
+      platformFactory.set(
+        graphResponse?.data?.data?.platformEntities[0]?.factory
+      );
+    }
+
+    if (graphResponse?.data?.data?.platformEntities[0]?.version) {
+      platformVersion.set(graphResponse.data.data.platformEntities[0].version);
+    }
+    if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
+      platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
+    }
+
     //// ASSETS PRICE (before backend)
     let prices: TAssetPrices = {};
     try {
@@ -669,12 +684,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     );
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
-    if (graphResponse?.data?.data?.platformEntities[0]?.version) {
-      platformVersion.set(graphResponse.data.data.platformEntities[0].version);
-    }
-    if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
-      platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
-    }
   };
 
   const fetchAllData = async () => {

@@ -500,6 +500,7 @@ const GRAPH_QUERY = `
           version
           bcAssets
           zap
+          factory
         }
         vaultTypeEntities {
           version
@@ -529,6 +530,11 @@ const GRAPH_QUERY = `
         }
       }
       `;
+
+// vaultHistoryEntity {
+//   APR24H
+//   APRWeekly
+// }
 
 const STABILITY_API = "https://api.stabilitydao.org/";
 

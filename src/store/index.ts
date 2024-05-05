@@ -23,6 +23,9 @@ const account = atom<string | undefined>();
 const network = atom<string | undefined>();
 const publicClient = atom<any>();
 const platformData = atom<TPlatformData | undefined>();
+const platformFactory = atom<string | undefined>(
+  "0xa14eaae76890595b3c7ea308daebb93863480ead"
+);
 const platformVersion = atom<string>("24.01.1-alpha");
 const platformZAP = atom<string>("");
 const userBalance = atom<TUserBalance | undefined>();
@@ -94,6 +97,7 @@ export {
   strategyTypes,
   transactionSettings,
   platformVersion,
+  platformFactory,
   platformZAP,
   hideFeeApr,
   reload,

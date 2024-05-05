@@ -13,12 +13,12 @@ import { Pagination } from "./Pagination";
 import { Filters } from "./Filters";
 import { Portfolio } from "./Portfolio";
 import {
-  VaultType,
   AssetsProportion,
   VaultState,
   TimeDifferenceIndicator,
   Loader,
   ErrorMessage,
+  ShortAddress,
 } from "@components";
 
 import {
@@ -28,6 +28,9 @@ import {
   error,
   aprFilter,
   connected,
+  publicClient,
+  platformVersion,
+  platformFactory,
   // assetsPrices,
 } from "@store";
 
@@ -36,6 +39,7 @@ import {
   getStrategyShortName,
   formatFromBigInt,
   getTimeDifference,
+  getDate,
   // getTokenData,
 } from "@utils";
 
@@ -48,12 +52,17 @@ import {
   // WETH,
   // WMATIC,
 } from "@constants";
+
+import { platform, PlatformABI, deployments } from "@web3";
+
 import type {
   TVault,
   TTableColumn,
   TTableFilters,
   TTAbleFiltersVariant,
   THoldData,
+  TPendingPlatformUpgrade,
+  TAddress,
 } from "@types";
 
 // type TToken = {
@@ -70,6 +79,9 @@ const Vaults = () => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
+  const $publicClient = useStore(publicClient);
+  const $platformVersion = useStore(platformVersion);
+  const $platformFactory = useStore(platformFactory);
   // const $assetsPrices = useStore(assetsPrices);
 
   // const [tokens, setTokens] = useState<TToken[]>([]);
@@ -93,6 +105,14 @@ const Vaults = () => {
     state: false,
     isVsActive: false,
   });
+  const [platformUpdates, setPlatformUpdates] =
+    useState<TPendingPlatformUpgrade>();
+  const [platformVersions, setPlatformVersions] = useState({
+    old: "1.0.0",
+    new: "1.1.0",
+  });
+  const [lockTime, setLockTime] = useState({ start: "", end: "" });
+  const [upgradesTable, setUpgradesTable] = useState([]);
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
@@ -275,6 +295,100 @@ const Vaults = () => {
     setTableStates(table);
   };
 
+  const fetchPlatformUpdates = async () => {
+    try {
+      const pendingPlatformUpgrade: any = await $publicClient?.readContract({
+        address: platform,
+        abi: PlatformABI,
+        functionName: "pendingPlatformUpgrade",
+      });
+      const updated = [];
+      if (pendingPlatformUpgrade?.proxies.length) {
+        pendingPlatformUpgrade.proxies.map((proxy: TAddress, index: number) => {
+          Object.keys(deployments[137]).map(async (moduleContract) => {
+            const address = deployments[137][moduleContract];
+
+            if (proxy === address) {
+              const oldImplementation = await $publicClient?.readContract({
+                address: address,
+                abi: [
+                  {
+                    inputs: [],
+                    name: "implementation",
+                    outputs: [
+                      { internalType: "address", name: "", type: "address" },
+                    ],
+                    stateMutability: "view",
+                    type: "function",
+                  },
+                ],
+                functionName: "implementation",
+              });
+              const oldImplementationVersion =
+                await $publicClient?.readContract({
+                  address: oldImplementation,
+                  abi: PlatformABI,
+                  functionName: "VERSION",
+                });
+              const newImplementationVersion =
+                await $publicClient?.readContract({
+                  address: pendingPlatformUpgrade.newImplementations[index],
+                  abi: PlatformABI,
+                  functionName: "VERSION",
+                });
+              updated.push({
+                contract: moduleContract,
+                oldVersion: oldImplementationVersion,
+                newVersion: newImplementationVersion,
+                proxy: proxy,
+                oldImplementation: oldImplementation,
+                newImplementation:
+                  pendingPlatformUpgrade.newImplementations[index],
+              });
+            }
+          });
+        });
+      }
+      setUpgradesTable(updated);
+
+      if (pendingPlatformUpgrade?.newImplementations) {
+        const oldVersion: any = await $publicClient?.readContract({
+          address: $platformFactory,
+          abi: PlatformABI,
+          functionName: "VERSION",
+        });
+        const newVersion: any = await $publicClient?.readContract({
+          address: pendingPlatformUpgrade.newImplementations[0],
+          abi: PlatformABI,
+          functionName: "VERSION",
+        });
+        setPlatformVersions({ old: oldVersion, new: newVersion });
+      }
+
+      /////***** TIME CHECK  *****/////
+      const lockTime: any = await $publicClient?.readContract({
+        address: platform,
+        abi: PlatformABI,
+        functionName: "TIME_LOCK",
+      });
+      const platformUpgradeTimelock: any = await $publicClient?.readContract({
+        address: platform,
+        abi: PlatformABI,
+        functionName: "platformUpgradeTimelock",
+      });
+      if (lockTime && platformUpgradeTimelock) {
+        setLockTime({
+          start: getDate(Number(platformUpgradeTimelock - lockTime)),
+          end: getDate(Number(platformUpgradeTimelock)),
+        });
+      }
+      /////***** SET DATA  *****/////
+      setPlatformUpdates(pendingPlatformUpgrade);
+    } catch (error) {
+      console.error("Error fetching platform updates:", error);
+    }
+  };
+
   const initFilters = (vaults: TVault[]) => {
     let shortNames: any[] = [
       ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
@@ -301,6 +415,9 @@ const Vaults = () => {
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
+
+      /////***** AFTER PAGE LOADING *****/ /////
+      fetchPlatformUpdates();
     }
   };
 
@@ -340,6 +457,7 @@ const Vaults = () => {
   useEffect(() => {
     initVaults();
   }, [$vaults]);
+
   if ($error.state && $error.type === "API") {
     return (
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -355,6 +473,80 @@ const Vaults = () => {
   ) : localVaults?.length ? (
     <>
       <ErrorMessage type="WEB3" />
+      {!!platformUpdates?.newVersion &&
+        platformUpdates?.newVersion != $platformVersion &&
+        !!upgradesTable?.length && (
+          <div className="p-3  mt-3 rounded-md bg-[#262830]">
+            <h3 className="mb-2 text-[1.4rem] font-medium">
+              Time-locked platform upgrade in progress
+            </h3>
+            <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
+              <em className="text-xl font-medium">Current version:</em>{" "}
+              {platformVersions.old}
+            </h2>
+            <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
+              <em className="text-xl font-medium">New version:</em>{" "}
+              {platformVersions.new}
+            </h2>
+            {!!lockTime.start && (
+              <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
+                <em className="text-xl font-medium">Timelock start:</em>{" "}
+                {lockTime.start}
+              </h2>
+            )}
+            {!!lockTime.end && (
+              <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
+                <em className="text-xl font-medium">Timelock end:</em>{" "}
+                {lockTime.end}
+              </h2>
+            )}
+
+            <table className="table table-auto w-full rounded-lg">
+              <thead className="bg-[#0b0e11]">
+                <tr className="text-[16px] text-[#8f8f8f] uppercase">
+                  <th>Contract</th>
+                  <th>Version</th>
+                  <th>Proxy</th>
+                  <th>Old Implementation</th>
+                  <th>New Implementation</th>
+                </tr>
+              </thead>
+              <tbody className="text-[14px]">
+                {!!upgradesTable.length &&
+                  upgradesTable.map((upgrade) => (
+                    <tr key={upgrade.contract} className="hover:bg-[#2B3139]">
+                      <td className="text-left">
+                        <p className="ml-[31px]">{upgrade.contract}</p>
+                      </td>
+                      <td className="text-right">
+                        {upgrade.oldVersion} {"->"} {upgrade.newVersion}
+                      </td>
+                      {upgrade?.proxy && (
+                        <td className="text-right">
+                          <ShortAddress address={upgrade.proxy as TAddress} />
+                        </td>
+                      )}
+                      {upgrade.oldImplementation && (
+                        <td className="text-right">
+                          <ShortAddress
+                            address={upgrade?.oldImplementation as TAddress}
+                          />
+                        </td>
+                      )}
+                      {upgrade?.newImplementation && (
+                        <td className="text-right">
+                          <ShortAddress
+                            address={upgrade.newImplementation as TAddress}
+                          />
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
       <Portfolio vaults={localVaults} />
       {/* <div className="flex items-center gap-5 p-2 flex-wrap">
         {!!tokens &&
@@ -369,6 +561,7 @@ const Vaults = () => {
             </div>
           ))}
       </div> */}
+
       <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input
           type="text"
