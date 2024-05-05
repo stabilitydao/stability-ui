@@ -515,50 +515,51 @@ const Vaults = () => {
                 {lockTime.end}
               </h2>
             )}
-
-            <table className="table table-auto w-full rounded-lg">
-              <thead className="bg-[#0b0e11]">
-                <tr className="text-[16px] text-[#8f8f8f] uppercase">
-                  <th>Contract</th>
-                  <th>Version</th>
-                  <th>Proxy</th>
-                  <th>Old Implementation</th>
-                  <th>New Implementation</th>
-                </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                {!!upgradesTable.length &&
-                  upgradesTable.map((upgrade) => (
-                    <tr key={upgrade.contract} className="hover:bg-[#2B3139]">
-                      <td className="text-left">
-                        <p className="ml-[31px]">{upgrade.contract}</p>
-                      </td>
-                      <td className="text-right">
-                        {upgrade.oldVersion} {"->"} {upgrade.newVersion}
-                      </td>
-                      {upgrade?.proxy && (
-                        <td className="text-right">
-                          <ShortAddress address={upgrade.proxy as TAddress} />
+            <div className="overflow-x-auto">
+              <table className="table table-auto w-full rounded-lg">
+                <thead className="bg-[#0b0e11]">
+                  <tr className="text-[16px] text-[#8f8f8f] uppercase whitespace-nowrap">
+                    <th className="text-left">Contract</th>
+                    <th>Version</th>
+                    <th>Proxy</th>
+                    <th className="px-2">Old Implementation</th>
+                    <th>New Implementation</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[14px]">
+                  {!!upgradesTable.length &&
+                    upgradesTable.map((upgrade) => (
+                      <tr key={upgrade.contract} className="hover:bg-[#2B3139]">
+                        <td className="text-left min-w-[100px]">
+                          <p>{upgrade.contract}</p>
                         </td>
-                      )}
-                      {upgrade.oldImplementation && (
-                        <td className="text-right">
-                          <ShortAddress
-                            address={upgrade?.oldImplementation as TAddress}
-                          />
+                        <td className="text-right min-w-[100px] px-2">
+                          {upgrade.oldVersion} {"->"} {upgrade.newVersion}
                         </td>
-                      )}
-                      {upgrade?.newImplementation && (
-                        <td className="text-right">
-                          <ShortAddress
-                            address={upgrade.newImplementation as TAddress}
-                          />
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                        {upgrade?.proxy && (
+                          <td className="text-right min-w-[150px]">
+                            <ShortAddress address={upgrade.proxy as TAddress} />
+                          </td>
+                        )}
+                        {upgrade.oldImplementation && (
+                          <td className="text-right min-w-[150px]">
+                            <ShortAddress
+                              address={upgrade?.oldImplementation as TAddress}
+                            />
+                          </td>
+                        )}
+                        {upgrade?.newImplementation && (
+                          <td className="text-right min-w-[150px]">
+                            <ShortAddress
+                              address={upgrade.newImplementation as TAddress}
+                            />
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
