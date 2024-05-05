@@ -12,6 +12,7 @@ import { HideFeesHandler } from "./HideFeesHandler";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
 import { FeeAPRModal } from "./FeeAPRModal";
 import { HoldModal } from "./HoldModal";
+import { ShortAddress } from "./ShortAddress";
 
 export {
   AssetsProportion,
@@ -28,4 +29,5 @@ export {
   FeeAPRModal,
   ChartSkeleton,
   HoldModal,
+  ShortAddress,
 };

@@ -3,8 +3,7 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { ShortAddress } from "./ShortAddress";
-import { Loader } from "@components";
+import { Loader, ShortAddress } from "@components";
 import { publicClient, assetsPrices } from "@store";
 import { getTokenData } from "@utils";
 import { ERC20ABI, platform, PlatformABI } from "@web3";
@@ -258,10 +257,10 @@ const Team = () => {
       </div>
 
       <div className="flex items-center gap-3 justify-center md:justify-between flex-wrap py-2 px-4">
-        {members.map((member) => (
+        {members.map((member, index: number) => (
           <a
             href={member.html_url}
-            key={member.name}
+            key={member.name + index}
             target="_blank"
             title="Visit GitHub"
             className="flex flex-col items-center"
@@ -295,10 +294,14 @@ const Team = () => {
                     {member.location}
                   </p>
                 )}
-                <p className="text-[14px] px-2 text-center">
-                  {member.bio.slice(0, 50)}
-                  {member.bio.length > 50 && "..."}
-                </p>
+                {member.bio ? (
+                  <p className="text-[14px] px-2 text-center">
+                    {member.bio.slice(0, 50)}
+                    {member.bio.length > 50 && "..."}
+                  </p>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </a>

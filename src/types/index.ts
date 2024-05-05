@@ -302,6 +302,14 @@ type TContractInfo = {
   type: string;
   isCopy: boolean;
 };
+type TUpgradesTable = {
+  contract: string;
+  oldVersion: string;
+  newVersion: string;
+  proxy: TAddress;
+  oldImplementation: TAddress;
+  newImplementation: TAddress;
+};
 
 //// CHART
 type TChartData = {
@@ -440,4 +448,5 @@ export type {
   TPieChartData,
   TRisk,
   THoldData,
+  TUpgradesTable,
 };

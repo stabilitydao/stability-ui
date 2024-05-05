@@ -24,13 +24,9 @@ const ShortAddress: React.FC<IProps> = ({ address }) => {
   };
 
   return (
-    <div className="flex my-auto">
-      <p className="m-auto flex">{shortAddress}</p>
-      <button
-        className="mx-3 my-auto"
-        onClick={copyAddress}
-        title="Copy address"
-      >
+    <div className="inline-flex">
+      <p>{shortAddress}</p>
+      <button className="mx-3" onClick={copyAddress} title="Copy address">
         {copied ? (
           <>
             <svg

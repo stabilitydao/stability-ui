@@ -3,8 +3,7 @@ import { useStore } from "@nanostores/react";
 import { formatUnits, parseUnits } from "viem";
 import { writeContract } from "@wagmi/core";
 
-import { ShortAddress } from "./ShortAddress";
-import { Loader } from "@components";
+import { Loader, ShortAddress } from "@components";
 import { account, publicClient, assetsPrices, connected } from "@store";
 import { getTokenData } from "@utils";
 import {
