@@ -125,7 +125,18 @@ const Vaults = () => {
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
 
-  const toVault = (address: string) => {
+  // gtag test
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+
+  const toVault = (address: string, symbol: string) => {
+    gtag("event", "button_click", {
+      event_category: "Button Click",
+      event_label: `Vault symbol: ${symbol}`,
+    });
+
     window.location.href = `/vault/${address}`;
   };
 
@@ -611,7 +622,7 @@ const Vaults = () => {
                   <tr
                     key={vault.name}
                     className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
-                    onClick={() => toVault(vault.address)}
+                    onClick={() => toVault(vault.address, vault.symbol)}
                   >
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                       <div className="flex items-center justify-start">
