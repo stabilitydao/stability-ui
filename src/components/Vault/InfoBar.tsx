@@ -146,6 +146,19 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
                 ))}
               </div>
             )}
+            {!!vault.yearnProtocols.length && (
+              <div className="flex gap-3">
+                {vault.yearnProtocols.map((protocol) => (
+                  <img
+                    key={protocol.link}
+                    src={protocol.link}
+                    alt={protocol.title}
+                    title={protocol.title}
+                    className="h-7 w-7 rounded-full"
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

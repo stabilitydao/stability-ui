@@ -27,3 +27,4 @@ yarn dev
 2. Update stability.tokenlist.json (if necessary)
 3. Update the PROTOCOLS constant
 4. Add data to getStrategyInfo
+5. Update getProtocolLogo function (if necessary)

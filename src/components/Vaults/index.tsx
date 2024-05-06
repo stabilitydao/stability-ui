@@ -607,42 +607,6 @@ const Vaults = () => {
           <tbody>
             {currentTabVaults?.length ? (
               currentTabVaults.map((vault: TVault) => {
-                let yearnProtocolsImages: string[] = [];
-                if (
-                  vault.strategySpecific &&
-                  vault.strategyInfo.shortName === "Y"
-                ) {
-                  const yProtocols = [
-                    "aave",
-                    "stargate",
-                    "stmatic",
-                    "compound",
-                  ];
-
-                  yProtocols.map((protocol: string) => {
-                    if (
-                      vault.strategySpecific.toLowerCase().includes(protocol)
-                    ) {
-                      switch (protocol) {
-                        case "aave":
-                          yearnProtocolsImages.push("/protocols/Aave.png");
-                          break;
-                        case "compound":
-                          yearnProtocolsImages.push("/protocols/Compound.png");
-                          break;
-                        case "stargate":
-                          yearnProtocolsImages.push("/protocols/Stargate.svg");
-                          break;
-                        case "stmatic":
-                          yearnProtocolsImages.push("/protocols/Lido.png");
-                          break;
-                        default:
-                          break;
-                      }
-                    }
-                  });
-                }
-
                 return (
                   <tr
                     key={vault.name}
@@ -751,19 +715,17 @@ const Vaults = () => {
                                 )
                               )}
                             </span> */}
-                              {vault.strategySpecific &&
-                              vault.strategyInfo.shortName === "Y" ? (
+                              {vault.yearnProtocols.length ? (
                                 <div className="flex">
-                                  {yearnProtocolsImages.map(
-                                    (imageLink: string, index: number) => (
-                                      <img
-                                        key={imageLink}
-                                        src={imageLink}
-                                        alt={`yearnProtocol${index}`}
-                                        className="h-6 w-6 rounded-full"
-                                      />
-                                    )
-                                  )}
+                                  {vault.yearnProtocols.map((protocol) => (
+                                    <img
+                                      key={protocol.link}
+                                      src={protocol.link}
+                                      alt={protocol.title}
+                                      title={protocol.title}
+                                      className="h-6 w-6 rounded-full"
+                                    />
+                                  ))}
                                 </div>
                               ) : vault.strategySpecific ? (
                                 <span
