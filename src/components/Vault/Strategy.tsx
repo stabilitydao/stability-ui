@@ -136,13 +136,28 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
                   />
                 ))}
               </span>
-              {vault.strategySpecific && (
+              {vault.yearnProtocols.length ? (
+                <div className="flex">
+                  {vault.yearnProtocols.map((protocol) => (
+                    <img
+                      key={protocol.link}
+                      src={protocol.link}
+                      alt={protocol.title}
+                      title={protocol.title}
+                      className="h-6 w-6 rounded-full"
+                    />
+                  ))}
+                </div>
+              ) : vault.strategySpecific ? (
                 <span className="font-bold rounded-[4px] text-[#b6bdd7] inline uppercase text-[10px] px-[6px]">
                   {vault.strategySpecific}
                 </span>
+              ) : (
+                ""
               )}
             </span>
           </div>
+
           <div
             style={{
               backgroundColor: vault.strategyInfo.bgColor,
@@ -150,10 +165,24 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             }}
             className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
           >
-            <p>
-              {vault.strategyInfo.name}
-              {vault.strategySpecific ? " " + vault.strategySpecific : ""}
-            </p>
+            {vault.yearnProtocols.length ? (
+              <div className="flex py-2 gap-2">
+                {vault.yearnProtocols.map((protocol) => (
+                  <img
+                    key={protocol.link}
+                    src={protocol.link}
+                    alt={protocol.title}
+                    title={protocol.title}
+                    className="h-6 w-6 rounded-full"
+                  />
+                ))}
+              </div>
+            ) : (
+              <p>
+                {vault.strategyInfo.name}
+                {vault.strategySpecific ? " " + vault.strategySpecific : ""}
+              </p>
+            )}
           </div>
         </div>
 

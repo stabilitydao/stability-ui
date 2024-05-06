@@ -13,6 +13,7 @@ import { debounce } from "./functions/debounce";
 import { decodeHex } from "./functions/decodeHex";
 import { setLocalStoreHash } from "./functions/setLocalStoreHash";
 import { getDate } from "./functions/getDate";
+import { getProtocolLogo } from "./functions/getProtocolLogo";
 
 export {
   getTokenData,
@@ -30,4 +31,5 @@ export {
   decodeHex,
   setLocalStoreHash,
   getDate,
+  getProtocolLogo,
 };

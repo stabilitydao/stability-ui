@@ -222,6 +222,9 @@ const VAULT_STATUSES: TVaultStatuses = {
   4: "DISABLED",
   5: "DEPOSITS_UNAVAILABLE",
 };
+
+const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
+
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
@@ -589,4 +592,5 @@ export {
   DEXes,
   STRATEGYES_ASSETS_AMOUNTS,
   CHAINLINK_STABLECOINS,
+  YEARN_PROTOCOLS,
 };

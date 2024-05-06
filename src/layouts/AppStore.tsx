@@ -10,7 +10,7 @@ import { useStore } from "@nanostores/react";
 import { useAccount, usePublicClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
-import { STRATEGYES_ASSETS_AMOUNTS } from "@constants";
+import { STRATEGYES_ASSETS_AMOUNTS, YEARN_PROTOCOLS } from "@constants";
 
 import { WagmiLayout } from "@layouts";
 
@@ -38,7 +38,6 @@ import {
   error,
   isWeb3Load,
   aprFilter,
-  assetsPrices,
 } from "@store";
 import {
   wagmiConfig,
@@ -67,7 +66,7 @@ import {
   TOKENS_ASSETS,
 } from "@constants";
 
-import type { TAddress, TAssetPrices, THoldData } from "@types";
+import type { TAddress, TAssetPrices, THoldData, TYearnProtocol } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -77,7 +76,6 @@ const AppStore = (props: React.PropsWithChildren) => {
   const _publicClient = usePublicClient();
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
-  const $assetsPrices: any = useStore(assetsPrices);
 
   let localVaults: any = {};
 
@@ -446,6 +444,43 @@ const AppStore = (props: React.PropsWithChildren) => {
           getTimeDifference(vault.created).days > 2 &&
           !!Number(APIVault.sharePrice);
 
+        /////***** YEARN PROTOCOLS *****/////
+        let yearnProtocols: TYearnProtocol[] = [];
+        if (vault.strategySpecific && strategyInfo.shortName === "Y") {
+          YEARN_PROTOCOLS.map((protocol: string) => {
+            if (vault.strategySpecific.toLowerCase().includes(protocol)) {
+              switch (protocol) {
+                case "aave":
+                  yearnProtocols.push({
+                    title: "Aave",
+                    link: "/protocols/Aave.png",
+                  });
+                  break;
+                case "compound":
+                  yearnProtocols.push({
+                    title: "Compound",
+                    link: "/protocols/Compound.png",
+                  });
+                  break;
+                case "stargate":
+                  yearnProtocols.push({
+                    title: "Stargate",
+                    link: "/protocols/Stargate.svg",
+                  });
+                  break;
+                case "stmatic":
+                  yearnProtocols.push({
+                    title: "Lido",
+                    link: "/protocols/Lido.png",
+                  });
+                  break;
+                default:
+                  break;
+              }
+            }
+          });
+        }
+
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -490,6 +525,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           holdYearPercentDiff: Number(holdYearPercentDiff.toFixed(2)),
           tokensHold,
           isVsActive,
+          yearnProtocols,
         };
 
         return vaults;

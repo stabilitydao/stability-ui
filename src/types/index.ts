@@ -206,6 +206,7 @@ type TVault = {
   holdYearPercentDiff: number;
   tokensHold: THoldData[];
   isVsActive: boolean;
+  yearnProtocols: TYearnProtocol[];
 };
 
 type TTableColumn = {
@@ -257,6 +258,8 @@ type TInputItem = {
   inputValue: string | number;
   valuePerDay: string;
 };
+
+type TYearnProtocol = { title: string; link: string };
 
 ////          VAULT
 
@@ -449,4 +452,5 @@ export type {
   TRisk,
   THoldData,
   TUpgradesTable,
+  TYearnProtocol,
 };

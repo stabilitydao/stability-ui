@@ -43,11 +43,11 @@ import {
 
 import {
   getTokenData,
-  formatFromBigInt,
   get1InchRoutes,
   debounce,
   decodeHex,
   setLocalStoreHash,
+  getProtocolLogo,
 } from "@utils";
 
 import type {
@@ -72,7 +72,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const { chain } = useAccount();
   const { switchChain } = useSwitchChain();
-
+  getProtocolLogo("123");
   const $vaultData = useStore(vaultData);
   const $assets: any = useStore(assets);
   const $account = useStore(account);
@@ -348,15 +348,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     ///// GET UNDERLYING TOKEN
     try {
       if (vault.underlying != zeroAddress) {
-        const logo =
-          vault.strategyInfo.shortName === "DQMF"
-            ? "/protocols/DefiEdge.svg"
-            : vault.strategyInfo.shortName === "IQMF" ||
-              vault.strategyInfo.shortName === "IRMF"
-            ? "/protocols/Ichi.png"
-            : vault.strategyInfo.shortName === "CCF"
-            ? "/protocols/Curve.png"
-            : "/protocols/Gamma.png";
+        const logo = getProtocolLogo(vault.strategyInfo.shortName);
         if ($connected) {
           let underlyingSymbol = "";
 
@@ -2183,14 +2175,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         [underlyingToken?.address],
                         underlyingToken?.symbol,
                         underlyingToken?.address,
-                        vault.strategyInfo.shortName === "DQMF"
-                          ? "/protocols/DefiEdge.svg"
-                          : vault.strategyInfo.shortName === "IQMF" ||
-                            vault.strategyInfo.shortName === "IRMF"
-                          ? "/protocols/Ichi.png"
-                          : vault.strategyInfo.shortName === "CCF"
-                          ? "/protocols/Curve.png"
-                          : "/protocols/Gamma.png"
+                        getProtocolLogo(vault.strategyInfo.shortName)
                       );
                     }}
                   >
