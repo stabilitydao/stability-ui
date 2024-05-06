@@ -467,7 +467,6 @@ const Vaults = () => {
   ) : localVaults?.length ? (
     <>
       <ErrorMessage type="WEB3" />
-
       {!!platformUpdates?.newVersion &&
         platformUpdates?.newVersion != $platformVersion &&
         !!upgradesTable?.length && (
@@ -608,6 +607,42 @@ const Vaults = () => {
           <tbody>
             {currentTabVaults?.length ? (
               currentTabVaults.map((vault: TVault) => {
+                let yearnProtocolsImages: string[] = [];
+                if (
+                  vault.strategySpecific &&
+                  vault.strategyInfo.shortName === "Y"
+                ) {
+                  const yProtocols = [
+                    "aave",
+                    "stargate",
+                    "stmatic",
+                    "compound",
+                  ];
+
+                  yProtocols.map((protocol: string) => {
+                    if (
+                      vault.strategySpecific.toLowerCase().includes(protocol)
+                    ) {
+                      switch (protocol) {
+                        case "aave":
+                          yearnProtocolsImages.push("/protocols/Aave.png");
+                          break;
+                        case "compound":
+                          yearnProtocolsImages.push("/protocols/Compound.png");
+                          break;
+                        case "stargate":
+                          yearnProtocolsImages.push("/protocols/Stargate.svg");
+                          break;
+                        case "stmatic":
+                          yearnProtocolsImages.push("/protocols/Lido.png");
+                          break;
+                        default:
+                          break;
+                      }
+                    }
+                  });
+                }
+
                 return (
                   <tr
                     key={vault.name}
@@ -716,7 +751,21 @@ const Vaults = () => {
                                 )
                               )}
                             </span> */}
-                              {vault.strategySpecific && (
+                              {vault.strategySpecific &&
+                              vault.strategyInfo.shortName === "Y" ? (
+                                <div className="flex">
+                                  {yearnProtocolsImages.map(
+                                    (imageLink: string, index: number) => (
+                                      <img
+                                        key={imageLink}
+                                        src={imageLink}
+                                        alt={`yearnProtocol${index}`}
+                                        className="h-6 w-6 rounded-full"
+                                      />
+                                    )
+                                  )}
+                                </div>
+                              ) : vault.strategySpecific ? (
                                 <span
                                   className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
                                     vault.strategySpecific.length > 10
@@ -726,6 +775,8 @@ const Vaults = () => {
                                 >
                                   {vault.strategySpecific}
                                 </span>
+                              ) : (
+                                ""
                               )}
                             </span>
                           </>

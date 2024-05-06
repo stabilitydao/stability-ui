@@ -181,6 +181,13 @@ const TOKENS_ASSETS = [
   },
 ];
 
+const CHAINLINK_STABLECOINS = {
+  USDT: "https://data.chain.link/feeds/polygon/mainnet/usdt-usd",
+  "USDC.e": "https://data.chain.link/feeds/polygon/mainnet/usdc-usd",
+  USDC: "https://data.chain.link/feeds/polygon/mainnet/usdc-usd",
+  DAI: "https://data.chain.link/feeds/polygon/mainnet/dai-usd",
+};
+
 const DEXes = [
   { name: "QuickSwap", algo: "AlgebraV1", img: "/protocols/QuickSwap.svg" },
   { name: "Retro", algo: "Uniswap V3", img: "/protocols/Retro.svg" },
@@ -251,6 +258,22 @@ const PROTOCOLS = {
   convex: {
     name: "Convex",
     logoSrc: "/protocols/Convex.png",
+  },
+  lido: {
+    name: "Lido",
+    logoSrc: "/protocols/Lido.png",
+  },
+  aave: {
+    name: "Aave",
+    logoSrc: "/protocols/Aave.png",
+  },
+  stargate: {
+    name: "Stargate",
+    logoSrc: "/protocols/Stargate.svg",
+  },
+  yearn: {
+    name: "Yearn",
+    logoSrc: "/protocols/Yearn.svg",
   },
 };
 
@@ -565,4 +588,5 @@ export {
   TIMESTAMPS_IN_SECONDS,
   DEXes,
   STRATEGYES_ASSETS_AMOUNTS,
+  CHAINLINK_STABLECOINS,
 };

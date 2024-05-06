@@ -54,6 +54,12 @@ const IL = {
     desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
     color: "#7af996",
   },
+  Y: {
+    rate: 0,
+    title: "None",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
 };
 
 export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
@@ -78,6 +84,10 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     retro,
     curve,
     convex,
+    stargate,
+    lido,
+    aave,
+    yearn,
   } = PROTOCOLS;
 
   const farm: IFeature = {
@@ -226,6 +236,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il,
+    };
+  } else if (vaultSymbol.match(/Y$/)) {
+    strategyInfo = {
+      name: "Yearn",
+      shortName: "Y",
+      protocols: [yearn],
+      features: [],
+      color: "#dc568a",
+      bgColor: "#000000",
+      baseStrategies: ["ERC4626 strategy"],
+      ammAdapter: "",
+      sourceCode: "",
+      il: IL.Y,
     };
   }
 
