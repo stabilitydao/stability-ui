@@ -12,7 +12,7 @@ import { StrategyABI, wagmiConfig } from "@web3";
 
 import { getTokenData, getDate, formatNumber } from "@utils";
 
-import { TOKENS_ASSETS } from "@constants";
+import { TOKENS_ASSETS, CHAINLINK_STABLECOINS } from "@constants";
 
 import type { TAddress, TAsset, TToken, TPieChartData } from "@types";
 
@@ -172,15 +172,23 @@ const Assets: React.FC<IProps> = memo(
               });
 
               const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+
               const price: number = $assetsPrices
                 ? Number(formatUnits($assetsPrices[asset.address], 18))
                 : 0;
 
               const creationDate = getDate(Number(created));
+
+              /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
+              const trustedLink =
+                CHAINLINK_STABLECOINS[
+                  tokenAssets?.symbol as keyof typeof CHAINLINK_STABLECOINS
+                ];
+
               return (
                 assetData && (
                   <article
-                    className="rounded-md p-3 flex  w-full"
+                    className="rounded-md p-3 flex w-full"
                     key={asset.address + index}
                   >
                     <div className="flex w-full flex-col gap-3">
@@ -262,6 +270,18 @@ const Assets: React.FC<IProps> = memo(
                             </p>
                           ))}
                         </div>
+                      )}
+                      {trustedLink && (
+                        <a
+                          className="w-[200px]"
+                          href={trustedLink}
+                          target="_blank"
+                        >
+                          <img
+                            src="https://chain.link/badge-market-data-black"
+                            alt="market data secured with chainlink"
+                          />
+                        </a>
                       )}
                       <p className="text-[16px]">{tokenAssets?.description}</p>
                     </div>
