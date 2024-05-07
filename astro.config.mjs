@@ -3,19 +3,18 @@ import react from "@astrojs/react";
 import vercel from "@astrojs/vercel/serverless";
 import tailwind from "@astrojs/tailwind";
 
-import partytown from "@astrojs/partytown";
+// import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
+
+// partytown({
+//   config: {
+//     forward: ["dataLayer.push"],
+//   },
+// }),
+
 export default defineConfig({
-  integrations: [
-    react(),
-    tailwind(),
-    partytown({
-      config: {
-        forward: ["dataLayer.push"],
-      },
-    }),
-  ],
+  integrations: [react(), tailwind()],
   output: "server",
   adapter: vercel(),
 });
