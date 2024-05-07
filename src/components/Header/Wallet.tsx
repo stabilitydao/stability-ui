@@ -58,15 +58,6 @@ const Wallet = () => {
     }
   };
   const openProfile = () => {
-    // partytown gtag test
-    partytown.forward.push([
-      "gtag",
-      {
-        event: "button_click",
-        event_category: "Button Click",
-        event_label: `Connect`,
-      },
-    ]);
     open();
     if (!$account) return;
     const web3ModalCard = document

@@ -108,6 +108,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
       }));
+
     if (!APRChartData.length) {
       setIsData(false);
       return;
@@ -116,11 +117,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
     time = Number(APRChartData[0].unixTimestamp);
 
-    while (time < lastTimestamp) {
+    do {
       let sortedAPRs = APRChartData.filter(
-        (obj: any) => Number(obj.unixTimestamp) > time
+        (obj: any) => Number(obj.unixTimestamp) >= time
       );
-      let firstEl = sortedAPRs[0];
+
+      let firstEl = sortedAPRs[0] || APRChartData[APRChartData.length - 1];
 
       newData.push({ ...firstEl, timestamp: time });
       time += 3600;
@@ -130,7 +132,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           timestamp: APRChartData[APRChartData.length - 1].unixTimestamp,
         });
       }
-    }
+    } while (time < lastTimestamp);
 
     APRChartData = newData.map(formatData);
 
@@ -157,11 +159,11 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         time = Number(APRArr[0].unixTimestamp);
 
         if (segment === "MONTH") {
-          while (time < lastTimestamp) {
+          do {
             let sortedAPRs = APRArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) > time
+              (obj: any) => Number(obj.unixTimestamp) >= time
             );
-            let firstEl = sortedAPRs[0];
+            let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
             newData.push({ ...firstEl, timestamp: time });
             time += 7200;
@@ -171,13 +173,13 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 timestamp: APRArr[APRArr.length - 1].unixTimestamp,
               });
             }
-          }
+          } while (time < lastTimestamp);
         } else if (segment === "YEAR") {
-          while (time < lastTimestamp) {
+          do {
             let sortedAPRs = APRArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) > time
+              (obj: any) => Number(obj.unixTimestamp) >= time
             );
-            let firstEl = sortedAPRs[0];
+            let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
             newData.push({ ...firstEl, timestamp: time });
             time += 14400;
@@ -187,13 +189,13 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 timestamp: APRArr[APRArr.length - 1].unixTimestamp,
               });
             }
-          }
+          } while (time < lastTimestamp);
         } else {
-          while (time < lastTimestamp) {
+          do {
             let sortedAPRs = APRArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) > time
+              (obj: any) => Number(obj.unixTimestamp) >= time
             );
-            let firstEl = sortedAPRs[0];
+            let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
             newData.push({ ...firstEl, timestamp: time });
             time += 3600;
@@ -203,7 +205,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 timestamp: APRArr[APRArr.length - 1].unixTimestamp,
               });
             }
-          }
+          } while (time < lastTimestamp);
         }
 
         APRArr = newData.map(formatData);
