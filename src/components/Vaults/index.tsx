@@ -96,6 +96,7 @@ const Vaults = () => {
     lastHardWork: 0,
     symbol: "",
     state: false,
+    pool: {},
   });
   const [vsHoldModal, setVsHoldModal] = useState({
     tokensHold: [],
@@ -676,13 +677,21 @@ const Vaults = () => {
                             </span>
                             <span
                               className={`px-2 rounded-r-[10px] bg-[#1f1d40] hidden md:flex h-8 items-center ${
-                                vault.strategySpecific ||
+                                (vault.strategySpecific &&
+                                  vault.strategyInfo.shortName != "Y") ||
                                 vault.strategyInfo.protocols.length > 2
                                   ? "min-w-[100px] w-[170px]"
                                   : ""
                               }`}
                             >
-                              <span className="flex min-w-[50px]">
+                              <span
+                                className={`flex ${
+                                  vault.yearnProtocols.length ||
+                                  vault.strategyInfo.shortName === "CF"
+                                    ? ""
+                                    : "min-w-[50px]"
+                                }`}
+                              >
                                 {vault.strategyInfo.protocols.map(
                                   (protocol, index) => (
                                     <img
@@ -754,6 +763,7 @@ const Vaults = () => {
                           lastHardWork: vault.lastHardWork as any,
                           symbol: vault?.risk?.symbol as string,
                           state: true,
+                          pool: vault?.pool,
                         });
                       }}
                       className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] md:w-[80px] min-[915px]:w-[160px]"
@@ -834,26 +844,26 @@ const Vaults = () => {
                               </p>
                             </div>
 
-                            {vault?.earningData?.poolSwapFeesAPR.daily !=
-                              "-" && (
-                              <div className="font-bold flex items-center justify-between">
-                                <p>Pool swap fees APR</p>
-                                <p
-                                  className={`${
-                                    $hideFeeAPR && "line-through"
-                                  } text-end`}
-                                >
-                                  {$aprFilter === "24h"
-                                    ? vault.earningData.poolSwapFeesAPR.daily
-                                    : $aprFilter === "week"
-                                    ? vault.earningData.poolSwapFeesAPR.weekly
-                                    : vault.earningData.poolSwapFeesAPR[
-                                        $aprFilter
-                                      ]}
-                                  %
-                                </p>
-                              </div>
-                            )}
+                            {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
+                              vault?.pool && (
+                                <div className="font-bold flex items-center justify-between">
+                                  <p>Pool swap fees APR</p>
+                                  <p
+                                    className={`${
+                                      $hideFeeAPR && "line-through"
+                                    } text-end`}
+                                  >
+                                    {$aprFilter === "24h"
+                                      ? vault.earningData.poolSwapFeesAPR.daily
+                                      : $aprFilter === "week"
+                                      ? vault.earningData.poolSwapFeesAPR.weekly
+                                      : vault.earningData.poolSwapFeesAPR[
+                                          $aprFilter
+                                        ]}
+                                    %
+                                  </p>
+                                </div>
+                              )}
                             <div className="font-bold flex items-center justify-between">
                               <p>Strategy APR</p>
                               <p className="text-end">

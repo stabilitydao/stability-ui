@@ -27,6 +27,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         lastHardWork: 0,
         symbol: "",
         state: false,
+        pool: {},
       });
     }
   };
@@ -60,6 +61,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               lastHardWork: 0,
               symbol: "",
               state: false,
+              pool: {},
             });
           }}
           className="absolute right-5 top-5 cursor-pointer"
@@ -168,19 +170,20 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
                 %
               </p>
             </div>
-            {state.earningData.poolSwapFeesAPR.daily != "-" && (
-              <div className="flex items-center justify-between mb-1">
-                <p>Pool swap fees APR</p>
-                <p className={`${$hideFeeAPR && "line-through"} text-end`}>
-                  {$aprFilter === "24h"
-                    ? state.earningData.poolSwapFeesAPR.daily
-                    : $aprFilter === "week"
-                    ? state.earningData.poolSwapFeesAPR.weekly
-                    : state.earningData.poolSwapFeesAPR[$aprFilter]}
-                  %
-                </p>
-              </div>
-            )}
+            {state.earningData.poolSwapFeesAPR.daily != "-" &&
+              !!state?.pool && (
+                <div className="flex items-center justify-between mb-1">
+                  <p>Pool swap fees APR</p>
+                  <p className={`${$hideFeeAPR && "line-through"} text-end`}>
+                    {$aprFilter === "24h"
+                      ? state.earningData.poolSwapFeesAPR.daily
+                      : $aprFilter === "week"
+                      ? state.earningData.poolSwapFeesAPR.weekly
+                      : state.earningData.poolSwapFeesAPR[$aprFilter]}
+                    %
+                  </p>
+                </div>
+              )}
             <div className="flex items-center justify-between mb-1">
               <p>Strategy APR</p>
               <p className="text-end">
