@@ -408,7 +408,6 @@ const Vaults = () => {
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
-
       /////***** AFTER PAGE LOADING *****/ /////
       if (!upgradesTable.length) {
         fetchPlatformUpdates();
