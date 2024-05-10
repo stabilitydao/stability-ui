@@ -482,6 +482,14 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
+        const strategySpecific =
+          strategyInfo?.shortName === "DQMF"
+            ? vault.strategySpecific.replace(
+                /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
+                ""
+              )
+            : vault.strategySpecific;
+
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -493,7 +501,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategy: vault.strategyId,
           shareprice: APIVault.sharePrice,
           tvl: APIVault.tvl,
-          strategySpecific: vault.strategySpecific,
+          strategySpecific,
           balance: "",
           lastHardWork: vault.lastHardWork,
           hardWorkOnDeposit: vault?.hardWorkOnDeposit,

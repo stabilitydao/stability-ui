@@ -243,6 +243,7 @@ type TAPRModal = {
   lastHardWork: any;
   symbol: string;
   state: boolean;
+  pool: TPool;
 };
 
 type TBuildVariant = {
