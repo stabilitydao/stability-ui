@@ -356,6 +356,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           STRATEGYES_ASSETS_AMOUNTS[
             vault.strategy as keyof typeof STRATEGYES_ASSETS_AMOUNTS
           ];
+
         let holdYearPercentDiff = 0;
         let holdPercentDiff = 0;
         let tokensHold: THoldData[] = [];

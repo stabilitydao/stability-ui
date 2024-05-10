@@ -474,6 +474,10 @@ const STRATEGYES_ASSETS_AMOUNTS = {
     ],
     assetsAmounts: [105542532n, 4894750034226052n],
   },
+  "0x013c18cbb64b560699f64bf2f4bf0d6d10127b56": {
+    assets: ["0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"],
+    assetsAmounts: [150001679n],
+  },
 };
 
 const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
