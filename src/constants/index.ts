@@ -480,6 +480,12 @@ const STRATEGYES_ASSETS_AMOUNTS = {
   },
 };
 
+const STRATEGY_SPECIFIC_SUBSTITUTE: {
+  [key: string]: string;
+} = {
+  "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
+};
+
 const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
   import.meta.env.PUBLIC_GRAPH_API_KEY
 }/subgraphs/id/3ZoXLL5NpCo7FxY5wNzVYuNAA7qF6AHsyhZLrEAensJG`;
@@ -597,4 +603,5 @@ export {
   STRATEGYES_ASSETS_AMOUNTS,
   CHAINLINK_STABLECOINS,
   YEARN_PROTOCOLS,
+  STRATEGY_SPECIFIC_SUBSTITUTE,
 };

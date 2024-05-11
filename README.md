@@ -28,3 +28,4 @@ yarn dev
 3. Update the PROTOCOLS constant
 4. Add data to getStrategyInfo
 5. Update getProtocolLogo function (if necessary)
+6. Update strategy specific substitute (if necessary)

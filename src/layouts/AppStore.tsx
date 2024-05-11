@@ -10,7 +10,11 @@ import { useStore } from "@nanostores/react";
 import { useAccount, usePublicClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
-import { STRATEGYES_ASSETS_AMOUNTS, YEARN_PROTOCOLS } from "@constants";
+import {
+  STRATEGYES_ASSETS_AMOUNTS,
+  YEARN_PROTOCOLS,
+  STRATEGY_SPECIFIC_SUBSTITUTE,
+} from "@constants";
 
 import { WagmiLayout } from "@layouts";
 
@@ -447,6 +451,8 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
+        let strategySpecific = "";
+
         if (vault.strategySpecific && strategyInfo.shortName === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
             if (vault.strategySpecific.toLowerCase().includes(protocol)) {
@@ -482,13 +488,17 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        const strategySpecific =
-          strategyInfo?.shortName === "DQMF"
-            ? vault.strategySpecific.replace(
-                /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
-                ""
-              )
-            : vault.strategySpecific;
+        if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.id]) {
+          strategySpecific = STRATEGY_SPECIFIC_SUBSTITUTE[vault.id];
+        } else {
+          strategySpecific =
+            strategyInfo?.shortName === "DQMF"
+              ? vault.strategySpecific.replace(
+                  /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
+                  ""
+                )
+              : vault.strategySpecific;
+        }
 
         /////
         vaults[vault.id] = {
