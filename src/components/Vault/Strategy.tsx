@@ -1,20 +1,11 @@
 import { useState, useEffect, memo } from "react";
-import { formatUnits } from "viem";
 
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import {
-  connected,
-  platformData,
-  vaultTypes,
-  strategyTypes,
-  apiData,
-} from "@store";
+import { connected, platformData, vaultTypes, strategyTypes } from "@store";
 
-import { calculateAPY } from "@utils";
-
-import { FactoryABI, wagmiConfig } from "@web3";
+import { FactoryABI, StrategyABI, wagmiConfig } from "@web3";
 
 import type { TAddress, TPlatformData, TVault } from "@types";
 

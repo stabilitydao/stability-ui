@@ -60,6 +60,12 @@ const IL = {
     desc: "Providing assets to the landing protocol does not incur impermanent losses.",
     color: "#4aff71",
   },
+  QSMF: {
+    rate: 0,
+    title: "None",
+    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+    color: "#4aff71",
+  },
 };
 
 export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
@@ -249,6 +255,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ammAdapter: "",
       sourceCode: "",
       il: IL.Y,
+    };
+  } else if (vaultSymbol.match(/QSMF$/)) {
+    strategyInfo = {
+      name: "QuickSwap Static Merkl Farm",
+      shortName: "QSMF",
+      protocols: [quickSwap, merkl],
+      features: [],
+      color: "#558ac5",
+      bgColor: "#000000",
+      baseStrategies: ["Liquidity providing", "Farming"],
+      ammAdapter: "Algebra",
+      sourceCode: "",
+      il: IL.QSMF,
     };
   }
 
