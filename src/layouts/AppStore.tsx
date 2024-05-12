@@ -434,8 +434,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             0
           );
 
-          const priceDifference =
-            ((holdPrice - sharePriceOnCreation) / sharePriceOnCreation) * 100;
+          const priceDifference = (holdPrice - sharePriceOnCreation) * 100;
           holdPercentDiff = sharePriceDifference - priceDifference;
 
           holdYearPercentDiff = (holdPercentDiff / daysFromCreation) * 365;
