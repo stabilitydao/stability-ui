@@ -184,7 +184,6 @@ const TOKENS_ASSETS = [
 const CHAINLINK_STABLECOINS = {
   USDT: "https://data.chain.link/feeds/polygon/mainnet/usdt-usd",
   "USDC.e": "https://data.chain.link/feeds/polygon/mainnet/usdc-usd",
-  USDC: "https://data.chain.link/feeds/polygon/mainnet/usdc-usd",
   DAI: "https://data.chain.link/feeds/polygon/mainnet/dai-usd",
 };
 
