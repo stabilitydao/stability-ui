@@ -163,7 +163,6 @@ type THoldData = {
   initPrice: string;
   price: string;
   priceDifference: string;
-  presentProportion: number;
   latestAPR: string;
   APR: string;
 };
