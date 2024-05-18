@@ -38,11 +38,13 @@ const Vault: React.FC<IProps> = ({ vault }) => {
       ["Ichi", "DefiEdge", "Gamma"].includes(localVault.alm.protocol),
     [localVault]
   );
+
   useEffect(() => {
     if ($vaults && vault) {
       setLocalVault($vaults[vault.toLowerCase()]);
     }
   }, [$vaults, $vaultData]);
+
   if ($error.state && $error.type === "API") {
     return (
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

@@ -98,6 +98,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
     if (APRsFiler) {
       const savedData = JSON.parse(APRsFiler);
+
       aprFilter.set(savedData);
     }
   };

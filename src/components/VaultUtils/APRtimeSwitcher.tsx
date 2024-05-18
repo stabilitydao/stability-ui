@@ -15,7 +15,18 @@ const APRtimeSwitcher = () => {
   const [activeAPRType, setActiveAPRType] = useState($aprFilter);
 
   const APRsHandler = (APRType: string) => {
-    aprFilter.set(APRType);
+    switch (APRType) {
+      case "24h":
+        aprFilter.set("daily");
+        break;
+      case "week":
+        aprFilter.set("weekly");
+        break;
+      default:
+        aprFilter.set(APRType);
+        break;
+    }
+
     setActiveAPRType(APRType);
     setDropDownSelector(false);
   };
@@ -49,7 +60,14 @@ const APRtimeSwitcher = () => {
         }}
         className="flex items-center justify-between gap-3 rounded-md px-3 h-[30px] bg-button cursor-pointer"
       >
-        <p className="text-[16px]">APRs: {activeAPRType}</p>
+        <p className="text-[16px]">
+          APRs:{" "}
+          {activeAPRType === "weekly"
+            ? "week"
+            : activeAPRType === "daily"
+            ? "24h"
+            : activeAPRType}
+        </p>
         <svg
           width="15"
           height="9"
