@@ -87,7 +87,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     const savedSettings = localStorage.getItem("transactionSettings");
     const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
     const APRsFiler = localStorage.getItem("APRsFiler");
-
+    console.log(JSON.parse(APRsFiler));
     if (savedSettings) {
       const savedData = JSON.parse(savedSettings);
       transactionSettings.set(savedData);
@@ -96,11 +96,10 @@ const AppStore = (props: React.PropsWithChildren) => {
       const savedData = JSON.parse(savedHideFeeAPR);
       hideFeeApr.set(savedData);
     }
-    if (APRsFiler) {
-      const savedData = JSON.parse(APRsFiler);
 
-      aprFilter.set(savedData);
-    }
+    const localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+
+    aprFilter.set(localAPRfilter);
   };
 
   const getDataFromStabilityAPI = async () => {
