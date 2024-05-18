@@ -57,36 +57,11 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
     let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
 
     if ($hideFeeAPR) {
-      switch ($aprFilter) {
-        case "24h":
-          apr = vault.earningData.apr.withoutFees.daily;
-          apy = vault.earningData.apy.withoutFees.daily;
-
-          break;
-        case "week":
-          apr = vault.earningData.apr.withoutFees.weekly;
-          apy = vault.earningData.apy.withoutFees.weekly;
-          break;
-        default:
-          apr = vault.earningData.apr.withoutFees[$aprFilter];
-          apy = vault.earningData.apy.withoutFees[$aprFilter];
-          break;
-      }
+      apr = vault.earningData.apr.withoutFees[$aprFilter];
+      apy = vault.earningData.apy.withoutFees[$aprFilter];
     } else {
-      switch ($aprFilter) {
-        case "24h":
-          apr = vault.earningData.apr.withFees.daily;
-          apy = vault.earningData.apy.withFees.daily;
-          break;
-        case "week":
-          apr = vault.earningData.apr.withFees.weekly;
-          apy = vault.earningData.apy.withFees.weekly;
-          break;
-        default:
-          apr = vault.earningData.apr.withFees[$aprFilter];
-          apy = vault.earningData.apy.withFees[$aprFilter];
-          break;
-      }
+      apr = vault.earningData.apr.withFees[$aprFilter];
+      apy = vault.earningData.apy.withFees[$aprFilter];
     }
     monthlyAPR = Number(apr) / 12;
     monthlyEarn = String(

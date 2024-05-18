@@ -139,15 +139,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Total APY</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? $aprFilter === "24h"
-                    ? state.earningData.apy.withoutFees.daily
-                    : $aprFilter === "week"
-                    ? state.earningData.apy.withoutFees.weekly
-                    : state.earningData.apy.withFees[$aprFilter]
-                  : $aprFilter === "24h"
-                  ? state.earningData.apy.withFees.daily
-                  : $aprFilter === "week"
-                  ? state.earningData.apy.withFees.weekly
+                  ? state.earningData.apy.withoutFees[$aprFilter]
                   : state.earningData.apy.withFees[$aprFilter]}
                 %
               </p>
@@ -157,15 +149,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Total APR</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? $aprFilter === "24h"
-                    ? state.earningData.apr.withoutFees.daily
-                    : $aprFilter === "week"
-                    ? state.earningData.apr.withoutFees.weekly
-                    : state.earningData.apr.withoutFees[$aprFilter]
-                  : $aprFilter === "24h"
-                  ? state.earningData.apr.withFees.daily
-                  : $aprFilter === "week"
-                  ? state.earningData.apr.withFees.weekly
+                  ? state.earningData.apr.withoutFees[$aprFilter]
                   : state.earningData.apr.withFees[$aprFilter]}
                 %
               </p>
@@ -175,32 +159,27 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
                 <div className="flex items-center justify-between mb-1">
                   <p>Pool swap fees APR</p>
                   <p className={`${$hideFeeAPR && "line-through"} text-end`}>
-                    {$aprFilter === "24h"
-                      ? state.earningData.poolSwapFeesAPR.daily
-                      : $aprFilter === "week"
-                      ? state.earningData.poolSwapFeesAPR.weekly
-                      : state.earningData.poolSwapFeesAPR[$aprFilter]}
-                    %
+                    {state.earningData.poolSwapFeesAPR[$aprFilter]}%
                   </p>
                 </div>
               )}
             <div className="flex items-center justify-between mb-1">
               <p>Strategy APR</p>
               <p className="text-end">
-                {$aprFilter === "24h"
-                  ? state.earningData.farmAPR.daily
-                  : $aprFilter === "week"
-                  ? state.earningData.farmAPR.weekly
-                  : state.earningData.farmAPR[$aprFilter]}
-                %
+                {state.earningData.farmAPR[$aprFilter]}%
               </p>
             </div>
             <div className="flex items-center justify-between">
               <p>Daily yield</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? state.earningData.apr.withoutFees.daily
-                  : state.earningData.apr.withFees.daily}
+                  ? (
+                      Number(state.earningData.apr.withoutFees[$aprFilter]) /
+                      365
+                    ).toFixed(2)
+                  : (
+                      Number(state.earningData.apr.withFees[$aprFilter]) / 365
+                    ).toFixed(2)}
                 %
               </p>
             </div>

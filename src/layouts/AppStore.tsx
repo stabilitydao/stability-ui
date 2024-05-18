@@ -10,11 +10,7 @@ import { useStore } from "@nanostores/react";
 import { useAccount, usePublicClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
-import {
-  STRATEGYES_ASSETS_AMOUNTS,
-  YEARN_PROTOCOLS,
-  STRATEGY_SPECIFIC_SUBSTITUTE,
-} from "@constants";
+import { YEARN_PROTOCOLS, STRATEGY_SPECIFIC_SUBSTITUTE } from "@constants";
 
 import { WagmiLayout } from "@layouts";
 
@@ -43,6 +39,7 @@ import {
   isWeb3Load,
   aprFilter,
 } from "@store";
+
 import {
   wagmiConfig,
   platform,
@@ -61,6 +58,7 @@ import {
   addAssetsBalance,
   addVaultData,
   getTimeDifference,
+  determineAPR,
 } from "@utils";
 
 import {
@@ -98,10 +96,16 @@ const AppStore = (props: React.PropsWithChildren) => {
       const savedData = JSON.parse(savedHideFeeAPR);
       hideFeeApr.set(savedData);
     }
-    if (APRsFiler) {
-      const savedData = JSON.parse(APRsFiler);
-      aprFilter.set(savedData);
+
+    let localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+
+    if (localAPRfilter === "week") {
+      localAPRfilter = "weekly";
+    } else if (localAPRfilter === "24h") {
+      localAPRfilter = "daily";
     }
+
+    aprFilter.set(localAPRfilter);
   };
 
   const getDataFromStabilityAPI = async () => {
@@ -138,6 +142,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         const NOW = Math.floor(Date.now() / 1000);
 
         const almRebalanceEntity = vault.almRebalanceHistoryEntity[0];
+
         let dailyAPR = 0;
         let rebalances = {};
 
@@ -170,17 +175,18 @@ const AppStore = (props: React.PropsWithChildren) => {
         );
 
         const assets = await assetsPromise;
+        const lastHistoryData = vault.vaultHistoryEntity[0];
+
         ///// APR DATA CALCULATION
-        const aprData = vault.vaultHistoryEntity[0];
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 
-        const dailyFarmApr = aprData?.APR24H
-          ? Number(formatUnits(aprData.APR24H, 3)).toFixed(2)
+        const dailyFarmApr = lastHistoryData?.APR24H
+          ? Number(formatUnits(lastHistoryData.APR24H, 3)).toFixed(2)
           : 0;
 
-        const weeklyFarmApr = aprData?.APRWeekly
-          ? Number(formatUnits(aprData.APRWeekly, 3)).toFixed(2)
+        const weeklyFarmApr = lastHistoryData?.APRWeekly
+          ? Number(formatUnits(lastHistoryData.APRWeekly, 3)).toFixed(2)
           : 0;
 
         if (APIData) {
@@ -294,6 +300,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           3,
           "withDecimals"
         ).toFixed(2);
+
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
         ///////
@@ -305,25 +312,57 @@ const AppStore = (props: React.PropsWithChildren) => {
         const APRArray = {
           withFees: {
             latest: String(APR),
-            daily: `${dailyTotalAPRWithFees.toFixed(2)}`,
-            weekly: `${weeklyTotalAPRWithFees.toFixed(2)}`,
+            daily: determineAPR(
+              lastHistoryData?.APR24H,
+              dailyTotalAPRWithFees,
+              APR
+            ),
+            weekly: determineAPR(
+              lastHistoryData?.APRWeekly,
+              weeklyTotalAPRWithFees,
+              APR
+            ),
           },
           withoutFees: {
             latest: APRWithoutFees,
-            daily: `${Number(dailyFarmApr).toFixed(2)}`,
-            weekly: `${Number(weeklyFarmApr).toFixed(2)}`,
+            daily: determineAPR(
+              lastHistoryData?.APR24H,
+              dailyFarmApr,
+              APRWithoutFees
+            ),
+            weekly: determineAPR(
+              lastHistoryData?.APRWeekly,
+              weeklyFarmApr,
+              APRWithoutFees
+            ),
           },
         };
         const APYArray = {
           withFees: {
             latest: APY,
-            daily: `${calculateAPY(dailyTotalAPRWithFees).toFixed(2)}`,
-            weekly: `${calculateAPY(weeklyTotalAPRWithFees).toFixed(2)}`,
+            daily: determineAPR(
+              lastHistoryData?.APR24H,
+              calculateAPY(dailyTotalAPRWithFees).toFixed(2),
+              APY
+            ),
+            weekly: determineAPR(
+              lastHistoryData?.APRWeekly,
+              calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
+              APY
+            ),
           },
           withoutFees: {
             latest: APYWithoutFees,
-            daily: `${calculateAPY(dailyFarmApr).toFixed(2)}`,
-            weekly: `${calculateAPY(weeklyFarmApr).toFixed(2)}`,
+            daily: determineAPR(
+              lastHistoryData?.APR24H,
+              calculateAPY(dailyFarmApr).toFixed(2),
+              APYWithoutFees
+            ),
+            weekly: determineAPR(
+              lastHistoryData?.APRWeekly,
+              calculateAPY(weeklyFarmApr).toFixed(2),
+              APYWithoutFees
+            ),
           },
         };
 
@@ -336,10 +375,22 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             : { latest: "-", daily: "-", weekly: "-" };
 
+        const latestFarmAPR = String(
+          Number(formatUnits(BigInt(vault.apr), 3)).toFixed(2)
+        );
+
         const farmAPR = {
-          latest: String(Number(formatUnits(BigInt(vault.apr), 3)).toFixed(2)),
-          daily: aprData?.APR24H ? String(dailyFarmApr) : "-",
-          weekly: aprData?.APRWeekly ? String(weeklyFarmApr) : "-",
+          latest: latestFarmAPR,
+          daily: determineAPR(
+            lastHistoryData?.APR24H,
+            dailyFarmApr,
+            latestFarmAPR
+          ),
+          weekly: determineAPR(
+            lastHistoryData?.APRWeekly,
+            weeklyFarmApr,
+            latestFarmAPR
+          ),
         };
 
         // IL
@@ -356,92 +407,49 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const strategyAmounts =
-          STRATEGYES_ASSETS_AMOUNTS[
-            vault.strategy as keyof typeof STRATEGYES_ASSETS_AMOUNTS
-          ];
+        const holdYearPercentDiff = Number(lastHistoryData?.vsHoldAPR).toFixed(
+          2
+        );
 
-        let holdYearPercentDiff = 0;
-        let holdPercentDiff = 0;
+        const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
+
+        const holdPercentDiff = (
+          (Number(holdYearPercentDiff) / 365) *
+          Number(daysFromCreation)
+        ).toFixed(2);
+
         let tokensHold: THoldData[] = [];
 
-        if (strategyAmounts && prices) {
-          const tokens = strategyAmounts.assets.map((token) =>
-            getTokenData(token)
-          );
-          const amounts = strategyAmounts.assetsAmounts.map((amount, index) =>
-            formatUnits(amount, tokens[index]?.decimals as number)
-          );
+        if (lastHistoryData?.tokensVsHoldAPR && prices) {
+          tokensHold = vault.strategyAssets.map(
+            (asset: string, index: number) => {
+              const price = Number(
+                formatUnits(prices[asset.toLowerCase()], 18)
+              );
 
-          const amountsInUSD = amounts.map((amount, index) => {
-            const tokenAddress: any = tokens[index]?.address;
+              const priceOnCreation = Number(
+                formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
+              );
 
-            const tokenPrice: bigint = prices[tokenAddress];
-            return Number(formatUnits(tokenPrice, 18)) * Number(amount);
-          });
+              const priceDifference =
+                ((price - priceOnCreation) / priceOnCreation) * 100;
 
-          const sum = amountsInUSD.reduce(
-            (acc: number, num: any) => acc + num,
-            0
-          );
+              const yearPercentDiff = Number(
+                lastHistoryData?.tokensVsHoldAPR[index]
+              );
 
-          const proportions = amountsInUSD.map((amount) =>
-            amount ? (Number(amount) / sum) * 100 : 0
-          );
+              const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
 
-          const sharePriceOnCreation = 1;
-          const sharePrice = Number(APIVault.sharePrice);
-
-          const sharePriceDifference =
-            (sharePrice - sharePriceOnCreation) * 100;
-
-          const daysFromCreation = getTimeDifference(vault.created).days;
-          tokensHold = strategyAmounts.assets.map((asset, index) => {
-            const price = Number(formatUnits(prices[asset.toLowerCase()], 18));
-            const priceOnCreation = Number(
-              formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
-            );
-
-            const startProportion = (1 / 100) * proportions[index];
-
-            const proportionPrice = startProportion / priceOnCreation;
-
-            const presentAmount = proportionPrice * price;
-
-            const priceDifference =
-              ((price - priceOnCreation) / priceOnCreation) * 100;
-
-            const percentDiff = sharePriceDifference - priceDifference;
-
-            let yearPercentDiff = (percentDiff / daysFromCreation) * 365;
-
-            if (yearPercentDiff < -100) {
-              yearPercentDiff = -99.99;
+              return {
+                symbol: getTokenData(asset)?.symbol || "",
+                initPrice: priceOnCreation.toFixed(2),
+                price: price.toFixed(2),
+                priceDifference: priceDifference.toFixed(2),
+                latestAPR: percentDiff.toFixed(2),
+                APR: yearPercentDiff.toFixed(2),
+              };
             }
-            return {
-              symbol: getTokenData(asset)?.symbol || "",
-              initPrice: priceOnCreation.toFixed(2),
-              price: price.toFixed(2),
-              priceDifference: priceDifference.toFixed(2),
-              presentProportion: presentAmount,
-              latestAPR: percentDiff.toFixed(2),
-              APR: yearPercentDiff.toFixed(2),
-            };
-          });
-
-          const holdPrice = tokensHold.reduce(
-            (acc, cur) => (acc += cur.presentProportion),
-            0
           );
-
-          const priceDifference = (holdPrice - sharePriceOnCreation) * 100;
-          holdPercentDiff = sharePriceDifference - priceDifference;
-
-          holdYearPercentDiff = (holdPercentDiff / daysFromCreation) * 365;
-
-          if (holdYearPercentDiff < -100) {
-            holdYearPercentDiff = -99.99;
-          }
         }
 
         const isVsActive =
@@ -539,8 +547,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
-          holdPercentDiff: Number(holdPercentDiff.toFixed(2)),
-          holdYearPercentDiff: Number(holdYearPercentDiff.toFixed(2)),
+          holdPercentDiff: Number(holdPercentDiff),
+          holdYearPercentDiff: Number(holdYearPercentDiff),
           tokensHold,
           isVsActive,
           yearnProtocols,

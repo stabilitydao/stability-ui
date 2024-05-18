@@ -163,7 +163,6 @@ type THoldData = {
   initPrice: string;
   price: string;
   priceDifference: string;
-  presentProportion: number;
   latestAPR: string;
   APR: string;
 };
@@ -323,6 +322,7 @@ type TChartData = {
   sharePrice?: number;
   timestamp: string;
   unixTimestamp?: string;
+  vsHoldAPR?: string;
   date: string;
 };
 

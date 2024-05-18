@@ -32,7 +32,7 @@ type TAlmAsset = {
 type TAlmTable = {
   amounts: string[];
   amountsInUSD: string[];
-  inRange: string;
+  inRange: boolean;
   lowerTick: number;
   upperTick: number;
   tvl: string;
@@ -190,8 +190,6 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
         formatNumber(amount, "format")
       ) as string[];
 
-      const inRange = position.inRange ? "Yes" : "No";
-
       const tvl = formatNumber(
         amountsInUSD.reduce((acc, value) => (acc += value), 0),
         "abbreviate"
@@ -204,7 +202,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
       return {
         amounts,
         amountsInUSD,
-        inRange,
+        inRange: position.inRange,
         lowerTick: position.lowerTick,
         upperTick: position.upperTick,
         tvl: tvl as string,
@@ -356,7 +354,13 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
                     <span className="mr-4">{position.lowerTick}</span>
                     <span>{position.upperTick}</span>
                   </td>
-                  <td className="text-right py-1">{position.inRange}</td>
+                  <td className="py-1 flex justify-end">
+                    {position.inRange ? (
+                      <img src="/icons/done.svg" alt="Yes" />
+                    ) : (
+                      <img src="/icons/close.svg" alt="No" />
+                    )}
+                  </td>
                   {position.amounts.map((amount) => (
                     <td key={amount} className="text-right py-1">
                       {amount}

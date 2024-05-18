@@ -777,15 +777,7 @@ const Vaults = () => {
                       >
                         <p>
                           {$hideFeeAPR
-                            ? $aprFilter === "24h"
-                              ? vault.earningData.apr.withoutFees.daily
-                              : $aprFilter === "week"
-                              ? vault.earningData.apr.withoutFees.weekly
-                              : vault.earningData.apr.withoutFees[$aprFilter]
-                            : $aprFilter === "24h"
-                            ? vault.earningData.apr.withFees.daily
-                            : $aprFilter === "week"
-                            ? vault.earningData.apr.withFees.weekly
+                            ? vault.earningData.apr.withoutFees[$aprFilter]
                             : vault.earningData.apr.withFees[$aprFilter]}
                           %
                         </p>
@@ -811,15 +803,9 @@ const Vaults = () => {
 
                               <p className="text-end">
                                 {$hideFeeAPR
-                                  ? $aprFilter === "24h"
-                                    ? vault.earningData.apy.withoutFees.daily
-                                    : $aprFilter === "week"
-                                    ? vault.earningData.apy.withoutFees.weekly
-                                    : vault.earningData.apy.withFees[$aprFilter]
-                                  : $aprFilter === "24h"
-                                  ? vault.earningData.apy.withFees.daily
-                                  : $aprFilter === "week"
-                                  ? vault.earningData.apy.withFees.weekly
+                                  ? vault.earningData.apy.withoutFees[
+                                      $aprFilter
+                                    ]
                                   : vault.earningData.apy.withFees[$aprFilter]}
                                 %
                               </p>
@@ -828,17 +814,9 @@ const Vaults = () => {
                               <p>Total APR</p>
                               <p className="text-end">
                                 {$hideFeeAPR
-                                  ? $aprFilter === "24h"
-                                    ? vault.earningData.apr.withoutFees.daily
-                                    : $aprFilter === "week"
-                                    ? vault.earningData.apr.withoutFees.weekly
-                                    : vault.earningData.apr.withoutFees[
-                                        $aprFilter
-                                      ]
-                                  : $aprFilter === "24h"
-                                  ? vault.earningData.apr.withFees.daily
-                                  : $aprFilter === "week"
-                                  ? vault.earningData.apr.withFees.weekly
+                                  ? vault.earningData.apr.withoutFees[
+                                      $aprFilter
+                                    ]
                                   : vault.earningData.apr.withFees[$aprFilter]}
                                 %
                               </p>
@@ -853,13 +831,11 @@ const Vaults = () => {
                                       $hideFeeAPR && "line-through"
                                     } text-end`}
                                   >
-                                    {$aprFilter === "24h"
-                                      ? vault.earningData.poolSwapFeesAPR.daily
-                                      : $aprFilter === "week"
-                                      ? vault.earningData.poolSwapFeesAPR.weekly
-                                      : vault.earningData.poolSwapFeesAPR[
-                                          $aprFilter
-                                        ]}
+                                    {
+                                      vault.earningData.poolSwapFeesAPR[
+                                        $aprFilter
+                                      ]
+                                    }
                                     %
                                   </p>
                                 </div>
@@ -867,20 +843,27 @@ const Vaults = () => {
                             <div className="font-bold flex items-center justify-between">
                               <p>Strategy APR</p>
                               <p className="text-end">
-                                {$aprFilter === "24h"
-                                  ? vault.earningData.farmAPR.daily
-                                  : $aprFilter === "week"
-                                  ? vault.earningData.farmAPR.weekly
-                                  : vault.earningData.farmAPR[$aprFilter]}
-                                %
+                                {vault.earningData.farmAPR[$aprFilter]}%
                               </p>
                             </div>
                             <div className="font-bold flex items-center justify-between">
                               <p>Daily</p>
                               <p className="text-end">
                                 {$hideFeeAPR
-                                  ? vault.earningData.apr.withoutFees.daily
-                                  : vault.earningData.apr.withFees.daily}
+                                  ? (
+                                      Number(
+                                        vault.earningData.apr.withoutFees[
+                                          $aprFilter
+                                        ]
+                                      ) / 365
+                                    ).toFixed(2)
+                                  : (
+                                      Number(
+                                        vault.earningData.apr.withFees[
+                                          $aprFilter
+                                        ]
+                                      ) / 365
+                                    ).toFixed(2)}
                                 %
                               </p>
                             </div>

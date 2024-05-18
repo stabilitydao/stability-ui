@@ -14,6 +14,7 @@ import { decodeHex } from "./functions/decodeHex";
 import { setLocalStoreHash } from "./functions/setLocalStoreHash";
 import { getDate } from "./functions/getDate";
 import { getProtocolLogo } from "./functions/getProtocolLogo";
+import { determineAPR } from "./functions/determineAPR";
 
 export {
   getTokenData,
@@ -32,4 +33,5 @@ export {
   setLocalStoreHash,
   getDate,
   getProtocolLogo,
+  determineAPR,
 };

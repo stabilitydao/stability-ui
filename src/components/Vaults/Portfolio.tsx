@@ -70,19 +70,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
       if (v.balance) {
         let apr = 0;
         if ($hideFeeAPR) {
-          apr =
-            $aprFilter === "24h"
-              ? v.earningData.apr.withoutFees.daily
-              : $aprFilter === "week"
-              ? v.earningData.apr.withoutFees.weekly
-              : v.earningData.apr.withoutFees[$aprFilter];
+          apr = v.earningData.apr.withoutFees[$aprFilter];
         } else {
-          apr =
-            $aprFilter === "24h"
-              ? v.earningData.apr.withFees.daily
-              : $aprFilter === "week"
-              ? v.earningData.apr.withFees.weekly
-              : v.earningData.apr.withFees[$aprFilter];
+          apr = v.earningData.apr.withFees[$aprFilter];
         }
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
