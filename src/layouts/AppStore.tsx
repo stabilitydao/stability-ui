@@ -87,7 +87,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     const savedSettings = localStorage.getItem("transactionSettings");
     const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
     const APRsFiler = localStorage.getItem("APRsFiler");
-    console.log(JSON.parse(APRsFiler));
+
     if (savedSettings) {
       const savedData = JSON.parse(savedSettings);
       transactionSettings.set(savedData);
@@ -97,7 +97,13 @@ const AppStore = (props: React.PropsWithChildren) => {
       hideFeeApr.set(savedData);
     }
 
-    const localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+    let localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+
+    if (localAPRfilter === "week") {
+      localAPRfilter = "weekly";
+    } else if (localAPRfilter === "24h") {
+      localAPRfilter = "daily";
+    }
 
     aprFilter.set(localAPRfilter);
   };
