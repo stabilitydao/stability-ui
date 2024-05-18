@@ -69,11 +69,14 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     while (status) {
       const HISTORY_QUERY = `{
             vaultHistoryEntities(
-                where: {address: "${address}"}
-                skip: ${entities}
+              orderBy: timestamp, 
+              orderDirection: asc,
+              where: {address: "${address}",vsHoldAPR_not: null}
+              skip: ${entities}
             ) {
                 APR
                 APR24H
+                vsHoldAPR
                 address
                 sharePrice
                 TVL
@@ -91,9 +94,8 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       }
       entities += 100;
     }
-    const workedData = DATA.map(formatData).sort(
-      (a, b) => a.unixTimestamp - b.unixTimestamp
-    );
+
+    const workedData = DATA.map(formatData);
 
     let APRChartData = workedData
       .filter(
@@ -107,6 +109,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
+        vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
       }));
 
     if (!APRChartData.length) {
@@ -229,6 +232,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           timestamp: obj.timestamp,
           date: obj.date,
           APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
+          vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
           x: APRDifferences[index],
           y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
         }));

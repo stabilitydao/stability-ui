@@ -12,7 +12,6 @@ import { Contracts } from "./Contracts";
 import { YieldBar } from "./YieldBar";
 import { LiquidityPool } from "./LiquidityPool";
 import { UnderlyingALM } from "./UnderlyingALM";
-import { HoldChart } from "./HoldChart";
 
 import { WagmiLayout } from "@layouts";
 import { Toast, Loader, ErrorMessage } from "@components";
@@ -63,10 +62,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
               address={vault.toLowerCase() as TAddress}
               vaultStrategy={localVault.strategy}
             />
-            <HoldChart
-              address={vault.toLowerCase() as TAddress}
-              assets={localVault.assets}
-            />
+
             <Toast />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">

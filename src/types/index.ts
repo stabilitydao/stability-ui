@@ -322,6 +322,7 @@ type TChartData = {
   sharePrice?: number;
   timestamp: string;
   unixTimestamp?: string;
+  vsHoldAPR?: string;
   date: string;
 };
 
