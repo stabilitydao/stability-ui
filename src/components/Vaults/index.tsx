@@ -270,14 +270,27 @@ const Vaults = () => {
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
-        sortedVaults = [...sortedVaults].sort((a, b) =>
-          compareHandler(
-            a[state.keyName as keyof TVault],
-            b[state.keyName as keyof TVault],
-            state.dataType,
-            state.sortType
-          )
-        );
+        if (state.keyName === "earningData") {
+          const fees = $hideFeeAPR ? "withoutFees" : "withFees";
+
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            compareHandler(
+              a[state.keyName as keyof TVault].apr[fees][$aprFilter],
+              b[state.keyName as keyof TVault].apr[fees][$aprFilter],
+              state.dataType,
+              state.sortType
+            )
+          );
+        } else {
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            compareHandler(
+              a[state.keyName as keyof TVault],
+              b[state.keyName as keyof TVault],
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
       }
     });
     //search

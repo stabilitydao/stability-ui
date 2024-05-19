@@ -33,7 +33,7 @@ const TABLE: TTableColumn[] = [
   },
   {
     name: "Income APR",
-    keyName: "sortAPR",
+    keyName: "earningData",
     sortType: "none",
     dataType: "number",
   },
