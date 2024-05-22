@@ -103,13 +103,13 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
 
         <Tooltip content={<CustomTooltip APRType={APRType} />} />
 
-        <Bar dataKey={chart.name} stackId="bar">
+        {/* <Bar dataKey={chart.name} stackId="bar">
           {chart.data.map((_: any, index: number) => (
             <Cell cursor="pointer" fill="#4626bc" key={`cell-${index}`} />
           ))}
-        </Bar>
+        </Bar> */}
 
-        {/* <Bar dataKey="vsHoldAPR" stackId="bar">
+        <Bar dataKey="vsHoldAPR" stackId="bar">
           {chart.data.map((_: any, index: number) => (
             <Cell
               cursor="pointer"
@@ -117,7 +117,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
               key={`vsHoldAPR-cell-${index}`}
             />
           ))}
-        </Bar> */}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );
