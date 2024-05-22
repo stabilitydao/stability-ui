@@ -285,7 +285,7 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
 const GRAPH_ENDPOINT =
-  "https://api.studio.thegraph.com/query/72132/test/v0.2.41";
+  "https://api.studio.thegraph.com/query/72132/test/v0.2.48";
 
 // const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
 //   import.meta.env.PUBLIC_GRAPH_API_KEY
