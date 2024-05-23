@@ -113,6 +113,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       const response = await axios.get(STABILITY_API);
 
       stabilityAPIData = response.data;
+
       apiData.set(stabilityAPIData);
     } catch (error) {
       console.error("API ERROR:", error);
