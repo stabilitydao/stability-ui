@@ -287,7 +287,7 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
 
 const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
   import.meta.env.PUBLIC_GRAPH_API_KEY
-}/subgraphs/id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`;
+}/deployments/id/QmPgtgt7ABw9mhYGfFdwHgvwzxfMpZWTMvEjrnhm5nNQuy`;
 
 const GRAPH_QUERY = `
       {
