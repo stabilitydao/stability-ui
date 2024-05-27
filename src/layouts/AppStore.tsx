@@ -408,14 +408,14 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const holdYearPercentDiff = Number(lastHistoryData?.vsHoldAPR).toFixed(
-          2
-        );
+        const lifetimeVsHoldAPR = Number(
+          lastHistoryData?.lifetimeVsHoldAPR
+        ).toFixed(2);
 
         const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
 
-        const holdPercentDiff = (
-          (Number(holdYearPercentDiff) / 365) *
+        const vsHoldAPR = (
+          (Number(lifetimeVsHoldAPR) / 365) *
           Number(daysFromCreation)
         ).toFixed(2);
 
@@ -548,8 +548,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
-          holdPercentDiff: Number(holdPercentDiff),
-          holdYearPercentDiff: Number(holdYearPercentDiff),
+          vsHoldAPR: Number(vsHoldAPR),
+          lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
           tokensHold,
           isVsActive,
           yearnProtocols,
@@ -577,6 +577,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         graphResponse = await axios.post(GRAPH_ENDPOINT, {
           query: GRAPH_QUERY,
         });
+
         if (graphResponse.data.errors && graphResponse.data.errors.length > 0) {
           throw new Error("GRAPH API ERROR");
         }

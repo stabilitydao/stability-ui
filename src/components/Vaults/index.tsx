@@ -100,8 +100,8 @@ const Vaults = () => {
   });
   const [vsHoldModal, setVsHoldModal] = useState({
     tokensHold: [],
-    holdPercentDiff: 0,
-    holdYearPercentDiff: 0,
+    vsHoldAPR: 0,
+    lifetimeVsHoldAPR: 0,
     created: 0,
     state: false,
     isVsActive: false,
@@ -896,8 +896,8 @@ const Vaults = () => {
                         e.stopPropagation();
                         setVsHoldModal({
                           tokensHold: vault.tokensHold as THoldData[],
-                          holdPercentDiff: vault.holdPercentDiff,
-                          holdYearPercentDiff: vault.holdYearPercentDiff,
+                          vsHoldAPR: vault.vsHoldAPR,
+                          lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
                           created: getTimeDifference(vault.created)?.days,
                           state: true,
                           isVsActive: vault.isVsActive,
@@ -907,13 +907,13 @@ const Vaults = () => {
                     >
                       <p
                         className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                          Number(vault.holdYearPercentDiff) > 0
+                          vault.lifetimeVsHoldAPR > 0
                             ? "text-[#b0ddb8]"
                             : "text-[#eb7979]"
                         }`}
                       >
-                        {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
-                        {vault.holdYearPercentDiff}%
+                        {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                        {vault.lifetimeVsHoldAPR}%
                       </p>
                       <div className="visible__tooltip !w-[450px]">
                         <table className="table table-auto w-full rounded-lg">
@@ -933,13 +933,13 @@ const Vaults = () => {
                               {vault.isVsActive ? (
                                 <td
                                   className={`text-right ${
-                                    Number(vault.holdPercentDiff) > 0
+                                    vault.vsHoldAPR > 0
                                       ? "text-[#b0ddb8]"
                                       : "text-[#eb7979]"
                                   }`}
                                 >
-                                  {Number(vault.holdPercentDiff) > 0 ? "+" : ""}
-                                  {vault.holdPercentDiff}%
+                                  {vault.vsHoldAPR > 0 ? "+" : ""}
+                                  {vault.vsHoldAPR}%
                                 </td>
                               ) : (
                                 <td className="text-right">-</td>
@@ -948,15 +948,13 @@ const Vaults = () => {
                               {vault.isVsActive ? (
                                 <td
                                   className={`text-right ${
-                                    Number(vault.holdYearPercentDiff) > 0
+                                    vault.lifetimeVsHoldAPR > 0
                                       ? "text-[#b0ddb8]"
                                       : "text-[#eb7979]"
                                   }`}
                                 >
-                                  {Number(vault.holdYearPercentDiff) > 0
-                                    ? "+"
-                                    : ""}
-                                  {vault.holdYearPercentDiff}%
+                                  {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                                  {vault.lifetimeVsHoldAPR}%
                                 </td>
                               ) : (
                                 <td className="text-right">-</td>
@@ -1024,7 +1022,7 @@ const Vaults = () => {
                       )}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
-                      ${Number(vault.shareprice).toFixed(2)}
+                      ${Number(vault.shareprice).toFixed(3)}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px] text-[15px]">
                       {formatNumber(vault.tvl, "abbreviate")}

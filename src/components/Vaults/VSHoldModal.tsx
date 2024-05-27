@@ -14,8 +14,8 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       setModalState({
         tokensHold: [],
-        holdPercentDiff: 0,
-        holdYearPercentDiff: 0,
+        vsHoldAPR: 0,
+        lifetimeVsHoldAPR: 0,
         created: 0,
         state: false,
         isVsActive: false,
@@ -44,8 +44,8 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
           onClick={() => {
             setModalState({
               tokensHold: [],
-              holdPercentDiff: 0,
-              holdYearPercentDiff: 0,
+              vsHoldAPR: 0,
+              lifetimeVsHoldAPR: 0,
               created: 0,
               state: false,
               isVsActive: false,
@@ -125,13 +125,11 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
                 {state.isVsActive ? (
                   <td
                     className={`text-right ${
-                      Number(state.holdPercentDiff) > 0
-                        ? "text-[#b0ddb8]"
-                        : "text-[#eb7979]"
+                      state.vsHoldAPR > 0 ? "text-[#b0ddb8]" : "text-[#eb7979]"
                     }`}
                   >
-                    {Number(state.holdPercentDiff) > 0 ? "+" : ""}
-                    {state.holdPercentDiff}%
+                    {state.vsHoldAPR > 0 ? "+" : ""}
+                    {state.vsHoldAPR}%
                   </td>
                 ) : (
                   <td className="text-right">-</td>
@@ -140,13 +138,13 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
                 {state.isVsActive ? (
                   <td
                     className={`text-right ${
-                      Number(state.holdYearPercentDiff) > 0
+                      state.lifetimeVsHoldAPR > 0
                         ? "text-[#b0ddb8]"
                         : "text-[#eb7979]"
                     }`}
                   >
-                    {Number(state.holdYearPercentDiff) > 0 ? "+" : ""}
-                    {state.holdYearPercentDiff}%
+                    {state.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                    {state.lifetimeVsHoldAPR}%
                   </td>
                 ) : (
                   <td className="text-right">-</td>

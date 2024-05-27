@@ -201,8 +201,8 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
-  holdPercentDiff: number;
-  holdYearPercentDiff: number;
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
   tokensHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
@@ -229,8 +229,8 @@ type TTableFilters = {
 
 type TVsHoldModal = {
   tokensHold: THoldData[];
-  holdPercentDiff: number;
-  holdYearPercentDiff: number;
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
   created: number;
   state: boolean;
   isVsActive: boolean;

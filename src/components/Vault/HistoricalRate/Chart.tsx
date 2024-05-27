@@ -13,7 +13,6 @@ import { formatNumber } from "@utils";
 
 interface IProps {
   chart: any;
-  APRType: string;
 }
 const CustomizedAxisTick = ({
   x,
@@ -44,19 +43,15 @@ const CustomizedAxisTick = ({
 const CustomTooltip = ({
   active,
   payload,
-  APRType,
 }: {
   active: boolean;
   payload: any;
-  APRType: string;
 }) => {
   const PDataKey =
     payload[0]?.dataKey === "TVL" ? (
       <p>{`TVL: $${payload[0].value}`}</p>
     ) : payload[0]?.dataKey === "sharePrice" ? (
       <p>{`Price: $${payload[0].value}`}</p>
-    ) : payload[0]?.dataKey === "APR" ? (
-      <p>{`${APRType}: ${payload[0].value}%`}</p>
     ) : (
       ""
     );
@@ -73,7 +68,7 @@ const CustomTooltip = ({
   }
 };
 
-const Chart: React.FC<IProps> = ({ chart, APRType }) => {
+const Chart: React.FC<IProps> = ({ chart }) => {
   const WIDTH = 500;
 
   const [minValue, setMinValue] = useState(0);
@@ -139,7 +134,7 @@ const Chart: React.FC<IProps> = ({ chart, APRType }) => {
           }}
           mirror={true}
         />
-        <Tooltip content={<CustomTooltip APRType={APRType} />} />
+        <Tooltip content={<CustomTooltip />} />
         <Area
           type="monotone"
           dataKey={chart.name}

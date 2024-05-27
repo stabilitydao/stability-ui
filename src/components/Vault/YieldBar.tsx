@@ -233,13 +233,11 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 {vault.isVsActive ? (
                   <td
                     className={`text-right ${
-                      Number(vault.holdPercentDiff) > 0
-                        ? "text-[#b0ddb8]"
-                        : "text-[#eb7979]"
+                      vault.vsHoldAPR > 0 ? "text-[#b0ddb8]" : "text-[#eb7979]"
                     }`}
                   >
-                    {Number(vault.holdPercentDiff) > 0 ? "+" : ""}
-                    {vault.holdPercentDiff}%
+                    {vault.vsHoldAPR > 0 ? "+" : ""}
+                    {vault.vsHoldAPR}%
                   </td>
                 ) : (
                   <td className="text-right">-</td>
@@ -247,13 +245,13 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 {vault.isVsActive ? (
                   <td
                     className={`text-right ${
-                      Number(vault.holdYearPercentDiff) > 0
+                      vault.lifetimeVsHoldAPR > 0
                         ? "text-[#b0ddb8]"
                         : "text-[#eb7979]"
                     }`}
                   >
-                    {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
-                    {vault.holdYearPercentDiff}%
+                    {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                    {vault.lifetimeVsHoldAPR}%
                   </td>
                 ) : (
                   <td className="text-right">-</td>

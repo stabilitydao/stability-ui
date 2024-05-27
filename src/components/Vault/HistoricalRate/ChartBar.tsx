@@ -56,7 +56,6 @@ const CustomTooltip = ({
         <div className="px-5 py-3">
           <p>{payload[0].payload.date}</p>
           <p>{`${APRType}: ${payload[0].value}%`}</p>
-          {payload.length > 1 && <p>{`VS HODL APR: ${payload[1].value}%`}</p>}
         </div>
       </div>
     );
@@ -72,7 +71,6 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
       min = Math.min(...chart.data.map((item: any) => item[chart.name]));
     }
   }, [chart]);
-
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart
@@ -103,19 +101,9 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
 
         <Tooltip content={<CustomTooltip APRType={APRType} />} />
 
-        {/* <Bar dataKey={chart.name} stackId="bar">
+        <Bar dataKey={chart.name} stackId="bar">
           {chart.data.map((_: any, index: number) => (
             <Cell cursor="pointer" fill="#4626bc" key={`cell-${index}`} />
-          ))}
-        </Bar> */}
-
-        <Bar dataKey="vsHoldAPR" stackId="bar">
-          {chart.data.map((_: any, index: number) => (
-            <Cell
-              cursor="pointer"
-              fill="#3047ff"
-              key={`vsHoldAPR-cell-${index}`}
-            />
           ))}
         </Bar>
       </BarChart>

@@ -351,6 +351,81 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           data: priceChartData,
         });
         break;
+
+      case "vsHodl":
+        let vsHoldArr = chartData.filter(
+          (obj: TChartData) =>
+            obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        newData = [];
+        time = Number(vsHoldArr[0].unixTimestamp);
+
+        if (segment === "MONTH") {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 7200;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        } else if (segment === "YEAR") {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 14400;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        } else {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 3600;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        }
+
+        vsHoldArr = newData.map(formatData);
+
+        const vsHoldAPRChartData = vsHoldArr.map(
+          (obj: TChartData, index: number) => ({
+            unixTimestamp: obj.unixTimestamp,
+            timestamp: obj.timestamp,
+            date: obj.date,
+            vsHodl: Number(obj.vsHoldAPR).toFixed(3),
+          })
+        );
+        setActiveChart({
+          name: "vsHodl",
+          data: vsHoldAPRChartData,
+        });
+        break;
       default:
         console.log("NO ACTIVE CASE");
         break;
@@ -375,17 +450,19 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           Historical rate
         </h2>
         {activeChart && (
-          <div className="flex items-center text-[1rem] relative sm:px-2 px-1 sm:gap-3 gap-2">
+          <div className="flex items-center text-[1rem] relative sm:px-2 px-1 sm:gap-2 gap-1">
             <div
               className="absolute bottom-0 bg-[#6376AF] rounded-sm"
               style={{
-                width: "33.33%",
+                width: "25%",
                 height: "3px",
                 left:
                   activeChart.name === "sharePrice"
-                    ? "66.7%"
+                    ? "75%"
                     : activeChart.name === "TVL"
-                    ? "33.3%"
+                    ? "50%"
+                    : activeChart.name === "vsHodl"
+                    ? "25%"
                     : "0%",
                 transition: "left 0.3s ease",
               }}
@@ -397,6 +474,14 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               onClick={() => chartHandler("APR")}
             >
               {APRType}
+            </p>
+            <p
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+                activeChart.name === "vsHodl" ? "opacity-100" : "opacity-80"
+              }`}
+              onClick={() => chartHandler("vsHodl")}
+            >
+              VS HODL
             </p>
             <p
               className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
@@ -424,8 +509,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               <>
                 {activeChart.name === "APR" ? (
                   <ChartBar chart={activeChart} APRType={APRType} />
+                ) : activeChart.name === "vsHodl" ? (
+                  <ChartBar chart={activeChart} APRType={"VS HODL APR"} />
                 ) : (
-                  <Chart chart={activeChart} APRType={APRType} />
+                  <Chart chart={activeChart} />
                 )}
               </>
             ) : (
