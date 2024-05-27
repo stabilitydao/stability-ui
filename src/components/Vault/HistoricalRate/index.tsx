@@ -86,7 +86,6 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
       const graphResponse = await axios.post(GRAPH_ENDPOINT, {
         query: HISTORY_QUERY,
       });
-      console.log(graphResponse);
 
       DATA.push(...graphResponse.data.data.vaultHistoryEntities);
 
