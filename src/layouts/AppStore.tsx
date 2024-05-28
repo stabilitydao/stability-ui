@@ -419,10 +419,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           Number(daysFromCreation)
         ).toFixed(2);
 
-        let tokensHold: THoldData[] = [];
+        let lifetimeTokensHold: THoldData[] = [];
 
-        if (lastHistoryData?.tokensVsHoldAPR && prices) {
-          tokensHold = vault.strategyAssets.map(
+        if (lastHistoryData?.lifetimeTokensVsHoldAPR && prices) {
+          lifetimeTokensHold = vault.strategyAssets.map(
             (asset: string, index: number) => {
               const price = Number(
                 formatUnits(prices[asset.toLowerCase()], 18)
@@ -436,7 +436,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
               const yearPercentDiff = Number(
-                lastHistoryData?.tokensVsHoldAPR[index]
+                lastHistoryData?.lifetimeTokensVsHoldAPR[index]
               );
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
@@ -507,7 +507,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 )
               : vault.strategySpecific;
         }
-
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -550,7 +549,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           risk: APIVault?.risk,
           vsHoldAPR: Number(vsHoldAPR),
           lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
-          tokensHold,
+          lifetimeTokensHold,
           isVsActive,
           yearnProtocols,
         };

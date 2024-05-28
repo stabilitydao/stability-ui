@@ -71,12 +71,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             vaultHistoryEntities(
               orderBy: timestamp, 
               orderDirection: asc,
-              where: {address: "${address}",vsHoldAPR_not: null}
+              where: {address: "${address}", periodVsHoldAPR_not: null}
               skip: ${entities}
             ) {
                 APR
                 APR24H
-                vsHoldAPR
+                periodVsHoldAPR
                 address
                 sharePrice
                 TVL
@@ -109,7 +109,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
-        vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
+        vsHoldAPR: Number(obj.periodVsHoldAPR).toFixed(3),
       }));
 
     if (!APRChartData.length) {
@@ -232,7 +232,6 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           timestamp: obj.timestamp,
           date: obj.date,
           APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
-          vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
           x: APRDifferences[index],
           y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
         }));
@@ -413,14 +412,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
         vsHoldArr = newData.map(formatData);
 
-        const vsHoldAPRChartData = vsHoldArr.map(
-          (obj: TChartData, index: number) => ({
-            unixTimestamp: obj.unixTimestamp,
-            timestamp: obj.timestamp,
-            date: obj.date,
-            vsHodl: Number(obj.vsHoldAPR).toFixed(3),
-          })
-        );
+        const vsHoldAPRChartData = vsHoldArr.map((obj: TChartData) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          vsHodl: Number(obj.periodVsHoldAPR).toFixed(3),
+        }));
         setActiveChart({
           name: "vsHodl",
           data: vsHoldAPRChartData,

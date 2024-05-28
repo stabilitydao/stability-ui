@@ -285,7 +285,7 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
 const GRAPH_ENDPOINT =
-  "https://api.studio.thegraph.com/query/72132/test/v0.2.77";
+  "https://api.studio.thegraph.com/query/72132/test/v0.3.0";
 
 // const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
 //   import.meta.env.PUBLIC_GRAPH_API_KEY
@@ -327,9 +327,8 @@ const GRAPH_QUERY = `
             APR24H
             APRWeekly
             daysFromCreation
-            tokensVsHoldAPR
-            vsHoldAPR
             lifetimeVsHoldAPR
+            lifetimeTokensVsHoldAPR
           }
           almRebalanceHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
             timestamp

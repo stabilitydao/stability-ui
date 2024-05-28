@@ -203,7 +203,7 @@ type TVault = {
   risk: TRisk;
   vsHoldAPR: number;
   lifetimeVsHoldAPR: number;
-  tokensHold: THoldData[];
+  lifetimeTokensHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
 };
@@ -228,7 +228,7 @@ type TTableFilters = {
 };
 
 type TVsHoldModal = {
-  tokensHold: THoldData[];
+  lifetimeTokensHold: THoldData[];
   vsHoldAPR: number;
   lifetimeVsHoldAPR: number;
   created: number;
@@ -322,7 +322,7 @@ type TChartData = {
   sharePrice?: number;
   timestamp: string;
   unixTimestamp?: string;
-  vsHoldAPR?: string;
+  periodVsHoldAPR?: string;
   date: string;
 };
 

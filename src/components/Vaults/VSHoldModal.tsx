@@ -13,7 +13,7 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       setModalState({
-        tokensHold: [],
+        lifetimeTokensHold: [],
         vsHoldAPR: 0,
         lifetimeVsHoldAPR: 0,
         created: 0,
@@ -43,7 +43,7 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
         <svg
           onClick={() => {
             setModalState({
-              tokensHold: [],
+              lifetimeTokensHold: [],
               vsHoldAPR: 0,
               lifetimeVsHoldAPR: 0,
               created: 0,
@@ -151,43 +151,45 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
                 )}
               </tr>
 
-              {state.tokensHold.map((aprsData: THoldData, index: number) => (
-                <tr key={index} className="hover:bg-[#2B3139]">
-                  <td className="text-left">
-                    VAULT VS {aprsData?.symbol} HODL
-                  </td>
-
-                  {state.isVsActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(aprsData.latestAPR) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(aprsData.latestAPR) > 0 ? "+" : ""}
-                      {aprsData.latestAPR}%
+              {state.lifetimeTokensHold.map(
+                (aprsData: THoldData, index: number) => (
+                  <tr key={index} className="hover:bg-[#2B3139]">
+                    <td className="text-left">
+                      VAULT VS {aprsData?.symbol} HODL
                     </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
 
-                  {state.isVsActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(aprsData.latestAPR) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(aprsData.APR) > 0 ? "+" : ""}
-                      {aprsData.APR}%
-                    </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
-                </tr>
-              ))}
+                    {state.isVsActive ? (
+                      <td
+                        className={`text-right ${
+                          Number(aprsData.latestAPR) > 0
+                            ? "text-[#b0ddb8]"
+                            : "text-[#eb7979]"
+                        }`}
+                      >
+                        {Number(aprsData.latestAPR) > 0 ? "+" : ""}
+                        {aprsData.latestAPR}%
+                      </td>
+                    ) : (
+                      <td className="text-right">-</td>
+                    )}
+
+                    {state.isVsActive ? (
+                      <td
+                        className={`text-right ${
+                          Number(aprsData.latestAPR) > 0
+                            ? "text-[#b0ddb8]"
+                            : "text-[#eb7979]"
+                        }`}
+                      >
+                        {Number(aprsData.APR) > 0 ? "+" : ""}
+                        {aprsData.APR}%
+                      </td>
+                    ) : (
+                      <td className="text-right">-</td>
+                    )}
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         </div>

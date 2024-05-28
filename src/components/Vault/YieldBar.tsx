@@ -190,7 +190,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
           </table>
         )}
 
-        {!!vault.tokensHold && (
+        {!!vault.lifetimeTokensHold && (
           <table className="table table-auto w-full rounded-lg mt-5">
             <thead className="bg-[#0b0e11]">
               <tr className="text-[17px] md:text-[15px] lg:text-[19px] text-[#8f8f8f] uppercase">
@@ -217,7 +217,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     <div className="visible__tooltip toCenter">
                       <HoldTable
                         shareData={shareData}
-                        holdData={vault.tokensHold}
+                        holdData={vault.lifetimeTokensHold}
                       />
                     </div>
                   </div>
@@ -258,41 +258,43 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 )}
               </tr>
 
-              {vault.tokensHold.map((aprsData: THoldData, index: number) => (
-                <tr key={index} className="hover:bg-[#2B3139]">
-                  <td>VAULT VS {aprsData?.symbol} HODL</td>
+              {vault.lifetimeTokensHold.map(
+                (aprsData: THoldData, index: number) => (
+                  <tr key={index} className="hover:bg-[#2B3139]">
+                    <td>VAULT VS {aprsData?.symbol} HODL</td>
 
-                  {vault.isVsActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(aprsData.latestAPR) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(aprsData.latestAPR) > 0 ? "+" : ""}
-                      {aprsData.latestAPR}%
-                    </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
+                    {vault.isVsActive ? (
+                      <td
+                        className={`text-right ${
+                          Number(aprsData.latestAPR) > 0
+                            ? "text-[#b0ddb8]"
+                            : "text-[#eb7979]"
+                        }`}
+                      >
+                        {Number(aprsData.latestAPR) > 0 ? "+" : ""}
+                        {aprsData.latestAPR}%
+                      </td>
+                    ) : (
+                      <td className="text-right">-</td>
+                    )}
 
-                  {vault.isVsActive ? (
-                    <td
-                      className={`text-right ${
-                        Number(aprsData.latestAPR) > 0
-                          ? "text-[#b0ddb8]"
-                          : "text-[#eb7979]"
-                      }`}
-                    >
-                      {Number(aprsData.APR) > 0 ? "+" : ""}
-                      {aprsData.APR}%
-                    </td>
-                  ) : (
-                    <td className="text-right">-</td>
-                  )}
-                </tr>
-              ))}
+                    {vault.isVsActive ? (
+                      <td
+                        className={`text-right ${
+                          Number(aprsData.latestAPR) > 0
+                            ? "text-[#b0ddb8]"
+                            : "text-[#eb7979]"
+                        }`}
+                      >
+                        {Number(aprsData.APR) > 0 ? "+" : ""}
+                        {aprsData.APR}%
+                      </td>
+                    ) : (
+                      <td className="text-right">-</td>
+                    )}
+                  </tr>
+                )
+              )}
             </tbody>
           </table>
         )}
@@ -301,7 +303,10 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
         <HoldModal
           setModalState={setModal}
           table={
-            <HoldTable shareData={shareData} holdData={vault.tokensHold} />
+            <HoldTable
+              shareData={shareData}
+              holdData={vault.lifetimeTokensHold}
+            />
           }
         />
       )}

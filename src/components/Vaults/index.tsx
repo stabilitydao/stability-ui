@@ -99,7 +99,7 @@ const Vaults = () => {
     pool: {},
   });
   const [vsHoldModal, setVsHoldModal] = useState({
-    tokensHold: [],
+    lifetimeTokensHold: [],
     vsHoldAPR: 0,
     lifetimeVsHoldAPR: 0,
     created: 0,
@@ -895,7 +895,8 @@ const Vaults = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setVsHoldModal({
-                          tokensHold: vault.tokensHold as THoldData[],
+                          lifetimeTokensHold:
+                            vault.lifetimeTokensHold as THoldData[],
                           vsHoldAPR: vault.vsHoldAPR,
                           lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
                           created: getTimeDifference(vault.created)?.days,
@@ -961,7 +962,7 @@ const Vaults = () => {
                               )}
                             </tr>
 
-                            {vault.tokensHold.map(
+                            {vault.lifetimeTokensHold.map(
                               (aprsData: THoldData, index: number) => (
                                 <tr key={index} className="hover:bg-[#2B3139]">
                                   <td className="text-left">
