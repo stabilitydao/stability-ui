@@ -7,7 +7,7 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
 import { YEARN_PROTOCOLS, STRATEGY_SPECIFIC_SUBSTITUTE } from "@constants";

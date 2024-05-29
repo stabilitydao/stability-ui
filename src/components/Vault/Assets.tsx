@@ -2,6 +2,7 @@ import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
+import { useWalletClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
@@ -10,11 +11,17 @@ import { assetsPrices, connected, account } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
-import { getTokenData, getDate, formatNumber } from "@utils";
+import { getTokenData, getDate, formatNumber, addAssetToWallet } from "@utils";
 
 import { TOKENS_ASSETS, CHAINLINK_STABLECOINS } from "@constants";
 
-import type { TAddress, TAsset, TToken, TPieChartData } from "@types";
+import type {
+  TAddress,
+  TAsset,
+  TToken,
+  TPieChartData,
+  TTokenData,
+} from "@types";
 
 interface IProps {
   assets: TAsset[];
@@ -72,6 +79,8 @@ const Assets: React.FC<IProps> = memo(
     const $connected = useStore(connected);
     const $account = useStore(account);
 
+    const client = useWalletClient();
+
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)
     );
@@ -94,25 +103,35 @@ const Assets: React.FC<IProps> = memo(
       );
 
       const amountsInUSD = amounts.map((amount, index) => {
-        const tokenAddress: any = tokens[index]?.address;
+        const tokenAddress: TAddress = tokens[index]?.address as TAddress;
 
         const tokenPrice: bigint = $assetsPrices[tokenAddress];
         return Number(formatUnits(tokenPrice, 18)) * Number(amount);
       });
 
-      const sum = amountsInUSD.reduce((acc: number, num: any) => acc + num, 0);
+      const sum = amountsInUSD.reduce(
+        (acc: number, num: number) => acc + num,
+        0
+      );
 
       const investedAssets = amountsInUSD.map((amount, index) => {
-        const address = tokens[index]?.address as TAddress;
+        const { address, symbol, logoURI, decimals } = tokens[
+          index
+        ] as TTokenData;
+
+        // const address = token?.address as TAddress;
         const price: number = $assetsPrices
           ? Number(formatUnits($assetsPrices[address], 18))
           : 0;
+
+        const color = assets.find((asset) => asset.symbol === symbol)?.color;
+
         return {
-          address: address,
-          symbol: tokens[index]?.symbol,
-          color: assets.find((asset) => asset.symbol === tokens[index]?.symbol)
-            ?.color,
-          logo: tokens[index]?.logoURI,
+          address,
+          symbol,
+          decimals,
+          color,
+          logo: logoURI,
           amount: formatNumber(
             amounts[index],
             price > 1000 ? "formatWithLongDecimalPart" : "format"
@@ -122,6 +141,7 @@ const Assets: React.FC<IProps> = memo(
           percent: amount ? (Number(amount) / sum) * 100 : 0,
         };
       });
+
       setInvestedData(investedAssets);
     };
 
@@ -188,7 +208,7 @@ const Assets: React.FC<IProps> = memo(
               return (
                 assetData && (
                   <article
-                    className="rounded-md p-3 flex w-full"
+                    className="rounded-md p-3 flex flex-col justify-between gap-3 w-full"
                     key={asset.address + index}
                   >
                     <div className="flex w-full flex-col gap-3">
@@ -285,6 +305,21 @@ const Assets: React.FC<IProps> = memo(
                       )}
                       <p className="text-[16px]">{tokenAssets?.description}</p>
                     </div>
+                    {$account && (
+                      <button
+                        onClick={() =>
+                          addAssetToWallet(
+                            client,
+                            asset?.address,
+                            asset?.decimals,
+                            asset?.symbol
+                          )
+                        }
+                        className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer"
+                      >
+                        Add to MetaMask
+                      </button>
+                    )}
                   </article>
                 )
               );

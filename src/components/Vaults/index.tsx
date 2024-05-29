@@ -98,6 +98,7 @@ const Vaults = () => {
     state: false,
     pool: {},
   });
+
   const [vsHoldModal, setVsHoldModal] = useState({
     lifetimeTokensHold: [],
     vsHoldAPR: 0,

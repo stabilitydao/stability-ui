@@ -60,7 +60,7 @@ type TAllowedBBTokenVaults = {
 };
 
 type TTokenData = {
-  address: string;
+  address: TAddress;
   name: string;
   symbol: string;
   chainId: number;
@@ -335,6 +335,7 @@ type TPieChartData = {
   logo: string;
   percent: number;
   symbol: string;
+  decimals: number;
 };
 
 //// DAO

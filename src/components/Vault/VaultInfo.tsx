@@ -1,12 +1,16 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 
-//import { walletClient } from "@web3";
+import { useStore } from "@nanostores/react";
+
+import { useWalletClient } from "wagmi";
 
 import { VaultState, VaultType } from "@components";
 
-import { getTimeDifference, getDate } from "@utils";
+import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
 import { VAULT_STATUSES } from "@constants";
+
+import { connected } from "@store";
 
 import type { TVault } from "@types";
 
@@ -19,6 +23,9 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
   const [timeDifference, setTimeDifference] = useState<any>();
 
+  const client = useWalletClient();
+  const $connected = useStore(connected);
+
   useEffect(() => {
     if (vault) {
       const date = getDate(Number(vault?.created));
@@ -29,35 +36,9 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
     }
   }, [vault]);
 
-  // const addVaultToken = async () => {
-  //   let symbol = vault?.symbol.split("");
-  //   let newArr = [];
-  //   let lastSymbol = "";
-  //   console.log(symbol);
-  //   for (let i = 0; i < symbol.length; i++) {
-  //     if (!i) {
-  //       newArr.push(symbol[0]);
-  //     }
-  //     if (lastSymbol === "-") {
-  //       newArr.push(lastSymbol);
-  //       newArr.push(symbol[i]);
-  //     }
-
-  //     lastSymbol = symbol[i];
-  //   }
-  //   symbol = newArr.join("");
-  //   if (symbol) {
-  //     const success = await walletClient.watchAsset({
-  //       type: "ERC20",
-  //       options: {
-  //         address: vault?.address,
-  //         decimals: 18,
-  //         symbol: vault?.symbol,
-  //       },
-  //     });
-  //   }
-  // };
-
+  const isShortSymbol = useMemo(() => {
+    return vault?.symbol?.length <= 11;
+  }, [vault?.symbol]);
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -151,6 +132,16 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
           </div>
         </div>
+        {isShortSymbol && $connected && (
+          <button
+            onClick={() =>
+              addAssetToWallet(client, vault?.address, 18, vault?.symbol)
+            }
+            className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer"
+          >
+            Add to MetaMask
+          </button>
+        )}
       </div>
     </div>
   );

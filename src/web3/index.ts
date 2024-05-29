@@ -1,6 +1,6 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { createWalletClient, http } from "viem";
+import { createWalletClient, http, custom } from "viem";
 
 import { polygon } from "wagmi/chains";
 
@@ -23,9 +23,11 @@ const platform = "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60";
 
 const priceReader = "0xcCef9C4459d73F9A997ff50AC34364555A3274Aa";
 
-const deployments: {[chainId:number]: {
-  [contractName:string]: `0x${string}`,
-}} = {
+const deployments: {
+  [chainId: number]: {
+    [contractName: string]: `0x${string}`;
+  };
+} = {
   137: {
     Platform: "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60",
     Factory: "0xa14EaAE76890595B3C7ea308dAEBB93863480EAD",
@@ -36,7 +38,7 @@ const deployments: {[chainId:number]: {
     StrategyLogic: "0xD16b60E39284190D9201f0eaD42c4674C310e905",
     Zap: "0xEA3fABD8cC14705d7E66D1833a547D31882aEA9b",
   },
-}
+};
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
