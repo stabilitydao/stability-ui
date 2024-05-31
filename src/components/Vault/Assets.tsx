@@ -1,13 +1,13 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { useWalletClient } from "wagmi";
+import { useWalletClient, useAccount } from "wagmi";
 import { readContract } from "@wagmi/core";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { assetsPrices, connected, account } from "@store";
+import { assetsPrices, connected } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
@@ -77,9 +77,9 @@ const Assets: React.FC<IProps> = memo(
   ({ assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
-    const $account = useStore(account);
 
     const client = useWalletClient();
+    const { connector } = useAccount();
 
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)
@@ -148,6 +148,10 @@ const Assets: React.FC<IProps> = memo(
     useEffect(() => {
       getInvestedData();
     }, [$connected, $assetsPrices]);
+
+    const isAddToWallet = useMemo(() => {
+      return $connected && window.ethereum && connector?.id === "io.metamask";
+    }, [$connected, connector]);
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
@@ -204,11 +208,10 @@ const Assets: React.FC<IProps> = memo(
                 CHAINLINK_STABLECOINS[
                   tokenAssets?.symbol as keyof typeof CHAINLINK_STABLECOINS
                 ];
-
               return (
                 assetData && (
                   <article
-                    className="rounded-md p-3 flex flex-col justify-between gap-3 w-full"
+                    className="rounded-md p-3 flex flex-col justify-between gap-3 w-full md:w-1/2"
                     key={asset.address + index}
                   >
                     <div className="flex w-full flex-col gap-3">
@@ -305,7 +308,7 @@ const Assets: React.FC<IProps> = memo(
                       )}
                       <p className="text-[16px]">{tokenAssets?.description}</p>
                     </div>
-                    {$account && (
+                    {isAddToWallet && (
                       <button
                         onClick={() =>
                           addAssetToWallet(
@@ -315,9 +318,10 @@ const Assets: React.FC<IProps> = memo(
                             asset?.symbol
                           )
                         }
-                        className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer"
+                        className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
                       >
-                        Add to MetaMask
+                        <span>Add to MetaMask </span>{" "}
+                        <img src="/metamask.svg" alt="metamask" />
                       </button>
                     )}
                   </article>

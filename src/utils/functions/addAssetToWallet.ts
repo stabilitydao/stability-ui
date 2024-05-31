@@ -5,7 +5,7 @@ export const addAssetToWallet = async (
   symbol: string
 ) => {
   try {
-    client?.data.watchAsset({
+    const result = await client?.data.watchAsset({
       type: "ERC20",
       options: {
         address: address,

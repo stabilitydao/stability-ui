@@ -1,6 +1,6 @@
 import { memo, useMemo, useState, useEffect } from "react";
 
-import { zeroAddress } from "viem";
+import { zeroAddress, getAddress } from "viem";
 
 import { AssetsProportion } from "@components";
 
@@ -39,7 +39,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
 
   const copyHandler = async (address: TAddress) => {
     try {
-      await navigator.clipboard.writeText(address);
+      await navigator.clipboard.writeText(getAddress(address));
     } catch (error) {
       console.error("Error copying address:", error);
     }
@@ -137,6 +137,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
       vault?.alm && ["Ichi", "DefiEdge", "Gamma"].includes(vault.alm.protocol),
     [vault]
   );
+
   return (
     <div className="rounded-md h-full">
       <div className="flex justify-between items-center h-[60px]">

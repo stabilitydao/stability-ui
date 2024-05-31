@@ -2,7 +2,7 @@ import { memo, useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { useWalletClient } from "wagmi";
+import { useWalletClient, useAccount } from "wagmi";
 
 import { VaultState, VaultType } from "@components";
 
@@ -24,6 +24,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   const [timeDifference, setTimeDifference] = useState<any>();
 
   const client = useWalletClient();
+  const { connector } = useAccount();
   const $connected = useStore(connected);
 
   useEffect(() => {
@@ -36,9 +37,14 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
     }
   }, [vault]);
 
-  const isShortSymbol = useMemo(() => {
-    return vault?.symbol?.length <= 11;
-  }, [vault?.symbol]);
+  const isAddToWallet = useMemo(() => {
+    return (
+      vault?.symbol?.length <= 11 &&
+      $connected &&
+      window.ethereum &&
+      connector?.id === "io.metamask"
+    );
+  }, [vault?.symbol, $connected, connector]);
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -132,14 +138,34 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
           </div>
         </div>
-        {isShortSymbol && $connected && (
+        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
+          {!!vault?.version && (
+            <div>
+              <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                VAULT VERSION
+              </p>
+              <p className="text-[16px] mt-1">{vault?.version}</p>
+            </div>
+          )}
+          {!!vault?.strategyVersion && (
+            <div className="sm:w-1/2">
+              <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                STRATEGY VERSION
+              </p>
+              <p className="text-[16px] mt-1">{vault?.strategyVersion} </p>
+            </div>
+          )}
+        </div>
+
+        {isAddToWallet && (
           <button
             onClick={() =>
               addAssetToWallet(client, vault?.address, 18, vault?.symbol)
             }
-            className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer"
+            className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
           >
-            Add to MetaMask
+            <span>Add to MetaMask </span>{" "}
+            <img src="/metamask.svg" alt="metamask" />
           </button>
         )}
       </div>
