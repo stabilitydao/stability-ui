@@ -57,6 +57,53 @@ const Wallet = () => {
       };
     }
   };
+
+  const insertAssets = () => {
+    const web3ModalCard = document
+      .querySelector("w3m-modal")
+      ?.shadowRoot?.querySelector("wui-card")
+      ?.querySelector("w3m-router")
+      ?.shadowRoot?.querySelector("div")
+      ?.querySelector("w3m-account-view")
+      ?.shadowRoot?.querySelector("w3m-account-default-widget")?.shadowRoot;
+
+    if (
+      !web3ModalCard ||
+      web3ModalCard.querySelector(".custom_assets__container")
+    )
+      return;
+
+    const we3ModalDescription = web3ModalCard?.querySelector("wui-flex");
+
+    const customContentContainer = document.createElement("div");
+    const customContent = document.createElement("div");
+    const customDescription = document.createElement("div");
+
+    customContentContainer.classList.add("custom_assets__container");
+
+    customContent.innerHTML = userAssets.join("");
+    customContent.setAttribute(
+      "style",
+      "display: flex; align-items:center;justify-content:center; flex-wrap: wrap; gap: 10px;"
+    );
+
+    customDescription.innerHTML = `<p style="margin:0; color:#949e9e;">$${userBalance}</p>`;
+
+    customContentContainer.setAttribute(
+      "style",
+      "display: flex; align-items: center; justify-content: center; flex-direction: column; width: 100%;"
+    );
+
+    customContentContainer.appendChild(customContent);
+    customContentContainer.appendChild(customDescription);
+
+    web3ModalCard.appendChild(customContentContainer);
+
+    if (we3ModalDescription) {
+      we3ModalDescription.appendChild(customContentContainer);
+    }
+  };
+
   const openProfile = () => {
     open();
     if (!$account) return;
@@ -67,24 +114,14 @@ const Wallet = () => {
       ?.shadowRoot?.querySelector("div")
       ?.querySelector("w3m-account-view")
       ?.shadowRoot?.querySelector("wui-flex");
-    const we3ModalDescription = web3ModalCard?.querySelector("wui-flex");
+
     if (web3ModalCard && userAssets) {
-      const customContent = document.createElement("div");
-      const customDescription = document.createElement("div");
-      customContent.innerHTML = userAssets.join("");
-      customContent.setAttribute(
-        "style",
-        "display: flex; align-items:center;justify-content:center; flex-wrap: wrap; gap: 10px;"
-      );
-      customDescription.innerHTML = `<p style="margin:0; color:#949e9e;">$${userBalance}</p>`;
-      web3ModalCard.appendChild(customContent);
-      if (we3ModalDescription) {
-        we3ModalDescription.appendChild(customDescription);
-      }
+      insertAssets();
     } else {
-      setTimeout(openProfile, 1000);
+      setTimeout(insertAssets, 1000);
     }
   };
+
   const initProfile = async () => {
     if (!$assetsBalances) return; // dublicated for TS
     let profileBalance = 0;

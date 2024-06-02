@@ -1,7 +1,7 @@
 {
   "name": "stability-ui",
   "type": "module",
-  "version": "0.7.2-alpha",
+  "version": "0.7.8-alpha",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -21,7 +21,7 @@
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
-    "@web3modal/wagmi": "^4.0.6",
+    "@web3modal/wagmi": "^4.2.3",
     "add": "^2.0.6",
     "astro": "^3.4.3",
     "axios": "^1.6.2",
@@ -33,7 +33,7 @@
     "recharts": "^2.10.4",
     "tailwindcss": "^3.3.5",
     "vercel": "^32.5.0",
-    "viem": "^2.9.6",
+    "viem": "^2.13.1",
     "wagmi": "^2.5.7"
   }
 }

@@ -15,6 +15,7 @@ import { setLocalStoreHash } from "./functions/setLocalStoreHash";
 import { getDate } from "./functions/getDate";
 import { getProtocolLogo } from "./functions/getProtocolLogo";
 import { determineAPR } from "./functions/determineAPR";
+import { addAssetToWallet } from "./functions/addAssetToWallet";
 
 export {
   getTokenData,
@@ -34,4 +35,5 @@ export {
   getDate,
   getProtocolLogo,
   determineAPR,
+  addAssetToWallet,
 };

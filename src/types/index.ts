@@ -60,7 +60,7 @@ type TAllowedBBTokenVaults = {
 };
 
 type TTokenData = {
-  address: string;
+  address: TAddress;
   name: string;
   symbol: string;
   chainId: number;
@@ -201,9 +201,9 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
-  holdPercentDiff: number;
-  holdYearPercentDiff: number;
-  tokensHold: THoldData[];
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
+  lifetimeTokensHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
 };
@@ -228,9 +228,9 @@ type TTableFilters = {
 };
 
 type TVsHoldModal = {
-  tokensHold: THoldData[];
-  holdPercentDiff: number;
-  holdYearPercentDiff: number;
+  lifetimeTokensHold: THoldData[];
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
   created: number;
   state: boolean;
   isVsActive: boolean;
@@ -322,7 +322,7 @@ type TChartData = {
   sharePrice?: number;
   timestamp: string;
   unixTimestamp?: string;
-  vsHoldAPR?: string;
+  periodVsHoldAPR?: string;
   date: string;
 };
 
@@ -335,6 +335,7 @@ type TPieChartData = {
   logo: string;
   percent: number;
   symbol: string;
+  decimals: number;
 };
 
 //// DAO

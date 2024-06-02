@@ -71,12 +71,12 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
             vaultHistoryEntities(
               orderBy: timestamp, 
               orderDirection: asc,
-              where: {address: "${address}",vsHoldAPR_not: null}
+              where: {address: "${address}", periodVsHoldAPR_not: null}
               skip: ${entities}
             ) {
                 APR
                 APR24H
-                vsHoldAPR
+                periodVsHoldAPR
                 address
                 sharePrice
                 TVL
@@ -109,7 +109,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
         date: obj.date,
         APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
         APR24H: obj.APR24H,
-        vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
+        vsHoldAPR: Number(obj.periodVsHoldAPR).toFixed(3),
       }));
 
     if (!APRChartData.length) {
@@ -232,7 +232,6 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           timestamp: obj.timestamp,
           date: obj.date,
           APR: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
-          vsHoldAPR: Number(obj.vsHoldAPR).toFixed(3),
           x: APRDifferences[index],
           y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
         }));
@@ -351,6 +350,79 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
           data: priceChartData,
         });
         break;
+
+      case "vsHodl":
+        let vsHoldArr = chartData.filter(
+          (obj: TChartData) =>
+            obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+        );
+
+        newData = [];
+        time = Number(vsHoldArr[0].unixTimestamp);
+
+        if (segment === "MONTH") {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 7200;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        } else if (segment === "YEAR") {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 14400;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        } else {
+          do {
+            let sortedAPRs = vsHoldArr.filter(
+              (obj: any) => Number(obj.unixTimestamp) >= time
+            );
+            let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
+
+            newData.push({ ...firstEl, timestamp: time });
+            time += 3600;
+            if (time >= lastTimestamp) {
+              newData.push({
+                ...vsHoldArr[vsHoldArr.length - 1],
+                timestamp: vsHoldArr[vsHoldArr.length - 1].unixTimestamp,
+              });
+            }
+          } while (time < lastTimestamp);
+        }
+
+        vsHoldArr = newData.map(formatData);
+
+        const vsHoldAPRChartData = vsHoldArr.map((obj: TChartData) => ({
+          unixTimestamp: obj.unixTimestamp,
+          timestamp: obj.timestamp,
+          date: obj.date,
+          vsHodl: Number(obj.periodVsHoldAPR).toFixed(3),
+        }));
+        setActiveChart({
+          name: "vsHodl",
+          data: vsHoldAPRChartData,
+        });
+        break;
       default:
         console.log("NO ACTIVE CASE");
         break;
@@ -370,28 +442,30 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
 
   return (
     <div className="rounded-md mt-5">
-      <div className="rounded-t-md flex justify-between items-center h-[60px] px-4">
-        <h2 className="text-start text-[1rem] min-[420px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem]">
+      <div className="rounded-t-md flex justify-between items-center  h-[60px] px-4">
+        <h2 className="text-start text-[1rem] min-[420px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem] lg:block md:hidden block">
           Historical rate
         </h2>
         {activeChart && (
-          <div className="flex items-center text-[1rem] relative sm:px-2 px-1 sm:gap-3 gap-2">
+          <div className="flex items-center relative sm:px-2 px-1 sm:gap-4 gap-2 text-[10px] sm:text-[12px] lg:text-[14px]">
             <div
               className="absolute bottom-0 bg-[#6376AF] rounded-sm"
               style={{
-                width: "33.33%",
+                width: "25%",
                 height: "3px",
                 left:
                   activeChart.name === "sharePrice"
-                    ? "66.7%"
+                    ? "75%"
                     : activeChart.name === "TVL"
-                    ? "33.3%"
+                    ? "50%"
+                    : activeChart.name === "vsHodl"
+                    ? "25%"
                     : "0%",
                 transition: "left 0.3s ease",
               }}
             ></div>
             <p
-              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
                 activeChart.name === "APR" ? "opacity-100" : "opacity-80"
               }`}
               onClick={() => chartHandler("APR")}
@@ -399,7 +473,15 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               {APRType}
             </p>
             <p
-              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 py-1 ${
+                activeChart.name === "vsHodl" ? "opacity-100" : "opacity-80"
+              }`}
+              onClick={() => chartHandler("vsHodl")}
+            >
+              VS HODL APR
+            </p>
+            <p
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
                 activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
               }`}
               onClick={() => chartHandler("TVL")}
@@ -407,7 +489,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               TVL
             </p>
             <p
-              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center text-[10px] sm:text-[12px] min-[960px]:text-[14px] py-1 ${
+              className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
                 activeChart.name === "sharePrice" ? "opacity-100" : "opacity-80"
               }`}
               onClick={() => chartHandler("sharePrice")}
@@ -424,8 +506,10 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
               <>
                 {activeChart.name === "APR" ? (
                   <ChartBar chart={activeChart} APRType={APRType} />
+                ) : activeChart.name === "vsHodl" ? (
+                  <ChartBar chart={activeChart} APRType={"VS HODL APR"} />
                 ) : (
-                  <Chart chart={activeChart} APRType={APRType} />
+                  <Chart chart={activeChart} />
                 )}
               </>
             ) : (

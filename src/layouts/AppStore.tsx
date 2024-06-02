@@ -7,7 +7,7 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
 import { YEARN_PROTOCOLS, STRATEGY_SPECIFIC_SUBSTITUTE } from "@constants";
@@ -113,6 +113,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       const response = await axios.get(STABILITY_API);
 
       stabilityAPIData = response.data;
+
       apiData.set(stabilityAPIData);
     } catch (error) {
       console.error("API ERROR:", error);
@@ -407,21 +408,21 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const holdYearPercentDiff = Number(lastHistoryData?.vsHoldAPR).toFixed(
-          2
-        );
+        const lifetimeVsHoldAPR = Number(
+          lastHistoryData?.lifetimeVsHoldAPR
+        ).toFixed(2);
 
         const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
 
-        const holdPercentDiff = (
-          (Number(holdYearPercentDiff) / 365) *
+        const vsHoldAPR = (
+          (Number(lifetimeVsHoldAPR) / 365) *
           Number(daysFromCreation)
         ).toFixed(2);
 
-        let tokensHold: THoldData[] = [];
+        let lifetimeTokensHold: THoldData[] = [];
 
-        if (lastHistoryData?.tokensVsHoldAPR && prices) {
-          tokensHold = vault.strategyAssets.map(
+        if (lastHistoryData?.lifetimeTokensVsHoldAPR && prices) {
+          lifetimeTokensHold = vault.strategyAssets.map(
             (asset: string, index: number) => {
               const price = Number(
                 formatUnits(prices[asset.toLowerCase()], 18)
@@ -435,7 +436,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
               const yearPercentDiff = Number(
-                lastHistoryData?.tokensVsHoldAPR[index]
+                lastHistoryData?.lifetimeTokensVsHoldAPR[index]
               );
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
@@ -506,7 +507,6 @@ const AppStore = (props: React.PropsWithChildren) => {
                 )
               : vault.strategySpecific;
         }
-
         /////
         vaults[vault.id] = {
           address: vault.id,
@@ -547,9 +547,9 @@ const AppStore = (props: React.PropsWithChildren) => {
           pool: APIVault.pool,
           alm: APIVault.alm,
           risk: APIVault?.risk,
-          holdPercentDiff: Number(holdPercentDiff),
-          holdYearPercentDiff: Number(holdYearPercentDiff),
-          tokensHold,
+          vsHoldAPR: Number(vsHoldAPR),
+          lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
+          lifetimeTokensHold,
           isVsActive,
           yearnProtocols,
         };
@@ -576,6 +576,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         graphResponse = await axios.post(GRAPH_ENDPOINT, {
           query: GRAPH_QUERY,
         });
+
         if (graphResponse.data.errors && graphResponse.data.errors.length > 0) {
           throw new Error("GRAPH API ERROR");
         }

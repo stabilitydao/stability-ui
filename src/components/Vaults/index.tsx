@@ -98,10 +98,11 @@ const Vaults = () => {
     state: false,
     pool: {},
   });
+
   const [vsHoldModal, setVsHoldModal] = useState({
-    tokensHold: [],
-    holdPercentDiff: 0,
-    holdYearPercentDiff: 0,
+    lifetimeTokensHold: [],
+    vsHoldAPR: 0,
+    lifetimeVsHoldAPR: 0,
     created: 0,
     state: false,
     isVsActive: false,
@@ -270,14 +271,27 @@ const Vaults = () => {
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
-        sortedVaults = [...sortedVaults].sort((a, b) =>
-          compareHandler(
-            a[state.keyName as keyof TVault],
-            b[state.keyName as keyof TVault],
-            state.dataType,
-            state.sortType
-          )
-        );
+        if (state.keyName === "earningData") {
+          const fees = $hideFeeAPR ? "withoutFees" : "withFees";
+
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            compareHandler(
+              a[state.keyName as keyof TVault].apr[fees][$aprFilter],
+              b[state.keyName as keyof TVault].apr[fees][$aprFilter],
+              state.dataType,
+              state.sortType
+            )
+          );
+        } else {
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            compareHandler(
+              a[state.keyName as keyof TVault],
+              b[state.keyName as keyof TVault],
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
       }
     });
     //search
@@ -882,9 +896,10 @@ const Vaults = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setVsHoldModal({
-                          tokensHold: vault.tokensHold as THoldData[],
-                          holdPercentDiff: vault.holdPercentDiff,
-                          holdYearPercentDiff: vault.holdYearPercentDiff,
+                          lifetimeTokensHold:
+                            vault.lifetimeTokensHold as THoldData[],
+                          vsHoldAPR: vault.vsHoldAPR,
+                          lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
                           created: getTimeDifference(vault.created)?.days,
                           state: true,
                           isVsActive: vault.isVsActive,
@@ -894,13 +909,13 @@ const Vaults = () => {
                     >
                       <p
                         className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                          Number(vault.holdYearPercentDiff) > 0
+                          vault.lifetimeVsHoldAPR > 0
                             ? "text-[#b0ddb8]"
                             : "text-[#eb7979]"
                         }`}
                       >
-                        {Number(vault.holdYearPercentDiff) > 0 ? "+" : ""}
-                        {vault.holdYearPercentDiff}%
+                        {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                        {vault.lifetimeVsHoldAPR}%
                       </p>
                       <div className="visible__tooltip !w-[450px]">
                         <table className="table table-auto w-full rounded-lg">
@@ -920,13 +935,13 @@ const Vaults = () => {
                               {vault.isVsActive ? (
                                 <td
                                   className={`text-right ${
-                                    Number(vault.holdPercentDiff) > 0
+                                    vault.vsHoldAPR > 0
                                       ? "text-[#b0ddb8]"
                                       : "text-[#eb7979]"
                                   }`}
                                 >
-                                  {Number(vault.holdPercentDiff) > 0 ? "+" : ""}
-                                  {vault.holdPercentDiff}%
+                                  {vault.vsHoldAPR > 0 ? "+" : ""}
+                                  {vault.vsHoldAPR}%
                                 </td>
                               ) : (
                                 <td className="text-right">-</td>
@@ -935,22 +950,20 @@ const Vaults = () => {
                               {vault.isVsActive ? (
                                 <td
                                   className={`text-right ${
-                                    Number(vault.holdYearPercentDiff) > 0
+                                    vault.lifetimeVsHoldAPR > 0
                                       ? "text-[#b0ddb8]"
                                       : "text-[#eb7979]"
                                   }`}
                                 >
-                                  {Number(vault.holdYearPercentDiff) > 0
-                                    ? "+"
-                                    : ""}
-                                  {vault.holdYearPercentDiff}%
+                                  {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
+                                  {vault.lifetimeVsHoldAPR}%
                                 </td>
                               ) : (
                                 <td className="text-right">-</td>
                               )}
                             </tr>
 
-                            {vault.tokensHold.map(
+                            {vault.lifetimeTokensHold.map(
                               (aprsData: THoldData, index: number) => (
                                 <tr key={index} className="hover:bg-[#2B3139]">
                                   <td className="text-left">
@@ -1011,7 +1024,7 @@ const Vaults = () => {
                       )}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
-                      ${Number(vault.shareprice).toFixed(2)}
+                      ${Number(vault.shareprice).toFixed(3)}
                     </td>
                     <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px] text-[15px]">
                       {formatNumber(vault.tvl, "abbreviate")}

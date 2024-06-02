@@ -1,14 +1,19 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 
-//import { walletClient } from "@web3";
+import { useStore } from "@nanostores/react";
+
+import { useWalletClient, useAccount } from "wagmi";
 
 import { VaultState, VaultType } from "@components";
 
-import { getTimeDifference, getDate } from "@utils";
+import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
 import { VAULT_STATUSES } from "@constants";
 
+import { connected } from "@store";
+
 import type { TVault } from "@types";
+import { formatUnits } from "viem";
 
 interface IProps {
   vault: TVault;
@@ -18,6 +23,10 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
   const [created, setCreated] = useState<any>();
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
   const [timeDifference, setTimeDifference] = useState<any>();
+
+  const client = useWalletClient();
+  const { connector } = useAccount();
+  const $connected = useStore(connected);
 
   useEffect(() => {
     if (vault) {
@@ -29,34 +38,20 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
     }
   }, [vault]);
 
-  // const addVaultToken = async () => {
-  //   let symbol = vault?.symbol.split("");
-  //   let newArr = [];
-  //   let lastSymbol = "";
-  //   console.log(symbol);
-  //   for (let i = 0; i < symbol.length; i++) {
-  //     if (!i) {
-  //       newArr.push(symbol[0]);
-  //     }
-  //     if (lastSymbol === "-") {
-  //       newArr.push(lastSymbol);
-  //       newArr.push(symbol[i]);
-  //     }
+  const isAddToWallet = useMemo(() => {
+    return (
+      vault?.symbol?.length <= 11 &&
+      $connected &&
+      window.ethereum &&
+      connector?.id === "io.metamask"
+    );
+  }, [vault?.symbol, $connected, connector]);
 
-  //     lastSymbol = symbol[i];
-  //   }
-  //   symbol = newArr.join("");
-  //   if (symbol) {
-  //     const success = await walletClient.watchAsset({
-  //       type: "ERC20",
-  //       options: {
-  //         address: vault?.address,
-  //         decimals: 18,
-  //         symbol: vault?.symbol,
-  //       },
-  //     });
-  //   }
-  // };
+  const gasReserve = useMemo(() => {
+    return !!Number(vault?.gasReserve)
+      ? Number(formatUnits(vault?.gasReserve, 18)).toFixed(5)
+      : 0;
+  }, [vault?.gasReserve]);
 
   return (
     <div>
@@ -88,7 +83,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               GAS RESERVE
             </p>
-            <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
+            <p className="text-[16px] mt-1">{gasReserve} MATIC</p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
@@ -151,6 +146,27 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
           </div>
         </div>
+
+        {!!vault?.version && (
+          <div>
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              VAULT VERSION
+            </p>
+            <p className="text-[16px] mt-1">{vault?.version}</p>
+          </div>
+        )}
+
+        {isAddToWallet && (
+          <button
+            onClick={() =>
+              addAssetToWallet(client, vault?.address, 18, vault?.symbol)
+            }
+            className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
+          >
+            <span>Add to MetaMask </span>{" "}
+            <img src="/metamask.svg" alt="metamask" />
+          </button>
+        )}
       </div>
     </div>
   );
