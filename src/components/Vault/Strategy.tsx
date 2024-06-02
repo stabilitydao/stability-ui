@@ -229,6 +229,14 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
                   </div>
                 ))}
               </div>
+              {!!vault?.strategyVersion && (
+                <div>
+                  <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+                    STRATEGY VERSION
+                  </p>
+                  <p className="text-[16px] mt-1">{vault?.strategyVersion} </p>
+                </div>
+              )}
             </div>
           </div>
         )}

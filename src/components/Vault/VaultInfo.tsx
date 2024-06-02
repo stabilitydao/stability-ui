@@ -138,24 +138,15 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
-          {!!vault?.version && (
-            <div>
-              <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                VAULT VERSION
-              </p>
-              <p className="text-[16px] mt-1">{vault?.version}</p>
-            </div>
-          )}
-          {!!vault?.strategyVersion && (
-            <div className="sm:w-1/2">
-              <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                STRATEGY VERSION
-              </p>
-              <p className="text-[16px] mt-1">{vault?.strategyVersion} </p>
-            </div>
-          )}
-        </div>
+
+        {!!vault?.version && (
+          <div>
+            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+              VAULT VERSION
+            </p>
+            <p className="text-[16px] mt-1">{vault?.version}</p>
+          </div>
+        )}
 
         {isAddToWallet && (
           <button
