@@ -87,7 +87,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
         contractsInfo.push({
           logo: underlyingToken.logo,
           symbol: underlyingToken.symbol,
-          type: isALM ? "ALM" : "UNDERLYING",
+          type: isALM ? "ALM" : "Underlying",
           address: vault?.underlying,
           isCopy: false,
         });
