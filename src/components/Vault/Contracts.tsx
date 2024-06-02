@@ -7,6 +7,7 @@ import { AssetsProportion } from "@components";
 import { DEXes } from "@constants";
 
 import type { TAddress, TVault, TContractInfo } from "@types";
+import { getProtocolLogo } from "@utils";
 
 interface IProps {
   vault: TVault;
@@ -24,14 +25,8 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
 
   const initUnderlying = async () => {
-    if (isALM) {
-      const logo =
-        vault.strategyInfo.shortName === "DQMF"
-          ? "/protocols/DefiEdge.svg"
-          : vault.strategyInfo.shortName === "IQMF" ||
-            vault.strategyInfo.shortName === "IRMF"
-          ? "/protocols/Ichi.png"
-          : "/protocols/Gamma.png";
+    if (isALM || isUnderlying) {
+      const logo = getProtocolLogo(vault.strategyInfo.shortName);
 
       setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
     }
@@ -92,7 +87,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
         contractsInfo.push({
           logo: underlyingToken.logo,
           symbol: underlyingToken.symbol,
-          type: "ALM",
+          type: isALM ? "ALM" : "UNDERLYING",
           address: vault?.underlying,
           isCopy: false,
         });
@@ -135,9 +130,14 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
   const isALM = useMemo(
     () =>
       vault?.alm && ["Ichi", "DefiEdge", "Gamma"].includes(vault.alm.protocol),
-    [vault]
+    [vault?.alm]
   );
 
+  // only for Yearn strategies
+  const isUnderlying = useMemo(
+    () => vault.strategy === "Yearn",
+    [vault.strategy]
+  );
   return (
     <div className="rounded-md h-full">
       <div className="flex justify-between items-center h-[60px]">

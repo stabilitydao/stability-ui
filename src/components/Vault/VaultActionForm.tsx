@@ -72,7 +72,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
 
   const { chain } = useAccount();
   const { switchChain } = useSwitchChain();
-  getProtocolLogo("123");
+
   const $vaultData = useStore(vaultData);
   const $assets: any = useStore(assets);
   const $account = useStore(account);

@@ -199,7 +199,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
             <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
           </div>
         </div>
-        {!!vault?.risk && (
+        {!!vault?.risk && vault?.risk?.symbol !== "UNKNOWN" && (
           <div className="mt-2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               RISK
