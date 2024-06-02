@@ -13,6 +13,7 @@ import { VAULT_STATUSES } from "@constants";
 import { connected } from "@store";
 
 import type { TVault } from "@types";
+import { formatUnits } from "viem";
 
 interface IProps {
   vault: TVault;
@@ -45,6 +46,13 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
       connector?.id === "io.metamask"
     );
   }, [vault?.symbol, $connected, connector]);
+
+  const gasReserve = useMemo(() => {
+    return !!Number(vault?.gasReserve)
+      ? Number(formatUnits(vault?.gasReserve, 18)).toFixed(5)
+      : 0;
+  }, [vault?.gasReserve]);
+
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -75,7 +83,7 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               GAS RESERVE
             </p>
-            <p className="text-[16px] mt-1"> {vault?.gasReserve} MATIC</p>
+            <p className="text-[16px] mt-1">{gasReserve} MATIC</p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
