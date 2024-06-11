@@ -7,7 +7,7 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { readContract } from "@wagmi/core";
 
 import { YEARN_PROTOCOLS, STRATEGY_SPECIFIC_SUBSTITUTE } from "@constants";
@@ -97,7 +97,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       hideFeeApr.set(savedData);
     }
 
-    let localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+    let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "weekly";
 
     if (localAPRfilter === "week") {
       localAPRfilter = "weekly";
@@ -408,9 +408,9 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const lifetimeVsHoldAPR = Number(
-          lastHistoryData?.lifetimeVsHoldAPR
-        ).toFixed(2);
+        const lifetimeVsHoldAPR = lastHistoryData?.lifetimeVsHoldAPR
+          ? Number(lastHistoryData?.lifetimeVsHoldAPR).toFixed(2)
+          : 0;
 
         const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
 
@@ -607,12 +607,13 @@ const AppStore = (props: React.PropsWithChildren) => {
     if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
       platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
     }
-
+    console.log(graphResponse);
     //// ASSETS PRICE (before backend)
     let prices: TAssetPrices = {};
     try {
       const randomAddress: TAddress =
         "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
+
       const contractBalance: any = await readContract(wagmiConfig, {
         address: platform,
         abi: PlatformABI,
@@ -621,6 +622,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       });
 
       prices = addAssetsPrice(contractBalance) as TAssetPrices;
+      console.log(contractBalance);
     } catch (error) {
       console.log("ASSETS PRICE ERROR:", error);
     }

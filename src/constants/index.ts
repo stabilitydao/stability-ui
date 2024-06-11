@@ -199,6 +199,10 @@ const CHAINS = [
     logoURI:
       "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
   },
+  {
+    name: "Base",
+    logoURI: "https://www.base.org/document/favicon-32x32.png",
+  },
 ];
 
 const TRANSACTION_SETTINGS = {
@@ -284,8 +288,19 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
 } = {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
-const GRAPH_ENDPOINT =
-  "https://api.studio.thegraph.com/query/72132/test/v0.3.0";
+// const GRAPH_ENDPOINT =
+//   "https://api.studio.thegraph.com/query/72132/test/v0.3.0";
+
+const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
+  import.meta.env.PUBLIC_GRAPH_API_KEY
+}/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`;
+
+// const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${}/subgraphs/
+// id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`
+
+// const BASE_GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
+//   import.meta.env.PUBLIC_GRAPH_API_KEY
+// }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`;
 
 const GRAPH_QUERY = `
       {

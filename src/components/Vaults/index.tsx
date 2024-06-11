@@ -6,6 +6,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { useStore } from "@nanostores/react";
 
+import { deployments } from "@stabilitydao/stability";
+console.log(deployments);
 import { APRModal } from "./APRModal";
 import { VSHoldModal } from "./VSHoldModal";
 import { ColumnSort } from "./ColumnSort";
@@ -31,6 +33,7 @@ import {
   connected,
   publicClient,
   platformVersion,
+  currentChainID,
   // assetsPrices,
 } from "@store";
 
@@ -53,7 +56,7 @@ import {
   // WMATIC,
 } from "@constants";
 
-import { platform, PlatformABI, deployments } from "@web3";
+import { platform, PlatformABI } from "@web3";
 
 import type {
   TVault,
@@ -82,6 +85,7 @@ const Vaults = () => {
   const $connected = useStore(connected);
   const $publicClient = useStore(publicClient);
   const $platformVersion = useStore(platformVersion);
+  const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
 
   // const [tokens, setTokens] = useState<TToken[]>([]);
@@ -318,10 +322,10 @@ const Vaults = () => {
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
           async (proxy: TAddress, index: number) => {
-            const moduleContracts = Object.keys(deployments[137]);
+            const moduleContracts = Object.keys(deployments[$currentChainID]);
             const upgratedData = await Promise.all(
-              moduleContracts.map(async (moduleContract) => {
-                const address = deployments[137][moduleContract];
+              moduleContracts.map(async (moduleContract: string) => {
+                const address = deployments[$currentChainID][moduleContract];
                 if (proxy === address) {
                   const oldImplementation = await $publicClient?.readContract({
                     address: address,

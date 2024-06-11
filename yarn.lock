@@ -2387,6 +2387,11 @@
   resolved "https://registry.npmjs.org/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
+"@stabilitydao/stability@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/@stabilitydao/stability/-/stability-0.2.0.tgz"
+  integrity sha512-+FVo+khZr/YHyv0HLwMgPAaTD6sj5ubo3SI7FMv7SQ0/LNF7Djb8j/kHshoeenTn/2qffXJLfxQW+51TN6dn3w==
+
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
   resolved "https://registry.npmjs.org/@stablelib/aead/-/aead-1.0.1.tgz"
@@ -8200,6 +8205,8 @@ napi-build-utils@^1.0.1:
 
 napi-wasm@^1.1.0:
   version "1.1.0"
+  resolved "https://registry.npmjs.org/napi-wasm/-/napi-wasm-1.1.0.tgz"
+  integrity sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==
 
 needle@^2.5.2:
   version "2.9.1"

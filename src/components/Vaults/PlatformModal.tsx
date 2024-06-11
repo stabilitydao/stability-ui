@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
-import { PROTOCOLS } from "@constants";
 import { useStore } from "@nanostores/react";
-import { deployments } from "@web3";
-import packageJson from "../../../package.json";
+import { deployments } from "@stabilitydao/stability";
 
-import { apiData, platformVersion } from "@store";
+import { PROTOCOLS } from "@constants";
+
+import { apiData, platformVersion, currentChainID } from "@store";
+
+import packageJson from "../../../package.json";
 
 interface IProps {
   setModalState: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,6 +54,7 @@ const TheGraph: React.FC<{}> = () => {
 const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
   const modalRef: any = useRef(null);
 
+  const $currentChainID = useStore(currentChainID);
   const $platformVersion = useStore(platformVersion);
   const $apiData = useStore(apiData);
 
@@ -176,24 +179,28 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                     <span>Stability Platform {$platformVersion}</span>
                   </div>
                   <div className="flex flex-wrap mt-2">
-                    {Object.keys(deployments[137]).map((moduleContract) => {
-                      const address = deployments[137][moduleContract];
-                      return (
-                        <a
-                          key={moduleContract}
-                          target="_blank"
-                          href={`https://polygonscan.com/address/${address}`}
-                          title={`Go to ${moduleContract} contract address at Polygonscan`}
-                          className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-2 lg:px-3 md:py-[3px] mr-1 mb-2"
-                        >
-                          <span className="inline-flex text-[#d3d0d0] ">
-                            {moduleContract}
-                          </span>
-                          {/* <span className="inline-flex bg-[#666888] rounded-l-full pl-1.5 pr-1">{moduleContract}</span> */}
-                          {/* <span className="inline-flex bg-[#ff8811] rounded-r-full pr-1.5 pl-1">{m.version}</span> */}
-                        </a>
-                      );
-                    })}
+                    {Object.keys(deployments[$currentChainID]).map(
+                      (moduleContract) => {
+                        const address =
+                          deployments[$currentChainID][moduleContract];
+
+                        return (
+                          <a
+                            key={moduleContract}
+                            target="_blank"
+                            href={`https://polygonscan.com/address/${address}`}
+                            title={`Go to ${moduleContract} contract address at Polygonscan`}
+                            className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-2 lg:px-3 md:py-[3px] mr-1 mb-2"
+                          >
+                            <span className="inline-flex text-[#d3d0d0] ">
+                              {moduleContract}
+                            </span>
+                            {/* <span className="inline-flex bg-[#666888] rounded-l-full pl-1.5 pr-1">{moduleContract}</span> */}
+                            {/* <span className="inline-flex bg-[#ff8811] rounded-r-full pr-1.5 pl-1">{m.version}</span> */}
+                          </a>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,8 +1,10 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { createWalletClient, http, custom } from "viem";
+import { createWalletClient, http } from "viem";
 
-import { polygon } from "wagmi/chains";
+import { polygon, base } from "wagmi/chains";
+
+import { deployments } from "@stabilitydao/stability";
 
 import ERC20ABI from "./abi/ERC20ABI.ts";
 import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.ts";
@@ -19,28 +21,11 @@ import DividendTokenABI from "./abi/DividendTokenABI.ts";
 import ICHIABI from "./abi/ICHIABI.ts";
 import PriceReaderABI from "./abi/PriceReaderABI.ts";
 
-const platform = "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60";
-
-const priceReader = "0xcCef9C4459d73F9A997ff50AC34364555A3274Aa";
-
-const deployments: {
-  [chainId: number]: {
-    [contractName: string]: `0x${string}`;
-  };
-} = {
-  137: {
-    Platform: "0xb2a0737ef27b5Cc474D24c779af612159b1c3e60",
-    Factory: "0xa14EaAE76890595B3C7ea308dAEBB93863480EAD",
-    PriceReader: "0xcCef9C4459d73F9A997ff50AC34364555A3274Aa",
-    Swapper: "0xD84E894A6646C7407b8CD1273Ea1EFc53A423762",
-    HardWorker: "0x6DBFfd2846d4a556349a3bc53297700d89a94034",
-    VaultManager: "0x6008b366058B42792A2497972A3312274DC5e1A8",
-    StrategyLogic: "0xD16b60E39284190D9201f0eaD42c4674C310e905",
-    Zap: "0xEA3fABD8cC14705d7E66D1833a547D31882aEA9b",
-  },
-};
-
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
+// 137 || 8453
+const platform = deployments[8453].platform;
+
+const priceReader = deployments[8453].priceReader;
 
 const defiedgeFactory = "0x730d158D29165C55aBF368e9608Af160DD21Bd80";
 
@@ -56,7 +41,7 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [polygon],
+  chains: [polygon, base],
   projectId: walletConnectProjectId,
   metadata,
 });
@@ -66,7 +51,6 @@ const walletClient = createWalletClient({
 });
 
 export {
-  deployments,
   platform,
   defiedgeFactory,
   quickSwapIchiFactory,

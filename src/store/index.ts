@@ -52,6 +52,8 @@ const apiData = atom<any>();
 const vaultTypes = atom();
 const strategyTypes = atom();
 
+const currentChainID = atom("137");
+
 // deepMaps
 
 const vaults = deepMap<any>();
@@ -106,4 +108,5 @@ export {
   queryClient,
   persister,
   aprFilter,
+  currentChainID,
 };
