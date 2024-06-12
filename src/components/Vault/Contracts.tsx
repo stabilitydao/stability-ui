@@ -14,8 +14,6 @@ interface IProps {
 }
 
 const Contracts: React.FC<IProps> = memo(({ vault }) => {
-  //const $platformZAP = useStore(platformZAP);
-
   const [timeoutId, setTimeoutId] = useState<any>();
 
   const [underlyingToken, setUnderlyingToken] = useState({

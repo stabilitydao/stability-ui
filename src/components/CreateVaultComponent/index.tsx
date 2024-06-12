@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits } from "viem";
 
-import { platform, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
+import { platforms, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
 import {
-  platformData,
+  platformsData,
   publicClient,
   lastTx,
   balances,
   account,
   connected,
+  currentChainID,
 } from "@store";
 
 import { getTokenData } from "@utils";
@@ -25,13 +26,15 @@ import type {
   TBuildVariant,
   TAddress,
 } from "@types";
+import { CHAINS } from "@constants";
 
 const CreateVaultComponent = () => {
   const $publicClient = useStore(publicClient);
-  const $platformData = useStore(platformData);
+  const $platformsData = useStore(platformsData);
   const $balances = useStore(balances);
   const $account = useStore(account);
   const $connected = useStore(connected);
+  const $currentChainID = useStore(currentChainID);
 
   const { open } = useWeb3Modal();
 
@@ -50,10 +53,10 @@ const CreateVaultComponent = () => {
   const [freeVaults, setFreeVaults]: any = useState();
 
   const getData = async () => {
-    if ($publicClient && $platformData) {
+    if ($publicClient && $platformsData[$currentChainID] && isCorrectNetwork) {
       const variants: TBuildVariant[] = [];
       const whatToBuild = await $publicClient.readContract({
-        address: $platformData.factory,
+        address: $platformsData[$currentChainID].factory,
         functionName: "whatToBuild",
         abi: FactoryABI,
       });
@@ -106,7 +109,7 @@ const CreateVaultComponent = () => {
       }
 
       const allowedBBTokenVaults = await $publicClient.readContract({
-        address: platform,
+        address: platforms[$currentChainID as string],
         functionName: "allowedBBTokenVaults",
         abi: PlatformABI,
       });
@@ -121,7 +124,7 @@ const CreateVaultComponent = () => {
       }
 
       const minInitialBoostPerDayValue = await $publicClient.readContract({
-        address: platform,
+        address: platforms[$currentChainID as string],
         functionName: "minInitialBoostPerDay",
         abi: PlatformABI,
       });
@@ -130,7 +133,7 @@ const CreateVaultComponent = () => {
       }
 
       const minInitialBoostDurationValue = await $publicClient.readContract({
-        address: platform,
+        address: platforms[$currentChainID as string],
         functionName: "minInitialBoostDuration",
         abi: PlatformABI,
       });
@@ -138,7 +141,7 @@ const CreateVaultComponent = () => {
         setMinInitialBoostDuration(minInitialBoostDurationValue);
       }
       const defaultBoostTokensValue = await $publicClient.readContract({
-        address: platform,
+        address: platforms[$currentChainID as string],
         functionName: "defaultBoostRewardTokens",
         abi: PlatformABI,
       });
@@ -148,7 +151,7 @@ const CreateVaultComponent = () => {
     }
   };
   const freeVaultsHandler = async () => {
-    if ($publicClient && $balances && $balances[7][0]) {
+    if ($publicClient && $balances && $balances[7][0] && isCorrectNetwork) {
       const epoch = Math.floor(new Date().getTime() / 1000);
       const nextEpoch = epoch + 7 * 24 * 60 * 60;
 
@@ -179,12 +182,12 @@ const CreateVaultComponent = () => {
         tokensOfOwner.push(tokenOfOwnerByIndex);
       }
 
-      if (tokensOfOwner && $platformData) {
+      if (tokensOfOwner && $platformsData[$currentChainID]) {
         const vaultsBuiltByPermitTokenIdPromises: Promise<any>[] =
           tokensOfOwner.map(async (tokenID: bigint) => {
             const vaultsBuiltByPermitTokenId = await $publicClient.readContract(
               {
-                address: $platformData.factory,
+                address: $platformsData[$currentChainID].factory,
                 functionName: "vaultsBuiltByPermitTokenId",
                 abi: FactoryABI,
                 args: [BigInt(week), tokenID],
@@ -210,7 +213,7 @@ const CreateVaultComponent = () => {
   };
   useEffect(() => {
     getData();
-  }, [$publicClient, $platformData?.factory, lastTx.get()]);
+  }, [$publicClient, $platformsData[$currentChainID]?.factory, lastTx.get()]);
   useEffect(() => {
     freeVaultsHandler();
   }, [$balances]);
@@ -218,9 +221,14 @@ const CreateVaultComponent = () => {
   const compoundingVaultsForBuilding = buildVariants.filter(
     (variant) => variant.vaultType === "Compounding"
   ).length;
+
+  const isCorrectNetwork = useMemo(
+    () => CHAINS.some((item) => item.id == $currentChainID) && $connected,
+    [$connected, $account]
+  );
   return (
     <WagmiLayout>
-      {$connected ? (
+      {isCorrectNetwork ? (
         <div>
           <h2 className="text-[22px] mb-3">Compounding vault</h2>
           {compoundingVaultsForBuilding ? (
@@ -445,7 +453,7 @@ const CreateVaultComponent = () => {
           <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
           <div className="text-[22px] text-center">Coming soon</div>
 
-          {$platformData && buildIndex !== undefined && (
+          {$platformsData[$currentChainID] && buildIndex !== undefined && (
             <div
               className="overlay"
               onClick={() => {
@@ -468,7 +476,7 @@ const CreateVaultComponent = () => {
                   strategyDesc={buildVariants[buildIndex].strategyDesc}
                   initParams={buildVariants[buildIndex].initParams}
                   buildingPrice={
-                    $platformData.buildingPrices[
+                    $platformsData[$currentChainID].buildingPrices[
                       buildVariants[buildIndex].vaultType
                     ]
                   }
@@ -483,6 +491,14 @@ const CreateVaultComponent = () => {
             </div>
           )}
         </div>
+      ) : $connected ? (
+        <button
+          type="button"
+          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+          onClick={() => open({ view: "Networks" })}
+        >
+          SWITCH NETWORK
+        </button>
       ) : (
         <button
           type="button"

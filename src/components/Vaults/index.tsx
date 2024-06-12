@@ -7,7 +7,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useStore } from "@nanostores/react";
 
 import { deployments } from "@stabilitydao/stability";
-console.log(deployments);
+
 import { APRModal } from "./APRModal";
 import { VSHoldModal } from "./VSHoldModal";
 import { ColumnSort } from "./ColumnSort";
@@ -32,7 +32,7 @@ import {
   aprFilter,
   connected,
   publicClient,
-  platformVersion,
+  platformVersions,
   currentChainID,
   // assetsPrices,
 } from "@store";
@@ -51,12 +51,13 @@ import {
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
+  CHAINS,
   // WBTC,
   // WETH,
   // WMATIC,
 } from "@constants";
 
-import { platform, PlatformABI } from "@web3";
+import { platforms, PlatformABI } from "@web3";
 
 import type {
   TVault,
@@ -84,7 +85,7 @@ const Vaults = () => {
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
   const $publicClient = useStore(publicClient);
-  const $platformVersion = useStore(platformVersion);
+  const $platformVersions = useStore(platformVersions);
   const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
 
@@ -111,6 +112,7 @@ const Vaults = () => {
     state: false,
     isVsActive: false,
   });
+
   const [platformUpdates, setPlatformUpdates] =
     useState<TPendingPlatformUpgrade>();
 
@@ -123,6 +125,7 @@ const Vaults = () => {
 
   const [tableStates, setTableStates] = useState(TABLE);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
+  const [activeNetworks, setActiveNetworks] = useState(CHAINS);
 
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
@@ -207,11 +210,48 @@ const Vaults = () => {
     setTableFilters(filters);
   };
 
+  const activeNetworksHandler = async (chainID: string) => {
+    let updatedNetworks = activeNetworks.map((network) => {
+      if (network.id === chainID) {
+        return { ...network, active: !network.active };
+      }
+      return network;
+    });
+
+    const allActive = activeNetworks.every((network) => network.active);
+    const allInactive = updatedNetworks.every((network) => !network.active);
+
+    if (allInactive) {
+      updatedNetworks = activeNetworks.map((network) => ({
+        ...network,
+        active: true,
+      }));
+    } else if (allActive) {
+      updatedNetworks = activeNetworks.map((network) => ({
+        ...network,
+        active: network.id === chainID,
+      }));
+    }
+
+    setActiveNetworks(updatedNetworks);
+  };
+
   const tableHandler = (table: TTableColumn[] = tableStates) => {
     const searchValue: string = String(search?.current?.value.toLowerCase());
+    let abc = {};
+    activeNetworks.map((network) => {
+      if (network.active) {
+        abc[network.id] = $vaults[network.id];
+      }
+    });
 
-    let sortedVaults = localVaults;
+    const mixedVaults: { [key: string]: TVault } = Object.values(abc).reduce<{
+      [key: string]: TVault;
+    }>((acc, value) => {
+      return { ...acc, ...value };
+    }, {});
 
+    let sortedVaults = Object.values(mixedVaults);
     //filter
     tableFilters.forEach((f) => {
       if (!f.state) return;
@@ -314,7 +354,7 @@ const Vaults = () => {
   const fetchPlatformUpdates = async () => {
     try {
       const pendingPlatformUpgrade: any = await $publicClient?.readContract({
-        address: platform,
+        address: platforms[$currentChainID],
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });
@@ -378,12 +418,12 @@ const Vaults = () => {
 
       /////***** TIME CHECK  *****/////
       const lockTime: any = await $publicClient?.readContract({
-        address: platform,
+        address: platforms[$currentChainID],
         abi: PlatformABI,
         functionName: "TIME_LOCK",
       });
       const platformUpgradeTimelock: any = await $publicClient?.readContract({
-        address: platform,
+        address: platforms[$currentChainID],
         abi: PlatformABI,
         functionName: "platformUpgradeTimelock",
       });
@@ -419,7 +459,14 @@ const Vaults = () => {
 
   const initVaults = async () => {
     if ($vaults) {
-      const vaults: TVault[] = Object.values($vaults);
+      const mixedVaults: { [key: string]: TVault } = Object.values(
+        $vaults
+      ).reduce<{ [key: string]: TVault }>((acc, value) => {
+        return { ...acc, ...value };
+      }, {});
+
+      const vaults: TVault[] = Object.values(mixedVaults);
+
       vaults.sort((a: TVault, b: TVault) => parseInt(b.tvl) - parseInt(a.tvl));
 
       initFilters(vaults);
@@ -465,11 +512,11 @@ const Vaults = () => {
 
   useEffect(() => {
     tableHandler();
-  }, [tableFilters]);
+  }, [tableFilters, activeNetworks]);
 
   useEffect(() => {
     initVaults();
-  }, [$vaults]);
+  }, [$vaults, $isVaultsLoaded]);
 
   if ($error.state && $error.type === "API") {
     return (
@@ -487,7 +534,7 @@ const Vaults = () => {
     <>
       <ErrorMessage type="WEB3" />
       {!!platformUpdates?.newVersion &&
-        platformUpdates?.newVersion != $platformVersion &&
+        platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
         !!upgradesTable?.length && (
           <div className="p-3  mt-3 rounded-md bg-[#262830]">
             <h3 className="mb-2 text-[1.4rem] font-medium">
@@ -495,7 +542,7 @@ const Vaults = () => {
             </h3>
             <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1">
               <em className="text-xl font-medium">Current version:</em> v
-              {$platformVersion}
+              {$platformVersions[$currentChainID]}
             </h2>
             <h2 className="w-full font-thin text-lg text-left text-gray-400 py-1 flex">
               <em className="text-xl font-medium mr-1">New version:</em>
@@ -595,7 +642,24 @@ const Vaults = () => {
             </div>
           ))}
       </div> */}
-
+      <div className="flex items-center gap-4">
+        {activeNetworks.map((chain) => (
+          <div
+            className={`h-[48px] w-[44px] flex items-center justify-center border-[#3d404b] bg-button cursor-pointer rounded-md ${
+              !chain.active && "opacity-20"
+            }`}
+            key={chain.name + chain.id}
+            title={chain.name}
+            onClick={() => activeNetworksHandler(chain.id)}
+          >
+            <img
+              className="h-6 w-6 rounded-full"
+              src={chain.logoURI}
+              alt={chain.name}
+            />
+          </div>
+        ))}
+      </div>
       <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
         <input
           type="text"
@@ -613,7 +677,7 @@ const Vaults = () => {
             <tr className="text-[12px] text-[#8f8f8f] uppercase">
               {tableStates.map((value: any, index: number) => (
                 <ColumnSort
-                  key={value.name}
+                  key={value.name + index}
                   index={index}
                   value={value.name}
                   table={tableStates}
@@ -625,14 +689,23 @@ const Vaults = () => {
           </thead>
           <tbody>
             {currentTabVaults?.length ? (
-              currentTabVaults.map((vault: TVault) => {
+              currentTabVaults.map((vault: TVault, index: number) => {
+                const network = CHAINS.find(
+                  (chain) => chain.id === vault.network
+                );
                 return (
                   <tr
-                    key={vault.name}
-                    className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium"
+                    key={vault.name + index}
+                    className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
                     onClick={() => toVault(vault.address)}
                   >
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
+                      <img
+                        src={network?.logoURI}
+                        alt={network?.name}
+                        className="absolute w-5 h-5 right-0 md:left-0 top-0 rounded-bl-xl rounded-br-none md:rounded-bl-none md:rounded-br-xl"
+                      />
+
                       <div className="flex items-center justify-start">
                         <div className="hidden md:block">
                           {vault?.risk?.isRektStrategy ? (

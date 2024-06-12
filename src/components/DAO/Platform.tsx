@@ -3,10 +3,10 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { publicClient, network } from "@store";
+import { publicClient, network, currentChainID } from "@store";
 import { Loader, ShortAddress } from "@components";
-import { GRAPH_ENDPOINT } from "@constants";
-import { PlatformABI, FactoryABI, platform } from "@web3";
+import { CHAINS, GRAPH_ENDPOINTS } from "@constants";
+import { PlatformABI, FactoryABI, platforms } from "@web3";
 import { getStrategyInfo } from "@utils";
 
 import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
@@ -14,6 +14,7 @@ import type { TAddress, TDAOData, TPendingPlatformUpgrade } from "@types";
 const Platform = () => {
   const $publicClient = useStore(publicClient);
   const $network = useStore(network);
+  const $currentChainID = useStore(currentChainID);
 
   const [daoData, setDaoData] = useState<TDAOData>();
   const [platformUpdates, setPlatformUpdates] =
@@ -22,37 +23,41 @@ const Platform = () => {
   const [totalNumberOfVaults, setTotalNumberOfVaults] = useState<any>();
 
   const fetchGraph = async () => {
+    let _tvl = 0;
+    let totalVaults = 0;
     try {
-      const response = await axios.post(
-        GRAPH_ENDPOINT,
-        {
-          query: `
-            query MyQuery {
-              vaultEntities {
-                tvl
-              }
-            }
-          `,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      CHAINS.map(async (chain) => {
+        const response = await axios.post(
+          GRAPH_ENDPOINTS[chain.id],
+          {
+            query: `
+        query MyQuery {
+          vaultEntities {
+            tvl
+          }
         }
-      );
-      const tvlVaultEntities = response.data.data.vaultEntities;
+      `,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const tvlVaultEntities = response.data.data.vaultEntities;
 
-      const totalTvl = tvlVaultEntities.reduce(
-        (total: bigint, item: { tvl: bigint }) => {
-          return total + BigInt(item.tvl);
-        },
-        BigInt(0)
-      );
-
-      const _tvl = Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100;
+        const totalTvl = tvlVaultEntities.reduce(
+          (total: bigint, item: { tvl: bigint }) => {
+            return total + BigInt(item.tvl);
+          },
+          BigInt(0)
+        );
+        totalVaults += tvlVaultEntities.length;
+        _tvl += Math.trunc(Number(formatUnits(totalTvl, 18)) * 100) / 100;
+      });
 
       setTvl(_tvl);
-      setTotalNumberOfVaults(tvlVaultEntities.length);
+      setTotalNumberOfVaults(totalVaults);
     } catch (error) {
       console.error("Error fetching graph data:", error);
     }
@@ -76,19 +81,19 @@ const Platform = () => {
     if ($publicClient && tvl) {
       try {
         const platformVersion: any = await $publicClient.readContract({
-          address: platform,
+          address: platforms[$currentChainID],
           abi: PlatformABI,
           functionName: "platformVersion",
         });
 
         const platformFees: any = await $publicClient.readContract({
-          address: platform,
+          address: platforms[$currentChainID],
           abi: PlatformABI,
           functionName: "getFees",
         });
 
         const contractData: any = await $publicClient.readContract({
-          address: platform,
+          address: platforms[$currentChainID],
           abi: PlatformABI,
           functionName: "getData",
         });
@@ -127,7 +132,7 @@ const Platform = () => {
   const fetchPlatformUpdates = async () => {
     try {
       const pendingPlatformUpgrade: any = await $publicClient?.readContract({
-        address: platform,
+        address: platforms[$currentChainID],
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });

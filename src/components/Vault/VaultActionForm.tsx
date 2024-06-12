@@ -25,7 +25,7 @@ import {
   assetsPrices,
   assetsBalances,
   account,
-  platformData,
+  platformsData,
   tokens,
   lastTx,
   connected,
@@ -56,11 +56,11 @@ import type {
   TVaultInput,
   TVaultBalance,
   TTokenData,
-  TPlatformData,
+  TPlatformsData,
   TVault,
 } from "@types";
 
-import tokensJson from "../../stability.tokenlist.json";
+import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 interface IProps {
   vault: TVault;
 }
@@ -79,7 +79,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const $assetsPrices: any = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
   const $transactionSettings = useStore(transactionSettings);
-  const $platformData: TPlatformData | any = useStore(platformData);
+  const $platformData: TPlatformsData = useStore(platformsData);
   const $tokens: TAddress[] | any = useStore(tokens);
   const $connected = useStore(connected);
 
@@ -333,7 +333,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
     if (!$tokens) return;
-    let filtredTokens = tokensJson.tokens
+    let filtredTokens = tokenlist.tokens
       .filter((token) => $tokens.includes(token.address.toLowerCase()))
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
@@ -1265,7 +1265,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           )
         );
       } else {
-        const token = tokensJson.tokens.find(
+        const token = tokenlist.tokens.find(
           (token) => token.address === option[changedInput ? 0 : 1]
         );
 
@@ -1454,7 +1454,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
       const txTokens = withdrawAmount.reduce((result, token) => {
-        const JSONToken = tokensJson.tokens.find(
+        const JSONToken = tokenlist.tokens.find(
           (t) => t.symbol === token.symbol
         );
         result[JSONToken.address] = {
@@ -1464,7 +1464,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
       }, {});
 
       const withdrawAmounts = withdrawAmount.map((obj: any) => {
-        const decimals = tokensJson.tokens.find(
+        const decimals = tokenlist.tokens.find(
           (token) => token.symbol === obj.symbol
         )?.decimals;
 
@@ -1813,7 +1813,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 amounts.push(parseUnits("0", decimals));
               }
             } else {
-              const token = tokensJson.tokens.find(
+              const token = tokenlist.tokens.find(
                 (token) => token.address === option[changedInput ? 0 : 1]
               );
 
@@ -2313,7 +2313,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                             htmlFor={asset}
                             className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
                           >
-                            {tokensJson.tokens.map((token) => {
+                            {tokenlist.tokens.map((token) => {
                               if (token.address.toLowerCase() === asset) {
                                 return (
                                   <div
@@ -2537,7 +2537,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                         htmlFor={option[0]}
                         className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
                       >
-                        {tokensJson.tokens.map((token) => {
+                        {tokenlist.tokens.map((token) => {
                           if (token.address === option[0]) {
                             return (
                               <div

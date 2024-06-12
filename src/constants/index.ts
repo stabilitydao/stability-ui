@@ -196,12 +196,16 @@ const DEXes = [
 const CHAINS = [
   {
     name: "Polygon",
+    id: "137",
     logoURI:
       "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+    active: true, // main page active networks
   },
   {
     name: "Base",
+    id: "8453",
     logoURI: "https://www.base.org/document/favicon-32x32.png",
+    active: true, // main page active networks
   },
 ];
 
@@ -288,19 +292,16 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
 } = {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
-// const GRAPH_ENDPOINT =
-//   "https://api.studio.thegraph.com/query/72132/test/v0.3.0";
 
-const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
-  import.meta.env.PUBLIC_GRAPH_API_KEY
-}/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`;
-
-// const GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${}/subgraphs/
-// id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`
-
-// const BASE_GRAPH_ENDPOINT = `https://gateway-arbitrum.network.thegraph.com/api/${
-//   import.meta.env.PUBLIC_GRAPH_API_KEY
-// }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`;
+const GRAPH_ENDPOINTS: { [key: string]: string } = {
+  137: `https://gateway-arbitrum.network.thegraph.com/api/${
+    import.meta.env.PUBLIC_GRAPH_API_KEY
+  }/subgraphs/
+id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`,
+  8453: `https://gateway-arbitrum.network.thegraph.com/api/${
+    import.meta.env.PUBLIC_GRAPH_API_KEY
+  }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`,
+};
 
 const GRAPH_QUERY = `
       {
@@ -395,7 +396,7 @@ export {
   CHAINS,
   TRANSACTION_SETTINGS,
   DEFAULT_TRANSACTION_SETTINGS,
-  GRAPH_ENDPOINT,
+  GRAPH_ENDPOINTS,
   PROTOCOLS,
   GRAPH_QUERY,
   STABILITY_API,

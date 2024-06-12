@@ -12,7 +12,7 @@ import { assetsPrices } from "@store";
 
 import {
   wagmiConfig,
-  defiedgeFactory,
+  defiedgeFactories,
   quickSwapIchiFactory,
   retroIchiFactory,
 } from "@web3";
@@ -70,7 +70,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
         break;
       case "DefiEdge":
         const managerFee = await readContract(wagmiConfig, {
-          address: defiedgeFactory,
+          address: defiedgeFactories["137"],
           abi: [
             {
               inputs: [],
@@ -83,7 +83,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
           functionName: "maximumManagerPerformanceFeeRate",
         });
         const protocolPerformanceFee = await readContract(wagmiConfig, {
-          address: defiedgeFactory,
+          address: defiedgeFactories["137"],
           abi: [
             {
               inputs: [

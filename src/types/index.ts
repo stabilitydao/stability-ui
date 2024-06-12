@@ -40,6 +40,7 @@ type TPlatformData = {
   zap: TAddress;
   buildingPrices: { [vaultType: string]: bigint };
 };
+type TPlatformsData = Record<string, TPlatformData>;
 
 type TUserBalance = {
   buildingPayPerVaultTokenBalance: bigint;
@@ -206,6 +207,7 @@ type TVault = {
   lifetimeTokensHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
+  network: string;
 };
 
 type TTableColumn = {
@@ -408,7 +410,7 @@ type TError = {
 };
 
 export type {
-  TPlatformData,
+  TPlatformsData,
   TUserBalance,
   TInitParams,
   TAllowedBBTokenVaults,

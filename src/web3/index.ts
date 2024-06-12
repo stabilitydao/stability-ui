@@ -1,4 +1,5 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
+import { usePublicClient } from "wagmi";
 
 import { createWalletClient, http } from "viem";
 
@@ -21,13 +22,24 @@ import DividendTokenABI from "./abi/DividendTokenABI.ts";
 import ICHIABI from "./abi/ICHIABI.ts";
 import PriceReaderABI from "./abi/PriceReaderABI.ts";
 
+import type { TAddress } from "@types";
+
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 // 137 || 8453
-const platform = deployments[8453].platform;
+const platforms: { [key: string]: TAddress } = {
+  "137": deployments[137]?.platform,
+  "8453": deployments[8453]?.platform,
+};
 
-const priceReader = deployments[8453].priceReader;
+const priceReaders: { [key: string]: TAddress } = {
+  "137": deployments[137].priceReader,
+  "8453": deployments[8453].priceReader,
+};
 
-const defiedgeFactory = "0x730d158D29165C55aBF368e9608Af160DD21Bd80";
+const defiedgeFactories: { [key: string]: TAddress } = {
+  "137": "0x730d158D29165C55aBF368e9608Af160DD21Bd80",
+  "8453": "0xa631c80f5F4739565d8793cAB6fD08812cE3337D",
+};
 
 const quickSwapIchiFactory = "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a";
 
@@ -45,19 +57,20 @@ const wagmiConfig = defaultWagmiConfig({
   projectId: walletConnectProjectId,
   metadata,
 });
+
 const walletClient = createWalletClient({
   chain: polygon,
   transport: http(),
 });
 
 export {
-  platform,
-  defiedgeFactory,
+  platforms,
+  defiedgeFactories,
   quickSwapIchiFactory,
   retroIchiFactory,
   walletConnectProjectId,
   walletClient,
-  priceReader,
+  priceReaders,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,
   ERC20DQMFABI,

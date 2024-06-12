@@ -3,11 +3,17 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import { connected, platformData, vaultTypes, strategyTypes } from "@store";
+import {
+  connected,
+  platformsData,
+  vaultTypes,
+  strategyTypes,
+  currentChainID,
+} from "@store";
 
 import { FactoryABI, StrategyABI, wagmiConfig } from "@web3";
 
-import type { TAddress, TPlatformData, TVault } from "@types";
+import type { TAddress, TPlatformsData, TVault } from "@types";
 
 interface IProps {
   vault: TVault;
@@ -15,9 +21,10 @@ interface IProps {
 
 const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
-  const $platformData: TPlatformData | any = useStore(platformData);
+  const $platformsData: TPlatformsData = useStore(platformsData);
   const $vaultTypes = useStore(vaultTypes);
   const $strategyTypes = useStore(strategyTypes);
+  const $currentChainID = useStore(currentChainID);
 
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
   const [needStrategyUpgrade, setNeedStrategyUpgrade] =
@@ -26,7 +33,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const upgradeVault = async () => {
     try {
       const upgradeVaultProxy = await writeContract(wagmiConfig, {
-        address: $platformData.factory,
+        address: $platformsData[$currentChainID].factory,
         abi: FactoryABI,
         functionName: "upgradeVaultProxy",
         args: [vault?.address as TAddress],
@@ -47,7 +54,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const upgradeStrategy = async () => {
     try {
       const upgradeStrategyProxy = await writeContract(wagmiConfig, {
-        address: $platformData.factory,
+        address: $platformsData[$currentChainID].factory,
         abi: FactoryABI,
         functionName: "upgradeStrategyProxy",
         args: [vault.strategyAddress as TAddress],

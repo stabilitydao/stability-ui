@@ -4,7 +4,7 @@ import { deployments } from "@stabilitydao/stability";
 
 import { PROTOCOLS } from "@constants";
 
-import { apiData, platformVersion, currentChainID } from "@store";
+import { apiData, platformVersions, currentChainID } from "@store";
 
 import packageJson from "../../../package.json";
 
@@ -55,7 +55,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
   const modalRef: any = useRef(null);
 
   const $currentChainID = useStore(currentChainID);
-  const $platformVersion = useStore(platformVersion);
+  const $platformVersions = useStore(platformVersions);
   const $apiData = useStore(apiData);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
@@ -176,7 +176,9 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                       alt="Stability"
                       className="w-[20px] h-[20px]"
                     />
-                    <span>Stability Platform {$platformVersion}</span>
+                    <span>
+                      Stability Platform {$platformVersions[$currentChainID]}
+                    </span>
                   </div>
                   <div className="flex flex-wrap mt-2">
                     {Object.keys(deployments[$currentChainID]).map(

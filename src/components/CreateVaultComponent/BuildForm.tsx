@@ -14,11 +14,12 @@ import { Loader } from "@components";
 import { FactoryABI, ERC20ABI } from "@web3";
 import {
   account,
-  platformData,
+  platformsData,
   userBalance,
   lastTx,
   assetsBalances,
   assetsPrices,
+  currentChainID,
 } from "@store";
 
 import type { TInitParams, TAddress, TInputItem } from "@types";
@@ -26,7 +27,7 @@ import { getTokenData } from "@utils";
 
 import { wagmiConfig } from "@web3";
 
-import tokensJson from "../../stability.tokenlist.json";
+import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 interface IProps {
   vaultType: string;
@@ -50,10 +51,11 @@ const BuildForm = ({
   nftData,
 }: IProps) => {
   const $account = useStore(account);
-  const $platformData = useStore(platformData);
+  const $platformsData = useStore(platformsData);
   const $balance = useStore(userBalance);
   const $assetsBalances: any = useStore(assetsBalances);
   const $assetsPrices: any = useStore(assetsPrices);
+  const $currentChainID = useStore(currentChainID);
   const _publicClient = usePublicClient();
   // todo implement using
   const canUsePermitToken = false;
@@ -62,17 +64,17 @@ const BuildForm = ({
   const BRT = [
     ...new Set([initParams.initVaultAddresses[0], ...defaultBoostTokens]),
   ].map((addr) => ({
-    symbol: tokensJson.tokens.find((token) => token.address === addr)?.symbol,
+    symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
       $assetsBalances[addr] || "0",
-      tokensJson.tokens.find((token) => token.address === addr)?.decimals ?? 18
+      tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
     price: formatUnits($assetsPrices[addr] || "0", 18),
     sum: "",
     allowance: "",
     decimals:
-      tokensJson.tokens.find((token) => token.address === addr)?.decimals ?? 18,
+      tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18,
   }));
 
   const [boostRewardsTokens, setBoostRewardsTokens] = useState(BRT);
@@ -140,14 +142,17 @@ const BuildForm = ({
   };
 
   const getTokensAllowance = async (tokens: any) => {
-    if ($platformData) {
+    if ($platformsData[$currentChainID]) {
       const allowances: any[] = await Promise.all(
         tokens.map(async (token: any) => {
           const response: any = await readContract(wagmiConfig, {
             address: token.address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
-            args: [$account as TAddress, $platformData?.factory],
+            args: [
+              $account as TAddress,
+              $platformsData[$currentChainID]?.factory,
+            ],
           });
           return response;
         })
@@ -168,14 +173,14 @@ const BuildForm = ({
     }
   };
   const approveRewardingVaultTokens = async () => {
-    if ($platformData && rewardingVaultApprove?.length) {
+    if ($platformsData[$currentChainID] && rewardingVaultApprove?.length) {
       try {
         rewardingVaultApprove.map(async (token: any) => {
           const approve = await writeContract(wagmiConfig, {
             address: token.address,
             abi: ERC20ABI,
             functionName: "approve",
-            args: [$platformData.factory, maxUint256],
+            args: [$platformsData[$currentChainID]?.factory, maxUint256],
           });
           setLoader(true);
           const transaction = await waitForTransactionReceipt(wagmiConfig, {
@@ -202,10 +207,10 @@ const BuildForm = ({
       parseUnits(item.sum, item.decimals)
     );
 
-    if ($platformData) {
+    if ($platformsData[$currentChainID]) {
       try {
         const deployVaultAndStrategy = await writeContract(wagmiConfig, {
-          address: $platformData.factory,
+          address: $platformsData[$currentChainID]?.factory,
           abi: FactoryABI,
           functionName: "deployVaultAndStrategy",
           args: [
@@ -239,22 +244,22 @@ const BuildForm = ({
 
   //// compounding vault
   const checkAllowance = async () => {
-    if (needCheckAllowance && $platformData) {
+    if (needCheckAllowance && $platformsData[$currentChainID]) {
       const allowance = await readContract(wagmiConfig, {
-        address: $platformData.buildingPayPerVaultToken,
+        address: $platformsData[$currentChainID]?.buildingPayPerVaultToken,
         abi: ERC20ABI,
         functionName: "allowance",
-        args: [$account as TAddress, $platformData?.factory],
+        args: [$account as TAddress, $platformsData[$currentChainID]?.factory],
       });
       setAllowance(allowance as bigint);
     }
   };
   const deploy = async () => {
     //todo combine deploy and deployRewardingVault
-    if ($platformData) {
+    if ($platformsData[$currentChainID]) {
       try {
         const deployVaultAndStrategy = await writeContract(wagmiConfig, {
-          address: $platformData.factory,
+          address: $platformsData[$currentChainID]?.factory,
           abi: FactoryABI,
           functionName: "deployVaultAndStrategy",
           args: [
@@ -287,13 +292,13 @@ const BuildForm = ({
   };
 
   const approve = async () => {
-    if ($platformData) {
+    if ($platformsData[$currentChainID]) {
       try {
         const approve = await writeContract(wagmiConfig, {
-          address: $platformData.buildingPayPerVaultToken,
+          address: $platformsData[$currentChainID]?.buildingPayPerVaultToken,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [$platformData.factory, maxUint256],
+          args: [$platformsData[$currentChainID]?.factory, maxUint256],
         });
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
@@ -303,10 +308,14 @@ const BuildForm = ({
           lastTx.set(transaction?.transactionHash);
           setAllowance(
             (await readContract(wagmiConfig, {
-              address: $platformData.buildingPayPerVaultToken,
+              address:
+                $platformsData[$currentChainID]?.buildingPayPerVaultToken,
               abi: ERC20ABI,
               functionName: "allowance",
-              args: [$account as TAddress, $platformData?.factory],
+              args: [
+                $account as TAddress,
+                $platformsData[$currentChainID]?.factory,
+              ],
             })) as bigint
           );
           setLoader(false);
@@ -320,8 +329,8 @@ const BuildForm = ({
   };
 
   const payPerVaultToken =
-    $platformData?.buildingPayPerVaultToken &&
-    getTokenData($platformData.buildingPayPerVaultToken);
+    $platformsData[$currentChainID]?.buildingPayPerVaultToken &&
+    getTokenData($platformsData[$currentChainID].buildingPayPerVaultToken);
 
   useEffect(() => {
     checkAllowance();

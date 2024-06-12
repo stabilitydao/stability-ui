@@ -9,9 +9,11 @@ import { ChartSkeleton } from "@components";
 
 import { formatFromBigInt } from "@utils";
 
-import { GRAPH_ENDPOINT, MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
+import { GRAPH_ENDPOINTS, MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
 import type { TAddress, TChartData } from "@types";
+import { account } from "@store";
+import { useStore } from "@nanostores/react";
 
 interface IProps {
   address: TAddress;
@@ -27,6 +29,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
     MONTH: "MONTH",
     YEAR: "YEAR",
   };
+  const $account = useStore(account);
 
   const [chartData, setChartData] = useState<any>([]);
   const [activeChart, setActiveChart] = useState<any>(false);
@@ -83,7 +86,7 @@ const HistoricalRate: React.FC<IProps> = memo(({ address, vaultStrategy }) => {
                 timestamp
             }}`;
 
-      const graphResponse = await axios.post(GRAPH_ENDPOINT, {
+      const graphResponse = await axios.post(GRAPH_ENDPOINTS, {
         query: HISTORY_QUERY,
       });
 

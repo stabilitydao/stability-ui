@@ -24,8 +24,7 @@ yarn dev
 ### Adding a new strategy
 
 1. Add a protocol logo in the /protocols folder
-2. Update stability.tokenlist.json (if necessary)
-3. Update the PROTOCOLS constant
-4. Add data to getStrategyInfo
-5. Update getProtocolLogo function (if necessary)
-6. Update strategy specific substitute (if necessary)
+2. Update the PROTOCOLS constant
+3. Add data to getStrategyInfo
+4. Update getProtocolLogo function (if necessary)
+5. Update strategy specific substitute (if necessary)
