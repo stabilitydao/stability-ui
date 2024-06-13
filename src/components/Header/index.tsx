@@ -31,9 +31,6 @@ const Header = () => {
           <a className={currentPath === "" ? "active font-bold" : ""} href="/">
             Vaults
           </a>
-          {/* <a className={currentPath === "dao" ? "active" : ""} href="/dao">
-      DAO
-    </a> */}
         </div>
         <div className="flex sm:w-8/12 md:w-5/12 justify-end">
           <Wallet />

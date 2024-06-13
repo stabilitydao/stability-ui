@@ -20,6 +20,7 @@ import {
 import type { TVault } from "@types";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
@@ -38,7 +39,7 @@ type TAlmTable = {
   tvl: string;
 };
 
-const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
+const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
@@ -172,9 +173,9 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     if (fee) setAlmFee(fee);
   };
   const getTableData = async () => {
-    if (!$assetsPrices || !vault?.alm?.positions) return;
+    if (!$assetsPrices[network] || !vault?.alm?.positions) return;
     const prices = vault.assets.map((asset) =>
-      Number(formatUnits($assetsPrices[asset.address], 18))
+      Number(formatUnits($assetsPrices[network][asset.address], 18))
     );
 
     const data = vault?.alm?.positions.map((position) => {
@@ -215,10 +216,12 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     getAlmFee();
     getTableData();
     // ASSETS
-    if (!$assetsPrices) return;
+    if (!$assetsPrices[network]) return;
 
     const assets = vault.assets.map((asset, index) => {
-      const price = Number(formatUnits($assetsPrices[asset.address], 18));
+      const price = Number(
+        formatUnits($assetsPrices[network][asset.address], 18)
+      );
 
       //@ts-ignore
       const amount = vault?.alm?.[`amountToken${index}`] || 0;

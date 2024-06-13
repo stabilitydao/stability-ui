@@ -340,20 +340,6 @@ type TPieChartData = {
   decimals: number;
 };
 
-//// DAO
-type TDAOData = {
-  platformVersion: string;
-  platformGovernance: string;
-  multisigAddress: string;
-  strategieNames: string[];
-  platformFee: string;
-  vaultManagerFee: string;
-  typesOfVaults: string;
-  strategyLogicFee: string;
-  ecosystemFee: string;
-  farmsLength: number;
-};
-
 type TPendingPlatformUpgrade = {
   newVersion: string;
   proxies: string[];
@@ -434,7 +420,6 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
-  TDAOData,
   TGitHubUser,
   TMultisigBalance,
   TMultiTokenData,

@@ -1,4 +1,4 @@
-const Skeleton = (props) => {
+const Skeleton = (props: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="100"

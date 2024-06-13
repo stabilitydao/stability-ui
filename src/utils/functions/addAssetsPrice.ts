@@ -1,4 +1,3 @@
-import { assetsPrices } from "@store";
 import type { TAddress, TAssetPrices } from "@types";
 
 export const addAssetsPrice = (data: any) => {
@@ -11,7 +10,6 @@ export const addAssetsPrice = (data: any) => {
       for (let i = 0; i < tokenAdress.length; i++) {
         assetPrice[tokenAdress[i]] = tokenPrice[i];
       }
-      assetsPrices.set(assetPrice);
     }
     return assetPrice;
   } catch (error) {

@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
+import {
+  formatUnits,
+  parseUnits,
+  zeroAddress,
+  maxUint256,
+  getAddress,
+} from "viem";
 
 import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import {
@@ -62,11 +68,22 @@ import type {
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
-const VaultActionForm: React.FC<IProps> = ({ vault }) => {
+const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   const _publicClient = usePublicClient();
+
+  const maticClient = usePublicClient({
+    chainId: 137,
+    config: wagmiConfig,
+  });
+
+  const baseClient = usePublicClient({
+    chainId: 8453,
+    config: wagmiConfig,
+  });
 
   const { open } = useWeb3Modal();
 
@@ -78,6 +95,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const $account = useStore(account);
   const $assetsPrices: any = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
+
   const $transactionSettings = useStore(transactionSettings);
   const $platformData: TPlatformsData = useStore(platformsData);
   const $tokens: TAddress[] | any = useStore(tokens);
@@ -158,7 +176,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     let change = false;
 
     for (let i = 0; i < input.length; i++) {
-      if ($assetsBalances && input[i] > $assetsBalances[$assets[i]]) {
+      if (
+        $assetsBalances[network] &&
+        input[i] > $assetsBalances[network][$assets[i]]
+      ) {
         setIsApprove(0);
         change = true;
       }
@@ -169,8 +190,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           if (
             allowance &&
             $assets &&
-            $assetsBalances &&
-            input[i] <= $assetsBalances[$assets[0]] &&
+            $assetsBalances[network] &&
+            input[i] <= $assetsBalances[network][$assets[0]] &&
             allowance[$assets[0]]?.allowance[0] >= input[i]
           ) {
             apprDepo.push(1);
@@ -181,8 +202,8 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
           if (
             allowance &&
             $assets &&
-            $assetsBalances &&
-            input[i] <= $assetsBalances[$assets[i]] &&
+            $assetsBalances[network] &&
+            input[i] <= $assetsBalances[network][$assets[i]] &&
             allowance[$assets[i]]?.allowance[0] >= input[i]
           ) {
             apprDepo.push(1);
@@ -332,9 +353,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   /////
   /////   SELECT TOKENS
   const selectTokensHandler = async () => {
-    if (!$tokens) return;
+    if (!$tokens[network]) return;
     let filtredTokens = tokenlist.tokens
-      .filter((token) => $tokens.includes(token.address.toLowerCase()))
+      .filter((token) => $tokens[network].includes(token.address.toLowerCase()))
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     filtredTokens = filtredTokens.filter(
@@ -414,6 +435,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   /////
   /////         ZAP
   const getZapAllowance = async (asset = option[0]) => {
+    asset = getAddress(asset);
     let allowanceData;
     if (tab === "Deposit") {
       if (asset === underlyingToken?.address) {
@@ -460,7 +482,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
         tab === "Withdraw" &&
         Number(amount) >
           parseFloat(
-            formatUnits($vaultData[vault.address].vaultUserBalance, 18)
+            formatUnits($vaultData[network][vault.address].vaultUserBalance, 18)
           )
       ) {
         setZapButton("insufficientBalance");
@@ -515,7 +537,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             getZapDepositSwapAmounts(amount);
             return;
           }
-
+          console.log(asset);
           const allowanceData = await getZapAllowance(asset);
 
           if (tab === "Withdraw") {
@@ -1624,13 +1646,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const loadAssetsBalances = () => {
     const balance: TVaultBalance | any = {};
 
-    if ($assetsBalances) {
+    if ($assetsBalances[network]) {
       for (let i = 0; i < option.length; i++) {
         const decimals = getTokenData(option[i])?.decimals;
 
         if (decimals) {
           balance[option[i]] = formatUnits(
-            $assetsBalances[option[i]],
+            $assetsBalances[network][option[i].toLowerCase()],
             decimals
           );
         }
@@ -1645,7 +1667,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
   const debouncedPreviewWithdraw = useCallback(
     debounce(async (value: string) => {
       const balance = Number(
-        formatUnits($vaultData[vault.address].vaultUserBalance, 18)
+        formatUnits($vaultData[network][vault.address].vaultUserBalance, 18)
       );
       if (!Number(value)) {
         setWithdrawAmount(false);
@@ -1706,7 +1728,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
             );
             const amountInUSD =
               amountInTokens *
-              Number(formatUnits($assetsPrices[assets[index]], 18));
+              Number(formatUnits($assetsPrices[network][assets[index]], 18));
             return {
               symbol: tokenData?.symbol,
               logo: tokenData?.logoURI,
@@ -1764,12 +1786,22 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
     const allowanceResult: TVaultAllowance | any = {};
 
     for (let i = 0; i < option.length; i++) {
-      const allowanceData = (await readContract(wagmiConfig, {
-        address: option[i] as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, vault.address],
-      })) as bigint;
+      let allowanceData;
+      if (network === "137") {
+        allowanceData = await maticClient.readContract({
+          address: option[i] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault.address],
+        });
+      } else if (network === "8453") {
+        allowanceData = await baseClient.readContract({
+          address: option[i] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault.address],
+        });
+      }
 
       if (!allowanceResult[option[i]]) {
         allowanceResult[option[i]] = { allowance: [] };
@@ -2381,12 +2413,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                         <p>
                           $
-                          {$assetsPrices &&
+                          {$assetsPrices[network] &&
                           inputs[asset]?.amount > 0 &&
                           underlyingToken?.address != option[0]
                             ? (
-                                Number(formatUnits($assetsPrices[asset], 18)) *
-                                inputs[asset].amount
+                                Number(
+                                  formatUnits($assetsPrices[network][asset], 18)
+                                ) * inputs[asset].amount
                               ).toFixed(2)
                             : 0}
                         </p>
@@ -2430,7 +2463,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </div>
                 {$connected ? (
                   <>
-                    {chain?.id === 137 ? (
+                    {chain?.id === Number(network) ? (
                       <>
                         {isApprove === 1 ? (
                           <button
@@ -2505,7 +2538,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                       </>
                     ) : (
                       <button
-                        onClick={() => switchChain({ chainId: 137 })}
+                        onClick={() =>
+                          switchChain({ chainId: Number(network) })
+                        }
                         className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                         type="button"
                       >
@@ -2610,12 +2645,13 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                     <p>
                       $
-                      {$assetsPrices &&
+                      {$assetsPrices[network] &&
                       inputs[option[0]]?.amount > 0 &&
                       underlyingToken?.address !== option[0]
                         ? (
-                            Number(formatUnits($assetsPrices[option[0]], 18)) *
-                            inputs[option[0]]?.amount
+                            Number(
+                              formatUnits($assetsPrices[network][option[0]], 18)
+                            ) * inputs[option[0]]?.amount
                           ).toFixed(2)
                         : 0}
                     </p>
@@ -2812,7 +2848,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   <>
                     {$connected ? (
                       <>
-                        {chain?.id === 137 ? (
+                        {chain?.id === Number(network) ? (
                           <>
                             {isApprove === 1 ? (
                               <button
@@ -2917,7 +2953,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           </>
                         ) : (
                           <button
-                            onClick={() => switchChain({ chainId: 137 })}
+                            onClick={() =>
+                              switchChain({ chainId: Number(network) })
+                            }
                             className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                             type="button"
                           >
@@ -2939,7 +2977,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   <>
                     {$connected ? (
                       <>
-                        {chain?.id === 137 ? (
+                        {chain?.id === Number(network) ? (
                           <>
                             {zapButton === "insufficientBalance" ? (
                               <button
@@ -3003,7 +3041,9 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           </>
                         ) : (
                           <button
-                            onClick={() => switchChain({ chainId: 137 })}
+                            onClick={() =>
+                              switchChain({ chainId: Number(network) })
+                            }
                             className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                             type="button"
                           >
@@ -3036,7 +3076,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                     Balance:{" "}
                     {parseFloat(
                       formatUnits(
-                        $vaultData[vault.address].vaultUserBalance,
+                        $vaultData[network][vault.address].vaultUserBalance,
                         18
                       )
                     )}
@@ -3051,14 +3091,16 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                           onClick={() => {
                             zapInputHandler(
                               formatUnits(
-                                $vaultData[vault.address]?.vaultUserBalance,
+                                $vaultData[network][vault.address]
+                                  ?.vaultUserBalance,
                                 18
                               ),
                               option[0]
                             );
                             previewWithdraw(
                               formatUnits(
-                                $vaultData[vault.address]?.vaultUserBalance,
+                                $vaultData[network][vault.address]
+                                  ?.vaultUserBalance,
                                 18
                               )
                             );
@@ -3108,7 +3150,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                   <p>
                     $
-                    {$assetsPrices && inputs[option[0]]?.amount > 0
+                    {$assetsPrices[network] && inputs[option[0]]?.amount > 0
                       ? (
                           Number(vault.shareprice) * inputs[option[0]]?.amount
                         ).toFixed(2)
@@ -3296,7 +3338,10 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                                         )
                                       : 0)) *
                                   Number(
-                                    formatUnits($assetsPrices[option[0]], 18)
+                                    formatUnits(
+                                      $assetsPrices[network][option[0]],
+                                      18
+                                    )
                                   )
                                 ).toFixed(2)})`}</p>
                               </div>
@@ -3310,7 +3355,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                   </div>
                 )}
               </div>
-              {chain?.id === 137 ? (
+              {chain?.id === Number(network) ? (
                 <>
                   {zapButton === "insufficientBalance" ? (
                     <button
@@ -3358,7 +3403,7 @@ const VaultActionForm: React.FC<IProps> = ({ vault }) => {
                 </>
               ) : (
                 <button
-                  onClick={() => switchChain({ chainId: 137 })}
+                  onClick={() => switchChain({ chainId: Number(network) })}
                   className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
                   type="button"
                 >

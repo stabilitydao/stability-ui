@@ -22,9 +22,10 @@ import type { TAddress } from "@types";
 
 interface IProps {
   vault: TAddress;
+  network: string;
 }
 
-const Vault: React.FC<IProps> = ({ vault }) => {
+const Vault: React.FC<IProps> = ({ vault, network }) => {
   const $vaultData = useStore(vaultData);
   const $vaults = useStore(vaults);
 
@@ -41,7 +42,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
 
   useEffect(() => {
     if ($vaults && vault) {
-      setLocalVault($vaults[vault.toLowerCase()]);
+      setLocalVault($vaults[network][vault.toLowerCase()]);
     }
   }, [$vaults, $vaultData]);
 
@@ -58,9 +59,10 @@ const Vault: React.FC<IProps> = ({ vault }) => {
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
           <div className="w-full md:w-1/2 lg:w-3/5 ">
-            <InfoBar vault={localVault} />
+            <InfoBar network={network} vault={localVault} />
 
             <HistoricalRate
+              network={network}
               address={vault.toLowerCase() as TAddress}
               vaultStrategy={localVault.strategy}
             />
@@ -68,7 +70,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <Toast />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">
-            <VaultActionForm vault={localVault} />
+            <VaultActionForm network={network} vault={localVault} />
           </div>
         </div>
 
@@ -77,7 +79,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <YieldBar vault={localVault} />
           </div>
           <div className="w-full lg:w-1/2">
-            <Contracts vault={localVault} />
+            <Contracts vault={localVault} network={network} />
           </div>
         </div>
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
@@ -85,7 +87,7 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             <VaultInfo vault={localVault} />
           </div>
           <div className="w-full lg:w-1/2">
-            <Strategy vault={localVault} />
+            <Strategy network={network} vault={localVault} />
           </div>
         </div>
 
@@ -94,14 +96,15 @@ const Vault: React.FC<IProps> = ({ vault }) => {
             {localVault.assets.length > 1 &&
               localVault?.pool &&
               localVault?.strategy != "Curve Convex Farm" && (
-                <LiquidityPool vault={localVault} />
+                <LiquidityPool network={network} vault={localVault} />
               )}
           </div>
           <div className="w-full lg:w-1/2">
-            {isALM && <UnderlyingALM vault={localVault} />}
+            {isALM && <UnderlyingALM network={network} vault={localVault} />}
           </div>
         </div>
         <Assets
+          network={network}
           assets={localVault?.assets}
           created={localVault.created}
           pricesOnCreation={localVault.assetsPricesOnCreation}

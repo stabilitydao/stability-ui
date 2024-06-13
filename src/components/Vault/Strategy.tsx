@@ -16,15 +16,15 @@ import { FactoryABI, StrategyABI, wagmiConfig } from "@web3";
 import type { TAddress, TPlatformsData, TVault } from "@types";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
-const Strategy: React.FC<IProps> = memo(({ vault }) => {
+const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   const $connected = useStore(connected);
   const $platformsData: TPlatformsData = useStore(platformsData);
   const $vaultTypes = useStore(vaultTypes);
   const $strategyTypes = useStore(strategyTypes);
-  const $currentChainID = useStore(currentChainID);
 
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
   const [needStrategyUpgrade, setNeedStrategyUpgrade] =
@@ -33,7 +33,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const upgradeVault = async () => {
     try {
       const upgradeVaultProxy = await writeContract(wagmiConfig, {
-        address: $platformsData[$currentChainID].factory,
+        address: $platformsData[network].factory,
         abi: FactoryABI,
         functionName: "upgradeVaultProxy",
         args: [vault?.address as TAddress],
@@ -54,7 +54,7 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
   const upgradeStrategy = async () => {
     try {
       const upgradeStrategyProxy = await writeContract(wagmiConfig, {
-        address: $platformsData[$currentChainID].factory,
+        address: $platformsData[network].factory,
         abi: FactoryABI,
         functionName: "upgradeStrategyProxy",
         args: [vault.strategyAddress as TAddress],
@@ -79,11 +79,11 @@ const Strategy: React.FC<IProps> = memo(({ vault }) => {
     const strategyTypesKey =
       vault.strategy.toLowerCase() as keyof typeof $strategyTypes;
 
-    if ($vaultTypes[vaultTypesKey] !== vault.version) {
+    if ($vaultTypes[network][vaultTypesKey] !== vault.version) {
       setNeedVaultUpgrade(true);
     }
 
-    if ($strategyTypes[strategyTypesKey] !== vault.strategyVersion) {
+    if ($strategyTypes[network][strategyTypesKey] !== vault.strategyVersion) {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, $vaultTypes, $strategyTypes]);

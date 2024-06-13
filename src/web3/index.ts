@@ -1,5 +1,4 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-import { usePublicClient } from "wagmi";
 
 import { createWalletClient, http } from "viem";
 

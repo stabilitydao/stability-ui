@@ -6,7 +6,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { useStore } from "@nanostores/react";
 
-import { deployments } from "@stabilitydao/stability";
+// import { deployments } from "@stabilitydao/stability";
 
 import { APRModal } from "./APRModal";
 import { VSHoldModal } from "./VSHoldModal";
@@ -42,7 +42,7 @@ import {
   getStrategyShortName,
   formatFromBigInt,
   getTimeDifference,
-  getDate,
+  // getDate,
   // getTokenData,
 } from "@utils";
 
@@ -57,7 +57,7 @@ import {
   // WMATIC,
 } from "@constants";
 
-import { platforms, PlatformABI } from "@web3";
+// import { platforms, PlatformABI } from "@web3";
 
 import type {
   TVault,
@@ -84,7 +84,7 @@ const Vaults = () => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
-  const $publicClient = useStore(publicClient);
+  // const $publicClient = useStore(publicClient);
   const $platformVersions = useStore(platformVersions);
   const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
@@ -135,8 +135,8 @@ const Vaults = () => {
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
 
-  const toVault = (address: string) => {
-    window.location.href = `/vault/${address}`;
+  const toVault = (network: string, address: string) => {
+    window.location.href = `/vault/${network}/${address}`;
   };
 
   const compareHandler = (
@@ -238,14 +238,19 @@ const Vaults = () => {
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
     const searchValue: string = String(search?.current?.value.toLowerCase());
-    let abc = {};
-    activeNetworks.map((network) => {
+
+    let activeNetworksVaults: { [key: string]: TVault[] } = {};
+
+    activeNetworks.forEach((network) => {
       if (network.active) {
-        abc[network.id] = $vaults[network.id];
+        activeNetworksVaults[network.id] = $vaults[network.id];
       }
     });
 
-    const mixedVaults: { [key: string]: TVault } = Object.values(abc).reduce<{
+    //@ts-ignore
+    const mixedVaults: { [key: string]: TVault } = Object.values(
+      activeNetworksVaults
+    ).reduce<{
       [key: string]: TVault;
     }>((acc, value) => {
       return { ...acc, ...value };
@@ -351,95 +356,97 @@ const Vaults = () => {
     setTableStates(table);
   };
 
-  const fetchPlatformUpdates = async () => {
-    try {
-      const pendingPlatformUpgrade: any = await $publicClient?.readContract({
-        address: platforms[$currentChainID],
-        abi: PlatformABI,
-        functionName: "pendingPlatformUpgrade",
-      });
-      let upgrated = [];
-      if (pendingPlatformUpgrade?.proxies.length) {
-        const promises = pendingPlatformUpgrade.proxies.map(
-          async (proxy: TAddress, index: number) => {
-            const moduleContracts = Object.keys(deployments[$currentChainID]);
-            const upgratedData = await Promise.all(
-              moduleContracts.map(async (moduleContract: string) => {
-                const address = deployments[$currentChainID][moduleContract];
-                if (proxy === address) {
-                  const oldImplementation = await $publicClient?.readContract({
-                    address: address,
-                    abi: [
-                      {
-                        inputs: [],
-                        name: "implementation",
-                        outputs: [
-                          {
-                            internalType: "address",
-                            name: "",
-                            type: "address",
-                          },
-                        ],
-                        stateMutability: "view",
-                        type: "function",
-                      },
-                    ],
-                    functionName: "implementation",
-                  });
-                  const oldImplementationVersion =
-                    await $publicClient?.readContract({
-                      address: oldImplementation,
-                      abi: PlatformABI,
-                      functionName: "VERSION",
-                    });
-                  const newImplementationVersion =
-                    await $publicClient?.readContract({
-                      address: pendingPlatformUpgrade.newImplementations[index],
-                      abi: PlatformABI,
-                      functionName: "VERSION",
-                    });
-                  return {
-                    contract: moduleContract,
-                    oldVersion: oldImplementationVersion,
-                    newVersion: newImplementationVersion,
-                    proxy: proxy,
-                    oldImplementation: oldImplementation,
-                    newImplementation:
-                      pendingPlatformUpgrade.newImplementations[index],
-                  };
-                }
-              })
-            );
-            return upgratedData.filter((data) => data !== undefined);
-          }
-        );
-        upgrated = (await Promise.all(promises)).flat();
-      }
+  // const fetchPlatformUpdates = async () => {
+  //   try {
+  //     const pendingPlatformUpgrade: any = await $publicClient?.readContract({
+  //       address: platforms[$currentChainID],
+  //       abi: PlatformABI,
+  //       functionName: "pendingPlatformUpgrade",
+  //     });
+  //     let upgrated = [];
+  //     if (pendingPlatformUpgrade?.proxies.length) {
+  //       const promises = pendingPlatformUpgrade.proxies.map(
+  //         async (proxy: TAddress, index: number) => {
+  //           const moduleContracts = Object.keys(deployments[$currentChainID]);
+  //           const upgratedData = await Promise.all(
+  //             moduleContracts.map(async (moduleContract: string) => {
+  //               //Can't use CoreContracts type
+  //               //@ts-ignore
+  //               const address = deployments[$currentChainID][moduleContract];
+  //               if (proxy === address) {
+  //                 const oldImplementation = await $publicClient?.readContract({
+  //                   address: address,
+  //                   abi: [
+  //                     {
+  //                       inputs: [],
+  //                       name: "implementation",
+  //                       outputs: [
+  //                         {
+  //                           internalType: "address",
+  //                           name: "",
+  //                           type: "address",
+  //                         },
+  //                       ],
+  //                       stateMutability: "view",
+  //                       type: "function",
+  //                     },
+  //                   ],
+  //                   functionName: "implementation",
+  //                 });
+  //                 const oldImplementationVersion =
+  //                   await $publicClient?.readContract({
+  //                     address: oldImplementation,
+  //                     abi: PlatformABI,
+  //                     functionName: "VERSION",
+  //                   });
+  //                 const newImplementationVersion =
+  //                   await $publicClient?.readContract({
+  //                     address: pendingPlatformUpgrade.newImplementations[index],
+  //                     abi: PlatformABI,
+  //                     functionName: "VERSION",
+  //                   });
+  //                 return {
+  //                   contract: moduleContract,
+  //                   oldVersion: oldImplementationVersion,
+  //                   newVersion: newImplementationVersion,
+  //                   proxy: proxy,
+  //                   oldImplementation: oldImplementation,
+  //                   newImplementation:
+  //                     pendingPlatformUpgrade.newImplementations[index],
+  //                 };
+  //               }
+  //             })
+  //           );
+  //           return upgratedData.filter((data) => data !== undefined);
+  //         }
+  //       );
+  //       upgrated = (await Promise.all(promises)).flat();
+  //     }
 
-      /////***** TIME CHECK  *****/////
-      const lockTime: any = await $publicClient?.readContract({
-        address: platforms[$currentChainID],
-        abi: PlatformABI,
-        functionName: "TIME_LOCK",
-      });
-      const platformUpgradeTimelock: any = await $publicClient?.readContract({
-        address: platforms[$currentChainID],
-        abi: PlatformABI,
-        functionName: "platformUpgradeTimelock",
-      });
-      if (lockTime && platformUpgradeTimelock) {
-        setLockTime({
-          start: getDate(Number(platformUpgradeTimelock - lockTime)),
-          end: getDate(Number(platformUpgradeTimelock)),
-        });
-      }
-      /////***** SET DATA  *****/////
-      setUpgradesTable(upgrated);
-      setPlatformUpdates(pendingPlatformUpgrade);
-    } catch (error) {
-      console.error("Error fetching platform updates:", error);
-    }
-  };
+  //     /////***** TIME CHECK  *****/////
+  //     const lockTime: any = await $publicClient?.readContract({
+  //       address: platforms[$currentChainID],
+  //       abi: PlatformABI,
+  //       functionName: "TIME_LOCK",
+  //     });
+  //     const platformUpgradeTimelock: any = await $publicClient?.readContract({
+  //       address: platforms[$currentChainID],
+  //       abi: PlatformABI,
+  //       functionName: "platformUpgradeTimelock",
+  //     });
+  //     if (lockTime && platformUpgradeTimelock) {
+  //       setLockTime({
+  //         start: getDate(Number(platformUpgradeTimelock - lockTime)),
+  //         end: getDate(Number(platformUpgradeTimelock)),
+  //       });
+  //     }
+  //     /////***** SET DATA  *****/////
+  //     setUpgradesTable(upgrated);
+  //     setPlatformUpdates(pendingPlatformUpgrade);
+  //   } catch (error) {
+  //     console.error("Error fetching platform updates:", error);
+  //   }
+  // };
 
   const initFilters = (vaults: TVault[]) => {
     let shortNames: any[] = [
@@ -459,6 +466,7 @@ const Vaults = () => {
 
   const initVaults = async () => {
     if ($vaults) {
+      //@ts-ignore
       const mixedVaults: { [key: string]: TVault } = Object.values(
         $vaults
       ).reduce<{ [key: string]: TVault }>((acc, value) => {
@@ -475,9 +483,9 @@ const Vaults = () => {
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
       /////***** AFTER PAGE LOADING *****/ /////
-      if (!upgradesTable.length) {
-        fetchPlatformUpdates();
-      }
+      // if (!upgradesTable.length) {
+      //   fetchPlatformUpdates();
+      // }
     }
   };
 
@@ -697,7 +705,7 @@ const Vaults = () => {
                   <tr
                     key={vault.name + index}
                     className="text-center text-[14px] md:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
-                    onClick={() => toVault(vault.address)}
+                    onClick={() => toVault(vault.network, vault.address)}
                   >
                     <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[300px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                       <img

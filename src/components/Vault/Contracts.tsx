@@ -4,16 +4,18 @@ import { zeroAddress, getAddress } from "viem";
 
 import { AssetsProportion } from "@components";
 
-import { DEXes } from "@constants";
+import { getProtocolLogo } from "@utils";
+
+import { DEXes, CHAINS } from "@constants";
 
 import type { TAddress, TVault, TContractInfo } from "@types";
-import { getProtocolLogo } from "@utils";
 
 interface IProps {
   vault: TVault;
+  network: string;
 }
 
-const Contracts: React.FC<IProps> = memo(({ vault }) => {
+const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   const [timeoutId, setTimeoutId] = useState<any>();
 
   const [underlyingToken, setUnderlyingToken] = useState({
@@ -136,6 +138,11 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
     () => vault.strategy === "Yearn",
     [vault.strategy]
   );
+  const explorer = useMemo(
+    () => CHAINS.find((chain) => chain.id === network)?.explorer,
+    [network]
+  );
+
   return (
     <div className="rounded-md h-full">
       <div className="flex justify-between items-center h-[60px]">
@@ -231,7 +238,7 @@ const Contracts: React.FC<IProps> = memo(({ vault }) => {
 
                     <a
                       className="flex items-center px-1 py-1 whitespace-nowrap"
-                      href={`https://polygonscan.com/address/${address}`}
+                      href={`${explorer}${address}`}
                       target="_blank"
                     >
                       <svg

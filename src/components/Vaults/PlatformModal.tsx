@@ -183,7 +183,9 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                   <div className="flex flex-wrap mt-2">
                     {Object.keys(deployments[$currentChainID]).map(
                       (moduleContract) => {
+                        //Can't use CoreContracts type
                         const address =
+                          //@ts-ignore
                           deployments[$currentChainID][moduleContract];
 
                         return (

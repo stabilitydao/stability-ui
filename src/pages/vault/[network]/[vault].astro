@@ -4,11 +4,11 @@ import {Vault} from "@components/Vault"
 
 import type { TAddress } from '@types';
 
-const { vault } = Astro.params;
+const { vault,network } = Astro.params;
 ---
   <Layout title="Vault">
     <div class="my-vault">
-      <Vault vault={vault as TAddress} client:only="react" />
+      <Vault vault={vault as TAddress} network={network} client:only="react" />
     </div>
   </Layout>
 

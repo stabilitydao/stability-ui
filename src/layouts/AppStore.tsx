@@ -8,13 +8,6 @@ import axios from "axios";
 import { useStore } from "@nanostores/react";
 
 import { useAccount, usePublicClient } from "wagmi";
-import { readContract } from "@wagmi/core";
-
-import {
-  YEARN_PROTOCOLS,
-  STRATEGY_SPECIFIC_SUBSTITUTE,
-  CHAINS,
-} from "@constants";
 
 import { WagmiLayout } from "@layouts";
 
@@ -41,6 +34,9 @@ import {
   isWeb3Load,
   aprFilter,
   currentChainID,
+  assetsPrices,
+  assetsBalances,
+  vaultData,
 } from "@store";
 
 import {
@@ -69,9 +65,18 @@ import {
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
+  YEARN_PROTOCOLS,
+  STRATEGY_SPECIFIC_SUBSTITUTE,
+  CHAINS,
 } from "@constants";
 
-import type { TAddress, TAssetPrices, THoldData, TYearnProtocol } from "@types";
+import type {
+  TAddress,
+  TAssetPrices,
+  THoldData,
+  TYearnProtocol,
+  TPlatformsData,
+} from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -94,6 +99,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const $reload = useStore(reload);
 
   let localVaults: any = {};
+  let assetPrice: any = {};
 
   let stabilityAPIData: any;
 
@@ -585,8 +591,6 @@ const AppStore = (props: React.PropsWithChildren) => {
       Promise.resolve({})
     );
     localVaults[chainID] = graphVaults;
-
-    // tokens.set(data.platformEntities[0].bcAssets);
   };
 
   const getData = async () => {
@@ -595,11 +599,14 @@ const AppStore = (props: React.PropsWithChildren) => {
     let apiError: string = "";
     const maxRetries = 2;
 
-    let versions = {};
-    let vaultsTokens = {};
-    let platformData = {};
-    let strategyTypeEntities = {};
-    let vaultTypeEntities = {};
+    const versions: Record<string, string> = {};
+    const vaultsTokens: { [key: string]: string[] } = {};
+    const platformData: TPlatformsData = {};
+    const strategyTypeEntities: { [key: string]: any } = {};
+    const vaultTypeEntities: { [key: string]: any } = {};
+    const assetBalances: { [key: string]: bigint } = {};
+    const vaultsData: { [key: string]: bigint } = {};
+
     await Promise.all(
       CHAINS.map(async (chain) => {
         while (retries < maxRetries) {
@@ -643,7 +650,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
           let contractBalance;
 
-          if (chain.id == 137) {
+          if (chain.id === "137") {
             contractBalance = await maticClient.readContract({
               address: platforms[chain.id],
               abi: PlatformABI,
@@ -651,7 +658,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               args: [randomAddress],
             });
           }
-          if (chain.id == 8453) {
+          if (chain.id === "8453") {
             contractBalance = await baseClient.readContract({
               address: platforms[chain.id],
               abi: PlatformABI,
@@ -661,13 +668,14 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
 
           prices = addAssetsPrice(contractBalance) as TAssetPrices;
+          assetPrice[String(chain.id)] = prices;
         } catch (error) {
           console.log("ASSETS PRICE ERROR:", error);
         }
 
         //todo: change this to data from backend
         await setGraphData(graphResponse.data.data, prices, String(chain.id));
-        let contractData;
+        let contractData: any;
         if (chain.id === "137") {
           contractData = await maticClient.readContract({
             address: platforms[chain.id],
@@ -732,8 +740,9 @@ const AppStore = (props: React.PropsWithChildren) => {
               const erc20Balance: { [token: string]: bigint } = {};
               const erc721Balance: { [token: string]: bigint } = {};
               //function -> .set vault/
-              addVaultData(contractBalance);
-              addAssetsBalance(contractBalance);
+              vaultsData[String(chain.id)] = addVaultData(contractBalance);
+              assetBalances[String(chain.id)] =
+                addAssetsBalance(contractBalance);
               //
 
               for (let i = 0; i < contractBalance[1].length; i++) {
@@ -821,6 +830,9 @@ const AppStore = (props: React.PropsWithChildren) => {
       })
     );
 
+    assetsPrices.set(assetPrice);
+    assetsBalances.set(assetBalances);
+    vaultData.set(vaultsData);
     vaults.set(localVaults);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);

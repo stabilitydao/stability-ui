@@ -199,12 +199,14 @@ const CHAINS = [
     id: "137",
     logoURI:
       "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+    explorer: "https://polygonscan.com/address/",
     active: true, // main page active networks
   },
   {
     name: "Base",
     id: "8453",
     logoURI: "https://www.base.org/document/favicon-32x32.png",
+    explorer: "https://basescan.org/address/",
     active: true, // main page active networks
   },
 ];

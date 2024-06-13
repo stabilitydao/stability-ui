@@ -12,6 +12,7 @@ import { assetsPrices } from "@store";
 import type { TVault } from "@types";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
@@ -21,7 +22,7 @@ type TPoolAsset = {
   percent: number;
 };
 
-const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
+const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [poolAssets, setPoolAssets] = useState<TPoolAsset[]>([]);
@@ -37,9 +38,11 @@ const LiquidityPool: React.FC<IProps> = memo(({ vault }) => {
   }, [vault]);
 
   useEffect(() => {
-    if (!$assetsPrices) return;
+    if (!$assetsPrices[network]) return;
     const assets = vault.assets.map((asset, index) => {
-      const price = Number(formatUnits($assetsPrices[asset.address], 18));
+      const price = Number(
+        formatUnits($assetsPrices[network][asset.address], 18)
+      );
 
       //@ts-ignore
       const amount = vault?.pool?.[`amountToken${index}`] || 0;
