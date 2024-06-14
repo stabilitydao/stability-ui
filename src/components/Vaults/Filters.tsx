@@ -145,6 +145,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
   return (
     filters.length && (
       <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-9 select-none lg:min-w-[60%]">

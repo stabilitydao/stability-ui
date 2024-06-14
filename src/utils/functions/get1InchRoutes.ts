@@ -7,6 +7,7 @@ import { getTokenData } from "./getTokenData";
 import type { TAddress } from "@types";
 
 export const get1InchRoutes = async (
+  network: string,
   fromAddress: TAddress,
   toAddress: TAddress,
   decimals: number,
@@ -30,7 +31,7 @@ export const get1InchRoutes = async (
       img: tokenData?.logoURI as string,
     };
   }
-  const url = `https://api.stabilitydao.org/swap/137/${fromAddress}/${toAddress}/${amount}`;
+  const url = `https://api.stabilitydao.org/swap/${network}/${fromAddress}/${toAddress}/${amount}`;
 
   const maxRetries = 3;
   let currentRetry = 0;

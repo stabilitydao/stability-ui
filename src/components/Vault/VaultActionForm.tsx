@@ -73,15 +73,8 @@ interface IProps {
 }
 
 const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
-  const _publicClient = usePublicClient();
-
-  const maticClient = usePublicClient({
-    chainId: 137,
-    config: wagmiConfig,
-  });
-
-  const baseClient = usePublicClient({
-    chainId: 8453,
+  const _publicClient = usePublicClient({
+    chainId: Number(network),
     config: wagmiConfig,
   });
 
@@ -242,7 +235,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     logoURI: string | string[]
   ) => {
     setTokenSelector((prevState) => !prevState);
-
+    option = option.map((address) => address.toLowerCase());
     ///// Option change
     resetInputs(option);
     setOption(option);
@@ -374,32 +367,32 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           let underlyingSymbol = "";
 
           if (vault.strategyInfo.shortName === "DQMF") {
-            underlyingSymbol = await readContract(wagmiConfig, {
+            underlyingSymbol = await _publicClient.readContract({
               address: vault.underlying,
               abi: ERC20DQMFABI,
               functionName: "symbol",
             });
             underlyingSymbol = decodeHex(underlyingSymbol);
           } else {
-            underlyingSymbol = await readContract(wagmiConfig, {
+            underlyingSymbol = await _publicClient.readContract({
               address: vault.underlying,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
             });
           }
 
-          const underlyingDecimals = await readContract(wagmiConfig, {
+          const underlyingDecimals = await _publicClient.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "decimals",
           });
-          const underlyingAllowance = await readContract(wagmiConfig, {
+          const underlyingAllowance = await _publicClient.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "allowance",
             args: [$account as TAddress, vault.address],
           });
-          const underlyingBalance = await readContract(wagmiConfig, {
+          const underlyingBalance = await _publicClient.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "balanceOf",
@@ -439,26 +432,26 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     let allowanceData;
     if (tab === "Deposit") {
       if (asset === underlyingToken?.address) {
-        allowanceData = await readContract(wagmiConfig, {
+        allowanceData = await _publicClient.readContract({
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, vault.address],
         });
       } else {
-        allowanceData = await readContract(wagmiConfig, {
+        allowanceData = await _publicClient.readContract({
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
-          args: [$account as TAddress, $platformData.zap as TAddress],
+          args: [$account as TAddress, $platformData[network]?.zap as TAddress],
         });
       }
     } else {
-      allowanceData = await readContract(wagmiConfig, {
+      allowanceData = await _publicClient.readContract({
         address: vault.address,
         abi: ERC20ABI,
         functionName: "allowance",
-        args: [$account as TAddress, $platformData.zap as TAddress],
+        args: [$account as TAddress, $platformData[network]?.zap as TAddress],
       });
     }
 
@@ -492,7 +485,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (asset === underlyingToken?.address) {
         try {
-          const previewDepositAssets = await readContract(wagmiConfig, {
+          const previewDepositAssets = await _publicClient.readContract({
             address: vault.address,
             abi: VaultABI,
             functionName: "previewDepositAssets",
@@ -500,7 +493,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           });
 
           setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-          const allowanceData = (await readContract(wagmiConfig, {
+          const allowanceData = (await _publicClient.readContract({
             address: option[0] as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -537,7 +530,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             getZapDepositSwapAmounts(amount);
             return;
           }
-          console.log(asset);
+
           const allowanceData = await getZapAllowance(asset);
 
           if (tab === "Withdraw") {
@@ -601,7 +594,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
-            args: [$platformData.zap as TAddress, approveSum],
+            args: [$platformData[network].zap as TAddress, approveSum],
             account: $account as TAddress,
           });
           const gasLimit = BigInt(
@@ -612,7 +605,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
-            args: [$platformData.zap as TAddress, approveSum],
+            args: [$platformData[network].zap as TAddress, approveSum],
             gas: gasLimit,
           });
           setNeedConfirm(false);
@@ -835,7 +828,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         if (vault.strategyInfo.shortName === "CCF") txData[1] = "";
 
         gas = await _publicClient.estimateContractGas({
-          address: $platformData.zap,
+          address: $platformData[network]?.zap,
           abi: ZapABI,
           functionName: "deposit",
           args: [
@@ -853,7 +846,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(true);
 
         zapDeposit = await writeContract(wagmiConfig, {
-          address: $platformData.zap,
+          address: $platformData[network]?.zap,
           abi: ZapABI,
           functionName: "deposit",
           args: [
@@ -915,7 +908,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
       try {
         let previewDepositAssets: any;
-        previewDepositAssets = await readContract(wagmiConfig, {
+        previewDepositAssets = await _publicClient.readContract({
           address: vault.address,
           abi: VaultABI,
           functionName: "previewDepositAssets",
@@ -943,8 +936,8 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
-      const zapAmounts = await readContract(wagmiConfig, {
-        address: $platformData.zap,
+      const zapAmounts = await _publicClient.readContract({
+        address: $platformData[network]?.zap,
         abi: ZapABI,
         functionName: "getDepositSwapAmounts",
         args: [vault.address, option[0], parseUnits(amount, decimals)],
@@ -954,6 +947,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       let outData;
       if (vault?.strategyInfo?.shortName === "CCF") {
         promises = await get1InchRoutes(
+          network,
           option[0],
           zapAmounts[0][1],
           decimals,
@@ -967,6 +961,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           async (toAddress, index) =>
             vault.assetsProportions[index] &&
             (await get1InchRoutes(
+              network,
               option[0],
               toAddress,
               decimals,
@@ -1012,12 +1007,13 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         );
       }
       ///// index ^ 1 --> XOR
+
       amounts = amounts.map((thisAmount, index) => {
         return !thisAmount
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
-      const previewDepositAssets = await readContract(wagmiConfig, {
+      const previewDepositAssets = await _publicClient.readContract({
         address: vault.address,
         abi: VaultABI,
         functionName: "previewDepositAssets",
@@ -1060,7 +1056,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         address: vault.address,
         abi: ERC20ABI,
         functionName: "approve",
-        args: [$platformData.zap, approveSum],
+        args: [$platformData[network]?.zap, approveSum],
         account: $account as TAddress,
       });
 
@@ -1072,7 +1068,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         address: vault.address,
         abi: ERC20ABI,
         functionName: "approve",
-        args: [$platformData.zap, approveSum],
+        args: [$platformData[network]?.zap, approveSum],
         gas: gasLimit,
       });
       setNeedConfirm(false);
@@ -1084,11 +1080,11 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
-        const newAllowance = await readContract(wagmiConfig, {
+        const newAllowance = await _publicClient.readContract({
           address: option[0] as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
-          args: [$account as TAddress, $platformData.zap as TAddress],
+          args: [$account as TAddress, $platformData[network]?.zap as TAddress],
         });
 
         if (
@@ -1178,7 +1174,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
-          const newAllowance = (await readContract(wagmiConfig, {
+          const newAllowance = (await _publicClient.readContract({
             address: asset,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -1204,7 +1200,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         }
       } catch (err) {
         lastTx.set("No approve hash...");
-        const newAllowance = (await readContract(wagmiConfig, {
+        const newAllowance = (await _publicClient.readContract({
           address: asset,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -1571,7 +1567,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       try {
         const gas = await _publicClient.estimateContractGas({
-          address: $platformData.zap,
+          address: $platformData[network]?.zap,
           abi: ZapABI,
           functionName: "withdraw",
           args: [
@@ -1589,7 +1585,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         );
         setNeedConfirm(true);
         zapWithdraw = await writeContract(wagmiConfig, {
-          address: $platformData.zap,
+          address: $platformData[network]?.zap,
           abi: ZapABI,
           functionName: "withdraw",
           args: [
@@ -1747,6 +1743,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             const promises = result.map(
               async (amount, index) =>
                 await get1InchRoutes(
+                  network,
                   assets[index],
                   option[0],
                   Number(getTokenData(assets[index])?.decimals),
@@ -1786,22 +1783,12 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     const allowanceResult: TVaultAllowance | any = {};
 
     for (let i = 0; i < option.length; i++) {
-      let allowanceData;
-      if (network === "137") {
-        allowanceData = await maticClient.readContract({
-          address: option[i] as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, vault.address],
-        });
-      } else if (network === "8453") {
-        allowanceData = await baseClient.readContract({
-          address: option[i] as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, vault.address],
-        });
-      }
+      const allowanceData = await _publicClient.readContract({
+        address: option[i] as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, vault.address],
+      });
 
       if (!allowanceResult[option[i]]) {
         allowanceResult[option[i]] = { allowance: [] };
@@ -1861,7 +1848,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             vault.strategyInfo.shortName !== "IQMF" &&
             vault.strategyInfo.shortName !== "IRMF"
           ) {
-            previewDepositAssets = await readContract(wagmiConfig, {
+            previewDepositAssets = await _publicClient.readContract({
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
@@ -1873,7 +1860,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
-            previewDepositAssets = await readContract(wagmiConfig, {
+            previewDepositAssets = await _publicClient.readContract({
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",

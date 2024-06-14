@@ -84,7 +84,7 @@ const Vault: React.FC<IProps> = ({ vault, network }) => {
         </div>
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            <VaultInfo vault={localVault} />
+            <VaultInfo network={network} vault={localVault} />
           </div>
           <div className="w-full lg:w-1/2">
             <Strategy network={network} vault={localVault} />

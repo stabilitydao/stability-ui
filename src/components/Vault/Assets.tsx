@@ -6,7 +6,7 @@ import { useWalletClient, useAccount, usePublicClient } from "wagmi";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { assetsPrices, connected } from "@store";
+import { assetsPrices, connected, currentChainID } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
@@ -77,6 +77,7 @@ const Assets: React.FC<IProps> = memo(
   ({ network, assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
+    const $currentChainID = useStore(currentChainID);
 
     const client = useWalletClient();
     const { connector } = useAccount();
@@ -181,8 +182,13 @@ const Assets: React.FC<IProps> = memo(
     }, [$connected, $assetsPrices]);
 
     const isAddToWallet = useMemo(() => {
-      return $connected && window.ethereum && connector?.id === "io.metamask";
-    }, [$connected, connector]);
+      return (
+        $connected &&
+        window.ethereum &&
+        connector?.id === "io.metamask" &&
+        network === $currentChainID
+      );
+    }, [$connected, connector, $currentChainID]);
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
