@@ -49,7 +49,6 @@ import {
 } from "@web3";
 
 import {
-  addAssetsPrice,
   formatFromBigInt,
   calculateAPY,
   getStrategyInfo,
@@ -99,7 +98,7 @@ const AppStore = (props: React.PropsWithChildren) => {
   const $reload = useStore(reload);
 
   let localVaults: any = {};
-  let assetPrice: any = {};
+  let prices: any = {};
 
   let stabilityAPIData: any;
 
@@ -134,6 +133,10 @@ const AppStore = (props: React.PropsWithChildren) => {
 
       stabilityAPIData = response.data;
 
+      if (stabilityAPIData?.assetPrices) {
+        assetsPrices.set(stabilityAPIData?.assetPrices);
+        prices = stabilityAPIData?.assetPrices;
+      }
       apiData.set(stabilityAPIData);
     } catch (error) {
       console.error("API ERROR:", error);
@@ -455,9 +458,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         if (lastHistoryData?.lifetimeTokensVsHoldAPR && prices) {
           lifetimeTokensHold = vault.strategyAssets.map(
             (asset: string, index: number) => {
-              const price = Number(
-                formatUnits(prices[asset.toLowerCase()], 18)
-              );
+              const price = Number(prices[asset.toLowerCase()]?.price);
 
               const priceOnCreation = Number(
                 formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
@@ -642,39 +643,12 @@ const AppStore = (props: React.PropsWithChildren) => {
             graphResponse?.data?.data?.platformEntities[0]?.version;
         }
 
-        //// ASSETS PRICE (before backend)
-        let prices: TAssetPrices = {};
-        try {
-          const randomAddress: TAddress =
-            "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
-
-          let contractBalance;
-
-          if (chain.id === "137") {
-            contractBalance = await maticClient.readContract({
-              address: platforms[chain.id],
-              abi: PlatformABI,
-              functionName: "getBalance",
-              args: [randomAddress],
-            });
-          }
-          if (chain.id === "8453") {
-            contractBalance = await baseClient.readContract({
-              address: platforms[chain.id],
-              abi: PlatformABI,
-              functionName: "getBalance",
-              args: [randomAddress],
-            });
-          }
-
-          prices = addAssetsPrice(contractBalance) as TAssetPrices;
-          assetPrice[String(chain.id)] = prices;
-        } catch (error) {
-          console.log("ASSETS PRICE ERROR:", error);
-        }
-
         //todo: change this to data from backend
-        await setGraphData(graphResponse.data.data, prices, String(chain.id));
+        await setGraphData(
+          graphResponse.data.data,
+          prices[chain.id],
+          String(chain.id)
+        );
         let contractData: any;
         if (chain.id === "137") {
           contractData = await maticClient.readContract({
@@ -690,7 +664,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             functionName: "getData",
           });
         }
-
+        // get from graph platform bcAssets(blockhain assets)
         if (contractData[1]) {
           vaultsTokens[String(chain.id)] = contractData[1].map(
             (address: TAddress) => address.toLowerCase()
@@ -830,7 +804,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       })
     );
 
-    assetsPrices.set(assetPrice);
+    // assetsPrices.set(assetPrice);
     assetsBalances.set(assetBalances);
     vaultData.set(vaultsData);
     vaults.set(localVaults);

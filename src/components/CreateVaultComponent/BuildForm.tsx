@@ -70,7 +70,7 @@ const BuildForm = ({
       $assetsBalances[addr] || "0",
       tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
-    price: formatUnits($assetsPrices[addr] || "0", 18),
+    price: $assetsPrices[$currentChainID][addr]?.price,
     sum: "",
     allowance: "",
     decimals:

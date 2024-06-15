@@ -175,7 +175,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   const getTableData = async () => {
     if (!$assetsPrices[network] || !vault?.alm?.positions) return;
     const prices = vault.assets.map((asset) =>
-      Number(formatUnits($assetsPrices[network][asset.address], 18))
+      Number($assetsPrices[network][asset.address].price)
     );
 
     const data = vault?.alm?.positions.map((position) => {
@@ -219,9 +219,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
     if (!$assetsPrices[network]) return;
 
     const assets = vault.assets.map((asset, index) => {
-      const price = Number(
-        formatUnits($assetsPrices[network][asset.address], 18)
-      );
+      const price = Number($assetsPrices[network][asset.address].price);
 
       //@ts-ignore
       const amount = vault?.alm?.[`amountToken${index}`] || 0;

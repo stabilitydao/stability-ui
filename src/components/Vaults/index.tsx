@@ -755,7 +755,7 @@ const Vaults = () => {
                                 <img
                                   src={network?.logoURI}
                                   alt={network?.name}
-                                  className="h-5 w-5"
+                                  className="h-5 w-5 rounded-full"
                                 />
                                 {vault?.risk?.isRektStrategy ? (
                                   <div

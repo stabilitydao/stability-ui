@@ -211,6 +211,7 @@ const CreateVaultComponent = () => {
       }
     }
   };
+
   useEffect(() => {
     getData();
   }, [$publicClient, $platformsData[$currentChainID]?.factory, lastTx.get()]);

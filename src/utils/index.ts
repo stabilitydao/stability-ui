@@ -5,7 +5,6 @@ import { formatFromBigInt } from "./functions/formatFromBigInt";
 import { calculateAPY } from "./functions/calculateAPY";
 import { getTimeDifference } from "./functions/getTimeDifference";
 import { getStrategyInfo } from "./functions/getStrategyInfo";
-import { addAssetsPrice } from "./functions/addAssetsPrice";
 import { addAssetsBalance } from "./functions/addAssetsBalance";
 import { addVaultData } from "./functions/addVaultData";
 import { get1InchRoutes } from "./functions/get1InchRoutes";
@@ -25,7 +24,6 @@ export {
   calculateAPY,
   getTimeDifference,
   getStrategyInfo,
-  addAssetsPrice,
   get1InchRoutes,
   debounce,
   addAssetsBalance,

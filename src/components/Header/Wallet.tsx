@@ -127,7 +127,6 @@ const Wallet = () => {
       setTimeout(insertAssets, 1000);
     }
   };
-
   const initProfile = async () => {
     if (!$assetsBalances) return; // dublicated for TS
     let profileBalance = 0;
@@ -137,7 +136,9 @@ const Wallet = () => {
         const balance = Number(
           formatUnits(data, getTokenData(address)?.decimals as number)
         );
-        const price = Number(formatUnits($assetsPrices?.[address] || 0n, 18));
+        const price = Number(
+          $assetsPrices?.[currentChain?.id]?.[address].price
+        );
         const balanceInUSD = balance * price;
         profileBalance += balanceInUSD;
         return {

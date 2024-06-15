@@ -40,9 +40,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
   useEffect(() => {
     if (!$assetsPrices[network]) return;
     const assets = vault.assets.map((asset, index) => {
-      const price = Number(
-        formatUnits($assetsPrices[network][asset.address], 18)
-      );
+      const price = Number($assetsPrices[network][asset.address].price);
 
       //@ts-ignore
       const amount = vault?.pool?.[`amountToken${index}`] || 0;

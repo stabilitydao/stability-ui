@@ -1724,7 +1724,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             );
             const amountInUSD =
               amountInTokens *
-              Number(formatUnits($assetsPrices[network][assets[index]], 18));
+              Number($assetsPrices[network][assets[index]].price);
             return {
               symbol: tokenData?.symbol,
               logo: tokenData?.logoURI,
@@ -2404,9 +2404,8 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                           inputs[asset]?.amount > 0 &&
                           underlyingToken?.address != option[0]
                             ? (
-                                Number(
-                                  formatUnits($assetsPrices[network][asset], 18)
-                                ) * inputs[asset].amount
+                                Number($assetsPrices[network][asset].price) *
+                                inputs[asset].amount
                               ).toFixed(2)
                             : 0}
                         </p>
@@ -2636,9 +2635,8 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                       inputs[option[0]]?.amount > 0 &&
                       underlyingToken?.address !== option[0]
                         ? (
-                            Number(
-                              formatUnits($assetsPrices[network][option[0]], 18)
-                            ) * inputs[option[0]]?.amount
+                            Number($assetsPrices[network][option[0]].price) *
+                            inputs[option[0]]?.amount
                           ).toFixed(2)
                         : 0}
                     </p>
@@ -3325,10 +3323,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                                         )
                                       : 0)) *
                                   Number(
-                                    formatUnits(
-                                      $assetsPrices[network][option[0]],
-                                      18
-                                    )
+                                    $assetsPrices[network][option[0]].price
                                   )
                                 ).toFixed(2)})`}</p>
                               </div>
