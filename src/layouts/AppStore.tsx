@@ -134,8 +134,21 @@ const AppStore = (props: React.PropsWithChildren) => {
       stabilityAPIData = response.data;
 
       if (stabilityAPIData?.assetPrices) {
-        assetsPrices.set(stabilityAPIData?.assetPrices);
-        prices = stabilityAPIData?.assetPrices;
+        const lowerPrices = {};
+
+        for (const [chainId, addresses] of Object.entries(
+          stabilityAPIData?.assetPrices
+        )) {
+          lowerPrices[chainId] = Object.fromEntries(
+            Object.entries(addresses).map(([address, info]) => [
+              address.toLowerCase(),
+              info,
+            ])
+          );
+        }
+
+        assetsPrices.set(lowerPrices);
+        prices = lowerPrices;
       }
       apiData.set(stabilityAPIData);
     } catch (error) {

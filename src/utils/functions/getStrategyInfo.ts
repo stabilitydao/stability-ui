@@ -68,6 +68,12 @@ const IL = {
     desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
     color: "#4aff71",
   },
+  LOW: {
+    rate: 3,
+    title: "Low",
+    desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
+    color: "#D7F55B",
+  },
 };
 
 export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
@@ -96,6 +102,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     lido,
     aave,
     yearn,
+    uniswapV3,
   } = PROTOCOLS;
 
   const farm: IFeature = {
@@ -245,6 +252,19 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il,
     };
+  } else if (vaultSymbol.match(/QSMF$/)) {
+    strategyInfo = {
+      name: strategies.QSMF?.id as string,
+      shortName: strategies.QSMF?.shortId as string,
+      protocols: [quickSwap, merkl],
+      features: [],
+      color: strategies.QSMF?.color as string,
+      bgColor: strategies.QSMF?.bgColor as string,
+      baseStrategies: ["Liquidity providing", "Farming"],
+      ammAdapter: "Algebra",
+      sourceCode: "",
+      il: IL.QSMF,
+    };
   } else if (vaultSymbol.match(/Y$/)) {
     strategyInfo = {
       name: strategies.Y?.id as string,
@@ -258,18 +278,18 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.Y,
     };
-  } else if (vaultSymbol.match(/QSMF$/)) {
+  } else if (vaultSymbol.match(/GUMF[A-Za-z]?$/)) {
     strategyInfo = {
-      name: strategies.QSMF?.id as string,
-      shortName: strategies.QSMF?.shortId as string,
-      protocols: [quickSwap, merkl],
+      name: strategies.GUMF?.id as string,
+      shortName: strategies.GUMF?.shortId as string,
+      protocols: [gamma, uniswapV3],
       features: [],
-      color: strategies.QSMF?.color as string,
-      bgColor: strategies.QSMF?.bgColor as string,
+      color: strategies.GUMF?.color as string,
+      bgColor: strategies.GUMF?.bgColor as string,
       baseStrategies: ["Liquidity providing", "Farming"],
-      ammAdapter: "Algebra",
+      ammAdapter: "UniswapV3",
       sourceCode: "",
-      il: IL.QSMF,
+      il: IL.LOW,
     };
   }
 

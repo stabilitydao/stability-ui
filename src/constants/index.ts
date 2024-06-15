@@ -11,6 +11,7 @@ import {
   PM,
   MULTISIG,
   TREASURY,
+  cbETH,
   CRV,
 } from "./tokens";
 
@@ -179,6 +180,14 @@ const TOKENS_ASSETS = [
     docs: "https://resources.curve.fi/",
     color: "#397949",
   },
+  {
+    symbol: "cbETH",
+    addresses: cbETH,
+    description: "Coinbase Wrapped Staked ETH",
+    website: "https://www.coinbase.com/",
+    docs: "https://www.coinbase.com/developer-platform",
+    color: "#0454ff",
+  },
 ];
 
 const CHAINLINK_STABLECOINS = {
@@ -191,6 +200,7 @@ const DEXes = [
   { name: "QuickSwap", algo: "AlgebraV1", img: "/protocols/QuickSwap.svg" },
   { name: "Retro", algo: "Uniswap V3", img: "/protocols/Retro.svg" },
   { name: "Curve", algo: "StableSwapNG", img: "/protocols/Curve.png" },
+  { name: "UniswapV3", algo: "Uniswap V3", img: "/protocols/Uniswap.svg" },
 ];
 
 const CHAINS = [
@@ -286,6 +296,10 @@ const PROTOCOLS = {
   yearn: {
     name: "Yearn",
     logoSrc: "/protocols/Yearn.svg",
+  },
+  uniswapV3: {
+    name: "UniswapV3",
+    logoSrc: "/protocols/Uniswap.svg",
   },
 };
 

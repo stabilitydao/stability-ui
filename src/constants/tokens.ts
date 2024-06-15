@@ -25,6 +25,7 @@ const CRV: TAddress[] = [
   "0xc4ce1d6f5d98d65ee25cf85e9f2e9dcfee6cb5d6",
   "0x417Ac0e078398C154EdFadD9Ef675d30Be60Af93",
 ];
+const cbETH: TAddress[] = ["0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22"];
 
 export {
   USDC,
@@ -39,4 +40,5 @@ export {
   TREASURY,
   MULTISIG,
   CRV,
+  cbETH,
 };
