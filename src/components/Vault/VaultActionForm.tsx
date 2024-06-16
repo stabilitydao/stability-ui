@@ -611,7 +611,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           setNeedConfirm(false);
           setLoader(true);
           const transaction = await waitForTransactionReceipt(wagmiConfig, {
-            confirmations: 5,
+            confirmations: 3,
             hash: assetApprove,
           });
 
@@ -668,7 +668,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(true);
 
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: assetApprove,
         });
 
@@ -765,7 +765,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(true);
 
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: depositAssets,
         });
         setLocalStoreHash({
@@ -863,7 +863,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: zapDeposit,
         });
 
@@ -1074,7 +1074,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       setNeedConfirm(false);
       setLoader(true);
       const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 5,
+        confirmations: 3,
         hash: assetApprove,
       });
 
@@ -1168,7 +1168,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: assetApprove,
         });
 
@@ -1340,7 +1340,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       }
       setLoader(true);
       transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 5,
+        confirmations: 3,
         hash: depositAssets,
       });
       if (transaction.status === "success") {
@@ -1432,7 +1432,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: withdrawAssets,
         });
         setLocalStoreHash({
@@ -1511,7 +1511,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: withdrawAssets,
         });
         setLocalStoreHash({
@@ -1601,7 +1601,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 5,
+          confirmations: 3,
           hash: zapWithdraw,
         });
         setLocalStoreHash({

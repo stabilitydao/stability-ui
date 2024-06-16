@@ -67,7 +67,7 @@ const Vault: React.FC<IProps> = ({ vault, network }) => {
               vaultStrategy={localVault.strategy}
             />
 
-            <Toast />
+            <Toast network={network} />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">
             <VaultActionForm network={network} vault={localVault} />
