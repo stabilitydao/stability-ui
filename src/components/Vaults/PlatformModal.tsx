@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "@nanostores/react";
 import { deployments } from "@stabilitydao/stability";
 
-import { PROTOCOLS } from "@constants";
+import { PROTOCOLS, CHAINS } from "@constants";
 
 import { apiData, platformVersions, currentChainID } from "@store";
 
@@ -82,6 +82,9 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
     };
   }, []);
 
+  const currentChain = useMemo(() => {
+    return CHAINS.find((chain) => chain.id === $currentChainID);
+  }, [$currentChainID]);
   return (
     <div>
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
@@ -158,10 +161,12 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
               <div className="flex items-center gap-2">
                 <div className="inline-flex items-center gap-1">
                   <img
-                    src="/networks/polygon.jpg"
+                    src={currentChain?.logoURI}
                     className="w-[20px] h-[20px] rounded-[6px]"
                   />
-                  <span>Polygon [137]</span>
+                  <span>
+                    {currentChain?.name} [{currentChain?.id}]
+                  </span>
                 </div>
               </div>
             </div>
@@ -192,8 +197,8 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                           <a
                             key={moduleContract}
                             target="_blank"
-                            href={`https://polygonscan.com/address/${address}`}
-                            title={`Go to ${moduleContract} contract address at Polygonscan`}
+                            href={`${currentChain?.explorer}${address}`}
+                            title={`Go to ${moduleContract} contract address at block explorer`}
                             className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-2 lg:px-3 md:py-[3px] mr-1 mb-2"
                           >
                             <span className="inline-flex text-[#d3d0d0] ">
@@ -273,7 +278,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                   <span>stability-subgraph</span>
                 </a>
                 <a
-                  href="https://thegraph.com/explorer/subgraphs/3ZoXLL5NpCo7FxY5wNzVYuNAA7qF6AHsyhZLrEAensJG?view=Overview&chain=arbitrum-one"
+                  href="https://thegraph.com/explorer/subgraphs/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N?view=Query&chain=arbitrum-one"
                   target="_blank"
                   className="flex items-center hover:bg-[#2a2c49]"
                   title="Graph Explorer on Arbitrum One"

@@ -134,21 +134,8 @@ const AppStore = (props: React.PropsWithChildren) => {
       stabilityAPIData = response.data;
 
       if (stabilityAPIData?.assetPrices) {
-        const lowerPrices = {};
-
-        for (const [chainId, addresses] of Object.entries(
-          stabilityAPIData?.assetPrices
-        )) {
-          lowerPrices[chainId] = Object.fromEntries(
-            Object.entries(addresses).map(([address, info]) => [
-              address.toLowerCase(),
-              info,
-            ])
-          );
-        }
-
-        assetsPrices.set(lowerPrices);
-        prices = lowerPrices;
+        assetsPrices.set(stabilityAPIData?.assetPrices);
+        prices = stabilityAPIData?.assetPrices;
       }
       apiData.set(stabilityAPIData);
     } catch (error) {
@@ -655,6 +642,10 @@ const AppStore = (props: React.PropsWithChildren) => {
           versions[String(chain.id)] =
             graphResponse?.data?.data?.platformEntities[0]?.version;
         }
+        if (graphResponse?.data?.data?.platformEntities[0]?.bcAssets) {
+          vaultsTokens[String(chain.id)] = graphResponse?.data?.data
+            ?.platformEntities[0]?.bcAssets as TAddress[];
+        }
 
         //todo: change this to data from backend
         await setGraphData(
@@ -677,18 +668,35 @@ const AppStore = (props: React.PropsWithChildren) => {
             functionName: "getData",
           });
         }
-        // get from graph platform bcAssets(blockhain assets)
-        if (contractData[1]) {
-          vaultsTokens[String(chain.id)] = contractData[1].map(
-            (address: TAddress) => address.toLowerCase()
-          ) as TAddress[];
-        }
+
+        // if (contractData?.length) {
+        //   const buildingPrices: { [vaultType: string]: bigint } = {};
+        //   for (let i = 0; i <= contractData[1].length - 1; i++) {
+        //     buildingPrices[contractData[3][i]] = contractData[5][i];
+        //   }
+        //   platformData[String(chain.id)] = {
+        //     platform: platforms[chain.id],
+        //     factory: contractData[0][0],
+        //     buildingPermitToken: contractData[0][3],
+        //     buildingPayPerVaultToken: contractData[0][4],
+        //     zap: contractData[0][7],
+        //     buildingPrices,
+        //   };
+        // }
 
         if (contractData?.length) {
           const buildingPrices: { [vaultType: string]: bigint } = {};
-          for (let i = 0; i < contractData[1].length; i++) {
-            buildingPrices[contractData[3][i]] = contractData[5][i];
+          const vaultTypes = contractData[3];
+          const prices = contractData[5];
+
+          if (vaultTypes.length === prices.length) {
+            for (let i = 0; i < vaultTypes.length; i++) {
+              if (vaultTypes[i] && prices[i] !== undefined) {
+                buildingPrices[vaultTypes[i]] = prices[i];
+              }
+            }
           }
+
           platformData[String(chain.id)] = {
             platform: platforms[chain.id],
             factory: contractData[0][0],
@@ -790,11 +798,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               description: txError.message,
             });
           }
-          isWeb3Load.set(false);
-        } else {
-          isWeb3Load.set(false);
         }
-        isWeb3Load.set(false);
 
         strategyTypeEntities[String(chain.id)] =
           graphResponse.data.data.strategyConfigEntities.reduce(
@@ -816,8 +820,8 @@ const AppStore = (props: React.PropsWithChildren) => {
           );
       })
     );
+    isWeb3Load.set(false);
 
-    // assetsPrices.set(assetPrice);
     assetsBalances.set(assetBalances);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
@@ -838,7 +842,10 @@ const AppStore = (props: React.PropsWithChildren) => {
 
     getData();
 
-    currentChainID.set(String(chain?.id));
+    if (chain?.id) {
+      currentChainID.set(String(chain?.id));
+    }
+
     account.set(address);
     publicClient.set(_publicClient);
     network.set(chain?.name);
