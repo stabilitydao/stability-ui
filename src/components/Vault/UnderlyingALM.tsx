@@ -12,7 +12,7 @@ import { assetsPrices } from "@store";
 
 import {
   wagmiConfig,
-  defiedgeFactory,
+  defiedgeFactories,
   quickSwapIchiFactory,
   retroIchiFactory,
 } from "@web3";
@@ -20,6 +20,7 @@ import {
 import type { TVault } from "@types";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
@@ -38,7 +39,7 @@ type TAlmTable = {
   tvl: string;
 };
 
-const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
+const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
@@ -70,7 +71,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
         break;
       case "DefiEdge":
         const managerFee = await readContract(wagmiConfig, {
-          address: defiedgeFactory,
+          address: defiedgeFactories["137"],
           abi: [
             {
               inputs: [],
@@ -83,7 +84,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
           functionName: "maximumManagerPerformanceFeeRate",
         });
         const protocolPerformanceFee = await readContract(wagmiConfig, {
-          address: defiedgeFactory,
+          address: defiedgeFactories["137"],
           abi: [
             {
               inputs: [
@@ -172,9 +173,9 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     if (fee) setAlmFee(fee);
   };
   const getTableData = async () => {
-    if (!$assetsPrices || !vault?.alm?.positions) return;
+    if (!$assetsPrices[network] || !vault?.alm?.positions) return;
     const prices = vault.assets.map((asset) =>
-      Number(formatUnits($assetsPrices[asset.address], 18))
+      Number($assetsPrices[network][asset.address].price)
     );
 
     const data = vault?.alm?.positions.map((position) => {
@@ -215,10 +216,10 @@ const UnderlyingALM: React.FC<IProps> = memo(({ vault }) => {
     getAlmFee();
     getTableData();
     // ASSETS
-    if (!$assetsPrices) return;
+    if (!$assetsPrices[network]) return;
 
     const assets = vault.assets.map((asset, index) => {
-      const price = Number(formatUnits($assetsPrices[asset.address], 18));
+      const price = Number($assetsPrices[network][asset.address].price);
 
       //@ts-ignore
       const amount = vault?.alm?.[`amountToken${index}`] || 0;

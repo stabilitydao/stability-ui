@@ -7,20 +7,15 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { readContract } from "@wagmi/core";
-
-import { YEARN_PROTOCOLS, STRATEGY_SPECIFIC_SUBSTITUTE } from "@constants";
+import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
 import {
   account,
   network,
-  platformData,
-  platformVersion,
-  platformFactory,
-  platformZAP,
+  platformsData,
+  platformVersions,
   publicClient,
   userBalance,
   vaults,
@@ -38,11 +33,15 @@ import {
   error,
   isWeb3Load,
   aprFilter,
+  currentChainID,
+  assetsPrices,
+  assetsBalances,
+  vaultData,
 } from "@store";
 
 import {
   wagmiConfig,
-  platform,
+  platforms,
   PlatformABI,
   IVaultManagerABI,
   retroIchiFactory,
@@ -50,7 +49,6 @@ import {
 } from "@web3";
 
 import {
-  addAssetsPrice,
   formatFromBigInt,
   calculateAPY,
   getStrategyInfo,
@@ -62,13 +60,22 @@ import {
 } from "@utils";
 
 import {
-  GRAPH_ENDPOINT,
+  GRAPH_ENDPOINTS,
   GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
+  YEARN_PROTOCOLS,
+  STRATEGY_SPECIFIC_SUBSTITUTE,
+  CHAINS,
 } from "@constants";
 
-import type { TAddress, TAssetPrices, THoldData, TYearnProtocol } from "@types";
+import type {
+  TAddress,
+  TAssetPrices,
+  THoldData,
+  TYearnProtocol,
+  TPlatformsData,
+} from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -76,10 +83,22 @@ const AppStore = (props: React.PropsWithChildren) => {
   const { chain } = useAccount();
 
   const _publicClient = usePublicClient();
+
+  const maticClient = usePublicClient({
+    chainId: 137,
+    config: wagmiConfig,
+  });
+
+  const baseClient = usePublicClient({
+    chainId: 8453,
+    config: wagmiConfig,
+  });
+
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
 
   let localVaults: any = {};
+  let prices: any = {};
 
   let stabilityAPIData: any;
 
@@ -97,7 +116,7 @@ const AppStore = (props: React.PropsWithChildren) => {
       hideFeeApr.set(savedData);
     }
 
-    let localAPRfilter = JSON.parse(APRsFiler) || "weekly";
+    let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "weekly";
 
     if (localAPRfilter === "week") {
       localAPRfilter = "weekly";
@@ -114,25 +133,34 @@ const AppStore = (props: React.PropsWithChildren) => {
 
       stabilityAPIData = response.data;
 
+      if (stabilityAPIData?.assetPrices) {
+        assetsPrices.set(stabilityAPIData?.assetPrices);
+        prices = stabilityAPIData?.assetPrices;
+      }
       apiData.set(stabilityAPIData);
     } catch (error) {
       console.error("API ERROR:", error);
     }
   };
 
-  const setGraphData = async (data: any, prices: TAssetPrices) => {
+  const setGraphData = async (
+    data: any,
+    prices: TAssetPrices,
+    chainID: string
+  ) => {
     const graphVaults = await data.vaultEntities.reduce(
       async (vaultsPromise: Promise<any>, vault: any) => {
         const vaults = await vaultsPromise;
+
         const APIData =
-          stabilityAPIData?.underlyings?.["137"]?.[
+          stabilityAPIData?.underlyings?.[chainID]?.[
             vault.underlying.toLowerCase()
           ];
 
         const APIVault =
-          stabilityAPIData?.vaults["137"][vault.id.toLowerCase()];
+          stabilityAPIData?.vaults[chainID][vault.id.toLowerCase()];
 
-        const strategyInfo = getStrategyInfo(APIVault.symbol);
+        const strategyInfo = getStrategyInfo(APIVault?.symbol);
 
         const strategyName = strategyInfo?.shortName;
 
@@ -195,12 +223,15 @@ const AppStore = (props: React.PropsWithChildren) => {
           poolSwapFeesAPRWeekly =
             APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
         }
-        if (strategyName === "IQMF" || strategyName === "IRMF") {
+        if (
+          (strategyName === "IQMF" || strategyName === "IRMF") &&
+          chainID == "137"
+        ) {
           let fee = 0;
 
           if (strategyName === "IRMF") {
             try {
-              const baseFee = await readContract(wagmiConfig, {
+              const baseFee = await maticClient.readContract({
                 address: retroIchiFactory,
                 abi: [
                   {
@@ -215,6 +246,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 ],
                 functionName: "baseFee",
               });
+
               fee = Number(formatUnits(baseFee, 16));
             } catch (error) {
               console.log("Retro fee error:", error);
@@ -222,7 +254,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
           if (strategyName === "IQMF") {
             try {
-              const ammFee = await readContract(wagmiConfig, {
+              const ammFee = await maticClient.readContract({
                 address: quickSwapIchiFactory,
                 abi: [
                   {
@@ -237,7 +269,8 @@ const AppStore = (props: React.PropsWithChildren) => {
                 ],
                 functionName: "ammFee",
               });
-              const baseFee = await readContract(wagmiConfig, {
+
+              const baseFee = await maticClient.readContract({
                 address: quickSwapIchiFactory,
                 abi: [
                   {
@@ -252,6 +285,7 @@ const AppStore = (props: React.PropsWithChildren) => {
                 ],
                 functionName: "baseFee",
               });
+
               fee = Number(formatUnits(ammFee + baseFee, 16));
             } catch (error) {
               console.log("Ichi fee error:", error);
@@ -408,9 +442,9 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const lifetimeVsHoldAPR = Number(
-          lastHistoryData?.lifetimeVsHoldAPR
-        ).toFixed(2);
+        const lifetimeVsHoldAPR = lastHistoryData?.lifetimeVsHoldAPR
+          ? Number(lastHistoryData?.lifetimeVsHoldAPR).toFixed(2)
+          : 0;
 
         const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
 
@@ -424,9 +458,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         if (lastHistoryData?.lifetimeTokensVsHoldAPR && prices) {
           lifetimeTokensHold = vault.strategyAssets.map(
             (asset: string, index: number) => {
-              const price = Number(
-                formatUnits(prices[asset.toLowerCase()], 18)
-              );
+              const price = Number(prices[asset.toLowerCase()]?.price);
 
               const priceOnCreation = Number(
                 formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
@@ -552,17 +584,14 @@ const AppStore = (props: React.PropsWithChildren) => {
           lifetimeTokensHold,
           isVsActive,
           yearnProtocols,
+          network: chainID,
         };
 
         return vaults;
       },
       Promise.resolve({})
     );
-    localVaults = graphVaults;
-
-    tokens.set(data.platformEntities[0].bcAssets);
-    vaults.set(localVaults);
-    isVaultsLoaded.set(true);
+    localVaults[chainID] = graphVaults;
   };
 
   const getData = async () => {
@@ -571,181 +600,237 @@ const AppStore = (props: React.PropsWithChildren) => {
     let apiError: string = "";
     const maxRetries = 2;
 
-    while (retries < maxRetries) {
-      try {
-        graphResponse = await axios.post(GRAPH_ENDPOINT, {
-          query: GRAPH_QUERY,
-        });
+    const versions: Record<string, string> = {};
+    const vaultsTokens: { [key: string]: string[] } = {};
+    const platformData: TPlatformsData = {};
+    const strategyTypeEntities: { [key: string]: any } = {};
+    const vaultTypeEntities: { [key: string]: any } = {};
+    const assetBalances: { [key: string]: bigint } = {};
+    const vaultsData: { [key: string]: bigint } = {};
 
-        if (graphResponse.data.errors && graphResponse.data.errors.length > 0) {
-          throw new Error("GRAPH API ERROR");
+    await Promise.all(
+      CHAINS.map(async (chain) => {
+        while (retries < maxRetries) {
+          try {
+            graphResponse = await axios.post(GRAPH_ENDPOINTS[chain.id], {
+              query: GRAPH_QUERY,
+            });
+
+            if (
+              graphResponse.data.errors &&
+              graphResponse.data.errors.length > 0
+            ) {
+              throw new Error("GRAPH API ERROR");
+            }
+            break;
+          } catch (error: any) {
+            retries++;
+            apiError = error.message as string;
+            console.log("GRAPH API ERROR:", error);
+          }
         }
-        break;
-      } catch (error: any) {
-        retries++;
-        apiError = error.message as string;
-        console.log("GRAPH API ERROR:", error);
-      }
-    }
-    if (retries >= maxRetries) {
-      error.set({ state: true, type: "API", description: apiError });
+        if (retries >= maxRetries) {
+          error.set({ state: true, type: "API", description: apiError });
 
-      throw new Error(
-        "Maximum number of retry attempts reached for graph request"
-      );
-    }
+          throw new Error(
+            "Maximum number of retry attempts reached for graph request"
+          );
+        }
 
-    /////***** SET PLATFORM DATA *****/////
-    if (graphResponse?.data?.data?.platformEntities[0]?.factory) {
-      platformFactory.set(
-        graphResponse?.data?.data?.platformEntities[0]?.factory
-      );
-    }
-    if (graphResponse?.data?.data?.platformEntities[0]?.version) {
-      platformVersion.set(graphResponse.data.data.platformEntities[0].version);
-    }
-    if (graphResponse?.data?.data?.platformEntities[0]?.zap) {
-      platformZAP.set(graphResponse?.data?.data?.platformEntities[0]?.zap);
-    }
+        /////***** SET PLATFORM DATA *****/////
+        if (graphResponse?.data?.data?.platformEntities[0]?.version) {
+          versions[String(chain.id)] =
+            graphResponse?.data?.data?.platformEntities[0]?.version;
+        }
+        if (graphResponse?.data?.data?.platformEntities[0]?.bcAssets) {
+          vaultsTokens[String(chain.id)] = graphResponse?.data?.data
+            ?.platformEntities[0]?.bcAssets as TAddress[];
+        }
 
-    //// ASSETS PRICE (before backend)
-    let prices: TAssetPrices = {};
-    try {
-      const randomAddress: TAddress =
-        "0xe319afa4d638f71400d4c7d60d90b0c227a5af48";
-      const contractBalance: any = await readContract(wagmiConfig, {
-        address: platform,
-        abi: PlatformABI,
-        functionName: "getBalance",
-        args: [randomAddress],
-      });
-
-      prices = addAssetsPrice(contractBalance) as TAssetPrices;
-    } catch (error) {
-      console.log("ASSETS PRICE ERROR:", error);
-    }
-    //todo: change this to data from backend
-    await setGraphData(graphResponse.data.data, prices);
-
-    const contractData: any = await readContract(wagmiConfig, {
-      address: platform,
-      abi: PlatformABI,
-      functionName: "getData",
-    });
-    if (contractData[1]) {
-      tokens.set(
-        contractData[1].map((address: TAddress) =>
-          address.toLowerCase()
-        ) as TAddress[]
-      );
-    }
-
-    if (contractData?.length) {
-      const buildingPrices: { [vaultType: string]: bigint } = {};
-      for (let i = 0; i < contractData[1].length; i++) {
-        buildingPrices[contractData[3][i]] = contractData[5][i];
-      }
-      platformData.set({
-        platform,
-        factory: contractData[0][0],
-        buildingPermitToken: contractData[0][3],
-        buildingPayPerVaultToken: contractData[0][4],
-        zap: contractData[0][7],
-        buildingPrices,
-      });
-    }
-
-    if (isConnected) {
-      isWeb3Load.set(true);
-      try {
-        const contractBalance: any = await readContract(wagmiConfig, {
-          address: platform,
-          abi: PlatformABI,
-          functionName: "getBalance",
-          args: [address as TAddress],
-        });
-
-        if (contractBalance?.length) {
-          const buildingPayPerVaultTokenBalance: bigint = contractBalance[8];
-          const erc20Balance: { [token: string]: bigint } = {};
-          const erc721Balance: { [token: string]: bigint } = {};
-          //function -> .set vault/
-          addVaultData(contractBalance);
-          addAssetsBalance(contractBalance);
-          //
-
-          for (let i = 0; i < contractBalance[1].length; i++) {
-            erc20Balance[contractBalance[1][i]] = contractBalance[3][i];
-          }
-
-          for (let i = 0; i < contractBalance[6].length; i++) {
-            erc721Balance[contractBalance[6][i]] = contractBalance[7][i];
-          }
-
-          userBalance.set({
-            buildingPayPerVaultTokenBalance,
-            erc20Balance,
-            erc721Balance,
+        //todo: change this to data from backend
+        await setGraphData(
+          graphResponse.data.data,
+          prices[chain.id],
+          String(chain.id)
+        );
+        let contractData: any;
+        if (chain.id === "137") {
+          contractData = await maticClient.readContract({
+            address: platforms[chain.id],
+            abi: PlatformABI,
+            functionName: "getData",
+          });
+        }
+        if (chain.id === "8453") {
+          contractData = await baseClient.readContract({
+            address: platforms[chain.id],
+            abi: PlatformABI,
+            functionName: "getData",
           });
         }
 
-        const contractVaults: any = await readContract(wagmiConfig, {
-          address: contractBalance[6][1],
-          abi: IVaultManagerABI,
-          functionName: "vaults",
-        });
+        // if (contractData?.length) {
+        //   const buildingPrices: { [vaultType: string]: bigint } = {};
+        //   for (let i = 0; i <= contractData[1].length - 1; i++) {
+        //     buildingPrices[contractData[3][i]] = contractData[5][i];
+        //   }
+        //   platformData[String(chain.id)] = {
+        //     platform: platforms[chain.id],
+        //     factory: contractData[0][0],
+        //     buildingPermitToken: contractData[0][3],
+        //     buildingPayPerVaultToken: contractData[0][4],
+        //     zap: contractData[0][7],
+        //     buildingPrices,
+        //   };
+        // }
 
-        if (contractBalance) {
-          balances.set(contractBalance);
+        if (contractData?.length) {
+          const buildingPrices: { [vaultType: string]: bigint } = {};
+          const vaultTypes = contractData[3];
+          const prices = contractData[5];
+
+          if (vaultTypes.length === prices.length) {
+            for (let i = 0; i < vaultTypes.length; i++) {
+              if (vaultTypes[i] && prices[i] !== undefined) {
+                buildingPrices[vaultTypes[i]] = prices[i];
+              }
+            }
+          }
+
+          platformData[String(chain.id)] = {
+            platform: platforms[chain.id],
+            factory: contractData[0][0],
+            buildingPermitToken: contractData[0][3],
+            buildingPayPerVaultToken: contractData[0][4],
+            zap: contractData[0][7],
+            buildingPrices,
+          };
         }
 
-        if (contractVaults) {
-          const vaultsPromise = await Promise.all(
-            contractVaults[0].map(async (vault: any, index: number) => {
-              return {
-                [vault.toLowerCase()]: {
-                  ...localVaults[vault.toLowerCase()],
-                  balance: contractBalance[5][index],
-                },
-              };
-            })
-          );
+        if (isConnected) {
+          isWeb3Load.set(true);
+          let contractBalance: any;
+          let contractVaults: any;
+          try {
+            if (chain.id === "137") {
+              contractBalance = await maticClient.readContract({
+                address: platforms[chain.id],
+                abi: PlatformABI,
+                functionName: "getBalance",
+                args: [address as TAddress],
+              });
+            }
+            if (chain.id === "8453") {
+              contractBalance = await baseClient.readContract({
+                address: platforms[chain.id],
+                abi: PlatformABI,
+                functionName: "getBalance",
+                args: [address as TAddress],
+              });
+            }
 
-          const vaultsObject = vaultsPromise.reduce(
-            (acc, curr) => ({ ...acc, ...curr }),
+            if (contractBalance?.length) {
+              const buildingPayPerVaultTokenBalance: bigint =
+                contractBalance[8];
+              const erc20Balance: { [token: string]: bigint } = {};
+              const erc721Balance: { [token: string]: bigint } = {};
+              //function -> .set vault/
+              vaultsData[String(chain.id)] = addVaultData(contractBalance);
+              assetBalances[String(chain.id)] =
+                addAssetsBalance(contractBalance);
+              //
+
+              for (let i = 0; i < contractBalance[1].length; i++) {
+                erc20Balance[contractBalance[1][i]] = contractBalance[3][i];
+              }
+
+              for (let i = 0; i < contractBalance[6].length; i++) {
+                erc721Balance[contractBalance[6][i]] = contractBalance[7][i];
+              }
+
+              userBalance.set({
+                buildingPayPerVaultTokenBalance,
+                erc20Balance,
+                erc721Balance,
+              });
+
+              balances.set(contractBalance);
+            }
+
+            if (chain.id === "137") {
+              contractVaults = await maticClient.readContract({
+                address: contractBalance[6][1],
+                abi: IVaultManagerABI,
+                functionName: "vaults",
+              });
+            }
+            if (chain.id === "8453") {
+              contractVaults = await baseClient.readContract({
+                address: contractBalance[6][1],
+                abi: IVaultManagerABI,
+                functionName: "vaults",
+              });
+            }
+
+            if (contractVaults) {
+              const vaultsPromise = await Promise.all(
+                contractVaults[0].map(async (vault: any, index: number) => {
+                  return {
+                    [vault.toLowerCase()]: {
+                      ...localVaults[chain.id][vault.toLowerCase()],
+                      balance: contractBalance[5][index],
+                    },
+                  };
+                })
+              );
+
+              localVaults[chain.id] = vaultsPromise.reduce(
+                (acc, curr) => ({ ...acc, ...curr }),
+                {}
+              );
+            }
+            isVaultsLoaded.set(true);
+          } catch (txError: any) {
+            console.log("BLOCKCHAIN ERROR:", txError);
+            error.set({
+              state: true,
+              type: "WEB3",
+              description: txError.message,
+            });
+          }
+        }
+
+        strategyTypeEntities[String(chain.id)] =
+          graphResponse.data.data.strategyConfigEntities.reduce(
+            (versions: any, version: any) => {
+              versions[version.id.toLowerCase()] = version.version;
+
+              return versions;
+            },
             {}
           );
-          vaults.set(vaultsObject);
-        }
-        isVaultsLoaded.set(true);
-      } catch (txError: any) {
-        console.log("BLOCKCHAIN ERROR:", txError);
-        error.set({ state: true, type: "WEB3", description: txError.message });
-      }
-      isWeb3Load.set(false);
-    } else {
-      isWeb3Load.set(false);
-    }
+        vaultTypeEntities[String(chain.id)] =
+          graphResponse.data.data.vaultTypeEntities.reduce(
+            (versions: any, version: any) => {
+              versions[version.id] = version.version;
 
-    const strategyTypeEntities =
-      graphResponse.data.data.strategyConfigEntities.reduce(
-        (versions: any, version: any) => {
-          versions[version.id.toLowerCase()] = version.version;
-
-          return versions;
-        },
-        {}
-      );
-    const vaultTypeEntities = graphResponse.data.data.vaultTypeEntities.reduce(
-      (versions: any, version: any) => {
-        versions[version.id] = version.version;
-
-        return versions;
-      },
-      {}
+              return versions;
+            },
+            {}
+          );
+      })
     );
+    isWeb3Load.set(false);
+
+    assetsBalances.set(assetBalances);
+    vaultData.set(vaultsData);
+    vaults.set(localVaults);
+    tokens.set(vaultsTokens);
+    platformsData.set(platformData);
+    platformVersions.set(versions);
     strategyTypes.set(strategyTypeEntities);
     vaultTypes.set(vaultTypeEntities);
+    isVaultsLoaded.set(true);
   };
 
   const fetchAllData = async () => {
@@ -756,6 +841,10 @@ const AppStore = (props: React.PropsWithChildren) => {
     await getDataFromStabilityAPI();
 
     getData();
+
+    if (chain?.id) {
+      currentChainID.set(String(chain?.id));
+    }
 
     account.set(address);
     publicClient.set(_publicClient);

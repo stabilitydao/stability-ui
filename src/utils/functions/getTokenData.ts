@@ -1,11 +1,11 @@
-import type { TTokenData } from "@types";
-import tokenlist from "../../stability.tokenlist.json";
+import type { TAddress, TTokenData } from "@types";
+import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 const getTokenData = (address: string): TTokenData | undefined => {
   for (const token of tokenlist.tokens) {
     if (token.address.toLowerCase() === address.toLowerCase()) {
       return {
-        address: token.address.toLowerCase(),
+        address: token.address.toLowerCase() as TAddress,
         chainId: token.chainId,
         decimals: token.decimals,
         name: token.name,

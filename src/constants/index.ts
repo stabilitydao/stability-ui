@@ -11,6 +11,7 @@ import {
   PM,
   MULTISIG,
   TREASURY,
+  cbETH,
   CRV,
 } from "./tokens";
 
@@ -179,6 +180,14 @@ const TOKENS_ASSETS = [
     docs: "https://resources.curve.fi/",
     color: "#397949",
   },
+  {
+    symbol: "cbETH",
+    addresses: cbETH,
+    description: "Coinbase Wrapped Staked ETH",
+    website: "https://www.coinbase.com/",
+    docs: "https://www.coinbase.com/developer-platform",
+    color: "#0454ff",
+  },
 ];
 
 const CHAINLINK_STABLECOINS = {
@@ -191,13 +200,24 @@ const DEXes = [
   { name: "QuickSwap", algo: "AlgebraV1", img: "/protocols/QuickSwap.svg" },
   { name: "Retro", algo: "Uniswap V3", img: "/protocols/Retro.svg" },
   { name: "Curve", algo: "StableSwapNG", img: "/protocols/Curve.png" },
+  { name: "UniswapV3", algo: "Uniswap V3", img: "/protocols/Uniswap.svg" },
 ];
 
 const CHAINS = [
   {
     name: "Polygon",
+    id: "137",
     logoURI:
       "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+    explorer: "https://polygonscan.com/address/",
+    active: true, // main page active networks
+  },
+  {
+    name: "Base",
+    id: "8453",
+    logoURI: "https://www.base.org/document/favicon-32x32.png",
+    explorer: "https://basescan.org/address/",
+    active: true, // main page active networks
   },
 ];
 
@@ -277,6 +297,10 @@ const PROTOCOLS = {
     name: "Yearn",
     logoSrc: "/protocols/Yearn.svg",
   },
+  uniswapV3: {
+    name: "UniswapV3",
+    logoSrc: "/protocols/Uniswap.svg",
+  },
 };
 
 const STRATEGY_SPECIFIC_SUBSTITUTE: {
@@ -284,8 +308,16 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
 } = {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
-const GRAPH_ENDPOINT =
-  "https://api.studio.thegraph.com/query/72132/test/v0.3.0";
+
+const GRAPH_ENDPOINTS: { [key: string]: string } = {
+  137: `https://gateway-arbitrum.network.thegraph.com/api/${
+    import.meta.env.PUBLIC_GRAPH_API_KEY
+  }/subgraphs/
+id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`,
+  8453: `https://gateway-arbitrum.network.thegraph.com/api/${
+    import.meta.env.PUBLIC_GRAPH_API_KEY
+  }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`,
+};
 
 const GRAPH_QUERY = `
       {
@@ -380,7 +412,7 @@ export {
   CHAINS,
   TRANSACTION_SETTINGS,
   DEFAULT_TRANSACTION_SETTINGS,
-  GRAPH_ENDPOINT,
+  GRAPH_ENDPOINTS,
   PROTOCOLS,
   GRAPH_QUERY,
   STABILITY_API,

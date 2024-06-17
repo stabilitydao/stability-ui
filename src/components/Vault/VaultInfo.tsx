@@ -10,23 +10,26 @@ import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
 import { VAULT_STATUSES } from "@constants";
 
-import { connected } from "@store";
+import { connected, currentChainID } from "@store";
 
 import type { TVault } from "@types";
 import { formatUnits } from "viem";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
-const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
+const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
   const [created, setCreated] = useState<any>();
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
   const [timeDifference, setTimeDifference] = useState<any>();
 
   const client = useWalletClient();
   const { connector } = useAccount();
+
   const $connected = useStore(connected);
+  const $currentChainID = useStore(currentChainID);
 
   useEffect(() => {
     if (vault) {
@@ -43,9 +46,10 @@ const VaultInfo: React.FC<IProps> = memo(({ vault }) => {
       vault?.symbol?.length <= 11 &&
       $connected &&
       window.ethereum &&
-      connector?.id === "io.metamask"
+      connector?.id === "io.metamask" &&
+      network === $currentChainID
     );
-  }, [vault?.symbol, $connected, connector]);
+  }, [vault?.symbol, $connected, connector, $currentChainID]);
 
   const gasReserve = useMemo(() => {
     return !!Number(vault?.gasReserve)

@@ -40,6 +40,7 @@ type TPlatformData = {
   zap: TAddress;
   buildingPrices: { [vaultType: string]: bigint };
 };
+type TPlatformsData = Record<string, TPlatformData>;
 
 type TUserBalance = {
   buildingPayPerVaultTokenBalance: bigint;
@@ -206,6 +207,7 @@ type TVault = {
   lifetimeTokensHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
+  network: string;
 };
 
 type TTableColumn = {
@@ -338,20 +340,6 @@ type TPieChartData = {
   decimals: number;
 };
 
-//// DAO
-type TDAOData = {
-  platformVersion: string;
-  platformGovernance: string;
-  multisigAddress: string;
-  strategieNames: string[];
-  platformFee: string;
-  vaultManagerFee: string;
-  typesOfVaults: string;
-  strategyLogicFee: string;
-  ecosystemFee: string;
-  farmsLength: number;
-};
-
 type TPendingPlatformUpgrade = {
   newVersion: string;
   proxies: string[];
@@ -408,7 +396,7 @@ type TError = {
 };
 
 export type {
-  TPlatformData,
+  TPlatformsData,
   TUserBalance,
   TInitParams,
   TAllowedBBTokenVaults,
@@ -432,7 +420,6 @@ export type {
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
-  TDAOData,
   TGitHubUser,
   TMultisigBalance,
   TMultiTokenData,

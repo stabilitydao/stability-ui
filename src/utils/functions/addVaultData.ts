@@ -1,5 +1,3 @@
-import { vaultData } from "@store";
-
 import type { TVaults } from "@types";
 
 const addVaultData = (data: any[]) => {
@@ -17,7 +15,7 @@ const addVaultData = (data: any[]) => {
         vaultUserBalance: vaultUserBalance[i],
       };
     }
-    vaultData.set(vault);
+    return vault;
   } else {
     console.error("There is an error, arrays lenght are different.");
   }

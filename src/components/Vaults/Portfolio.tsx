@@ -372,7 +372,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                   TVL
                 </h2>
                 <p className="text-[1rem] md:text-[1.125rem]">
-                  {portfolio.tvl}
+                  {$isWeb3Load ? (
+                    <Skeleton height={25.61} width={100} />
+                  ) : (
+                    portfolio.tvl
+                  )}
                 </p>
               </div>
             </div>

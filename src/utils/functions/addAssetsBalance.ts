@@ -1,5 +1,3 @@
-import { assetsBalances } from "@store";
-
 import type { TAddress, TBalances } from "@types";
 
 const addAssetsBalance = (data: any[]) => {
@@ -10,7 +8,7 @@ const addAssetsBalance = (data: any[]) => {
     for (let i = 0; i < assets.length; i++) {
       balances[assets[i]] = _assetsBalances[i];
     }
-    assetsBalances.set(balances);
+    return balances;
   } else {
     console.error("There is an error, arrays lenght are different.");
   }

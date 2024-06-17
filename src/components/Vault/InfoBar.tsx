@@ -1,8 +1,7 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { usePublicClient } from "wagmi";
 import { formatUnits } from "viem";
 
 import {
@@ -21,15 +20,13 @@ import { CHAINS } from "@constants";
 import type { TVault } from "@types";
 
 interface IProps {
+  network: string;
   vault: TVault;
 }
 
-const InfoBar: React.FC<IProps> = memo(({ vault }) => {
-  const _publicClient = usePublicClient();
-
+const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
-  const [currentChain, setCurrentChain] = useState<any>();
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [userBalances, setUserBalances] = useState({
@@ -44,14 +41,6 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
     dailyAPR: "",
     dailyEarn: "",
   });
-
-  useEffect(() => {
-    if (_publicClient) {
-      setCurrentChain(
-        CHAINS.find((item) => item.name === _publicClient.chain.name)
-      );
-    }
-  }, [_publicClient]);
 
   useEffect(() => {
     let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
@@ -92,6 +81,10 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
       setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
+  const vaultChain = useMemo(
+    () => CHAINS.find((item) => item.id === network),
+    [network]
+  );
   return (
     <div className="bg-button rounded-md">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
@@ -104,9 +97,9 @@ const InfoBar: React.FC<IProps> = memo(({ vault }) => {
           <div className="flex gap-3">
             <img
               className="w-7 h-7 rounded-full hidden lg:flex"
-              src={currentChain?.logoURI}
-              alt={currentChain?.name}
-              title={currentChain?.name}
+              src={vaultChain?.logoURI}
+              alt={vaultChain?.name}
+              title={vaultChain?.name}
             />
             {!!vault?.strategyInfo?.protocols.length && (
               <div className="lg:flex items-start gap-3 hidden">

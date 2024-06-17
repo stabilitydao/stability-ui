@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react";
 
 import { HoldModal } from "@components";
 
-import { assetsPrices, connected } from "@store";
+import { connected } from "@store";
 
 import { getTimeDifference } from "@utils";
 
@@ -62,7 +62,6 @@ const HoldTable = ({
 };
 
 const YieldBar: React.FC<IProps> = memo(({ vault }) => {
-  const $assetsPrices = useStore(assetsPrices);
   const $connected = useStore(connected);
 
   const [shareData, setShareData] = useState<any>();
@@ -70,7 +69,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const [modal, setModal] = useState<boolean>(false);
 
   const getShareData = async () => {
-    if (!Number(vault.shareprice) || !$assetsPrices) {
+    if (!Number(vault.shareprice)) {
       return;
     }
     const sharePriceOnCreation = 1;
@@ -87,7 +86,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
   useEffect(() => {
     getShareData();
-  }, [$connected, $assetsPrices]);
+  }, [$connected]);
 
   return (
     <div>

@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { useSwitchChain, useAccount } from "wagmi";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+
+import { deployments } from "@stabilitydao/stability";
 
 import {
   account,
@@ -39,22 +41,26 @@ const Wallet = () => {
   const [userAssets, setUserAssets] = useState<any>();
   const [providerImage, setProviderImage] = useState<string>("");
 
-  const maticChain = CHAINS.find((item) => item.name === $network);
+  const currentChain = CHAINS.find((item) => item.name === $network);
 
   const checkPM = async () => {
-    const balance = (await $publicClient?.readContract({
-      address: PM[0],
-      abi: IERC721Enumerable,
-      functionName: "balanceOf",
-      args: [$account as TAddress],
-    })) as bigint;
-    if (balance) {
-      return {
-        balance: String(formatUnits(balance, 18)),
-        balanceInUSD: "",
-        logo: "https://stabilitydao.org/pm.png",
-        symbol: "PM",
-      };
+    try {
+      const balance = (await $publicClient?.readContract({
+        address: PM[0],
+        abi: IERC721Enumerable,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      })) as bigint;
+      if (balance) {
+        return {
+          balance: String(formatUnits(balance, 18)),
+          balanceInUSD: "",
+          logo: "https://stabilitydao.org/pm.png",
+          symbol: "PM",
+        };
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -121,7 +127,6 @@ const Wallet = () => {
       setTimeout(insertAssets, 1000);
     }
   };
-
   const initProfile = async () => {
     if (!$assetsBalances) return; // dublicated for TS
     let profileBalance = 0;
@@ -131,7 +136,9 @@ const Wallet = () => {
         const balance = Number(
           formatUnits(data, getTokenData(address)?.decimals as number)
         );
-        const price = Number(formatUnits($assetsPrices?.[address] || 0n, 18));
+        const price = Number(
+          $assetsPrices?.[currentChain?.id]?.[address].price
+        );
         const balanceInUSD = balance * price;
         profileBalance += balanceInUSD;
         return {
@@ -141,8 +148,11 @@ const Wallet = () => {
           symbol: getTokenData(address)?.symbol,
         };
       });
-    const profitMaker = await checkPM();
-    if (profitMaker) assets.push(profitMaker);
+    if (currentChain?.name === "Polygon") {
+      const profitMaker = await checkPM();
+      if (profitMaker) assets.push(profitMaker);
+    }
+
     const assetsTemplates = assets.map(
       (asset) =>
         `<div style="width:70px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px;flex-grow:1;">
@@ -193,9 +203,15 @@ const Wallet = () => {
   useEffect(() => {
     localStorage.removeItem("@w3m/connected_wallet_image_url");
   }, []);
+
+  const isSwitchNetwork = useMemo(
+    () => chain && !Object.keys(deployments).map(Number).includes(chain?.id),
+    []
+  );
+
   return (
     <div className="flex flex-nowrap justify-end whitespace-nowrap">
-      {maticChain && (
+      {currentChain && (
         <button
           className="bg-[#272451] sm:py-1 px-3 rounded-xl mx-2 sm:mx-4 flex items-center sm:gap-1"
           id="network"
@@ -203,13 +219,13 @@ const Wallet = () => {
         >
           <img
             className="w-5 h-5 rounded-full sm:mx-1"
-            src={maticChain?.logoURI}
-            alt={maticChain?.name}
+            src={currentChain?.logoURI}
+            alt={currentChain?.name}
           />
-          <p className="hidden sm:flex"> {maticChain?.name}</p>
+          <p className="hidden sm:flex"> {currentChain?.name}</p>
         </button>
       )}
-      {chain && chain?.id !== 137 && (
+      {isSwitchNetwork && (
         <button
           className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
           onClick={() => switchChain({ chainId: 137 })}

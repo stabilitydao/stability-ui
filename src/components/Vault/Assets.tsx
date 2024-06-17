@@ -2,12 +2,11 @@ import { memo, useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { useWalletClient, useAccount } from "wagmi";
-import { readContract } from "@wagmi/core";
+import { useWalletClient, useAccount, usePublicClient } from "wagmi";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { assetsPrices, connected } from "@store";
+import { assetsPrices, connected, currentChainID } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
@@ -24,6 +23,7 @@ import type {
 } from "@types";
 
 interface IProps {
+  network: string;
   assets: TAsset[];
   created: string;
   pricesOnCreation: string[];
@@ -74,12 +74,23 @@ const Chart = ({ data }: { data: TPieChartData[] }) => {
 };
 
 const Assets: React.FC<IProps> = memo(
-  ({ assets, created, pricesOnCreation, strategy }) => {
+  ({ network, assets, created, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
+    const $currentChainID = useStore(currentChainID);
 
     const client = useWalletClient();
     const { connector } = useAccount();
+
+    const maticClient = usePublicClient({
+      chainId: 137,
+      config: wagmiConfig,
+    });
+
+    const baseClient = usePublicClient({
+      chainId: 8453,
+      config: wagmiConfig,
+    });
 
     const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
       BigInt(price)
@@ -88,25 +99,44 @@ const Assets: React.FC<IProps> = memo(
     const [investedData, setInvestedData] = useState<any>(false);
 
     const getInvestedData = async () => {
-      const assetsAmounts = await readContract(wagmiConfig, {
-        address: strategy,
-        abi: StrategyABI,
-        functionName: "assetsAmounts",
-      });
+      let assetsAmounts = [];
+      if (network === "137") {
+        assetsAmounts = await maticClient.readContract({
+          address: strategy,
+          abi: StrategyABI,
+          functionName: "assetsAmounts",
+        });
+      } else if (network === "8453") {
+        assetsAmounts = await baseClient.readContract({
+          address: strategy,
+          abi: StrategyABI,
+          functionName: "assetsAmounts",
+        });
+      }
 
-      if (!assetsAmounts || !$assetsPrices) return;
+      if (!assetsAmounts?.length || !$assetsPrices[network]) return;
 
-      const tokens = assetsAmounts[0].map((token) => getTokenData(token));
+      const tokens = assetsAmounts[0].map((token: TAddress) =>
+        getTokenData(token)
+      );
 
-      const amounts = assetsAmounts[1].map((amount, index) =>
+      const amounts = assetsAmounts[1].map((amount: bigint, index: number) =>
         formatUnits(amount, tokens[index]?.decimals as number)
       );
 
-      const amountsInUSD = amounts.map((amount, index) => {
+      //   const amounts = assetsAmounts[1].map((amount: bigint, index: number) => {
+      //     if (tokens[index]?.decimals === undefined) {
+      //         return '0';
+      //     }
+      //     return formatUnits(amount, tokens[index]?.decimals as number);
+      // });
+
+      const amountsInUSD = amounts.map((amount: string, index: number) => {
         const tokenAddress: TAddress = tokens[index]?.address as TAddress;
 
-        const tokenPrice: bigint = $assetsPrices[tokenAddress];
-        return Number(formatUnits(tokenPrice, 18)) * Number(amount);
+        const tokenPrice: string = $assetsPrices[network][tokenAddress].price;
+
+        return Number(tokenPrice) * Number(amount);
       });
 
       const sum = amountsInUSD.reduce(
@@ -114,33 +144,35 @@ const Assets: React.FC<IProps> = memo(
         0
       );
 
-      const investedAssets = amountsInUSD.map((amount, index) => {
-        const { address, symbol, logoURI, decimals } = tokens[
-          index
-        ] as TTokenData;
+      const investedAssets = amountsInUSD.map(
+        (amount: number, index: number) => {
+          const { address, symbol, logoURI, decimals } = tokens[
+            index
+          ] as TTokenData;
 
-        // const address = token?.address as TAddress;
-        const price: number = $assetsPrices
-          ? Number(formatUnits($assetsPrices[address], 18))
-          : 0;
+          // const address = token?.address as TAddress;
+          const price: number = $assetsPrices[network][address]
+            ? Number($assetsPrices[network][address]?.price)
+            : 0;
 
-        const color = assets.find((asset) => asset.symbol === symbol)?.color;
+          const color = assets.find((asset) => asset.symbol === symbol)?.color;
 
-        return {
-          address,
-          symbol,
-          decimals,
-          color,
-          logo: logoURI,
-          amount: formatNumber(
-            amounts[index],
-            price > 1000 ? "formatWithLongDecimalPart" : "format"
-          ),
-          amountInUSD: amount,
-          formatedAmountInUSD: formatNumber(amount, "format"),
-          percent: amount ? (Number(amount) / sum) * 100 : 0,
-        };
-      });
+          return {
+            address,
+            symbol,
+            decimals,
+            color,
+            logo: logoURI,
+            amount: formatNumber(
+              amounts[index],
+              price > 1000 ? "formatWithLongDecimalPart" : "format"
+            ),
+            amountInUSD: amount,
+            formatedAmountInUSD: formatNumber(amount, "format"),
+            percent: amount ? (Number(amount) / sum) * 100 : 0,
+          };
+        }
+      );
 
       setInvestedData(investedAssets);
     };
@@ -150,8 +182,13 @@ const Assets: React.FC<IProps> = memo(
     }, [$connected, $assetsPrices]);
 
     const isAddToWallet = useMemo(() => {
-      return $connected && window.ethereum && connector?.id === "io.metamask";
-    }, [$connected, connector]);
+      return (
+        $connected &&
+        window.ethereum &&
+        connector?.id === "io.metamask" &&
+        network === $currentChainID
+      );
+    }, [$connected, connector, $currentChainID]);
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
@@ -197,8 +234,8 @@ const Assets: React.FC<IProps> = memo(
 
               const priceOnCreation = formatUnits(onCreationPrice[index], 18);
 
-              const price: number = $assetsPrices
-                ? Number(formatUnits($assetsPrices[asset.address], 18))
+              const price: number = $assetsPrices[network][asset.address]
+                ? Number($assetsPrices[network][asset.address].price)
                 : 0;
 
               const creationDate = getDate(Number(created));

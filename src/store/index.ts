@@ -8,7 +8,7 @@ import { deserialize, serialize } from "wagmi";
 import { DEFAULT_TRANSACTION_SETTINGS, APRsType } from "@constants";
 
 import type {
-  TPlatformData,
+  TPlatformsData,
   TUserBalance,
   TVaults,
   TAssetPrices,
@@ -22,12 +22,9 @@ import type {
 const account = atom<string | undefined>();
 const network = atom<string | undefined>();
 const publicClient = atom<any>();
-const platformData = atom<TPlatformData | undefined>();
-const platformFactory = atom<string | undefined>(
-  "0xa14eaae76890595b3c7ea308daebb93863480ead"
-);
-const platformVersion = atom<string>("24.01.1-alpha");
-const platformZAP = atom<string>("");
+const platformsData = atom<TPlatformsData>({});
+
+const platformVersions = atom<Record<string, string>>({});
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
 const assets = atom<string[] | undefined>();
@@ -52,9 +49,11 @@ const apiData = atom<any>();
 const vaultTypes = atom();
 const strategyTypes = atom();
 
+const currentChainID = atom("137");
+
 // deepMaps
 
-const vaults = deepMap<any>();
+const vaults = deepMap<any>(false);
 
 // portfolio
 const hideFeeApr = atom(false);
@@ -79,7 +78,7 @@ export {
   account,
   network,
   publicClient,
-  platformData,
+  platformsData,
   userBalance,
   lastTx,
   assets,
@@ -96,9 +95,7 @@ export {
   vaultTypes,
   strategyTypes,
   transactionSettings,
-  platformVersion,
-  platformFactory,
-  platformZAP,
+  platformVersions,
   hideFeeApr,
   reload,
   error,
@@ -106,4 +103,5 @@ export {
   queryClient,
   persister,
   aprFilter,
+  currentChainID,
 };
