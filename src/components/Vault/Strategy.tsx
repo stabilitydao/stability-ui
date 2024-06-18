@@ -3,13 +3,7 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import {
-  connected,
-  platformsData,
-  vaultTypes,
-  strategyTypes,
-  currentChainID,
-} from "@store";
+import { connected, platformsData, vaultTypes, strategyTypes } from "@store";
 
 import { FactoryABI, StrategyABI, wagmiConfig } from "@web3";
 
@@ -76,8 +70,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
     if (!$connected || !vault || !$vaultTypes || !$strategyTypes) return;
 
     const vaultTypesKey = vault?.type as keyof typeof $vaultTypes;
-    const strategyTypesKey =
-      vault.strategy.toLowerCase() as keyof typeof $strategyTypes;
+    const strategyTypesKey = vault.strategy as keyof typeof $strategyTypes;
 
     if ($vaultTypes[network][vaultTypesKey] !== vault.version) {
       setNeedVaultUpgrade(true);

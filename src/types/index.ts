@@ -203,7 +203,7 @@ type TVault = {
   underlying: TAddress;
   strategyAddress: TAddress;
   strategyDescription: string;
-  status: number;
+  status: string;
   version: string;
   strategyVersion: string;
   underlyingSymbol: string;
@@ -292,10 +292,6 @@ type TVaultAllowance = {
 
 type TVaultsAddress = {
   [vaultAddress: string]: string;
-};
-
-type TVaultStatuses = {
-  [key: number]: string;
 };
 
 type TSettings = {
@@ -452,7 +448,6 @@ export type {
   TSettings,
   TProfitTokenWallet,
   TSdivTokenWallet,
-  TVaultStatuses,
   TTableFilters,
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,

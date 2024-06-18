@@ -11,6 +11,8 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
+import { deployments } from "@stabilitydao/stability";
+
 import {
   account,
   platformsData,
@@ -48,7 +50,6 @@ import {
 } from "@web3";
 
 import {
-  formatFromBigInt,
   calculateAPY,
   getStrategyInfo,
   getTokenData,
@@ -59,8 +60,6 @@ import {
 } from "@utils";
 
 import {
-  GRAPH_ENDPOINTS,
-  GRAPH_QUERY,
   STABILITY_API,
   TOKENS_ASSETS,
   YEARN_PROTOCOLS,
@@ -154,7 +153,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     prices: TPriceInfo[],
     chainID: string
   ) => {
-    const graphVaults = await data.vaultEntities.reduce(
+    const graphVaults = await data.reduce(
       async (vaultsPromise: Promise<TVaults>, vault: TVault) => {
         const vaults = await vaultsPromise;
 
@@ -163,20 +162,19 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.underlying.toLowerCase()
           ];
 
-        const APIVault =
-          stabilityAPIData?.vaults[chainID][vault.id.toLowerCase()];
+        const APIVault = vault;
+
+        const strategyAssets = APIVault.assets.map((asset: TAddress) =>
+          asset.toLowerCase()
+        );
 
         const strategyInfo = getStrategyInfo(APIVault?.symbol);
 
         const strategyName = strategyInfo?.shortName;
 
-        const strategyEntity = data.strategyEntities.find(
-          (obj: any) => obj.id === vault.strategy
-        );
-
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault.almRebalanceHistoryEntity[0];
+        const almRebalanceEntity = APIVault.almRebalanceRawData[0];
 
         let dailyAPR = 0;
         let rebalances = {};
@@ -186,13 +184,33 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///////
-        const assetsProportions = vault.assetsProportions
-          ? vault.assetsProportions.map((proportion: any) =>
-              Math.round(Number(formatUnits(proportion, 16)))
+        const decimals = APIVault.assets.map(
+          (asset: TAddress) => getTokenData(asset)?.decimals
+        );
+
+        const assetsAmounts = APIVault.assetsAmounts.map(
+          (amount: string, index: number) =>
+            formatUnits(amount, decimals[index])
+        );
+        const assetsPrices = APIVault.assets.map(
+          (asset) => prices[asset.toLowerCase()].price
+        );
+        const assetsAmountsInUSD = assetsAmounts.map(
+          (amount, index) => amount * assetsPrices[index]
+        );
+
+        const assetsAmountsSum = assetsAmountsInUSD.reduce(
+          (acc: number, cur: string) => acc + Number(cur),
+          0
+        );
+        const assetsProportions = assetsAmountsSum
+          ? assetsAmountsInUSD.map((amount: string) =>
+              Math.round((Number(amount) / assetsAmountsSum) * 100)
             )
-          : [];
+          : assetsAmountsInUSD.map((_) => 50);
+
         const assetsPromise = Promise.all(
-          vault.strategyAssets.map(async (strategyAsset: any) => {
+          strategyAssets.map(async (strategyAsset: TAddress) => {
             const token = getTokenData(strategyAsset);
             if (token) {
               const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
@@ -210,18 +228,19 @@ const AppStore = (props: React.PropsWithChildren) => {
         );
 
         const assets = await assetsPromise;
-        const lastHistoryData = vault.vaultHistoryEntity[0];
+
+        const lastHistoryData = APIVault.apr;
 
         ///// APR DATA CALCULATION
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 
-        const dailyFarmApr = lastHistoryData?.APR24H
-          ? Number(formatUnits(lastHistoryData.APR24H, 3)).toFixed(2)
+        const dailyFarmApr = lastHistoryData?.income24h
+          ? Number(lastHistoryData?.income24h)
           : 0;
 
-        const weeklyFarmApr = lastHistoryData?.APRWeekly
-          ? Number(formatUnits(lastHistoryData.APRWeekly, 3)).toFixed(2)
+        const weeklyFarmApr = lastHistoryData?.incomeWeek
+          ? Number(lastHistoryData?.incomeWeek)
           : 0;
 
         if (APIData) {
@@ -299,48 +318,41 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
           //////
           poolSwapFeesAPRDaily =
-            Number(formatUnits(almRebalanceEntity.APR24H, 8)) -
-            (Number(formatUnits(almRebalanceEntity.APR24H, 8)) / 100) * fee;
+            Number(formatUnits(almRebalanceEntity[0], 8)) -
+            (Number(formatUnits(almRebalanceEntity[0], 8)) / 100) * fee;
 
           poolSwapFeesAPRWeekly =
-            Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) -
-            (Number(formatUnits(almRebalanceEntity.APRWeekly, 8)) / 100) * fee;
+            Number(formatUnits(almRebalanceEntity[2], 8)) -
+            (Number(formatUnits(almRebalanceEntity[2], 8)) / 100) * fee;
 
           dailyAPR =
-            Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) -
-            (Number(formatUnits(almRebalanceEntity.APRFromLastEvent, 8)) /
-              100) *
-              fee;
+            Number(formatUnits(almRebalanceEntity[1], 8)) -
+            (Number(formatUnits(almRebalanceEntity[1], 8)) / 100) * fee;
 
           if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
           if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
           if (!dailyAPR) dailyAPR = 0;
 
           // rebalances
-          const totalRebalances = vault.almRebalanceHistoryEntity;
+          const totalRebalances = APIVault.almRebalanceRawData;
 
           const _24HRebalances = totalRebalances.filter(
-            (obj: any) => Number(obj.timestamp) >= NOW - 86400
+            (obj: string[]) => Number(obj[3]) >= NOW - 86400
           ).length;
           const _7DRebalances = totalRebalances.filter(
-            (obj: any) => Number(obj.timestamp) >= NOW - 86400 * 7
+            (obj: string[]) => Number(obj[3]) >= NOW - 86400 * 7
           ).length;
 
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
         }
 
         const APR = (
-          formatFromBigInt(String(vault.apr), 3, "withDecimals") +
-          Number(dailyAPR)
+          Number(APIVault.apr.incomeLatest) + Number(dailyAPR)
         ).toFixed(2);
 
         const APY = calculateAPY(APR).toFixed(2);
 
-        const APRWithoutFees = formatFromBigInt(
-          String(vault.apr),
-          3,
-          "withDecimals"
-        ).toFixed(2);
+        const APRWithoutFees = APIVault.apr.incomeLatest;
 
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
@@ -354,12 +366,12 @@ const AppStore = (props: React.PropsWithChildren) => {
           withFees: {
             latest: String(APR),
             daily: determineAPR(
-              lastHistoryData?.APR24H,
+              lastHistoryData?.income24h,
               dailyTotalAPRWithFees,
               APR
             ),
             weekly: determineAPR(
-              lastHistoryData?.APRWeekly,
+              lastHistoryData?.incomeWeek,
               weeklyTotalAPRWithFees,
               APR
             ),
@@ -367,12 +379,12 @@ const AppStore = (props: React.PropsWithChildren) => {
           withoutFees: {
             latest: APRWithoutFees,
             daily: determineAPR(
-              lastHistoryData?.APR24H,
+              lastHistoryData?.income24h,
               dailyFarmApr,
               APRWithoutFees
             ),
             weekly: determineAPR(
-              lastHistoryData?.APRWeekly,
+              lastHistoryData?.incomeWeek,
               weeklyFarmApr,
               APRWithoutFees
             ),
@@ -382,12 +394,12 @@ const AppStore = (props: React.PropsWithChildren) => {
           withFees: {
             latest: APY,
             daily: determineAPR(
-              lastHistoryData?.APR24H,
+              lastHistoryData?.income24h,
               calculateAPY(dailyTotalAPRWithFees).toFixed(2),
               APY
             ),
             weekly: determineAPR(
-              lastHistoryData?.APRWeekly,
+              lastHistoryData?.incomeWeek,
               calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
               APY
             ),
@@ -395,12 +407,12 @@ const AppStore = (props: React.PropsWithChildren) => {
           withoutFees: {
             latest: APYWithoutFees,
             daily: determineAPR(
-              lastHistoryData?.APR24H,
+              lastHistoryData?.income24h,
               calculateAPY(dailyFarmApr).toFixed(2),
               APYWithoutFees
             ),
             weekly: determineAPR(
-              lastHistoryData?.APRWeekly,
+              lastHistoryData?.incomeWeek,
               calculateAPY(weeklyFarmApr).toFixed(2),
               APYWithoutFees
             ),
@@ -416,19 +428,17 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             : { latest: "-", daily: "-", weekly: "-" };
 
-        const latestFarmAPR = String(
-          Number(formatUnits(BigInt(vault.apr), 3)).toFixed(2)
-        );
+        const latestFarmAPR = APIVault.apr.incomeLatest;
 
         const farmAPR = {
           latest: latestFarmAPR,
           daily: determineAPR(
-            lastHistoryData?.APR24H,
+            lastHistoryData?.income24h,
             dailyFarmApr,
             latestFarmAPR
           ),
           weekly: determineAPR(
-            lastHistoryData?.APRWeekly,
+            lastHistoryData?.incomeWeek,
             weeklyFarmApr,
             latestFarmAPR
           ),
@@ -448,11 +458,21 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const lifetimeVsHoldAPR = lastHistoryData?.lifetimeVsHoldAPR
-          ? Number(lastHistoryData?.lifetimeVsHoldAPR).toFixed(2)
+        const lifetimeVsHoldAPR = lastHistoryData?.vsHoldLifetime
+          ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
           : 0;
 
-        const daysFromCreation = Number(lastHistoryData?.daysFromCreation) || 1;
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        const vaultCreated = APIVault.created;
+
+        const differenceInSecondsFromCreation = currentTime - vaultCreated;
+
+        const secondsInADay = 60 * 60 * 24;
+
+        const daysFromCreation = Math.round(
+          differenceInSecondsFromCreation / secondsInADay
+        );
 
         const vsHoldAPR = (
           (Number(lifetimeVsHoldAPR) / 365) *
@@ -461,20 +481,20 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         let lifetimeTokensHold: THoldData[] = [];
 
-        if (lastHistoryData?.lifetimeTokensVsHoldAPR && prices) {
-          lifetimeTokensHold = vault.strategyAssets.map(
-            (asset: string, index: number) => {
+        if (lastHistoryData?.vsHoldAssetsLifetime && prices) {
+          lifetimeTokensHold = strategyAssets.map(
+            (asset: TAddress, index: number) => {
               const price = Number(prices[asset.toLowerCase()]?.price);
 
               const priceOnCreation = Number(
-                formatUnits(BigInt(vault.AssetsPricesOnCreation[index]), 18)
+                formatUnits(BigInt(APIVault.assetsPricesOnCreation[index]), 18)
               );
 
               const priceDifference =
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
               const yearPercentDiff = Number(
-                lastHistoryData?.lifetimeTokensVsHoldAPR[index]
+                lastHistoryData?.vsHoldAssetsLifetime[index]
               );
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
@@ -492,16 +512,16 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         const isVsActive =
-          getTimeDifference(vault.created).days > 2 &&
+          getTimeDifference(APIVault.created).days > 2 &&
           !!Number(APIVault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
         let strategySpecific = "";
 
-        if (vault.strategySpecific && strategyInfo.shortName === "Y") {
+        if (APIVault.strategySpecific && strategyInfo.shortName === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
-            if (vault.strategySpecific.toLowerCase().includes(protocol)) {
+            if (APIVault.strategySpecific.toLowerCase().includes(protocol)) {
               switch (protocol) {
                 case "aave":
                   yearnProtocols.push({
@@ -534,46 +554,53 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.id]) {
-          strategySpecific = STRATEGY_SPECIFIC_SUBSTITUTE[vault.id];
+        if (STRATEGY_SPECIFIC_SUBSTITUTE[APIVault.address.toLowerCase()]) {
+          strategySpecific =
+            STRATEGY_SPECIFIC_SUBSTITUTE[APIVault.address.toLowerCase()];
         } else {
           strategySpecific =
             strategyInfo?.shortName === "DQMF"
-              ? vault.strategySpecific.replace(
+              ? APIVault.strategySpecific.replace(
                   /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
                   ""
                 )
-              : vault.strategySpecific;
+              : APIVault.strategySpecific;
         }
         /////
-        vaults[vault.id] = {
-          address: vault.id,
-          name: vault.name,
-          symbol: vault.symbol,
-          created: vault.created,
-          assetsPricesOnCreation: vault.AssetsPricesOnCreation,
-          type: vault.vaultType,
-          strategy: vault.strategyId,
+
+        const strategyVersion =
+          stabilityAPIData.platforms[chainID].versions.strategy[
+            APIVault.strategyId
+          ];
+
+        vaults[APIVault.address.toLowerCase()] = {
+          address: APIVault.address.toLowerCase(),
+          name: APIVault.name,
+          symbol: APIVault.symbol,
+          created: APIVault.created,
+          assetsPricesOnCreation: APIVault.assetsPricesOnCreation,
+          type: APIVault.vaultType,
+          strategy: APIVault.strategyId,
           shareprice: APIVault.sharePrice,
           tvl: APIVault.tvl,
           strategySpecific,
           balance: "",
-          lastHardWork: vault.lastHardWork,
-          hardWorkOnDeposit: vault?.hardWorkOnDeposit,
+          lastHardWork: APIVault.lastHardWork,
+          hardWorkOnDeposit: APIVault.hardWorkOnDeposit,
           daily: (Number(APR) / 365).toFixed(2),
           assets,
           assetsProportions,
           strategyInfo,
           il: IL,
-          underlying: vault.underlying,
-          strategyAddress: vault.strategy,
-          strategyDescription: vault.strategyDescription,
-          status: Number(vault.vaultStatus),
-          version: vault.version,
-          strategyVersion: strategyEntity.version,
-          underlyingSymbol: strategyEntity.underlyingSymbol,
-          NFTtokenID: vault.NFTtokenID,
-          gasReserve: vault.gasReserve,
+          underlying: APIVault.underlying,
+          strategyAddress: APIVault.strategy.toLowerCase(),
+          strategyDescription: APIVault.strategyDescription,
+          status: APIVault.status,
+          version: APIVault.version,
+          strategyVersion: strategyVersion,
+          underlyingSymbol: APIVault?.underlyingSymbol || "",
+          NFTtokenID: APIVault.vaultManagerId,
+          gasReserve: APIVault.gasReserve,
           rebalances,
           earningData: {
             apr: APRArray,
@@ -601,11 +628,6 @@ const AppStore = (props: React.PropsWithChildren) => {
   };
 
   const getData = async () => {
-    let graphResponse: any;
-    let retries = 0;
-    let apiError: string = "";
-    const maxRetries = 2;
-
     const versions: Record<string, string> = {};
     const vaultsTokens: { [key: string]: string[] } = {};
     const platformData: TPlatformsData = {};
@@ -616,76 +638,36 @@ const AppStore = (props: React.PropsWithChildren) => {
 
     await Promise.all(
       CHAINS.map(async (chain) => {
-        while (retries < maxRetries) {
-          try {
-            graphResponse = await axios.post(GRAPH_ENDPOINTS[chain.id], {
-              query: GRAPH_QUERY,
-            });
+        const tempData = Object.entries(stabilityAPIData.vaults[chain.id]).map(
+          (obj) => obj[1]
+        );
 
-            if (
-              graphResponse.data.errors &&
-              graphResponse.data.errors.length > 0
-            ) {
-              throw new Error("GRAPH API ERROR");
-            }
-            break;
-          } catch (error: any) {
-            retries++;
-            apiError = error.message as string;
-            console.log("GRAPH API ERROR:", error);
-          }
-        }
-        if (retries >= maxRetries) {
-          error.set({ state: true, type: "API", description: apiError });
-
-          throw new Error(
-            "Maximum number of retry attempts reached for graph request"
-          );
-        }
+        await setGraphData(tempData, prices[chain.id], String(chain.id));
 
         /////***** SET PLATFORM DATA *****/////
-        const platformEntity = graphResponse?.data?.data?.platformEntities[0];
 
-        if (platformEntity) {
-          vaultsTokens[String(chain.id)] =
-            platformEntity?.bcAssets as TAddress[];
+        vaultsTokens[String(chain.id)] = stabilityAPIData?.platforms[chain.id]
+          .bcAssets as TAddress[];
 
-          versions[String(chain.id)] = platformEntity?.version;
+        versions[String(chain.id)] =
+          stabilityAPIData?.platforms[chain.id]?.versions?.platform;
 
-          platformData[String(chain.id)] = {
-            platform: platforms[chain.id],
-            factory: platformEntity?.factory,
-            buildingPermitToken: platformEntity?.buildingPermitToken,
-            buildingPayPerVaultToken: platformEntity?.buildingPayPerVaultToken,
-            zap: platformEntity?.zap,
-          };
-        }
+        platformData[String(chain.id)] = {
+          platform: platforms[chain.id],
+          factory: deployments[chain.id].factory.toLowerCase(),
+          buildingPermitToken:
+            stabilityAPIData?.platforms[chain.id]?.buildingPermitToken,
+          buildingPayPerVaultToken:
+            stabilityAPIData?.platforms[chain.id]?.buildingPayPerVaultToken,
+          zap: deployments[chain.id].zap.toLowerCase(),
+        };
 
-        //todo: change this to data from backend
-        await setGraphData(
-          graphResponse.data.data,
-          prices[chain.id],
-          String(chain.id)
-        );
         strategyTypeEntities[String(chain.id)] =
-          graphResponse.data.data.strategyConfigEntities.reduce(
-            (versions: any, version: any) => {
-              versions[version.id.toLowerCase()] = version.version;
-
-              return versions;
-            },
-            {}
-          );
+          stabilityAPIData.platforms[chain.id].versions.strategy;
         vaultTypeEntities[String(chain.id)] =
-          graphResponse.data.data.vaultTypeEntities.reduce(
-            (versions: any, version: any) => {
-              versions[version.id] = version.version;
+          stabilityAPIData.platforms[chain.id].versions.vaultType;
 
-              return versions;
-            },
-            {}
-          );
-
+        /////***** SET USER BALANCES *****/////
         if (isConnected) {
           isWeb3Load.set(true);
 

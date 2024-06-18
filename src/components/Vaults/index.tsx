@@ -325,7 +325,7 @@ const Vaults = () => {
           }
           if (f.name === "Active") {
             sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.status === 1
+              (vault: TVault) => vault.status === "Active"
             );
           }
           break;

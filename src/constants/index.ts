@@ -1,4 +1,4 @@
-import type { TVaultStatuses, TTableFilters, TTableColumn } from "@types";
+import type { TTableFilters, TTableColumn } from "@types";
 import {
   USDC,
   USDT,
@@ -233,15 +233,6 @@ const DEFAULT_TRANSACTION_SETTINGS = {
   gasLimit: "1.1",
 };
 
-const VAULT_STATUSES: TVaultStatuses = {
-  0: "NOT_EXIST",
-  1: "ACTIVE",
-  2: "DEPRECATED",
-  3: "EMERGENCY_EXIT",
-  4: "DISABLED",
-  5: "DEPOSITS_UNAVAILABLE",
-};
-
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const PROTOCOLS = {
@@ -319,69 +310,6 @@ id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`,
   }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`,
 };
 
-const GRAPH_QUERY = `
-      {
-        vaultEntities {
-          id
-          apr
-          assetsProportions
-          strategy
-          strategyId
-          created
-          vaultType
-          version
-          underlying
-          symbol
-          strategySpecific
-          strategyDescription
-          name
-          strategyAssets
-          lastHardWork
-          hardWorkOnDeposit
-          vaultStatus
-          AssetsPricesOnCreation
-          gasReserve
-          NFTtokenID
-          vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
-            APR24H
-            APRWeekly
-            daysFromCreation
-            lifetimeVsHoldAPR
-            lifetimeTokensVsHoldAPR
-          }
-          almRebalanceHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
-            timestamp
-            APRFromLastEvent
-            APR24H
-            APRWeekly
-          }
-        }
-        platformEntities {
-          version
-          bcAssets
-          zap
-          factory
-          buildingPayPerVaultToken
-          buildingPermitToken
-        }
-        vaultTypeEntities {
-          version
-          id
-        }
-        strategyEntities {
-          strategyId
-          version
-          pool
-          underlyingSymbol
-          id
-        }
-        strategyConfigEntities {
-          version
-          id
-        }
-      }
-      `;
-
 const STABILITY_API = "https://api.stabilitydao.org/";
 
 export {
@@ -396,7 +324,6 @@ export {
   DEFAULT_TRANSACTION_SETTINGS,
   GRAPH_ENDPOINTS,
   PROTOCOLS,
-  GRAPH_QUERY,
   STABILITY_API,
   PROFIT,
   PM,
@@ -404,7 +331,6 @@ export {
   WBTC,
   WETH,
   WMATIC,
-  VAULT_STATUSES,
   MULTISIG,
   TREASURY,
   MONTHS,

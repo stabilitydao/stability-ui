@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { VAULT_STATUSES } from "@constants";
 
 interface IProps {
-  status: number;
+  status: string;
 }
 
 const VaultState: React.FC<IProps> = ({ status }) => {
@@ -30,9 +29,9 @@ const VaultState: React.FC<IProps> = ({ status }) => {
     <div className="relative">
       <div
         className={`h-5 w-5 md:w-3 md:h-3 ${
-          status === 1 ? "bg-[#488B57]" : "bg-[#EE6A63]"
+          status === "Active" ? "bg-[#488B57]" : "bg-[#EE6A63]"
         } rounded-full mr-2`}
-        title={VAULT_STATUSES[status]}
+        title={status}
         onClick={(e) => {
           e.stopPropagation();
           setTooltip((prev) => !prev);
@@ -43,7 +42,7 @@ const VaultState: React.FC<IProps> = ({ status }) => {
           ref={tooltipRef}
           className="absolute bottom-[-55px] right-[-50px] py-2 px-3 rounded-md bg-button"
         >
-          {VAULT_STATUSES[status]}
+          {status}
         </div>
       )}
     </div>
