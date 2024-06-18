@@ -8,8 +8,6 @@ import { VaultState, VaultType } from "@components";
 
 import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
-import { VAULT_STATUSES } from "@constants";
-
 import { connected, currentChainID } from "@store";
 
 import type { TVault } from "@types";
@@ -80,7 +78,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             </p>
             <div className="text-[16px] mt-1 flex items-center gap-1">
               <VaultState status={vault?.status} />
-              <span> {VAULT_STATUSES[vault?.status]}</span>
+              <span> {vault?.status}</span>
             </div>
           </div>
           <div className="sm:w-1/2">

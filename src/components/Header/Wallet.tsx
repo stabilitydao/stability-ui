@@ -12,8 +12,8 @@ import {
   assetsBalances,
   visible,
   assetsPrices,
-  network,
   publicClient,
+  currentChainID,
 } from "@store";
 
 import { IERC721Enumerable } from "@web3";
@@ -31,7 +31,7 @@ const Wallet = () => {
   const { connector } = useAccount();
 
   const $account = useStore(account);
-  const $network = useStore(network);
+  const $currentChainID = useStore(currentChainID);
   const $visible = useStore(visible);
   const $publicClient = useStore(publicClient);
   const $assetsBalances = useStore(assetsBalances);
@@ -41,7 +41,7 @@ const Wallet = () => {
   const [userAssets, setUserAssets] = useState<any>();
   const [providerImage, setProviderImage] = useState<string>("");
 
-  const currentChain = CHAINS.find((item) => item.name === $network);
+  const currentChain = CHAINS.find((item) => item.id === $currentChainID);
 
   const checkPM = async () => {
     try {
@@ -136,9 +136,8 @@ const Wallet = () => {
         const balance = Number(
           formatUnits(data, getTokenData(address)?.decimals as number)
         );
-        const price = Number(
-          $assetsPrices?.[currentChain?.id]?.[address].price
-        );
+        const price = Number($assetsPrices?.[$currentChainID]?.[address].price);
+
         const balanceInUSD = balance * price;
         profileBalance += balanceInUSD;
         return {

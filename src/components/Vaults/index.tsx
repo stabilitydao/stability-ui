@@ -68,6 +68,7 @@ import type {
   TPendingPlatformUpgrade,
   TAddress,
   TUpgradesTable,
+  TEarningData,
 } from "@types";
 
 // type TToken = {
@@ -96,9 +97,9 @@ const Vaults = () => {
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
-    earningData: "",
+    earningData: {} as TEarningData,
     daily: 0,
-    lastHardWork: 0,
+    lastHardWork: "0",
     symbol: "",
     state: false,
     pool: {},
@@ -324,7 +325,7 @@ const Vaults = () => {
           }
           if (f.name === "Active") {
             sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.status === 1
+              (vault: TVault) => vault.status === "Active"
             );
           }
           break;
@@ -354,8 +355,8 @@ const Vaults = () => {
 
           sortedVaults = [...sortedVaults].sort((a, b) =>
             compareHandler(
-              a[state.keyName as keyof TVault].apr[fees][$aprFilter],
-              b[state.keyName as keyof TVault].apr[fees][$aprFilter],
+              a[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
+              b[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
               state.dataType,
               state.sortType
             )
@@ -907,7 +908,7 @@ const Vaults = () => {
                               setAprModal({
                                 earningData: vault.earningData,
                                 daily: vault.daily,
-                                lastHardWork: vault.lastHardWork as any,
+                                lastHardWork: vault.lastHardWork,
                                 symbol: vault?.risk?.symbol as string,
                                 state: true,
                                 pool: vault?.pool,
@@ -924,10 +925,12 @@ const Vaults = () => {
                             >
                               <p>
                                 {$hideFeeAPR
-                                  ? vault.earningData.apr.withoutFees[
+                                  ? vault?.earningData?.apr.withoutFees[
                                       $aprFilter
                                     ]
-                                  : vault.earningData.apr.withFees[$aprFilter]}
+                                  : vault?.earningData?.apr.withFees[
+                                      $aprFilter
+                                    ]}
                                 %
                               </p>
                             </div>

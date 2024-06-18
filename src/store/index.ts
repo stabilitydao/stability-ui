@@ -11,24 +11,22 @@ import type {
   TPlatformsData,
   TUserBalance,
   TVaults,
-  TAssetPrices,
   TBalances,
   TAddress,
   TSettings,
   TError,
+  TMultichainPrices,
 } from "@types";
 
 // atoms
 const account = atom<string | undefined>();
-const network = atom<string | undefined>();
 const publicClient = atom<any>();
 const platformsData = atom<TPlatformsData>({});
 
 const platformVersions = atom<Record<string, string>>({});
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
-const assets = atom<string[] | undefined>();
-const assetsPrices = atom<TAssetPrices | undefined>();
+const assetsPrices = atom<TMultichainPrices>({});
 const assetsBalances = atom<TBalances | undefined>();
 const vaultData = atom<TVaults>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
@@ -76,12 +74,10 @@ const persister = createSyncStoragePersister({
 
 export {
   account,
-  network,
   publicClient,
   platformsData,
   userBalance,
   lastTx,
-  assets,
   assetsPrices,
   assetsBalances,
   vaultData,
