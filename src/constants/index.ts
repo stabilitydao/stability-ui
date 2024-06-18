@@ -327,15 +327,9 @@ const GRAPH_QUERY = `
           assetsProportions
           strategy
           strategyId
-          totalSupply
           created
-          color
-          upgradeAllowed
           vaultType
           version
-          colorBackground
-          deployAllowed
-          vaultBuildingPrice
           underlying
           symbol
           strategySpecific
@@ -344,13 +338,10 @@ const GRAPH_QUERY = `
           strategyAssets
           lastHardWork
           hardWorkOnDeposit
-          assetsWithApr
-          assetsAprs
           vaultStatus
           AssetsPricesOnCreation
           gasReserve
           NFTtokenID
-          initAssetsAmounts
           vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
             APR24H
             APRWeekly
@@ -370,6 +361,8 @@ const GRAPH_QUERY = `
           bcAssets
           zap
           factory
+          buildingPayPerVaultToken
+          buildingPermitToken
         }
         vaultTypeEntities {
           version
@@ -385,17 +378,6 @@ const GRAPH_QUERY = `
         strategyConfigEntities {
           version
           id
-        }
-        assetHistoryEntities {
-          id
-          price
-          timestamp
-          address
-        }
-        lastFeeAMLEntities {
-          id
-          timestamps
-          APRS
         }
       }
       `;

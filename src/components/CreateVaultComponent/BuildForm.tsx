@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@nanostores/react";
 
-import { usePublicClient } from "wagmi";
 import { formatUnits, parseUnits, maxUint256 } from "viem";
 import {
   readContract,
@@ -56,7 +55,6 @@ const BuildForm = ({
   const $assetsBalances: any = useStore(assetsBalances);
   const $assetsPrices: any = useStore(assetsPrices);
   const $currentChainID = useStore(currentChainID);
-  const _publicClient = usePublicClient();
   // todo implement using
   const canUsePermitToken = false;
 

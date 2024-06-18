@@ -2,8 +2,16 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits } from "viem";
+import { usePublicClient } from "wagmi";
 
-import { platforms, PlatformABI, FactoryABI, IERC721Enumerable } from "@web3";
+import {
+  platforms,
+  PlatformABI,
+  FactoryABI,
+  IERC721Enumerable,
+  wagmiConfig,
+} from "@web3";
+
 import {
   platformsData,
   publicClient,
@@ -36,6 +44,11 @@ const CreateVaultComponent = () => {
   const $connected = useStore(connected);
   const $currentChainID = useStore(currentChainID);
 
+  const _publicClient = usePublicClient({
+    chainId: Number($currentChainID),
+    config: wagmiConfig,
+  });
+
   const { open } = useWeb3Modal();
 
   const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
@@ -51,6 +64,31 @@ const CreateVaultComponent = () => {
   >();
   const [defaultBoostTokens, setDefaultBoostTokens] = useState<string[]>([]);
   const [freeVaults, setFreeVaults]: any = useState();
+  const [buildingPrices, setBuildingPrices] = useState<
+    { [vaultType: string]: bigint }[]
+  >({});
+
+  const getBuildingPrices = async () => {
+    let contractData = await _publicClient.readContract({
+      address: platforms[$currentChainID],
+      abi: PlatformABI,
+      functionName: "getData",
+    });
+    if (contractData) {
+      const buildingPrices: { [vaultType: string]: bigint } = {};
+      const vaultTypes = contractData[3];
+      const prices = contractData[5];
+
+      if (vaultTypes.length === prices.length) {
+        for (let i = 0; i < vaultTypes.length; i++) {
+          if (vaultTypes[i] && prices[i] !== undefined) {
+            buildingPrices[vaultTypes[i]] = prices[i];
+          }
+        }
+        setBuildingPrices(buildingPrices);
+      }
+    }
+  };
 
   const getData = async () => {
     if ($publicClient && $platformsData[$currentChainID] && isCorrectNetwork) {
@@ -150,6 +188,7 @@ const CreateVaultComponent = () => {
       }
     }
   };
+
   const freeVaultsHandler = async () => {
     if ($publicClient && $balances && $balances[7][0] && isCorrectNetwork) {
       const epoch = Math.floor(new Date().getTime() / 1000);
@@ -213,8 +252,10 @@ const CreateVaultComponent = () => {
   };
 
   useEffect(() => {
+    getBuildingPrices();
     getData();
   }, [$publicClient, $platformsData[$currentChainID]?.factory, lastTx.get()]);
+
   useEffect(() => {
     freeVaultsHandler();
   }, [$balances]);
@@ -227,6 +268,7 @@ const CreateVaultComponent = () => {
     () => CHAINS.some((item) => item.id == $currentChainID) && $connected,
     [$connected, $account]
   );
+
   return (
     <WagmiLayout>
       {isCorrectNetwork ? (
@@ -477,9 +519,7 @@ const CreateVaultComponent = () => {
                   strategyDesc={buildVariants[buildIndex].strategyDesc}
                   initParams={buildVariants[buildIndex].initParams}
                   buildingPrice={
-                    $platformsData[$currentChainID].buildingPrices[
-                      buildVariants[buildIndex].vaultType
-                    ]
+                    buildingPrices[buildVariants[buildIndex].vaultType]
                   }
                   defaultBoostTokens={defaultBoostTokens}
                   minInitialBoostPerDay={formatUnits(

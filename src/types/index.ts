@@ -14,7 +14,7 @@ interface IProtocol {
 interface IFeature {
   name: string;
   logoSrc?: string;
-  svg?: any;
+  svg?: string;
 }
 
 interface IStrategyInfo {
@@ -38,7 +38,6 @@ type TPlatformData = {
   buildingPermitToken: TAddress;
   buildingPayPerVaultToken: TAddress;
   zap: TAddress;
-  buildingPrices: { [vaultType: string]: bigint };
 };
 type TPlatformsData = Record<string, TPlatformData>;
 
@@ -78,18 +77,20 @@ type TAPRData = {
   weekly: string;
 };
 
-type TEarningData = {
-  apr: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
-  apy: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
-  poolSwapFeesAPR: TAPRData;
-  farmAPR: TAPRData;
-};
+type TEarningData =
+  | {
+      apr: {
+        withFees: TAPRData;
+        withoutFees: TAPRData;
+      };
+      apy: {
+        withFees: TAPRData;
+        withoutFees: TAPRData;
+      };
+      poolSwapFeesAPR: TAPRData;
+      farmAPR: TAPRData;
+    }
+  | {};
 
 type TVaults = {
   [vaultAddress: string]: TVaultData;
@@ -110,8 +111,14 @@ type TToken = {
   tags?: string[];
 };
 
-type TAssetPrices = {
-  [address: string]: bigint;
+type TPriceInfo = {
+  price: string;
+  trusted: boolean;
+};
+type TMultichainPrices = {
+  [network: string]: {
+    [key: string]: TPriceInfo;
+  };
 };
 
 type TBalances = {
@@ -158,6 +165,12 @@ type TRisk = {
   isRektStrategy: boolean | string;
   symbol: string;
 };
+type TRebalances =
+  | {
+      daily: number;
+      weekly: number;
+    }
+  | {};
 
 type THoldData = {
   symbol: string;
@@ -180,7 +193,7 @@ type TVault = {
   tvl: string;
   strategySpecific: string;
   balance: string | bigint;
-  lastHardWork: bigint;
+  lastHardWork: string;
   hardWorkOnDeposit: boolean;
   daily: number;
   assets: TAsset[];
@@ -196,8 +209,8 @@ type TVault = {
   underlyingSymbol: string;
   NFTtokenID: string;
   gasReserve: string;
-  rebalances: any;
-  earningData: TEarningData | any;
+  rebalances: TRebalances;
+  earningData: TEarningData;
   sortAPR: string;
   pool: TPool;
   alm: TAlm;
@@ -239,9 +252,9 @@ type TVsHoldModal = {
 };
 
 type TAPRModal = {
-  earningData: TEarningData | any;
+  earningData: TEarningData;
   daily: number;
-  lastHardWork: any;
+  lastHardWork: string;
   symbol: string;
   state: boolean;
   pool: TPool;
@@ -278,7 +291,7 @@ type TVaultAllowance = {
 };
 
 type TVaultsAddress = {
-  [vaultAddress: string]: string | any;
+  [vaultAddress: string]: string;
 };
 
 type TVaultStatuses = {
@@ -395,6 +408,18 @@ type TError = {
   description: string;
 };
 
+//// API
+
+type TAPIData = {
+  title?: string;
+  about?: string;
+  status?: string;
+  services?: string[];
+  assetPrices?: TMultichainPrices;
+  vaults?: TVaults;
+  underlyings?: TVaults;
+};
+
 export type {
   TPlatformsData,
   TUserBalance,
@@ -404,7 +429,6 @@ export type {
   TVaults,
   TVaultData,
   TToken,
-  TAssetPrices,
   TBalances,
   TVault,
   TAsset,
@@ -413,6 +437,7 @@ export type {
   TBuildVariant,
   TAddress,
   IProtocol,
+  TMultichainPrices,
   IFeature,
   IStrategyInfo,
   TInputItem,
@@ -442,4 +467,7 @@ export type {
   THoldData,
   TUpgradesTable,
   TYearnProtocol,
+  TPriceInfo,
+  TAPIData,
+  TEarningData,
 };

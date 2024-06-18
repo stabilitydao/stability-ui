@@ -13,7 +13,6 @@ import { WagmiLayout } from "@layouts";
 
 import {
   account,
-  network,
   platformsData,
   platformVersions,
   publicClient,
@@ -71,10 +70,14 @@ import {
 
 import type {
   TAddress,
-  TAssetPrices,
   THoldData,
   TYearnProtocol,
   TPlatformsData,
+  TVaults,
+  TPriceInfo,
+  TMultichainPrices,
+  TAPIData,
+  TVault,
 } from "@types";
 
 const AppStore = (props: React.PropsWithChildren) => {
@@ -97,10 +100,13 @@ const AppStore = (props: React.PropsWithChildren) => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
 
-  let localVaults: any = {};
-  let prices: any = {};
+  const localVaults: {
+    [network: string]: TVaults[];
+  } = {};
 
-  let stabilityAPIData: any;
+  let prices: TMultichainPrices = {};
+
+  let stabilityAPIData: TAPIData = {};
 
   const getLocalStorageData = () => {
     const savedSettings = localStorage.getItem("transactionSettings");
@@ -131,7 +137,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     try {
       const response = await axios.get(STABILITY_API);
 
-      stabilityAPIData = response.data;
+      stabilityAPIData = response.data as TAPIData;
 
       if (stabilityAPIData?.assetPrices) {
         assetsPrices.set(stabilityAPIData?.assetPrices);
@@ -145,11 +151,11 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   const setGraphData = async (
     data: any,
-    prices: TAssetPrices,
+    prices: TPriceInfo[],
     chainID: string
   ) => {
     const graphVaults = await data.vaultEntities.reduce(
-      async (vaultsPromise: Promise<any>, vault: any) => {
+      async (vaultsPromise: Promise<TVaults>, vault: TVault) => {
         const vaults = await vaultsPromise;
 
         const APIData =
@@ -638,13 +644,21 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         /////***** SET PLATFORM DATA *****/////
-        if (graphResponse?.data?.data?.platformEntities[0]?.version) {
-          versions[String(chain.id)] =
-            graphResponse?.data?.data?.platformEntities[0]?.version;
-        }
-        if (graphResponse?.data?.data?.platformEntities[0]?.bcAssets) {
-          vaultsTokens[String(chain.id)] = graphResponse?.data?.data
-            ?.platformEntities[0]?.bcAssets as TAddress[];
+        const platformEntity = graphResponse?.data?.data?.platformEntities[0];
+
+        if (platformEntity) {
+          vaultsTokens[String(chain.id)] =
+            platformEntity?.bcAssets as TAddress[];
+
+          versions[String(chain.id)] = platformEntity?.version;
+
+          platformData[String(chain.id)] = {
+            platform: platforms[chain.id],
+            factory: platformEntity?.factory,
+            buildingPermitToken: platformEntity?.buildingPermitToken,
+            buildingPayPerVaultToken: platformEntity?.buildingPayPerVaultToken,
+            zap: platformEntity?.zap,
+          };
         }
 
         //todo: change this to data from backend
@@ -653,83 +667,47 @@ const AppStore = (props: React.PropsWithChildren) => {
           prices[chain.id],
           String(chain.id)
         );
-        let contractData: any;
-        if (chain.id === "137") {
-          contractData = await maticClient.readContract({
-            address: platforms[chain.id],
-            abi: PlatformABI,
-            functionName: "getData",
-          });
-        }
-        if (chain.id === "8453") {
-          contractData = await baseClient.readContract({
-            address: platforms[chain.id],
-            abi: PlatformABI,
-            functionName: "getData",
-          });
-        }
+        strategyTypeEntities[String(chain.id)] =
+          graphResponse.data.data.strategyConfigEntities.reduce(
+            (versions: any, version: any) => {
+              versions[version.id.toLowerCase()] = version.version;
 
-        // if (contractData?.length) {
-        //   const buildingPrices: { [vaultType: string]: bigint } = {};
-        //   for (let i = 0; i <= contractData[1].length - 1; i++) {
-        //     buildingPrices[contractData[3][i]] = contractData[5][i];
-        //   }
-        //   platformData[String(chain.id)] = {
-        //     platform: platforms[chain.id],
-        //     factory: contractData[0][0],
-        //     buildingPermitToken: contractData[0][3],
-        //     buildingPayPerVaultToken: contractData[0][4],
-        //     zap: contractData[0][7],
-        //     buildingPrices,
-        //   };
-        // }
+              return versions;
+            },
+            {}
+          );
+        vaultTypeEntities[String(chain.id)] =
+          graphResponse.data.data.vaultTypeEntities.reduce(
+            (versions: any, version: any) => {
+              versions[version.id] = version.version;
 
-        if (contractData?.length) {
-          const buildingPrices: { [vaultType: string]: bigint } = {};
-          const vaultTypes = contractData[3];
-          const prices = contractData[5];
-
-          if (vaultTypes.length === prices.length) {
-            for (let i = 0; i < vaultTypes.length; i++) {
-              if (vaultTypes[i] && prices[i] !== undefined) {
-                buildingPrices[vaultTypes[i]] = prices[i];
-              }
-            }
-          }
-
-          platformData[String(chain.id)] = {
-            platform: platforms[chain.id],
-            factory: contractData[0][0],
-            buildingPermitToken: contractData[0][3],
-            buildingPayPerVaultToken: contractData[0][4],
-            zap: contractData[0][7],
-            buildingPrices,
-          };
-        }
+              return versions;
+            },
+            {}
+          );
 
         if (isConnected) {
           isWeb3Load.set(true);
-          let contractBalance: any;
-          let contractVaults: any;
-          try {
-            if (chain.id === "137") {
-              contractBalance = await maticClient.readContract({
-                address: platforms[chain.id],
-                abi: PlatformABI,
-                functionName: "getBalance",
-                args: [address as TAddress],
-              });
-            }
-            if (chain.id === "8453") {
-              contractBalance = await baseClient.readContract({
-                address: platforms[chain.id],
-                abi: PlatformABI,
-                functionName: "getBalance",
-                args: [address as TAddress],
-              });
-            }
 
-            if (contractBalance?.length) {
+          let localClient = maticClient;
+          if (chain.id === "8453") {
+            localClient = baseClient;
+          }
+
+          try {
+            const contractBalance = await localClient.readContract({
+              address: platforms[chain.id],
+              abi: PlatformABI,
+              functionName: "getBalance",
+              args: [address as TAddress],
+            });
+            const contractVaults = await localClient.readContract({
+              address: contractBalance[6][1],
+              abi: IVaultManagerABI,
+              functionName: "vaults",
+            });
+
+            if (contractBalance) {
               const buildingPayPerVaultTokenBalance: bigint =
                 contractBalance[8];
               const erc20Balance: { [token: string]: bigint } = {};
@@ -755,21 +733,6 @@ const AppStore = (props: React.PropsWithChildren) => {
               });
 
               balances.set(contractBalance);
-            }
-
-            if (chain.id === "137") {
-              contractVaults = await maticClient.readContract({
-                address: contractBalance[6][1],
-                abi: IVaultManagerABI,
-                functionName: "vaults",
-              });
-            }
-            if (chain.id === "8453") {
-              contractVaults = await baseClient.readContract({
-                address: contractBalance[6][1],
-                abi: IVaultManagerABI,
-                functionName: "vaults",
-              });
             }
 
             if (contractVaults) {
@@ -799,25 +762,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             });
           }
         }
-
-        strategyTypeEntities[String(chain.id)] =
-          graphResponse.data.data.strategyConfigEntities.reduce(
-            (versions: any, version: any) => {
-              versions[version.id.toLowerCase()] = version.version;
-
-              return versions;
-            },
-            {}
-          );
-        vaultTypeEntities[String(chain.id)] =
-          graphResponse.data.data.vaultTypeEntities.reduce(
-            (versions: any, version: any) => {
-              versions[version.id] = version.version;
-
-              return versions;
-            },
-            {}
-          );
       })
     );
     isWeb3Load.set(false);
@@ -848,7 +792,6 @@ const AppStore = (props: React.PropsWithChildren) => {
 
     account.set(address);
     publicClient.set(_publicClient);
-    network.set(chain?.name);
     connected.set(isConnected);
   };
 
