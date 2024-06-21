@@ -1,10 +1,12 @@
 ---
 import App from "./App";
+import { ViewTransitions } from 'astro:transitions';
+
 import { Header} from "@components/Header"
 import { Footer } from "@components/Footer";
 
 interface IProps {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props as IProps;
@@ -12,44 +14,45 @@ const { title } = Astro.props as IProps;
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<!-- Google tag (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-			gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
-		</script>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Asset Management Platform" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="twitter:image:src" content="/og.png" />
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content="On-chain asset management, liquidity mining and yield farming platform." />
-		<meta name="twitter:description" content="On-chain asset management, liquidity mining and yield farming platform." />
-      	<meta property="og:image" content="/og.png" /> 
-		<meta property="twitter:image:height" content="100" />
-		<meta property="twitter:image:width" content="100" />
-	  	<meta property="og:image:alt" content="On-chain asset management, liquidity mining and yield farming platform." />
-		<meta property="og:type" content="object" />
-		<meta property="og:title" content="On-chain asset management, liquidity mining and yield farming platform." />
-		<meta property="og:url" content="https://stability.farm/" />
-		<meta property="og:description" content="On-chain asset management, liquidity mining and yield farming platform." />
-		<link rel="icon" type="image/svg+xml" href="/favicon.png" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title} - Stability</title>
-	</head>
-	<body>
-		<App client:only>
-			<Header client:only/>
-			<main>
-				<slot />
-			</main>
-			<Footer client:only/>
-		</App>
-	</body>
+      gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Asset Management Platform" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="twitter:image:src" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta name="twitter:description" content="On-chain asset management, liquidity mining and yield farming platform." />
+        <meta property="og:image" content="/og.png" /> 
+    <meta property="twitter:image:height" content="100" />
+    <meta property="twitter:image:width" content="100" />
+      <meta property="og:image:alt" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta property="og:type" content="object" />
+    <meta property="og:title" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta property="og:url" content="https://stability.farm/" />
+    <meta property="og:description" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} - Stability</title>
+    <ViewTransitions />
+  </head>
+  <body>
+    <App client:only>
+      <Header client:only/>
+      <main>
+        <slot />
+      </main>
+      <Footer client:only/>
+    </App>
+  </body>
 </html>
 <style is:global>
 	html, body {

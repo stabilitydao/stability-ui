@@ -1802,7 +1802,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const previewDeposit = async () => {
-    // if (!Number(lastKeyPress.key2)) return;
+    if (!Number(lastKeyPress.key2)) return;
     setLoader(true);
     if (assets && tab === "Deposit") {
       const changedInput = assets?.indexOf(lastKeyPress.key1);
