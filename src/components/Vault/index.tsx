@@ -21,11 +21,11 @@ import { vaultData, vaults, error } from "@store";
 import type { TAddress } from "@types";
 
 interface IProps {
-  vault: TAddress;
   network: string;
+  vault: TAddress;
 }
 
-const Vault: React.FC<IProps> = ({ vault, network }) => {
+const Vault: React.FC<IProps> = ({ network, vault }) => {
   const $vaultData = useStore(vaultData);
   const $vaults = useStore(vaults);
 
@@ -53,6 +53,7 @@ const Vault: React.FC<IProps> = ({ vault, network }) => {
       </div>
     );
   }
+
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">

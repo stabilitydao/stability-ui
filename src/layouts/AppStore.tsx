@@ -26,8 +26,6 @@ import {
   connected,
   apiData,
   lastTx,
-  vaultTypes,
-  strategyTypes,
   transactionSettings,
   hideFeeApr,
   reload,
@@ -73,11 +71,15 @@ import type {
   TYearnProtocol,
   TPlatformsData,
   TVaults,
-  TPriceInfo,
   TMultichainPrices,
   TAPIData,
-  TVault,
 } from "@types";
+
+import type {
+  Vaults,
+  AssetPrices,
+  Vault,
+} from "@stabilitydao/stability/out/api.types";
 
 const AppStore = (props: React.PropsWithChildren) => {
   const { address, isConnected } = useAccount();
@@ -136,7 +138,7 @@ const AppStore = (props: React.PropsWithChildren) => {
     try {
       const response = await axios.get(STABILITY_API);
 
-      stabilityAPIData = response.data as TAPIData;
+      stabilityAPIData = response.data;
 
       if (stabilityAPIData?.assetPrices) {
         assetsPrices.set(stabilityAPIData?.assetPrices);
@@ -148,88 +150,86 @@ const AppStore = (props: React.PropsWithChildren) => {
     }
   };
 
-  const setGraphData = async (
+  const setVaultsData = async (
     data: any,
-    prices: TPriceInfo[],
+    prices: AssetPrices,
     chainID: string
   ) => {
-    const graphVaults = await data.reduce(
-      async (vaultsPromise: Promise<TVaults>, vault: TVault) => {
+    const APIVaults = await data.reduce(
+      async (vaultsPromise: Promise<Vaults>, vault: Vault) => {
         const vaults = await vaultsPromise;
 
-        const APIData =
+        const underlying =
           stabilityAPIData?.underlyings?.[chainID]?.[
             vault.underlying.toLowerCase()
           ];
 
-        const APIVault = vault;
-
-        const strategyAssets = APIVault.assets.map((asset: TAddress) =>
+        const strategyAssets = vault?.assets?.map((asset: string) =>
           asset.toLowerCase()
         );
 
-        const strategyInfo = getStrategyInfo(APIVault?.symbol);
+        const strategyInfo = getStrategyInfo(vault?.symbol);
 
         const strategyName = strategyInfo?.shortName;
 
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = APIVault.almRebalanceRawData[0];
+        const almRebalanceEntity = vault?.almRebalanceRawData[0]?.map(
+          (_: string) => BigInt(_)
+        );
 
         let dailyAPR = 0;
         let rebalances = {};
 
-        if (APIData?.apr?.daily) {
-          dailyAPR = APIData.apr.daily;
+        if (underlying?.apr?.daily) {
+          dailyAPR = underlying.apr.daily;
         }
 
         ///////
-        const decimals = APIVault.assets.map(
-          (asset: TAddress) => getTokenData(asset)?.decimals
+        const decimals = vault?.assets?.map(
+          (asset: string) => getTokenData(asset)?.decimals
         );
 
-        const assetsAmounts = APIVault.assetsAmounts.map(
+        const assetsAmounts = vault?.assetsAmounts?.map(
           (amount: string, index: number) =>
             formatUnits(amount, decimals[index])
         );
-        const assetsPrices = APIVault.assets.map(
-          (asset) => prices[asset.toLowerCase()].price
+        const assetsPrices = vault?.assets?.map(
+          (asset: string) => prices[asset.toLowerCase()].price
         );
-        const assetsAmountsInUSD = assetsAmounts.map(
-          (amount, index) => amount * assetsPrices[index]
+        const assetsAmountsInUSD = assetsAmounts?.map(
+          (amount: string, index: number) =>
+            Number(amount) * Number(assetsPrices[index])
         );
 
-        const assetsAmountsSum = assetsAmountsInUSD.reduce(
+        const assetsAmountsSum = assetsAmountsInUSD?.reduce(
           (acc: number, cur: string) => acc + Number(cur),
           0
         );
+
         const assetsProportions = assetsAmountsSum
-          ? assetsAmountsInUSD.map((amount: string) =>
+          ? assetsAmountsInUSD?.map((amount: string | number) =>
               Math.round((Number(amount) / assetsAmountsSum) * 100)
             )
-          : assetsAmountsInUSD.map((_) => 50);
+          : assetsAmountsInUSD?.map((_: number) => 50);
 
-        const assetsPromise = Promise.all(
-          strategyAssets.map(async (strategyAsset: TAddress) => {
-            const token = getTokenData(strategyAsset);
-            if (token) {
-              const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-                tokenAsset.addresses.includes(token.address as TAddress)
-              );
-              return {
-                address: token?.address,
-                logo: token?.logoURI,
-                symbol: token?.symbol,
-                name: token?.name,
-                color: tokenExtended?.color,
-              };
-            }
-          })
-        );
+        const assets = strategyAssets.map((strategyAsset: string) => {
+          const token = getTokenData(strategyAsset);
+          if (token) {
+            const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
+              tokenAsset.addresses.includes(token.address as TAddress)
+            );
+            return {
+              address: token?.address,
+              logo: token?.logoURI,
+              symbol: token?.symbol,
+              name: token?.name,
+              color: tokenExtended?.color,
+            };
+          }
+        });
 
-        const assets = await assetsPromise;
-
-        const lastHistoryData = APIVault.apr;
+        const lastHistoryData = vault.apr;
 
         ///// APR DATA CALCULATION
         let poolSwapFeesAPRDaily = 0;
@@ -243,79 +243,14 @@ const AppStore = (props: React.PropsWithChildren) => {
           ? Number(lastHistoryData?.incomeWeek)
           : 0;
 
-        if (APIData) {
-          poolSwapFeesAPRDaily = APIData?.apr?.daily || 0;
+        if (underlying) {
+          poolSwapFeesAPRDaily = underlying?.apr?.daily || 0;
           poolSwapFeesAPRWeekly =
-            APIData?.apr?.weekly || APIData?.apr?.monthly || 0;
+            underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
         }
-        if (
-          (strategyName === "IQMF" || strategyName === "IRMF") &&
-          chainID == "137"
-        ) {
-          let fee = 0;
+        if (strategyName === "IQMF" || strategyName === "IRMF") {
+          let fee = vault.almFee.income;
 
-          if (strategyName === "IRMF") {
-            try {
-              const baseFee = await maticClient.readContract({
-                address: retroIchiFactory,
-                abi: [
-                  {
-                    inputs: [],
-                    name: "baseFee",
-                    outputs: [
-                      { internalType: "uint256", name: "", type: "uint256" },
-                    ],
-                    stateMutability: "view",
-                    type: "function",
-                  },
-                ],
-                functionName: "baseFee",
-              });
-
-              fee = Number(formatUnits(baseFee, 16));
-            } catch (error) {
-              console.log("Retro fee error:", error);
-            }
-          }
-          if (strategyName === "IQMF") {
-            try {
-              const ammFee = await maticClient.readContract({
-                address: quickSwapIchiFactory,
-                abi: [
-                  {
-                    inputs: [],
-                    name: "ammFee",
-                    outputs: [
-                      { internalType: "uint256", name: "", type: "uint256" },
-                    ],
-                    stateMutability: "view",
-                    type: "function",
-                  },
-                ],
-                functionName: "ammFee",
-              });
-
-              const baseFee = await maticClient.readContract({
-                address: quickSwapIchiFactory,
-                abi: [
-                  {
-                    inputs: [],
-                    name: "baseFee",
-                    outputs: [
-                      { internalType: "uint256", name: "", type: "uint256" },
-                    ],
-                    stateMutability: "view",
-                    type: "function",
-                  },
-                ],
-                functionName: "baseFee",
-              });
-
-              fee = Number(formatUnits(ammFee + baseFee, 16));
-            } catch (error) {
-              console.log("Ichi fee error:", error);
-            }
-          }
           //////
           poolSwapFeesAPRDaily =
             Number(formatUnits(almRebalanceEntity[0], 8)) -
@@ -334,7 +269,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           if (!dailyAPR) dailyAPR = 0;
 
           // rebalances
-          const totalRebalances = APIVault.almRebalanceRawData;
+          const totalRebalances = vault.almRebalanceRawData || [];
 
           const _24HRebalances = totalRebalances.filter(
             (obj: string[]) => Number(obj[3]) >= NOW - 86400
@@ -346,13 +281,13 @@ const AppStore = (props: React.PropsWithChildren) => {
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
         }
 
-        const APR = (
-          Number(APIVault.apr.incomeLatest) + Number(dailyAPR)
-        ).toFixed(2);
+        const APR = (Number(vault.apr.incomeLatest) + Number(dailyAPR)).toFixed(
+          2
+        );
 
         const APY = calculateAPY(APR).toFixed(2);
 
-        const APRWithoutFees = APIVault.apr.incomeLatest;
+        const APRWithoutFees = vault.apr.incomeLatest;
 
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
@@ -428,7 +363,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             : { latest: "-", daily: "-", weekly: "-" };
 
-        const latestFarmAPR = APIVault.apr.incomeLatest;
+        const latestFarmAPR = vault.apr.incomeLatest;
 
         const farmAPR = {
           latest: latestFarmAPR,
@@ -446,7 +381,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         // IL
         let IL = strategyInfo?.il?.rate || 0;
-        switch (APIVault?.risk?.symbol) {
+        switch (vault?.risk?.symbol) {
           case "REKT":
             IL = 9;
             break;
@@ -464,7 +399,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const currentTime = Math.floor(Date.now() / 1000);
 
-        const vaultCreated = APIVault.created;
+        const vaultCreated = vault.created as number;
 
         const differenceInSecondsFromCreation = currentTime - vaultCreated;
 
@@ -487,7 +422,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               const price = Number(prices[asset.toLowerCase()]?.price);
 
               const priceOnCreation = Number(
-                formatUnits(BigInt(APIVault.assetsPricesOnCreation[index]), 18)
+                formatUnits(BigInt(vault?.assetsPricesOnCreation[index]), 18)
               );
 
               const priceDifference =
@@ -512,16 +447,16 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         const isVsActive =
-          getTimeDifference(APIVault.created).days > 2 &&
-          !!Number(APIVault.sharePrice);
+          getTimeDifference(vaultCreated).days > 2 &&
+          !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
         let strategySpecific = "";
 
-        if (APIVault.strategySpecific && strategyInfo.shortName === "Y") {
+        if (vault.strategySpecific && strategyInfo.shortName === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
-            if (APIVault.strategySpecific.toLowerCase().includes(protocol)) {
+            if (vault.strategySpecific.toLowerCase().includes(protocol)) {
               switch (protocol) {
                 case "aave":
                   yearnProtocols.push({
@@ -554,53 +489,53 @@ const AppStore = (props: React.PropsWithChildren) => {
           });
         }
 
-        if (STRATEGY_SPECIFIC_SUBSTITUTE[APIVault.address.toLowerCase()]) {
+        if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()]) {
           strategySpecific =
-            STRATEGY_SPECIFIC_SUBSTITUTE[APIVault.address.toLowerCase()];
+            STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()];
         } else {
           strategySpecific =
             strategyInfo?.shortName === "DQMF"
-              ? APIVault.strategySpecific.replace(
+              ? vault.strategySpecific.replace(
                   /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
                   ""
                 )
-              : APIVault.strategySpecific;
+              : vault.strategySpecific;
         }
         /////
 
         const strategyVersion =
           stabilityAPIData.platforms[chainID].versions.strategy[
-            APIVault.strategyId
+            vault.strategyId
           ];
 
-        vaults[APIVault.address.toLowerCase()] = {
-          address: APIVault.address.toLowerCase(),
-          name: APIVault.name,
-          symbol: APIVault.symbol,
-          created: APIVault.created,
-          assetsPricesOnCreation: APIVault.assetsPricesOnCreation,
-          type: APIVault.vaultType,
-          strategy: APIVault.strategyId,
-          shareprice: APIVault.sharePrice,
-          tvl: APIVault.tvl,
+        vaults[vault.address.toLowerCase()] = {
+          address: vault.address.toLowerCase(),
+          name: vault.name,
+          symbol: vault.symbol,
+          created: vaultCreated,
+          assetsPricesOnCreation: vault.assetsPricesOnCreation,
+          type: vault.vaultType,
+          strategy: vault.strategyId,
+          shareprice: vault.sharePrice,
+          tvl: vault.tvl,
           strategySpecific,
           balance: "",
-          lastHardWork: APIVault.lastHardWork,
-          hardWorkOnDeposit: APIVault.hardWorkOnDeposit,
+          lastHardWork: vault.lastHardWork,
+          hardWorkOnDeposit: vault.hardWorkOnDeposit,
           daily: (Number(APR) / 365).toFixed(2),
           assets,
           assetsProportions,
           strategyInfo,
           il: IL,
-          underlying: APIVault.underlying,
-          strategyAddress: APIVault.strategy.toLowerCase(),
-          strategyDescription: APIVault.strategyDescription,
-          status: APIVault.status,
-          version: APIVault.version,
+          underlying: vault.underlying,
+          strategyAddress: vault.strategy.toLowerCase(),
+          strategyDescription: vault.strategyDescription,
+          status: vault.status,
+          version: vault.version,
           strategyVersion: strategyVersion,
-          underlyingSymbol: APIVault?.underlyingSymbol || "",
-          NFTtokenID: APIVault.vaultManagerId,
-          gasReserve: APIVault.gasReserve,
+          underlyingSymbol: vault?.underlyingSymbol || "",
+          NFTtokenID: vault.vaultManagerId,
+          gasReserve: vault.gasReserve,
           rebalances,
           earningData: {
             apr: APRArray,
@@ -609,9 +544,9 @@ const AppStore = (props: React.PropsWithChildren) => {
             farmAPR,
           },
           sortAPR: APRArray?.withFees?.latest,
-          pool: APIVault.pool,
-          alm: APIVault.alm,
-          risk: APIVault?.risk,
+          pool: vault.pool,
+          alm: vault.alm,
+          risk: vault?.risk,
           vsHoldAPR: Number(vsHoldAPR),
           lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
           lifetimeTokensHold,
@@ -624,25 +559,29 @@ const AppStore = (props: React.PropsWithChildren) => {
       },
       Promise.resolve({})
     );
-    localVaults[chainID] = graphVaults;
+    localVaults[chainID] = APIVaults;
   };
 
   const getData = async () => {
     const versions: Record<string, string> = {};
     const vaultsTokens: { [key: string]: string[] } = {};
     const platformData: TPlatformsData = {};
-    const strategyTypeEntities: { [key: string]: any } = {};
-    const vaultTypeEntities: { [key: string]: any } = {};
     const assetBalances: { [key: string]: bigint } = {};
     const vaultsData: { [key: string]: bigint } = {};
 
     await Promise.all(
       CHAINS.map(async (chain) => {
-        const tempData = Object.entries(stabilityAPIData.vaults[chain.id]).map(
-          (obj) => obj[1]
-        );
+        /////***** SET VAULTS DATA *****/////
 
-        await setGraphData(tempData, prices[chain.id], String(chain.id));
+        const APIVaultsData = Object.entries(
+          stabilityAPIData?.vaults[chain.id] as Vaults
+        ).map(([, vault]) => vault);
+
+        await setVaultsData(
+          APIVaultsData,
+          prices[chain.id] as AssetPrices,
+          String(chain.id)
+        );
 
         /////***** SET PLATFORM DATA *****/////
 
@@ -661,11 +600,6 @@ const AppStore = (props: React.PropsWithChildren) => {
             stabilityAPIData?.platforms[chain.id]?.buildingPayPerVaultToken,
           zap: deployments[chain.id].zap.toLowerCase(),
         };
-
-        strategyTypeEntities[String(chain.id)] =
-          stabilityAPIData.platforms[chain.id].versions.strategy;
-        vaultTypeEntities[String(chain.id)] =
-          stabilityAPIData.platforms[chain.id].versions.vaultType;
 
         /////***** SET USER BALANCES *****/////
         if (isConnected) {
@@ -746,6 +680,7 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
       })
     );
+
     isWeb3Load.set(false);
 
     assetsBalances.set(assetBalances);
@@ -754,8 +689,6 @@ const AppStore = (props: React.PropsWithChildren) => {
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);
-    strategyTypes.set(strategyTypeEntities);
-    vaultTypes.set(vaultTypeEntities);
     isVaultsLoaded.set(true);
   };
 

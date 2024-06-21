@@ -3,9 +3,9 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import { connected, platformsData, vaultTypes, strategyTypes } from "@store";
+import { connected, platformsData, apiData } from "@store";
 
-import { FactoryABI, StrategyABI, wagmiConfig } from "@web3";
+import { FactoryABI, wagmiConfig } from "@web3";
 
 import type { TAddress, TPlatformsData, TVault } from "@types";
 
@@ -17,8 +17,10 @@ interface IProps {
 const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   const $connected = useStore(connected);
   const $platformsData: TPlatformsData = useStore(platformsData);
-  const $vaultTypes = useStore(vaultTypes);
-  const $strategyTypes = useStore(strategyTypes);
+  const $apiData = useStore(apiData);
+
+  const vaultTypes = $apiData.platforms[network].versions.vaultType;
+  const strategyTypes = $apiData.platforms[network].versions.strategy;
 
   const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
   const [needStrategyUpgrade, setNeedStrategyUpgrade] =
@@ -67,19 +69,19 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   };
 
   useEffect(() => {
-    if (!$connected || !vault || !$vaultTypes || !$strategyTypes) return;
+    if (!$connected || !vault || !vaultTypes || !strategyTypes) return;
 
-    const vaultTypesKey = vault?.type as keyof typeof $vaultTypes;
-    const strategyTypesKey = vault.strategy as keyof typeof $strategyTypes;
+    const vaultTypesKey = vault?.type;
+    const strategyTypesKey = vault.strategy;
 
-    if ($vaultTypes[network][vaultTypesKey] !== vault.version) {
+    if (vaultTypes[vaultTypesKey] !== vault.version) {
       setNeedVaultUpgrade(true);
     }
 
-    if ($strategyTypes[network][strategyTypesKey] !== vault.strategyVersion) {
+    if (strategyTypes[strategyTypesKey] !== vault.strategyVersion) {
       setNeedStrategyUpgrade(true);
     }
-  }, [vault, $vaultTypes, $strategyTypes]);
+  }, [vault, vaultTypes, strategyTypes]);
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">

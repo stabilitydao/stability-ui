@@ -44,8 +44,6 @@ const error = atom<TError>({ state: false, type: "", description: "" });
 const isWeb3Load = atom<boolean>(true);
 
 const apiData = atom<any>();
-const vaultTypes = atom();
-const strategyTypes = atom();
 
 const currentChainID = atom("137");
 
@@ -88,8 +86,6 @@ export {
   tokens,
   connected,
   apiData,
-  vaultTypes,
-  strategyTypes,
   transactionSettings,
   platformVersions,
   hideFeeApr,
