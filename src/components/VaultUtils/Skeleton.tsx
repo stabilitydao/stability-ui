@@ -1,11 +1,13 @@
 const Skeleton = (props: React.SVGProps<SVGSVGElement>) => {
+  const { width, height, ...rest } = props;
   return (
     <svg
-      width="100"
-      height="100"
+      width={width}
+      height={height}
       viewBox="0 0 320 63"
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
+      {...rest}
     >
       <rect
         x="0"

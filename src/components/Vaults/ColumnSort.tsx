@@ -52,8 +52,8 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
             index < 5
               ? `${
                   value === "Symbol"
-                    ? "px-0 md:px-2 min-[1130px]:px-4 sticky left-0 md:relative z-10 bg-[#0b0e11]"
-                    : "px-0 md:px-2  min-[1130px]:px-4"
+                    ? "px-0 md:px-2 min-[1130px]:px-4 sticky left-0 md:relative z-10 bg-[#0b0e11] w-[150px] md:w-[270px] min-[860px]:w-[320px]"
+                    : "px-0 md:px-2 min-[1130px]:px-4"
                 }`
               : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
           } py-2 text-center cursor-pointer whitespace-nowrap ${
