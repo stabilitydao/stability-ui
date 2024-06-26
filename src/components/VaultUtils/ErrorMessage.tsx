@@ -1,6 +1,7 @@
 import { useStore } from "@nanostores/react";
 
 import { error, reload } from "@store";
+import { useEffect } from "react";
 
 interface IProps {
   type: string;
@@ -9,6 +10,11 @@ interface IProps {
 const ErrorMessage: React.FC<IProps> = ({ type }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
+
+  useEffect(() => {
+    console.log($error);
+  }, [$error]);
+
   if ($error.state && type === "API") {
     return (
       <div className="mt-5 text-[14px]">

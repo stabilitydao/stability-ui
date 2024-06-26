@@ -1,6 +1,6 @@
 ---
 import App from "./App";
-import { ViewTransitions } from 'astro:transitions';
+// import { ViewTransitions } from 'astro:transitions';
 
 import { Header} from "@components/Header"
 import { Footer } from "@components/Footer";
@@ -42,7 +42,7 @@ const { title } = Astro.props as IProps;
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title} - Stability</title>
-    <ViewTransitions />
+    <!-- <ViewTransitions /> -->
   </head>
   <body>
     <App client:only>
@@ -62,6 +62,23 @@ const { title } = Astro.props as IProps;
 	body {
 		display: flex;
   		flex-direction: column;
+	}
+
+	::-webkit-scrollbar {
+	    width: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+	    background-color: #0C0C1C;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background-color: #272451;
+		border-radius: 12px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background-color: #30127f;
 	}
 	:root {
 		--accent: 136, 58, 234;
