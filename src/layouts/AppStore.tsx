@@ -428,9 +428,8 @@ const AppStore = (props: React.PropsWithChildren) => {
               const priceDifference =
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
-              const yearPercentDiff = Number(
-                lastHistoryData?.vsHoldAssetsLifetime[index]
-              );
+              const yearPercentDiff =
+                Number(lastHistoryData?.vsHoldAssetsLifetime[index]) || 0;
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
 

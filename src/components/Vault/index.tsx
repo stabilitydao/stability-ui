@@ -53,7 +53,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
       </div>
     );
   }
-
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">

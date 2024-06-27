@@ -756,20 +756,20 @@ const Vaults = () => {
                       >
                         <td className="md:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] md:w-[270px] min-[860px]:w-[320px] sticky md:relative left-0 md:block bg-[#181A20] md:bg-transparent z-10 min-[1130px]:mt-2">
                           <div className="flex items-center justify-start">
-                            <div className="hidden md:flex gap-2 items-center">
+                            <div className="hidden md:flex gap-2 items-center mr-2">
                               <img
                                 src={network?.logoURI}
                                 alt={network?.name}
                                 className="h-5 w-5 rounded-full"
                               />
-                              {vault?.risk?.isRektStrategy ? (
+                              {/* {vault?.risk?.isRektStrategy ? (
                                 <div
                                   className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
                                   title={vault?.risk?.isRektStrategy as string}
                                 ></div>
                               ) : (
                                 <VaultState status={vault.status} />
-                              )}
+                              )} */}
                             </div>
                             {vault.assets && (
                               <AssetsProportion
@@ -780,6 +780,7 @@ const Vaults = () => {
                                 type="vaults"
                               />
                             )}
+
                             <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                               <p
                                 title={vault.name}
@@ -800,9 +801,35 @@ const Vaults = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell md:hidden w-[50px]">
+                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 w-[52px] justify-center">
+                              {vault.assets.map((asset) => (
+                                <img
+                                  src={asset.logo}
+                                  alt={asset.symbol}
+                                  className="w-6 h-6 rounded-full"
+                                  key={asset.logo}
+                                />
+                              ))}
+                            </div>
+                            <span>
+                              {vault.assets
+                                .map((asset) => asset.symbol)
+                                .join(", ")}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell w-[50px]">
                           <div className="flex items-center justify-center">
-                            <VaultState status={vault.status} />
+                            {vault?.risk?.isRektStrategy ? (
+                              <div
+                                className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
+                                title={vault?.risk?.isRektStrategy as string}
+                              ></div>
+                            ) : (
+                              <VaultState status={vault.status} />
+                            )}
                           </div>
                         </td>
                         {/* <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">

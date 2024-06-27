@@ -1,7 +1,6 @@
 import { useStore } from "@nanostores/react";
 
 import { error, reload } from "@store";
-import { useEffect } from "react";
 
 interface IProps {
   type: string;
@@ -11,15 +10,11 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
 
-  useEffect(() => {
-    console.log($error);
-  }, [$error]);
-
   if ($error.state && type === "API") {
     return (
       <div className="mt-5 text-[14px]">
         <div className="flex items-center justify-center flex-col gap-3">
-          <p>{$error.description}</p>
+          <p> {$error.description.slice(0, 20)}...</p>
           <button
             onClick={() => reload.set(!$reload)}
             className="bg-button px-3 py-2 rounded-md"
@@ -93,7 +88,7 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
             </filter>
           </defs>
         </svg>
-        <p className="py-8 px-3">{$error.description}</p>
+        <p className="py-8 px-3"> {$error.description.slice(0, 20)}...</p>
         <button
           onClick={() => reload.set(!$reload)}
           className="bg-button px-3 py-2 rounded-md mb-2"
