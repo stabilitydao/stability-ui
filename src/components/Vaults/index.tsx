@@ -573,9 +573,7 @@ const Vaults = () => {
     <>
       <div
         className={`${
-          isLoading
-            ? "pointer-events-none opacity-50"
-            : "pointer-events-auto opacity-100"
+          isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
         <Portfolio vaults={localVaults} />
@@ -765,7 +763,7 @@ const Vaults = () => {
                               ) : (
                                 <VaultState status={vault.status} />
                               )} */}
-                            <div className="relative mr-2 hidden min-[1020px]:block">
+                            <div className="relative mr-[6px] hidden min-[1020px]:block">
                               <img
                                 src={network?.logoURI}
                                 alt={network?.name}
@@ -799,14 +797,16 @@ const Vaults = () => {
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-[6px]">
                             <div className="flex items-center w-[52px] justify-center">
                               {vault.assets.map((asset, index) => (
                                 <img
                                   src={asset.logo}
                                   alt={asset.symbol}
                                   className={`w-6 h-6 rounded-full ${
-                                    !index && "mr-[-5px] z-[5]"
+                                    !index &&
+                                    vault.assets.length > 1 &&
+                                    "mr-[-10px] z-[5]"
                                   }`}
                                   key={asset.logo + index}
                                 />
@@ -901,7 +901,7 @@ const Vaults = () => {
                                           src={protocol.link}
                                           alt={protocol.title}
                                           title={protocol.title}
-                                          className="h-6 w-6 rounded-full"
+                                          className="h-6 w-6 rounded-full mx-[2px]"
                                         />
                                       ))}
                                     </div>
@@ -938,13 +938,13 @@ const Vaults = () => {
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] min-[1020px]:w-[80px]"
                         >
                           <div
-                            className={`text-[14px] whitespace-nowrap w-full min-[1020px]:w-[60px] min-[915px]:w-[120px] text-end flex items-center justify-end gap-[2px] ${
+                            className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault?.risk?.isRektStrategy
                                 ? "text-[#818181]"
                                 : "text-[#eaecef]"
                             }`}
                           >
-                            <p>
+                            <p className="text-end">
                               {$hideFeeAPR
                                 ? vault?.earningData?.apr.withoutFees[
                                     $aprFilter
@@ -1250,11 +1250,11 @@ const Vaults = () => {
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
-      <a href="/create-vault">
+      {/* <a href="/create-vault">
         <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
           Create vault
         </button>
-      </a>
+      </a> */}
     </>
   );
 };
