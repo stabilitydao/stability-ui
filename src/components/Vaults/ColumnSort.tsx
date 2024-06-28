@@ -11,7 +11,7 @@ type TProps = {
 const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
   const styles: Record<string, string> = {
     Type: "hidden xl:table-cell",
-    Strategy: "hidden min-[1200px]:table-cell",
+    Strategy: "hidden min-[1340px]:table-cell",
     Status: "table-cell",
     RISK: "text-start pl-2",
   };
@@ -52,7 +52,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
             index < 5
               ? `${
                   value === "Symbol"
-                    ? "px-0 md:px-2 min-[1130px]:px-4 sticky left-0 md:relative z-10 bg-[#0b0e11] w-[150px] md:w-[270px] min-[860px]:w-[320px]"
+                    ? "px-0 md:px-2 min-[1130px]:px-4 sticky left-0 md:relative z-10 bg-[#0b0e11] w-[150px] md:w-[270px] min-[860px]:w-[250px]"
                     : "px-0 md:px-2 min-[1130px]:px-4"
                 }`
               : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
@@ -81,7 +81,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, type, sort }) => {
           >
             <path
               d="M6 7L11.1962 0.25H0.803848L6 7Z"
-              fill="white"
+              fill={table[index].sortType !== "none" ? "#8076ff" : "white"}
               fillOpacity="0.6"
             />
           </svg>

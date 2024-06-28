@@ -73,6 +73,7 @@ import type {
   TVaults,
   TMultichainPrices,
   TAPIData,
+  TAsset,
 } from "@types";
 
 import type {
@@ -507,6 +508,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.strategyId
           ];
 
+        const assetsSymbol = assets.map((asset) => asset.symbol).join("+");
+
         vaults[vault.address.toLowerCase()] = {
           address: vault.address.toLowerCase(),
           name: vault.name,
@@ -523,6 +526,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           hardWorkOnDeposit: vault.hardWorkOnDeposit,
           daily: (Number(APR) / 365).toFixed(2),
           assets,
+          assetsSymbol,
           assetsProportions,
           strategyInfo,
           il: IL,

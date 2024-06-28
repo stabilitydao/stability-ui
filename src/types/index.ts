@@ -93,7 +93,7 @@ type TEarningData =
   | {};
 
 type TVaults = {
-  [vaultAddress: string]: TVaultData;
+  [vaultAddress: string]: TVault;
 };
 
 type TVaultData = {
@@ -197,6 +197,7 @@ type TVault = {
   hardWorkOnDeposit: boolean;
   daily: number;
   assets: TAsset[];
+  assetsSymbol: string;
   assetsProportions: number[];
   strategyInfo: IStrategyInfo;
   il: number;

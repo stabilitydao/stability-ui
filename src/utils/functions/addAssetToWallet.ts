@@ -22,7 +22,7 @@ export const addAssetToWallet = async (
     if (image) {
       options.image = image;
     }
-
+    console.log(client.data.watchAsset);
     const result = await client?.data.watchAsset({
       type: "ERC20",
       options: options,
