@@ -161,7 +161,13 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
         {isAddToWallet && (
           <button
             onClick={() =>
-              addAssetToWallet(client, vault?.address, 18, vault?.symbol)
+              addAssetToWallet(
+                client,
+                vault?.address,
+                18,
+                vault?.symbol,
+                `https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`
+              )
             }
             className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
           >

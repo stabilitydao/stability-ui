@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-// import { formatUnits } from "viem";
+// import { formatUnits} from "viem";
 
 import { useStore } from "@nanostores/react";
 
@@ -31,7 +31,6 @@ import {
   error,
   aprFilter,
   connected,
-  publicClient,
   platformVersions,
   currentChainID,
   // assetsPrices,
@@ -771,15 +770,12 @@ const Vaults = () => {
                                 <VaultState status={vault.status} />
                               )} */}
                             </div>
-                            {vault.assets && (
-                              <AssetsProportion
-                                proportions={
-                                  vault.assetsProportions as number[]
-                                }
-                                assets={vault.assets}
-                                type="vaults"
-                              />
-                            )}
+
+                            <img
+                              src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                              alt="logo"
+                              className="w-6 h-6 rounded-full mr-2"
+                            />
 
                             <div className="max-w-[150px] md:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                               <p
