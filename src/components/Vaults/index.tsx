@@ -38,7 +38,6 @@ import {
 
 import {
   formatNumber,
-  getStrategyShortName,
   formatFromBigInt,
   getTimeDifference,
   // getDate,
@@ -717,8 +716,8 @@ const Vaults = () => {
           ))}
       </div> */}
 
-      <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px]">
+      <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px] md:min-w-full">
           <thead className="bg-[#0b0e11]">
             <tr className="text-[12px] text-[#8f8f8f] uppercase">
               {tableStates.map((value: any, index: number) => (
@@ -747,14 +746,15 @@ const Vaults = () => {
                     const network = CHAINS.find(
                       (chain) => chain.id === vault.network
                     );
+
                     return (
                       <tr
                         key={vault.name + index}
                         className="text-center text-[14px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
                       >
-                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 min-[1130px]:py-3 text-center w-[150px] min-[1020px]:w-[270px] min-[860px]:w-[250px] sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10 min-[1130px]:mt-2">
-                          <div className="flex items-center justify-start">
+                        <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center w-[150px] min-[1020px]:w-[270px] min-[860px]:w-[250px] sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
+                          <div className="flex items-center">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
                                   className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
@@ -788,16 +788,13 @@ const Vaults = () => {
                                 {vault.symbol}
                               </p>
                               <p className="min-[1130px]:hidden text-[#848e9c]">
-                                {vault.type}
-                              </p>
-                              <p className="min-[1130px]:hidden text-[#848e9c]">
-                                {getStrategyShortName(vault.symbol)}
+                                {vault.strategyInfo.shortName}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
-                          <div className="flex items-center gap-[6px]">
+                          <div className="flex items-center">
                             <div className="flex items-center w-[52px] justify-center">
                               {vault.assets.map((asset, index) => (
                                 <img
