@@ -55,6 +55,12 @@ const { title } = Astro.props as IProps;
   </body>
 </html>
 <style is:global>
+
+	html {
+		width:100vw;
+		overflow-x: hidden;
+	}
+
 	html, body {
 		height: 100%;
 		margin: 0;
@@ -170,7 +176,6 @@ const { title } = Astro.props as IProps;
 	main {
 		margin: 0 auto auto auto;
 		padding: 1rem 0.5rem;
-		width: 1200px;
 		max-width: calc(100% - 2rem);
 		color: white;
 		font-size: 20px;

@@ -4,12 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { formatUnits } from "viem";
 
-import {
-  APRtimeSwitcher,
-  HideFeesHandler,
-  FeeAPRModal,
-  AssetsProportion,
-} from "@components";
+import { APRtimeSwitcher, HideFeesHandler, FeeAPRModal } from "@components";
 
 import { hideFeeApr, aprFilter } from "@store";
 
@@ -89,10 +84,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     <div className="bg-button rounded-md">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
         <div className="hidden lg:flex items-center gap-[17px]">
-          <AssetsProportion
-            proportions={vault.assetsProportions}
-            assets={vault?.assets}
-            type="vault"
+          <img
+            src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+            alt="logo"
+            className="w-8 h-8 rounded-full"
           />
           <div className="flex gap-3">
             <img

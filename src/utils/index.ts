@@ -1,6 +1,5 @@
 import { getTokenData } from "./functions/getTokenData";
 import { formatNumber } from "./functions/formatNumber";
-import { getStrategyShortName } from "./functions/getStrategyShortName";
 import { formatFromBigInt } from "./functions/formatFromBigInt";
 import { calculateAPY } from "./functions/calculateAPY";
 import { getTimeDifference } from "./functions/getTimeDifference";
@@ -19,7 +18,6 @@ import { addAssetToWallet } from "./functions/addAssetToWallet";
 export {
   getTokenData,
   formatNumber,
-  getStrategyShortName,
   formatFromBigInt,
   calculateAPY,
   getTimeDifference,

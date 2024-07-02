@@ -282,7 +282,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     strategyInfo = {
       name: strategies.GUMF?.id as string,
       shortName: strategies.GUMF?.shortId as string,
-      protocols: [gamma, uniswapV3],
+      protocols: [gamma, uniswapV3, merkl],
       features: [],
       color: strategies.GUMF?.color as string,
       bgColor: strategies.GUMF?.bgColor as string,
