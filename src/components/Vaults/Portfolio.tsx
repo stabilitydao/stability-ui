@@ -207,9 +207,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DEPOSITED
               </h2>
-              <p className="text-[1rem] md:text-[1.125rem]">
+              <div className="text-[1rem] md:text-[1.125rem]">
                 {$isWeb3Load ? (
-                  <Skeleton height={28.8} width={100} />
+                  <div className="mt-2">
+                    <Skeleton height={21} width={100} />
+                  </div>
                 ) : (
                   <>
                     {$visible
@@ -217,55 +219,63 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       : "****"}
                   </>
                 )}
-              </p>
+              </div>
             </div>
             <div className="max-w-[130px] w-full md:max-w-[150px]  flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DAILY YIELD
               </h2>
-              <p className="text-[1rem] md:text-[1.125rem]">
+              <div className="text-[1rem] md:text-[1.125rem]">
                 {$isWeb3Load ? (
-                  <Skeleton height={28.8} width={100} />
+                  <div className="mt-2">
+                    <Skeleton height={21} width={100} />
+                  </div>
                 ) : (
                   <>{$visible ? dailyYield : "****"}</>
                 )}
-              </p>
+              </div>
             </div>
             <div className="w-[120px] md:w-[180px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 MONTHLY YIELD
               </h2>
-              <p className="text-[1rem] md:text-[1.125rem]">
+              <div className="text-[1rem] md:text-[1.125rem]">
                 {$isWeb3Load ? (
-                  <Skeleton height={28.8} width={100} />
+                  <div className="mt-2">
+                    <Skeleton height={21} width={100} />
+                  </div>
                 ) : (
                   <>{$visible ? monthlyYield : "****"}</>
                 )}
-              </p>
+              </div>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 AVG. APR
               </h2>
-              <p className="text-[1rem] md:text-[1.125rem]">
+              <div className="text-[1rem] md:text-[1.125rem]">
                 {$isWeb3Load ? (
-                  <Skeleton height={28.8} width={100} />
+                  <div className="mt-2">
+                    <Skeleton height={21} width={100} />
+                  </div>
                 ) : (
                   <>{$visible ? avgApr : "****"}</>
                 )}
-              </p>
+              </div>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
               <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                 AVG. APY
               </h2>
-              <p className="text-[1rem] md:text-[1.125rem]">
+              <div className="text-[1rem] md:text-[1.125rem]">
                 {$isWeb3Load ? (
-                  <Skeleton height={28.8} width={100} />
+                  <div className="mt-2">
+                    <Skeleton height={21} width={100} />
+                  </div>
                 ) : (
                   <>{$visible ? avgApy : "****"}</>
                 )}
-              </p>
+              </div>
             </div>
           </div>
           <div className="md:hidden flex items-start justify-between whitespace-nowrap w-full">
@@ -274,9 +284,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                   DEPOSITED
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-1">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     <>
                       {$visible
@@ -284,31 +296,35 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                         : "****"}
                     </>
                   )}
-                </p>
+                </div>
               </div>
               <div className="flex flex-col items-start">
                 <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                   MONTHLY YIELD
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-1">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     <>{$visible ? monthlyYield : "****"}</>
                   )}
-                </p>
+                </div>
               </div>
               <div className="flex flex-col items-start">
                 <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                   AVG. APY
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-1">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     <>{$visible ? avgApy : "****"}</>
                   )}
-                </p>
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-5">
@@ -316,25 +332,29 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                   DAILY YIELD
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem] w-[100px]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-1">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     <>{$visible ? dailyYield : "****"}</>
                   )}
-                </p>
+                </div>
               </div>
               <div className="flex flex-col items-start">
                 <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                   AVG. APR
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem] w-[100px]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-1">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     <>{$visible ? avgApr : "****"}</>
                   )}
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -371,13 +391,15 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                   TVL
                 </h2>
-                <p className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[1rem] md:text-[1.125rem]">
                   {$isWeb3Load ? (
-                    <Skeleton height={25.61} width={100} />
+                    <div className="mt-2">
+                      <Skeleton height={21} width={100} />
+                    </div>
                   ) : (
                     portfolio.tvl
                   )}
-                </p>
+                </div>
               </div>
             </div>
           </div>

@@ -576,7 +576,7 @@ const Vaults = () => {
         }`}
       >
         <Portfolio vaults={localVaults} />
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mb-4 min-[1020px]:mb-0">
           {activeNetworks.map((chain) => (
             <div
               className={`h-[48px] w-[44px] flex items-center justify-center border-[#3d404b] bg-button cursor-pointer rounded-md ${
@@ -726,7 +726,6 @@ const Vaults = () => {
                   index={index}
                   value={value.name}
                   table={tableStates}
-                  type="table"
                   sort={tableHandler}
                 />
               ))}
@@ -753,7 +752,7 @@ const Vaults = () => {
                         className="text-center text-[14px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
                       >
-                        <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center w-[150px] min-[1020px]:w-[270px] min-[860px]:w-[250px] sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
+                        <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
                           <div className="flex items-center">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
@@ -827,7 +826,7 @@ const Vaults = () => {
                         <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
                           <VaultType type={vault.type} />
                         </td> */}
-                        <td className="pl-2 py-2 hidden min-[1340px]:table-cell whitespace-nowrap w-[220px]">
+                        <td className="pl-2 py-2 hidden min-[1340px]:table-cell whitespace-nowrap">
                           <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                             {vault.strategyInfo && (
                               <>
@@ -932,7 +931,7 @@ const Vaults = () => {
                               pool: vault?.pool,
                             });
                           }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help w-[150px] min-[1020px]:w-[80px]"
+                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <div
                             className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
@@ -1064,7 +1063,7 @@ const Vaults = () => {
                               isVsActive: vault.isVsActive,
                             });
                           }}
-                          className="px-2 min-[1130px]:px-3 py-2 w-[40px] tooltip cursor-help"
+                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <p
                             className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
@@ -1171,7 +1170,7 @@ const Vaults = () => {
                             <i></i>
                           </div>
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-start w-[60px] min-[1020px]:w-[100px] whitespace-nowrap">
+                        <td className="px-2 min-[1130px]:px-4 py-2 text-start whitespace-nowrap">
                           {vault?.risk?.isRektStrategy ? (
                             <span className="uppercase text-[#F52A11]">
                               {vault?.risk?.symbol}
@@ -1185,13 +1184,13 @@ const Vaults = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 w-[90px]">
+                        <td className="px-2 min-[1130px]:px-4 py-2">
                           ${Number(vault.shareprice).toFixed(3)}
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-right w-[85px] text-[15px]">
+                        <td className="px-2 min-[1130px]:px-4 py-2 text-right text-[15px]">
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
-                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right w-[110px] text-[15px]">
+                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right text-[15px]">
                           {formatNumber(
                             formatFromBigInt(vault.balance, 18),
                             "format"
