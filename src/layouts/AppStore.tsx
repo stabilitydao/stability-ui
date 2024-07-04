@@ -73,6 +73,7 @@ import type {
   TVaults,
   TMultichainPrices,
   TAPIData,
+  TAsset,
 } from "@types";
 
 import type {
@@ -428,9 +429,8 @@ const AppStore = (props: React.PropsWithChildren) => {
               const priceDifference =
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
-              const yearPercentDiff = Number(
-                lastHistoryData?.vsHoldAssetsLifetime[index]
-              );
+              const yearPercentDiff =
+                Number(lastHistoryData?.vsHoldAssetsLifetime[index]) || 0;
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
 
@@ -508,6 +508,8 @@ const AppStore = (props: React.PropsWithChildren) => {
             vault.strategyId
           ];
 
+        const assetsSymbol = assets.map((asset) => asset.symbol).join("+");
+
         vaults[vault.address.toLowerCase()] = {
           address: vault.address.toLowerCase(),
           name: vault.name,
@@ -524,6 +526,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           hardWorkOnDeposit: vault.hardWorkOnDeposit,
           daily: (Number(APR) / 365).toFixed(2),
           assets,
+          assetsSymbol,
           assetsProportions,
           strategyInfo,
           il: IL,
