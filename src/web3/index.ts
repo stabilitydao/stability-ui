@@ -26,13 +26,13 @@ import type { TAddress } from "@types";
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 // 137 || 8453
 const platforms: { [key: string]: TAddress } = {
-  "137": deployments[137]?.platform,
-  "8453": deployments[8453]?.platform,
+  "137": deployments[137].core?.platform,
+  "8453": deployments[8453].core?.platform,
 };
 
 const priceReaders: { [key: string]: TAddress } = {
-  "137": deployments[137].priceReader,
-  "8453": deployments[8453].priceReader,
+  "137": deployments[137].core.priceReader,
+  "8453": deployments[8453].core.priceReader,
 };
 
 const defiedgeFactories: { [key: string]: TAddress } = {

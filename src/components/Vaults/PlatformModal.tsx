@@ -186,12 +186,12 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                     </span>
                   </div>
                   <div className="flex flex-wrap mt-2">
-                    {Object.keys(deployments[$currentChainID]).map(
+                    {Object.keys(deployments[$currentChainID].core).map(
                       (moduleContract) => {
                         //Can't use CoreContracts type
                         const address =
                           //@ts-ignore
-                          deployments[$currentChainID][moduleContract];
+                          deployments[$currentChainID].core[moduleContract];
 
                         return (
                           <a

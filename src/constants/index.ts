@@ -14,6 +14,7 @@ import {
   cbETH,
   CRV,
 } from "./tokens";
+import { deployments } from "@stabilitydao/stability";
 
 const APRsType = ["latest", "24h", "week"];
 
@@ -307,13 +308,14 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
 };
 
 const GRAPH_ENDPOINTS: { [key: string]: string } = {
-  137: `https://gateway-arbitrum.network.thegraph.com/api/${
+  137: deployments[137].subgraph.replace(
+    "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY
-  }/subgraphs/
-id/7WgM7jRzoW7yiJCE8DMEwCxtN3KLisYrVVShuAL2Kz4N`,
-  8453: `https://gateway-arbitrum.network.thegraph.com/api/${
+  ),
+  8453: deployments[8453].subgraph.replace(
+    "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY
-  }/subgraphs/id/8uU5LrpCLCP1P31GBCUXu8AdWKQ2aW6mKTKsr2ssUdJS`,
+  ),
 };
 
 const STABILITY_API = "https://api.stabilitydao.org/";
