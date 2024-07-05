@@ -205,7 +205,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       ? IL.GQFN
       : vaultSymbol.match(/GQMFW$/)
       ? IL.GQFW
-      : { rate: 0, title: "None", desc: "None", color: "#000000" };
+      : { rate: 0, title: "None", desc: "None", color: "#4aff71" };
 
     strategyInfo = {
       name: strategies.GQMF?.id as string,
@@ -219,7 +219,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       il: il,
       sourceCode: "",
     };
-  } else if (vaultSymbol.match(/IRMF\d+$/)) {
+  } else if (vaultSymbol.match(/\bIRMF\b/)) {
     strategyInfo = {
       name: strategies.IRMF?.id as string,
       shortName: strategies.IRMF?.shortId as string,
@@ -232,7 +232,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.IQMF,
     };
-  } else if (vaultSymbol.match(/GRMF(S|N|W)$/)) {
+  } else if (vaultSymbol.match(/GRMF(S|N|W)?$/)) {
     const il = vaultSymbol.match(/GRMFS$/)
       ? IL.GQFS
       : vaultSymbol.match(/GRMFN$/)
