@@ -172,7 +172,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.CF,
     };
-  } else if (vaultSymbol.match(/DQMFN[a-z0-9]{1}$/)) {
+  } else if (vaultSymbol.match(/DQMFN?[A-Z0-9]?$/)) {
     strategyInfo = {
       name: strategies.DQMF?.id as string,
       shortName: strategies.DQMF?.shortId as string,
@@ -198,7 +198,7 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
       sourceCode: "",
       il: IL.IQMF,
     };
-  } else if (vaultSymbol.match(/GQMF(S|N|W)$/)) {
+  } else if (vaultSymbol.match(/GQMF(S|N|W)?$/)) {
     const il = vaultSymbol.match(/GQMFS$/)
       ? IL.GQFS
       : vaultSymbol.match(/GQMFN$/)

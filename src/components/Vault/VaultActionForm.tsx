@@ -40,6 +40,8 @@ import {
   ZapABI,
   ERC20MetadataUpgradeableABI,
   wagmiConfig,
+  platforms,
+  PlatformABI,
 } from "@web3";
 
 import {
@@ -49,6 +51,7 @@ import {
   decodeHex,
   setLocalStoreHash,
   getProtocolLogo,
+  addAssetsBalance,
 } from "@utils";
 
 import type {
@@ -59,6 +62,7 @@ import type {
   TTokenData,
   TPlatformsData,
   TVault,
+  TBalances,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -1117,12 +1121,32 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     setTransactionInProgress(false);
   };
 
+  const refreshBalance = async () => {
+    const contractBalance = await _publicClient.readContract({
+      address: platforms[network],
+      abi: PlatformABI,
+      functionName: "getBalance",
+      args: [$account as TAddress],
+    });
+
+    const currentChainBalances = addAssetsBalance(contractBalance);
+
+    const oldBalances = assetsBalances.get();
+    oldBalances[network] = currentChainBalances;
+
+    assetsBalances.set(oldBalances);
+
+    return currentChainBalances;
+  };
+
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
+    const currentBalances: TBalances = await refreshBalance();
+
     setRotation(rotation + 360);
     setLoader(true);
-    loadAssetsBalances();
+    loadAssetsBalances(currentBalances);
     zapInputHandler(inputs[option[0]]?.amount, option[0]);
   };
   /////
@@ -1640,16 +1664,18 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     setTransactionInProgress(false);
   };
 
-  const loadAssetsBalances = () => {
+  const loadAssetsBalances = (
+    balances: Balances = $assetsBalances[network]
+  ) => {
     const balance: TVaultBalance | any = {};
 
-    if ($assetsBalances[network]) {
+    if (balances) {
       for (let i = 0; i < option.length; i++) {
         const decimals = getTokenData(option[i])?.decimals;
 
         if (decimals) {
           balance[option[i]] = formatUnits(
-            $assetsBalances[network][option[i].toLowerCase()],
+            balances[option[i].toLowerCase()],
             decimals
           );
         }
@@ -2019,7 +2045,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setUnderlyingShares(false);
     setZapShares(false);
-    if (option[0] === underlyingToken?.address || !inputs[option[0]]?.amount) {
+    if (option[0] === underlyingToken?.address) {
       setIsRefresh(false);
       return;
     }

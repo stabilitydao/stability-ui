@@ -38,14 +38,7 @@ import {
   vaultData,
 } from "@store";
 
-import {
-  wagmiConfig,
-  platforms,
-  PlatformABI,
-  IVaultManagerABI,
-  retroIchiFactory,
-  quickSwapIchiFactory,
-} from "@web3";
+import { wagmiConfig, platforms, PlatformABI, IVaultManagerABI } from "@web3";
 
 import {
   calculateAPY,
@@ -596,12 +589,12 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         platformData[String(chain.id)] = {
           platform: platforms[chain.id],
-          factory: deployments[chain.id].factory.toLowerCase(),
+          factory: deployments[chain.id].core.factory.toLowerCase(),
           buildingPermitToken:
             stabilityAPIData?.platforms[chain.id]?.buildingPermitToken,
           buildingPayPerVaultToken:
             stabilityAPIData?.platforms[chain.id]?.buildingPayPerVaultToken,
-          zap: deployments[chain.id].zap.toLowerCase(),
+          zap: deployments[chain.id].core.zap.toLowerCase(),
         };
 
         /////***** SET USER BALANCES *****/////

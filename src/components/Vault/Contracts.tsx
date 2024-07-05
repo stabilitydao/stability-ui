@@ -2,8 +2,6 @@ import { memo, useMemo, useState, useEffect } from "react";
 
 import { zeroAddress, getAddress } from "viem";
 
-import { AssetsProportion } from "@components";
-
 import { getProtocolLogo } from "@utils";
 
 import { DEXes, CHAINS } from "@constants";
@@ -160,10 +158,10 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                 <td>
                   <div className="ml-3 hidden sm:block">
                     {logo === "proportions" ? (
-                      <AssetsProportion
-                        proportions={vault.assetsProportions}
-                        assets={vault?.assets}
-                        type="vault"
+                      <img
+                        src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                        alt="logo"
+                        className="w-[26px] h-[26px] rounded-full"
                       />
                     ) : (
                       <img
