@@ -150,7 +150,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
     filters.length && (
       <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 md:py-9 select-none lg:min-w-[60%]">
         {filters.map((filter: TTableFilters) => (
-          <div key={filter.name}>
+          <div data-testid="filter" key={filter.name}>
             {filter.type === "single" ? (
               <div
                 onClick={() => activeFiltersHandler(filter)}
@@ -237,6 +237,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                             ? "opacity-100"
                             : "opacity-70 hover:opacity-80"
                         }`}
+                        data-testid="strategy"
                       >
                         {variant.name}
                       </p>

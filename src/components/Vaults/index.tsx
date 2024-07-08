@@ -491,6 +491,7 @@ const Vaults = () => {
     const newFilters = tableFilters.map((f) =>
       f.name === "Strategy" ? { ...f, variants: shortNames } : f
     );
+
     setURLFilters(newFilters);
   };
 
@@ -585,6 +586,7 @@ const Vaults = () => {
               key={chain.name + chain.id}
               title={chain.name}
               onClick={() => activeNetworksHandler(chain.id)}
+              data-testid="network"
             >
               <img
                 className="h-6 w-6 rounded-full"
@@ -749,8 +751,9 @@ const Vaults = () => {
                     return (
                       <tr
                         key={vault.name + index}
-                        className="component text-center text-[14px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
+                        className="text-center text-[14px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
+                        data-testid="vault"
                       >
                         <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
                           <div className="flex items-center">
@@ -1086,7 +1089,10 @@ const Vaults = () => {
                                   <th className="text-right">est Annual</th>
                                 </tr>
                               </thead>
-                              <tbody className="text-[14px]">
+                              <tbody
+                                data-testid="vsHoldAPRTable"
+                                className="text-[14px]"
+                              >
                                 <tr className="hover:bg-[#2B3139]">
                                   <td className="text-left">VAULT VS HODL</td>
 

@@ -61,6 +61,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
       } py-2 text-center cursor-pointer whitespace-nowrap ${
         styles[value] || ""
       }`}
+      data-testid="sort"
     >
       {value !== "APR / APY" ? (
         <p className="inline-block">{value}</p>
