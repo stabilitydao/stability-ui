@@ -20,7 +20,7 @@ const SORT_CASES = [
 ];
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("https://stability.farm/", { waitUntil: "load" });
+  await page.goto("/", { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(5000);
 });
 
