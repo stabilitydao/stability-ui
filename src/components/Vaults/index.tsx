@@ -769,12 +769,12 @@ const Vaults = () => {
                               <img
                                 src={network?.logoURI}
                                 alt={network?.name}
-                                className="h-4 w-4 rounded-full absolute right-[-15%] top-[-15%]"
+                                className="h-4 w-4 rounded-full absolute left-[-15%] top-[-15%]"
                               />
                               <img
                                 src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
                                 alt="logo"
-                                className="w-8 h-8 rounded-full"
+                                className="w-6 h-6 rounded-full"
                               />
                             </div>
 

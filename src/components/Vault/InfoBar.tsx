@@ -87,7 +87,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           <img
             src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
             alt="logo"
-            className="w-8 h-8 rounded-full"
+            className="w-7 h-7 rounded-full"
           />
           <div className="flex gap-3">
             <img

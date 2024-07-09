@@ -11,7 +11,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
     // Type: "hidden xl:table-cell",
     Assets: "min-w-[180px]",
-    Strategy: "hidden min-[1340px]:table-cell w-[240px]",
+    Strategy: "hidden min-[1340px]:table-cell w-[200px]",
     "Income APR": "min-w-[130px]",
     "VS HODL APR": "min-w-[130px]",
     // Status: "table-cell",
@@ -55,7 +55,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
         index < 5
           ? `px-2 min-[1130px]:px-4 ${
               value === "Symbol" &&
-              "sticky left-0 md:relative z-10 bg-[#0b0e11] min-w-[150px] w-[270px]"
+              "sticky left-0 md:relative z-10 bg-[#0b0e11] min-w-[150px] w-[180px]"
             }`
           : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
       } py-2 text-center cursor-pointer whitespace-nowrap ${
