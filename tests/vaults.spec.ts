@@ -193,12 +193,14 @@ test.describe("Vaults page tests", () => {
           for (let i = 0; i < vaultsCount; i++) {
             const vault = vaults.nth(i);
 
-            const value = await vault
+            let value = await vault
               .locator("td")
               .nth(queue)
               .locator("p")
               .first()
               .textContent();
+
+            if (value === "-") value = "0%";
 
             const formattedValue = Number(value?.slice(0, -1));
 

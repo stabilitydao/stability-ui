@@ -387,13 +387,16 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const lifetimeVsHoldAPR = lastHistoryData?.vsHoldLifetime
-          ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
-          : 0;
-
-        const currentTime = Math.floor(Date.now() / 1000);
 
         const vaultCreated = vault.created as number;
+
+        const lifetimeVsHoldAPR =
+          lastHistoryData?.vsHoldLifetime &&
+          getTimeDifference(vaultCreated)?.days >= 3
+            ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
+            : 0;
+
+        const currentTime = Math.floor(Date.now() / 1000);
 
         const differenceInSecondsFromCreation = currentTime - vaultCreated;
 

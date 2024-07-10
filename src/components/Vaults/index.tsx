@@ -1061,10 +1061,14 @@ const Vaults = () => {
                         >
                           <p
                             className={`text-[15px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault.lifetimeVsHoldAPR < 0 && "text-[#eb7979]"
+                              vault.lifetimeVsHoldAPR < 0 &&
+                              getTimeDifference(vault.created).days >= 3 &&
+                              "text-[#eb7979]"
                             }`}
                           >
-                            {vault.lifetimeVsHoldAPR}%
+                            {getTimeDifference(vault.created).days >= 3
+                              ? `${vault.lifetimeVsHoldAPR}%`
+                              : "-"}
                           </p>
                           <div className="visible__tooltip !w-[450px]">
                             <table className="table table-auto w-full rounded-lg">
