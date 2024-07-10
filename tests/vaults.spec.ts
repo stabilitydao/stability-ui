@@ -171,11 +171,11 @@ test.describe("Vaults page tests", () => {
   // maybe add "my vaults" test
   // add "active" test, after icons
 
-  // only "income apr", "vs hold apr","price" and "tvl" by ascendant
+  // only "income apr", "vs hold apr","price" and "tvl" by descendent
   test("should be sort", async ({ page }) => {
     const allSorts = await page.getByTestId("sort");
 
-    let vaults, vaultsCount, isAscendant;
+    let vaults, vaultsCount, isDescendent;
 
     for (const { name, queue, dataType } of SORT_CASES) {
       const sortCol = await allSorts.nth(queue);
@@ -261,11 +261,11 @@ test.describe("Vaults page tests", () => {
           throw new Error(`Invalid data type: ${dataType}`);
       }
 
-      isAscendant = formattedValues.every((value, index, array) => {
-        return index === 0 || array[index - 1] <= value;
+      isDescendent = formattedValues.every((value, index, array) => {
+        return index === 0 || array[index - 1] >= value;
       });
 
-      await expect(isAscendant).toBeTruthy();
+      await expect(isDescendent).toBeTruthy();
     }
   });
 });

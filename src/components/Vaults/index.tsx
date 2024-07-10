@@ -755,7 +755,7 @@ const Vaults = () => {
                         onClick={() => toVault(vault.network, vault.address)}
                         data-testid="vault"
                       >
-                        <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
+                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#181A20] min-[1020px]:bg-transparent z-10">
                           <div className="flex items-center">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
@@ -835,7 +835,7 @@ const Vaults = () => {
                             {vault.strategyInfo && (
                               <>
                                 <span
-                                  className={`px-2 rounded-[10px] bg-[#1f1d40] hidden min-[1020px]:flex h-8 items-center ${
+                                  className={`px-2 rounded-[10px] hidden min-[1020px]:flex h-8 items-center ${
                                     (vault.strategySpecific &&
                                       vault.strategyInfo.shortName != "Y") ||
                                     vault.strategyInfo.protocols.length > 2

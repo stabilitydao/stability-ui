@@ -142,8 +142,9 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   const [assets, setAssets] = useState<string[]>([]);
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
-  const CFCondition =
-    vault.strategyInfo.shortName === "CF" &&
+  const isSingleTokenStrategy =
+    (vault.strategyInfo.shortName === "CF" ||
+      vault.strategyInfo.shortName === "Y") &&
     vault.assets[0].address === option[0];
   const underlyingCondition =
     !underlyingToken || option[0] !== underlyingToken?.address;
@@ -3174,14 +3175,18 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                 </div>
               </div>
               <div className="my-2 ml-2 flex flex-col gap-2">
-                {(option.length > 1 || CFCondition || !underlyingCondition) && (
+                {(option.length > 1 ||
+                  isSingleTokenStrategy ||
+                  !underlyingCondition) && (
                   <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
                     YOU RECEIVE
                   </p>
                 )}
 
                 <div className="h-[100px]">
-                  {(option.length > 1 || CFCondition || !underlyingCondition) &&
+                  {(option.length > 1 ||
+                    isSingleTokenStrategy ||
+                    !underlyingCondition) &&
                     option.map((address, index) => (
                       <div className="flex items-center gap-1" key={address}>
                         {underlyingCondition ? (
@@ -3213,7 +3218,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                       </div>
                     ))}
 
-                  {!CFCondition && underlyingCondition && (
+                  {!isSingleTokenStrategy && underlyingCondition && (
                     <div>
                       {option.length < 2 && (
                         <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
@@ -3300,72 +3305,74 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                   )}
                 </div>
 
-                {option.length < 2 && underlyingCondition && !CFCondition && (
-                  <div className="mt-5">
-                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                      YOU RECEIVE
-                    </p>
-                    <div className="h-[63px]">
-                      <div className="flex items-center gap-1">
-                        <img
-                          src={getTokenData(option[0])?.logoURI}
-                          alt={getTokenData(option[0])?.symbol}
-                          title={getTokenData(option[0])?.symbol}
-                          className="w-6 h-6 rounded-full"
-                        />
-                        {loader && !transactionInProgress ? (
-                          <ShareSkeleton height={32} />
-                        ) : (
-                          <div>
-                            {zapPreviewWithdraw ? (
-                              <div className="flex items-center gap-1">
-                                <p>
-                                  {(
-                                    Number(
+                {option.length < 2 &&
+                  underlyingCondition &&
+                  !isSingleTokenStrategy && (
+                    <div className="mt-5">
+                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                        YOU RECEIVE
+                      </p>
+                      <div className="h-[63px]">
+                        <div className="flex items-center gap-1">
+                          <img
+                            src={getTokenData(option[0])?.logoURI}
+                            alt={getTokenData(option[0])?.symbol}
+                            title={getTokenData(option[0])?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                          {loader && !transactionInProgress ? (
+                            <ShareSkeleton height={32} />
+                          ) : (
+                            <div>
+                              {zapPreviewWithdraw ? (
+                                <div className="flex items-center gap-1">
+                                  <p>
+                                    {(
+                                      Number(
+                                        Number(zapPreviewWithdraw[0]?.amountOut)
+                                          ? zapPreviewWithdraw[0]?.amountOut
+                                          : zapPreviewWithdraw[0]?.amountIn
+                                      ) +
+                                      (zapPreviewWithdraw[1]
+                                        ? Number(
+                                            Number(
+                                              zapPreviewWithdraw[1]?.amountOut
+                                            )
+                                              ? zapPreviewWithdraw[1]?.amountOut
+                                              : zapPreviewWithdraw[1]?.amountIn
+                                          )
+                                        : 0)
+                                    ).toFixed(5)}
+                                  </p>
+                                  <p>{`($${(
+                                    (Number(
                                       Number(zapPreviewWithdraw[0]?.amountOut)
                                         ? zapPreviewWithdraw[0]?.amountOut
                                         : zapPreviewWithdraw[0]?.amountIn
                                     ) +
-                                    (zapPreviewWithdraw[1]
-                                      ? Number(
-                                          Number(
-                                            zapPreviewWithdraw[1]?.amountOut
+                                      (zapPreviewWithdraw[1]
+                                        ? Number(
+                                            Number(
+                                              zapPreviewWithdraw[1]?.amountOut
+                                            )
+                                              ? zapPreviewWithdraw[1]?.amountOut
+                                              : zapPreviewWithdraw[1]?.amountIn
                                           )
-                                            ? zapPreviewWithdraw[1]?.amountOut
-                                            : zapPreviewWithdraw[1]?.amountIn
-                                        )
-                                      : 0)
-                                  ).toFixed(5)}
-                                </p>
-                                <p>{`($${(
-                                  (Number(
-                                    Number(zapPreviewWithdraw[0]?.amountOut)
-                                      ? zapPreviewWithdraw[0]?.amountOut
-                                      : zapPreviewWithdraw[0]?.amountIn
-                                  ) +
-                                    (zapPreviewWithdraw[1]
-                                      ? Number(
-                                          Number(
-                                            zapPreviewWithdraw[1]?.amountOut
-                                          )
-                                            ? zapPreviewWithdraw[1]?.amountOut
-                                            : zapPreviewWithdraw[1]?.amountIn
-                                        )
-                                      : 0)) *
-                                  Number(
-                                    $assetsPrices[network][option[0]].price
-                                  )
-                                ).toFixed(2)})`}</p>
-                              </div>
-                            ) : (
-                              <p>0 ($0)</p>
-                            )}
-                          </div>
-                        )}
+                                        : 0)) *
+                                    Number(
+                                      $assetsPrices[network][option[0]].price
+                                    )
+                                  ).toFixed(2)})`}</p>
+                                </div>
+                              ) : (
+                                <p>0 ($0)</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
               {chain?.id === Number(network) ? (
                 <>
