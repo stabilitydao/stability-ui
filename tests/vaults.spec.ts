@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const CURRENT_ACTIVE_VAULTS = 18;
+const CURRENT_ACTIVE_VAULTS = 19;
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
