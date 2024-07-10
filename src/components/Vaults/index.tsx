@@ -491,6 +491,7 @@ const Vaults = () => {
     const newFilters = tableFilters.map((f) =>
       f.name === "Strategy" ? { ...f, variants: shortNames } : f
     );
+
     setURLFilters(newFilters);
   };
 
@@ -585,6 +586,7 @@ const Vaults = () => {
               key={chain.name + chain.id}
               title={chain.name}
               onClick={() => activeNetworksHandler(chain.id)}
+              data-testid="network"
             >
               <img
                 className="h-6 w-6 rounded-full"
@@ -749,10 +751,11 @@ const Vaults = () => {
                     return (
                       <tr
                         key={vault.name + index}
-                        className="component text-center text-[14px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
+                        className="text-center text-[15px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
+                        data-testid="vault"
                       >
-                        <td className="mt-[6px] min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:block bg-[#181A20] min-[1020px]:bg-transparent z-10">
+                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#181A20] min-[1020px]:bg-transparent z-10">
                           <div className="flex items-center">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
@@ -766,12 +769,12 @@ const Vaults = () => {
                               <img
                                 src={network?.logoURI}
                                 alt={network?.name}
-                                className="h-4 w-4 rounded-full absolute right-[-15%] top-[-15%]"
+                                className="h-4 w-4 rounded-full absolute left-[-15%] top-[-15%]"
                               />
                               <img
                                 src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
                                 alt="logo"
-                                className="w-8 h-8 rounded-full"
+                                className="w-6 h-6 rounded-full"
                               />
                             </div>
 
@@ -783,6 +786,7 @@ const Vaults = () => {
                                     ? "text-[#818181]"
                                     : "text-[#fff]"
                                 }`}
+                                style={{ color: vault.strategyInfo.color }}
                               >
                                 {vault.symbol}
                               </p>
@@ -831,17 +835,7 @@ const Vaults = () => {
                             {vault.strategyInfo && (
                               <>
                                 <span
-                                  style={{
-                                    backgroundColor: vault.strategyInfo.bgColor,
-                                    color: vault.strategyInfo.color,
-                                  }}
-                                  className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[58px]"
-                                  title={vault.strategyInfo.name}
-                                >
-                                  {vault.strategyInfo.shortName}
-                                </span>
-                                <span
-                                  className={`px-2 rounded-r-[10px] bg-[#1f1d40] hidden min-[1020px]:flex h-8 items-center ${
+                                  className={`px-2 rounded-[10px] hidden min-[1020px]:flex h-8 items-center ${
                                     (vault.strategySpecific &&
                                       vault.strategyInfo.shortName != "Y") ||
                                     vault.strategyInfo.protocols.length > 2
@@ -934,7 +928,7 @@ const Vaults = () => {
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <div
-                            className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                            className={`text-[15px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault?.risk?.isRektStrategy
                                 ? "text-[#818181]"
                                 : "text-[#eaecef]"
@@ -951,7 +945,7 @@ const Vaults = () => {
                           </div>
                           <div className="visible__tooltip">
                             <div className="flex items-start flex-col gap-4">
-                              <div className="text-[14px] flex flex-col gap-1 w-full">
+                              <div className="text-[15px] flex flex-col gap-1 w-full">
                                 {!!vault?.risk?.isRektStrategy && (
                                   <div className="flex flex-col items-center gap-2 mb-[10px]">
                                     <h3 className="text-[#f52a11] font-bold">
@@ -1066,14 +1060,15 @@ const Vaults = () => {
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <p
-                            className={`text-[14px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault.lifetimeVsHoldAPR > 0
-                                ? "text-[#b0ddb8]"
-                                : "text-[#eb7979]"
+                            className={`text-[15px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                              vault.lifetimeVsHoldAPR < 0 &&
+                              getTimeDifference(vault.created).days >= 3 &&
+                              "text-[#eb7979]"
                             }`}
                           >
-                            {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
-                            {vault.lifetimeVsHoldAPR}%
+                            {getTimeDifference(vault.created).days >= 3
+                              ? `${vault.lifetimeVsHoldAPR}%`
+                              : "-"}
                           </p>
                           <div className="visible__tooltip !w-[450px]">
                             <table className="table table-auto w-full rounded-lg">
@@ -1086,19 +1081,19 @@ const Vaults = () => {
                                   <th className="text-right">est Annual</th>
                                 </tr>
                               </thead>
-                              <tbody className="text-[14px]">
+                              <tbody
+                                data-testid="vsHoldAPRTable"
+                                className="text-[15px]"
+                              >
                                 <tr className="hover:bg-[#2B3139]">
                                   <td className="text-left">VAULT VS HODL</td>
 
                                   {vault.isVsActive ? (
                                     <td
                                       className={`text-right ${
-                                        vault.vsHoldAPR > 0
-                                          ? "text-[#b0ddb8]"
-                                          : "text-[#eb7979]"
+                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
                                       }`}
                                     >
-                                      {vault.vsHoldAPR > 0 ? "+" : ""}
                                       {vault.vsHoldAPR}%
                                     </td>
                                   ) : (
@@ -1108,12 +1103,10 @@ const Vaults = () => {
                                   {vault.isVsActive ? (
                                     <td
                                       className={`text-right ${
-                                        vault.lifetimeVsHoldAPR > 0
-                                          ? "text-[#b0ddb8]"
-                                          : "text-[#eb7979]"
+                                        vault.lifetimeVsHoldAPR < 0 &&
+                                        "text-[#eb7979]"
                                       }`}
                                     >
-                                      {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
                                       {vault.lifetimeVsHoldAPR}%
                                     </td>
                                   ) : (
@@ -1134,14 +1127,10 @@ const Vaults = () => {
                                       {vault.isVsActive ? (
                                         <td
                                           className={`text-right ${
-                                            Number(aprsData.latestAPR) > 0
-                                              ? "text-[#b0ddb8]"
-                                              : "text-[#eb7979]"
+                                            Number(aprsData.latestAPR) < 0 &&
+                                            "text-[#eb7979]"
                                           }`}
                                         >
-                                          {Number(aprsData.latestAPR) > 0
-                                            ? "+"
-                                            : ""}
                                           {aprsData.latestAPR}%
                                         </td>
                                       ) : (
@@ -1151,12 +1140,10 @@ const Vaults = () => {
                                       {vault.isVsActive ? (
                                         <td
                                           className={`text-right ${
-                                            Number(aprsData.latestAPR) > 0
-                                              ? "text-[#b0ddb8]"
-                                              : "text-[#eb7979]"
+                                            Number(aprsData.latestAPR) < 0 &&
+                                            "text-[#eb7979]"
                                           }`}
                                         >
-                                          {Number(aprsData.APR) > 0 ? "+" : ""}
                                           {aprsData.APR}%
                                         </td>
                                       ) : (
@@ -1200,7 +1187,7 @@ const Vaults = () => {
                     );
                   })
                 ) : (
-                  <tr className="text-start text-[14px] h-[60px] font-medium">
+                  <tr className="text-start text-[15px] h-[60px] font-medium">
                     {userVaultsCondition ? (
                       <td>
                         <p className="text-[18px]">
@@ -1227,7 +1214,7 @@ const Vaults = () => {
                 )}
               </>
             ) : (
-              <tr className="text-start text-[14px] h-[60px] font-medium">
+              <tr className="text-start text-[15px] h-[60px] font-medium">
                 <td>No vaults</td>
               </tr>
             )}

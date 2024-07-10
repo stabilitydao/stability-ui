@@ -6,13 +6,15 @@ import { useWalletClient, useAccount, usePublicClient } from "wagmi";
 
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
+import { getAsset } from "@stabilitydao/stability";
+
 import { assetsPrices, connected, currentChainID } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
 import { getTokenData, getDate, formatNumber, addAssetToWallet } from "@utils";
 
-import { TOKENS_ASSETS, CHAINLINK_STABLECOINS } from "@constants";
+import { CHAINLINK_STABLECOINS } from "@constants";
 
 import type {
   TAddress,
@@ -228,9 +230,7 @@ const Assets: React.FC<IProps> = memo(
             investedData.map((asset: TPieChartData, index: number) => {
               const assetData: TToken | any = getTokenData(asset.address);
 
-              const tokenAssets = TOKENS_ASSETS.find((tokenAsset) => {
-                return tokenAsset.addresses.includes(assetData?.address);
-              });
+              const tokenAssets = getAsset(network, assetData?.address);
 
               const priceOnCreation = formatUnits(onCreationPrice[index], 18);
 

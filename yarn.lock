@@ -1868,10 +1868,10 @@
   resolved "https://registry.npmjs.org/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
-"@stabilitydao/stability@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.9.0.tgz#692a0cdbc829f6083d3170cb89f203a8aaa261f6"
-  integrity sha512-ik6ze8pWVRiD06wTI8rHgzPWWZ3+gn/Q7RexLx1mG5mYq0XcTmO1pCSRgRLhhcwA6tfbufl7S7EG39ZBkGFmqg==
+"@stabilitydao/stability@=0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.9.1.tgz#34c888a7d9115f196bf0f340c580084415e4c2e7"
+  integrity sha512-GSzkOajHBgUyR4AzYJjkY2y5B3Q5BHXhmEaNhJnXuyNX/RKWwC71twHjVRdu4U/oywpIUYvrixMD/aI+DycgmQ==
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"

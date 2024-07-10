@@ -11,7 +11,7 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import { deployments } from "@stabilitydao/stability";
+import { deployments, getAsset } from "@stabilitydao/stability";
 
 import {
   account,
@@ -52,7 +52,6 @@ import {
 
 import {
   STABILITY_API,
-  TOKENS_ASSETS,
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
@@ -210,9 +209,8 @@ const AppStore = (props: React.PropsWithChildren) => {
         const assets = strategyAssets.map((strategyAsset: string) => {
           const token = getTokenData(strategyAsset);
           if (token) {
-            const tokenExtended = TOKENS_ASSETS.find((tokenAsset) =>
-              tokenAsset.addresses.includes(token.address as TAddress)
-            );
+            const tokenExtended = getAsset(chainID, token.address);
+
             return {
               address: token?.address,
               logo: token?.logoURI,
@@ -387,13 +385,16 @@ const AppStore = (props: React.PropsWithChildren) => {
         }
 
         ///// VS HODL
-        const lifetimeVsHoldAPR = lastHistoryData?.vsHoldLifetime
-          ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
-          : 0;
-
-        const currentTime = Math.floor(Date.now() / 1000);
 
         const vaultCreated = vault.created as number;
+
+        const lifetimeVsHoldAPR =
+          lastHistoryData?.vsHoldLifetime &&
+          getTimeDifference(vaultCreated)?.days >= 3
+            ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
+            : 0;
+
+        const currentTime = Math.floor(Date.now() / 1000);
 
         const differenceInSecondsFromCreation = currentTime - vaultCreated;
 

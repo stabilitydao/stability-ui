@@ -1,14 +1,13 @@
 {
   "name": "stability-ui",
   "type": "module",
-  "version": "0.8.6-alpha",
+  "version": "0.9.1-alpha",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "test": "jest"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/partytown": "^2.1.0",
@@ -16,7 +15,7 @@
     "@astrojs/tailwind": "^5.0.2",
     "@astrojs/vercel": "^5.1.0",
     "@nanostores/react": "^0.7.1",
-    "@stabilitydao/stability": "^0.9.0",
+    "@stabilitydao/stability": "=0.9.1",
     "@tanstack/query-sync-storage-persister": "^5.22.2",
     "@tanstack/react-query": "^5.22.2",
     "@tanstack/react-query-persist-client": "^5.22.2",
