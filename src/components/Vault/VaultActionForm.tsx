@@ -372,6 +372,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
               abi: ERC20DQMFABI,
               functionName: "symbol",
             });
+
             underlyingSymbol = decodeHex(underlyingSymbol);
           } else {
             underlyingSymbol = await _publicClient.readContract({

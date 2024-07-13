@@ -216,11 +216,13 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
 
+// deployments[137].subgraph.replace(
+//   "[api-key]",
+//   import.meta.env.PUBLIC_GRAPH_API_KEY
+// )
+
 const GRAPH_ENDPOINTS: { [key: string]: string } = {
-  137: deployments[137].subgraph.replace(
-    "[api-key]",
-    import.meta.env.PUBLIC_GRAPH_API_KEY
-  ),
+  137: "https://api.studio.thegraph.com/query/72132/test/version/latest",
   8453: deployments[8453].subgraph.replace(
     "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY

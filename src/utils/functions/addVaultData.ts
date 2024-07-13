@@ -17,7 +17,7 @@ const addVaultData = (data: any[]) => {
     }
     return vault;
   } else {
-    console.error("There is an error, arrays lenght are different.");
+    console.error("There is an error, arrays length are different.");
   }
 };
 

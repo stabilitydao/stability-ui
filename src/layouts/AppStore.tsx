@@ -627,6 +627,7 @@ const AppStore = (props: React.PropsWithChildren) => {
               const erc721Balance: { [token: string]: bigint } = {};
               //function -> .set vault/
               vaultsData[String(chain.id)] = addVaultData(contractBalance);
+
               assetBalances[String(chain.id)] =
                 addAssetsBalance(contractBalance);
               //
