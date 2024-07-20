@@ -16,4 +16,4 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Run vitest
-        run: yarn vitest
+        run: yarn test:unit
