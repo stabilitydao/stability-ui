@@ -1,24 +1,52 @@
-name: End-to-End Tests(Playwright)
+# name: End-to-End Tests(Playwright)
+# on:
+#   push:
+#     branches: [main, master]
+#   pull_request:
+#     branches: [main, master]
+# jobs:
+#   test:
+#     timeout-minutes: 60
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: lts/*
+#       - name: Install dependencies
+#         run: yarn install
+#       - name: Install Playwright Browsers
+#         run: yarn playwright install --with-deps
+#       - name: Run Playwright tests
+#         run: yarn test:e2e
+#       - uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: playwright-report
+#           path: playwright-report/
+#           retention-days: 30
+
+name: End-to-End Tests (Playwright)
+
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: setup
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install dependencies
-        run: yarn install
+      - name: Use common setup
+        uses: ./.github/workflows/0_common-setup.yml
+
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
       - name: Run Playwright tests
-        run: yarn test:2e2
+        run: yarn test:e2e
       - uses: actions/upload-artifact@v4
         if: always()
         with:
