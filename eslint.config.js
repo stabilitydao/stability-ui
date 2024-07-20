@@ -1,6 +1,7 @@
 import typescriptParser from "@typescript-eslint/parser";
 import typescriptPlugin from "@typescript-eslint/eslint-plugin";
 import prettierPlugin from "eslint-plugin-prettier";
+import astroParser from "astro-eslint-parser";
 
 export default [
   {
