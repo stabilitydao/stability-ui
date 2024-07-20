@@ -39,4 +39,4 @@ jobs:
         run: |
           yarn add eslint eslint-plugin-astro @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier astro-eslint-parser --dev
       - name: Run ESLint
-        run: yarn eslint . --ext .ts,.tsx,.astro
+        run: yarn eslint **/*.{ts,tsx,astro}
