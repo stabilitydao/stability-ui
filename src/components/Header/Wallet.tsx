@@ -233,6 +233,7 @@ const Wallet = () => {
         </button>
       )}
       <button
+        data-testid="connectButton"
         className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] flex items-center justify-center gap-1"
         onClick={() => openProfile()}
       >
