@@ -21,4 +21,4 @@ jobs:
         run: |
           export NODE_OPTIONS=--max-old-space-size=16384
           yarn lint
-        timeout-minutes: 20
+        timeout-minutes: 60
