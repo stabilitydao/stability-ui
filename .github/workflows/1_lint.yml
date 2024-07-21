@@ -1,3 +1,42 @@
+# name: ESLint Check
+
+# on:
+#   push:
+#     branches: [main, master]
+#   pull_request:
+#     branches: [main, master]
+
+# jobs:
+#   lint:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: lts/*
+#       - name: Install dependencies
+#         run: |
+#           yarn add eslint eslint-plugin-astro @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier astro-eslint-parser --dev
+#       # - name: Run ESLint
+#       #   run: |
+#       #     export NODE_OPTIONS=--max-old-space-size=16384
+#       #     yarn lint --max-warnings 0
+#       #   timeout-minutes: 60
+#       - name: Get list of changed files
+#         id: changed-files
+#         run: |
+#           git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
+
+#       - name: Run ESLint on changed files
+#         run: |
+#           export NODE_OPTIONS=--max-old-space-size=32768
+#           CHANGED_FILES=$(cat changed_files.txt | grep -E '\.(ts|tsx|astro)$' | tr '\n' ' ')
+#           if [ -n "$CHANGED_FILES" ]; then
+#             yarn eslint $CHANGED_FILES --cache --max-warnings 0
+#           else
+#             echo "No TypeScript or Astro files changed."
+#           fi
+#         timeout-minutes: 60
 name: ESLint Check
 
 on:
@@ -10,22 +49,24 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
+
       - name: Install dependencies
-        run: |
-          yarn add eslint eslint-plugin-astro @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier astro-eslint-parser --dev
-      # - name: Run ESLint
-      #   run: |
-      #     export NODE_OPTIONS=--max-old-space-size=16384
-      #     yarn lint --max-warnings 0
-      #   timeout-minutes: 60
-      - name: Get list of changed files
-        id: changed-files
+        run: yarn install
+
+      - name: Get changed files
+        id: changes
         run: |
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
+          cat changed_files.txt
 
       - name: Run ESLint on changed files
         run: |
@@ -35,5 +76,4 @@ jobs:
             yarn eslint $CHANGED_FILES --cache --max-warnings 0
           else
             echo "No TypeScript or Astro files changed."
-          fi
         timeout-minutes: 60
