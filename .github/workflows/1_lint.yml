@@ -19,6 +19,6 @@ jobs:
           yarn add eslint eslint-plugin-astro @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier astro-eslint-parser --dev
       - name: Run ESLint
         run: |
-          export NODE_OPTIONS=--max-old-space-size=16384
+          export NODE_OPTIONS=--max-old-space-size=32768
           yarn lint
         timeout-minutes: 60
