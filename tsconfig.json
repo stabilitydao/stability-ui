@@ -16,6 +16,7 @@
       "@utils": ["src/utils"],
       "@constants": ["src/constants"],
       "@types": ["src/types"]
-    }
+    },
+    "moduleResolution": "node"
   }
 }
