@@ -30,7 +30,10 @@ export const get1InchRoutes = async (
   const tokenDecimals = tokenData?.decimals || 18;
   const address = type === "deposit" ? toAddress : fromAddress;
 
-  if (fromAddress.toLowerCase() === toAddress.toLowerCase() || !amount) {
+  if (
+    fromAddress.toLowerCase() === toAddress.toLowerCase() ||
+    !Number(amount)
+  ) {
     return {
       symbol: symbol as string,
       address: address,
