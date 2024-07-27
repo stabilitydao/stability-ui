@@ -1,4 +1,4 @@
-export const getDate = (unix: number) => {
+export const getDate = (unix: number): string => {
   const date = new Date(unix * 1000);
 
   const userLocale =

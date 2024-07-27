@@ -1,5 +1,8 @@
-export const formatNumber = (value: string | number, type: string) => {
-  let changedValue;
+export const formatNumber = (
+  value: string | number,
+  type: string
+): string | number => {
+  let changedValue = "";
 
   const suffixes = ["", "K", "M", "B", "T"];
   let suffixNum = 0;

@@ -1,7 +1,7 @@
 import { getTimeDifference } from "@utils";
 
 interface IProps {
-  unix: bigint;
+  unix: string;
 }
 
 const TimeDifferenceIndicator: React.FC<IProps> = ({ unix }) => {

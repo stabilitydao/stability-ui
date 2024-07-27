@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
-  const modalRef: any = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
@@ -24,7 +24,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
       setModalState({
         earningData: "",
         daily: 0,
-        lastHardWork: 0,
+        lastHardWork: "",
         symbol: "",
         state: false,
         pool: {},
@@ -58,7 +58,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             setModalState({
               earningData: "",
               daily: 0,
-              lastHardWork: 0,
+              lastHardWork: "",
               symbol: "",
               state: false,
               pool: {},
@@ -149,7 +149,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               <p>Total APR</p>
               <p className="text-end">
                 {$hideFeeAPR
-                  ? state.earningData.apr.withoutFees[$aprFilter]
+                  ? state?.earningData?.apr?.withoutFees?.[$aprFilter]
                   : state.earningData.apr.withFees[$aprFilter]}
                 %
               </p>

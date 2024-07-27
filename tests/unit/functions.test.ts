@@ -13,7 +13,10 @@ import {
   getProtocolLogo,
   getStrategyInfo,
   getTimeDifference,
+  get1InchRoutes,
 } from "@utils";
+
+import { CHAINS } from "@constants";
 
 describe("addAssetsBalance", () => {
   it("should correctly map assets to balances", () => {
@@ -343,7 +346,7 @@ describe("formatNumber", () => {
   });
 
   it("should return undefined for unknown type", () => {
-    expect(formatNumber(1500, "unknownType")).toBeUndefined();
+    expect(formatNumber(1500, "unknownType")).toBe("");
   });
 });
 
@@ -442,7 +445,67 @@ describe("getTimeDifference function", () => {
   });
 });
 
+describe("1inch", () => {
+  it("should get correct amountOut for polygon", async () => {
+    const setAction = () => {};
+
+    const result = await get1InchRoutes(
+      CHAINS[0].id,
+      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+      6,
+      "123000000",
+      setAction,
+      "deposit"
+    );
+
+    expect(result?.amountOut).toBeDefined();
+
+    expect(typeof result?.amountOut).toBe("string");
+
+    expect(result?.amountOut).not.toBe("");
+    expect(result?.amountOut).not.toBe(0);
+
+    expect(Number(result?.amountOut.slice(0, 3))).toBe(123);
+  });
+  it("should get correct amountOut for base", async () => {
+    const setAction = () => {};
+
+    const result = await get1InchRoutes(
+      CHAINS[1].id,
+      "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      6,
+      "123000000",
+      setAction,
+      "deposit"
+    );
+
+    expect(result?.amountOut).toBeDefined();
+
+    expect(typeof result?.amountOut).toBe("string");
+
+    expect(result?.amountOut).not.toBe("");
+    expect(result?.amountOut).not.toBe(0);
+
+    expect(Number(result?.amountOut.slice(0, 3))).toBe(123);
+  });
+  it("should get correct amountOut for zero", async () => {
+    const setAction = () => {};
+
+    const result = await get1InchRoutes(
+      CHAINS[1].id,
+      "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      6,
+      "0",
+      setAction,
+      "deposit"
+    );
+    expect(result?.amountOut).toBe("0");
+  });
+});
+
 // add asset to wallet
-// tests from 1inch routes
 // tests for getTokenData
 /// tests for setLocalStoreHash

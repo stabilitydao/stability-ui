@@ -1,6 +1,7 @@
 import type React from "react";
 
 import { useEffect } from "react";
+
 import { formatUnits } from "viem";
 
 import axios from "axios";
@@ -65,16 +66,15 @@ import type {
   TVaults,
   TMultichainPrices,
   TAPIData,
-  TAsset,
+  TPriceInfo,
+  TVaultDataKey,
+  TPlatformGetBalance,
+  // TAsset,
 } from "@types";
 
-import type {
-  Vaults,
-  AssetPrices,
-  Vault,
-} from "@stabilitydao/stability/out/api.types";
+import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
 
-const AppStore = (props: React.PropsWithChildren) => {
+const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
 
   const { chain } = useAccount();
@@ -145,7 +145,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
   const setVaultsData = async (
     data: any,
-    prices: AssetPrices,
+    prices: { [key: string]: TPriceInfo },
     chainID: string
   ) => {
     const APIVaults = await data.reduce(
@@ -154,12 +154,12 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const underlying =
           stabilityAPIData?.underlyings?.[chainID]?.[
-            vault.underlying.toLowerCase()
+            //@ts-ignore
+            vault?.underlying?.toLowerCase()
           ];
 
-        const strategyAssets = vault?.assets?.map((asset: string) =>
-          asset.toLowerCase()
-        );
+        const strategyAssets: string[] =
+          vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
         const strategyInfo = getStrategyInfo(vault?.symbol);
 
@@ -167,7 +167,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault?.almRebalanceRawData[0]?.map(
+        const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
           (_: string) => BigInt(_)
         );
 
@@ -185,18 +185,19 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         const assetsAmounts = vault?.assetsAmounts?.map(
           (amount: string, index: number) =>
-            formatUnits(amount, decimals[index])
+            formatUnits(BigInt(amount), decimals?.[index] || 18)
         );
         const assetsPrices = vault?.assets?.map(
-          (asset: string) => prices[asset.toLowerCase()].price
+          (asset: string) => prices?.[asset?.toLowerCase()]?.price
         );
+
         const assetsAmountsInUSD = assetsAmounts?.map(
           (amount: string, index: number) =>
-            Number(amount) * Number(assetsPrices[index])
+            Number(amount) * Number(assetsPrices?.[index])
         );
 
         const assetsAmountsSum = assetsAmountsInUSD?.reduce(
-          (acc: number, cur: string) => acc + Number(cur),
+          (acc: number, cur: number) => acc + cur,
           0
         );
 
@@ -241,20 +242,20 @@ const AppStore = (props: React.PropsWithChildren) => {
             underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
         }
         if (strategyName === "IQMF" || strategyName === "IRMF") {
-          let fee = vault.almFee.income;
+          let fee = vault?.almFee?.income || 0;
 
           //////
           poolSwapFeesAPRDaily =
-            Number(formatUnits(almRebalanceEntity[0], 8)) -
-            (Number(formatUnits(almRebalanceEntity[0], 8)) / 100) * fee;
+            Number(formatUnits(almRebalanceEntity?.[0] || 0n, 8)) -
+            (Number(formatUnits(almRebalanceEntity?.[0] || 0n, 8)) / 100) * fee;
 
           poolSwapFeesAPRWeekly =
-            Number(formatUnits(almRebalanceEntity[2], 8)) -
-            (Number(formatUnits(almRebalanceEntity[2], 8)) / 100) * fee;
+            Number(formatUnits(almRebalanceEntity?.[2] || 0n, 8)) -
+            (Number(formatUnits(almRebalanceEntity?.[2] || 0n, 8)) / 100) * fee;
 
           dailyAPR =
-            Number(formatUnits(almRebalanceEntity[1], 8)) -
-            (Number(formatUnits(almRebalanceEntity[1], 8)) / 100) * fee;
+            Number(formatUnits(almRebalanceEntity?.[1] || 0n, 8)) -
+            (Number(formatUnits(almRebalanceEntity?.[1] || 0n, 8)) / 100) * fee;
 
           if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
           if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
@@ -273,13 +274,13 @@ const AppStore = (props: React.PropsWithChildren) => {
           rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
         }
 
-        const APR = (Number(vault.apr.incomeLatest) + Number(dailyAPR)).toFixed(
-          2
-        );
+        const APR = (
+          Number(vault?.apr?.incomeLatest) + Number(dailyAPR)
+        ).toFixed(2);
 
         const APY = calculateAPY(APR).toFixed(2);
 
-        const APRWithoutFees = vault.apr.incomeLatest;
+        const APRWithoutFees = vault?.apr?.incomeLatest || 0;
 
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
@@ -355,19 +356,17 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
             : { latest: "-", daily: "-", weekly: "-" };
 
-        const latestFarmAPR = vault.apr.incomeLatest;
-
         const farmAPR = {
-          latest: latestFarmAPR,
+          latest: APRWithoutFees,
           daily: determineAPR(
             lastHistoryData?.income24h,
             dailyFarmApr,
-            latestFarmAPR
+            APRWithoutFees
           ),
           weekly: determineAPR(
             lastHistoryData?.incomeWeek,
             weeklyFarmApr,
-            latestFarmAPR
+            APRWithoutFees
           ),
         };
 
@@ -410,14 +409,18 @@ const AppStore = (props: React.PropsWithChildren) => {
         ).toFixed(2);
 
         let lifetimeTokensHold: THoldData[] = [];
-
         if (lastHistoryData?.vsHoldAssetsLifetime && prices) {
           lifetimeTokensHold = strategyAssets.map(
-            (asset: TAddress, index: number) => {
-              const price = Number(prices[asset.toLowerCase()]?.price);
+            (asset: string, index: number) => {
+              const price = vault?.assetsPricesLast?.[index]
+                ? Number(vault?.assetsPricesLast?.[index])
+                : Number(prices[asset?.toLowerCase()]?.price);
 
               const priceOnCreation = Number(
-                formatUnits(BigInt(vault?.assetsPricesOnCreation[index]), 18)
+                formatUnits(
+                  BigInt(vault?.assetsPricesOnCreation?.[index] || 0),
+                  18
+                )
               );
 
               const priceDifference =
@@ -446,11 +449,11 @@ const AppStore = (props: React.PropsWithChildren) => {
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
-        let strategySpecific = "";
+        let strategySpecific: string = "";
 
         if (vault.strategySpecific && strategyInfo.shortName === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
-            if (vault.strategySpecific.toLowerCase().includes(protocol)) {
+            if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
               switch (protocol) {
                 case "aave":
                   yearnProtocols.push({
@@ -489,22 +492,22 @@ const AppStore = (props: React.PropsWithChildren) => {
         } else {
           strategySpecific =
             strategyInfo?.shortName === "DQMF"
-              ? vault.strategySpecific.replace(
+              ? (vault?.strategySpecific?.replace(
                   /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
                   ""
-                )
-              : vault.strategySpecific;
+                ) as string)
+              : (vault?.strategySpecific as string);
         }
         /////
 
         const strategyVersion =
-          stabilityAPIData.platforms[chainID].versions.strategy[
+          stabilityAPIData?.platforms?.[chainID]?.versions?.strategy?.[
             vault.strategyId
           ];
 
-        const assetsSymbol = assets.map((asset) => asset.symbol).join("+");
+        const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
 
-        vaults[vault.address.toLowerCase()] = {
+        vaults[vault?.address?.toLowerCase()] = {
           address: vault.address.toLowerCase(),
           name: vault.name,
           symbol: vault.symbol,
@@ -525,7 +528,7 @@ const AppStore = (props: React.PropsWithChildren) => {
           strategyInfo,
           il: IL,
           underlying: vault.underlying,
-          strategyAddress: vault.strategy.toLowerCase(),
+          strategyAddress: vault?.strategy?.toLowerCase(),
           strategyDescription: vault.strategyDescription,
           status: vault.status,
           version: vault.version,
@@ -564,37 +567,37 @@ const AppStore = (props: React.PropsWithChildren) => {
     const vaultsTokens: { [key: string]: string[] } = {};
     const platformData: TPlatformsData = {};
     const assetBalances: { [key: string]: bigint } = {};
-    const vaultsData: { [key: string]: bigint } = {};
+    const vaultsData: TVaultDataKey = {};
 
     await Promise.all(
       CHAINS.map(async (chain) => {
         /////***** SET VAULTS DATA *****/////
 
         const APIVaultsData = Object.entries(
-          stabilityAPIData?.vaults[chain.id] as Vaults
+          stabilityAPIData?.vaults?.[chain.id] as Vaults
         ).map(([, vault]) => vault);
 
         await setVaultsData(
           APIVaultsData,
-          prices[chain.id] as AssetPrices,
+          prices?.[chain.id],
           String(chain.id)
         );
 
         /////***** SET PLATFORM DATA *****/////
 
-        vaultsTokens[String(chain.id)] = stabilityAPIData?.platforms[chain.id]
-          .bcAssets as TAddress[];
+        vaultsTokens[String(chain.id)] = stabilityAPIData?.platforms?.[chain.id]
+          ?.bcAssets as TAddress[];
 
         versions[String(chain.id)] =
-          stabilityAPIData?.platforms[chain.id]?.versions?.platform;
+          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform;
 
         platformData[String(chain.id)] = {
           platform: platforms[chain.id],
           factory: deployments[chain.id].core.factory.toLowerCase(),
           buildingPermitToken:
-            stabilityAPIData?.platforms[chain.id]?.buildingPermitToken,
+            stabilityAPIData?.platforms?.[chain.id]?.buildingPermitToken,
           buildingPayPerVaultToken:
-            stabilityAPIData?.platforms[chain.id]?.buildingPayPerVaultToken,
+            stabilityAPIData?.platforms?.[chain.id]?.buildingPayPerVaultToken,
           zap: deployments[chain.id].core.zap.toLowerCase(),
         };
 
@@ -608,14 +611,15 @@ const AppStore = (props: React.PropsWithChildren) => {
           }
 
           try {
-            const contractBalance = await localClient.readContract({
+            const contractBalance = (await localClient?.readContract({
               address: platforms[chain.id],
               abi: PlatformABI,
               functionName: "getBalance",
               args: [address as TAddress],
-            });
-            const contractVaults = await localClient.readContract({
-              address: contractBalance[6][1],
+            })) as TPlatformGetBalance;
+
+            const contractVaults = await localClient?.readContract({
+              address: contractBalance[6][1] as TAddress,
               abi: IVaultManagerABI,
               functionName: "vaults",
             });
@@ -626,10 +630,13 @@ const AppStore = (props: React.PropsWithChildren) => {
               const erc20Balance: { [token: string]: bigint } = {};
               const erc721Balance: { [token: string]: bigint } = {};
               //function -> .set vault/
-              vaultsData[String(chain.id)] = addVaultData(contractBalance);
+              vaultsData[String(chain.id)] = addVaultData(
+                contractBalance as TPlatformGetBalance
+              );
 
-              assetBalances[String(chain.id)] =
-                addAssetsBalance(contractBalance);
+              assetBalances[String(chain.id)] = addAssetsBalance(
+                contractBalance as TPlatformGetBalance
+              );
               //
 
               for (let i = 0; i < contractBalance[1].length; i++) {
@@ -637,7 +644,8 @@ const AppStore = (props: React.PropsWithChildren) => {
               }
 
               for (let i = 0; i < contractBalance[6].length; i++) {
-                erc721Balance[contractBalance[6][i]] = contractBalance[7][i];
+                erc721Balance[contractBalance[6][i]] =
+                  contractBalance?.[7]?.[i];
               }
 
               userBalance.set({
@@ -651,7 +659,7 @@ const AppStore = (props: React.PropsWithChildren) => {
 
             if (contractVaults) {
               const vaultsPromise = await Promise.all(
-                contractVaults[0].map(async (vault: any, index: number) => {
+                contractVaults[0].map(async (vault: string, index: number) => {
                   return {
                     [vault.toLowerCase()]: {
                       ...localVaults[chain.id][vault.toLowerCase()],
@@ -672,7 +680,7 @@ const AppStore = (props: React.PropsWithChildren) => {
             error.set({
               state: true,
               type: "WEB3",
-              description: txError.message,
+              description: txError?.message,
             });
           }
         }

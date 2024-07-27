@@ -6,6 +6,16 @@ import { getTokenData } from "./getTokenData";
 
 import type { TAddress } from "@types";
 
+type ReturnData = {
+  symbol: string;
+  address: string;
+  amountIn: string;
+  amountOut: string;
+  router: string;
+  txData: string;
+  img: string;
+};
+
 export const get1InchRoutes = async (
   network: string,
   fromAddress: TAddress,
@@ -14,23 +24,24 @@ export const get1InchRoutes = async (
   amount: string | bigint,
   setError: React.Dispatch<React.SetStateAction<boolean>>,
   type: string
-) => {
+): Promise<ReturnData | undefined> => {
   const tokenData = getTokenData(toAddress);
   const symbol = tokenData?.symbol;
   const tokenDecimals = tokenData?.decimals || 18;
   const address = type === "deposit" ? toAddress : fromAddress;
 
-  if (fromAddress.toLowerCase() === toAddress.toLowerCase()) {
+  if (fromAddress.toLowerCase() === toAddress.toLowerCase() || !amount) {
     return {
       symbol: symbol as string,
       address: address,
-      amountIn: formatUnits(amount as any, decimals),
+      amountIn: formatUnits(BigInt(amount), decimals),
       amountOut: "0",
       router: "",
       txData: "",
       img: tokenData?.logoURI as string,
     };
   }
+
   const url = `https://api.stabilitydao.org/swap/${network}/${fromAddress}/${toAddress}/${amount}`;
 
   const maxRetries = 3;
@@ -39,12 +50,13 @@ export const get1InchRoutes = async (
   while (currentRetry < maxRetries) {
     try {
       const response = await axios.get(url);
+
       setError(false);
 
       return {
         symbol: symbol as string,
         address: address,
-        amountIn: formatUnits(amount as any, decimals),
+        amountIn: formatUnits(BigInt(amount), decimals),
         amountOut: formatUnits(response?.data[0].amountOut, tokenDecimals),
         router: response?.data[0].router,
         txData: response?.data[0].txData,
@@ -62,7 +74,7 @@ export const get1InchRoutes = async (
         return {
           symbol: symbol as string,
           address: address,
-          amountIn: formatUnits(amount as any, decimals),
+          amountIn: formatUnits(BigInt(amount), decimals),
           amountOut: "0",
           router: "",
           txData: "",

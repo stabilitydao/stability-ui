@@ -1,7 +1,7 @@
-import type { TAddress, TBalances } from "@types";
+import type { TBalances, TPlatformGetBalance } from "@types";
 
-const addAssetsBalance = (data: any[]) => {
-  const assets = data[0].map((address: TAddress) => address.toLowerCase());
+const addAssetsBalance = (data: TPlatformGetBalance): TBalances | undefined => {
+  const assets = data[0].map((address: string) => address.toLowerCase());
   const assetsBalances = data[2];
   const balances: TBalances = {};
   if (assets?.length === assetsBalances?.length) {

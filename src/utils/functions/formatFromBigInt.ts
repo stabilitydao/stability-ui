@@ -4,7 +4,7 @@ export const formatFromBigInt = (
   value: number | string | bigint,
   decimals: number,
   type: string = ""
-) => {
+): number => {
   let formatedValue;
 
   switch (type) {

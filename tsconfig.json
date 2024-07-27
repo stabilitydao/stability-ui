@@ -1,6 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "moduleResolution": "node",
     "jsx": "react-jsx",
     "strict": true,
     "jsxImportSource": "react",
@@ -16,7 +17,6 @@
       "@utils": ["src/utils"],
       "@constants": ["src/constants"],
       "@types": ["src/types"]
-    },
-    "moduleResolution": "node"
+    }
   }
 }

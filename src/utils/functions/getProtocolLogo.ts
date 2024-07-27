@@ -1,6 +1,6 @@
 import { PROTOCOLS } from "@constants";
 
-export const getProtocolLogo = (strategyShortName: string) => {
+export const getProtocolLogo = (strategyShortName: string): string => {
   let protocolLogo = "";
 
   switch (strategyShortName) {

@@ -27,7 +27,7 @@ const platformVersions = atom<Record<string, string>>({});
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
 const assetsPrices = atom<TMultichainPrices>({});
-const assetsBalances = atom<TBalances | undefined>();
+const assetsBalances = atom<TBalances>({});
 const vaultData = atom<TVaults>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
@@ -35,7 +35,7 @@ const balances = atom<any>();
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
 
-const tokens = atom<TAddress[] | undefined>();
+const tokens = atom<TAddress[]>([]);
 
 const connected = atom<boolean | undefined>();
 

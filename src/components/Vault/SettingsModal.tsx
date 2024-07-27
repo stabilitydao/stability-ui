@@ -15,7 +15,7 @@ const SettingsModal: React.FC<IProps> = ({
   setSettingsState,
   setModalState,
 }) => {
-  const modalRef: any = useRef();
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: MouseEvent) => {
     const isSvgClick = (event.target as HTMLElement).classList.contains(
@@ -24,7 +24,7 @@ const SettingsModal: React.FC<IProps> = ({
 
     if (
       modalRef.current &&
-      !modalRef.current.contains(event.target) &&
+      !modalRef.current.contains(event.target as Node) &&
       !isSvgClick
     ) {
       setModalState(false);

@@ -24,6 +24,15 @@ interface IProps {
   vault: TVault;
 }
 
+type TDefiedgeFee =
+  | {
+      rebalance: string;
+      withdraw: string;
+      deposit: string;
+      poolSwapFee: string;
+    }
+  | undefined;
+
 type TAlmAsset = {
   symbol: string;
   amount: number;
@@ -44,7 +53,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
 
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
   const [almFee, setAlmFee] = useState<string>("");
-  const [defiedgeFee, setDefiedgeFee] = useState<any>();
+  const [defiedgeFee, setDefiedgeFee] = useState<TDefiedgeFee>();
   const [tableData, setTableData] = useState<TAlmTable[]>([]);
 
   const getAlmFee = async () => {

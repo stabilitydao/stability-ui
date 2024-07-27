@@ -24,7 +24,7 @@ import { CHAINS, PM } from "@constants";
 
 import type { TAddress } from "@types";
 
-const Wallet = () => {
+const Wallet = (): JSX.Element => {
   const { open } = useWeb3Modal();
   const { chain } = useAccount();
   const { switchChain } = useSwitchChain();
@@ -38,7 +38,7 @@ const Wallet = () => {
   const $assetsPrices = useStore(assetsPrices);
 
   const [userBalance, setUserBalance] = useState<number>(0);
-  const [userAssets, setUserAssets] = useState<any>();
+  const [userAssets, setUserAssets] = useState<string[]>([]);
   const [providerImage, setProviderImage] = useState<string>("");
 
   const currentChain = CHAINS.find((item) => item.id === $currentChainID);
@@ -121,7 +121,7 @@ const Wallet = () => {
       ?.querySelector("w3m-account-view")
       ?.shadowRoot?.querySelector("wui-flex");
 
-    if (web3ModalCard && userAssets) {
+    if (web3ModalCard && userAssets?.length) {
       insertAssets();
     } else {
       setTimeout(insertAssets, 1000);

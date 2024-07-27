@@ -16,12 +16,10 @@ import { Filters } from "./Filters";
 import { Portfolio } from "./Portfolio";
 
 import {
-  AssetsProportion,
-  VaultState,
   TimeDifferenceIndicator,
   Loader,
   ErrorMessage,
-  ShortAddress,
+  // ShortAddress,
 } from "@components";
 
 import {
@@ -31,8 +29,8 @@ import {
   error,
   aprFilter,
   connected,
-  platformVersions,
-  currentChainID,
+  // platformVersions,
+  // currentChainID,
   // assetsPrices,
 } from "@store";
 
@@ -63,9 +61,9 @@ import type {
   TTableFilters,
   TTAbleFiltersVariant,
   THoldData,
-  TPendingPlatformUpgrade,
-  TAddress,
-  TUpgradesTable,
+  // TPendingPlatformUpgrade,
+  // TAddress,
+  // TUpgradesTable,
   TEarningData,
 } from "@types";
 
@@ -74,7 +72,7 @@ import type {
 //   price: string;
 // };
 
-const Vaults = () => {
+const Vaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
 
   const $vaults = useStore(vaults);
@@ -84,8 +82,8 @@ const Vaults = () => {
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
   // const $publicClient = useStore(publicClient);
-  const $platformVersions = useStore(platformVersions);
-  const $currentChainID = useStore(currentChainID);
+  // const $platformVersions = useStore(platformVersions);
+  // const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
 
   // const [tokens, setTokens] = useState<TToken[]>([]);
@@ -112,11 +110,11 @@ const Vaults = () => {
     isVsActive: false,
   });
 
-  const [platformUpdates, setPlatformUpdates] =
-    useState<TPendingPlatformUpgrade>();
+  // const [platformUpdates, setPlatformUpdates] =
+  //   useState<TPendingPlatformUpgrade>();
 
-  const [lockTime, setLockTime] = useState({ start: "", end: "" });
-  const [upgradesTable, setUpgradesTable] = useState<TUpgradesTable[]>([]);
+  // const [lockTime, setLockTime] = useState({ start: "", end: "" });
+  // const [upgradesTable, setUpgradesTable] = useState<TUpgradesTable[]>([]);
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
@@ -139,8 +137,8 @@ const Vaults = () => {
   };
 
   const compareHandler = (
-    a: any,
-    b: any,
+    a: string,
+    b: string,
     dataType: string,
     sortOrder: string
   ) => {
@@ -479,17 +477,17 @@ const Vaults = () => {
   // };
 
   const initFilters = (vaults: TVault[]) => {
-    let shortNames: any[] = [
+    const shortNames: string[] = [
       ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
     ];
 
-    shortNames = shortNames.map((name: string) => ({
+    const convertedShortNames = shortNames.map((name: string) => ({
       name: name,
       state: false,
     }));
 
     const newFilters = tableFilters.map((f) =>
-      f.name === "Strategy" ? { ...f, variants: shortNames } : f
+      f.name === "Strategy" ? { ...f, variants: convertedShortNames } : f
     );
 
     setURLFilters(newFilters);
@@ -609,7 +607,7 @@ const Vaults = () => {
       </div>
 
       <ErrorMessage type="WEB3" />
-      {!!platformUpdates?.newVersion &&
+      {/* {!!platformUpdates?.newVersion &&
         platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
         !!upgradesTable?.length && (
           <div className="p-3  mt-3 rounded-md bg-[#262830]">
@@ -702,7 +700,7 @@ const Vaults = () => {
               </table>
             </div>
           </div>
-        )}
+        )} */}
 
       {/* <div className="flex items-center gap-5 p-2 flex-wrap">
         {!!tokens &&
@@ -980,7 +978,7 @@ const Vaults = () => {
                                       ? vault.earningData.apr.withoutFees[
                                           $aprFilter
                                         ]
-                                      : vault.earningData.apr.withFees[
+                                      : vault?.earningData?.apr?.withFees[
                                           $aprFilter
                                         ]}
                                     %

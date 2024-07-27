@@ -107,13 +107,13 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const dailyYield = $connected
     ? `$${formatNumber(portfolio.dailySum, "format")} / ${formatNumber(
         portfolio.dailyPercent,
-        "format"
+        "format",
       )}%`
     : "-";
   const monthlyYield = $connected
     ? `$${formatNumber(portfolio.monthly, "format")} / ${formatNumber(
         portfolio.monthPercent,
-        "format"
+        "format",
       )}%`
     : "-";
   const avgApr = $connected ? `${formatNumber(portfolio.apr, "format")}%` : "-";

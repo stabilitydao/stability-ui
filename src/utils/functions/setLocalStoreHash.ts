@@ -1,15 +1,21 @@
 import type { TAddress } from "@types";
 
+type TPropsTokens = {
+  [address: string]: {
+    amount: string;
+  };
+};
+
 type TProps = {
   hash: TAddress;
   status: string;
   timestamp: number;
-  tokens: any[];
+  tokens: TPropsTokens[];
   type: string;
   vault: TAddress;
 };
 
-const setLocalStoreHash = (obj: TProps) => {
+const setLocalStoreHash = (obj: TProps): void => {
   localStorage.setItem("lastTx", JSON.stringify(obj));
 };
 

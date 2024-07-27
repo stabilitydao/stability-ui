@@ -6,7 +6,7 @@ import { aprFilter } from "@store";
 
 import { APRsType } from "@constants";
 
-const APRtimeSwitcher = () => {
+const APRtimeSwitcher = (): JSX.Element => {
   const $aprFilter = useStore(aprFilter);
 
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -65,8 +65,8 @@ const APRtimeSwitcher = () => {
           {activeAPRType === "weekly"
             ? "week"
             : activeAPRType === "daily"
-            ? "24h"
-            : activeAPRType}
+              ? "24h"
+              : activeAPRType}
         </p>
         <svg
           width="15"

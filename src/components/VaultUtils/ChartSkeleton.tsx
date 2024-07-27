@@ -1,4 +1,4 @@
-const ChartSkeleton = () => {
+const ChartSkeleton = (): JSX.Element => {
   return (
     <svg
       width="100%"

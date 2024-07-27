@@ -45,12 +45,12 @@ const { title } = Astro.props as IProps;
     <!-- <ViewTransitions /> -->
   </head>
   <body>
-    <App client:only>
-      <Header client:only/>
+    <App client:only="react">
+      <Header client:only="react"/>
       <main>
         <slot />
       </main>
-      <Footer client:only/>
+      <Footer client:only="react"/>
     </App>
   </body>
 </html>

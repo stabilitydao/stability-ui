@@ -1,4 +1,4 @@
-const AssetsSkeleton = () => {
+const AssetsSkeleton = (): JSX.Element => {
   return (
     <svg
       width="320"

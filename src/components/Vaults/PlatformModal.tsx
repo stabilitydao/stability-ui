@@ -52,14 +52,14 @@ const TheGraph: React.FC<{}> = () => {
 };
 
 const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
-  const modalRef: any = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
   const $apiData = useStore(apiData);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setModalState(false);
     }
   };
@@ -290,7 +290,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
             </div>
             <div className="flex flex-col mb-2">
               <span className="text-[#848E9C]">API</span>
-              <span>{$apiData?.about}</span>
+              {/* <span>{$apiData?.about}</span> */}
               <a
                 href="https://api.stabilitydao.org"
                 target="_blank"

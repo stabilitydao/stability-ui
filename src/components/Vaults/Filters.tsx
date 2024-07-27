@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, memo } from "react";
+
+import type { Dispatch, SetStateAction } from "react";
+
 import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
   filters: TTableFilters[];
-  setFilters: any;
+  setFilters: Dispatch<SetStateAction<TTableFilters[]>>;
 }
 
 const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
@@ -135,8 +138,11 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropDownRef.current &&
+        !dropDownRef.current?.contains(event.target as Node)
+      ) {
         setDropDownSelector(false);
       }
     };

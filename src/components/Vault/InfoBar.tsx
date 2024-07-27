@@ -41,11 +41,11 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
 
     if ($hideFeeAPR) {
-      apr = vault.earningData.apr.withoutFees[$aprFilter];
-      apy = vault.earningData.apy.withoutFees[$aprFilter];
+      apr = vault?.earningData?.apr?.withoutFees?.[$aprFilter];
+      apy = vault?.earningData?.apy?.withoutFees?.[$aprFilter];
     } else {
-      apr = vault.earningData.apr.withFees[$aprFilter];
-      apy = vault.earningData.apy.withFees[$aprFilter];
+      apr = vault?.earningData?.apr?.withFees?.[$aprFilter];
+      apy = vault?.earningData?.apy?.withFees?.[$aprFilter];
     }
     monthlyAPR = Number(apr) / 12;
     monthlyEarn = String(

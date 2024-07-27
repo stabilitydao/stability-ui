@@ -1,3 +1,4 @@
+import type { TChartData } from "@types";
 import { useEffect } from "react";
 import {
   BarChart,
@@ -10,8 +11,13 @@ import {
   Cell,
 } from "recharts";
 
+import type { TChartPayload } from "@types";
+
 interface IProps {
-  chart: any;
+  chart: {
+    name: string;
+    data: [];
+  };
   APRType: string;
 }
 
@@ -23,7 +29,7 @@ const CustomizedAxisTick = ({
 }: {
   x: number;
   y: number;
-  payload: any;
+  payload: TChartPayload;
   fontSize: number;
 }) => {
   return (
@@ -47,7 +53,7 @@ const CustomTooltip = ({
   APRType,
 }: {
   active: boolean;
-  payload: any;
+  payload: TChartPayload[];
   APRType: string;
 }) => {
   if (active && payload && payload.length) {
@@ -68,7 +74,11 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
 
   useEffect(() => {
     if (chart.data) {
-      min = Math.min(...chart.data.map((item: any) => item[chart.name]));
+      min = Math.min(
+        ...chart.data.map((item: TChartData) =>
+          Number(item[chart.name as keyof typeof item])
+        )
+      );
     }
   }, [chart]);
   return (
@@ -102,7 +112,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
         <Tooltip content={<CustomTooltip APRType={APRType} />} />
 
         <Bar dataKey={chart.name} stackId="bar">
-          {chart.data.map((_: any, index: number) => (
+          {chart.data.map((_: TChartData, index: number) => (
             <Cell cursor="pointer" fill="#4626bc" key={`cell-${index}`} />
           ))}
         </Bar>

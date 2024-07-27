@@ -70,6 +70,7 @@ const Toast: React.FC<IProps> = memo(
             symbol: symbol ? symbol : getTokenData(address)?.symbol,
             logo: logo ? logo : getTokenData(address)?.logoURI,
           }));
+
           setTokens(array);
 
           setIsVisible(true);

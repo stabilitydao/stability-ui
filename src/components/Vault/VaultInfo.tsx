@@ -19,9 +19,12 @@ interface IProps {
 }
 
 const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
-  const [created, setCreated] = useState<any>();
+  const [created, setCreated] = useState<{ time: string; days: number }>();
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
-  const [timeDifference, setTimeDifference] = useState<any>();
+  const [timeDifference, setTimeDifference] = useState<{
+    days: number;
+    hours: number;
+  }>();
 
   const client = useWalletClient();
   const { connector } = useAccount();
@@ -35,6 +38,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
       setHardWorkOnDeposit(vault?.hardWorkOnDeposit ? "YES" : "NO");
       setCreated({ time: date, days: getTimeDifference(vault?.created)?.days });
+
       setTimeDifference(getTimeDifference(vault?.lastHardWork));
     }
   }, [vault]);
@@ -43,7 +47,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
     return (
       vault?.symbol?.length <= 11 &&
       $connected &&
-      window.ethereum &&
+      window?.ethereum &&
       connector?.id === "io.metamask" &&
       network === $currentChainID
     );
@@ -51,7 +55,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   const gasReserve = useMemo(() => {
     return !!Number(vault?.gasReserve)
-      ? Number(formatUnits(vault?.gasReserve, 18)).toFixed(5)
+      ? Number(formatUnits(BigInt(vault?.gasReserve), 18)).toFixed(5)
       : 0;
   }, [vault?.gasReserve]);
 

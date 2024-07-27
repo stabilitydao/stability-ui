@@ -2,7 +2,7 @@ export const determineAPR = (
   graphAPR: string | undefined,
   APR: string | number,
   fallbackAPR: string | number
-) => {
+): string => {
   if (graphAPR && Number(APR) <= 0) {
     return Number(fallbackAPR).toFixed(2);
   }

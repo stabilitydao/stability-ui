@@ -18,7 +18,7 @@ import { Toast, Loader, ErrorMessage } from "@components";
 
 import { vaultData, vaults, error } from "@store";
 
-import type { TAddress } from "@types";
+import type { TAddress, TVault } from "@types";
 
 interface IProps {
   network: string;
@@ -31,7 +31,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
   const $error = useStore(error);
 
-  const [localVault, setLocalVault] = useState<any>();
+  const [localVault, setLocalVault] = useState<TVault>();
 
   const isALM = useMemo(
     () =>

@@ -11,7 +11,7 @@ export const addAssetToWallet = async (
   decimals: number,
   symbol: string,
   image?: string
-) => {
+): Promise<void> => {
   try {
     const options: TOptions = {
       address: address,
@@ -23,7 +23,7 @@ export const addAssetToWallet = async (
       options.image = image;
     }
 
-    const result = await client?.data.watchAsset({
+    await client?.data.watchAsset({
       type: "ERC20",
       options: options,
     });

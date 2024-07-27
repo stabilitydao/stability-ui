@@ -13,11 +13,17 @@ interface IProps {
   vault: TVault;
 }
 
+type TShareData = {
+  sharePriceOnCreation: string;
+  sharePrice: string;
+  yieldPercent: string;
+};
+
 const HoldTable = ({
   shareData,
   holdData,
 }: {
-  shareData: any;
+  shareData: TShareData;
   holdData: THoldData[];
 }) => {
   return (
@@ -64,7 +70,7 @@ const HoldTable = ({
 const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
 
-  const [shareData, setShareData] = useState<any>();
+  const [shareData, setShareData] = useState<TShareData>({});
 
   const [modal, setModal] = useState<boolean>(false);
 

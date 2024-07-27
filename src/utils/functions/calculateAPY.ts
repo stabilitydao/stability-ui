@@ -1,4 +1,4 @@
-export const calculateAPY = (apr: number | string) => {
+export const calculateAPY = (apr: number | string): number => {
   if (!apr) {
     apr = 0;
   } else {

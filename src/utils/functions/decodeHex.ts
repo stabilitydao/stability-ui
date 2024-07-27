@@ -1,4 +1,4 @@
-const decodeHex = (hex: string) => {
+const decodeHex = (hex: string): string => {
   if (typeof hex !== "string") {
     return "";
   }

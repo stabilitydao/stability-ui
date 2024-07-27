@@ -8,6 +8,7 @@ on:
 
 jobs:
   lint:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,4 +22,3 @@ jobs:
         run: |
           export NODE_OPTIONS=--max-old-space-size=8192
           yarn lint
-        timeout-minutes: 60
