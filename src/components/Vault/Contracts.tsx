@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
-  const [timeoutId, setTimeoutId] = useState<any>();
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>>();
 
   const [underlyingToken, setUnderlyingToken] = useState({
     symbol: "",
@@ -55,6 +55,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
       }));
       setContracts(updatedContractsInfo);
     }, 3000);
+
     setTimeoutId(newTimeoutId);
   };
   useEffect(() => {

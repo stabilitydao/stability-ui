@@ -75,6 +75,8 @@ test.describe("Vaults page tests", () => {
   });
 
   test("should be filter by network", async ({ page }) => {
+    await page.waitForTimeout(5000);
+
     const networks = await page.getByTestId("network");
     const networksCount = await networks.count();
 
@@ -90,7 +92,7 @@ test.describe("Vaults page tests", () => {
     await expect(currentNetworks).toEqual(NETWORKS);
 
     await networks.nth(1).click();
-    // await networks.waitFor();
+    await page.waitForTimeout(1000);
 
     const vaults = await page.getByTestId("vault");
     const vaultsCount = await vaults.count();

@@ -4,7 +4,7 @@ const VaultType = ({
 }: {
   type: string;
   text?: string;
-}) => {
+}): JSX.Element => {
   const vaultTypes = [
     {
       type: "Compounding",

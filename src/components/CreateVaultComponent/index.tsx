@@ -4,6 +4,10 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { formatUnits } from "viem";
 import { usePublicClient } from "wagmi";
 
+import { WagmiLayout } from "@layouts";
+
+import { BuildForm } from "./BuildForm";
+
 import {
   platforms,
   PlatformABI,
@@ -24,19 +28,26 @@ import {
 
 import { getTokenData } from "@utils";
 
-import { WagmiLayout } from "@layouts";
-
-import { BuildForm } from "./BuildForm";
+import { CHAINS } from "@constants";
 
 import type {
   TInitParams,
   TAllowedBBTokenVaults,
   TBuildVariant,
   TAddress,
+  TPlatformGetData,
 } from "@types";
-import { CHAINS } from "@constants";
 
-const CreateVaultComponent = () => {
+type TFreeVaults =
+  | {
+      freeVaults: number;
+      nextUpdate: string;
+    }
+  | undefined;
+
+type TBuildingPrices = { [vaultType: string]: bigint };
+
+const CreateVaultComponent = (): JSX.Element => {
   const $publicClient = useStore(publicClient);
   const $platformsData = useStore(platformsData);
   const $balances = useStore(balances);
@@ -59,23 +70,25 @@ const CreateVaultComponent = () => {
   const [minInitialBoostPerDay, setMinInitialBoostPerDay] = useState<
     bigint | undefined
   >();
-  const [minInitialBoostDuration, setMinInitialBoostDuration] = useState<
-    bigint | undefined
-  >();
+  // const [minInitialBoostDuration, setMinInitialBoostDuration] = useState<
+  //   bigint | undefined
+  // >();
+
   const [defaultBoostTokens, setDefaultBoostTokens] = useState<string[]>([]);
-  const [freeVaults, setFreeVaults]: any = useState();
-  const [buildingPrices, setBuildingPrices] = useState<
-    { [vaultType: string]: bigint }[]
-  >({});
+  const [freeVaults, setFreeVaults] = useState<TFreeVaults>();
+
+  const [buildingPrices, setBuildingPrices] = useState<TBuildingPrices>({});
 
   const getBuildingPrices = async () => {
-    let contractData = await _publicClient.readContract({
+    const contractData = (await _publicClient?.readContract({
       address: platforms[$currentChainID],
       abi: PlatformABI,
       functionName: "getData",
-    });
+    })) as TPlatformGetData;
+
     if (contractData) {
-      const buildingPrices: { [vaultType: string]: bigint } = {};
+      const buildingPrices: TBuildingPrices = {};
+
       const vaultTypes = contractData[3];
       const prices = contractData[5];
 
@@ -170,14 +183,14 @@ const CreateVaultComponent = () => {
         setMinInitialBoostPerDay(minInitialBoostPerDayValue);
       }
 
-      const minInitialBoostDurationValue = await $publicClient.readContract({
-        address: platforms[$currentChainID as string],
-        functionName: "minInitialBoostDuration",
-        abi: PlatformABI,
-      });
-      if (typeof minInitialBoostDurationValue === "bigint") {
-        setMinInitialBoostDuration(minInitialBoostDurationValue);
-      }
+      // const minInitialBoostDurationValue = await $publicClient.readContract({
+      //   address: platforms[$currentChainID as string],
+      //   functionName: "minInitialBoostDuration",
+      //   abi: PlatformABI,
+      // });
+      // if (typeof minInitialBoostDurationValue === "bigint") {
+      //   setMinInitialBoostDuration(minInitialBoostDurationValue);
+      // }
       const defaultBoostTokensValue = await $publicClient.readContract({
         address: platforms[$currentChainID as string],
         functionName: "defaultBoostRewardTokens",
@@ -222,7 +235,7 @@ const CreateVaultComponent = () => {
       }
 
       if (tokensOfOwner && $platformsData[$currentChainID]) {
-        const vaultsBuiltByPermitTokenIdPromises: Promise<any>[] =
+        const vaultsBuiltByPermitTokenIdPromises: Promise<bigint[]>[] =
           tokensOfOwner.map(async (tokenID: bigint) => {
             const vaultsBuiltByPermitTokenId = await $publicClient.readContract(
               {
@@ -232,6 +245,7 @@ const CreateVaultComponent = () => {
                 args: [BigInt(week), tokenID],
               }
             );
+
             return vaultsBuiltByPermitTokenId;
           });
 

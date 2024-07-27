@@ -5,10 +5,10 @@ interface IProps {
 }
 
 const FeeAPRModal: React.FC<IProps> = ({ setModalState }) => {
-  const modalRef: any = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setModalState(false);
     }
   };

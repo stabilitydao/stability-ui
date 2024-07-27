@@ -1,7 +1,6 @@
 import { memo, useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
-import { formatUnits } from "viem";
 
 import { DEXes } from "@constants";
 

@@ -44,7 +44,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
         } else {
           return { ...column, sortType: "none" };
         }
-      }
+      },
     );
     sort(updatedTable);
   };

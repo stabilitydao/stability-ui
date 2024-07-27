@@ -32,12 +32,21 @@ interface IProps {
   strategy: TAddress;
 }
 
+interface IPayload {
+  payload: {
+    amount: string;
+    formatedAmountInUSD: string;
+    symbol: string;
+    percent: number;
+  };
+}
+
 const ChartTooltip = ({
   active,
   payload,
 }: {
   active: boolean;
-  payload: any;
+  payload: IPayload[];
 }) => {
   if (active && payload) {
     return (
@@ -84,13 +93,8 @@ const Assets: React.FC<IProps> = memo(
     const client = useWalletClient();
     const { connector } = useAccount();
 
-    const maticClient = usePublicClient({
-      chainId: 137,
-      config: wagmiConfig,
-    });
-
-    const baseClient = usePublicClient({
-      chainId: 8453,
+    const publicClient = usePublicClient({
+      chainId: Number(network),
       config: wagmiConfig,
     });
 
@@ -98,23 +102,14 @@ const Assets: React.FC<IProps> = memo(
       BigInt(price)
     );
 
-    const [investedData, setInvestedData] = useState<any>(false);
+    const [investedData, setInvestedData] = useState<TPieChartData[]>([]);
 
     const getInvestedData = async () => {
-      let assetsAmounts = [];
-      if (network === "137") {
-        assetsAmounts = await maticClient.readContract({
-          address: strategy,
-          abi: StrategyABI,
-          functionName: "assetsAmounts",
-        });
-      } else if (network === "8453") {
-        assetsAmounts = await baseClient.readContract({
-          address: strategy,
-          abi: StrategyABI,
-          functionName: "assetsAmounts",
-        });
-      }
+      const assetsAmounts = await publicClient?.readContract({
+        address: strategy,
+        abi: StrategyABI,
+        functionName: "assetsAmounts",
+      });
 
       if (!assetsAmounts?.length || !$assetsPrices[network]) return;
 
@@ -157,7 +152,8 @@ const Assets: React.FC<IProps> = memo(
             ? Number($assetsPrices[network][address]?.price)
             : 0;
 
-          const color = assets.find((asset) => asset.symbol === symbol)?.color;
+          const color: string =
+            assets.find((asset) => asset.symbol === symbol)?.color || "";
 
           return {
             address,
@@ -168,9 +164,9 @@ const Assets: React.FC<IProps> = memo(
             amount: formatNumber(
               amounts[index],
               price > 1000 ? "formatWithLongDecimalPart" : "format"
-            ),
+            ) as string,
             amountInUSD: amount,
-            formatedAmountInUSD: formatNumber(amount, "format"),
+            formatedAmountInUSD: String(formatNumber(amount, "format")),
             percent: amount ? (Number(amount) / sum) * 100 : 0,
           };
         }
@@ -186,7 +182,7 @@ const Assets: React.FC<IProps> = memo(
     const isAddToWallet = useMemo(() => {
       return (
         $connected &&
-        window.ethereum &&
+        window?.ethereum &&
         connector?.id === "io.metamask" &&
         network === $currentChainID
       );
@@ -205,7 +201,7 @@ const Assets: React.FC<IProps> = memo(
                 return (
                   <div
                     className="flex items-center gap-2"
-                    key={data.color + index}
+                    key={data?.color + index}
                   >
                     <div
                       style={{ background: data.color }}
@@ -228,9 +224,14 @@ const Assets: React.FC<IProps> = memo(
         <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
           {investedData &&
             investedData.map((asset: TPieChartData, index: number) => {
-              const assetData: TToken | any = getTokenData(asset.address);
+              const assetData: TToken | undefined = getTokenData(asset.address);
 
-              const tokenAssets = getAsset(network, assetData?.address);
+              if (!assetData?.address) return;
+
+              const tokenAssets = getAsset(
+                network,
+                assetData?.address as TAddress
+              );
 
               const priceOnCreation = formatUnits(onCreationPrice[index], 18);
 

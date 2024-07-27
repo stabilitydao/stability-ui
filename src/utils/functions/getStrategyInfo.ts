@@ -98,9 +98,9 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     retro,
     curve,
     convex,
-    stargate,
-    lido,
-    aave,
+    // stargate,
+    // lido,
+    // aave,
     yearn,
     uniswapV3,
   } = PROTOCOLS;
@@ -114,10 +114,10 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     const il = vaultSymbol.match(/GQFS$/)
       ? IL.GQFS
       : vaultSymbol.match(/GQFN$/)
-      ? IL.GQFN
-      : vaultSymbol.match(/GQFW$/)
-      ? IL.GQFW
-      : { rate: 0, title: "None", desc: "None", color: "#000000" };
+        ? IL.GQFN
+        : vaultSymbol.match(/GQFW$/)
+          ? IL.GQFW
+          : { rate: 0, title: "None", desc: "None", color: "#000000" };
 
     strategyInfo = {
       name: "Gamma QuickSwap Farm",
@@ -202,10 +202,10 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     const il = vaultSymbol.match(/GQMFS$/)
       ? IL.GQFS
       : vaultSymbol.match(/GQMFN$/)
-      ? IL.GQFN
-      : vaultSymbol.match(/GQMFW$/)
-      ? IL.GQFW
-      : { rate: 0, title: "None", desc: "None", color: "#4aff71" };
+        ? IL.GQFN
+        : vaultSymbol.match(/GQMFW$/)
+          ? IL.GQFW
+          : { rate: 0, title: "None", desc: "None", color: "#4aff71" };
 
     strategyInfo = {
       name: strategies.GQMF?.id as string,
@@ -236,10 +236,10 @@ export const getStrategyInfo = (vaultSymbol: string): IStrategyInfo => {
     const il = vaultSymbol.match(/GRMFS$/)
       ? IL.GQFS
       : vaultSymbol.match(/GRMFN$/)
-      ? IL.GQFN
-      : vaultSymbol.match(/GRMFW$/)
-      ? IL.GQFW
-      : { rate: 0, title: "None", desc: "None", color: "#000000" };
+        ? IL.GQFN
+        : vaultSymbol.match(/GRMFW$/)
+          ? IL.GQFW
+          : { rate: 0, title: "None", desc: "None", color: "#000000" };
     strategyInfo = {
       name: strategies.GRMF?.id as string,
       shortName: strategies.GRMF?.shortId as string,

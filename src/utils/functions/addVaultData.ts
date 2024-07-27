@@ -1,10 +1,10 @@
-import type { TVaults } from "@types";
+import type { TVaultDataKey, TPlatformGetBalance } from "@types";
 
-const addVaultData = (data: any[]) => {
+const addVaultData = (data: TPlatformGetBalance): TVaultDataKey | undefined => {
   const vaultAddress = data[3];
   const vaultSharePrice = data[4];
   const vaultUserBalance = data[5];
-  const vault: TVaults = {};
+  const vault: TVaultDataKey = {};
   if (
     vaultAddress.length === vaultSharePrice.length &&
     vaultAddress.length === vaultUserBalance.length
@@ -17,7 +17,7 @@ const addVaultData = (data: any[]) => {
     }
     return vault;
   } else {
-    console.error("There is an error, arrays lenght are different.");
+    console.error("There is an error, arrays length are different.");
   }
 };
 

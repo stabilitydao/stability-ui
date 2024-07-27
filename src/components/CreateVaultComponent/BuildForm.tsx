@@ -10,7 +10,10 @@ import {
 
 import { Loader } from "@components";
 
-import { FactoryABI, ERC20ABI } from "@web3";
+import { FactoryABI, ERC20ABI, wagmiConfig } from "@web3";
+
+import { getTokenData } from "@utils";
+
 import {
   account,
   platformsData,
@@ -22,9 +25,6 @@ import {
 } from "@store";
 
 import type { TInitParams, TAddress, TInputItem } from "@types";
-import { getTokenData } from "@utils";
-
-import { wagmiConfig } from "@web3";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
@@ -39,6 +39,16 @@ interface IProps {
   nftData: { freeVaults: number; nextUpdate: string } | undefined;
 }
 
+type TTokenData = {
+  address: string;
+  allowance: string;
+  balance: string;
+  decimals: number;
+  price: string | undefined;
+  sum: number;
+  symbol: string | undefined;
+};
+
 const BuildForm = ({
   vaultType,
   strategyId,
@@ -48,24 +58,25 @@ const BuildForm = ({
   defaultBoostTokens,
   minInitialBoostPerDay,
   nftData,
-}: IProps) => {
+}: IProps): JSX.Element => {
   const $account = useStore(account);
   const $platformsData = useStore(platformsData);
   const $balance = useStore(userBalance);
-  const $assetsBalances: any = useStore(assetsBalances);
-  const $assetsPrices: any = useStore(assetsPrices);
+  const $assetsBalances = useStore(assetsBalances);
+  const $assetsPrices = useStore(assetsPrices);
   const $currentChainID = useStore(currentChainID);
   // todo implement using
   const canUsePermitToken = false;
 
   const needCheckAllowance = !canUsePermitToken;
+
   const BRT = [
     ...new Set([initParams.initVaultAddresses[0], ...defaultBoostTokens]),
   ].map((addr) => ({
     symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
-      $assetsBalances[addr] || "0",
+      $assetsBalances?.[addr] || 0n,
       tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
     price: $assetsPrices[$currentChainID][addr]?.price,
@@ -81,8 +92,10 @@ const BuildForm = ({
   const [inputValues, setInputValues] = useState<Array<TInputItem>>(
     Array(defaultBoostTokens.length).fill({ inputValue: "", valuePerDay: "" })
   );
-  const [rewardingVaultApprove, setRewardingVaultApprove]: any =
-    useState(false);
+  const [rewardingVaultApprove, setRewardingVaultApprove] = useState<
+    TTokenData[]
+  >([]);
+
   const [rewardingVaultDeploy, setRewardingVaultDeploy] = useState(false);
   const refArray = Array.from({ length: boostRewardsTokens.length }).map(() =>
     useRef<HTMLInputElement | null>(null)
@@ -117,33 +130,34 @@ const BuildForm = ({
     setInputValues(newInputValues);
   };
   const handleDeploy = () => {
-    let tokensToAllowance: any = [];
+    const tokensData: TTokenData[] = [];
+
     inputValues.forEach((value, index) => {
       if (!value.inputValue) return;
       if (
         Number(boostRewardsTokens[index].balance) >= Number(value.inputValue) &&
         Number(value.valuePerDay) >= Number(minInitialBoostPerDay)
       ) {
-        tokensToAllowance.push({
+        tokensData.push({
           ...boostRewardsTokens[index],
-          sum: value.inputValue,
+          sum: Number(value.inputValue),
         });
       }
     });
 
-    if (tokensToAllowance?.length) {
-      getTokensAllowance(tokensToAllowance);
+    if (tokensData?.length) {
+      getTokensAllowance(tokensData);
     } else {
       setRewardingVaultDeploy(false);
-      setRewardingVaultApprove(false);
+      setRewardingVaultApprove([]);
     }
   };
 
-  const getTokensAllowance = async (tokens: any) => {
+  const getTokensAllowance = async (tokens: TTokenData[]) => {
     if ($platformsData[$currentChainID]) {
-      const allowances: any[] = await Promise.all(
-        tokens.map(async (token: any) => {
-          const response: any = await readContract(wagmiConfig, {
+      const allowances: bigint[] = await Promise.all(
+        tokens.map(async (token: TTokenData) => {
+          const response = await readContract(wagmiConfig, {
             address: token.address as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -152,18 +166,19 @@ const BuildForm = ({
               $platformsData[$currentChainID]?.factory,
             ],
           });
+
           return response;
         })
       );
-      tokens = tokens.map((item: any, i: any) => ({
-        ...item,
-        allowance: formatUnits(allowances[i], item.decimals),
+      tokens = tokens.map((token: TTokenData, index: number) => ({
+        ...token,
+        allowance: formatUnits(allowances[index], token.decimals),
       }));
 
       // todo for multiple tokens
-      if (tokens[0].allowance >= tokens[0].sum) {
+      if (Number(tokens[0].allowance) >= tokens[0].sum) {
         setRewardingVaultDeploy(true);
-        setRewardingVaultApprove(false);
+        setRewardingVaultApprove([]);
       } else {
         setRewardingVaultDeploy(false);
         setRewardingVaultApprove(tokens);
@@ -173,9 +188,9 @@ const BuildForm = ({
   const approveRewardingVaultTokens = async () => {
     if ($platformsData[$currentChainID] && rewardingVaultApprove?.length) {
       try {
-        rewardingVaultApprove.map(async (token: any) => {
+        rewardingVaultApprove.map(async (token: TTokenData) => {
           const approve = await writeContract(wagmiConfig, {
-            address: token.address,
+            address: token.address as TAddress,
             abi: ERC20ABI,
             functionName: "approve",
             args: [$platformsData[$currentChainID]?.factory, maxUint256],
@@ -189,7 +204,7 @@ const BuildForm = ({
             setLoader(false);
             // it will be work only with one approve
             // todo fix approve state
-            setRewardingVaultApprove(false);
+            setRewardingVaultApprove([]);
             setRewardingVaultDeploy(true);
           }
         });
@@ -489,7 +504,7 @@ const BuildForm = ({
           ) : (
             buildResult === undefined &&
             vaultType === "Rewarding" &&
-            (rewardingVaultApprove || rewardingVaultDeploy) && (
+            (rewardingVaultApprove?.length || rewardingVaultDeploy) && (
               <div className="mt-10 flex justify-center">
                 {rewardingVaultApprove && (
                   <button

@@ -39,7 +39,31 @@ type TPlatformData = {
   buildingPayPerVaultToken: TAddress;
   zap: TAddress;
 };
-type TPlatformsData = Record<string, TPlatformData>;
+type TPlatformsData = Record<TAddress, TPlatformData>;
+
+type TPlatformGetData = [
+  string[],
+  string[],
+  string[],
+  string[],
+  string[],
+  bigint[],
+  string[],
+  boolean[],
+  string[],
+  string[],
+];
+type TPlatformGetBalance = [
+  string[],
+  bigint[],
+  bigint[],
+  string[],
+  bigint[],
+  bigint[],
+  string[],
+  bigint[],
+  bigint,
+];
 
 type TUserBalance = {
   buildingPayPerVaultTokenBalance: bigint;
@@ -100,6 +124,7 @@ type TVaultData = {
   vaultSharePrice: bigint;
   vaultUserBalance: bigint;
 };
+type TVaultDataKey = Record<string, TVaultData>;
 
 type TToken = {
   chainId: number;
@@ -108,6 +133,8 @@ type TToken = {
   name: string;
   decimals: number;
   logoURI: string;
+  logo?: string;
+  color?: string;
   tags?: string[];
 };
 
@@ -328,14 +355,28 @@ type TUpgradesTable = {
 
 //// CHART
 type TChartData = {
-  APR?: number;
-  TVL?: number;
-  address?: TAddress;
-  sharePrice?: number;
-  timestamp: string;
-  unixTimestamp?: string;
-  periodVsHoldAPR?: string;
+  APR: number;
+  APR24H: string;
   date: string;
+  timestamp: number | string;
+  unixTimestamp: number;
+  vsHoldAPR: string;
+  periodVsHoldAPR?: number;
+  TVL?: string;
+  address?: string;
+  sharePrice?: string;
+};
+type TChartPayload = {
+  chartType?: string;
+  color?: string;
+  dataKey: string;
+  formatter?: undefined;
+  hide?: boolean;
+  name: string;
+  payload: TChartData;
+  type?: string;
+  unit?: string;
+  value: number;
 };
 
 type TPieChartData = {
@@ -343,7 +384,7 @@ type TPieChartData = {
   amount: string;
   amountInUSD: number;
   color: string;
-  formatedAmountInUSD: string;
+  formatedAmountInUSD?: string;
   logo: string;
   percent: number;
   symbol: string;
@@ -409,12 +450,13 @@ type TError = {
 
 type TAPIData = {
   title?: string;
-  about?: string;
+  // about?: string;
   status?: string;
-  services?: string[];
+  // services?: string[];
   assetPrices?: TMultichainPrices;
   vaults?: TVaults;
   underlyings?: TVaults;
+  platforms?: {};
 };
 
 export type {
@@ -466,4 +508,8 @@ export type {
   TPriceInfo,
   TAPIData,
   TEarningData,
+  TPlatformGetData,
+  TChartPayload,
+  TVaultDataKey,
+  TPlatformGetBalance,
 };

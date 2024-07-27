@@ -20,6 +20,13 @@ interface IProps {
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
+type TActiveChart =
+  | {
+      name: string;
+      data: [];
+    }
+  | undefined;
+
 const HistoricalRate: React.FC<IProps> = memo(
   ({ network, address, vaultStrategy }) => {
     const APRType = vaultStrategy === "Compound Farm" ? "APR" : "Farm APR";
@@ -30,14 +37,14 @@ const HistoricalRate: React.FC<IProps> = memo(
       YEAR: "YEAR",
     };
 
-    const [chartData, setChartData] = useState<any>([]);
-    const [activeChart, setActiveChart] = useState<any>(false);
+    const [chartData, setChartData] = useState<TChartData[]>([]);
+    const [activeChart, setActiveChart] = useState<TActiveChart>();
     const [timeline, setTimeline] = useState<TSegment>(
       timelineSegments.WEEK as TSegment
     );
     const [isData, setIsData] = useState(true);
 
-    const formatData = (obj: any) => {
+    const formatData = (obj: TChartData) => {
       const date = new Date(Number(obj.timestamp) * 1000);
 
       const day = date.getDate();
@@ -53,7 +60,7 @@ const HistoricalRate: React.FC<IProps> = memo(
 
       return {
         ...obj,
-        unixTimestamp: obj.timestamp,
+        unixTimestamp: Number(obj.timestamp),
         timestamp: formattedDate,
         date: formattedTime,
       };
@@ -102,8 +109,7 @@ const HistoricalRate: React.FC<IProps> = memo(
       let APRChartData = workedData
         .filter(
           (obj) =>
-            obj.APR &&
-            Number(obj.unixTimestamp) >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
+            obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
         )
         .map((obj) => ({
           unixTimestamp: obj.unixTimestamp,
@@ -120,11 +126,11 @@ const HistoricalRate: React.FC<IProps> = memo(
       }
       const lastTimestamp = APRChartData[APRChartData.length - 1].unixTimestamp;
 
-      time = Number(APRChartData[0].unixTimestamp);
+      time = APRChartData[0].unixTimestamp;
 
       do {
         let sortedAPRs = APRChartData.filter(
-          (obj: any) => Number(obj.unixTimestamp) >= time
+          (obj) => obj.unixTimestamp >= time
         );
 
         let firstEl = sortedAPRs[0] || APRChartData[APRChartData.length - 1];
@@ -142,31 +148,31 @@ const HistoricalRate: React.FC<IProps> = memo(
       APRChartData = newData.map(formatData);
 
       setChartData(workedData);
-      setActiveChart({ name: "APR", data: APRChartData });
+      setActiveChart({ name: "APR", data: APRChartData as [] });
     };
 
     const chartHandler = (chartType: string, segment: TSegment = timeline) => {
       const NOW = Math.floor(Date.now() / 1000);
-      const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
+      const TIME: number = TIMESTAMPS_IN_SECONDS[segment];
 
       let time = 0,
         newData;
+
       const lastTimestamp = chartData[chartData.length - 1].unixTimestamp;
 
       switch (chartType) {
         case "APR":
           let APRArr = chartData.filter(
-            (obj: TChartData) =>
-              obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+            (obj) => obj.APR && obj.unixTimestamp >= NOW - TIME
           );
 
           newData = [];
-          time = Number(APRArr[0].unixTimestamp);
+          time = APRArr[0].unixTimestamp;
 
           if (segment === "MONTH") {
             do {
               let sortedAPRs = APRArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
@@ -182,7 +188,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           } else if (segment === "YEAR") {
             do {
               let sortedAPRs = APRArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
@@ -198,7 +204,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           } else {
             do {
               let sortedAPRs = APRArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
@@ -222,13 +228,15 @@ const HistoricalRate: React.FC<IProps> = memo(
 
           let sum = 0;
 
-          const APRDifferences = APRArr.map((entry: any, index: number) => {
-            if (index === 0) return 0;
-            const prevEntry = APRArr[index - 1];
-            const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
-            sum += diff;
-            return Math.floor(sum / APRWidthPercent);
-          });
+          const APRDifferences = APRArr.map(
+            (entry: TChartData, index: number) => {
+              if (index === 0) return 0;
+              const prevEntry = APRArr[index - 1];
+              const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+              sum += diff;
+              return Math.floor(sum / APRWidthPercent);
+            }
+          );
 
           const APRChartData = APRArr.map((obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
@@ -240,20 +248,18 @@ const HistoricalRate: React.FC<IProps> = memo(
           }));
           setActiveChart({
             name: "APR",
-            data: APRChartData,
+            data: APRChartData as [],
           });
           break;
         case "TVL":
           let TVLArr = chartData.filter(
-            (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+            (obj: TChartData) => obj.unixTimestamp >= NOW - TIME
           );
           newData = [];
-          time = Number(TVLArr[0].unixTimestamp);
+          time = TVLArr[0].unixTimestamp;
 
           while (time < lastTimestamp) {
-            let sortedAPRs = TVLArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) < time
-            );
+            let sortedAPRs = TVLArr.filter((obj) => obj.unixTimestamp < time);
             let lastEl = sortedAPRs[sortedAPRs.length - 1] || TVLArr[0];
 
             newData.push({ ...lastEl, timestamp: time });
@@ -274,39 +280,39 @@ const HistoricalRate: React.FC<IProps> = memo(
 
           let TSum = 0;
 
-          const TVLDifferences = TVLArr.map((entry: any, index: number) => {
-            if (index === 0) return 0;
-            const prevEntry = TVLArr[index - 1];
-            const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
-            TSum += diff;
-            return Math.floor(TSum / TVLWidthPercent);
-          });
+          const TVLDifferences = TVLArr.map(
+            (entry: TChartData, index: number) => {
+              if (index === 0) return 0;
+              const prevEntry = TVLArr[index - 1];
+              const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+              TSum += diff;
+              return Math.floor(TSum / TVLWidthPercent);
+            }
+          );
 
           const TVLChartData = TVLArr.map((obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
             date: obj.date,
-            TVL: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+            TVL: formatFromBigInt(obj.TVL || 0, 18, "withFloor"),
             x: TVLDifferences[index],
-            y: formatFromBigInt(obj.TVL as number, 18, "withFloor"),
+            y: formatFromBigInt(obj.TVL || 0, 18, "withFloor"),
           }));
           setActiveChart({
             name: "TVL",
-            data: TVLChartData,
+            data: TVLChartData as [],
           });
           break;
         case "sharePrice":
           let priceArr = chartData.filter(
-            (obj: TChartData) => Number(obj.unixTimestamp) >= NOW - TIME
+            (obj: TChartData) => obj.unixTimestamp >= NOW - TIME
           );
 
           newData = [];
-          time = Number(priceArr[0].unixTimestamp);
+          time = priceArr[0].unixTimestamp;
 
           while (time < lastTimestamp) {
-            let sortedData = priceArr.filter(
-              (obj: any) => Number(obj.unixTimestamp) < time
-            );
+            let sortedData = priceArr.filter((obj) => obj.unixTimestamp < time);
             let lastEl = sortedData[sortedData.length - 1] || priceArr[0];
             newData.push({ ...lastEl, timestamp: time });
             time += 3600;
@@ -327,13 +333,15 @@ const HistoricalRate: React.FC<IProps> = memo(
 
           let PSum = 0;
 
-          const priceDifferences = priceArr.map((entry: any, index: number) => {
-            if (index === 0) return 0;
-            const prevEntry = priceArr[index - 1];
-            const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
-            PSum += diff;
-            return Math.floor(PSum / priceWidthPercent);
-          });
+          const priceDifferences = priceArr.map(
+            (entry: TChartData, index: number) => {
+              if (!index) return 0;
+              const prevEntry = priceArr[index - 1];
+              const diff = entry.unixTimestamp - prevEntry.unixTimestamp;
+              PSum += diff;
+              return Math.floor(PSum / priceWidthPercent);
+            }
+          );
 
           const priceChartData = priceArr.map(
             (obj: TChartData, index: number) => ({
@@ -341,33 +349,32 @@ const HistoricalRate: React.FC<IProps> = memo(
               timestamp: obj.timestamp,
               date: obj.date,
               sharePrice: formatFromBigInt(
-                obj.sharePrice as number,
+                obj.sharePrice || 0,
                 18,
                 "withDecimals"
               ),
               x: priceDifferences[index],
-              y: formatFromBigInt(obj.sharePrice as number, 18, "withDecimals"),
+              y: formatFromBigInt(obj.sharePrice || 0, 18, "withDecimals"),
             })
           );
           setActiveChart({
             name: "sharePrice",
-            data: priceChartData,
+            data: priceChartData as [],
           });
           break;
 
         case "vsHodl":
           let vsHoldArr = chartData.filter(
-            (obj: TChartData) =>
-              obj.APR && Number(obj.unixTimestamp) >= NOW - TIME
+            (obj: TChartData) => obj.APR && obj.unixTimestamp >= NOW - TIME
           );
 
           newData = [];
-          time = Number(vsHoldArr[0].unixTimestamp);
+          time = vsHoldArr[0].unixTimestamp;
 
           if (segment === "MONTH") {
             do {
               let sortedAPRs = vsHoldArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
 
@@ -383,7 +390,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           } else if (segment === "YEAR") {
             do {
               let sortedAPRs = vsHoldArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
 
@@ -399,7 +406,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           } else {
             do {
               let sortedAPRs = vsHoldArr.filter(
-                (obj: any) => Number(obj.unixTimestamp) >= time
+                (obj) => obj.unixTimestamp >= time
               );
               let firstEl = sortedAPRs[0] || vsHoldArr[vsHoldArr.length - 1];
 
@@ -424,7 +431,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           }));
           setActiveChart({
             name: "vsHodl",
-            data: vsHoldAPRChartData,
+            data: vsHoldAPRChartData as [],
           });
           break;
         default:
@@ -434,10 +441,9 @@ const HistoricalRate: React.FC<IProps> = memo(
     };
 
     const timelineHandler = (segment: TSegment) => {
-      const TIME: any = TIMESTAMPS_IN_SECONDS[segment];
-      if (TIME === timeline) return;
+      if (segment === timeline) return;
       setTimeline(segment);
-      chartHandler(activeChart.name, segment);
+      chartHandler(activeChart?.name || "", segment);
     };
 
     useEffect(() => {
@@ -461,10 +467,10 @@ const HistoricalRate: React.FC<IProps> = memo(
                     activeChart.name === "sharePrice"
                       ? "75%"
                       : activeChart.name === "TVL"
-                      ? "50%"
-                      : activeChart.name === "vsHodl"
-                      ? "25%"
-                      : "0%",
+                        ? "50%"
+                        : activeChart.name === "vsHodl"
+                          ? "25%"
+                          : "0%",
                   transition: "left 0.3s ease",
                 }}
               ></div>

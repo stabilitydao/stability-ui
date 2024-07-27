@@ -1,4 +1,4 @@
-const ShareSkeleton = (props: React.SVGProps<SVGSVGElement>) => {
+const ShareSkeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       width="320"

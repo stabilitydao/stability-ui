@@ -1,4 +1,4 @@
-const Footer = () => {
+const Footer = (): JSX.Element => {
   return (
     <footer className="shrink-0">
       <div className="flex items-center justify-end py-5 px-3">

@@ -1,6 +1,6 @@
 interface LoaderProps {
-  width?: any;
-  height?: any;
+  width?: number | string;
+  height?: number | string;
   color?: string;
 }
 

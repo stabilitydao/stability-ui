@@ -29,7 +29,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   const upgradeVault = async () => {
     try {
       const upgradeVaultProxy = await writeContract(wagmiConfig, {
-        address: $platformsData[network].factory,
+        address: $platformsData?.[network]?.factory,
         abi: FactoryABI,
         functionName: "upgradeVaultProxy",
         args: [vault?.address as TAddress],
@@ -50,7 +50,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   const upgradeStrategy = async () => {
     try {
       const upgradeStrategyProxy = await writeContract(wagmiConfig, {
-        address: $platformsData[network].factory,
+        address: $platformsData?.[network]?.factory,
         abi: FactoryABI,
         functionName: "upgradeStrategyProxy",
         args: [vault.strategyAddress as TAddress],
@@ -123,9 +123,11 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                     title={feature.name}
                     alt={feature.name}
                     className="w-6 h-6 ml-1"
-                    src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                    src={
                       feature.svg
-                    )}`}
+                        ? `data:image/svg+xml;utf8,${encodeURIComponent(feature.svg)}`
+                        : undefined
+                    }
                   />
                 ))}
               </span>

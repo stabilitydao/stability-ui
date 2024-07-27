@@ -1,10 +1,15 @@
+import type { TToken } from "@types";
 interface IProps {
   proportions: number[];
-  assets: any;
+  assets: TToken[];
   type: string;
 }
 
-const AssetsProportion = ({ proportions, assets, type }: IProps) => {
+const AssetsProportion = ({
+  proportions,
+  assets,
+  type,
+}: IProps): JSX.Element => {
   return proportions.length > 1 ? (
     <div
       className={

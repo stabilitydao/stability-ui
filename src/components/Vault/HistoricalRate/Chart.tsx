@@ -11,9 +11,15 @@ import {
 
 import { formatNumber } from "@utils";
 
+import type { TChartData, TChartPayload } from "@types";
+
 interface IProps {
-  chart: any;
+  chart: {
+    name: string;
+    data: [];
+  };
 }
+
 const CustomizedAxisTick = ({
   x,
   y,
@@ -22,7 +28,7 @@ const CustomizedAxisTick = ({
 }: {
   x: number;
   y: number;
-  payload: any;
+  payload: TChartPayload;
   fontSize: number;
 }) => {
   return (
@@ -45,7 +51,7 @@ const CustomTooltip = ({
   payload,
 }: {
   active: boolean;
-  payload: any;
+  payload: TChartPayload[];
 }) => {
   const PDataKey =
     payload[0]?.dataKey === "TVL" ? (
@@ -77,10 +83,14 @@ const Chart: React.FC<IProps> = ({ chart }) => {
   useEffect(() => {
     if (chart.data) {
       let min: number = Math.min(
-        ...chart.data.map((item: any) => item[chart.name])
+        ...chart.data.map((item: TChartData) =>
+          Number(item[chart.name as keyof typeof item])
+        )
       );
       let max: number = Math.max(
-        ...chart.data.map((item: any) => item[chart.name])
+        ...chart.data.map((item: TChartData) =>
+          Number(item[chart.name as keyof typeof item])
+        )
       );
 
       let difference = (max - min) / 10;
@@ -142,8 +152,8 @@ const Chart: React.FC<IProps> = ({ chart }) => {
           strokeWidth="2"
           fill="url(#colorUv)"
           points={chart.data.map((entry) => ({
-            x: entry.x,
-            y: entry.y,
+            x: entry?.x as number,
+            y: entry?.y as number,
           }))}
         />
       </AreaChart>

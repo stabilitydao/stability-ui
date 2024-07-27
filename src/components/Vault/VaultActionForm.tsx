@@ -71,6 +71,8 @@ interface IProps {
   vault: TVault;
 }
 
+type TOptionInfo = { address: TAddress; symol: string; logoURI: string };
+
 const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   const _publicClient = usePublicClient({
     chainId: Number(network),
@@ -84,53 +86,72 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
   const $vaultData = useStore(vaultData);
   const $account = useStore(account);
-  const $assetsPrices: any = useStore(assetsPrices);
+  const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
 
   const $transactionSettings = useStore(transactionSettings);
   const $platformsData: TPlatformsData = useStore(platformsData);
-  const $tokens: TAddress[] | any = useStore(tokens);
+  const $tokens: TAddress[] = useStore(tokens);
   const $connected = useStore(connected);
 
   const [tab, setTab] = useState("Deposit");
-  const [option, setOption] = useState<string[] | any>([]);
+  const [option, setOption] = useState<string[]>([]);
   const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
   const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
-  const [allowance, setAllowance] = useState<TVaultAllowance | undefined | any>(
-    {}
-  );
+  const [allowance, setAllowance] = useState<TVaultAllowance>({});
   const [isApprove, setIsApprove] = useState<number | undefined>();
-  const [balances, setBalances] = useState<TVaultBalance | any>({});
+  const [balances, setBalances] = useState<TVaultBalance>({});
 
-  const [inputs, setInputs] = useState<TVaultInput | any>({});
+  const [inputs, setInputs] = useState<TVaultInput>({});
   const [lastKeyPress, setLastKeyPress] = useState<{
     key1: string | undefined;
     key2: string | undefined;
   }>({ key1: undefined, key2: undefined });
 
-  const [sharesOut, setSharesOut] = useState<bigint | any>();
+  const [sharesOut, setSharesOut] = useState<bigint | boolean>(false);
 
-  const [withdrawAmount, setWithdrawAmount] = useState<string[] | any>(false);
-  const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<any>();
-  const [underlyingToken, setUnderlyingToken] = useState<any>();
-  const [underlyingShares, setUnderlyingShares] = useState<any>();
-  const [zapShares, setZapShares] = useState<any>();
+  const [withdrawAmount, setWithdrawAmount] = useState<string[] | boolean>(
+    false
+  );
+  const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState();
+  const [underlyingToken, setUnderlyingToken] = useState<{
+    address: TAddress;
+    symbol: string;
+    decimals: number;
+    balance: number;
+    allowance: number;
+    logoURI: string;
+  }>({
+    address: "0x0",
+    symbol: "",
+    decimals: 0,
+    balance: 0,
+    allowance: 0,
+    logoURI: "",
+  });
+
+  const [underlyingShares, setUnderlyingShares] = useState();
+  const [zapShares, setZapShares] = useState();
   const [zapButton, setZapButton] = useState<string>("none");
-  const [optionTokens, setOptionTokens] = useState<any>();
-  const [approveIndex, setApproveIndex] = useState<any>(false);
+  const [optionTokens, setOptionTokens] = useState<TOptionInfo[]>([]);
+  const [approveIndex, setApproveIndex] = useState(false);
 
   const [tokenSelector, setTokenSelector] = useState<boolean>(false);
-  const [activeOptionToken, setActiveOptionToken] = useState<any>({
+  const [activeOptionToken, setActiveOptionToken] = useState<{
+    symbol: string;
+    address: string;
+    logoURI: string | string[];
+  }>({
     symbol: "",
     address: "",
     logoURI: "",
   });
-  const [defaultOptionImages, setDefaultOptionImages] = useState<any>();
+  const [defaultOptionImages, setDefaultOptionImages] = useState();
   const [settingsModal, setSettingsModal] = useState(false);
 
   const [settings, setSettings] = useState($transactionSettings);
 
-  const [zapTokens, setZapTokens] = useState<any>(false);
+  const [zapTokens, setZapTokens] = useState(false);
   const [zapError, setZapError] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
   const [isRefresh, setIsRefresh] = useState(false);
@@ -138,14 +159,16 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   const [needConfirm, setNeedConfirm] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
 
-  const [error, setError] = useState<any>(false);
+  const [error, setError] = useState(false);
   const [assets, setAssets] = useState<string[]>([]);
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
+
   const isSingleTokenStrategy =
     (vault.strategyInfo.shortName === "CF" ||
       vault.strategyInfo.shortName === "Y") &&
     vault.assets[0].address === option[0];
+
   const underlyingCondition =
     !underlyingToken || option[0] !== underlyingToken?.address;
 
@@ -171,7 +194,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     for (let i = 0; i < input.length; i++) {
       if (
         $assetsBalances[network] &&
-        input[i] > $assetsBalances[network][assets[i]]
+        input[i] > $assetsBalances?.[network]?.[assets[i]]
       ) {
         setIsApprove(0);
         change = true;
@@ -229,13 +252,13 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   };
   ///// INPUTS & OPTIONS
   const optionHandler = (
-    option: any,
+    option: string[],
     symbol: string,
-    address: string | TAddress,
+    address: string,
     logoURI: string | string[]
   ) => {
     setTokenSelector((prevState) => !prevState);
-    option = option.map((address) => address.toLowerCase());
+    option = option.map((address: string) => address.toLowerCase());
     ///// Option change
     resetInputs(option);
     setOption(option);
@@ -261,7 +284,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             [asset]: {
               amount: amount,
             },
-          } as TVaultInput)
+          }) as TVaultInput
       );
       if (
         option.length > 1 ||
@@ -285,7 +308,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     if (assets) {
       const logos = defaultOptionAssets.split(", ").map((address) => {
         const token = optionTokens.find(
-          (token: any) => token.address.toLowerCase() === address
+          (token: TOptionInfo) => token.address.toLowerCase() === address
         );
         return token?.logoURI;
       });
@@ -367,32 +390,33 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           let underlyingSymbol = "";
 
           if (vault.strategyInfo.shortName === "DQMF") {
-            underlyingSymbol = await _publicClient.readContract({
+            underlyingSymbol = await _publicClient?.readContract({
               address: vault.underlying,
               abi: ERC20DQMFABI,
               functionName: "symbol",
             });
+
             underlyingSymbol = decodeHex(underlyingSymbol);
           } else {
-            underlyingSymbol = await _publicClient.readContract({
+            underlyingSymbol = await _publicClient?.readContract({
               address: vault.underlying,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
             });
           }
 
-          const underlyingDecimals = await _publicClient.readContract({
+          const underlyingDecimals = await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "decimals",
           });
-          const underlyingAllowance = await _publicClient.readContract({
+          const underlyingAllowance = await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "allowance",
             args: [$account as TAddress, vault.address],
           });
-          const underlyingBalance = await _publicClient.readContract({
+          const underlyingBalance = await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "balanceOf",
@@ -402,9 +426,11 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           setUnderlyingToken({
             address: vault.underlying,
             symbol: underlyingSymbol,
-            decimals: underlyingDecimals,
-            balance: formatUnits(underlyingBalance, underlyingDecimals),
-            allowance: formatUnits(underlyingAllowance, underlyingDecimals),
+            decimals: Number(underlyingDecimals),
+            balance: Number(formatUnits(underlyingBalance, underlyingDecimals)),
+            allowance: Number(
+              formatUnits(underlyingAllowance, underlyingDecimals)
+            ),
             logoURI: logo,
           });
         } else {
@@ -432,14 +458,14 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     let allowanceData;
     if (tab === "Deposit") {
       if (asset === underlyingToken?.address) {
-        allowanceData = await _publicClient.readContract({
+        allowanceData = await _publicClient?.readContract({
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, vault.address],
         });
       } else {
-        allowanceData = await _publicClient.readContract({
+        allowanceData = await _publicClient?.readContract({
           address: asset as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -450,7 +476,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         });
       }
     } else {
-      allowanceData = await _publicClient.readContract({
+      allowanceData = await _publicClient?.readContract({
         address: vault.address,
         abi: ERC20ABI,
         functionName: "allowance",
@@ -478,7 +504,10 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         tab === "Withdraw" &&
         Number(amount) >
           parseFloat(
-            formatUnits($vaultData[network][vault.address].vaultUserBalance, 18)
+            formatUnits(
+              $vaultData[network][vault.address]?.vaultUserBalance,
+              18
+            )
           )
       ) {
         setZapButton("insufficientBalance");
@@ -488,7 +517,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (asset === underlyingToken?.address) {
         try {
-          const previewDepositAssets = await _publicClient.readContract({
+          const previewDepositAssets = await _publicClient?.readContract({
             address: vault.address,
             abi: VaultABI,
             functionName: "previewDepositAssets",
@@ -496,7 +525,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           });
 
           setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
-          const allowanceData = (await _publicClient.readContract({
+          const allowanceData = (await _publicClient?.readContract({
             address: option[0] as TAddress,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -566,7 +595,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           [asset]: {
             amount: amount,
           },
-        } as TVaultInput)
+        }) as TVaultInput
     );
 
     setZapButton("none");
@@ -593,7 +622,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     if (option[0] !== underlyingToken?.address) {
       if (amount && decimals) {
         try {
-          const gas = await _publicClient.estimateContractGas({
+          const gas = await _publicClient?.estimateContractGas({
             address: option[0],
             abi: ERC20ABI,
             functionName: "approve",
@@ -649,7 +678,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       }
     } else {
       try {
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: underlyingToken?.address,
           abi: ERC20ABI,
           functionName: "approve",
@@ -736,7 +765,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           },
         };
 
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -830,7 +859,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         }
         if (vault.strategyInfo.shortName === "CCF") txData[1] = "";
 
-        gas = await _publicClient.estimateContractGas({
+        gas = await _publicClient?.estimateContractGas({
           address: $platformsData[network]?.zap,
           abi: ZapABI,
           functionName: "deposit",
@@ -911,7 +940,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
       try {
         let previewDepositAssets: any;
-        previewDepositAssets = await _publicClient.readContract({
+        previewDepositAssets = await _publicClient?.readContract({
           address: vault.address,
           abi: VaultABI,
           functionName: "previewDepositAssets",
@@ -939,7 +968,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
-      const zapAmounts = await _publicClient.readContract({
+      const zapAmounts = await _publicClient?.readContract({
         address: $platformsData[network]?.zap,
         abi: ZapABI,
         functionName: "getDepositSwapAmounts",
@@ -992,7 +1021,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         vault.strategyInfo.shortName === "IQMF" ||
         vault.strategyInfo.shortName === "IRMF"
       ) {
-        amounts = vault.assetsProportions.map((proportion, index) =>
+        amounts = vault.assetsProportions.map((proportion) =>
           proportion
             ? parseUnits(
                 outData[0]?.amountOut as string,
@@ -1016,7 +1045,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
-      const previewDepositAssets = await _publicClient.readContract({
+      const previewDepositAssets = await _publicClient?.readContract({
         address: vault.address,
         abi: VaultABI,
         functionName: "previewDepositAssets",
@@ -1055,7 +1084,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       settings.approves === "unlimited" ? maxUint256 : parseUnits(amount, 18);
 
     try {
-      const gas = await _publicClient.estimateContractGas({
+      const gas = await _publicClient?.estimateContractGas({
         address: vault.address,
         abi: ERC20ABI,
         functionName: "approve",
@@ -1083,7 +1112,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
-        const newAllowance = await _publicClient.readContract({
+        const newAllowance = await _publicClient?.readContract({
           address: option[0] as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -1123,7 +1152,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const refreshBalance = async () => {
-    const contractBalance = await _publicClient.readContract({
+    const contractBalance = await _publicClient?.readContract({
       address: platforms[network],
       abi: PlatformABI,
       functionName: "getBalance",
@@ -1173,7 +1202,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     );
     if (vault.address) {
       try {
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: asset,
           abi: ERC20ABI,
           functionName: "approve",
@@ -1200,7 +1229,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
-          const newAllowance = (await _publicClient.readContract({
+          const newAllowance = (await _publicClient?.readContract({
             address: asset,
             abi: ERC20ABI,
             functionName: "allowance",
@@ -1226,7 +1255,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         }
       } catch (err) {
         lastTx.set("No approve hash...");
-        const newAllowance = (await _publicClient.readContract({
+        const newAllowance = (await _publicClient?.readContract({
           address: asset,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -1297,8 +1326,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       depositAssets: any,
       gas,
       gasLimit,
-      amounts: any = [],
-      txAmounts: any = [];
+      amounts: any = [];
 
     for (let i = 0; i < option.length; i++) {
       if (i === changedInput) {
@@ -1323,7 +1351,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         vault.strategyInfo.shortName !== "IQMF" &&
         vault.strategyInfo.shortName !== "IRMF"
       ) {
-        gas = await _publicClient.estimateContractGas({
+        gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -1346,7 +1374,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
           proportion ? amounts[0] : 0n
         );
-        gas = await _publicClient.estimateContractGas({
+        gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
           functionName: "depositAssets",
@@ -1437,7 +1465,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         return amount - (amount * decimalPercent) / 100n;
       });
       try {
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1516,7 +1544,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         return amount - (amount * decimalPercent) / 100n;
       });
       try {
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1592,7 +1620,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       const txData = zapPreviewWithdraw.map((preview: any) => preview.txData);
 
       try {
-        const gas = await _publicClient.estimateContractGas({
+        const gas = await _publicClient?.estimateContractGas({
           address: $platformsData[network]?.zap,
           abi: ZapABI,
           functionName: "withdraw",
@@ -1708,7 +1736,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       const currentValue = parseUnits(value, 18);
 
       if (underlyingToken?.address === option[0]) {
-        const { result } = await _publicClient.simulateContract({
+        const { result } = await _publicClient?.simulateContract({
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1734,7 +1762,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           localAssets = vault.assets.map((asset) => asset.address);
         }
 
-        const { result } = await _publicClient.simulateContract({
+        const { result } = await _publicClient?.simulateContract({
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
@@ -1813,7 +1841,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     const allowanceResult: TVaultAllowance | any = {};
 
     for (let i = 0; i < option.length; i++) {
-      const allowanceData = await _publicClient.readContract({
+      const allowanceData = await _publicClient?.readContract({
         address: option[i] as TAddress,
         abi: ERC20ABI,
         functionName: "allowance",
@@ -1878,7 +1906,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             vault.strategyInfo.shortName !== "IQMF" &&
             vault.strategyInfo.shortName !== "IRMF"
           ) {
-            previewDepositAssets = await _publicClient.readContract({
+            previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
@@ -1890,7 +1918,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
-            previewDepositAssets = await _publicClient.readContract({
+            previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
@@ -2626,7 +2654,9 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
                             if (
                               !/[\d.]/.test(evt.key) &&
-                              evt.key !== "Backspace"
+                              evt.key !== "Backspace" &&
+                              evt.key !== "ArrowLeft" &&
+                              evt.key !== "ArrowRight"
                             ) {
                               evt.preventDefault();
                             }
@@ -3145,7 +3175,12 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                       const currentValue =
                         inputs && inputs[option[0]] && inputs[option[0]].amount;
 
-                      if (!/[\d.]/.test(evt.key) && evt.key !== "Backspace") {
+                      if (
+                        !/[\d.]/.test(evt.key) &&
+                        evt.key !== "Backspace" &&
+                        evt.key !== "ArrowLeft" &&
+                        evt.key !== "ArrowRight"
+                      ) {
                         evt.preventDefault();
                       }
 
