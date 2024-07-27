@@ -4,7 +4,7 @@ import { deployments } from "@stabilitydao/stability";
 
 import { PROTOCOLS, CHAINS } from "@constants";
 
-import { apiData, platformVersions, currentChainID } from "@store";
+import { platformVersions, currentChainID } from "@store";
 
 import packageJson from "../../../package.json";
 
@@ -56,7 +56,6 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
 
   const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
-  const $apiData = useStore(apiData);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
