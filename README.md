@@ -4,6 +4,12 @@
 
 [Issues](https://github.com/stabilitydao/stability-ui/issues)
 
+## Coverage
+
+[![codecov](https://codecov.io/gh/stabilitydao/stability-ui/graph/badge.svg?token=ER8QCFAF8C)](https://codecov.io/gh/stabilitydao/stability-ui)
+
+![Coverage Grid](https://codecov.io/gh/stabilitydao/stability-ui/graphs/tree.svg?token=ER8QCFAF8C)
+
 ## Develop
 
 ### 👀 Learn stack
