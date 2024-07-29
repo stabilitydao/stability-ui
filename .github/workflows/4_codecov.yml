@@ -7,14 +7,18 @@ on:
     branches: [main, master]
 
 jobs:
-  codecov:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Upload coverage reports to Codecov
+
+      - name: Run tests and collect coverage
+        run: yarn test:unit --coverage
+
+      - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        env:
+          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
