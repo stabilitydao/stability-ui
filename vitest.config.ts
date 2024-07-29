@@ -14,7 +14,7 @@ export default getViteConfig({
       provider: "v8",
       exclude: [
         "**/src/web3/**",
-        "**/tests/e2e/**",
+        "**/tests/**",
         "**/node_modules/**",
         "**/wallet-setup/**",
         "**public/**",
