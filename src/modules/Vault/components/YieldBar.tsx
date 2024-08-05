@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import { HoldModal } from "@components";
+import { HoldModal } from "@ui";
 
 import { connected } from "@store";
 

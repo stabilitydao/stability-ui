@@ -47,7 +47,7 @@ type TFreeVaults =
 
 type TBuildingPrices = { [vaultType: string]: bigint };
 
-const CreateVaultComponent = (): JSX.Element => {
+const CreateVault = (): JSX.Element => {
   const $publicClient = useStore(publicClient);
   const $platformsData = useStore(platformsData);
   const $balances = useStore(balances);
@@ -268,7 +268,7 @@ const CreateVaultComponent = (): JSX.Element => {
   useEffect(() => {
     getBuildingPrices();
     getData();
-  }, [$publicClient, $platformsData[$currentChainID]?.factory, lastTx.get()]);
+  }, [$publicClient, $platformsData?.[$currentChainID]?.factory, lastTx.get()]);
 
   useEffect(() => {
     freeVaultsHandler();
@@ -510,7 +510,7 @@ const CreateVaultComponent = (): JSX.Element => {
           <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
           <div className="text-[22px] text-center">Coming soon</div>
 
-          {$platformsData[$currentChainID] && buildIndex !== undefined && (
+          {$platformsData?.[$currentChainID] && buildIndex !== undefined && (
             <div
               className="overlay"
               onClick={() => {
@@ -566,4 +566,4 @@ const CreateVaultComponent = (): JSX.Element => {
     </WagmiLayout>
   );
 };
-export { CreateVaultComponent };
+export { CreateVault };

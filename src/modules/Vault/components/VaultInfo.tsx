@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { useWalletClient, useAccount } from "wagmi";
 
-import { VaultState, VaultType } from "@components";
+import { VaultState, VaultType } from "@ui";
 
 import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 

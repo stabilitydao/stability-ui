@@ -490,6 +490,7 @@ describe("get1InchRoutes", () => {
     expect(result?.amountOut).not.toBe(0);
 
     const amountOutNumber = Number(result?.amountOut.slice(0, 3));
+
     expect(amountOutNumber >= 99 && amountOutNumber <= 101).toBe(true);
   });
   it("should get correct amountOut for zero", async () => {

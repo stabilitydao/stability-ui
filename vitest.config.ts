@@ -2,13 +2,14 @@ import { getViteConfig } from "astro/config";
 
 export default getViteConfig({
   test: {
-    environment: "node",
+    environment: "jsdom",
     testFiles: "**/*.test.ts",
     exclude: [
       "**/tests/e2e/**",
       "**/node_modules/**",
       "**/src/web3/**",
       "**/*.config.*",
+      "**/src/store/**",
     ],
     coverage: {
       provider: "v8",
@@ -19,6 +20,7 @@ export default getViteConfig({
         "**/wallet-setup/**",
         "**public/**",
         "**/*.config.*",
+        "**/src/store/**",
       ],
     },
   },

@@ -3,14 +3,9 @@ import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 
-import { PlatformModal } from "./PlatformModal";
+import { PlatformModal } from "./modals/PlatformModal";
 
-import {
-  HideFeesHandler,
-  Skeleton,
-  APRtimeSwitcher,
-  FeeAPRModal,
-} from "@components";
+import { HideFeesHandler, Skeleton, APRtimeSwitcher, FeeAPRModal } from "@ui";
 
 import { connected, visible, hideFeeApr, isWeb3Load, aprFilter } from "@store";
 
@@ -107,13 +102,13 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const dailyYield = $connected
     ? `$${formatNumber(portfolio.dailySum, "format")} / ${formatNumber(
         portfolio.dailyPercent,
-        "format",
+        "format"
       )}%`
     : "-";
   const monthlyYield = $connected
     ? `$${formatNumber(portfolio.monthly, "format")} / ${formatNumber(
         portfolio.monthPercent,
-        "format",
+        "format"
       )}%`
     : "-";
   const avgApr = $connected ? `${formatNumber(portfolio.apr, "format")}%` : "-";

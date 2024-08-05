@@ -5,7 +5,7 @@ import axios from "axios";
 import { Chart } from "./Chart";
 import { ChartBar } from "./ChartBar";
 
-import { ChartSkeleton } from "@components";
+import { ChartSkeleton } from "@ui";
 
 import { formatFromBigInt } from "@utils";
 

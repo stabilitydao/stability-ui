@@ -16,7 +16,9 @@
       "@store": ["src/store"],
       "@utils": ["src/utils"],
       "@constants": ["src/constants"],
-      "@types": ["src/types"]
+      "@types": ["src/types"],
+      "@modules": ["src/modules"],
+      "@ui": ["src/ui"]
     }
   }
 }

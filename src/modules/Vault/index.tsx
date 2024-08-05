@@ -1,20 +1,20 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
-import { VaultBar } from "./VaultBar";
-import { VaultActionForm } from "./VaultActionForm";
-import { Strategy } from "./Strategy";
-import { Assets } from "./Assets";
-import { InfoBar } from "./InfoBar";
-import { HistoricalRate } from "./HistoricalRate";
-import { VaultInfo } from "./VaultInfo";
-import { Contracts } from "./Contracts";
-import { YieldBar } from "./YieldBar";
-import { LiquidityPool } from "./LiquidityPool";
-import { UnderlyingALM } from "./UnderlyingALM";
+import { VaultBar } from "./components/VaultBar";
+import { InvestForm } from "./components/InvestForm";
+import { Strategy } from "./components/Strategy";
+import { Assets } from "./components/Assets";
+import { InfoBar } from "./components/InfoBar";
+import { HistoricalRate } from "./components/HistoricalRate";
+import { VaultInfo } from "./components/VaultInfo";
+import { Contracts } from "./components/Contracts";
+import { YieldBar } from "./components/YieldBar";
+import { LiquidityPool } from "./components/LiquidityPool";
+import { UnderlyingALM } from "./components/UnderlyingALM";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, Loader, ErrorMessage } from "@components";
+import { Toast, Loader, ErrorMessage } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -70,7 +70,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
             <Toast network={network} />
           </div>
           <div className="w-full md:w-1/2 lg:w-2/5">
-            <VaultActionForm network={network} vault={localVault} />
+            <InvestForm network={network} vault={localVault} />
           </div>
         </div>
 

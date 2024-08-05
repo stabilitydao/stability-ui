@@ -304,6 +304,14 @@ type TInputItem = {
 
 type TYearnProtocol = { title: string; link: string };
 
+type TChain = {
+  name: string;
+  id: string;
+  logoURI: string;
+  explorer: string;
+  active: boolean;
+};
+
 ////          VAULT
 
 type TVaultBalance = {
@@ -315,7 +323,7 @@ type TVaultInput = {
 };
 
 type TVaultAllowance = {
-  [asset: string]: bigint[];
+  [asset: string]: bigint;
 };
 
 type TVaultsAddress = {
@@ -512,4 +520,5 @@ export type {
   TChartPayload,
   TVaultDataKey,
   TPlatformGetBalance,
+  TChain,
 };

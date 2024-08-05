@@ -14,12 +14,7 @@ import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 
-import {
-  Loader,
-  ShareSkeleton,
-  AssetsSkeleton,
-  AssetsProportion,
-} from "@components";
+import { Loader, ShareSkeleton, AssetsSkeleton, AssetsProportion } from "@ui";
 
 import {
   vaultData,
@@ -66,6 +61,7 @@ import type {
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
+
 interface IProps {
   network: string;
   vault: TVault;
@@ -73,7 +69,7 @@ interface IProps {
 
 type TOptionInfo = { address: TAddress; symol: string; logoURI: string };
 
-const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
+const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const _publicClient = usePublicClient({
     chainId: Number(network),
     config: wagmiConfig,
@@ -208,7 +204,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             assets &&
             $assetsBalances[network] &&
             input[i] <= $assetsBalances[network][assets[0]] &&
-            allowance[assets[0]]?.allowance[0] >= input[i]
+            allowance[assets[0]] >= input[i]
           ) {
             apprDepo.push(1);
           } else {
@@ -220,7 +216,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
             assets &&
             $assetsBalances[network] &&
             input[i] <= $assetsBalances[network][assets[i]] &&
-            allowance[assets[i]]?.allowance[0] >= input[i]
+            allowance[assets[i]] >= input[i]
           ) {
             apprDepo.push(1);
           } else {
@@ -281,9 +277,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         (prevInputs: any) =>
           ({
             ...prevInputs,
-            [asset]: {
-              amount: amount,
-            },
+            [asset]: amount,
           }) as TVaultInput
       );
       if (
@@ -295,9 +289,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     } else {
       const preview: TVaultInput | any = {};
       for (let i = 0; i < option.length; i++) {
-        preview[option[i]] = {
-          amount: amount as string,
-        };
+        preview[option[i]] = amount as string;
       }
 
       setInputs(preview);
@@ -326,9 +318,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     const reset: TVaultInput | any = {};
 
     for (let i = 0; i < options.length; i++) {
-      reset[options[i]] = {
-        amount: "",
-      };
+      reset[options[i]] = "";
     }
     setInputs(reset);
     setIsApprove(undefined);
@@ -454,35 +444,21 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   /////
   /////         ZAP
   const getZapAllowance = async (asset = option[0]) => {
-    asset = getAddress(asset);
-    let allowanceData;
-    if (tab === "Deposit") {
-      if (asset === underlyingToken?.address) {
-        allowanceData = await _publicClient?.readContract({
-          address: asset as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, vault.address],
-        });
-      } else {
-        allowanceData = await _publicClient?.readContract({
-          address: asset as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [
-            $account as TAddress,
-            $platformsData[network]?.zap as TAddress,
-          ],
-        });
-      }
-    } else {
-      allowanceData = await _publicClient?.readContract({
-        address: vault.address,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, $platformsData[network]?.zap as TAddress],
-      });
-    }
+    asset = getAddress(asset) as TAddress;
+
+    const address: TAddress = tab === "Deposit" ? asset : vault.address;
+
+    const fromAddress: TAddress =
+      tab === "Deposit" && asset === underlyingToken?.address
+        ? vault?.address
+        : $platformsData?.[network]?.zap;
+
+    const allowanceData = await _publicClient?.readContract({
+      address: address,
+      abi: ERC20ABI,
+      functionName: "allowance",
+      args: [$account as TAddress, fromAddress],
+    });
 
     return allowanceData;
   };
@@ -592,9 +568,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       (prevInputs: any) =>
         ({
           ...prevInputs,
-          [asset]: {
-            amount: amount,
-          },
+          [asset]: amount,
         }) as TVaultInput
     );
 
@@ -611,7 +585,8 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
     setError(false);
     setTransactionInProgress(true);
-    const amount = inputs[option[0]]?.amount;
+    const amount = inputs[option[0]];
+
     const decimals = getTokenData(option[0])?.decimals || 18;
 
     const approveSum =
@@ -619,118 +594,73 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         ? maxUint256
         : parseUnits(amount, decimals);
 
-    if (option[0] !== underlyingToken?.address) {
-      if (amount && decimals) {
-        try {
-          const gas = await _publicClient?.estimateContractGas({
-            address: option[0],
-            abi: ERC20ABI,
-            functionName: "approve",
-            args: [$platformsData[network].zap as TAddress, approveSum],
-            account: $account as TAddress,
-          });
-          const gasLimit = BigInt(
-            Math.trunc(Number(gas) * Number(settings.gasLimit))
-          );
-          setNeedConfirm(true);
-          const assetApprove = await writeContract(wagmiConfig, {
-            address: option[0],
-            abi: ERC20ABI,
-            functionName: "approve",
-            args: [$platformsData[network].zap as TAddress, approveSum],
-            gas: gasLimit,
-          });
-          setNeedConfirm(false);
-          setLoader(true);
-          const transaction = await waitForTransactionReceipt(wagmiConfig, {
-            confirmations: 3,
-            hash: assetApprove,
-          });
+    try {
+      const address =
+        option[0] === underlyingToken?.address
+          ? underlyingToken?.address
+          : option[0];
 
-          if (transaction.status === "success") {
-            lastTx.set(transaction?.transactionHash);
-            const allowance = formatUnits(await getZapAllowance(), 18);
+      const argsAddress =
+        option[0] === underlyingToken?.address
+          ? vault.address
+          : $platformsData[network]?.zap;
 
-            if (Number(allowance) >= Number(amount)) {
-              getZapDepositSwapAmounts(amount);
-              setZapButton(tab.toLowerCase());
-            }
-            setLoader(false);
-          }
-        } catch (err) {
-          lastTx.set("No approve hash...");
-          if (err instanceof Error) {
-            const errName = err.name;
-            const errorMessageLength =
-              err.message.indexOf("Contract Call:") !== -1
-                ? err.message.indexOf("Contract Call:")
-                : 150;
+      const gas = await _publicClient?.estimateContractGas({
+        address: address as TAddress,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: [argsAddress, approveSum],
+        account: $account as TAddress,
+      });
+      const gasLimit = BigInt(
+        Math.trunc(Number(gas) * Number(settings.gasLimit))
+      );
 
-            const errorMessage =
-              err.message.substring(0, errorMessageLength) + "...";
+      setNeedConfirm(true);
+      const assetApprove = await writeContract(wagmiConfig, {
+        address: address as TAddress,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: [argsAddress, approveSum],
+        gas: gasLimit,
+      });
+      setNeedConfirm(false);
+      setLoader(true);
 
-            setError({ name: errName, message: errorMessage });
-          }
-          setNeedConfirm(false);
-          setLoader(false);
-          console.error("APPROVE ERROR:", err);
-        }
-      }
-    } else {
-      try {
-        const gas = await _publicClient?.estimateContractGas({
-          address: underlyingToken?.address,
-          abi: ERC20ABI,
-          functionName: "approve",
-          args: [vault.address, approveSum],
-          account: $account as TAddress,
-        });
-        const gasLimit = BigInt(
-          Math.trunc(Number(gas) * Number(settings.gasLimit))
-        );
-        setNeedConfirm(true);
-        const assetApprove = await writeContract(wagmiConfig, {
-          address: underlyingToken?.address,
-          abi: ERC20ABI,
-          functionName: "approve",
-          args: [vault.address, approveSum],
-          gas: gasLimit,
-        });
-        setNeedConfirm(false);
-        setLoader(true);
+      const transaction = await waitForTransactionReceipt(wagmiConfig, {
+        confirmations: 3,
+        hash: assetApprove,
+      });
 
-        const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
-          hash: assetApprove,
-        });
+      if (transaction.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+        const allowance = formatUnits(await getZapAllowance(), 18);
 
-        if (transaction.status === "success") {
-          lastTx.set(transaction?.transactionHash);
-          const allowance = formatUnits(await getZapAllowance(), 18);
-          if (Number(allowance) >= Number(amount)) {
-            setZapButton(tab.toLowerCase());
-          }
-          setLoader(false);
-        }
-      } catch (err) {
-        lastTx.set("No approve hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
+        if (Number(allowance) >= Number(amount)) {
+          getZapDepositSwapAmounts(amount);
+          setZapButton(tab.toLowerCase());
         }
         setLoader(false);
-        setNeedConfirm(false);
-        console.error("APPROVE ERROR:", err);
       }
+    } catch (err) {
+      lastTx.set("No approve hash...");
+      if (err instanceof Error) {
+        const errName = err.name;
+        const errorMessageLength =
+          err.message.indexOf("Contract Call:") !== -1
+            ? err.message.indexOf("Contract Call:")
+            : 150;
+
+        const errorMessage =
+          err.message.substring(0, errorMessageLength) + "...";
+
+        setError({ name: errName, message: errorMessage });
+      }
+      setLoader(false);
+      setNeedConfirm(false);
+      console.error("APPROVE ERROR:", err);
     }
+
     setTransactionInProgress(false);
   };
   const zapDeposit = async () => {
@@ -749,7 +679,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     setLoader(true);
 
     let transaction, depositAssets: any, zapDeposit: any, gas, gasLimit;
-    const amount = inputs[option[0]]?.amount;
+    const amount = inputs[option[0]];
     if (underlyingToken?.address === option[0]) {
       try {
         const shares = parseUnits(underlyingShares, 18);
@@ -1078,7 +1008,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     setError(false);
     setTransactionInProgress(true);
 
-    const amount = inputs[option[0]].amount;
+    const amount = inputs[option[0]];
 
     const approveSum =
       settings.approves === "unlimited" ? maxUint256 : parseUnits(amount, 18);
@@ -1123,8 +1053,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
         });
 
         if (
-          Number(formatUnits(newAllowance, 18)) >=
-          Number(inputs[option[0]].amount)
+          Number(formatUnits(newAllowance, 18)) >= Number(inputs[option[0]])
         ) {
           setZapButton("withdraw");
         }
@@ -1177,13 +1106,13 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     setRotation(rotation + 360);
     setLoader(true);
     loadAssetsBalances(currentBalances);
-    zapInputHandler(inputs[option[0]]?.amount, option[0]);
+    zapInputHandler(inputs[option[0]], option[0]);
   };
   /////
 
   const approve = async (asset: TAddress, index: number) => {
     setApproveIndex(index);
-    const amount = inputs[asset].amount;
+    const amount = inputs[asset];
     const decimals = getTokenData(asset)?.decimals || 18;
 
     const approveSum =
@@ -1195,10 +1124,8 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     const needApprove = option.filter(
       (asset: TAddress) =>
         allowance &&
-        formatUnits(
-          allowance[asset]?.allowance[0],
-          Number(getTokenData(asset)?.decimals)
-        ) < inputs[asset].amount
+        formatUnits(allowance[asset], Number(getTokenData(asset)?.decimals)) <
+          inputs[asset]
     );
     if (vault.address) {
       try {
@@ -1238,16 +1165,14 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
           setAllowance((prevAllowance: any) => ({
             ...prevAllowance,
-            [asset]: {
-              allowance: [newAllowance],
-            },
+            [asset]: newAllowance,
           }));
 
           // this is a temp condition before rewrite
           if (
             needApprove.length == 1 &&
             formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
-              inputs[asset].amount
+              inputs[asset]
           ) {
             setIsApprove(1);
           }
@@ -1264,15 +1189,13 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
         setAllowance((prevAllowance: any) => ({
           ...prevAllowance,
-          [asset]: {
-            allowance: [newAllowance],
-          },
+          [asset]: newAllowance,
         }));
         // this is a temp condition before rewrite
         if (
           needApprove.length == 1 &&
           formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
-            inputs[asset].amount
+            inputs[asset]
         ) {
           setIsApprove(1);
         }
@@ -1316,7 +1239,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
 
       const token: any = getTokenData(option[i]);
 
-      input.push(parseUnits(inputs[option[i]].amount, token.decimals));
+      input.push(parseUnits(inputs[option[i]], token.decimals));
     }
     const changedInput = assets?.indexOf(lastAsset);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
@@ -1332,7 +1255,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       if (i === changedInput) {
         amounts.push(
           parseUnits(
-            inputs[lastAsset as string].amount,
+            inputs[lastAsset as string],
             Number(getTokenData(lastAsset as string)?.decimals)
           )
         );
@@ -1434,7 +1357,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   const withdraw = async () => {
     setError(false);
     setTransactionInProgress(true);
-    const sharesToBurn = parseUnits(inputs[option[0]]?.amount, 18);
+    const sharesToBurn = parseUnits(inputs[option[0]], 18);
 
     if (!sharesToBurn) return;
 
@@ -1849,10 +1772,11 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
       });
 
       if (!allowanceResult[option[i]]) {
-        allowanceResult[option[i]] = { allowance: [] };
+        allowanceResult[option[i]] = 0n;
       }
-      allowanceResult[option[i]].allowance.push(allowanceData);
+      allowanceResult[option[i]] = allowanceData;
     }
+
     setAllowance(allowanceResult);
   };
 
@@ -1868,7 +1792,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           if (i === changedInput) {
             amounts.push(
               parseUnits(
-                inputs[lastKeyPress.key1 as string].amount,
+                inputs[lastKeyPress.key1 as string],
                 Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
               )
             );
@@ -1936,9 +1860,10 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
           for (let i = 0; i < assets?.length; i++) {
             const decimals = getTokenData(assets[i])?.decimals;
             if (i !== changedInput && decimals) {
-              preview[assets[i]] = {
-                amount: formatUnits(previewDepositAssetsArray[i], decimals),
-              };
+              preview[assets[i]] = formatUnits(
+                previewDepositAssetsArray[i],
+                decimals
+              );
             }
           }
           setInputs((prevInputs: any) => ({
@@ -2049,12 +1974,12 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
         if (transactionInProgress) return;
-        if (inputs[option[0]]?.amount) {
+        if (inputs[option[0]]) {
           if (tab === "Deposit") {
-            await getZapDepositSwapAmounts(inputs[option[0]]?.amount);
+            await getZapDepositSwapAmounts(inputs[option[0]]);
           }
           if (tab === "Withdraw") {
-            await previewWithdraw(inputs[option[0]]?.amount);
+            await previewWithdraw(inputs[option[0]]);
           }
         }
       };
@@ -2414,16 +2339,13 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                             id={asset}
                             name="amount"
                             placeholder="0"
-                            value={
-                              inputs && inputs[asset] && inputs[asset].amount
-                            }
+                            value={inputs[asset]}
                             onChange={(e) =>
                               handleInputChange(e.target.value, e.target.id)
                             }
                             type="text"
                             onKeyDown={(evt) => {
-                              const currentValue =
-                                inputs && inputs[asset] && inputs[asset].amount;
+                              const currentValue = inputs[asset];
 
                               if (
                                 !/[\d.]/.test(evt.key) &&
@@ -2460,11 +2382,11 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                         <p>
                           $
                           {$assetsPrices[network] &&
-                          inputs[asset]?.amount > 0 &&
+                          inputs[asset] > 0 &&
                           underlyingToken?.address != option[0]
                             ? (
                                 Number($assetsPrices[network][asset].price) *
-                                inputs[asset].amount
+                                inputs[asset]
                               ).toFixed(2)
                             : 0}
                         </p>
@@ -2535,9 +2457,9 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                               (asset: any, index: number) =>
                                 allowance &&
                                 formatUnits(
-                                  allowance[asset]?.allowance[0],
+                                  allowance[asset],
                                   Number(getTokenData(asset)?.decimals)
-                                ) < inputs[asset].amount && (
+                                ) < inputs[asset] && (
                                   <button
                                     disabled={approveIndex !== false}
                                     className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2639,7 +2561,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                         <input
                           list="amount"
                           id={option[0]}
-                          value={inputs[option[0]]?.amount}
+                          value={inputs[option[0]]}
                           name="amount"
                           type="text"
                           placeholder="0"
@@ -2647,10 +2569,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                             zapInputHandler(e.target.value, e.target.id)
                           }
                           onKeyDown={(evt) => {
-                            const currentValue =
-                              inputs &&
-                              inputs[option[0]] &&
-                              inputs[option[0]].amount;
+                            const currentValue = inputs[option[0]];
 
                             if (
                               !/[\d.]/.test(evt.key) &&
@@ -2693,11 +2612,11 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                     <p>
                       $
                       {$assetsPrices[network] &&
-                      inputs[option[0]]?.amount > 0 &&
+                      inputs[option[0]] > 0 &&
                       underlyingToken?.address !== option[0]
                         ? (
                             Number($assetsPrices[network][option[0]].price) *
-                            inputs[option[0]]?.amount
+                            inputs[option[0]]
                           ).toFixed(2)
                         : 0}
                     </p>
@@ -2861,18 +2780,16 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                               ) : (
                                 <div>
                                   {(underlyingShares &&
-                                    inputs[option[0]]?.amount > 0) ||
-                                  (zapShares &&
-                                    inputs[option[0]]?.amount > 0) ? (
+                                    inputs[option[0]] > 0) ||
+                                  (zapShares && inputs[option[0]] > 0) ? (
                                     <p>
-                                      {underlyingShares &&
-                                      inputs[option[0]]?.amount > 0
+                                      {underlyingShares && inputs[option[0]] > 0
                                         ? `${underlyingShares} ($${(
                                             underlyingShares *
                                             Number(vault.shareprice)
                                           ).toFixed(2)})`
                                         : zapShares &&
-                                          inputs[option[0]]?.amount > 0 &&
+                                          inputs[option[0]] > 0 &&
                                           `${zapShares} ($${(
                                             zapShares * Number(vault.shareprice)
                                           ).toFixed(2)})`}
@@ -2923,9 +2840,9 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                                   if (
                                     allowance &&
                                     formatUnits(
-                                      allowance[asset]?.allowance[0],
+                                      allowance[asset],
                                       Number(getTokenData(asset)?.decimals)
-                                    ) < inputs[asset].amount
+                                    ) < inputs[asset]
                                   ) {
                                     isAnyCCFOptionVisible = true;
                                     return (
@@ -3163,7 +3080,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                   <input
                     list="amount"
                     id={option.join(", ")}
-                    value={inputs[option[0]]?.amount}
+                    value={inputs[option[0]]}
                     name="amount"
                     placeholder="0"
                     onChange={(e) => {
@@ -3172,8 +3089,7 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                       handleInputChange(e.target.value, e.target.id);
                     }}
                     onKeyDown={(evt) => {
-                      const currentValue =
-                        inputs && inputs[option[0]] && inputs[option[0]].amount;
+                      const currentValue = inputs[option[0]];
 
                       if (
                         !/[\d.]/.test(evt.key) &&
@@ -3201,10 +3117,10 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
                 <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                   <p>
                     $
-                    {$assetsPrices[network] && inputs[option[0]]?.amount > 0
-                      ? (
-                          Number(vault.shareprice) * inputs[option[0]]?.amount
-                        ).toFixed(2)
+                    {$assetsPrices[network] && inputs[option[0]] > 0
+                      ? (Number(vault.shareprice) * inputs[option[0]]).toFixed(
+                          2
+                        )
                       : 0}
                   </p>
                 </div>
@@ -3565,4 +3481,4 @@ const VaultActionForm: React.FC<IProps> = ({ network, vault }) => {
   );
 };
 
-export { VaultActionForm };
+export { InvestForm };

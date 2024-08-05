@@ -14,6 +14,7 @@ import { getDate } from "./functions/getDate";
 import { getProtocolLogo } from "./functions/getProtocolLogo";
 import { determineAPR } from "./functions/determineAPR";
 import { addAssetToWallet } from "./functions/addAssetToWallet";
+import { getLocalStorageData } from "./functions/getLocalStorageData";
 
 export {
   getTokenData,
@@ -32,4 +33,5 @@ export {
   getProtocolLogo,
   determineAPR,
   addAssetToWallet,
+  getLocalStorageData,
 };

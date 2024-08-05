@@ -8,19 +8,20 @@ import { useStore } from "@nanostores/react";
 
 // import { deployments } from "@stabilitydao/stability";
 
-import { APRModal } from "./APRModal";
-import { VSHoldModal } from "./VSHoldModal";
-import { ColumnSort } from "./ColumnSort";
-import { Pagination } from "./Pagination";
-import { Filters } from "./Filters";
-import { Portfolio } from "./Portfolio";
+import { APRModal } from "./components/modals/APRModal";
+import { VSHoldModal } from "./components/modals/VSHoldModal";
+import { ColumnSort } from "./components/ColumnSort";
+import { Pagination } from "./components/Pagination";
+import { Filters } from "./components/Filters";
+import { Portfolio } from "./components/Portfolio";
+import { NetworkFilters } from "./components/NetworksFilter";
 
 import {
   TimeDifferenceIndicator,
   Loader,
   ErrorMessage,
   // ShortAddress,
-} from "@components";
+} from "@ui";
 
 import {
   vaults,
@@ -33,6 +34,10 @@ import {
   // currentChainID,
   // assetsPrices,
 } from "@store";
+
+import { dataSorter } from "./functions/dataSorter";
+import { toVault } from "./functions/toVault";
+import { initFilters } from "./functions/initFilters";
 
 import {
   formatNumber,
@@ -58,7 +63,6 @@ import {
 import type {
   TVault,
   TTableColumn,
-  TTableFilters,
   TTAbleFiltersVariant,
   THoldData,
   // TPendingPlatformUpgrade,
@@ -132,85 +136,6 @@ const Vaults = (): JSX.Element => {
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
 
-  const toVault = (network: string, address: string) => {
-    window.location.href = `/vault/${network}/${address}`;
-  };
-
-  const compareHandler = (
-    a: string,
-    b: string,
-    dataType: string,
-    sortOrder: string
-  ) => {
-    if (dataType === "number") {
-      return sortOrder === "ascendentic"
-        ? Number(a) - Number(b)
-        : Number(b) - Number(a);
-    }
-    if (dataType === "string") {
-      return sortOrder === "ascendentic"
-        ? a.localeCompare(b)
-        : b.localeCompare(a);
-    }
-    return 0;
-  };
-
-  const setURLFilters = (filters: TTableFilters[]) => {
-    const searchParams = new URLSearchParams(window.location.search);
-
-    const tagsParam = searchParams.get("tags");
-    const strategyParam = searchParams.get("strategy");
-    const vaultsParam = searchParams.get("vaults");
-    const statusParam = searchParams.get("status");
-    const chainParam = searchParams.get("chain");
-
-    if (tagsParam) {
-      filters = filters.map((f) =>
-        f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
-      );
-    }
-    if (strategyParam) {
-      filters = filters.map((f) => {
-        return f.name.toLowerCase() === "strategy"
-          ? {
-              ...f,
-              variants:
-                f.variants?.map((variant: TTAbleFiltersVariant) => {
-                  return variant.name.toLowerCase() ===
-                    strategyParam.toLowerCase()
-                    ? { ...variant, state: true }
-                    : { ...variant, state: false };
-                }) || [],
-            }
-          : f;
-      });
-    }
-    if (vaultsParam) {
-      filters = filters.map((f) => {
-        if (f.name.toLowerCase() === "my vaults") {
-          return vaultsParam === "my"
-            ? { ...f, state: true }
-            : { ...f, state: false };
-        }
-        return f;
-      });
-    }
-    if (statusParam) {
-      filters = filters.map((f) => {
-        if (f.name.toLowerCase() === "active") {
-          return statusParam === "active"
-            ? { ...f, state: true }
-            : { ...f, state: false };
-        }
-        return f;
-      });
-    }
-    if (chainParam) {
-      activeNetworksHandler(chainParam);
-    }
-    setTableFilters(filters);
-  };
-
   const activeNetworksHandler = async (chainID: string) => {
     ///// For vaults URL filters
     const newUrl = new URL(window.location.href);
@@ -258,130 +183,6 @@ const Vaults = (): JSX.Element => {
     window.history.pushState({}, "", newUrl.toString());
 
     setActiveNetworks(updatedNetworks);
-  };
-
-  const tableHandler = (table: TTableColumn[] = tableStates) => {
-    const searchValue: string = String(search?.current?.value.toLowerCase());
-
-    let activeNetworksVaults: { [key: string]: TVault[] } = {};
-
-    activeNetworks.forEach((network) => {
-      if (network.active) {
-        activeNetworksVaults[network.id] = $vaults[network.id];
-      }
-    });
-
-    //@ts-ignore
-    const mixedVaults: { [key: string]: TVault } = Object.values(
-      activeNetworksVaults
-    ).reduce<{
-      [key: string]: TVault;
-    }>((acc, value) => {
-      return { ...acc, ...value };
-    }, {});
-
-    let sortedVaults = Object.values(mixedVaults).sort(
-      (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
-    );
-    //filter
-    tableFilters.forEach((f) => {
-      if (!f.state) return;
-      switch (f.type) {
-        case "single":
-          if (f.name === "Stablecoins") {
-            sortedVaults = sortedVaults.filter((vault: TVault) => {
-              if (vault.assets.length > 1) {
-                return (
-                  STABLECOINS.includes(vault.assets[0].address) &&
-                  STABLECOINS.includes(vault.assets[1].address)
-                );
-              }
-              return STABLECOINS.includes(vault.assets[0].address);
-            });
-          }
-          break;
-        case "multiple":
-          // if (!f.variants) break;
-          // if (f.name === "Strategy") {
-          //   const strategyName = f.variants.find(
-          //     (variant: TTAbleFiltersVariant) => variant.state
-          //   )?.name;
-          //   if (strategyName) {
-          //     sortedVaults = sortedVaults.filter(
-          //       (vault: TVault) => vault.strategyInfo.shortName === strategyName
-          //     );
-          //   }
-          // }
-          break;
-        case "sample":
-          if (f.name === "My vaults") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.balance
-            );
-          }
-          if (f.name === "Active") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.status === "Active"
-            );
-          }
-          break;
-        case "dropdown":
-          if (!f.variants) break;
-          if (f.name === "Strategy") {
-            const strategyName = f.variants.find(
-              (variant: TTAbleFiltersVariant) => variant.state
-            )?.name;
-            if (strategyName) {
-              sortedVaults = sortedVaults.filter(
-                (vault: TVault) => vault.strategyInfo.shortName === strategyName
-              );
-            }
-          }
-          break;
-        default:
-          console.error("NO FILTER CASE");
-          break;
-      }
-    });
-    //sort
-    table.forEach((state: TTableColumn) => {
-      if (state.sortType !== "none") {
-        if (state.keyName === "earningData") {
-          const fees = $hideFeeAPR ? "withoutFees" : "withFees";
-
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            compareHandler(
-              a[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
-              b[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
-              state.dataType,
-              state.sortType
-            )
-          );
-        } else {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            compareHandler(
-              a[state.keyName as keyof TVault],
-              b[state.keyName as keyof TVault],
-              state.dataType,
-              state.sortType
-            )
-          );
-        }
-      }
-    });
-    //search
-    sortedVaults = sortedVaults.filter(
-      (vault: TVault) =>
-        vault.symbol.toLowerCase().includes(searchValue) ||
-        vault.assetsSymbol.toLowerCase().includes(searchValue)
-    );
-    // pagination upd
-    if (currentTab != 1) {
-      setCurrentTab(1);
-    }
-
-    setFilteredVaults(sortedVaults);
-    setTableStates(table);
   };
 
   // const fetchPlatformUpdates = async () => {
@@ -476,21 +277,128 @@ const Vaults = (): JSX.Element => {
   //   }
   // };
 
-  const initFilters = (vaults: TVault[]) => {
-    const shortNames: string[] = [
-      ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
-    ];
+  const tableHandler = (table: TTableColumn[] = tableStates) => {
+    const searchValue: string = String(search?.current?.value.toLowerCase());
 
-    const convertedShortNames = shortNames.map((name: string) => ({
-      name: name,
-      state: false,
-    }));
+    let activeNetworksVaults: { [key: string]: TVault[] } = {};
 
-    const newFilters = tableFilters.map((f) =>
-      f.name === "Strategy" ? { ...f, variants: convertedShortNames } : f
+    activeNetworks.forEach((network) => {
+      if (network.active) {
+        activeNetworksVaults[network.id] = $vaults[network.id];
+      }
+    });
+
+    //@ts-ignore
+    const mixedVaults: { [key: string]: TVault } = Object.values(
+      activeNetworksVaults
+    ).reduce<{
+      [key: string]: TVault;
+    }>((acc, value) => {
+      return { ...acc, ...value };
+    }, {});
+
+    let sortedVaults = Object.values(mixedVaults).sort(
+      (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
     );
+    //filter
+    tableFilters.forEach((f) => {
+      if (!f.state) return;
+      switch (f.type) {
+        case "single":
+          if (f.name === "Stablecoins") {
+            sortedVaults = sortedVaults.filter((vault: TVault) => {
+              if (vault.assets.length > 1) {
+                return (
+                  STABLECOINS.includes(vault.assets[0].address) &&
+                  STABLECOINS.includes(vault.assets[1].address)
+                );
+              }
+              return STABLECOINS.includes(vault.assets[0].address);
+            });
+          }
+          break;
+        case "multiple":
+          // if (!f.variants) break;
+          // if (f.name === "Strategy") {
+          //   const strategyName = f.variants.find(
+          //     (variant: TTAbleFiltersVariant) => variant.state
+          //   )?.name;
+          //   if (strategyName) {
+          //     sortedVaults = sortedVaults.filter(
+          //       (vault: TVault) => vault.strategyInfo.shortName === strategyName
+          //     );
+          //   }
+          // }
+          break;
+        case "sample":
+          if (f.name === "My vaults") {
+            sortedVaults = sortedVaults.filter(
+              (vault: TVault) => vault.balance
+            );
+          }
+          if (f.name === "Active") {
+            sortedVaults = sortedVaults.filter(
+              (vault: TVault) => vault.status === "Active"
+            );
+          }
+          break;
+        case "dropdown":
+          if (!f.variants) break;
+          if (f.name === "Strategy") {
+            const strategyName = f.variants.find(
+              (variant: TTAbleFiltersVariant) => variant.state
+            )?.name;
+            if (strategyName) {
+              sortedVaults = sortedVaults.filter(
+                (vault: TVault) => vault.strategyInfo.shortName === strategyName
+              );
+            }
+          }
+          break;
+        default:
+          console.error("NO FILTER CASE");
+          break;
+      }
+    });
+    //sort
+    table.forEach((state: TTableColumn) => {
+      if (state.sortType !== "none") {
+        if (state.keyName === "earningData") {
+          const fees = $hideFeeAPR ? "withoutFees" : "withFees";
 
-    setURLFilters(newFilters);
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            dataSorter(
+              a[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
+              b[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
+              state.dataType,
+              state.sortType
+            )
+          );
+        } else {
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            dataSorter(
+              a[state.keyName as keyof TVault],
+              b[state.keyName as keyof TVault],
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
+      }
+    });
+    //search
+    sortedVaults = sortedVaults.filter(
+      (vault: TVault) =>
+        vault.symbol.toLowerCase().includes(searchValue) ||
+        vault.assetsSymbol.toLowerCase().includes(searchValue)
+    );
+    // pagination upd
+    if (currentTab != 1) {
+      setCurrentTab(1);
+    }
+
+    setFilteredVaults(sortedVaults);
+    setTableStates(table);
   };
 
   const initVaults = async () => {
@@ -506,7 +414,7 @@ const Vaults = (): JSX.Element => {
         (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
       );
 
-      initFilters(vaults);
+      initFilters(vaults, tableFilters, setTableFilters, activeNetworksHandler);
       setLocalVaults(vaults);
 
       setFilteredVaults(vaults);
@@ -566,7 +474,6 @@ const Vaults = (): JSX.Element => {
       </div>
     );
   }
-
   return (
     <>
       <div
@@ -575,25 +482,10 @@ const Vaults = (): JSX.Element => {
         }`}
       >
         <Portfolio vaults={localVaults} />
-        <div className="flex items-center gap-4 mb-4 min-[1020px]:mb-0">
-          {activeNetworks.map((chain) => (
-            <div
-              className={`h-[48px] w-[44px] flex items-center justify-center border-[#3d404b] bg-button cursor-pointer rounded-md ${
-                !chain.active && "opacity-20"
-              }`}
-              key={chain.name + chain.id}
-              title={chain.name}
-              onClick={() => activeNetworksHandler(chain.id)}
-              data-testid="network"
-            >
-              <img
-                className="h-6 w-6 rounded-full"
-                src={chain.logoURI}
-                alt={chain.name}
-              />
-            </div>
-          ))}
-        </div>
+        <NetworkFilters
+          activeNetworks={activeNetworks}
+          activeNetworksHandler={activeNetworksHandler}
+        />
         <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
           <input
             type="text"

@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { formatUnits } from "viem";
 
-import { APRtimeSwitcher, HideFeesHandler, FeeAPRModal } from "@components";
+import { APRtimeSwitcher, HideFeesHandler, FeeAPRModal } from "@ui";
 
 import { hideFeeApr, aprFilter } from "@store";
 

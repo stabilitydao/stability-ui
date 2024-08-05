@@ -6,7 +6,7 @@ import { PROTOCOLS, CHAINS } from "@constants";
 
 import { platformVersions, currentChainID } from "@store";
 
-import packageJson from "../../../package.json";
+import packageJson from "../../../../../package.json";
 
 interface IProps {
   setModalState: React.Dispatch<React.SetStateAction<boolean>>;
