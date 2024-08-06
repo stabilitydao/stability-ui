@@ -8,7 +8,7 @@ import {
   waitForTransactionReceipt,
 } from "@wagmi/core";
 
-import { Loader } from "@components";
+import { Loader } from "@ui";
 
 import { FactoryABI, ERC20ABI, wagmiConfig } from "@web3";
 

@@ -1,11 +1,11 @@
 ---
-import {CreateVaultComponent} from '@components/CreateVaultComponent';
+import {CreateVault} from '@modules';
 import Layout from '@layouts/Layout.astro';
 ---
 
 <Layout title="Create vault">
     <div class="what-to-build max-w-[1200px]">
-        <CreateVaultComponent client:only="react" />
+        <CreateVault client:only="react" />
     </div>
 </Layout>
 

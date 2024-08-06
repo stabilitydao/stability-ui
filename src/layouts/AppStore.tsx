@@ -27,12 +27,9 @@ import {
   connected,
   apiData,
   lastTx,
-  transactionSettings,
-  hideFeeApr,
   reload,
   error,
   isWeb3Load,
-  aprFilter,
   currentChainID,
   assetsPrices,
   assetsBalances,
@@ -49,6 +46,7 @@ import {
   addVaultData,
   getTimeDifference,
   determineAPR,
+  getLocalStorageData,
 } from "@utils";
 
 import {
@@ -101,31 +99,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   let prices: TMultichainPrices = {};
 
   let stabilityAPIData: TAPIData = {};
-
-  const getLocalStorageData = () => {
-    const savedSettings = localStorage.getItem("transactionSettings");
-    const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
-    const APRsFiler = localStorage.getItem("APRsFiler");
-
-    if (savedSettings) {
-      const savedData = JSON.parse(savedSettings);
-      transactionSettings.set(savedData);
-    }
-    if (savedHideFeeAPR) {
-      const savedData = JSON.parse(savedHideFeeAPR);
-      hideFeeApr.set(savedData);
-    }
-
-    let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "weekly";
-
-    if (localAPRfilter === "week") {
-      localAPRfilter = "weekly";
-    } else if (localAPRfilter === "24h") {
-      localAPRfilter = "daily";
-    }
-
-    aprFilter.set(localAPRfilter);
-  };
 
   const getDataFromStabilityAPI = async () => {
     try {

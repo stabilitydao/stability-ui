@@ -9,6 +9,7 @@ import { getTokenData } from "@utils";
 import type { TToast } from "@types";
 
 import "./Toast.css";
+
 import { CHAINS } from "@constants";
 
 interface IProps {
@@ -50,6 +51,7 @@ const Toast: React.FC<IProps> = memo(
 
     useEffect(() => {
       const initialTx = JSON.parse(localStorage.getItem("lastTx") as string);
+
       if (initialTx) {
         const currentTime = new Date().getTime();
         const lastUpdateTime = initialTx.timestamp || 0;
@@ -59,16 +61,14 @@ const Toast: React.FC<IProps> = memo(
           initialTx.status === "success"
             ? setColor("#9FC6A7")
             : setColor("#B34D61");
+
           const array = Object.entries(
-            initialTx.tokens as Record<
-              string,
-              { amount: string; symbol?: string; logo?: string }
-            >
-          ).map(([address, { amount, symbol, logo }]) => ({
+            initialTx.tokens as Record<string, string>
+          ).map(([address, amount]) => ({
             address,
             amount: Number(amount).toFixed(4),
-            symbol: symbol ? symbol : getTokenData(address)?.symbol,
-            logo: logo ? logo : getTokenData(address)?.logoURI,
+            symbol: getTokenData(address)?.symbol,
+            logo: getTokenData(address)?.logoURI,
           }));
 
           setTokens(array);

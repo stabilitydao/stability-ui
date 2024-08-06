@@ -1,4 +1,5 @@
 import type { TToken } from "@types";
+
 interface IProps {
   proportions: number[];
   assets: TToken[];

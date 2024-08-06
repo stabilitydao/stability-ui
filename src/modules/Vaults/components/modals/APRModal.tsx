@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { TimeDifferenceIndicator } from "@components";
+import { TimeDifferenceIndicator } from "@ui";
 
 import { aprFilter, hideFeeApr } from "@store";
 
@@ -20,7 +20,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const $aprFilter = useStore(aprFilter);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setModalState({
         earningData: "",
         daily: 0,

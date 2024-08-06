@@ -1,5 +1,6 @@
 const Skeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
   const { width, height, ...rest } = props;
+
   return (
     <svg
       width={width}
