@@ -137,19 +137,13 @@ const CHAINS = [
   },
 ];
 
-const TRANSACTION_SETTINGS = {
-  slippage: ["0.5", "1", "2"],
-  approves: ["limited", "unlimited"],
-  gasLimits: ["1", "1.1"],
-};
+const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "1",
   approves: "unlimited",
   gasLimit: "1.1",
 };
-
-const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const PROTOCOLS = {
   quickSwap: {
@@ -236,8 +230,6 @@ export {
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,
-  TRANSACTION_SETTINGS,
-  DEFAULT_TRANSACTION_SETTINGS,
   GRAPH_ENDPOINTS,
   PROTOCOLS,
   STABILITY_API,
@@ -255,4 +247,5 @@ export {
   CHAINLINK_STABLECOINS,
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
+  DEFAULT_TRANSACTION_SETTINGS,
 };

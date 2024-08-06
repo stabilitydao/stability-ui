@@ -13,6 +13,7 @@ import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
+import { TabSwitcher } from "./TabSwitcher";
 
 import { Loader, ShareSkeleton, AssetsSkeleton, AssetsProportion } from "@ui";
 
@@ -99,10 +100,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [balances, setBalances] = useState<TVaultBalance>({});
 
   const [inputs, setInputs] = useState<TVaultInput>({});
-  const [lastKeyPress, setLastKeyPress] = useState<{
-    key1: string | undefined;
-    key2: string | undefined;
-  }>({ key1: undefined, key2: undefined });
 
   const [sharesOut, setSharesOut] = useState<bigint | boolean>(false);
 
@@ -269,7 +266,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const handleInputChange = async (amount: string, asset: string) => {
     if (!amount) {
       setSharesOut(false);
-      resetInputs(option);
+      resetInputs();
       return;
     }
     if (tab === "Deposit") {
@@ -284,7 +281,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         option.length > 1 ||
         (defaultOptionAssets === option[0] && option.length < 2)
       ) {
-        setLastKeyPress({ key1: asset, key2: amount });
+        previewDeposit(asset, amount);
       }
     } else {
       const preview: TVaultInput | any = {};
@@ -295,7 +292,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setInputs(preview);
     }
   };
-
   const resetOptions = () => {
     if (assets) {
       const logos = defaultOptionAssets.split(", ").map((address) => {
@@ -314,7 +310,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
   };
 
-  const resetInputs = (options: string[]) => {
+  const resetInputs = (options: string[] = option) => {
     const reset: TVaultInput | any = {};
 
     for (let i = 0; i < options.length; i++) {
@@ -332,7 +328,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setWithdrawAmount(false);
     setSharesOut(false);
     setZapShares(false);
-    resetInputs(option);
+    resetInputs();
   };
 
   const defaultAssetsOption = (assets: string[]) => {
@@ -1224,7 +1220,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     let assets: string[] = [];
     let input: any = [];
 
-    const lastAsset = lastKeyPress.key1 ? lastKeyPress.key1 : option[0];
+    const lastAsset = option[0];
     // only for CCF strategy
     const shares = sharesOut
       ? sharesOut
@@ -1780,28 +1776,25 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setAllowance(allowanceResult);
   };
 
-  const previewDeposit = async () => {
-    if (!Number(lastKeyPress.key2)) return;
+  const previewDeposit = async (asset: string, amount: string) => {
+    if (!Number(amount)) return;
     setLoader(true);
-    if (assets && tab === "Deposit") {
-      const changedInput = assets?.indexOf(lastKeyPress.key1);
+    if (assets) {
+      const changedInput = assets?.indexOf(asset);
       const preview: TVaultInput | any = {};
       if (option) {
         let amounts: bigint[] = [];
         for (let i = 0; i < option.length; i++) {
           if (i === changedInput) {
             amounts.push(
-              parseUnits(
-                inputs[lastKeyPress.key1 as string],
-                Number(getTokenData(lastKeyPress.key1 as string)?.decimals)
-              )
+              parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
             if (vault.strategyInfo.shortName === "CCF") {
               let value;
               let decimals = 18;
               for (const key in inputs) {
-                if (key !== lastKeyPress.key1) {
+                if (key !== asset) {
                   value = inputs[key];
                   decimals = getTokenData(key)?.decimals || 18;
 
@@ -1893,7 +1886,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         .filter((_, index) => vault.assetsProportions[index]);
       if (Array.isArray(assetsData)) {
         setAssets(assetsData);
-
         setOption(assetsData);
         defaultAssetsOption(assetsData);
       }
@@ -1940,10 +1932,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [option, $assetsBalances]);
 
   useEffect(() => {
-    previewDeposit();
-  }, [lastKeyPress]);
-
-  useEffect(() => {
     setZapButton("none");
     setSharesOut(false);
     setWithdrawAmount(false);
@@ -1956,7 +1944,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [option, $connected]);
 
   useEffect(() => {
-    resetInputs(option);
+    resetInputs();
   }, [$connected]);
 
   useEffect(() => {
@@ -2044,32 +2032,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [tokenSelectorRef]);
   return (
     <div className="bg-button rounded-md">
-      <div className="flex">
-        <button
-          className={`h-[60px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
-            tab === "Deposit" && "border-b-[2px] border-[#6376AF]"
-          }`}
-          onClick={() => {
-            setTab("Deposit");
-            resetInputs(option);
-            resetOptions();
-          }}
-        >
-          Deposit
-        </button>
-        <button
-          className={`h-[60px] cursor-pointer text-[16px] w-full rounded-tr-md  bg-[#1c1c23]  ${
-            tab === "Withdraw" && "border-b-[2px] border-[#6376AF]"
-          }`}
-          onClick={() => {
-            setTab("Withdraw");
-            resetOptions();
-            resetInputs(option);
-          }}
-        >
-          Withdraw
-        </button>
-      </div>
+      <TabSwitcher
+        activeTab={tab}
+        setActiveTab={setTab}
+        resetInputs={resetInputs}
+        resetOptions={resetOptions}
+      />
+
       <form autoComplete="off" className="w-full px-4 pb-5">
         <div className="flex items-center mt-4 gap-3 relative">
           {optionTokens && (
