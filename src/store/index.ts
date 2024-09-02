@@ -19,7 +19,7 @@ import type {
 } from "@types";
 
 // atoms
-const account = atom<string | undefined>();
+const account = atom<TAddress>("");
 const publicClient = atom<any>();
 const platformsData = atom<TPlatformsData>({});
 

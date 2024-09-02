@@ -82,6 +82,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         tvl += Number(v.tvl);
       }
     });
+
     const dailySum = monthly / 30;
     avgApr = deposited !== 0 ? (100 * dailySum * 365) / deposited : 0;
 
@@ -152,6 +153,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                   viewBox="0 0 22 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  data-testid="visibleSwitcher"
                 >
                   <path
                     d="M21 8C21 8 16.5228 15 11 15C5.47715 15 1 8 1 8C1 8 5.47715 1 11 1C16.5228 1 21 8 21 8Z"
@@ -202,7 +204,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DEPOSITED
               </h2>
-              <div className="text-[1rem] md:text-[1.125rem]">
+              <div
+                data-testid="portfolioDeposited"
+                className="text-[1rem] md:text-[1.125rem]"
+              >
                 {$isWeb3Load ? (
                   <div className="mt-2">
                     <Skeleton height={21} width={100} />
@@ -220,7 +225,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 DAILY YIELD
               </h2>
-              <div className="text-[1rem] md:text-[1.125rem]">
+              <div
+                data-testid="portfolioDaily"
+                className="text-[1rem] md:text-[1.125rem]"
+              >
                 {$isWeb3Load ? (
                   <div className="mt-2">
                     <Skeleton height={21} width={100} />
@@ -234,7 +242,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 MONTHLY YIELD
               </h2>
-              <div className="text-[1rem] md:text-[1.125rem]">
+              <div
+                data-testid="portfolioMonthly"
+                className="text-[1rem] md:text-[1.125rem]"
+              >
                 {$isWeb3Load ? (
                   <div className="mt-2">
                     <Skeleton height={21} width={100} />
@@ -248,7 +259,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
                 AVG. APR
               </h2>
-              <div className="text-[1rem] md:text-[1.125rem]">
+              <div
+                data-testid="portfolioAPR"
+                className="text-[1rem] md:text-[1.125rem]"
+              >
                 {$isWeb3Load ? (
                   <div className="mt-2">
                     <Skeleton height={21} width={100} />
@@ -262,7 +276,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                 AVG. APY
               </h2>
-              <div className="text-[1rem] md:text-[1.125rem]">
+              <div
+                data-testid="portfolioAPY"
+                className="text-[1rem] md:text-[1.125rem]"
+              >
                 {$isWeb3Load ? (
                   <div className="mt-2">
                     <Skeleton height={21} width={100} />
@@ -386,7 +403,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
                   TVL
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem]">
+                <div
+                  data-testid="tvl"
+                  className="text-[1rem] md:text-[1.125rem]"
+                >
                   {$isWeb3Load ? (
                     <div className="mt-2">
                       <Skeleton height={21} width={100} />

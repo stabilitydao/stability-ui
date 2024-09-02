@@ -11,7 +11,7 @@ const TimeDifferenceIndicator: React.FC<IProps> = ({ unix }) => {
       {timeDifference.days ? (
         <>
           {timeDifference?.days < 1000 ? (
-            <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
+            <div className="text-[12px] bg-[#6F5648] text-[#F2C4A0] px-2 py-1 rounded-lg border-[2px] border-[#AE642E]">
               {timeDifference.days}
               {timeDifference.days > 1 ? "days" : "day"} {timeDifference.hours}h
               ago

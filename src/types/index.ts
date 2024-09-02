@@ -312,6 +312,15 @@ type TChain = {
   active: boolean;
 };
 
+type TUnderlyingToken = {
+  address: TAddress;
+  symbol: string;
+  decimals: number;
+  balance: number;
+  allowance: number;
+  logoURI: string;
+};
+
 ////          VAULT
 
 type TVaultBalance = {
@@ -521,4 +530,5 @@ export type {
   TVaultDataKey,
   TPlatformGetBalance,
   TChain,
+  TUnderlyingToken,
 };

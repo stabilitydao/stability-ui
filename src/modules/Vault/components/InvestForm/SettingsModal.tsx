@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { TRANSACTION_SETTINGS } from "@constants";
+import { TRANSACTION_SETTINGS } from "../../constants";
 
 import type { TSettings } from "@types";
 

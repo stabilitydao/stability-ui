@@ -14,12 +14,13 @@ import {
   // cbETH,
   CRV,
 } from "./tokens";
+
 import { deployments } from "@stabilitydao/stability";
 
 const APRsType = ["latest", "24h", "week"];
 
 const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
+  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
   {
     name: "Assets",
     keyName: "assetsSymbol",
@@ -128,28 +129,22 @@ const CHAINS = [
     explorer: "https://polygonscan.com/address/",
     active: true, // main page active networks
   },
-  {
-    name: "Base",
-    id: "8453",
-    logoURI: "https://www.base.org/document/favicon-32x32.png",
-    explorer: "https://basescan.org/address/",
-    active: true, // main page active networks
-  },
+  // {
+  //   name: "Base",
+  //   id: "8453",
+  //   logoURI: "https://www.base.org/document/favicon-32x32.png",
+  //   explorer: "https://basescan.org/address/",
+  //   active: true, // main page active networks
+  // },
 ];
 
-const TRANSACTION_SETTINGS = {
-  slippage: ["0.5", "1", "2"],
-  approves: ["limited", "unlimited"],
-  gasLimits: ["1", "1.1"],
-};
+const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "1",
   approves: "unlimited",
   gasLimit: "1.1",
 };
-
-const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const PROTOCOLS = {
   quickSwap: {
@@ -210,6 +205,77 @@ const PROTOCOLS = {
   },
 };
 
+const IL = {
+  GQFS: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.",
+    color: "#7af996",
+  },
+  GQFN: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider (Gamma Narrow LP) provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#f55e11",
+  },
+  GQFW: {
+    rate: 5,
+    title: "Medium",
+    desc: "The strategy of the underlying liquidity provider (Gamma Wide LP) provides liquidity in the wide range, rebalancing the position infrequently (when the price deviates from the average by approximately +-10%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#F5DA5B",
+  },
+  QSF: {
+    rate: 0,
+    title: "None",
+    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+    color: "#4aff71",
+  },
+  CF: {
+    rate: 0,
+    title: "None",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
+  DQMFN: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#f55e11",
+  },
+  IQMF: {
+    rate: 4,
+    title: "Medium",
+    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the wide range, not often rebalancing the position.",
+    color: "#F5DA5B",
+  },
+  CCF: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
+    color: "#7af996",
+  },
+  Y: {
+    rate: 0,
+    title: "None",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
+  QSMF: {
+    rate: 0,
+    title: "None",
+    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+    color: "#4aff71",
+  },
+  LOW: {
+    rate: 3,
+    title: "Low",
+    desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
+    color: "#D7F55B",
+  },
+};
+
+const DEFAULT_ERROR = { state: false, type: "", description: "" };
+
 const STRATEGY_SPECIFIC_SUBSTITUTE: {
   [key: string]: string;
 } = {
@@ -236,8 +302,6 @@ export {
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,
-  TRANSACTION_SETTINGS,
-  DEFAULT_TRANSACTION_SETTINGS,
   GRAPH_ENDPOINTS,
   PROTOCOLS,
   STABILITY_API,
@@ -255,4 +319,7 @@ export {
   CHAINLINK_STABLECOINS,
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
+  DEFAULT_TRANSACTION_SETTINGS,
+  DEFAULT_ERROR,
+  IL,
 };

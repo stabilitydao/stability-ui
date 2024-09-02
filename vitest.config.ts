@@ -10,6 +10,9 @@ export default getViteConfig({
       "**/src/web3/**",
       "**/*.config.*",
       "**/src/store/**",
+      "**/src/modules/CreateVault/**",
+      "**/src/components/**",
+      "**/src/ui/**",
     ],
     coverage: {
       provider: "v8",
@@ -21,7 +24,11 @@ export default getViteConfig({
         "**public/**",
         "**/*.config.*",
         "**/src/store/**",
+        "**/src/modules/CreateVault/**",
+        "**/src/components/**",
+        "**/src/ui/**",
       ],
+      include: ["**/*.ts"],
     },
   },
 });

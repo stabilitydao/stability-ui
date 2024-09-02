@@ -58,6 +58,7 @@ const APRtimeSwitcher = (): JSX.Element => {
           e.stopPropagation();
           setDropDownSelector((prevState) => !prevState);
         }}
+        data-testid="APRTimeSwitcher"
         className="flex items-center justify-between gap-3 rounded-md px-3 h-[30px] bg-button cursor-pointer"
       >
         <p className="text-[16px]">
@@ -97,6 +98,7 @@ const APRtimeSwitcher = (): JSX.Element => {
                   ? "opacity-100"
                   : "opacity-70 hover:opacity-80"
               }`}
+              data-testid="APRType"
             >
               {APRType}
             </p>

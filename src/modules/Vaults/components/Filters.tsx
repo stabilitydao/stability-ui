@@ -13,6 +13,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
   const searchParams = new URLSearchParams(window.location.search);
 
   const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+
   const [activeStrategy, setActiveStrategy] = useState(
     searchParams.get("strategy") ? searchParams.get("strategy") : "All"
   );
@@ -199,6 +200,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     e.stopPropagation();
                     setDropDownSelector((prevState) => !prevState);
                   }}
+                  data-testid="strategyFilterDropdown"
                   className="flex items-center justify-between gap-3 rounded-md px-3 py-1 h-[30px] bg-button cursor-pointer"
                 >
                   <p

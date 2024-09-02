@@ -21,6 +21,7 @@ const HideFeesHandler: React.FC<IProps> = ({ setModalState }) => {
     <button
       onClick={() => setHideFee((prev) => !prev)}
       className="bg-[#262830] rounded-md"
+      data-testid="hideSwapFee"
     >
       <div className="flex items-center justify-center gap-2 px-2 h-[30px]">
         {hideFee ? (

@@ -258,7 +258,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           newData = [];
           time = TVLArr[0].unixTimestamp;
 
-          while (time < lastTimestamp) {
+          do {
             let sortedAPRs = TVLArr.filter((obj) => obj.unixTimestamp < time);
             let lastEl = sortedAPRs[sortedAPRs.length - 1] || TVLArr[0];
 
@@ -270,9 +270,10 @@ const HistoricalRate: React.FC<IProps> = memo(
                 timestamp: TVLArr[TVLArr.length - 1].unixTimestamp,
               });
             }
-          }
+          } while (time < lastTimestamp);
 
           TVLArr = newData.map(formatData);
+
           const TVLWidthPercent =
             (TVLArr[TVLArr.length - 1].unixTimestamp -
               TVLArr[0].unixTimestamp) /
@@ -311,7 +312,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           newData = [];
           time = priceArr[0].unixTimestamp;
 
-          while (time < lastTimestamp) {
+          do {
             let sortedData = priceArr.filter((obj) => obj.unixTimestamp < time);
             let lastEl = sortedData[sortedData.length - 1] || priceArr[0];
             newData.push({ ...lastEl, timestamp: time });
@@ -322,7 +323,7 @@ const HistoricalRate: React.FC<IProps> = memo(
                 timestamp: priceArr[priceArr.length - 1].unixTimestamp,
               });
             }
-          }
+          } while (time < lastTimestamp);
 
           priceArr = newData.map(formatData);
 
