@@ -185,7 +185,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
             </div>
           </div>
           <div className="flex items-center justify-between w-full">
-            <p className="text-[16px]">Last Hard Work</p>
+            <p className="text-[14px]">Last Hard Work</p>
             <TimeDifferenceIndicator unix={state.lastHardWork} />
           </div>
         </div>

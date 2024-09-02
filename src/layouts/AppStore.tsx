@@ -545,7 +545,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     await Promise.all(
       CHAINS.map(async (chain) => {
         /////***** SET VAULTS DATA *****/////
-
         const APIVaultsData = Object.entries(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
         ).map(([, vault]) => vault);

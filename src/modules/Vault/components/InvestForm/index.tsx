@@ -1,19 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import {
-  formatUnits,
-  parseUnits,
-  zeroAddress,
-  maxUint256,
-  getAddress,
-} from "viem";
+
+import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 
 import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 import { TabSwitcher } from "./TabSwitcher";
+import { InvestError } from "./InvestError";
 
 import { Loader, ShareSkeleton, AssetsSkeleton, AssetsProportion } from "@ui";
 
@@ -36,8 +32,6 @@ import {
   ZapABI,
   ERC20MetadataUpgradeableABI,
   wagmiConfig,
-  platforms,
-  PlatformABI,
 } from "@web3";
 
 import {
@@ -47,8 +41,15 @@ import {
   decodeHex,
   setLocalStoreHash,
   getProtocolLogo,
-  addAssetsBalance,
 } from "@utils";
+
+import {
+  getAssetAllowance,
+  getPlatformBalance,
+  getAssetsBalances,
+} from "../../functions";
+
+import { DEFAULT_ERROR } from "@constants";
 
 import type {
   TAddress,
@@ -59,6 +60,9 @@ import type {
   TPlatformsData,
   TVault,
   TBalances,
+  TAsset,
+  TError,
+  TUnderlyingToken,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -82,7 +86,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const { switchChain } = useSwitchChain();
 
   const $vaultData = useStore(vaultData);
-  const $account = useStore(account);
+  const $account: TAddress = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
 
@@ -93,10 +97,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [tab, setTab] = useState("Deposit");
   const [option, setOption] = useState<string[]>([]);
-  const [defaultOptionSymbols, setDefaultOptionSymbols] = useState("");
-  const [defaultOptionAssets, setDefaultOptionAssets] = useState("");
+
+  const [defaultOption, setDefaultOption] = useState({
+    symbols: "",
+    assets: "",
+    assetsArray: [],
+    logos: [],
+  });
+
   const [allowance, setAllowance] = useState<TVaultAllowance>({});
-  const [isApprove, setIsApprove] = useState<number | undefined>();
   const [balances, setBalances] = useState<TVaultBalance>({});
 
   const [inputs, setInputs] = useState<TVaultInput>({});
@@ -106,15 +115,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [withdrawAmount, setWithdrawAmount] = useState<string[] | boolean>(
     false
   );
+
   const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState();
-  const [underlyingToken, setUnderlyingToken] = useState<{
-    address: TAddress;
-    symbol: string;
-    decimals: number;
-    balance: number;
-    allowance: number;
-    logoURI: string;
-  }>({
+  const [underlyingToken, setUnderlyingToken] = useState<TUnderlyingToken>({
     address: "0x0",
     symbol: "",
     decimals: 0,
@@ -125,7 +128,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [underlyingShares, setUnderlyingShares] = useState();
   const [zapShares, setZapShares] = useState();
-  const [zapButton, setZapButton] = useState<string>("none");
+  const [button, setButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<TOptionInfo[]>([]);
   const [approveIndex, setApproveIndex] = useState(false);
 
@@ -133,13 +136,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [activeOptionToken, setActiveOptionToken] = useState<{
     symbol: string;
     address: string;
-    logoURI: string | string[];
+    logoURI: string[];
   }>({
     symbol: "",
     address: "",
-    logoURI: "",
+    logoURI: [],
   });
-  const [defaultOptionImages, setDefaultOptionImages] = useState();
+
   const [settingsModal, setSettingsModal] = useState(false);
 
   const [settings, setSettings] = useState($transactionSettings);
@@ -152,97 +155,91 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [needConfirm, setNeedConfirm] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
 
-  const [error, setError] = useState(false);
-  const [assets, setAssets] = useState<string[]>([]);
+  const [error, setError] = useState<TError>(DEFAULT_ERROR);
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
-  const isSingleTokenStrategy =
-    (vault.strategyInfo.shortName === "CF" ||
-      vault.strategyInfo.shortName === "Y") &&
-    vault.assets[0].address === option[0];
-
-  const underlyingCondition =
-    !underlyingToken || option[0] !== underlyingToken?.address;
-
   let isAnyCCFOptionVisible = false;
 
-  const checkButtonApproveDeposit = (apprDepo: number[]) => {
-    if (
-      vault.strategyInfo.shortName === "IQMF" ||
-      vault.strategyInfo.shortName === "IRMF"
-    ) {
-      if (apprDepo.includes(1)) return true;
+  const checkButtonApproveDeposit = (apprDepo: string[]) => {
+    const { shortName } = vault.strategyInfo;
+
+    if (shortName === "IQMF" || shortName === "IRMF") {
+      if (apprDepo.includes("deposit")) return true;
     }
+
     if (apprDepo.length < 2) {
       return true;
     }
+
     return apprDepo.every((element) => element === apprDepo[0]);
   };
 
   const checkInputsAllowance = (input: bigint[]) => {
-    const apprDepo = [];
+    const apprDepo: string[] = [];
     let change = false;
 
+    const assetsBalances = $assetsBalances[network];
+    const assetsArray = defaultOption?.assetsArray;
+    const { shortName } = vault.strategyInfo;
+
+    const isIRMF = shortName === "IRMF";
+    const isIQMFOrIRMF = shortName === "IQMF" || isIRMF;
+
     for (let i = 0; i < input.length; i++) {
-      if (
-        $assetsBalances[network] &&
-        input[i] > $assetsBalances?.[network]?.[assets[i]]
-      ) {
-        setIsApprove(0);
+      if (assetsBalances && input[i] > assetsBalances?.[assetsArray[i]]) {
+        setButton("insufficientBalance");
         change = true;
+        break;
       }
     }
+
     if (!change) {
       for (let i = 0; i < input.length; i++) {
-        if (vault.strategyInfo.shortName === "IRMF") {
-          if (
-            allowance &&
-            assets &&
-            $assetsBalances[network] &&
-            input[i] <= $assetsBalances[network][assets[0]] &&
-            allowance[assets[0]] >= input[i]
-          ) {
-            apprDepo.push(1);
-          } else {
-            apprDepo.push(2);
-          }
+        const asset = isIRMF ? assetsArray[0] : assetsArray[i];
+        const balance = assetsBalances[asset];
+        const allowanceForAsset = allowance[asset];
+
+        if (input[i] <= balance && allowanceForAsset >= input[i]) {
+          apprDepo.push("deposit");
         } else {
-          if (
-            allowance &&
-            assets &&
-            $assetsBalances[network] &&
-            input[i] <= $assetsBalances[network][assets[i]] &&
-            allowance[assets[i]] >= input[i]
-          ) {
-            apprDepo.push(1);
-          } else {
-            apprDepo.push(2);
-          }
+          apprDepo.push("needApprove");
         }
       }
 
       const button = checkButtonApproveDeposit(apprDepo);
 
       if (button) {
-        if (
-          vault.strategyInfo.shortName === "IQMF" ||
-          vault.strategyInfo.shortName === "IRMF"
-        ) {
-          const index =
-            input.findIndex((amount) => amount) > 0
-              ? input.findIndex((amount) => amount)
-              : 0;
-
-          setIsApprove(apprDepo[index]);
+        if (isIQMFOrIRMF) {
+          const index = input.findIndex((amount) => amount) || 0;
+          setButton(apprDepo[index]);
         } else {
-          setIsApprove(apprDepo[apprDepo.length - 1]);
+          setButton(apprDepo[apprDepo.length - 1]);
         }
       } else {
-        setIsApprove(2);
+        setButton("needApprove");
       }
     }
   };
+
+  const errorHandler = (err: Error) => {
+    lastTx.set("No transaction hash...");
+    if (err instanceof Error) {
+      const errName = err.name;
+      const errorMessageLength =
+        err.message.indexOf("Contract Call:") !== -1
+          ? err.message.indexOf("Contract Call:")
+          : 150;
+
+      const errorMessage = err.message.substring(0, errorMessageLength) + "...";
+
+      setError({ state: true, type: errName, description: errorMessage });
+    }
+    setLoader(false);
+    setNeedConfirm(false);
+    console.error("ERROR:", err);
+  };
+
   ///// INPUTS & OPTIONS
   const optionHandler = (
     option: string[],
@@ -279,7 +276,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       );
       if (
         option.length > 1 ||
-        (defaultOptionAssets === option[0] && option.length < 2)
+        (defaultOption?.assets === option[0] && option.length < 2)
       ) {
         previewDeposit(asset, amount);
       }
@@ -292,20 +289,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setInputs(preview);
     }
   };
-  const resetOptions = () => {
-    if (assets) {
-      const logos = defaultOptionAssets.split(", ").map((address) => {
-        const token = optionTokens.find(
-          (token: TOptionInfo) => token.address.toLowerCase() === address
-        );
-        return token?.logoURI;
-      });
 
-      setOption(assets);
+  const resetOptions = () => {
+    if (defaultOption?.assetsArray) {
+      setOption(defaultOption?.assetsArray);
       setActiveOptionToken({
-        symbol: defaultOptionSymbols,
-        address: defaultOptionAssets,
-        logoURI: logos,
+        symbol: defaultOption?.symbols,
+        address: defaultOption?.assets,
+        logoURI: defaultOption?.logos,
       });
     }
   };
@@ -317,11 +308,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       reset[options[i]] = "";
     }
     setInputs(reset);
-    setIsApprove(undefined);
+    setButton("none");
   };
 
   const resetFormAfterTx = () => {
-    setZapButton("none");
+    setButton("none");
     setZapTokens(false);
     setZapPreviewWithdraw(false);
     setUnderlyingShares(false);
@@ -332,23 +323,28 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const defaultAssetsOption = (assets: string[]) => {
-    const defaultOptionAssets: string[] = [];
+    const symbols: string[] = [];
     const logoURIs: string[] = [];
+
     for (let i = 0; i < assets.length; i++) {
       const token = getTokenData(assets[i].toLowerCase());
+
       if (token) {
-        defaultOptionAssets[i] = token.symbol;
+        symbols.push(token.symbol);
         logoURIs.push(token.logoURI);
-      } else {
-        defaultOptionAssets[i] = "Token not found.";
       }
     }
-    setDefaultOptionSymbols(defaultOptionAssets.join(" + "));
-    setDefaultOptionAssets(assets.join(", "));
-    setDefaultOptionImages(logoURIs);
+
+    setDefaultOption({
+      symbols: symbols.join(" + "),
+      assets: assets.join(", "),
+      assetsArray: assets, // temp
+      logos: logoURIs,
+    });
+
     setActiveOptionToken({
-      symbol: defaultOptionAssets.join(" + "),
-      address: defaultOptionAssets,
+      symbol: symbols.join(" + "),
+      address: symbols,
       logoURI: logoURIs,
     });
   };
@@ -361,11 +357,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     filtredTokens = filtredTokens.filter(
-      (token) => token.address != defaultOptionAssets
+      (token) => token.address != defaultOption?.assets
     );
-    if (assets?.length < 2) {
+    if (defaultOption?.assetsArray?.length < 2) {
       filtredTokens = filtredTokens.filter(
-        (token) => token.address != assets[0]
+        (token) => token.address != defaultOption?.assetsArray[0]
       );
     }
     ///// GET UNDERLYING TOKEN
@@ -420,7 +416,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             logoURI: logo,
           });
         } else {
-          const defaultTokens = defaultOptionSymbols.split(" + ");
+          const defaultTokens = defaultOption?.symbols?.split(" + ");
           setUnderlyingToken({
             address: vault.underlying,
             symbol: `aw${defaultTokens[0]}-${defaultTokens[1]}`,
@@ -431,45 +427,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           });
         }
       }
+    } catch (err) {
+      console.error("UNDERLYING TOKEN ERROR:", err);
+    } finally {
       setOptionTokens(filtredTokens);
-    } catch (error) {
-      setOptionTokens(filtredTokens);
-      console.error("UNDERLYING TOKEN ERROR:", error);
     }
   };
   /////
   /////         ZAP
-  const getZapAllowance = async (asset = option[0]) => {
-    asset = getAddress(asset) as TAddress;
-
-    const address: TAddress = tab === "Deposit" ? asset : vault.address;
-
-    const fromAddress: TAddress =
-      tab === "Deposit" && asset === underlyingToken?.address
-        ? vault?.address
-        : $platformsData?.[network]?.zap;
-
-    const allowanceData = await _publicClient?.readContract({
-      address: address,
-      abi: ERC20ABI,
-      functionName: "allowance",
-      args: [$account as TAddress, fromAddress],
-    });
-
-    return allowanceData;
-  };
 
   const debouncedZap = useCallback(
     debounce(async (amount: string, asset: string) => {
       if (!Number(amount)) {
-        setZapButton("none");
+        setButton("none");
         setZapTokens(false);
         setLoader(false);
         return;
       }
 
       if (tab === "Deposit" && Number(amount) > Number(balances[asset])) {
-        setZapButton("insufficientBalance");
+        setButton("insufficientBalance");
       }
 
       if (
@@ -482,7 +459,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             )
           )
       ) {
-        setZapButton("insufficientBalance");
+        setButton("insufficientBalance");
         setZapTokens(false);
         return;
       }
@@ -507,14 +484,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             Number(formatUnits(allowanceData, 18)) < Number(amount) &&
             Number(amount) <= Number(balances[asset])
           ) {
-            setZapButton("needApprove");
+            setButton("needApprove");
           }
 
           if (
             Number(amount) <= Number(balances[asset]) &&
             Number(formatUnits(allowanceData, 18)) >= Number(amount)
           ) {
-            setZapButton(tab.toLowerCase());
+            setButton(tab.toLowerCase());
           }
 
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
@@ -522,8 +499,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
           );
           setLoader(false);
-        } catch (error) {
-          console.error("UNDERLYING SHARES ERROR:", error);
+        } catch (err) {
+          console.error("UNDERLYING SHARES ERROR:", err);
         }
       } else {
         ///// DEPOSIT / WITHDRAW
@@ -535,25 +512,36 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             return;
           }
 
-          const allowanceData = await getZapAllowance(asset);
+          const allowanceData = await getAssetAllowance(
+            _publicClient,
+            asset,
+            tab,
+            vault?.address,
+            underlyingToken?.address,
+            $platformsData?.[network]?.zap
+          );
+
+          const formattedAllowance = Number(
+            formatUnits(allowanceData, decimals)
+          );
 
           if (tab === "Withdraw") {
-            if (Number(formatUnits(allowanceData, decimals)) < Number(amount)) {
-              setZapButton("needApprove");
+            if (formattedAllowance < Number(amount)) {
+              setButton("needApprove");
             }
             previewWithdraw(amount);
           }
           if (tab === "Deposit") {
             if (
-              Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
+              formattedAllowance < Number(amount) &&
               Number(amount) <= Number(balances[asset])
             ) {
-              setZapButton("needApprove");
+              setButton("needApprove");
             }
             getZapDepositSwapAmounts(amount);
           }
-        } catch (error) {
-          console.error("ZAP ERROR:", error);
+        } catch (err) {
+          console.error("ZAP ERROR:", err);
         }
       }
     }, 1000),
@@ -568,7 +556,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         }) as TVaultInput
     );
 
-    setZapButton("none");
+    setButton("none");
     setZapTokens(false);
     setZapPreviewWithdraw(false);
     setLoader(true);
@@ -579,7 +567,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const zapApprove = async () => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
-    setError(false);
+    setError(DEFAULT_ERROR);
     setTransactionInProgress(true);
     const amount = inputs[option[0]];
 
@@ -630,47 +618,43 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
-        const allowance = formatUnits(await getZapAllowance(), 18);
+        const allowance = formatUnits(
+          await getAssetAllowance(
+            _publicClient,
+            option[0],
+            tab,
+            vault?.address,
+            underlyingToken?.address,
+            $platformsData?.[network]?.zap
+          ),
+          18
+        );
 
         if (Number(allowance) >= Number(amount)) {
           getZapDepositSwapAmounts(amount);
-          setZapButton(tab.toLowerCase());
+          setButton(tab.toLowerCase());
         }
         setLoader(false);
       }
     } catch (err) {
-      lastTx.set("No approve hash...");
-      if (err instanceof Error) {
-        const errName = err.name;
-        const errorMessageLength =
-          err.message.indexOf("Contract Call:") !== -1
-            ? err.message.indexOf("Contract Call:")
-            : 150;
-
-        const errorMessage =
-          err.message.substring(0, errorMessageLength) + "...";
-
-        setError({ name: errName, message: errorMessage });
-      }
-      setLoader(false);
-      setNeedConfirm(false);
-      console.error("APPROVE ERROR:", err);
+      errorHandler(err);
     }
 
     setTransactionInProgress(false);
   };
+
   const zapDeposit = async () => {
     // break point for curve
     if (
       vault?.strategyInfo?.shortName === "CCF" &&
-      defaultOptionAssets.includes(option[0])
+      defaultOption?.assets.includes(option[0])
     ) {
       deposit();
       return;
     }
 
     ///// UNDERLYING
-    setError(false);
+    setError(DEFAULT_ERROR);
     setTransactionInProgress(true);
     setLoader(true);
 
@@ -740,22 +724,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        lastTx.set("No depositAssets hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
-        console.error("UNDERLYING DEPOSIT ERROR:", err);
+        errorHandler(err);
       }
     } else {
       try {
@@ -839,22 +808,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        lastTx.set("No deposit hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
-        console.error("ZAP DEPOSIT ERROR:", err);
+        errorHandler(err);
       }
     }
     setTransactionInProgress(false);
@@ -870,12 +824,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "previewDepositAssets",
-          args: [assets as TAddress[], amounts],
+          args: [defaultOption?.assetsArray as TAddress[], amounts],
         });
         setZapShares(formatUnits(previewDepositAssets[1], 18));
         checkInputsAllowance(option[0]);
-      } catch (error) {
-        console.error("Error: the asset balance is too low to convert.", error);
+      } catch (err) {
+        console.error("Error: the asset balance is too low to convert.", err);
       }
     }
 
@@ -886,7 +840,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setLoader(true);
     if (
       vault?.strategyInfo?.shortName === "CCF" &&
-      defaultOptionAssets.includes(option[0])
+      defaultOption?.assets.includes(option[0])
     ) {
       depositCCF(amount);
       return;
@@ -940,7 +894,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
       }
       setZapTokens(outData);
-      let assets: TAddress[] = vault.assets.map((asset) => asset.address);
       let amounts;
 
       if (
@@ -975,33 +928,40 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         address: vault.address,
         abi: VaultABI,
         functionName: "previewDepositAssets",
-        args: [assets as TAddress[], amounts],
+        args: [defaultOption?.assetsArray as TAddress[], amounts],
       });
       setZapShares(formatUnits(previewDepositAssets[1], 18));
       if ($connected) {
-        const allowanceData = await getZapAllowance(option[0]);
+        const allowanceData = await getAssetAllowance(
+          _publicClient,
+          option[0],
+          tab,
+          vault?.address,
+          underlyingToken?.address,
+          $platformsData?.[network]?.zap
+        );
         if (
           Number(formatUnits(allowanceData, decimals)) < Number(amount) &&
           Number(amount) <= Number(balances[option[0]])
         ) {
-          setZapButton("needApprove");
+          setButton("needApprove");
         }
         if (
           Number(formatUnits(allowanceData, decimals)) >= Number(amount) &&
           Number(amount) <= Number(balances[option[0]])
         ) {
-          setZapButton("deposit");
+          setButton("deposit");
         }
       }
+    } catch (err) {
+      console.error("ZAP DEPOSIT ERROR:", err);
+    } finally {
       setLoader(false);
-    } catch (error) {
-      setLoader(false);
-      console.error("ZAP DEPOSIT ERROR:", error);
     }
   };
 
   const withdrawZapApprove = async () => {
-    setError(false);
+    setError(DEFAULT_ERROR);
     setTransactionInProgress(true);
 
     const amount = inputs[option[0]];
@@ -1051,57 +1011,28 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         if (
           Number(formatUnits(newAllowance, 18)) >= Number(inputs[option[0]])
         ) {
-          setZapButton("withdraw");
+          setButton("withdraw");
         }
         setLoader(false);
       }
     } catch (err) {
-      lastTx.set("No approve hash...");
-      if (err instanceof Error) {
-        const errName = err.name;
-        const errorMessageLength =
-          err.message.indexOf("Contract Call:") !== -1
-            ? err.message.indexOf("Contract Call:")
-            : 150;
-
-        const errorMessage =
-          err.message.substring(0, errorMessageLength) + "...";
-
-        setError({ name: errName, message: errorMessage });
-      }
-      setNeedConfirm(false);
-      setLoader(false);
-      console.error("ZAP ERROR:", err);
+      errorHandler(err);
     }
     setTransactionInProgress(false);
-  };
-
-  const refreshBalance = async () => {
-    const contractBalance = await _publicClient?.readContract({
-      address: platforms[network],
-      abi: PlatformABI,
-      functionName: "getBalance",
-      args: [$account as TAddress],
-    });
-
-    const currentChainBalances = addAssetsBalance(contractBalance);
-
-    const oldBalances = assetsBalances.get();
-    oldBalances[network] = currentChainBalances;
-
-    assetsBalances.set(oldBalances);
-
-    return currentChainBalances;
   };
 
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
-    const currentBalances: TBalances = await refreshBalance();
+    const currentBalances: TBalances = await getPlatformBalance(
+      _publicClient,
+      network,
+      $account
+    );
 
     setRotation(rotation + 360);
     setLoader(true);
-    loadAssetsBalances(currentBalances);
+    getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
     zapInputHandler(inputs[option[0]], option[0]);
   };
   /////
@@ -1116,12 +1047,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ? maxUint256
         : parseUnits(amount, decimals);
 
-    setError(false);
+    setError(DEFAULT_ERROR);
     const needApprove = option.filter(
       (asset: TAddress) =>
-        allowance &&
         formatUnits(allowance[asset], Number(getTokenData(asset)?.decimals)) <
-          inputs[asset]
+        inputs[asset]
     );
     if (vault.address) {
       try {
@@ -1170,12 +1100,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
               inputs[asset]
           ) {
-            setIsApprove(1);
+            setButton("deposit");
           }
           setLoader(false);
         }
       } catch (err) {
-        lastTx.set("No approve hash...");
         const newAllowance = (await _publicClient?.readContract({
           address: asset,
           abi: ERC20ABI,
@@ -1193,29 +1122,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
             inputs[asset]
         ) {
-          setIsApprove(1);
+          setButton("deposit");
         }
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
+        errorHandler(err);
       }
     }
     setApproveIndex(false);
   };
 
   const deposit = async () => {
-    setError(false);
+    setError(DEFAULT_ERROR);
     setTransactionInProgress(true);
     let assets: string[] = [];
     let input: any = [];
@@ -1330,28 +1246,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
     } catch (err) {
-      lastTx.set("No depositAssets hash...");
-      if (err instanceof Error) {
-        const errName = err.name;
-        const errorMessageLength =
-          err.message.indexOf("Contract Call:") !== -1
-            ? err.message.indexOf("Contract Call:")
-            : 150;
-
-        const errorMessage =
-          err.message.substring(0, errorMessageLength) + "...";
-
-        setError({ name: errName, message: errorMessage });
-      }
-      setNeedConfirm(false);
-      setLoader(false);
-      console.error("DEPOSIT ASSETS ERROR:", err);
+      errorHandler(err);
     }
     setTransactionInProgress(false);
   };
 
   const withdraw = async () => {
-    setError(false);
+    setError(DEFAULT_ERROR);
     setTransactionInProgress(true);
     const sharesToBurn = parseUnits(inputs[option[0]], 18);
 
@@ -1360,7 +1261,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     ///// 2ASSETS -> UNDERLYING -> ZAP
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
-    let localAssets = assets;
+    let localAssets = defaultOption?.assetsArray;
     if (
       vault.strategyInfo.shortName === "IQMF" ||
       vault.strategyInfo.shortName === "IRMF"
@@ -1422,25 +1323,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        lastTx.set("No withdrawAssets hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
-        console.error("WITHDRAW ERROR:", err);
+        errorHandler(err);
       }
     } else if (
-      (defaultOptionAssets === option[0] && option.length < 2) ||
+      (defaultOption?.assets === option[0] && option.length < 2) ||
       option.length > 1
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
@@ -1501,22 +1387,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        lastTx.set("No withdrawAssets hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
-        console.error("WITHDRAW ERROR:", err);
+        errorHandler(err);
       }
     } else {
       const optionAmount = zapPreviewWithdraw.reduce(
@@ -1591,50 +1462,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        lastTx.set("No withdraw hash...");
-        if (err instanceof Error) {
-          const errName = err.name;
-          const errorMessageLength =
-            err.message.indexOf("Contract Call:") !== -1
-              ? err.message.indexOf("Contract Call:")
-              : 150;
-
-          const errorMessage =
-            err.message.substring(0, errorMessageLength) + "...";
-
-          setError({ name: errName, message: errorMessage });
-        }
-        setNeedConfirm(false);
-        setLoader(false);
-        console.error("WITHDRAW ERROR:", err);
+        errorHandler(err);
       }
     }
     setTransactionInProgress(false);
   };
 
-  const loadAssetsBalances = (
-    balances: Balances = $assetsBalances[network]
-  ) => {
-    const balance: TVaultBalance | any = {};
-
-    if (balances) {
-      for (let i = 0; i < option.length; i++) {
-        const decimals = getTokenData(option[i])?.decimals;
-
-        if (decimals) {
-          balance[option[i]] = formatUnits(
-            balances[option[i].toLowerCase()],
-            decimals
-          );
-        }
-      }
-    }
-    if (underlyingToken && underlyingToken?.address === option[0]) {
-      balance[option[0]] = underlyingToken.balance;
-    }
-
-    setBalances(balance);
-  };
   const debouncedPreviewWithdraw = useCallback(
     debounce(async (value: string) => {
       const balance = Number(
@@ -1647,7 +1480,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
 
       if (Number(value) > balance) {
-        setZapButton("insufficientBalance");
+        setButton("insufficientBalance");
         return;
       }
 
@@ -1669,10 +1502,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             amount: formatUnits(result[0], 18),
           },
         ]);
-        setZapButton("withdraw");
+        setButton("withdraw");
       } else {
-        let assetsLength = assets.map((_: string) => 0n);
-        let localAssets = assets;
+        let assetsLength = defaultOption?.assetsArray.map((_: string) => 0n);
+        let localAssets = defaultOption?.assetsArray;
         if (
           vault.strategyInfo.shortName === "IQMF" ||
           vault.strategyInfo.shortName === "IRMF"
@@ -1689,7 +1522,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           account: $account as TAddress,
         });
         if (
-          (defaultOptionAssets === option[0] && option.length < 2) ||
+          (defaultOption?.assets === option[0] && option.length < 2) ||
           option.length > 1
         ) {
           const preview = result.map((amount: any, index: number) => {
@@ -1710,12 +1543,22 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             };
           });
           setWithdrawAmount(preview);
-          setZapButton("withdraw");
+          setButton("withdraw");
           setLoader(false);
         } else {
           try {
             setLoader(true);
-            const allowanceData: any = formatUnits(await getZapAllowance(), 18);
+            const allowanceData: any = formatUnits(
+              await getAssetAllowance(
+                _publicClient,
+                option[0],
+                tab,
+                vault?.address,
+                underlyingToken?.address,
+                $platformsData?.[network]?.zap
+              ),
+              18
+            );
 
             const promises = result.map(
               async (amount, index) =>
@@ -1734,15 +1577,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             setZapPreviewWithdraw(outData);
 
             if (Number(allowanceData) < Number(value)) {
-              setZapButton("needApprove");
+              setButton("needApprove");
             } else {
-              setZapButton("withdraw");
+              setButton("withdraw");
             }
-
+          } catch (err) {
+            console.error("WITHDRAW ERROR:", err);
+          } finally {
             setLoader(false);
-          } catch (error) {
-            setLoader(false);
-            console.error("WITHDRAW ERROR:", error);
           }
         }
       }
@@ -1757,7 +1599,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const checkAllowance = async () => {
     if (!$connected) return;
-    const allowanceResult: TVaultAllowance | any = {};
+
+    const allowanceResult: TVaultAllowance | any = allowance;
 
     for (let i = 0; i < option.length; i++) {
       const allowanceData = await _publicClient?.readContract({
@@ -1779,8 +1622,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const previewDeposit = async (asset: string, amount: string) => {
     if (!Number(amount)) return;
     setLoader(true);
-    if (assets) {
-      const changedInput = assets?.indexOf(asset);
+    if (defaultOption?.assetsArray) {
+      const changedInput = defaultOption?.assetsArray?.indexOf(asset);
       const preview: TVaultInput | any = {};
       if (option) {
         let amounts: bigint[] = [];
@@ -1827,7 +1670,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
-              args: [assets as TAddress[], amounts],
+              args: [defaultOption?.assetsArray as TAddress[], amounts],
             });
           } else {
             // IQMF & IRMF strategy only
@@ -1850,10 +1693,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           const previewDepositAssetsArray: bigint[] = [
             ...previewDepositAssets[0],
           ];
-          for (let i = 0; i < assets?.length; i++) {
-            const decimals = getTokenData(assets[i])?.decimals;
+          for (let i = 0; i < defaultOption?.assetsArray?.length; i++) {
+            const decimals = getTokenData(
+              defaultOption?.assetsArray[i]
+            )?.decimals;
             if (i !== changedInput && decimals) {
-              preview[assets[i]] = formatUnits(
+              preview[defaultOption?.assetsArray[i]] = formatUnits(
                 previewDepositAssetsArray[i],
                 decimals
               );
@@ -1863,76 +1708,76 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             ...prevInputs,
             ...preview,
           }));
-        } catch (error) {
-          console.error(
-            "Error: the asset balance is too low to convert.",
-            error
-          );
-          setIsApprove(undefined);
+        } catch (err) {
+          console.error("Error: the asset balance is too low to convert.", err);
+          setButton("none");
         }
       }
     }
     setLoader(false);
   };
 
+  const isSingleTokenStrategy = useMemo(() => {
+    return (
+      vault.strategyInfo.shortName === "CF" ||
+      (vault.strategyInfo.shortName === "Y" &&
+        vault.assets[0].address === option[0])
+    );
+  }, [vault]);
+
+  const isNotUnderlying = useMemo(
+    () => !underlyingToken || option[0] !== underlyingToken?.address,
+    [underlyingToken]
+  );
+
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
 
-  useEffect(() => {
-    if (vault) {
-      const assetsData = vault.assets
-        .map((asset: any) => asset.address.toLowerCase())
-        .filter((_, index) => vault.assetsProportions[index]);
-      if (Array.isArray(assetsData)) {
-        setAssets(assetsData);
-        setOption(assetsData);
-        defaultAssetsOption(assetsData);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (
-      vault.strategyInfo.shortName === "IQMF" ||
-      vault.strategyInfo.shortName === "IRMF"
-    ) {
-      let assetsData;
-      switch (tab) {
-        case "Deposit":
-          assetsData = vault.assets
-            .map((asset: any) => asset.address.toLowerCase())
-            .filter((_, index) => vault.assetsProportions[index]);
-          if (Array.isArray(assetsData)) {
-            setAssets(assetsData);
-            setOption(assetsData);
-            defaultAssetsOption(assetsData);
-          }
-          break;
-        case "Withdraw":
-          assetsData = vault.assets.map((asset: any) =>
-            asset.address.toLowerCase()
-          );
-
-          if (Array.isArray(assetsData)) {
-            setAssets(assetsData);
-            setOption(assetsData);
-            defaultAssetsOption(assetsData);
-          }
-          break;
-        default:
-          break;
-      }
-    }
-  }, [tab]);
+  // useEffect(() => {
+  //   if (
+  //     vault.strategyInfo.shortName === "IQMF" ||
+  //     vault.strategyInfo.shortName === "IRMF"
+  //   ) {
+  //     let assetsData = vault.assets.map((asset: TAsset) =>
+  //       asset.address.toLowerCase()
+  //     );
+  //     switch (tab) {
+  //       case "Deposit":
+  //         assetsData = assetsData.filter(
+  //           (_, index) => vault.assetsProportions[index]
+  //         );
+  //         if (assetsData?.length) {
+  //           setAssets(assetsData);
+  //           setOption(assetsData);
+  //           defaultAssetsOption(assetsData);
+  //         }
+  //         break;
+  //       case "Withdraw":
+  //         if (assetsData?.length) {
+  //           setAssets(assetsData);
+  //           setOption(assetsData);
+  //           defaultAssetsOption(assetsData);
+  //         }
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   }
+  // }, [tab]);
 
   useEffect(() => {
     checkAllowance();
-    loadAssetsBalances();
+    getAssetsBalances(
+      $assetsBalances[network],
+      setBalances,
+      option,
+      underlyingToken
+    );
   }, [option, $assetsBalances]);
 
   useEffect(() => {
-    setZapButton("none");
+    setButton("none");
     setSharesOut(false);
     setWithdrawAmount(false);
     setUnderlyingShares(false);
@@ -1951,7 +1796,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     if (vault) {
       selectTokensHandler();
     }
-  }, [vault, $tokens, defaultOptionSymbols, assets]);
+  }, [vault, $tokens, defaultOption, defaultOption]);
 
   useEffect(() => {
     setZapTokens(false);
@@ -1980,7 +1825,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     zapTokens,
     withdrawAmount,
     zapPreviewWithdraw,
-    zapButton,
+    button,
     transactionInProgress,
   ]);
 
@@ -1993,26 +1838,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
     setIsRefresh(true);
   }, [option, inputs]);
-  /////
-  useEffect(() => {
-    if (
-      (!activeOptionToken.symbol || !activeOptionToken.address) &&
-      optionTokens
-    ) {
-      const logos = defaultOptionAssets.split(", ").map((address) => {
-        const token = optionTokens.find(
-          (token: any) => token.address.toLowerCase() === address.toLowerCase()
-        );
 
-        return token?.logoURI;
-      });
-      setActiveOptionToken({
-        symbol: defaultOptionSymbols,
-        address: defaultOptionAssets,
-        logoURI: logos,
-      });
-    }
-  }, [defaultOptionAssets, defaultOptionSymbols, optionTokens]);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -2030,6 +1856,19 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [tokenSelectorRef]);
+
+  useEffect(() => {
+    if (vault) {
+      const assetsData = vault.assets
+        .map((asset: TAsset) => asset.address.toLowerCase())
+        .filter((_, index) => vault.assetsProportions[index]);
+      if (assetsData?.length) {
+        setOption(assetsData);
+        defaultAssetsOption(assetsData);
+      }
+    }
+  }, []);
+
   return (
     <div className="bg-button rounded-md">
       <TabSwitcher
@@ -2050,41 +1889,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  {activeOptionToken?.logoURI &&
-                  Array.isArray(activeOptionToken?.logoURI) ? (
-                    <div className="flex items-center">
-                      {$connected && defaultOptionImages
-                        ? defaultOptionImages.map((logo: string) => (
-                            <img
-                              key={Math.random()}
-                              className="max-w-6 max-h-6 rounded-full"
-                              src={logo}
-                              alt="logo"
-                            />
-                          ))
-                        : activeOptionToken?.logoURI.map((logo: string) => (
-                            <img
-                              key={Math.random()}
-                              className="max-w-6 max-h-6 rounded-full"
-                              src={logo}
-                              alt="logo"
-                            />
-                          ))}
-                    </div>
-                  ) : (
-                    activeOptionToken?.logoURI && (
+                  <div className="flex items-center">
+                    {activeOptionToken?.logoURI?.map((logo: string) => (
                       <img
+                        key={Math.random()}
                         className="max-w-6 max-h-6 rounded-full"
-                        src={activeOptionToken?.logoURI}
+                        src={logo}
                         alt="logo"
                       />
-                    )
-                  )}
+                    ))}
+                  </div>
                   <p className="text-[16px] md:text-[15px] lg:text-[20px]">
                     {activeOptionToken?.symbol}
                   </p>
                 </div>
-
                 <svg
                   width="15"
                   height="9"
@@ -2107,36 +1925,35 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 <div
                   onClick={() => {
                     optionHandler(
-                      defaultOptionAssets.split(", "),
-                      defaultOptionSymbols,
-                      defaultOptionAssets,
-                      defaultOptionImages
+                      defaultOption?.assets.split(", "),
+                      defaultOption?.symbols,
+                      defaultOption?.assets,
+                      defaultOption?.logos
                     );
                   }}
                   className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
                 >
-                  {defaultOptionImages?.length && (
-                    <div
-                      className={`flex items-center ${
-                        defaultOptionImages?.length < 2 && "ml-3"
-                      }`}
-                    >
-                      {defaultOptionImages.map((logo: string) => (
-                        <img
-                          key={Math.random()}
-                          className="max-w-6 max-h-6 rounded-full"
-                          src={logo}
-                          alt="logo"
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <div
+                    className={`flex items-center ${
+                      defaultOption?.logos?.length < 2 && "ml-3"
+                    }`}
+                  >
+                    {defaultOption?.logos?.map((logo: string) => (
+                      <img
+                        key={Math.random()}
+                        className="max-w-6 max-h-6 rounded-full"
+                        src={logo}
+                        alt="logo"
+                      />
+                    ))}
+                  </div>
+
                   <p
                     className={`${
-                      defaultOptionImages?.length < 2 ? "ml-2" : "ml-[-4px]"
+                      defaultOption?.logos?.length < 2 ? "ml-2" : "ml-[-4px]"
                     }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}
                   >
-                    {defaultOptionSymbols}
+                    {defaultOption?.symbols}
                   </p>
                 </div>
                 {underlyingToken && (
@@ -2147,7 +1964,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         [underlyingToken?.address],
                         underlyingToken?.symbol,
                         underlyingToken?.address,
-                        getProtocolLogo(vault.strategyInfo.shortName)
+                        [getProtocolLogo(vault.strategyInfo.shortName)]
                       );
                     }}
                   >
@@ -2164,45 +1981,31 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   </div>
                 )}
                 {/* CRV Strategy don't have zap withdraw */}
-                {vault?.strategyInfo?.shortName === "CCF" && tab === "Withdraw"
-                  ? null
-                  : optionTokens.map(
-                      ({
-                        address,
-                        symbol,
-                        logoURI,
-                      }: {
-                        address: TAddress;
-                        symbol: string;
-                        logoURI: string;
-                      }) => {
-                        return (
-                          <div
-                            className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
-                            key={address}
-                            onClick={() => {
-                              optionHandler(
-                                [address],
-                                symbol,
-                                address,
-                                logoURI
-                              );
-                            }}
-                          >
-                            {logoURI && (
-                              <img
-                                className="max-w-6 max-h-6 rounded-full"
-                                src={logoURI}
-                                alt="logo"
-                              />
-                            )}
-                            <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                              {symbol}
-                            </p>
-                          </div>
-                        );
-                      }
-                    )}
+                {!(
+                  vault?.strategyInfo?.shortName === "CCF" && tab === "Withdraw"
+                ) &&
+                  optionTokens.map(({ address, symbol, logoURI }) => {
+                    return (
+                      <div
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                        key={address}
+                        onClick={() => {
+                          optionHandler([address], symbol, address, [logoURI]);
+                        }}
+                      >
+                        {logoURI && (
+                          <img
+                            className="max-w-6 max-h-6 rounded-full"
+                            src={logoURI}
+                            alt="logo"
+                          />
+                        )}
+                        <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
+                          {symbol}
+                        </p>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -2264,13 +2067,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
         </div>
 
-        {tab === "Deposit" && (
+        {tab === "Deposit" ? (
           <>
             {option?.length > 1 ||
-            (defaultOptionAssets === option[0] && option.length < 2) ? (
+            (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
                 <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
-                  {option.map((asset: any) => (
+                  {option.map((asset: string) => (
                     <div className="w-full" key={asset}>
                       {!!balances[asset] && (
                         <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
@@ -2368,7 +2171,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     <ShareSkeleton />
                   ) : (
                     <div className="h-[63px] text-[18px]">
-                      {sharesOut && (
+                      {!!sharesOut && (
                         <div>
                           <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
                             YOU RECEIVE
@@ -2397,102 +2200,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </div>
                   )}
                 </div>
-                {$connected ? (
-                  <>
-                    {chain?.id === Number(network) ? (
-                      <>
-                        {isApprove === 1 ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            type="button"
-                            onClick={deposit}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Deposit"}
-                            </p>
-
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
-                            )}
-                          </button>
-                        ) : isApprove === 2 ? (
-                          <div className="flex gap-3">
-                            {option.map(
-                              (asset: any, index: number) =>
-                                allowance &&
-                                formatUnits(
-                                  allowance[asset],
-                                  Number(getTokenData(asset)?.decimals)
-                                ) < inputs[asset] && (
-                                  <button
-                                    disabled={approveIndex !== false}
-                                    className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                      approveIndex === index
-                                        ? "bg-transparent flex items-center justify-center gap-1"
-                                        : "bg-[#486556]"
-                                    }`}
-                                    key={asset}
-                                    type="button"
-                                    onClick={() =>
-                                      approve(asset as TAddress, index)
-                                    }
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : `Approve ${
-                                            getTokenData(asset)?.symbol
-                                          }`}
-                                    </p>
-                                    {approveIndex === index && (
-                                      <Loader color={"#486556"} />
-                                    )}
-                                  </button>
-                                )
-                            )}
-                          </div>
-                        ) : isApprove === 0 ? (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                          >
-                            INSUFFICIENT BALANCE
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                          >
-                            {loader ? "LOADING..." : "ENTER AMOUNT"}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          switchChain({ chainId: Number(network) })
-                        }
-                        className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                        type="button"
-                      >
-                        <p>SWITCH NETWORK</p>
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                    onClick={() => open()}
-                  >
-                    CONNECT WALLET
-                  </button>
-                )}
               </>
             ) : (
               <div>
@@ -2591,7 +2298,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </p>
                   </div>
                   <div className="my-2 ml-2 flex flex-col gap-2">
-                    {underlyingCondition && (
+                    {isNotUnderlying && (
                       <>
                         <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
                           SWAPS
@@ -2604,7 +2311,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               <>
                                 {vault?.strategyInfo?.shortName !== "CCF" ? (
                                   <div>
-                                    {zapTokens.map((token: any) => (
+                                    {zapTokens?.map((token: any) => (
                                       <div
                                         className="text-[18px]  flex items-center gap-1 ml-2"
                                         key={token.address}
@@ -2775,14 +2482,385 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </div>
                   </div>
                 </div>
-                {vault?.strategyInfo?.shortName === "CCF" &&
-                defaultOptionAssets.includes(option[0]) ? (
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="grid mt-[15px] text-[15px] w-full">
+              {!!balances[option[0]] && (
+                <div className="text-left text-[gray] ml-2">
+                  Balance:{" "}
+                  {parseFloat(
+                    formatUnits(
+                      $vaultData[network][vault.address].vaultUserBalance,
+                      18
+                    )
+                  )}
+                </div>
+              )}
+
+              <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
+                {!!balances[option[0]] && (
+                  <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => {
+                          zapInputHandler(
+                            formatUnits(
+                              $vaultData[network][vault.address]
+                                ?.vaultUserBalance,
+                              18
+                            ),
+                            option[0]
+                          );
+                          previewWithdraw(
+                            formatUnits(
+                              $vaultData[network][vault.address]
+                                ?.vaultUserBalance,
+                              18
+                            )
+                          );
+                        }}
+                        type="button"
+                        className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
+                      >
+                        MAX
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <input
+                  list="amount"
+                  id={option.join(", ")}
+                  value={inputs[option[0]]}
+                  name="amount"
+                  placeholder="0"
+                  onChange={(e) => {
+                    zapInputHandler(e.target.value, e.target.id);
+                    previewWithdraw(e.target.value);
+                    handleInputChange(e.target.value, e.target.id);
+                  }}
+                  onKeyDown={(evt) => {
+                    const currentValue = inputs[option[0]];
+
+                    if (
+                      !/[\d.]/.test(evt.key) &&
+                      evt.key !== "Backspace" &&
+                      evt.key !== "ArrowLeft" &&
+                      evt.key !== "ArrowRight"
+                    ) {
+                      evt.preventDefault();
+                    }
+
+                    if (
+                      evt.key === "." &&
+                      currentValue &&
+                      currentValue.includes(".")
+                    ) {
+                      evt.preventDefault();
+                    }
+                  }}
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  inputMode="decimal"
+                  className="py-3 flex items-center h-full  bg-transparent  text-[16px] w-[70%] pl-[10px]"
+                />
+              </div>
+
+              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                <p>
+                  $
+                  {$assetsPrices[network] && inputs[option[0]] > 0
+                    ? (Number(vault.shareprice) * inputs[option[0]]).toFixed(2)
+                    : 0}
+                </p>
+              </div>
+            </div>
+            <div className="my-2 ml-2 flex flex-col gap-2">
+              {(option.length > 1 ||
+                isSingleTokenStrategy ||
+                !isNotUnderlying) && (
+                <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
+                  YOU RECEIVE
+                </p>
+              )}
+
+              <div className="h-[100px]">
+                {(option.length > 1 ||
+                  isSingleTokenStrategy ||
+                  !isNotUnderlying) &&
+                  option.map((address, index) => (
+                    <div className="flex items-center gap-1" key={address}>
+                      {isNotUnderlying ? (
+                        <img
+                          src={getTokenData(address)?.logoURI}
+                          alt={getTokenData(address)?.symbol}
+                          title={getTokenData(address)?.symbol}
+                          className="w-6 h-6 rounded-full"
+                        />
+                      ) : (
+                        <img
+                          src={underlyingToken?.logoURI}
+                          alt={underlyingToken?.symbol}
+                          title={underlyingToken?.symbol}
+                          className="w-6 h-6 rounded-full"
+                        />
+                      )}
+                      {loader && !transactionInProgress ? (
+                        <ShareSkeleton height={32} />
+                      ) : (
+                        <p>
+                          {withdrawAmount
+                            ? withdrawAmount[index]?.amountInUSD
+                              ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
+                              : `${withdrawAmount[index]?.amount}`
+                            : "0 ($0)"}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                {!isSingleTokenStrategy && isNotUnderlying && (
+                  <div>
+                    {option.length < 2 && (
+                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                        SWAPS
+                      </p>
+                    )}
+                    {loader && option.length < 2 && !transactionInProgress ? (
+                      <AssetsSkeleton />
+                    ) : (
+                      <div>
+                        {zapPreviewWithdraw &&
+                          zapPreviewWithdraw?.map(
+                            ({
+                              address,
+                              amountIn,
+                              amountOut,
+                            }: {
+                              address: TAddress;
+                              amountIn: string;
+                              amountOut: string;
+                              symbol: string;
+                            }) => (
+                              <div key={amountIn}>
+                                {address.toLowerCase() !==
+                                  option[0].toLowerCase() && (
+                                  <div className="flex">
+                                    <img
+                                      src="/oneInch.svg"
+                                      alt="1inch logo"
+                                      title="1inch"
+                                    />
+                                    {!!amountOut ? (
+                                      <>
+                                        <div className="flex items-center gap-1">
+                                          <p>{Number(amountIn).toFixed(6)}</p>
+                                          <img
+                                            src={getTokenData(address)?.logoURI}
+                                            title={
+                                              getTokenData(address)?.symbol
+                                            }
+                                            alt={getTokenData(address)?.symbol}
+                                            className="w-6 h-6 rounded-full"
+                                          />
+                                        </div>
+                                        -&gt;
+                                        <div className="flex items-center gap-1">
+                                          <p>{Number(amountOut).toFixed(6)}</p>
+
+                                          <img
+                                            src={
+                                              getTokenData(option[0])?.logoURI
+                                            }
+                                            title={
+                                              getTokenData(option[0])?.symbol
+                                            }
+                                            alt={
+                                              getTokenData(option[0])?.symbol
+                                            }
+                                            className="w-6 h-6 rounded-full"
+                                          />
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <img
+                                        src="/error.svg"
+                                        alt="error img"
+                                        title="error"
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {option.length < 2 &&
+                isNotUnderlying &&
+                !isSingleTokenStrategy && (
+                  <div className="mt-5">
+                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
+                      YOU RECEIVE
+                    </p>
+                    <div className="h-[63px]">
+                      <div className="flex items-center gap-1">
+                        <img
+                          src={getTokenData(option[0])?.logoURI}
+                          alt={getTokenData(option[0])?.symbol}
+                          title={getTokenData(option[0])?.symbol}
+                          className="w-6 h-6 rounded-full"
+                        />
+                        {loader && !transactionInProgress ? (
+                          <ShareSkeleton height={32} />
+                        ) : (
+                          <div>
+                            {zapPreviewWithdraw ? (
+                              <div className="flex items-center gap-1">
+                                <p>
+                                  {(
+                                    Number(
+                                      Number(zapPreviewWithdraw[0]?.amountOut)
+                                        ? zapPreviewWithdraw[0]?.amountOut
+                                        : zapPreviewWithdraw[0]?.amountIn
+                                    ) +
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)
+                                  ).toFixed(5)}
+                                </p>
+                                <p>{`($${(
+                                  (Number(
+                                    Number(zapPreviewWithdraw[0]?.amountOut)
+                                      ? zapPreviewWithdraw[0]?.amountOut
+                                      : zapPreviewWithdraw[0]?.amountIn
+                                  ) +
+                                    (zapPreviewWithdraw[1]
+                                      ? Number(
+                                          Number(
+                                            zapPreviewWithdraw[1]?.amountOut
+                                          )
+                                            ? zapPreviewWithdraw[1]?.amountOut
+                                            : zapPreviewWithdraw[1]?.amountIn
+                                        )
+                                      : 0)) *
+                                  Number(
+                                    $assetsPrices[network][option[0]].price
+                                  )
+                                ).toFixed(2)})`}</p>
+                              </div>
+                            ) : (
+                              <p>0 ($0)</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+            </div>
+          </>
+        )}
+
+        {$connected ? (
+          <>
+            {chain?.id === Number(network) ? (
+              <>
+                {tab === "Deposit" ? (
                   <>
-                    {$connected ? (
+                    {option?.length > 1 ||
+                    (defaultOption?.assets === option[0] &&
+                      option.length < 2) ? (
                       <>
-                        {chain?.id === Number(network) ? (
+                        {button === "deposit" ? (
+                          <button
+                            disabled={transactionInProgress}
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            type="button"
+                            onClick={deposit}
+                          >
+                            <p>
+                              {needConfirm ? "Confirm in wallet" : "Deposit"}
+                            </p>
+
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : button === "needApprove" ? (
+                          <div className="flex gap-3">
+                            {option.map(
+                              (asset: any, index: number) =>
+                                allowance &&
+                                formatUnits(
+                                  allowance[asset],
+                                  Number(getTokenData(asset)?.decimals)
+                                ) < inputs[asset] && (
+                                  <button
+                                    disabled={approveIndex !== false}
+                                    className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                      approveIndex === index
+                                        ? "bg-transparent flex items-center justify-center gap-1"
+                                        : "bg-[#486556]"
+                                    }`}
+                                    key={asset}
+                                    type="button"
+                                    onClick={() =>
+                                      approve(asset as TAddress, index)
+                                    }
+                                  >
+                                    <p>
+                                      {needConfirm
+                                        ? "Confirm in wallet"
+                                        : `Approve ${
+                                            getTokenData(asset)?.symbol
+                                          }`}
+                                    </p>
+                                    {approveIndex === index && (
+                                      <Loader color={"#486556"} />
+                                    )}
+                                  </button>
+                                )
+                            )}
+                          </div>
+                        ) : button === "insufficientBalance" ? (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                          >
+                            INSUFFICIENT BALANCE
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                          >
+                            {loader ? "LOADING..." : "ENTER AMOUNT"}
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <div>
+                        {vault?.strategyInfo?.shortName === "CCF" &&
+                        defaultOption?.assets?.includes(option[0]) ? (
                           <>
-                            {isApprove === 1 ? (
+                            {button === "deposit" ? (
                               <button
                                 disabled={transactionInProgress}
                                 className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2803,7 +2881,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   <Loader color={"#486556"} />
                                 )}
                               </button>
-                            ) : isApprove === 2 ? (
+                            ) : button === "needApprove" ? (
                               <div className="flex gap-3">
                                 {option.map((asset: any, index: number) => {
                                   if (
@@ -2867,7 +2945,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   </button>
                                 )}
                               </div>
-                            ) : isApprove === 0 ? (
+                            ) : button === "insufficientBalance" ? (
                               <button
                                 disabled
                                 className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
@@ -2884,41 +2962,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             )}
                           </>
                         ) : (
-                          <button
-                            onClick={() =>
-                              switchChain({ chainId: Number(network) })
-                            }
-                            className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                            type="button"
-                          >
-                            <p>SWITCH NETWORK</p>
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                        onClick={() => open()}
-                      >
-                        CONNECT WALLET
-                      </button>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {$connected ? (
-                      <>
-                        {chain?.id === Number(network) ? (
                           <>
-                            {zapButton === "insufficientBalance" ? (
+                            {button === "insufficientBalance" ? (
                               <button
                                 disabled
                                 className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
                               >
                                 INSUFFICIENT BALANCE
                               </button>
-                            ) : zapButton === "needApprove" ? (
+                            ) : button === "needApprove" ? (
                               <button
                                 disabled={transactionInProgress}
                                 className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2942,7 +2994,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   <Loader color={"#486556"} />
                                 )}
                               </button>
-                            ) : zapButton === "deposit" ? (
+                            ) : button === "deposit" ? (
                               <button
                                 disabled={transactionInProgress}
                                 className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2971,480 +3023,79 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               </button>
                             )}
                           </>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              switchChain({ chainId: Number(network) })
-                            }
-                            className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                            type="button"
-                          >
-                            <p>SWITCH NETWORK</p>
-                          </button>
                         )}
-                      </>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {button === "insufficientBalance" ? (
+                      <button
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                      >
+                        INSUFFICIENT BALANCE
+                      </button>
+                    ) : button === "needApprove" ? (
+                      <button
+                        disabled={transactionInProgress}
+                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                          transactionInProgress
+                            ? "bg-transparent flex items-center justify-center gap-2"
+                            : "bg-[#486556]"
+                        }`}
+                        type="button"
+                        onClick={withdrawZapApprove}
+                      >
+                        <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
+                        {transactionInProgress && <Loader color={"#486556"} />}
+                      </button>
+                    ) : button === "withdraw" ? (
+                      <button
+                        disabled={transactionInProgress}
+                        type="button"
+                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                          transactionInProgress
+                            ? "bg-transparent flex items-center justify-center gap-2"
+                            : "bg-[#486556]"
+                        }`}
+                        onClick={withdraw}
+                      >
+                        <p>{needConfirm ? "Confirm in wallet" : "WITHDRAW"}</p>
+                        {transactionInProgress && <Loader color={"#486556"} />}
+                      </button>
                     ) : (
                       <button
-                        type="button"
-                        className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-                        onClick={() => open()}
+                        disabled
+                        className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
                       >
-                        CONNECT WALLET
+                        {loader ? "LOADING..." : "ENTER AMOUNT"}
                       </button>
                     )}
                   </>
                 )}
-              </div>
+              </>
+            ) : (
+              <button
+                onClick={() => switchChain({ chainId: Number(network) })}
+                className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
+                type="button"
+              >
+                SWITCH NETWORK
+              </button>
             )}
           </>
+        ) : (
+          <button
+            type="button"
+            className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
+            onClick={() => open()}
+          >
+            CONNECT WALLET
+          </button>
         )}
 
-        {tab === "Withdraw" &&
-          ($connected ? (
-            <>
-              <div className="grid mt-[15px] text-[15px] w-full">
-                {!!balances[option[0]] && (
-                  <div className="text-left text-[gray] ml-2">
-                    Balance:{" "}
-                    {parseFloat(
-                      formatUnits(
-                        $vaultData[network][vault.address].vaultUserBalance,
-                        18
-                      )
-                    )}
-                  </div>
-                )}
-
-                <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                  {!!balances[option[0]] && (
-                    <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
-                      <div className="flex items-center">
-                        <button
-                          onClick={() => {
-                            zapInputHandler(
-                              formatUnits(
-                                $vaultData[network][vault.address]
-                                  ?.vaultUserBalance,
-                                18
-                              ),
-                              option[0]
-                            );
-                            previewWithdraw(
-                              formatUnits(
-                                $vaultData[network][vault.address]
-                                  ?.vaultUserBalance,
-                                18
-                              )
-                            );
-                          }}
-                          type="button"
-                          className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                        >
-                          MAX
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <input
-                    list="amount"
-                    id={option.join(", ")}
-                    value={inputs[option[0]]}
-                    name="amount"
-                    placeholder="0"
-                    onChange={(e) => {
-                      zapInputHandler(e.target.value, e.target.id);
-                      previewWithdraw(e.target.value);
-                      handleInputChange(e.target.value, e.target.id);
-                    }}
-                    onKeyDown={(evt) => {
-                      const currentValue = inputs[option[0]];
-
-                      if (
-                        !/[\d.]/.test(evt.key) &&
-                        evt.key !== "Backspace" &&
-                        evt.key !== "ArrowLeft" &&
-                        evt.key !== "ArrowRight"
-                      ) {
-                        evt.preventDefault();
-                      }
-
-                      if (
-                        evt.key === "." &&
-                        currentValue &&
-                        currentValue.includes(".")
-                      ) {
-                        evt.preventDefault();
-                      }
-                    }}
-                    pattern="^[0-9]*[.,]?[0-9]*$"
-                    inputMode="decimal"
-                    className="py-3 flex items-center h-full  bg-transparent  text-[16px] w-[70%] pl-[10px]"
-                  />
-                </div>
-
-                <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                  <p>
-                    $
-                    {$assetsPrices[network] && inputs[option[0]] > 0
-                      ? (Number(vault.shareprice) * inputs[option[0]]).toFixed(
-                          2
-                        )
-                      : 0}
-                  </p>
-                </div>
-              </div>
-              <div className="my-2 ml-2 flex flex-col gap-2">
-                {(option.length > 1 ||
-                  isSingleTokenStrategy ||
-                  !underlyingCondition) && (
-                  <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
-                    YOU RECEIVE
-                  </p>
-                )}
-
-                <div className="h-[100px]">
-                  {(option.length > 1 ||
-                    isSingleTokenStrategy ||
-                    !underlyingCondition) &&
-                    option.map((address, index) => (
-                      <div className="flex items-center gap-1" key={address}>
-                        {underlyingCondition ? (
-                          <img
-                            src={getTokenData(address)?.logoURI}
-                            alt={getTokenData(address)?.symbol}
-                            title={getTokenData(address)?.symbol}
-                            className="w-6 h-6 rounded-full"
-                          />
-                        ) : (
-                          <img
-                            src={underlyingToken?.logoURI}
-                            alt={underlyingToken?.symbol}
-                            title={underlyingToken?.symbol}
-                            className="w-6 h-6 rounded-full"
-                          />
-                        )}
-                        {loader && !transactionInProgress ? (
-                          <ShareSkeleton height={32} />
-                        ) : (
-                          <p>
-                            {withdrawAmount
-                              ? withdrawAmount[index]?.amountInUSD
-                                ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
-                                : `${withdrawAmount[index]?.amount}`
-                              : "0 ($0)"}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-
-                  {!isSingleTokenStrategy && underlyingCondition && (
-                    <div>
-                      {option.length < 2 && (
-                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                          SWAPS
-                        </p>
-                      )}
-                      {loader && option.length < 2 && !transactionInProgress ? (
-                        <AssetsSkeleton />
-                      ) : (
-                        <div>
-                          {zapPreviewWithdraw &&
-                            zapPreviewWithdraw?.map(
-                              ({
-                                address,
-                                amountIn,
-                                amountOut,
-                              }: {
-                                address: TAddress;
-                                amountIn: string;
-                                amountOut: string;
-                                symbol: string;
-                              }) => (
-                                <div key={amountIn}>
-                                  {address.toLowerCase() !==
-                                    option[0].toLowerCase() && (
-                                    <div className="flex">
-                                      <img
-                                        src="/oneInch.svg"
-                                        alt="1inch logo"
-                                        title="1inch"
-                                      />
-                                      {!!amountOut ? (
-                                        <>
-                                          <div className="flex items-center gap-1">
-                                            <p>{Number(amountIn).toFixed(6)}</p>
-                                            <img
-                                              src={
-                                                getTokenData(address)?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(address)?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(address)?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                          -&gt;
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(amountOut).toFixed(6)}
-                                            </p>
-
-                                            <img
-                                              src={
-                                                getTokenData(option[0])?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <img
-                                          src="/error.svg"
-                                          alt="error img"
-                                          title="error"
-                                        />
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {option.length < 2 &&
-                  underlyingCondition &&
-                  !isSingleTokenStrategy && (
-                    <div className="mt-5">
-                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                        YOU RECEIVE
-                      </p>
-                      <div className="h-[63px]">
-                        <div className="flex items-center gap-1">
-                          <img
-                            src={getTokenData(option[0])?.logoURI}
-                            alt={getTokenData(option[0])?.symbol}
-                            title={getTokenData(option[0])?.symbol}
-                            className="w-6 h-6 rounded-full"
-                          />
-                          {loader && !transactionInProgress ? (
-                            <ShareSkeleton height={32} />
-                          ) : (
-                            <div>
-                              {zapPreviewWithdraw ? (
-                                <div className="flex items-center gap-1">
-                                  <p>
-                                    {(
-                                      Number(
-                                        Number(zapPreviewWithdraw[0]?.amountOut)
-                                          ? zapPreviewWithdraw[0]?.amountOut
-                                          : zapPreviewWithdraw[0]?.amountIn
-                                      ) +
-                                      (zapPreviewWithdraw[1]
-                                        ? Number(
-                                            Number(
-                                              zapPreviewWithdraw[1]?.amountOut
-                                            )
-                                              ? zapPreviewWithdraw[1]?.amountOut
-                                              : zapPreviewWithdraw[1]?.amountIn
-                                          )
-                                        : 0)
-                                    ).toFixed(5)}
-                                  </p>
-                                  <p>{`($${(
-                                    (Number(
-                                      Number(zapPreviewWithdraw[0]?.amountOut)
-                                        ? zapPreviewWithdraw[0]?.amountOut
-                                        : zapPreviewWithdraw[0]?.amountIn
-                                    ) +
-                                      (zapPreviewWithdraw[1]
-                                        ? Number(
-                                            Number(
-                                              zapPreviewWithdraw[1]?.amountOut
-                                            )
-                                              ? zapPreviewWithdraw[1]?.amountOut
-                                              : zapPreviewWithdraw[1]?.amountIn
-                                          )
-                                        : 0)) *
-                                    Number(
-                                      $assetsPrices[network][option[0]].price
-                                    )
-                                  ).toFixed(2)})`}</p>
-                                </div>
-                              ) : (
-                                <p>0 ($0)</p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-              </div>
-              {chain?.id === Number(network) ? (
-                <>
-                  {zapButton === "insufficientBalance" ? (
-                    <button
-                      disabled
-                      className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                    >
-                      INSUFFICIENT BALANCE
-                    </button>
-                  ) : zapButton === "needApprove" ? (
-                    <button
-                      disabled={transactionInProgress}
-                      className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                        transactionInProgress
-                          ? "bg-transparent flex items-center justify-center gap-2"
-                          : "bg-[#486556]"
-                      }`}
-                      type="button"
-                      onClick={withdrawZapApprove}
-                    >
-                      <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
-                      {transactionInProgress && <Loader color={"#486556"} />}
-                    </button>
-                  ) : zapButton === "withdraw" || zapButton === "deposit" ? (
-                    <button
-                      disabled={transactionInProgress}
-                      type="button"
-                      className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                        transactionInProgress
-                          ? "bg-transparent flex items-center justify-center gap-2"
-                          : "bg-[#486556]"
-                      }`}
-                      onClick={withdraw}
-                    >
-                      <p>{needConfirm ? "Confirm in wallet" : "WITHDRAW"}</p>
-                      {transactionInProgress && <Loader color={"#486556"} />}
-                    </button>
-                  ) : (
-                    <button
-                      disabled
-                      className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                    >
-                      {loader ? "LOADING..." : "ENTER AMOUNT"}
-                    </button>
-                  )}
-                </>
-              ) : (
-                <button
-                  onClick={() => switchChain({ chainId: Number(network) })}
-                  className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                  type="button"
-                >
-                  <p>SWITCH NETWORK</p>
-                </button>
-              )}
-            </>
-          ) : (
-            <button
-              type="button"
-              className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-              onClick={() => open()}
-            >
-              CONNECT WALLET
-            </button>
-          ))}
-
-        {error && (
-          <div className="bg-[#734950] border border-[#b75457] rounded-sm mt-5 relative">
-            <div className="px-2 py-2 flex items-center justify-center flex-col">
-              <div className="flex items-center justify-between w-full">
-                <svg
-                  width="24"
-                  height="21"
-                  viewBox="0 0 24 21"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mr-2"
-                >
-                  <path
-                    d="M23.2266 17.7266L13.8516 1.4375C13.1484 0.226562 11.3125 0.1875 10.6094 1.4375L1.23438 17.7266C0.53125 18.9375 1.42969 20.5 2.875 20.5H21.5859C23.0312 20.5 23.9297 18.9766 23.2266 17.7266ZM12.25 14.3281C13.2266 14.3281 14.0469 15.1484 14.0469 16.125C14.0469 17.1406 13.2266 17.9219 12.25 17.9219C11.2344 17.9219 10.4531 17.1406 10.4531 16.125C10.4531 15.1484 11.2344 14.3281 12.25 14.3281ZM10.5312 7.88281C10.4922 7.60938 10.7266 7.375 11 7.375H13.4609C13.7344 7.375 13.9688 7.60938 13.9297 7.88281L13.6562 13.1953C13.6172 13.4688 13.4219 13.625 13.1875 13.625H11.2734C11.0391 13.625 10.8438 13.4688 10.8047 13.1953L10.5312 7.88281Z"
-                    fill="#DE2E2E"
-                  />
-                </svg>
-                <p className="text-[18px] text-[#f2aeae]">{error.name}</p>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="cursor-pointer"
-                  onClick={() => setError(false)}
-                >
-                  <g filter="url(#filter0_i_910_1842)">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M0.292893 1.70711C-0.097631 1.31658 -0.097631 0.683417 0.292893 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L6 4.58579L10.2929 0.292893C10.6834 -0.0976311 11.3166 -0.0976311 11.7071 0.292893C12.0976 0.683417 12.0976 1.31658 11.7071 1.70711L7.41421 6L11.7071 10.2929C12.0976 10.6834 12.0976 11.3166 11.7071 11.7071C11.3166 12.0976 10.6834 12.0976 10.2929 11.7071L6 7.41421L1.70711 11.7071C1.31658 12.0976 0.683417 12.0976 0.292893 11.7071C-0.0976311 11.3166 -0.0976311 10.6834 0.292893 10.2929L4.58579 6L0.292893 1.70711Z"
-                      fill="white"
-                    />
-                  </g>
-                  <defs>
-                    <filter
-                      id="filter0_i_910_1842"
-                      x="0"
-                      y="0"
-                      width="14"
-                      height="14"
-                      filterUnits="userSpaceOnUse"
-                      colorInterpolationFilters="sRGB"
-                    >
-                      <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                      <feBlend
-                        mode="normal"
-                        in="SourceGraphic"
-                        in2="BackgroundImageFix"
-                        result="shape"
-                      />
-                      <feColorMatrix
-                        in="SourceAlpha"
-                        type="matrix"
-                        values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                        result="hardAlpha"
-                      />
-                      <feOffset dx="2" dy="2" />
-                      <feGaussianBlur stdDeviation="1" />
-                      <feComposite
-                        in2="hardAlpha"
-                        operator="arithmetic"
-                        k2="-1"
-                        k3="1"
-                      />
-                      <feColorMatrix
-                        type="matrix"
-                        values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
-                      />
-                      <feBlend
-                        mode="normal"
-                        in2="shape"
-                        result="effect1_innerShadow_910_1842"
-                      />
-                    </filter>
-                  </defs>
-                </svg>
-              </div>
-              <p className="text-[16px] max-w-[400px] text-[#f2aeae] break-words">
-                {error.message}
-              </p>
-            </div>
-          </div>
-        )}
+        {error?.state && <InvestError error={error} setError={setError} />}
       </form>
     </div>
   );

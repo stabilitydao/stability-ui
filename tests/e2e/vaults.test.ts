@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+import axios from "axios";
+
+// Cannot use imports from constants and utils due to .env or playwright bugs ¯\_(ツ)_/¯
+
 const CURRENT_ACTIVE_VAULTS = 19;
 
 const SEARCH_VALUES = {
@@ -8,29 +12,186 @@ const SEARCH_VALUES = {
   invalidByLaguage: "вматик",
 };
 
+const CHAINS = ["137", "8453"];
+
 const NETWORKS = ["Polygon", "Base"];
 
-const STRATEGY = "Y";
+const STRATEGIES = [
+  "Y",
+  "IQMF",
+  "GUMF",
+  "CF",
+  "DQMF",
+  "GQMF",
+  "QSMF",
+  "CCF",
+  "IRMF",
+  "GRMF",
+  "GQF",
+  "QSF",
+];
 
 const SORT_CASES = [
+  { name: "SYMBOL", queue: 0, dataType: "text" },
+  { name: "ASSETS", queue: 1, dataType: "text" },
   { name: "INCOME APR", queue: 3, dataType: "APR" },
   { name: "VS HOLD APR", queue: 4, dataType: "APR" },
   { name: "PRICE", queue: 6, dataType: "withCurrency" },
   { name: "TVL", queue: 7, dataType: "withFormat" },
 ];
 
+const LINKS = [
+  "https://github.com/stabilitydao",
+  "https://twitter.com/stabilitydao",
+  "https://t.me/stabilitydao",
+  "https://discord.com/invite/R3nnetWzC9",
+  "https://stabilitydao.gitbook.io/",
+];
+
+const PORTFOLIO_VALUES = ["Deposited", "Daily", "Monthly", "APR", "APY"];
+
+let allVaults: any[] = [];
+
+const formatTVL = (value: number): string => {
+  let changedValue = "";
+
+  const suffixes = ["", "K", "M", "B", "T"];
+  let suffixNum = 0;
+
+  while (value >= 1000) {
+    value /= 1000;
+    suffixNum++;
+  }
+
+  const fixeds = !!suffixNum ? 2 : 0;
+  let roundedValue = value.toFixed(fixeds);
+
+  if (suffixNum > 0) {
+    roundedValue += suffixes[suffixNum];
+  }
+  changedValue = "$" + roundedValue;
+
+  return changedValue;
+};
+
 test.beforeEach(async ({ page }) => {
+  try {
+    const response = await axios.get("https://api.stabilitydao.org/");
+
+    const vaultsData = response.data?.vaults || {};
+
+    allVaults = await Promise.all(
+      CHAINS.map(async (chain) => {
+        const chainVaults = vaultsData[chain] || {};
+        return Object.values(chainVaults).map((vault) => vault);
+      })
+    );
+    allVaults = allVaults.flat();
+  } catch (error) {
+    throw new Error(`API Error: ${error}`);
+  }
+
   await page.goto("/", { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(5000);
 });
 
 test.describe("Vaults page tests", () => {
+  test("logo and vaults tab is clickable and refers to main page", async ({
+    page,
+  }) => {
+    const ids = ["stability-logo", "vaults-link"];
+
+    for (const id of ids) {
+      await page.getByTestId(id).click();
+
+      await page.waitForLoadState("load");
+
+      const isCorrectPageURL =
+        page.url() === "https://stability.farm/" ||
+        page.url() === "http://localhost:4321/";
+
+      expect(isCorrectPageURL).toBeTruthy();
+    }
+  });
   test("should be active vaults", async ({ page }) => {
     await page.waitForSelector("[data-testid='vault']");
 
     const activeVaults = await page.getByTestId("vault").count();
 
     await expect(activeVaults).toBe(CURRENT_ACTIVE_VAULTS);
+  });
+
+  test("should be hide portfolio data", async ({ page }) => {
+    await page.getByTestId("visibleSwitcher").click();
+
+    let allValuesAreMasked = true;
+
+    for (const value of PORTFOLIO_VALUES) {
+      const portfolioValue = await page
+        .getByTestId(`portfolio${value}`)
+        .textContent();
+
+      if (portfolioValue !== "****") {
+        allValuesAreMasked = false;
+      }
+    }
+
+    await expect(allValuesAreMasked).toBeTruthy();
+  });
+
+  test("should be change APR by latest/24h/7d", async ({ page }) => {
+    await page.getByTestId("hideSwapFee").first().click();
+
+    const APRTimeSwitcher = await page.getByTestId("APRTimeSwitcher").first();
+
+    const APRTypes = await page.getByTestId("APRType");
+
+    const vaults = await page.getByTestId("vault");
+    const vaultsCount = await vaults.count();
+
+    const vaultsAPR = allVaults.map((vault) => vault.apr);
+
+    const incomeLatestAPRs: number[] = vaultsAPR.map(({ incomeLatest }) =>
+      Number(Number(incomeLatest).toFixed(2))
+    );
+    const income24hAPRs: number[] = vaultsAPR.map(({ income24h }) =>
+      Number(Number(income24h).toFixed(2))
+    );
+    const incomeWeekAPRs: number[] = vaultsAPR.map(({ incomeWeek }) =>
+      Number(Number(incomeWeek).toFixed(2))
+    );
+
+    const allAPRs = [incomeLatestAPRs, income24hAPRs, incomeWeekAPRs];
+
+    for (let i = 0; i < allAPRs.length; i++) {
+      await APRTimeSwitcher.click();
+      await page.waitForTimeout(500);
+
+      await APRTypes.nth(i).click();
+      await page.waitForTimeout(500);
+
+      const currentArr = allAPRs[i];
+
+      let isCorrectly = true;
+
+      for (let j = 0; j < vaultsCount; j++) {
+        const vault = vaults.nth(j);
+
+        let value = await vault
+          .locator("td")
+          .nth(3)
+          .locator("p")
+          .first()
+          .textContent();
+
+        if (
+          !currentArr.includes(Number(Number(value?.slice(0, -1)).toFixed(2)))
+        ) {
+          isCorrectly = false;
+        }
+      }
+      expect(isCorrectly).toBeTruthy();
+    }
   });
 
   test("should be search", async ({ page }) => {
@@ -91,31 +252,33 @@ test.describe("Vaults page tests", () => {
     // to be all networks
     await expect(currentNetworks).toEqual(NETWORKS);
 
-    await networks.nth(1).click();
-    await page.waitForTimeout(1000);
+    for (let i = 0; i < NETWORKS.length; i++) {
+      await networks.nth(i).click();
+      if (i === 1) await networks.nth(i).click();
 
-    const vaults = await page.getByTestId("vault");
-    const vaultsCount = await vaults.count();
+      await page.waitForTimeout(3000);
 
-    let baseVaultsCount = 0;
+      const vaults = await page.getByTestId("vault");
+      const vaultsCount = await vaults.count();
 
-    for (let i = 0; i < vaultsCount; i++) {
-      const vault = vaults.nth(i);
+      let networkVaultsCount = 0;
 
-      const name = await vault
-        .locator("td")
-        .nth(0)
-        .getByRole("img")
-        .nth(0)
-        .getAttribute("alt");
+      for (let j = 0; j < vaultsCount; j++) {
+        const vault = vaults.nth(j);
 
-      if (name === NETWORKS[1]) {
-        baseVaultsCount++;
+        const name = await vault
+          .locator("td")
+          .nth(0)
+          .getByRole("img")
+          .nth(0)
+          .getAttribute("alt");
+        if (name === NETWORKS[i]) {
+          networkVaultsCount++;
+        }
       }
-    }
 
-    // to be filtred by "Base" network
-    await expect(baseVaultsCount).toEqual(vaultsCount);
+      await expect(networkVaultsCount).toEqual(vaultsCount);
+    }
   });
 
   test("should be filter by stablecoins", async ({ page }) => {
@@ -144,132 +307,238 @@ test.describe("Vaults page tests", () => {
     await expect(stablecoinsVaultsCount).toEqual(vaultsCount);
   });
 
-  test("should be filter by strategy", async ({ page }) => {
-    const strategyFilter = await page.getByTestId("filter").nth(1);
+  test("should be all strategy filters", async ({ page }) => {
+    const strategiesCount = await page.getByTestId("strategy").count();
 
-    await strategyFilter.click();
-    await page.waitForTimeout(1000);
+    const dropdownStrategyes = [];
 
-    const firstStrategySelector = await page.getByTestId("strategy").first();
+    for (let i = 0; i < strategiesCount; i++) {
+      const strategy = await page.getByTestId("strategy").nth(i).textContent();
 
-    await firstStrategySelector.click();
-    await page.waitForTimeout(1000);
-
-    const vaults = await page.getByTestId("vault");
-    const vaultsCount = await vaults.count();
-
-    let strategyVaultsCount = 0;
-
-    for (let i = 0; i < vaultsCount; i++) {
-      const vault = vaults.nth(i);
-
-      const symbol = await vault.locator("td").first().textContent();
-
-      if (STRATEGY === symbol?.slice(-1)) strategyVaultsCount++;
+      dropdownStrategyes.push(strategy);
     }
-    // to be filtred by "Y" strategy
-    await expect(strategyVaultsCount).toEqual(vaultsCount);
-  });
-  // maybe add "my vaults" test
-  // add "active" test, after icons
 
-  // only "income apr", "vs hold apr","price" and "tvl" by descendent
+    expect(dropdownStrategyes).toEqual(STRATEGIES);
+    expect(strategiesCount).toBe(STRATEGIES.length);
+  });
+
+  test("should be filter by strategy", async ({ page }) => {
+    const strategiesCount = await page.getByTestId("strategy").count();
+
+    for (let i = 0; i < strategiesCount; i++) {
+      const strategyName = await page
+        .getByTestId("strategy")
+        .nth(i)
+        .textContent();
+
+      await page.getByTestId("strategyFilterDropdown").click();
+      await page.waitForTimeout(500);
+
+      await page.getByTestId("strategy").nth(i).click();
+      await page.waitForTimeout(500);
+
+      const vaults = await page.getByTestId("vault");
+      const vaultsCount = await vaults.count();
+
+      let strategyVaultsCount = 0;
+
+      for (let i = 0; i < vaultsCount; i++) {
+        const vault = vaults.nth(i);
+
+        const symbol = await vault.locator("td").first().textContent();
+
+        if (strategyName === symbol?.slice(-strategyName?.length))
+          strategyVaultsCount++;
+      }
+      await expect(strategyVaultsCount).toEqual(vaultsCount);
+    }
+  });
+
   test("should be sort", async ({ page }) => {
     const allSorts = await page.getByTestId("sort");
 
-    let vaults, vaultsCount, isDescendent;
+    let isSortedCorrectly;
 
     for (const { name, queue, dataType } of SORT_CASES) {
-      const sortCol = await allSorts.nth(queue);
+      for (const sortOrder of ["desc", "asc"]) {
+        const sortCol = await allSorts.nth(queue);
 
-      await sortCol.click();
-      await sortCol.waitFor();
+        await sortCol.click();
+        await sortCol.waitFor();
 
-      vaults = await page.getByTestId("vault");
-      vaultsCount = await vaults.count();
+        const vaults = await page.getByTestId("vault");
+        const vaultsCount = await vaults.count();
 
-      const formattedValues = [];
+        const formattedValues = [];
 
-      switch (dataType) {
-        case "APR":
-          for (let i = 0; i < vaultsCount; i++) {
-            const vault = vaults.nth(i);
+        switch (dataType) {
+          case "text":
+            for (let i = 0; i < vaultsCount; i++) {
+              let value = "";
+              const vault = vaults.nth(i);
+              if (name === "SYMBOL") {
+                value =
+                  (await vault
+                    .locator("td")
+                    .nth(queue)
+                    .locator("p")
+                    .first()
+                    .textContent()) || "";
+              }
+              if (name === "ASSETS") {
+                value =
+                  (await vault
+                    .locator("td")
+                    .nth(queue)
+                    .locator("span")
+                    .first()
+                    .textContent()) || "";
+              }
 
-            let value = await vault
-              .locator("td")
-              .nth(queue)
-              .locator("p")
-              .first()
-              .textContent();
-
-            if (value === "-") value = "0%";
-
-            const formattedValue = Number(value?.slice(0, -1));
-
-            if (!isNaN(formattedValue)) {
-              formattedValues.push(formattedValue);
-            } else {
-              throw new Error(`Invalid value: ${formattedValue}`);
+              formattedValues.push(value);
             }
-          }
-          break;
-        case "withCurrency":
-          for (let i = 0; i < vaultsCount; i++) {
-            const vault = vaults.nth(i);
+            break;
+          case "APR":
+            for (let i = 0; i < vaultsCount; i++) {
+              const vault = vaults.nth(i);
 
-            const vsHoldTdCount = await vault
-              .getByTestId("vsHoldAPRTable")
-              .locator("td")
-              .count();
+              let value = await vault
+                .locator("td")
+                .nth(queue)
+                .locator("p")
+                .first()
+                .textContent();
 
-            const price = await vault
-              .locator("td")
-              .nth(queue + vsHoldTdCount)
-              .textContent();
+              if (value === "-") value = "0%";
 
-            const formattedPrice = Number(price?.slice(1));
+              const formattedValue = Number(value?.slice(0, -1));
 
-            if (!isNaN(formattedPrice)) {
-              formattedValues.push(formattedPrice);
-            } else {
-              throw new Error(`Invalid price value: ${price}`);
+              if (!isNaN(formattedValue)) {
+                formattedValues.push(formattedValue);
+              } else {
+                throw new Error(`Invalid APR: ${formattedValue}`);
+              }
             }
-          }
-          break;
-        case "withFormat":
-          for (let i = 0; i < vaultsCount; i++) {
-            const vault = vaults.nth(i);
+            break;
+          case "withCurrency":
+            for (let i = 0; i < vaultsCount; i++) {
+              const vault = vaults.nth(i);
 
-            const vsHoldTdCount = await vault
-              .getByTestId("vsHoldAPRTable")
-              .locator("td")
-              .count();
+              const vsHoldTdCount = await vault
+                .getByTestId("vsHoldAPRTable")
+                .locator("td")
+                .count();
 
-            const TVL = await vault
-              .locator("td")
-              .nth(queue + vsHoldTdCount)
-              .textContent();
+              const price = await vault
+                .locator("td")
+                .nth(queue + vsHoldTdCount)
+                .textContent();
 
-            let formattedTVL = TVL?.slice(1)?.includes("K")
-              ? Number(TVL?.slice(1, -1)) * 1000
-              : Number(TVL?.slice(1));
+              const formattedPrice = Number(price?.slice(1));
 
-            if (!isNaN(formattedTVL)) {
-              formattedValues.push(formattedTVL);
-            } else {
-              throw new Error(`Invalid TVL value: ${TVL}`);
+              if (!isNaN(formattedPrice)) {
+                formattedValues.push(formattedPrice);
+              } else {
+                throw new Error(`Invalid price value: ${price}`);
+              }
             }
-          }
-          break;
-        default:
-          throw new Error(`Invalid data type: ${dataType}`);
+            break;
+          case "withFormat":
+            for (let i = 0; i < vaultsCount; i++) {
+              const vault = vaults.nth(i);
+
+              const vsHoldTdCount = await vault
+                .getByTestId("vsHoldAPRTable")
+                .locator("td")
+                .count();
+
+              const TVL = await vault
+                .locator("td")
+                .nth(queue + vsHoldTdCount)
+                .textContent();
+
+              let formattedTVL = TVL?.slice(1)?.includes("K")
+                ? Number(TVL?.slice(1, -1)) * 1000
+                : Number(TVL?.slice(1));
+
+              if (!isNaN(formattedTVL)) {
+                formattedValues.push(formattedTVL);
+              } else {
+                throw new Error(`Invalid TVL value: ${TVL}`);
+              }
+            }
+            break;
+          default:
+            throw new Error(`Invalid data type: ${dataType}`);
+        }
+
+        if (dataType === "text") {
+          isSortedCorrectly = formattedValues.every((value, index, array) => {
+            return (
+              index === 0 ||
+              (sortOrder === "desc"
+                ? array[index - 1]?.localeCompare(value) >= 0
+                : array[index - 1]?.localeCompare(value) <= 0)
+            );
+          });
+        } else {
+          isSortedCorrectly = formattedValues.every((value, index, array) => {
+            return (
+              index === 0 ||
+              (sortOrder === "desc"
+                ? array[index - 1] >= value
+                : array[index - 1] <= value)
+            );
+          });
+        }
+
+        await expect(isSortedCorrectly).toBeTruthy();
       }
+    }
+  });
 
-      isDescendent = formattedValues.every((value, index, array) => {
-        return index === 0 || array[index - 1] >= value;
-      });
+  test("should be tvl", async ({ page }) => {
+    try {
+      const TVLs = allVaults.map((vault) => vault.tvl);
 
-      await expect(isDescendent).toBeTruthy();
+      const totalTVL = TVLs.reduce((acc, tvl) => acc + tvl, 0);
+      const formattedTVL = formatTVL(totalTVL);
+
+      await page.waitForSelector("[data-testid='tvl']");
+
+      const pageTVL = await page.getByTestId("tvl").textContent();
+
+      expect(pageTVL).toBe(formattedTVL);
+    } catch (error) {
+      console.error("Error fetching or processing data:", error);
+    }
+  });
+
+  test("should be share price", async ({ page }) => {
+    const pageSharePrices = await page.getByTestId("sharePrice");
+    const pageSharePricesCount = await pageSharePrices.count();
+
+    const APISharePrices = allVaults.map((vault) =>
+      Number(Number(vault.sharePrice).toFixed(3))
+    );
+
+    let isCorrectSharePrices = true;
+
+    for (let i = 0; i < pageSharePricesCount; i++) {
+      const sharePrice = (await pageSharePrices.nth(i).textContent())?.slice(1);
+
+      if (!APISharePrices?.includes(Number(sharePrice)))
+        isCorrectSharePrices = false;
+    }
+
+    expect(isCorrectSharePrices).toBeTruthy();
+  });
+
+  test("should be correct footer links", async ({ page }) => {
+    for (let i = 0; i < LINKS.length; i++) {
+      const href = await page.locator("footer a").nth(i).getAttribute("href");
+
+      expect(href).toBe(LINKS[i]);
     }
   });
 });

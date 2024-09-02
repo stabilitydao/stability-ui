@@ -6,6 +6,8 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { useStore } from "@nanostores/react";
 
+import { isMobile } from "react-device-detect";
+
 // import { deployments } from "@stabilitydao/stability";
 
 import { APRModal } from "./components/modals/APRModal";
@@ -425,7 +427,6 @@ const Vaults = (): JSX.Element => {
       // }
     }
   };
-
   // useEffect(() => {
   //   if ($assetsPrices) {
   //     const BTC_LOGO = getTokenData(WBTC[0])?.logoURI as string;
@@ -805,15 +806,17 @@ const Vaults = (): JSX.Element => {
                         </td>
                         <td
                           onClick={(e) => {
-                            e.stopPropagation();
-                            setAprModal({
-                              earningData: vault.earningData,
-                              daily: vault.daily,
-                              lastHardWork: vault.lastHardWork,
-                              symbol: vault?.risk?.symbol as string,
-                              state: true,
-                              pool: vault?.pool,
-                            });
+                            if (isMobile) {
+                              e.stopPropagation();
+                              setAprModal({
+                                earningData: vault.earningData,
+                                daily: vault.daily,
+                                lastHardWork: vault.lastHardWork,
+                                symbol: vault?.risk?.symbol as string,
+                                state: true,
+                                pool: vault?.pool,
+                              });
+                            }
                           }}
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
@@ -925,7 +928,7 @@ const Vaults = (): JSX.Element => {
                                 </div>
                               </div>
                               <div className="flex items-center justify-between w-full">
-                                <p className="text-[16px]">Last Hard Work</p>
+                                <p className="text-[14x]">Last Hard Work</p>
                                 <TimeDifferenceIndicator
                                   unix={vault.lastHardWork}
                                 />
@@ -936,16 +939,18 @@ const Vaults = (): JSX.Element => {
                         </td>
                         <td
                           onClick={(e) => {
-                            e.stopPropagation();
-                            setVsHoldModal({
-                              lifetimeTokensHold:
-                                vault.lifetimeTokensHold as THoldData[],
-                              vsHoldAPR: vault.vsHoldAPR,
-                              lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
-                              created: getTimeDifference(vault.created)?.days,
-                              state: true,
-                              isVsActive: vault.isVsActive,
-                            });
+                            if (isMobile) {
+                              e.stopPropagation();
+                              setVsHoldModal({
+                                lifetimeTokensHold:
+                                  vault.lifetimeTokensHold as THoldData[],
+                                vsHoldAPR: vault.vsHoldAPR,
+                                lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
+                                created: getTimeDifference(vault.created)?.days,
+                                state: true,
+                                isVsActive: vault.isVsActive,
+                              });
+                            }
                           }}
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
@@ -1061,7 +1066,10 @@ const Vaults = (): JSX.Element => {
                             </span>
                           )}
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2">
+                        <td
+                          data-testid="sharePrice"
+                          className="px-2 min-[1130px]:px-4 py-2"
+                        >
                           ${Number(vault.shareprice).toFixed(3)}
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 text-right text-[15px]">

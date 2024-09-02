@@ -19,6 +19,7 @@ const TabSwitcher: React.FC<IProps> = ({
     <div className="flex">
       {TABS.map((tab) => (
         <button
+          key={tab}
           className={`h-[60px] cursor-pointer text-[16px] w-full rounded-tl-md  bg-[#1c1c23] ${
             activeTab === tab && "border-b-[2px] border-[#6376AF]"
           }`}

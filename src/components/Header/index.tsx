@@ -22,13 +22,17 @@ const Header = (): JSX.Element => {
     <WagmiLayout>
       <header>
         <span className="title sm:w-4/12 md:w-5/12">
-          <a href="/" title="Stability">
+          <a data-testid="stability-logo" href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
             <span className="hidden sm:flex">Stability</span>
           </a>
         </span>
         <div className="menu w-2/12">
-          <a className={currentPath === "" ? "active font-bold" : ""} href="/">
+          <a
+            data-testid="vaults-link"
+            className={currentPath === "" ? "active font-bold" : ""}
+            href="/"
+          >
             Vaults
           </a>
         </div>

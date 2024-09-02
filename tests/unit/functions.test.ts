@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import {
   addAssetsBalance,
@@ -14,9 +14,20 @@ import {
   getStrategyInfo,
   getTimeDifference,
   get1InchRoutes,
+  addAssetToWallet,
+  getLocalStorageData,
+  setLocalStoreHash,
 } from "@utils";
 
-import { CHAINS } from "@constants";
+import { transactionSettings, hideFeeApr, aprFilter } from "@store";
+
+import { CHAINS, PROTOCOLS, IL } from "@constants";
+
+vi.mock("@store", () => ({
+  transactionSettings: { set: vi.fn() },
+  hideFeeApr: { set: vi.fn() },
+  aprFilter: { set: vi.fn() },
+}));
 
 describe("addAssetsBalance", () => {
   it("should correctly map assets to balances", () => {
@@ -381,16 +392,40 @@ describe("getDate", () => {
 });
 
 describe("getProtocolLogo", () => {
-  it("should be correct logo for Curve", () => {
+  it("should return correct logo for Curve (CCF)", () => {
     const logo = getProtocolLogo("CCF");
 
-    expect(logo).toBe("/protocols/Curve.png");
+    expect(logo).toBe(PROTOCOLS.curve.logoSrc);
   });
 
-  it("should be gamma for incorrect input", () => {
+  it("should return correct logo for DefiEdge (DQMF)", () => {
+    const logo = getProtocolLogo("DQMF");
+
+    expect(logo).toBe(PROTOCOLS.defiedge.logoSrc);
+  });
+
+  it("should return correct logo for Ichi (IQMF)", () => {
+    const logo = getProtocolLogo("IQMF");
+
+    expect(logo).toBe(PROTOCOLS.ichi.logoSrc);
+  });
+
+  it("should return correct logo for Ichi (IRMF)", () => {
+    const logo = getProtocolLogo("IRMF");
+
+    expect(logo).toBe(PROTOCOLS.ichi.logoSrc);
+  });
+
+  it("should return correct logo for Yearn (Y)", () => {
+    const logo = getProtocolLogo("Y");
+
+    expect(logo).toBe(PROTOCOLS.yearn.logoSrc);
+  });
+
+  it("should return default logo for unknown strategy (example)", () => {
     const logo = getProtocolLogo("example");
 
-    expect(logo).toBe("/protocols/Gamma.png");
+    expect(logo).toBe(PROTOCOLS.gamma.logoSrc);
   });
 });
 
@@ -412,6 +447,92 @@ describe("getStrategyInfo", () => {
       desc: "The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.",
       color: "#7af996",
     });
+  });
+
+  it("should return correct strategy info for QSF", () => {
+    const vaultSymbol = "QSF";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("QuickSwap Static Farm");
+    expect(strategyInfo.shortName).toBe("QSF");
+    expect(strategyInfo.features).toContainEqual({
+      name: "Farming",
+      svg: expect.any(String),
+    });
+    expect(strategyInfo.color).toBe("#558ac5");
+    expect(strategyInfo.il).toEqual({
+      rate: 0,
+      title: "None",
+      desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+      color: "#4aff71",
+    });
+  });
+
+  it("should return correct strategy info for CCF", () => {
+    const vaultSymbol = "CCF";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("Curve Convex Farm");
+    expect(strategyInfo.shortName).toBe("CCF");
+    expect(strategyInfo.protocols).toEqual([PROTOCOLS.curve, PROTOCOLS.convex]);
+    expect(strategyInfo.il).toEqual({
+      rate: 1,
+      title: "Zero exp",
+      desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
+      color: "#7af996",
+    });
+  });
+
+  it("should return correct strategy info for DQMFN", () => {
+    const vaultSymbol = "DQMFN";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("DefiEdge QuickSwap Merkl Farm");
+    expect(strategyInfo.shortName).toBe("DQMF");
+    expect(strategyInfo.il).toEqual({
+      rate: 8,
+      title: "High",
+      desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+      color: "#f55e11",
+    });
+  });
+
+  it("should return correct strategy info for IRMF", () => {
+    const vaultSymbol = "IRMF";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("Ichi Retro Merkl Farm");
+    expect(strategyInfo.shortName).toBe("IRMF");
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.ichi,
+      PROTOCOLS.retro,
+      PROTOCOLS.merkl,
+    ]);
+    expect(strategyInfo.il).toEqual(IL.IQMF);
+  });
+
+  it("should return correct strategy info for Y", () => {
+    const vaultSymbol = "Y";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("Yearn");
+    expect(strategyInfo.shortName).toBe("Y");
+    expect(strategyInfo.protocols).toEqual([PROTOCOLS.yearn]);
+    expect(strategyInfo.il).toEqual(IL.Y);
+  });
+
+  it("should return correct strategy info for GUMF", () => {
+    const vaultSymbol = "GUMF";
+    const strategyInfo = getStrategyInfo(vaultSymbol);
+
+    expect(strategyInfo.name).toBe("Gamma UniswapV3 Merkl Farm");
+    expect(strategyInfo.shortName).toBe("GUMF");
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.gamma,
+      PROTOCOLS.uniswapV3,
+      PROTOCOLS.merkl,
+    ]);
+    expect(strategyInfo.il).toEqual(IL.LOW);
   });
 
   it("should return correct strategy info for unknown vaultSymbol", () => {
@@ -509,6 +630,156 @@ describe("get1InchRoutes", () => {
   });
 }, 10000);
 
-// add asset to wallet
-// tests for getTokenData
-/// tests for setLocalStoreHash
+describe("addAssetToWallet", () => {
+  it("should call client.data.watchAsset with correct parameters when image is provided", async () => {
+    const mockClient = {
+      data: {
+        watchAsset: vi.fn().mockResolvedValue(true),
+      },
+    };
+
+    const address = "0xMockedAssetAddress";
+    const decimals = 18;
+    const symbol = "MOCK";
+    const image = "https://example.com/image.png";
+
+    await addAssetToWallet(mockClient, address, decimals, symbol, image);
+
+    expect(mockClient.data.watchAsset).toHaveBeenCalledWith({
+      type: "ERC20",
+      options: {
+        address: address,
+        decimals: decimals,
+        symbol: symbol,
+        image: image,
+      },
+    });
+  });
+
+  it("should call client.data.watchAsset with correct parameters when image is not provided", async () => {
+    const mockClient = {
+      data: {
+        watchAsset: vi.fn().mockResolvedValue(true),
+      },
+    };
+
+    const address = "0xMockedAssetAddress";
+    const decimals = 18;
+    const symbol = "MOCK";
+
+    await addAssetToWallet(mockClient, address, decimals, symbol);
+
+    expect(mockClient.data.watchAsset).toHaveBeenCalledWith({
+      type: "ERC20",
+      options: {
+        address: address,
+        decimals: decimals,
+        symbol: symbol,
+      },
+    });
+  });
+
+  it("should handle errors gracefully", async () => {
+    const mockClient = {
+      data: {
+        watchAsset: vi.fn().mockRejectedValue(new Error("Test Error")),
+      },
+    };
+
+    const address = "0xMockedAssetAddress";
+    const decimals = 18;
+    const symbol = "MOCK";
+
+    const consoleSpy = vi.spyOn(console, "log");
+
+    await addAssetToWallet(mockClient, address, decimals, symbol);
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "ADD ASSET ERROR:",
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
+  });
+});
+
+describe("getLocalStorageData", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  it("should load transactionSettings from localStorage and set the store", () => {
+    const savedSettings = JSON.stringify({ gasLimit: 21000 });
+    localStorage.setItem("transactionSettings", savedSettings);
+
+    getLocalStorageData();
+
+    expect(transactionSettings.set).toHaveBeenCalledWith({ gasLimit: 21000 });
+  });
+
+  it("should load hideFeeAPR from localStorage and set the store", () => {
+    const savedHideFeeAPR = JSON.stringify(true);
+    localStorage.setItem("hideFeeAPR", savedHideFeeAPR);
+
+    getLocalStorageData();
+
+    expect(hideFeeApr.set).toHaveBeenCalledWith(true);
+  });
+
+  it("should set aprFilter to 'weekly' if localStorage value is 'week'", () => {
+    localStorage.setItem("APRsFiler", JSON.stringify("week"));
+
+    getLocalStorageData();
+
+    expect(aprFilter.set).toHaveBeenCalledWith("weekly");
+  });
+
+  it("should set aprFilter to 'daily' if localStorage value is '24h'", () => {
+    localStorage.setItem("APRsFiler", JSON.stringify("24h"));
+
+    getLocalStorageData();
+
+    expect(aprFilter.set).toHaveBeenCalledWith("daily");
+  });
+
+  it("should set aprFilter to default value 'weekly' if nothing is in localStorage", () => {
+    getLocalStorageData();
+
+    expect(aprFilter.set).toHaveBeenCalledWith("weekly");
+  });
+
+  it("should not set transactionSettings if there is no data in localStorage", () => {
+    getLocalStorageData();
+
+    expect(transactionSettings.set).not.toHaveBeenCalled();
+  });
+});
+
+describe("setLocalStoreHash", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('should store the object in localStorage under the key "lastTx"', () => {
+    const testObj = {
+      hash: "0x123",
+      status: "pending",
+      timestamp: 1234567890,
+      tokens: [
+        {
+          "0xabc": { amount: "100" },
+          "0xdef": { amount: "200" },
+        },
+      ],
+      type: "transfer",
+      vault: "0x456",
+    };
+
+    setLocalStoreHash(testObj);
+
+    const storedItem = localStorage.getItem("lastTx");
+    expect(storedItem).not.toBeNull();
+    expect(JSON.parse(storedItem as string)).toEqual(testObj);
+  });
+});
