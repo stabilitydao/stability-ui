@@ -955,7 +955,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           setButton("deposit");
         }
       }
-    } catch (err) {
+    } catch {
       console.error("zap deposit failed");
     } finally {
       setLoader(false);
