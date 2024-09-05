@@ -47,6 +47,7 @@ import {
   getAssetAllowance,
   getPlatformBalance,
   getAssetsBalances,
+  handleInputKeyDown,
 } from "../../functions";
 
 import { DEFAULT_ERROR } from "@constants";
@@ -893,6 +894,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
       }
+
       setZapTokens(outData);
       let amounts;
 
@@ -918,12 +920,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
       }
       ///// index ^ 1 --> XOR
-
       amounts = amounts.map((thisAmount, index) => {
         return !thisAmount
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
+
       const previewDepositAssets = await _publicClient?.readContract({
         address: vault.address,
         abi: VaultABI,
@@ -954,7 +956,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         }
       }
     } catch (err) {
-      console.error("ZAP DEPOSIT ERROR:", err);
+      console.error("zap deposit failed");
     } finally {
       setLoader(false);
     }
@@ -1621,6 +1623,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     if (!Number(amount)) return;
+
     setLoader(true);
     if (defaultOption?.assetsArray) {
       const changedInput = defaultOption?.assetsArray?.indexOf(asset);
@@ -1654,8 +1657,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 (token) => token.address === option[changedInput ? 0 : 1]
               );
 
-              const decimals = token ? token.decimals + 18 : 24;
-
+              const decimals = token ? token.decimals : 18;
+              // const decimals = token ? token.decimals + 18 : 24;
               amounts.push(parseUnits("1", decimals));
             }
           }
@@ -2116,26 +2119,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               handleInputChange(e.target.value, e.target.id)
                             }
                             type="text"
-                            onKeyDown={(evt) => {
-                              const currentValue = inputs[asset];
-
-                              if (
-                                !/[\d.]/.test(evt.key) &&
-                                evt.key !== "Backspace" &&
-                                evt.key !== "ArrowLeft" &&
-                                evt.key !== "ArrowRight"
-                              ) {
-                                evt.preventDefault();
-                              }
-
-                              if (
-                                evt.key === "." &&
-                                currentValue &&
-                                currentValue.includes(".")
-                              ) {
-                                evt.preventDefault();
-                              }
-                            }}
+                            onKeyDown={(evt) =>
+                              handleInputKeyDown(evt, inputs[asset])
+                            }
                           />
                           <button
                             className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
@@ -2244,26 +2230,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           onChange={(e) =>
                             zapInputHandler(e.target.value, e.target.id)
                           }
-                          onKeyDown={(evt) => {
-                            const currentValue = inputs[option[0]];
-
-                            if (
-                              !/[\d.]/.test(evt.key) &&
-                              evt.key !== "Backspace" &&
-                              evt.key !== "ArrowLeft" &&
-                              evt.key !== "ArrowRight"
-                            ) {
-                              evt.preventDefault();
-                            }
-
-                            if (
-                              evt.key === "." &&
-                              currentValue &&
-                              currentValue.includes(".")
-                            ) {
-                              evt.preventDefault();
-                            }
-                          }}
+                          onKeyDown={(evt) =>
+                            handleInputKeyDown(evt, inputs[option[0]])
+                          }
                           className={`ml-2 flex items-center h-full   bg-transparent ${
                             underlyingToken?.address === option[0]
                               ? "text-[16px] w-[70%]"
@@ -2542,26 +2511,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     previewWithdraw(e.target.value);
                     handleInputChange(e.target.value, e.target.id);
                   }}
-                  onKeyDown={(evt) => {
-                    const currentValue = inputs[option[0]];
-
-                    if (
-                      !/[\d.]/.test(evt.key) &&
-                      evt.key !== "Backspace" &&
-                      evt.key !== "ArrowLeft" &&
-                      evt.key !== "ArrowRight"
-                    ) {
-                      evt.preventDefault();
-                    }
-
-                    if (
-                      evt.key === "." &&
-                      currentValue &&
-                      currentValue.includes(".")
-                    ) {
-                      evt.preventDefault();
-                    }
-                  }}
+                  onKeyDown={(evt) =>
+                    handleInputKeyDown(evt, inputs[option[0]])
+                  }
                   pattern="^[0-9]*[.,]?[0-9]*$"
                   inputMode="decimal"
                   className="py-3 flex items-center h-full  bg-transparent  text-[16px] w-[70%] pl-[10px]"
@@ -2778,87 +2730,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           <>
             {chain?.id === Number(network) ? (
               <>
-                {tab === "Deposit" ? (
+                {zapError ? (
+                  <button
+                    disabled
+                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                  >
+                    Failed to get routes from aggregator
+                  </button>
+                ) : (
                   <>
-                    {option?.length > 1 ||
-                    (defaultOption?.assets === option[0] &&
-                      option.length < 2) ? (
+                    {tab === "Deposit" ? (
                       <>
-                        {button === "deposit" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            type="button"
-                            onClick={deposit}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Deposit"}
-                            </p>
-
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
-                            )}
-                          </button>
-                        ) : button === "needApprove" ? (
-                          <div className="flex gap-3">
-                            {option.map(
-                              (asset: any, index: number) =>
-                                allowance &&
-                                formatUnits(
-                                  allowance[asset],
-                                  Number(getTokenData(asset)?.decimals)
-                                ) < inputs[asset] && (
-                                  <button
-                                    disabled={approveIndex !== false}
-                                    className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                      approveIndex === index
-                                        ? "bg-transparent flex items-center justify-center gap-1"
-                                        : "bg-[#486556]"
-                                    }`}
-                                    key={asset}
-                                    type="button"
-                                    onClick={() =>
-                                      approve(asset as TAddress, index)
-                                    }
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : `Approve ${
-                                            getTokenData(asset)?.symbol
-                                          }`}
-                                    </p>
-                                    {approveIndex === index && (
-                                      <Loader color={"#486556"} />
-                                    )}
-                                  </button>
-                                )
-                            )}
-                          </div>
-                        ) : button === "insufficientBalance" ? (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                          >
-                            INSUFFICIENT BALANCE
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                          >
-                            {loader ? "LOADING..." : "ENTER AMOUNT"}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <div>
-                        {vault?.strategyInfo?.shortName === "CCF" &&
-                        defaultOption?.assets?.includes(option[0]) ? (
+                        {option?.length > 1 ||
+                        (defaultOption?.assets === option[0] &&
+                          option.length < 2) ? (
                           <>
                             {button === "deposit" ? (
                               <button
@@ -2883,16 +2768,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               </button>
                             ) : button === "needApprove" ? (
                               <div className="flex gap-3">
-                                {option.map((asset: any, index: number) => {
-                                  if (
+                                {option.map(
+                                  (asset: any, index: number) =>
                                     allowance &&
                                     formatUnits(
                                       allowance[asset],
                                       Number(getTokenData(asset)?.decimals)
-                                    ) < inputs[asset]
-                                  ) {
-                                    isAnyCCFOptionVisible = true;
-                                    return (
+                                    ) < inputs[asset] && (
                                       <button
                                         disabled={approveIndex !== false}
                                         className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2917,12 +2799,31 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                           <Loader color={"#486556"} />
                                         )}
                                       </button>
-                                    );
-                                  } else {
-                                    return null;
-                                  }
-                                })}
-                                {!isAnyCCFOptionVisible && (
+                                    )
+                                )}
+                              </div>
+                            ) : button === "insufficientBalance" ? (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                              >
+                                INSUFFICIENT BALANCE
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                              >
+                                {loader ? "LOADING..." : "ENTER AMOUNT"}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <div>
+                            {vault?.strategyInfo?.shortName === "CCF" &&
+                            defaultOption?.assets?.includes(option[0]) ? (
+                              <>
+                                {button === "deposit" ? (
                                   <button
                                     disabled={transactionInProgress}
                                     className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
@@ -2943,134 +2844,207 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       <Loader color={"#486556"} />
                                     )}
                                   </button>
+                                ) : button === "needApprove" ? (
+                                  <div className="flex gap-3">
+                                    {option.map((asset: any, index: number) => {
+                                      if (
+                                        allowance &&
+                                        formatUnits(
+                                          allowance[asset],
+                                          Number(getTokenData(asset)?.decimals)
+                                        ) < inputs[asset]
+                                      ) {
+                                        isAnyCCFOptionVisible = true;
+                                        return (
+                                          <button
+                                            disabled={approveIndex !== false}
+                                            className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                              approveIndex === index
+                                                ? "bg-transparent flex items-center justify-center gap-1"
+                                                : "bg-[#486556]"
+                                            }`}
+                                            key={asset}
+                                            type="button"
+                                            onClick={() =>
+                                              approve(asset as TAddress, index)
+                                            }
+                                          >
+                                            <p>
+                                              {needConfirm
+                                                ? "Confirm in wallet"
+                                                : `Approve ${
+                                                    getTokenData(asset)?.symbol
+                                                  }`}
+                                            </p>
+                                            {approveIndex === index && (
+                                              <Loader color={"#486556"} />
+                                            )}
+                                          </button>
+                                        );
+                                      } else {
+                                        return null;
+                                      }
+                                    })}
+                                    {!isAnyCCFOptionVisible && (
+                                      <button
+                                        disabled={transactionInProgress}
+                                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                          transactionInProgress
+                                            ? "bg-transparent flex items-center justify-center gap-2"
+                                            : "bg-[#486556]"
+                                        }`}
+                                        type="button"
+                                        onClick={deposit}
+                                      >
+                                        <p>
+                                          {needConfirm
+                                            ? "Confirm in wallet"
+                                            : "Deposit"}
+                                        </p>
+
+                                        {transactionInProgress && (
+                                          <Loader color={"#486556"} />
+                                        )}
+                                      </button>
+                                    )}
+                                  </div>
+                                ) : button === "insufficientBalance" ? (
+                                  <button
+                                    disabled
+                                    className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
+                                  >
+                                    INSUFFICIENT BALANCE
+                                  </button>
+                                ) : (
+                                  <button
+                                    disabled
+                                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                                  >
+                                    {loader ? "LOADING..." : "ENTER AMOUNT"}
+                                  </button>
                                 )}
-                              </div>
-                            ) : button === "insufficientBalance" ? (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                              >
-                                INSUFFICIENT BALANCE
-                              </button>
+                              </>
                             ) : (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                              >
-                                {loader ? "LOADING..." : "ENTER AMOUNT"}
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            {button === "insufficientBalance" ? (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                              >
-                                INSUFFICIENT BALANCE
-                              </button>
-                            ) : button === "needApprove" ? (
-                              <button
-                                disabled={transactionInProgress}
-                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                  transactionInProgress
-                                    ? "bg-transparent flex items-center justify-center gap-2"
-                                    : "bg-[#486556]"
-                                }`}
-                                type="button"
-                                onClick={zapApprove}
-                              >
-                                <p>
-                                  {needConfirm
-                                    ? "Confirm in wallet"
-                                    : `Approve ${
-                                        underlyingToken?.address === option[0]
-                                          ? underlyingToken.symbol
-                                          : getTokenData(option[0])?.symbol
-                                      }`}
-                                </p>
-                                {transactionInProgress && (
-                                  <Loader color={"#486556"} />
+                              <>
+                                {button === "insufficientBalance" ? (
+                                  <button
+                                    disabled
+                                    className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                                  >
+                                    INSUFFICIENT BALANCE
+                                  </button>
+                                ) : button === "needApprove" ? (
+                                  <button
+                                    disabled={transactionInProgress}
+                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                      transactionInProgress
+                                        ? "bg-transparent flex items-center justify-center gap-2"
+                                        : "bg-[#486556]"
+                                    }`}
+                                    type="button"
+                                    onClick={zapApprove}
+                                  >
+                                    <p>
+                                      {needConfirm
+                                        ? "Confirm in wallet"
+                                        : `Approve ${
+                                            underlyingToken?.address ===
+                                            option[0]
+                                              ? underlyingToken.symbol
+                                              : getTokenData(option[0])?.symbol
+                                          }`}
+                                    </p>
+                                    {transactionInProgress && (
+                                      <Loader color={"#486556"} />
+                                    )}
+                                  </button>
+                                ) : button === "deposit" ? (
+                                  <button
+                                    disabled={transactionInProgress}
+                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                                      transactionInProgress
+                                        ? "bg-transparent flex items-center justify-center gap-2"
+                                        : "bg-[#486556]"
+                                    }`}
+                                    type="button"
+                                    onClick={zapDeposit}
+                                  >
+                                    <p>
+                                      {needConfirm
+                                        ? "Confirm in wallet"
+                                        : "Deposit"}
+                                    </p>
+                                    {transactionInProgress && (
+                                      <Loader color={"#486556"} />
+                                    )}
+                                  </button>
+                                ) : (
+                                  <button
+                                    disabled
+                                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                                  >
+                                    {loader ? "LOADING..." : "ENTER AMOUNT"}
+                                  </button>
                                 )}
-                              </button>
-                            ) : button === "deposit" ? (
-                              <button
-                                disabled={transactionInProgress}
-                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                  transactionInProgress
-                                    ? "bg-transparent flex items-center justify-center gap-2"
-                                    : "bg-[#486556]"
-                                }`}
-                                type="button"
-                                onClick={zapDeposit}
-                              >
-                                <p>
-                                  {needConfirm
-                                    ? "Confirm in wallet"
-                                    : "Deposit"}
-                                </p>
-                                {transactionInProgress && (
-                                  <Loader color={"#486556"} />
-                                )}
-                              </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                              >
-                                {loader ? "LOADING..." : "ENTER AMOUNT"}
-                              </button>
+                              </>
                             )}
-                          </>
+                          </div>
                         )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {button === "insufficientBalance" ? (
-                      <button
-                        disabled
-                        className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                      >
-                        INSUFFICIENT BALANCE
-                      </button>
-                    ) : button === "needApprove" ? (
-                      <button
-                        disabled={transactionInProgress}
-                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                          transactionInProgress
-                            ? "bg-transparent flex items-center justify-center gap-2"
-                            : "bg-[#486556]"
-                        }`}
-                        type="button"
-                        onClick={withdrawZapApprove}
-                      >
-                        <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
-                        {transactionInProgress && <Loader color={"#486556"} />}
-                      </button>
-                    ) : button === "withdraw" ? (
-                      <button
-                        disabled={transactionInProgress}
-                        type="button"
-                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                          transactionInProgress
-                            ? "bg-transparent flex items-center justify-center gap-2"
-                            : "bg-[#486556]"
-                        }`}
-                        onClick={withdraw}
-                      >
-                        <p>{needConfirm ? "Confirm in wallet" : "WITHDRAW"}</p>
-                        {transactionInProgress && <Loader color={"#486556"} />}
-                      </button>
+                      </>
                     ) : (
-                      <button
-                        disabled
-                        className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                      >
-                        {loader ? "LOADING..." : "ENTER AMOUNT"}
-                      </button>
+                      <>
+                        {button === "insufficientBalance" ? (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
+                          >
+                            INSUFFICIENT BALANCE
+                          </button>
+                        ) : button === "needApprove" ? (
+                          <button
+                            disabled={transactionInProgress}
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            type="button"
+                            onClick={withdrawZapApprove}
+                          >
+                            <p>
+                              {needConfirm ? "Confirm in wallet" : "Approve"}
+                            </p>
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : button === "withdraw" ? (
+                          <button
+                            disabled={transactionInProgress}
+                            type="button"
+                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
+                              transactionInProgress
+                                ? "bg-transparent flex items-center justify-center gap-2"
+                                : "bg-[#486556]"
+                            }`}
+                            onClick={withdraw}
+                          >
+                            <p>
+                              {needConfirm ? "Confirm in wallet" : "WITHDRAW"}
+                            </p>
+                            {transactionInProgress && (
+                              <Loader color={"#486556"} />
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            disabled
+                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
+                          >
+                            {loader ? "LOADING..." : "ENTER AMOUNT"}
+                          </button>
+                        )}
+                      </>
                     )}
                   </>
                 )}

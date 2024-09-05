@@ -54,8 +54,13 @@ export const get1InchRoutes = async (
     try {
       const response = await axios.get(url);
 
-      setError(false);
+      if (!response?.data[0]?.amountOut) {
+        throw new Error(
+          `1inch status: ${response?.data?.[0]?.aggApiReply.status}`
+        );
+      }
 
+      setError(false);
       return {
         symbol: symbol as string,
         address: address,
@@ -71,7 +76,7 @@ export const get1InchRoutes = async (
         console.log(`Retrying (${currentRetry}/${maxRetries})...`, url);
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else {
-        console.error("1INCH API ERROR:", error);
+        console.error("1inch api error:", error);
         setError(true);
 
         return {
