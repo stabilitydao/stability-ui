@@ -32,6 +32,7 @@ import {
   ZapABI,
   ERC20MetadataUpgradeableABI,
   wagmiConfig,
+  ICHIABI,
 } from "@web3";
 
 import {
@@ -132,6 +133,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [button, setButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<TOptionInfo[]>([]);
   const [approveIndex, setApproveIndex] = useState(false);
+  const [ichiAllow, setIchiAllow] = useState<boolean[]>([true, true]);
 
   const [tokenSelector, setTokenSelector] = useState<boolean>(false);
   const [activeOptionToken, setActiveOptionToken] = useState<{
@@ -1621,6 +1623,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setAllowance(allowanceResult);
   };
 
+  const getIchiAllow = async () => {
+    try {
+      const allowToken0 = (await _publicClient?.readContract({
+        address: vault.underlying,
+        abi: ICHIABI,
+        functionName: "allowToken0",
+      })) as boolean;
+      const allowToken1 = (await _publicClient?.readContract({
+        address: vault.underlying,
+        abi: ICHIABI,
+        functionName: "allowToken1",
+      })) as boolean;
+      setIchiAllow([allowToken0, allowToken1]);
+    } catch (err) {
+      console.error("get ichi allow error:", err);
+    }
+  };
+
   const previewDeposit = async (asset: string, amount: string) => {
     if (!Number(amount)) return;
 
@@ -1657,8 +1677,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 (token) => token.address === option[changedInput ? 0 : 1]
               );
 
-              const decimals = token ? token.decimals : 18;
-              // const decimals = token ? token.decimals + 18 : 24;
+              const decimals = token ? token.decimals + 18 : 24;
+
               amounts.push(parseUnits("1", decimals));
             }
           }
@@ -1666,26 +1686,27 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         try {
           let previewDepositAssets: any;
           if (
-            vault.strategyInfo.shortName !== "IQMF" &&
-            vault.strategyInfo.shortName !== "IRMF"
+            vault.strategyInfo.shortName === "IQMF" ||
+            vault.strategyInfo.shortName === "IRMF"
           ) {
-            previewDepositAssets = await _publicClient?.readContract({
-              address: vault.address,
-              abi: VaultABI,
-              functionName: "previewDepositAssets",
-              args: [defaultOption?.assetsArray as TAddress[], amounts],
-            });
-          } else {
             // IQMF & IRMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : 0n)
             );
+
             previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
               args: [assets, IQMFAmounts],
+            });
+          } else {
+            previewDepositAssets = await _publicClient?.readContract({
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [defaultOption?.assetsArray as TAddress[], amounts],
             });
           }
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
@@ -1800,6 +1821,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       selectTokensHandler();
     }
   }, [vault, $tokens, defaultOption, defaultOption]);
+
+  useEffect(() => {
+    if (vault?.alm?.protocol === "Ichi") {
+      getIchiAllow();
+    }
+  }, []);
 
   useEffect(() => {
     setZapTokens(false);
@@ -2076,79 +2103,84 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
                 <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
-                  {option.map((asset: string) => (
-                    <div className="w-full" key={asset}>
-                      {!!balances[asset] && (
-                        <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                          <p>Balance: </p>
-                          <p>{balances[asset]}</p>
+                  {option.map((asset: string, index: number) => (
+                    <div key={asset}>
+                      {ichiAllow[index] && (
+                        <div className="w-full">
+                          {!!balances[asset] && (
+                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                              <p>Balance: </p>
+                              <p>{balances[asset]}</p>
+                            </div>
+                          )}
+
+                          <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
+                            <div className="py-3 w-full flex items-center px-4">
+                              <label
+                                htmlFor={asset}
+                                className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
+                              >
+                                {tokenlist.tokens.map((token) => {
+                                  if (token.address.toLowerCase() === asset) {
+                                    return (
+                                      <div
+                                        className="flex items-center gap-2"
+                                        key={token.address}
+                                      >
+                                        <img
+                                          className="rounded-full w-[25px] h-[25px] "
+                                          src={token.logoURI}
+                                          alt={token.name}
+                                        />
+                                      </div>
+                                    );
+                                  }
+                                })}
+                              </label>
+                              <input
+                                className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
+                                list="amount"
+                                id={asset}
+                                name="amount"
+                                placeholder="0"
+                                value={inputs[asset]}
+                                onChange={(e) =>
+                                  handleInputChange(e.target.value, e.target.id)
+                                }
+                                type="text"
+                                onKeyDown={(evt) =>
+                                  handleInputKeyDown(evt, inputs[asset])
+                                }
+                              />
+                              <button
+                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
+                                onClick={() =>
+                                  balances[asset] &&
+                                  handleInputChange(balances[asset], asset)
+                                }
+                                type="button"
+                              >
+                                MAX
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                            <p>
+                              $
+                              {$assetsPrices[network] &&
+                              inputs[asset] > 0 &&
+                              underlyingToken?.address != option[0]
+                                ? (
+                                    Number(
+                                      $assetsPrices[network][asset].price
+                                    ) * inputs[asset]
+                                  ).toFixed(2)
+                                : 0}
+                            </p>
+                          </div>
                         </div>
                       )}
-
-                      <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
-                        <div className="py-3 w-full flex items-center px-4">
-                          <label
-                            htmlFor={asset}
-                            className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
-                          >
-                            {tokenlist.tokens.map((token) => {
-                              if (token.address.toLowerCase() === asset) {
-                                return (
-                                  <div
-                                    className="flex items-center gap-2"
-                                    key={token.address}
-                                  >
-                                    <img
-                                      className="rounded-full w-[25px] h-[25px] "
-                                      src={token.logoURI}
-                                      alt={token.name}
-                                    />
-                                  </div>
-                                );
-                              }
-                            })}
-                          </label>
-                          <input
-                            className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
-                            list="amount"
-                            id={asset}
-                            name="amount"
-                            placeholder="0"
-                            value={inputs[asset]}
-                            onChange={(e) =>
-                              handleInputChange(e.target.value, e.target.id)
-                            }
-                            type="text"
-                            onKeyDown={(evt) =>
-                              handleInputKeyDown(evt, inputs[asset])
-                            }
-                          />
-                          <button
-                            className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
-                            onClick={() =>
-                              balances[asset] &&
-                              handleInputChange(balances[asset], asset)
-                            }
-                            type="button"
-                          >
-                            MAX
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                        <p>
-                          $
-                          {$assetsPrices[network] &&
-                          inputs[asset] > 0 &&
-                          underlyingToken?.address != option[0]
-                            ? (
-                                Number($assetsPrices[network][asset].price) *
-                                inputs[asset]
-                              ).toFixed(2)
-                            : 0}
-                        </p>
-                      </div>
                     </div>
                   ))}
                 </div>
