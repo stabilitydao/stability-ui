@@ -129,13 +129,13 @@ const CHAINS = [
     explorer: "https://polygonscan.com/address/",
     active: true, // main page active networks
   },
-  // {
-  //   name: "Base",
-  //   id: "8453",
-  //   logoURI: "https://www.base.org/document/favicon-32x32.png",
-  //   explorer: "https://basescan.org/address/",
-  //   active: true, // main page active networks
-  // },
+  {
+    name: "Base",
+    id: "8453",
+    logoURI: "https://www.base.org/document/favicon-32x32.png",
+    explorer: "https://basescan.org/address/",
+    active: true, // main page active networks
+  },
 ];
 
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
