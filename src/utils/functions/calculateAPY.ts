@@ -1,9 +1,5 @@
 export const calculateAPY = (apr: number | string): number => {
-  if (!apr) {
-    apr = 0;
-  } else {
-    apr = Number(apr) / 100;
-  }
+  apr = apr ? Number(apr) / 100 : 0;
 
   const compoundingFrequency = 365;
   const apy =

@@ -12,7 +12,7 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import { deployments, getAsset } from "@stabilitydao/stability";
+import { deployments, getAsset, seeds } from "@stabilitydao/stability";
 
 import {
   account,
@@ -50,7 +50,6 @@ import {
 } from "@utils";
 
 import {
-  STABILITY_API,
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
@@ -102,7 +101,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const getDataFromStabilityAPI = async () => {
     try {
-      const response = await axios.get(STABILITY_API);
+      const response = await axios.get(seeds[0]);
 
       stabilityAPIData = response.data;
 
@@ -110,6 +109,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         assetsPrices.set(stabilityAPIData?.assetPrices);
         prices = stabilityAPIData?.assetPrices;
       }
+
       apiData.set(stabilityAPIData);
     } catch (error) {
       console.error("API ERROR:", error);
@@ -195,18 +195,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           }
         });
 
-        const lastHistoryData = vault.apr;
-
         ///// APR DATA CALCULATION
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
 
-        const dailyFarmApr = lastHistoryData?.income24h
-          ? Number(lastHistoryData?.income24h)
+        const dailyFarmApr = vault.apr?.income24h
+          ? Number(vault.apr?.income24h)
           : 0;
 
-        const weeklyFarmApr = lastHistoryData?.incomeWeek
-          ? Number(lastHistoryData?.incomeWeek)
+        const weeklyFarmApr = vault.apr?.incomeWeek
+          ? Number(vault.apr?.incomeWeek)
           : 0;
 
         if (underlying) {
@@ -253,7 +251,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const APY = calculateAPY(APR).toFixed(2);
 
-        const APRWithoutFees = vault?.apr?.incomeLatest || 0;
+        const APRWithoutFees = Number(vault?.apr?.incomeLatest).toFixed(2) || 0;
 
         const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
 
@@ -267,12 +265,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           withFees: {
             latest: String(APR),
             daily: determineAPR(
-              lastHistoryData?.income24h,
+              vault.apr?.income24h,
               dailyTotalAPRWithFees,
               APR
             ),
             weekly: determineAPR(
-              lastHistoryData?.incomeWeek,
+              vault.apr?.incomeWeek,
               weeklyTotalAPRWithFees,
               APR
             ),
@@ -280,12 +278,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           withoutFees: {
             latest: APRWithoutFees,
             daily: determineAPR(
-              lastHistoryData?.income24h,
+              vault.apr?.income24h,
               dailyFarmApr,
               APRWithoutFees
             ),
             weekly: determineAPR(
-              lastHistoryData?.incomeWeek,
+              vault.apr?.incomeWeek,
               weeklyFarmApr,
               APRWithoutFees
             ),
@@ -295,12 +293,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           withFees: {
             latest: APY,
             daily: determineAPR(
-              lastHistoryData?.income24h,
+              vault.apr?.income24h,
               calculateAPY(dailyTotalAPRWithFees).toFixed(2),
               APY
             ),
             weekly: determineAPR(
-              lastHistoryData?.incomeWeek,
+              vault.apr?.incomeWeek,
               calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
               APY
             ),
@@ -308,12 +306,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           withoutFees: {
             latest: APYWithoutFees,
             daily: determineAPR(
-              lastHistoryData?.income24h,
+              vault.apr?.income24h,
               calculateAPY(dailyFarmApr).toFixed(2),
               APYWithoutFees
             ),
             weekly: determineAPR(
-              lastHistoryData?.incomeWeek,
+              vault.apr?.incomeWeek,
               calculateAPY(weeklyFarmApr).toFixed(2),
               APYWithoutFees
             ),
@@ -332,12 +330,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const farmAPR = {
           latest: APRWithoutFees,
           daily: determineAPR(
-            lastHistoryData?.income24h,
+            vault.apr?.income24h,
             dailyFarmApr,
             APRWithoutFees
           ),
           weekly: determineAPR(
-            lastHistoryData?.incomeWeek,
+            vault.apr?.incomeWeek,
             weeklyFarmApr,
             APRWithoutFees
           ),
@@ -361,9 +359,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const vaultCreated = vault.created as number;
 
         const lifetimeVsHoldAPR =
-          lastHistoryData?.vsHoldLifetime &&
+          vault.apr?.vsHoldLifetime &&
           getTimeDifference(vaultCreated)?.days >= 3
-            ? Number(lastHistoryData?.vsHoldLifetime).toFixed(2)
+            ? Number(vault.apr?.vsHoldLifetime).toFixed(2)
             : 0;
 
         const currentTime = Math.floor(Date.now() / 1000);
@@ -382,7 +380,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         ).toFixed(2);
 
         let lifetimeTokensHold: THoldData[] = [];
-        if (lastHistoryData?.vsHoldAssetsLifetime && prices) {
+        if (vault.apr?.vsHoldAssetsLifetime && prices) {
           lifetimeTokensHold = strategyAssets.map(
             (asset: string, index: number) => {
               const price = vault?.assetsPricesLast?.[index]
@@ -400,7 +398,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
               const yearPercentDiff =
-                Number(lastHistoryData?.vsHoldAssetsLifetime[index]) || 0;
+                Number(vault.apr?.vsHoldAssetsLifetime[index]) || 0;
 
               const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
 

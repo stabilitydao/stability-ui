@@ -15,7 +15,7 @@ import {
   CRV,
 } from "./tokens";
 
-import { deployments } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
 const APRsType = ["latest", "24h", "week"];
 
@@ -127,6 +127,7 @@ const CHAINS = [
     logoURI:
       "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
     explorer: "https://polygonscan.com/address/",
+    nativeCurrency: "POL",
     active: true, // main page active networks
   },
   {
@@ -134,6 +135,7 @@ const CHAINS = [
     id: "8453",
     logoURI: "https://www.base.org/document/favicon-32x32.png",
     explorer: "https://basescan.org/address/",
+    nativeCurrency: "ETH",
     active: true, // main page active networks
   },
 ];
@@ -282,19 +284,6 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
 
-const GRAPH_ENDPOINTS: { [key: string]: string } = {
-  137: deployments[137].subgraph.replace(
-    "[api-key]",
-    import.meta.env.PUBLIC_GRAPH_API_KEY
-  ),
-  8453: deployments[8453].subgraph.replace(
-    "[api-key]",
-    import.meta.env.PUBLIC_GRAPH_API_KEY
-  ),
-};
-
-const STABILITY_API = "https://api.stabilitydao.org/";
-
 export {
   APRsType,
   TABLE,
@@ -302,9 +291,7 @@ export {
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,
-  GRAPH_ENDPOINTS,
   PROTOCOLS,
-  STABILITY_API,
   PROFIT,
   PM,
   SDIV,
