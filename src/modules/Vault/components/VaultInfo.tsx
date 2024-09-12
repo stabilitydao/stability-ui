@@ -2,16 +2,18 @@ import { memo, useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import { formatUnits } from "viem";
 import { useWalletClient, useAccount } from "wagmi";
 
 import { VaultState, VaultType } from "@ui";
 
 import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
+import { CHAINS } from "@constants";
+
 import { connected, currentChainID } from "@store";
 
 import type { TVault } from "@types";
-import { formatUnits } from "viem";
 
 interface IProps {
   network: string;
@@ -59,6 +61,10 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
       : 0;
   }, [vault?.gasReserve]);
 
+  const nativeCurrency = CHAINS.find(
+    (chain) => chain.id === network
+  )?.nativeCurrency;
+
   return (
     <div>
       <div className="flex justify-between items-center h-[60px]">
@@ -67,10 +73,10 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
       <div className="flex flex-col items-start gap-5 p-4">
         <div className="flex flex-col gap-3">
-          <p className="text-[16px]">
+          <p data-testid="vaultType" className="text-[16px]">
             <VaultType text="long" type={vault?.type} />
           </p>
-          <p className="text-[18px]">
+          <p data-testid="vaultIncomeText" className="text-[18px]">
             All income is automatically reinvested into vault
           </p>
         </div>
@@ -82,14 +88,16 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             </p>
             <div className="text-[16px] mt-1 flex items-center gap-1">
               <VaultState status={vault?.status} />
-              <span> {vault?.status}</span>
+              <span data-testid="vaultStatus">{vault?.status}</span>
             </div>
           </div>
           <div className="sm:w-1/2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               GAS RESERVE
             </p>
-            <p className="text-[16px] mt-1">{gasReserve} MATIC</p>
+            <p data-testid="vaultGasReserve" className="text-[16px] mt-1">
+              {gasReserve} {nativeCurrency}
+            </p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">

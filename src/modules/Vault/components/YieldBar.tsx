@@ -113,17 +113,17 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
               <tr className="hover:bg-[#2B3139]">
                 <td>Total APY</td>
-                <td className="text-right py-1">
+                <td data-testid="yieldLatestAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apy?.withFees?.latest}%`
                     : "-"}
                 </td>
-                <td className="text-right py-1">
+                <td data-testid="yieldDailyAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apy?.withFees?.daily}%`
                     : "-"}
                 </td>
-                <td className="text-right py-1">
+                <td data-testid="yieldWeeklyAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apy?.withFees?.weekly}%`
                     : "-"}
@@ -131,17 +131,17 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
               </tr>
               <tr className="hover:bg-[#2B3139]">
                 <td>Total APR</td>
-                <td className="text-right py-1">
+                <td data-testid="yieldLatestAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apr?.withFees?.latest}%`
                     : "-"}
                 </td>
-                <td className="text-right py-1">
+                <td data-testid="yieldDailyAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apr?.withFees?.daily}%`
                     : "-"}
                 </td>
-                <td className="text-right py-1">
+                <td data-testid="yieldWeeklyAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.apr?.withFees?.weekly}%`
                     : "-"}
@@ -151,17 +151,26 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 <tr className="hover:bg-[#2B3139]">
                   <td>Pool swap fees APR</td>
 
-                  <td className="text-right py-1">
+                  <td
+                    data-testid="yieldLatestPoolAPR"
+                    className="text-right py-1"
+                  >
                     {!!Number(vault.shareprice)
                       ? `${vault?.earningData?.poolSwapFeesAPR?.latest}%`
                       : "-"}
                   </td>
-                  <td className="text-right py-1">
+                  <td
+                    data-testid="yieldDailyPoolAPR"
+                    className="text-right py-1"
+                  >
                     {!!Number(vault.shareprice)
                       ? `${vault?.earningData?.poolSwapFeesAPR?.daily}%`
                       : "-"}
                   </td>
-                  <td className="text-right py-1">
+                  <td
+                    data-testid="yieldWeeklyPoolAPR"
+                    className="text-right py-1"
+                  >
                     {!!Number(vault.shareprice)
                       ? `${vault?.earningData?.poolSwapFeesAPR?.weekly}%`
                       : "-"}
@@ -174,18 +183,24 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 ) : (
                   <td>Farm APR</td>
                 )}
-                <td className="text-right py-1">
+                <td
+                  data-testid="yieldLatestFarmAPR"
+                  className="text-right py-1"
+                >
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.farmAPR?.latest}%`
                     : "-"}
                 </td>
 
-                <td className="text-right py-1">
+                <td data-testid="yieldDailyFarmAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.farmAPR?.daily}%`
                     : "-"}
                 </td>
-                <td className="text-right py-1">
+                <td
+                  data-testid="yieldWeeklyFarmAPR"
+                  className="text-right py-1"
+                >
                   {!!Number(vault.shareprice)
                     ? `${vault?.earningData?.farmAPR?.weekly}%`
                     : "-"}
@@ -237,6 +252,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
                 {vault.isVsActive ? (
                   <td
+                    data-testid="vaultVsHold"
                     className={`text-right ${
                       vault.vsHoldAPR > 0 ? "text-[#b0ddb8]" : "text-[#eb7979]"
                     }`}
@@ -249,6 +265,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 )}
                 {vault.isVsActive ? (
                   <td
+                    data-testid="vaultVsHoldLifetime"
                     className={`text-right ${
                       vault.lifetimeVsHoldAPR > 0
                         ? "text-[#b0ddb8]"
@@ -270,6 +287,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
                     {vault.isVsActive ? (
                       <td
+                        data-testid={`tokensHold${index}`}
                         className={`text-right ${
                           Number(aprsData.latestAPR) > 0
                             ? "text-[#b0ddb8]"
@@ -285,6 +303,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
                     {vault.isVsActive ? (
                       <td
+                        data-testid={`lifetimeTokensHold${index}`}
                         className={`text-right ${
                           Number(aprsData.latestAPR) > 0
                             ? "text-[#b0ddb8]"

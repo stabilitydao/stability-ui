@@ -157,7 +157,10 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                 className="border-b border-[#4f5158] h-[60px]"
               >
                 <td>
-                  <div className="ml-3 hidden sm:block">
+                  <div
+                    data-testid="contractsLogo"
+                    className="ml-3 hidden sm:block"
+                  >
                     {logo === "proportions" ? (
                       <img
                         src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
@@ -177,14 +180,25 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                 </td>
                 <td>
                   <div className="flex flex-col items-start">
-                    <span className="text-[14px] sm:text-[18px]">{symbol}</span>
-                    <span className="text-[#8D8E96] text-[14px] mt-[-6px]">
+                    <span
+                      data-testid="contractsSymbol"
+                      className="text-[14px] sm:text-[18px]"
+                    >
+                      {symbol}
+                    </span>
+                    <span
+                      data-testid="contractsType"
+                      className="text-[#8D8E96] text-[14px] mt-[-6px]"
+                    >
                       {type}
                     </span>
                   </div>
                 </td>
                 <td className="flex items-center justify-end gap-3 sm:gap-5 h-[60px]">
-                  <span className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]">
+                  <span
+                    data-testid="contractsAddress"
+                    className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]"
+                  >
                     {address.slice(0, 6)}...{address.slice(-4)}
                   </span>
                   <div className="flex items-center">
@@ -207,6 +221,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                       </div>
                     ) : (
                       <div
+                        data-testid="contractCopyBtn"
                         onClick={() => copyHandler(address)}
                         className="cursor-pointer px-1 py-1"
                       >
@@ -236,6 +251,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                     )}
 
                     <a
+                      data-testid="contractLinkBtn"
                       className="flex items-center px-1 py-1 whitespace-nowrap"
                       href={`${explorer}${address}`}
                       target="_blank"

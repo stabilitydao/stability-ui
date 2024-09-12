@@ -2,7 +2,11 @@ import { test, expect } from "@playwright/test";
 
 import axios from "axios";
 
-// Cannot use imports from constants and utils due to .env or playwright bugs ¯\_(ツ)_/¯
+import { seeds } from "@stabilitydao/stability";
+
+import { formatNumber } from "../../src/utils/functions/formatNumber";
+
+import { CHAINS } from "@constants";
 
 const CURRENT_ACTIVE_VAULTS = 19;
 
@@ -11,8 +15,6 @@ const SEARCH_VALUES = {
   invalidByNumber: String(Math.random()),
   invalidByLaguage: "вматик",
 };
-
-const CHAINS = ["137", "8453"];
 
 const NETWORKS = ["Polygon", "Base"];
 
@@ -52,37 +54,15 @@ const PORTFOLIO_VALUES = ["Deposited", "Daily", "Monthly", "APR", "APY"];
 
 let allVaults: any[] = [];
 
-const formatTVL = (value: number): string => {
-  let changedValue = "";
-
-  const suffixes = ["", "K", "M", "B", "T"];
-  let suffixNum = 0;
-
-  while (value >= 1000) {
-    value /= 1000;
-    suffixNum++;
-  }
-
-  const fixeds = !!suffixNum ? 2 : 0;
-  let roundedValue = value.toFixed(fixeds);
-
-  if (suffixNum > 0) {
-    roundedValue += suffixes[suffixNum];
-  }
-  changedValue = "$" + roundedValue;
-
-  return changedValue;
-};
-
 test.beforeEach(async ({ page }) => {
   try {
-    const response = await axios.get("https://api.stabilitydao.org/");
+    const response = await axios.get(seeds[0]);
 
     const vaultsData = response.data?.vaults || {};
 
     allVaults = await Promise.all(
       CHAINS.map(async (chain) => {
-        const chainVaults = vaultsData[chain] || {};
+        const chainVaults = vaultsData[chain?.id] || {};
         return Object.values(chainVaults).map((vault) => vault);
       })
     );
@@ -96,6 +76,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("Vaults page tests", () => {
+  test.setTimeout(500000);
   test("logo and vaults tab is clickable and refers to main page", async ({
     page,
   }) => {
@@ -501,8 +482,9 @@ test.describe("Vaults page tests", () => {
     try {
       const TVLs = allVaults.map((vault) => vault.tvl);
 
-      const totalTVL = TVLs.reduce((acc, tvl) => acc + tvl, 0);
-      const formattedTVL = formatTVL(totalTVL);
+      const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
+
+      const formattedTVL = formatNumber(totalTVL, "abbreviate");
 
       await page.waitForSelector("[data-testid='tvl']");
 

@@ -47,15 +47,14 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
       apr = vault?.earningData?.apr?.withFees?.[$aprFilter];
       apy = vault?.earningData?.apy?.withFees?.[$aprFilter];
     }
+
     monthlyAPR = Number(apr) / 12;
-    monthlyEarn = String(
-      ((userBalances.USDBalance * monthlyAPR) / 100).toFixed(2)
-    );
-    monthlyAPR = String(monthlyAPR.toFixed(2));
+    monthlyEarn = ((userBalances.USDBalance * monthlyAPR) / 100).toFixed(2);
+    monthlyAPR = monthlyAPR.toFixed(2);
 
     dailyAPR = Number(apr) / 365;
-    dailyEarn = String(((userBalances.USDBalance * dailyAPR) / 100).toFixed(2));
-    dailyAPR = String(dailyAPR.toFixed(2));
+    dailyEarn = ((userBalances.USDBalance * dailyAPR) / 100).toFixed(2);
+    dailyAPR = dailyAPR.toFixed(2);
 
     setEarnData({ apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn });
   }, [$hideFeeAPR, $aprFilter, userBalances]);
@@ -83,7 +82,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   return (
     <div className="bg-button rounded-md">
       <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
-        <div className="hidden lg:flex items-center gap-[17px]">
+        <div
+          data-testid="infoBarLogo"
+          className="hidden lg:flex items-center gap-[17px]"
+        >
           <img
             src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
             alt="logo"
@@ -97,11 +99,14 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               title={vaultChain?.name}
             />
             {!!vault?.strategyInfo?.protocols.length && (
-              <div className="lg:flex items-start gap-3 hidden">
+              <div
+                className="lg:flex items-start gap-3 hidden"
+                data-testid="infoBarStrategyesLogo"
+              >
                 {vault?.strategyInfo?.protocols.map((protocol, index) => (
                   <img
                     key={protocol?.name + index}
-                    className="w-7 h-7 rounded-full "
+                    className="w-7 h-7 rounded-full"
                     src={protocol?.logoSrc}
                     alt={protocol?.name}
                     title={protocol?.name}
@@ -110,7 +115,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               </div>
             )}
             {!!vault.yearnProtocols.length && (
-              <div className="flex gap-3">
+              <div className="flex gap-3" data-testid="infoBarProtocolsLogo">
                 {vault.yearnProtocols.map((protocol) => (
                   <img
                     key={protocol.link}
@@ -137,7 +142,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 TVL
               </p>
-              <p className="text-[16px] whitespace-nowrap">
+              <p
+                data-testid="infoBarTVL"
+                className="text-[16px] whitespace-nowrap"
+              >
                 {formatNumber(vault.tvl, "abbreviate")}
               </p>
             </div>
@@ -146,7 +154,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 DEPOSITED
               </p>
               <div className="text-[16px] flex whitespace-nowrap">
-                <p className="mr-1">
+                <p data-testid="infoBarDeposited" className="mr-1">
                   {formatNumber(userBalances.shareBalance, "format")}
                 </p>
                 <p className="whitespace-nowrap md:hidden lg:block">
@@ -160,7 +168,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
                 SHARE PRICE
               </p>
-              <p className="text-[16px] whitespace-nowrap">
+              <p
+                data-testid="infoBarSP"
+                className="text-[16px] whitespace-nowrap"
+              >
                 ${Number(vault.shareprice).toFixed(5)}
               </p>
             </div>
@@ -168,7 +179,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 DAILY
               </p>
-              <p className="text-[16px] whitespace-nowrap">
+              <p
+                data-testid="infoBarDailyAPR"
+                className="text-[16px] whitespace-nowrap"
+              >
                 {earnData.dailyAPR}% / {earnData.dailyEarn}$
               </p>
             </div>
@@ -178,7 +192,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 APR / APY
               </p>
-              <p className="text-[16px] whitespace-nowrap">
+              <p
+                data-testid="infoBarAPR"
+                className="text-[16px] whitespace-nowrap"
+              >
                 {earnData.apr}% / {earnData.apy}%
               </p>
             </div>
@@ -186,7 +203,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
                 MONTHLY
               </p>
-              <p className="text-[16px] whitespace-nowrap">
+              <p
+                data-testid="infoBarMonthlyAPR"
+                className="text-[16px] whitespace-nowrap"
+              >
                 {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
               </p>
             </div>

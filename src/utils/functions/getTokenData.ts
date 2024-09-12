@@ -17,4 +17,5 @@ const getTokenData = (address: string): TTokenData | undefined => {
   }
   return undefined;
 };
+
 export { getTokenData };

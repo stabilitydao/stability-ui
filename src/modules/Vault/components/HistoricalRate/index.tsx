@@ -9,7 +9,9 @@ import { ChartSkeleton } from "@ui";
 
 import { formatFromBigInt } from "@utils";
 
-import { GRAPH_ENDPOINTS, MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
+import { GRAPH_ENDPOINTS } from "src/constants/env";
+
+import { MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
 import type { TAddress, TChartData } from "@types";
 
