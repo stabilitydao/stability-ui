@@ -27,6 +27,7 @@ export default getViteConfig({
         "**/src/modules/CreateVault/**",
         "**/src/components/**",
         "**/src/ui/**",
+        "**/src/constants/env.ts",
       ],
       include: ["**/*.ts"],
     },
