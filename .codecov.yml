@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        threshold: 30
+        # paths:
+        #   - "src/*"
+    patch:
+      default:
+        threshold: 30
