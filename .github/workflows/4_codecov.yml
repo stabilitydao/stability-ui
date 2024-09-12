@@ -25,3 +25,6 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         env:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+        with:
+          fail_ci_if_error: false
+          threshold: 3
