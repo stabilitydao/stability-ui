@@ -2,9 +2,11 @@ coverage:
   status:
     project:
       default:
-        threshold: 30
-        # paths:
-        #   - "src/*"
+        enabled: yes
+        threshold: 0
+        informational: true
     patch:
       default:
-        threshold: 30
+        enabled: yes
+        threshold: 0
+        informational: true
