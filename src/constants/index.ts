@@ -15,8 +15,6 @@ import {
   CRV,
 } from "./tokens";
 
-import { seeds } from "@stabilitydao/stability";
-
 const APRsType = ["latest", "24h", "week"];
 
 const TABLE: TTableColumn[] = [
