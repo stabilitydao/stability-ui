@@ -43,7 +43,7 @@ const Platform = () => {
 
   })
 
-  const capitalize = (s: string) => (s && s[0].toUpperCase() + s.slice(1)) || ""
+  // const capitalize = (s: string) => (s && s[0].toUpperCase() + s.slice(1)) || ""
 
   let protocolsTotal = 0
   for (const defiOrgCode of Object.keys(integrations)) {
