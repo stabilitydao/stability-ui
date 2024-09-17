@@ -1,0 +1,17 @@
+---
+import {Platform} from '@components/Platform';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Platform">
+    <div class="platform max-w-[1200px]">
+        <Platform client:only="react" />
+    </div>
+</Layout>
+
+<style is:global>
+    .what-to-build table td {
+        padding: 0 20px;
+    }
+    
+</style>
