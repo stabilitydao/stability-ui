@@ -1,8 +1,28 @@
 # Stability User Interface
 
-## Tasks
+## Pages
 
-[Issues](https://github.com/stabilitydao/stability-ui/issues)
+| Name                                                                                                                | Status            | Description                                   |
+|---------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------|
+| **Landing**                                                                                                         | Development Figma | Index page                                    |
+| [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                    |
+| --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                    |
+| **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts |
+| **Contest**                                                                                                         |                   | Yield contests                                |
+| **AI**                                                                                                              |                   | Chatbot                                       |
+| **DAO**                                                                                                             |                   | Self-developing DAO portal                    |
+| [**Platform**](https://stability.farm/platform)                                                                     | Development       | Platform portal                               |
+| --- [**Factory**](https://stability.farm/create-vault)                                                              | Development       | Factory of vaults, farms.                     |
+| --- [**Network**](https://stability.farm/network)                                                                   | Development       | Stability p2p network nodes                   |
+| --- --- [**Node**](https://stability.farm/network/6e9a70eb6628e1295772218defdf254ce3200890cb16cc588c4dab5000972edd) | Development       | Node page                                     |
+| --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                            |
+| --- --- **Strategy**                                                                                                |                   | Strategy page                                 |
+| --- [**Integrations**](https://stability.farm/protocols)                                                            | Development       | List of DeFi protocols and organizations      |
+| --- --- **Organization**                                                                                            |                   | Chain page                                    |
+| --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform   |
+| --- --- **Chain**                                                                                                   |                   | Chain page                                    |
+| --- [**Assets**](https://stability.farm/assets)                                                                     | Development       | List of supported assets                      |
+| --- --- **Asset**                                                                                                   |                   | Asset page                                    |
 
 ## Coverage
 
@@ -25,12 +45,8 @@
 ```
 yarn
 yarn dev
+yarn lint
+yarn test:unit
+yarn test:e2e
+yarn build
 ```
-
-### Adding a new strategy
-
-1. Add a protocol logo in the /protocols folder
-2. Update the PROTOCOLS constant
-3. Add data to getStrategyInfo
-4. Update getProtocolLogo function (if necessary)
-5. Update strategy specific substitute (if necessary)

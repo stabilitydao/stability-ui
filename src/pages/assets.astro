@@ -1,0 +1,10 @@
+---
+import {Assets} from '@components/Platform/Assets';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Assets">
+    <div class="platform max-w-[1200px]">
+        <Assets client:only="react" />
+    </div>
+</Layout>

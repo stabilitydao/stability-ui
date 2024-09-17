@@ -1,0 +1,11 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Node} from "@components/Platform/Node"
+const { machineId } = Astro.params;
+---
+
+<Layout title="Node">
+    <div class="my-vault max-w-[1200px]">
+        <Node machineIdHash={machineId} client:only="react" />
+    </div>
+</Layout>

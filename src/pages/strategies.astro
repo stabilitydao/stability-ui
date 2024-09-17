@@ -1,0 +1,10 @@
+---
+import {Strategies} from '@components/Platform/Strategies';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Strategies">
+    <div class="platform max-w-[1200px]">
+        <Strategies client:only="react" />
+    </div>
+</Layout>

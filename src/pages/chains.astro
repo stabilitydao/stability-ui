@@ -1,0 +1,10 @@
+---
+import {Chains} from '@components/Platform/Chains';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Chains">
+    <div class="platform max-w-[1200px]">
+        <Chains client:only="react" />
+    </div>
+</Layout>
