@@ -12,7 +12,7 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import {type ApiMainReply, deployments, getAsset, seeds} from "@stabilitydao/stability";
+import {deployments, getAsset, seeds} from "@stabilitydao/stability";
 
 import {
   account,
@@ -102,8 +102,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const getDataFromStabilityAPI = async () => {
     try {
       const response = await axios.get(seeds[0]);
-
-      const apiMainReply = response.data as ApiMainReply;
       stabilityAPIData = response.data;
 
       if (stabilityAPIData?.assetPrices) {

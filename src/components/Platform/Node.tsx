@@ -1,4 +1,4 @@
-import {type ApiMainReply, strategies, type StrategyShortId} from "@stabilitydao/stability";
+import {type ApiMainReply} from "@stabilitydao/stability";
 import {useStore} from "@nanostores/react";
 import {apiData} from "@store";
 import type {NodeState} from "@stabilitydao/stability/out/api.types";

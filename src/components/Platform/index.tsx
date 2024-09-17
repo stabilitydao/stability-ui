@@ -1,16 +1,14 @@
 import {useStore} from "@nanostores/react";
 import {apiData, currentChainID, platformVersions} from "@store";
 import {
-  type ApiMainReply, assets,
-  deployments,
+  type ApiMainReply,
+  assets,
   getNetworksTotals,
   integrations,
   strategies,
   StrategyShortId,
   StrategyState
 } from "@stabilitydao/stability";
-import {useMemo} from "react";
-import {CHAINS} from "@constants";
 import packageJson from "../../../package.json";
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
@@ -18,10 +16,6 @@ const Platform = () => {
   const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply|undefined = useStore(apiData);
-  // console.log($apiData)
-  const currentChain = useMemo(() => {
-    return CHAINS.find((chain) => chain.id === $currentChainID);
-  }, [$currentChainID]);
 
   const _networksTotal = getNetworksTotals()
 
