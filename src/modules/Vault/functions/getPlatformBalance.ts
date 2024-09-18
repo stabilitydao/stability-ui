@@ -6,7 +6,22 @@ import { platforms, PlatformABI } from "@web3";
 
 import type { TAddress, TBalances } from "@types";
 
-const getPlatformBalance = async (
+/**
+ * Retrieves the balance of a user's assets from a specific platform on a blockchain network, updates the global store, and returns the balances
+ *
+ * @example
+ * ```
+ * const balances = await getPlatformBalance(publicClient, "mainnet", "0xUserAddress");
+ * ```
+ *
+ * @param {any} publicClient - Public client instance used to interact with the blockchain
+ * @param {string} network - Network
+ * @param {TAddress} address - User wallet address for which the balance is retrieved
+ *
+ * @returns {Promise<TBalances | undefined>} Promise that resolves to the balances of assets for the given platform, or `undefined` if an error occurs
+ */
+
+export const getPlatformBalance = async (
   publicClient: any,
   network: string,
   address: TAddress
@@ -28,5 +43,3 @@ const getPlatformBalance = async (
 
   return currentChainBalances;
 };
-
-export { getPlatformBalance };

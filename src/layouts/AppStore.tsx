@@ -12,7 +12,7 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import {deployments, getAsset, seeds} from "@stabilitydao/stability";
+import { deployments, getAsset, seeds } from "@stabilitydao/stability";
 
 import {
   account,
@@ -70,6 +70,8 @@ import type {
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+
+import { strategies } from "@stabilitydao/stability";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -134,7 +136,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
         const strategyInfo = getStrategyInfo(vault?.symbol);
-
+        console.log(strategyInfo);
+        console.log(strategies.DQMF);
         const strategyName = strategyInfo?.shortName;
 
         const NOW = Math.floor(Date.now() / 1000);

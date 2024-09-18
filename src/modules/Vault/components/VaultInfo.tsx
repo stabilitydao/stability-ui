@@ -103,7 +103,10 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
           <div className="flex flex-col">
             {timeDifference && (
-              <div className="flex flex-col justify-between">
+              <div
+                data-testid="vaultLastHardWork"
+                className="flex flex-col justify-between"
+              >
                 <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
                   Last Hard Work
                 </p>
@@ -141,7 +144,9 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               HARD WORK ON DEPOSIT
             </p>
-            <p className="text-[16px] mt-1">{hardWorkOnDeposit}</p>
+            <p data-testid="hardWorkOnDeposit" className="text-[16px] mt-1">
+              {hardWorkOnDeposit}
+            </p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
@@ -149,7 +154,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               CREATED
             </p>
-            <p className="text-[16px] mt-1">
+            <p data-testid="vaultCreated" className="text-[16px] mt-1">
               {created?.time} / {created?.days} days ago
             </p>
           </div>
@@ -157,7 +162,9 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               NFT TOKEN ID
             </p>
-            <p className="text-[16px] mt-1"> {vault?.NFTtokenID}</p>
+            <p data-testid="vaultManagerID" className="text-[16px] mt-1">
+              {vault?.NFTtokenID}
+            </p>
           </div>
         </div>
 
@@ -166,7 +173,9 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               VAULT VERSION
             </p>
-            <p className="text-[16px] mt-1">{vault?.version}</p>
+            <p data-testid="vaultVersion" className="text-[16px] mt-1">
+              {vault?.version}
+            </p>
           </div>
         )}
 

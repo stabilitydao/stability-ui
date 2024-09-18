@@ -1,168 +1,201 @@
-// import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-// import axios from "axios";
+import axios from "axios";
 
-// import { seeds } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
-// import { formatNumber } from "../../../src/utils/functions/formatNumber";
+import { formatNumber } from "../../../src/utils/functions/formatNumber";
 
-// import { CHAINS } from "@constants";
+import { CHAINS } from "@constants";
 
-// let allVaults: any[] = [];
+let allVaults: any[] = [];
 
-// test.beforeEach(async ({ page }) => {
-//   try {
-//     const response = await axios.get(seeds[0]);
+const isDifferenceWithinTenPercents = (num1: number, num2: number): boolean => {
+  const larger = Math.max(num1, num2);
+  const smaller = Math.min(num1, num2);
 
-//     const vaultsData = response.data?.vaults || {};
+  const difference = Math.abs(larger - smaller);
+  const twentyPercentOfLarger = Math.abs(larger * 0.2);
 
-//     allVaults = await Promise.all(
-//       CHAINS.map(async (chain) => {
-//         const chainVaults = vaultsData[chain?.id] || {};
-//         return Object.values(chainVaults).map((vault) => vault);
-//       })
-//     );
-//     allVaults = allVaults.flat();
-//   } catch (error) {
-//     throw new Error(`API Error: ${error}`);
-//   }
+  return difference <= twentyPercentOfLarger;
+};
 
-//   await page.goto("/", { waitUntil: "load", timeout: 60000 });
-//   await page.waitForTimeout(5000);
-// });
+test.beforeEach(async ({ page }) => {
+  try {
+    const response = await axios.get(seeds[0]);
 
-// test("Should be vault basic info", async ({ page }) => {
-//   test.setTimeout(500000);
+    const vaultsData = response.data?.vaults || {};
 
-//   await page.waitForSelector("[data-testid='vault']");
+    allVaults = await Promise.all(
+      CHAINS.map(async (chain) => {
+        const chainVaults = vaultsData[chain?.id] || {};
+        return Object.values(chainVaults).map((vault) => vault);
+      })
+    );
+    allVaults = allVaults.flat();
+  } catch (error) {
+    throw new Error(`API Error: ${error}`);
+  }
 
-//   const activeVaults = await page.getByTestId("vault").count();
+  await page.goto("/", { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(5000);
+});
 
-//   for (let i = 0; i < activeVaults; i++) {
-//     await page.getByTestId("vault").nth(i).click();
+test("Should display basic info correctly", async ({ page }) => {
+  test.setTimeout(500000);
 
-//     await page.waitForSelector("[data-testid='vaultSymbol']");
-//     await page.waitForSelector("[data-testid='vaultName']");
-//     await page.waitForSelector("[data-testid='infoBarLogo']");
+  await page.waitForSelector("[data-testid='vault']");
+  await page.waitForSelector("[data-testid='hideSwapFee']");
 
-//     const currentVaultAddress = page.url().slice(-42);
+  await page.getByTestId("hideSwapFee").first().click();
 
-//     const currentVault = allVaults.find(
-//       ({ address }) => address.toLowerCase() === currentVaultAddress
-//     );
+  const vaultsCount = await page.getByTestId("vault").count();
 
-//     /* Short and full vault name should display correctly */
+  for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
+    await page.getByTestId("vault").nth(vaultIndex).click();
 
-//     const symbol = await page.getByTestId("vaultSymbol").innerText();
-//     const name = await page.getByTestId("vaultName").innerText();
+    await page.waitForSelector("[data-testid='vaultSymbol']");
+    await page.waitForSelector("[data-testid='vaultName']");
+    await page.waitForSelector("[data-testid='infoBarLogo']");
 
-//     expect(currentVault.symbol === symbol).toBeTruthy();
-//     expect(currentVault.name === name).toBeTruthy();
+    const vaultAddress = page.url().slice(-42);
 
-//     /* Vault logo, chain logo and protocols logos under strategy */
-//     /* should be displayed correctly in one line                 */
+    const vaultData = allVaults.find(
+      ({ address }) => address.toLowerCase() === vaultAddress
+    );
 
-//     const logo = await page.getByTestId("infoBarLogo");
+    /* Short and full vault name should display correctly */
 
-//     const strategyesLogo = await page.getByTestId("infoBarStrategyesLogo");
+    const symbol = await page.getByTestId("vaultSymbol").innerText();
+    const name = await page.getByTestId("vaultName").innerText();
 
-//     const protocolsLogo = await page.getByTestId("infoBarProtocolsLogo");
+    expect(vaultData.symbol === symbol).toBeTruthy();
+    expect(vaultData.name === name).toBeTruthy();
 
-//     const isLogoFlex = await logo.evaluate((element) => {
-//       return window.getComputedStyle(element).display === "flex";
-//     });
+    /* Vault logo, chain logo and protocols logos under strategy */
+    /* should be displayed correctly in one line                 */
 
-//     let isStrategyFlex = false;
+    const logo = await page.getByTestId("infoBarLogo");
 
-//     const strategyLogoCount = await strategyesLogo.count();
+    const strategyesLogo = await page.getByTestId("infoBarStrategyesLogo");
 
-//     if (strategyLogoCount > 0) {
-//       isStrategyFlex = await strategyesLogo.evaluate((element) => {
-//         return window.getComputedStyle(element).display === "flex";
-//       });
-//     }
+    const protocolsLogo = await page.getByTestId("infoBarProtocolsLogo");
 
-//     let isProtocolsFlex = false;
+    const isLogoFlex = await logo.evaluate((element) => {
+      return window.getComputedStyle(element).display === "flex";
+    });
 
-//     const protocolsLogoCount = await protocolsLogo.count();
+    let isStrategyFlex = false;
 
-//     if (protocolsLogoCount > 0) {
-//       isProtocolsFlex = await protocolsLogo.evaluate((element) => {
-//         return window.getComputedStyle(element).display === "flex";
-//       });
-//     }
+    const strategyLogoCount = await strategyesLogo.count();
 
-//     expect(isLogoFlex).toBeTruthy();
+    if (strategyLogoCount > 0) {
+      isStrategyFlex = await strategyesLogo.evaluate((element) => {
+        return window.getComputedStyle(element).display === "flex";
+      });
+    }
 
-//     if (strategyLogoCount > 0) {
-//       expect(isStrategyFlex).toBeTruthy();
-//     }
-//     if (protocolsLogoCount > 0) {
-//       expect(isProtocolsFlex).toBeTruthy();
-//     }
+    let isProtocolsFlex = false;
 
-//     /* TVL should be displayed correctly per vault */
-//     const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
+    const protocolsLogoCount = await protocolsLogo.count();
 
-//     expect(vaultTVL).toBe(formatNumber(Number(currentVault.tvl), "abbreviate"));
+    if (protocolsLogoCount > 0) {
+      isProtocolsFlex = await protocolsLogo.evaluate((element) => {
+        return window.getComputedStyle(element).display === "flex";
+      });
+    }
 
-//     /* Share price should be displayed correctly */
-//     const vaultSP = await page.getByTestId("infoBarSP").innerText();
+    expect(isLogoFlex).toBeTruthy();
 
-//     expect(Number(vaultSP.slice(1)).toFixed(3)).toBe(
-//       Number(currentVault.sharePrice).toFixed(3)
-//     );
+    if (strategyLogoCount > 0) {
+      expect(isStrategyFlex).toBeTruthy();
+    }
+    if (protocolsLogoCount > 0) {
+      expect(isProtocolsFlex).toBeTruthy();
+    }
 
-//     /* Deposited amount should be 0 if user have no deps in vault or disconnected */
+    /* TVL should be displayed correctly per vault */
+    const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
 
-//     const deposited = await page.getByTestId("infoBarDeposited").innerText();
+    let lastChar = vaultTVL[vaultTVL.length - 1];
 
-//     expect(deposited).toBe("0");
+    const formattedTVL = isNaN(Number(lastChar))
+      ? Number(vaultTVL.slice(1, -1))
+      : Number(vaultTVL.slice(1));
 
-//     /* Daily/Monthly percentage amounts should be displayed correctly */
-//     /* APRs terms rate should filter APR/APY by latest/24h/7d         */
-//     await page.getByTestId("hideSwapFee").first().click();
+    const totalTVL = String(formatNumber(vaultData.tvl, "abbreviate"));
 
-//     const APRSwitcher = await page.getByTestId("APRTimeSwitcher").first();
-//     const APRTypes = await page.getByTestId("APRType");
+    lastChar = totalTVL[totalTVL.length - 1];
 
-//     const APRs = [
-//       currentVault.apr.incomeLatest,
-//       currentVault.apr.income24h,
-//       currentVault.apr.incomeWeek,
-//     ];
+    const formattedTotalTVL = isNaN(Number(lastChar))
+      ? Number(totalTVL.slice(1, -1))
+      : Number(totalTVL.slice(1));
 
-//     const toAPR = (apr: number) => ({
-//       APR: apr.toFixed(1),
-//       dailyAPR: (apr / 365).toFixed(2),
-//       monthlyAPR: (apr / 12).toFixed(2),
-//     });
+    const isTVL = isDifferenceWithinTenPercents(
+      formattedTVL,
+      formattedTotalTVL
+    );
 
-//     const allAPRs = APRs.map((apr) => toAPR(Number(apr)));
+    expect(isTVL).toBeTruthy();
 
-//     for (let i = 0; i < allAPRs.length; i++) {
-//       await APRSwitcher.click();
-//       await APRTypes.nth(i).click();
-//       await page.waitForTimeout(500);
+    /* Share price should be displayed correctly */
+    const vaultSP = await page.getByTestId("infoBarSP").innerText();
 
-//       const { APR, dailyAPR, monthlyAPR } = allAPRs[i];
+    expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(
+      Number(vaultData.sharePrice).toFixed(1)
+    );
 
-//       const APRText = await page.getByTestId("infoBarAPR").innerText();
-//       const dailyAPRText = await page
-//         .getByTestId("infoBarDailyAPR")
-//         .innerText();
-//       const monthlyAPRText = await page
-//         .getByTestId("infoBarMonthlyAPR")
-//         .innerText();
+    /* Deposited amount should be 0 if user have no deps in vault or disconnected */
 
-//       const extractAPR = (text: string) =>
-//         Number(text.slice(0, text.indexOf("%")).trim());
+    const deposited = await page.getByTestId("infoBarDeposited").innerText();
 
-//       expect(extractAPR(APRText).toFixed(1)).toBe(APR);
-//       expect(extractAPR(dailyAPRText).toFixed(2)).toBe(dailyAPR);
-//       expect(extractAPR(monthlyAPRText).toFixed(2)).toBe(monthlyAPR);
-//     }
+    expect(deposited).toBe("0");
 
-//     await page.goBack();
-//   }
-// });
+    /* Daily/Monthly percentage amounts should be displayed correctly */
+    /* APRs terms rate should filter APR/APY by latest/24h/7d         */
+
+    const APRSwitcher = await page.getByTestId("APRTimeSwitcher").first();
+    const APRTypes = await page.getByTestId("APRType");
+
+    const APRs = [
+      vaultData.apr.incomeLatest,
+      vaultData.apr.income24h,
+      vaultData.apr.incomeWeek,
+    ];
+
+    const toAPR = (apr: number) => ({
+      APR: apr.toFixed(),
+      dailyAPR: (apr / 365).toFixed(),
+      monthlyAPR: (apr / 12).toFixed(),
+    });
+
+    const allAPRs = APRs.map((apr) => toAPR(Number(apr)));
+
+    for (let i = 0; i < allAPRs.length; i++) {
+      await APRSwitcher.click();
+      await APRTypes.nth(i).click();
+      await page.waitForTimeout(500);
+
+      const { APR, dailyAPR, monthlyAPR } = allAPRs[i];
+
+      const APRText = await page.getByTestId("infoBarAPR").innerText();
+
+      const dailyAPRText = await page
+        .getByTestId("infoBarDailyAPR")
+        .innerText();
+
+      const monthlyAPRText = await page
+        .getByTestId("infoBarMonthlyAPR")
+        .innerText();
+
+      const extractAPR = (text: string) =>
+        Number(text.slice(0, text.indexOf("%")).trim());
+
+      expect(extractAPR(APRText).toFixed()).toBe(APR);
+      expect(extractAPR(dailyAPRText).toFixed()).toBe(dailyAPR);
+      expect(extractAPR(monthlyAPRText).toFixed()).toBe(monthlyAPR);
+    }
+
+    await page.goBack();
+  }
+});

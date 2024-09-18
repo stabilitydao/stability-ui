@@ -37,9 +37,7 @@ import {
   // assetsPrices,
 } from "@store";
 
-import { dataSorter } from "./functions/dataSorter";
-import { toVault } from "./functions/toVault";
-import { initFilters } from "./functions/initFilters";
+import { dataSorter, toVault, initFilters } from "./functions";
 
 import {
   formatNumber,

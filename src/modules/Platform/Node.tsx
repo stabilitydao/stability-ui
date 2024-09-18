@@ -1,15 +1,16 @@
-import {type ApiMainReply} from "@stabilitydao/stability";
-import {useStore} from "@nanostores/react";
-import {apiData} from "@store";
-import type {NodeState} from "@stabilitydao/stability/out/api.types";
+import { type ApiMainReply } from "@stabilitydao/stability";
+import { useStore } from "@nanostores/react";
+import { apiData } from "@store";
+import type { NodeState } from "@stabilitydao/stability/out/api.types";
 
 interface IProps {
   machineIdHash: string;
 }
 
-const Node : React.FC<IProps> = ({ machineIdHash, }) => {
+const Node: React.FC<IProps> = ({ machineIdHash }) => {
   const $apiData: ApiMainReply = useStore(apiData);
-  const nodeState: NodeState|undefined = $apiData?.network.nodes[machineIdHash]
+  const nodeState: NodeState | undefined =
+    $apiData?.network.nodes[machineIdHash];
 
   return (
     <div>
@@ -27,17 +28,16 @@ const Node : React.FC<IProps> = ({ machineIdHash, }) => {
         <div className="flex flex-col mb-5">
           <div className="text-[12px] font-bold">Services</div>
           <div className="flex-col">
-            {nodeState?.services.map(s => {
-              return (
-                <div className="flex">{s.name}</div>
-              )
-            })}
+            {nodeState?.services.map((service) => (
+              <div key={service.name} className="flex">
+                {service.name}
+              </div>
+            ))}
           </div>
         </div>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
-export {Node}
+export { Node };

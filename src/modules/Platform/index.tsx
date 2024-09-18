@@ -1,5 +1,5 @@
-import {useStore} from "@nanostores/react";
-import {apiData, currentChainID, platformVersions} from "@store";
+import { useStore } from "@nanostores/react";
+
 import {
   type ApiMainReply,
   assets,
@@ -7,47 +7,52 @@ import {
   integrations,
   strategies,
   StrategyShortId,
-  StrategyState
+  StrategyState,
 } from "@stabilitydao/stability";
-import packageJson from "../../../package.json";
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
-const Platform = () => {
+import { apiData, currentChainID, platformVersions } from "@store";
+
+import packageJson from "../../../package.json";
+
+const Platform = (): JSX.Element => {
   const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
-  const $apiData: ApiMainReply|undefined = useStore(apiData);
+  const $apiData: ApiMainReply | undefined = useStore(apiData);
 
-  const _networksTotal = getNetworksTotals()
+  const totalNetworks = getNetworksTotals();
 
   const strategyStatus = {
     live: 0,
     dev: 0,
     awaiting: 0,
     proposed: 0,
-  }
+  };
   // @ts-ignore
   Object.keys(strategies).forEach((shortId: StrategyShortId) => {
-    const status = strategies[shortId].state
+    const status = strategies[shortId].state;
     if (status === StrategyState.LIVE) {
-      strategyStatus.live++
+      strategyStatus.live++;
     }
     if (status === StrategyState.DEVELOPMENT) {
-      strategyStatus.dev++
+      strategyStatus.dev++;
     }
     if (status === StrategyState.AWAITING) {
-      strategyStatus.awaiting++
+      strategyStatus.awaiting++;
     }
-    if (status === StrategyState.POSSIBLE || status === StrategyState.PROPOSAL) {
-      strategyStatus.proposed++
+    if (
+      status === StrategyState.POSSIBLE ||
+      status === StrategyState.PROPOSAL
+    ) {
+      strategyStatus.proposed++;
     }
-
-  })
+  });
 
   // const capitalize = (s: string) => (s && s[0].toUpperCase() + s.slice(1)) || ""
 
-  let protocolsTotal = 0
+  let protocolsTotal = 0;
   for (const defiOrgCode of Object.keys(integrations)) {
-    protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length
+    protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length;
   }
 
   return (
@@ -55,21 +60,22 @@ const Platform = () => {
       <h1 className="mb-5">Platform</h1>
 
       <div className="flex flex-wrap">
-        <div
-          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col"
-        >
+        <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
           <div className="text-4xl">${$apiData?.total.tvl}</div>
           <div className="flex self-center justify-center text-[16px]">AUM</div>
         </div>
-        <div
-          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col"
-        >
+        <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
           <div className="text-4xl">{$apiData?.total.activeVaults}</div>
-          <div className="flex self-center justify-center text-[16px]">Vaults</div>
+          <div className="flex self-center justify-center text-[16px]">
+            Vaults
+          </div>
         </div>
       </div>
 
-      <a href="/create-vault" className="hover:bg-amber-950 flex flex-col px-3 py-2 rounded-2xl mb-10">
+      <a
+        href="/create-vault"
+        className="hover:bg-amber-950 flex flex-col px-3 py-2 rounded-2xl mb-10"
+      >
         <h2 className="mb-3 text-3xl flex items-center justify-center">
           Factory
         </h2>
@@ -78,7 +84,6 @@ const Platform = () => {
           <div>Farms: {$apiData?.total.farms}</div>
           <div>Available for building: {$apiData?.total.vaultForBuilding}</div>
         </div>
-
       </a>
 
       <a
@@ -88,17 +93,12 @@ const Platform = () => {
       >
         <h2 className="text-3xl mb-3">Network</h2>
         <div className="flex mb-10 flex-col">
-          <div>
-            Status: {$apiData?.network.status}
-          </div>
-          <div>
-            Nodes: {Object.keys($apiData?.network.nodes || []).length}
-          </div>
-
+          <div>Status: {$apiData?.network.status}</div>
+          <div>Nodes: {Object.keys($apiData?.network.nodes || []).length}</div>
         </div>
       </a>
 
-      <br/>
+      <br />
 
       <a
         className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
@@ -107,34 +107,33 @@ const Platform = () => {
       >
         <h2 className="text-3xl text-center mb-3">Strategies</h2>
         <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.live}</div>
-            <div className="flex self-center justify-center text-[16px]">Live</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Live
+            </div>
           </div>
 
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.dev}</div>
-            <div className="flex self-center justify-center text-[16px]">Development</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Development
+            </div>
           </div>
 
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-violet-200 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-violet-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.awaiting}</div>
-            <div className="flex self-center justify-center text-[16px]">Awaiting</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Awaiting
+            </div>
           </div>
 
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.proposed}</div>
-            <div className="flex self-center justify-center text-[16px]">Proposal</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Proposal
+            </div>
           </div>
-
         </div>
       </a>
 
@@ -145,17 +144,17 @@ const Platform = () => {
       >
         <h2 className="text-3xl text-center mb-3">Integrations</h2>
         <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
             <div className="text-4xl">{Object.keys(integrations).length}</div>
-            <div className="flex self-center justify-center text-[16px]">Organizations</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Organizations
+            </div>
           </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
             <div className="text-4xl">{protocolsTotal}</div>
-            <div className="flex self-center justify-center text-[16px]">Protocols</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Protocols
+            </div>
           </div>
         </div>
       </a>
@@ -167,31 +166,33 @@ const Platform = () => {
       >
         <h3 className="text-3xl text-center mb-3">Chains</h3>
         <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col"
-          >
-            <div className="text-4xl">{_networksTotal.SUPPORTED}</div>
-            <div className="flex self-center justify-center text-[16px]">Supported</div>
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
+            <div className="text-4xl">{totalNetworks.SUPPORTED}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Supported
+            </div>
           </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-cyan-200 items-center justify-center flex-col"
-          >
-            <div className="text-4xl">{_networksTotal.CHAINLIB_DONE}</div>
-            <div className="flex self-center justify-center text-[16px]">Coming soon</div>
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-cyan-200 items-center justify-center flex-col">
+            <div className="text-4xl">{totalNetworks.CHAINLIB_DONE}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Coming soon
+            </div>
           </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col"
-          >
-            <div className="text-4xl">{_networksTotal.CHAINLIB_DEVELOPMENT + _networksTotal.CHAINLIB_AWAITING}</div>
-            <div className="flex self-center justify-center text-[16px]">Development</div>
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
+            <div className="text-4xl">
+              {totalNetworks.CHAINLIB_DEVELOPMENT +
+                totalNetworks.CHAINLIB_AWAITING}
+            </div>
+            <div className="flex self-center justify-center text-[16px]">
+              Development
+            </div>
           </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col"
-          >
-            <div className="text-4xl">{_networksTotal.NOT_SUPPORTED}</div>
-            <div className="flex self-center justify-center text-[16px]">Not supported</div>
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
+            <div className="text-4xl">{totalNetworks.NOT_SUPPORTED}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Not supported
+            </div>
           </div>
-
         </div>
       </a>
 
@@ -202,21 +203,20 @@ const Platform = () => {
       >
         <h2 className="text-3xl text-center mb-3">Assets</h2>
         <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
             <div className="text-4xl">{assets.length}</div>
-            <div className="flex self-center justify-center text-[16px]">Assets</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Assets
+            </div>
           </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col"
-          >
+          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
             <div className="text-4xl">{tokenlist.tokens.length}</div>
-            <div className="flex self-center justify-center text-[16px]">Tokenlist items</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Tokenlist items
+            </div>
           </div>
         </div>
       </a>
-
 
       <h2 className="text-3xl text-center mb-3">Software</h2>
       <div className="mb-10 flex items-center gap-2">
@@ -227,8 +227,10 @@ const Platform = () => {
             target="_blank"
             title="Go to smart contracts source code on Github"
           >
-            <GitHub/>
-            <span className="ml-1">💎 Stability Platform {$platformVersions[$currentChainID]}</span>
+            <GitHub />
+            <span className="ml-1">
+              💎 Stability Platform {$platformVersions[$currentChainID]}
+            </span>
           </a>
 
           <a
@@ -237,9 +239,14 @@ const Platform = () => {
             target="_blank"
             title="Go to library source code on Github"
           >
-            <GitHub/>
-            <span
-              className="ml-1">📦 Stability Integration Library {packageJson.dependencies["@stabilitydao/stability"].replace('^', '')}</span>
+            <GitHub />
+            <span className="ml-1">
+              📦 Stability Integration Library{" "}
+              {packageJson.dependencies["@stabilitydao/stability"].replace(
+                "^",
+                ""
+              )}
+            </span>
           </a>
 
           <a
@@ -248,18 +255,16 @@ const Platform = () => {
             target="_blank"
             title="Go to UI source code on Github"
           >
-            <GitHub/>
-            <span className="ml-1">👩‍🚀 Stability User Interface {packageJson.version}</span>
+            <GitHub />
+            <span className="ml-1">
+              👩‍🚀 Stability User Interface {packageJson.version}
+            </span>
           </a>
-
-
         </div>
-
       </div>
-
     </>
-  )
-}
+  );
+};
 
 const GitHub: React.FC<{}> = () => {
   return (
@@ -280,4 +285,4 @@ const GitHub: React.FC<{}> = () => {
   );
 };
 
-export {Platform}
+export { Platform };

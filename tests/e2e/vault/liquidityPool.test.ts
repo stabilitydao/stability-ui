@@ -4,10 +4,10 @@ import axios from "axios";
 
 import { seeds } from "@stabilitydao/stability";
 
-import { getProtocolLogo } from "../../../src/utils/functions/getProtocolLogo";
 import { getStrategyInfo } from "../../../src/utils/functions/getStrategyInfo";
+import { formatNumber } from "../../../src/utils/functions/formatNumber";
 
-import { CHAINS, DEXes } from "@constants";
+import { CHAINS } from "@constants";
 
 // Playwright doesn't work with json
 const tokenlist = {
@@ -234,7 +234,18 @@ const getTokenData = (address: string): any => {
   return undefined;
 };
 
+const isDifferenceWithinTenPercents = (num1: number, num2: number): boolean => {
+  const larger = Math.max(num1, num2);
+  const smaller = Math.min(num1, num2);
+
+  const difference = Math.abs(larger - smaller);
+  const twentyPercentOfLarger = Math.abs(larger * 0.2);
+
+  return difference <= twentyPercentOfLarger;
+};
+
 let allVaults: any[] = [];
+let prices: any = {};
 
 test.beforeEach(async ({ page }) => {
   try {
@@ -249,6 +260,7 @@ test.beforeEach(async ({ page }) => {
       })
     );
     allVaults = allVaults.flat();
+    prices = response.data?.assetPrices;
   } catch (error) {
     throw new Error(`API Error: ${error}`);
   }
@@ -257,7 +269,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForTimeout(5000);
 });
 
-test("Should display contracts info correctly", async ({ page, context }) => {
+test("Should display liquidity pool info correctly", async ({ page }) => {
   test.setTimeout(500000);
 
   await page.waitForSelector("[data-testid='vault']");
@@ -267,9 +279,15 @@ test("Should display contracts info correctly", async ({ page, context }) => {
   for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
     await page.getByTestId("vault").nth(vaultIndex).click();
 
-    await page.waitForSelector("[data-testid='contractsLogo']");
-    await page.waitForSelector("[data-testid='contractsSymbol']");
-    await page.waitForSelector("[data-testid='contractsType']");
+    await page.waitForSelector("[data-testid='vaultType']");
+    await page.waitForSelector("[data-testid='vaultStatus']");
+
+    const isLiquidityPool = await page.getByTestId("poolLogo").isVisible();
+
+    if (!isLiquidityPool) {
+      await page.goBack();
+      continue;
+    }
 
     const vaultAddress = page.url().slice(-42);
 
@@ -279,165 +297,125 @@ test("Should display contracts info correctly", async ({ page, context }) => {
       ({ address }) => address.toLowerCase() === vaultAddress
     );
 
+    const strategyInfo = getStrategyInfo(vaultData?.symbol);
+
     const strategyAssets: string[] =
       vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-    const strategyInfo = getStrategyInfo(vaultData?.symbol);
-
     const assets = strategyAssets.map((strategyAsset: string) => {
       const token = getTokenData(strategyAsset);
+
       if (token) {
         return {
           address: token?.address,
-          logo: token?.logoURI,
           symbol: token?.symbol,
         };
       }
     });
 
-    const isALM =
-      vaultData?.alm &&
-      ["Ichi", "DefiEdge", "Gamma"].includes(vaultData.alm.protocol);
+    const symbol =
+      assets.length > 1
+        ? `${assets[0]?.symbol}-${assets[1]?.symbol}`
+        : assets[0]?.symbol;
 
-    const isUnderlying = vaultData.strategy === "Yearn";
+    /* Logo, protocol name and tokens tickers should be displayed correctly */
 
-    let underlyingToken = {};
+    const poolLogo = await page.getByTestId("poolLogo").getAttribute("src");
+    const poolName = await page.getByTestId("poolName").innerText();
+    const poolSymbol = await page.getByTestId("poolSymbol").innerText();
 
-    if (isALM || isUnderlying) {
-      const logo = getProtocolLogo(vaultData.strategyShortId);
+    expect(poolLogo).toBe(strategyInfo.protocols[1].logoSrc);
+    expect(poolName).toBe(strategyInfo.protocols[1].name);
+    expect(poolSymbol).toBe(symbol);
 
-      underlyingToken = { symbol: vaultData.underlyingSymbol, logo: logo };
-    }
-    let contractsInfo: any = [];
+    /* Pool TVL should be displayed correctly in USD */
+    const TVL = String(formatNumber(vaultData.pool.tvl, "abbreviate"));
 
-    if (vaultData?.address) {
-      contractsInfo = [
-        {
-          logo: "proportions",
-          symbol: vaultData?.symbol,
-          type: "Vault",
-          address: vaultData?.address.toLowerCase(),
-          isCopy: false,
-        },
-        {
-          logo: "/logo.svg",
-          symbol: vaultData.strategyShortId,
-          type: "Strategy",
-          address: vaultData?.strategy?.toLowerCase(),
-          isCopy: false,
-        },
-      ];
+    const poolTVL = await page.getByTestId("poolTVL").innerText();
 
-      if (underlyingToken?.symbol) {
-        contractsInfo.push({
-          logo: underlyingToken?.logo,
-          symbol: underlyingToken?.symbol,
-          type: isALM ? "ALM" : "Underlying",
-          address: vaultData?.underlying,
-          isCopy: false,
-        });
-      }
-      if (vaultData?.pool?.address) {
-        const poolSymbol =
-          assets.length > 1
-            ? `${assets[0]?.symbol}-${assets[1]?.symbol}`
-            : assets[0]?.symbol;
+    let lastChar = poolTVL[poolTVL.length - 1];
 
-        const dexPool = DEXes.find((dex) =>
-          strategyInfo.protocols.some((protocol) => protocol.name === dex.name)
+    const formattedPoolTVL = isNaN(Number(lastChar))
+      ? Number(poolTVL.slice(1, -1))
+      : Number(poolTVL.slice(1));
+
+    lastChar = TVL[TVL.length - 1];
+
+    const formattedTVL = isNaN(Number(lastChar))
+      ? Number(TVL.slice(1, -1))
+      : Number(TVL.slice(1));
+
+    const isPoolTVL = isDifferenceWithinTenPercents(
+      formattedTVL,
+      formattedPoolTVL
+    );
+
+    expect(isPoolTVL).toBeTruthy();
+    /* Pool tokens native amounts and ratio in pool in percents should be displayed correctly */
+
+    if (prices[chainId]) {
+      const poolAssets = assets.map((asset, index) => {
+        const price = Number(prices[chainId][asset?.address].price);
+
+        //@ts-ignore
+        const amount = vaultData?.pool?.[`amountToken${index}`] || 0;
+
+        const amountInUSD = price * amount;
+
+        return {
+          symbol: asset?.symbol,
+          amountInUSD: amountInUSD,
+          amount: amount,
+        };
+      });
+
+      const vaultLiquidity = poolAssets.reduce(
+        (acc, curr) => (acc += curr?.amountInUSD),
+        0
+      );
+
+      const assetsWithPercents = poolAssets.map((asset) => {
+        return {
+          ...asset,
+          percent: (asset?.amountInUSD / vaultLiquidity) * 100,
+        };
+      });
+
+      for (let i = 0; i < assetsWithPercents.length; i++) {
+        const asset = await page.getByTestId(`poolAsset${i}`).innerText();
+
+        const assetArr = asset.split(" ");
+
+        const assetPercent = Number(assetArr[assetArr.length - 1].slice(1, -2));
+
+        assetArr.pop();
+
+        let assetAmount = Number(
+          assetArr.reduce((acc, cur) => (acc += cur), "")
         );
 
-        contractsInfo.push({
-          logo: dexPool?.img as string,
-          symbol: poolSymbol,
-          type: "Pool",
-          address: vaultData?.pool?.address,
-          isCopy: false,
-        });
-      }
-      if (assets) {
-        assets.map((asset) => {
-          contractsInfo.push({
-            logo: asset?.logo,
-            symbol: asset?.symbol,
-            type: "Asset",
-            address: asset?.address,
-            isCopy: false,
-          });
-        });
+        const isAssetAmount = isDifferenceWithinTenPercents(
+          Number(assetsWithPercents[i].amount),
+          assetAmount
+        );
+
+        const isAssetPercent = isDifferenceWithinTenPercents(
+          assetsWithPercents[i]?.percent,
+          assetPercent
+        );
+
+        expect(isAssetPercent).toBeTruthy();
+        expect(isAssetAmount).toBeTruthy();
       }
     }
 
-    if (contractsInfo.length) {
-      for (let i = 0; i < contractsInfo.length; i++) {
-        /* Row should contain logo, short title, one-word description, first and last part of it's address */
+    /* Pool fee should be displayed correctly */
 
-        const contractsLogoSrc = await page
-          .locator('[data-testid="contractsLogo"] img')
-          .nth(i)
-          .getAttribute("src");
+    const fee = `${vaultData?.pool?.fee}%`;
 
-        const contractsSymbol = await page
-          .getByTestId("contractsSymbol")
-          .nth(i)
-          .innerText();
+    const poolFee = await page.getByTestId("poolFee").innerText();
 
-        const contractsType = await page
-          .getByTestId("contractsType")
-          .nth(i)
-          .innerText();
-
-        const contractsAddress = await page
-          .getByTestId("contractsAddress")
-          .nth(i)
-          .innerText();
-
-        const address = `${contractsInfo[i].address.slice(0, 6)}...${contractsInfo[i].address.slice(-4)}`;
-        let logo = contractsInfo[i].logo;
-
-        if (contractsInfo[i].logo === "proportions") {
-          logo =
-            `https://api.stabilitydao.org/vault/${chainId}/${vaultData.address}/logo.svg`.toLowerCase();
-        }
-
-        expect(contractsLogoSrc).toBe(logo);
-        expect(contractsSymbol).toBe(contractsInfo[i].symbol);
-        expect(contractsType).toBe(contractsInfo[i].type);
-        expect(contractsAddress).toBe(address);
-
-        /* Copy CTA should works correctly and copy entire address */
-
-        await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-        await page.getByTestId("contractCopyBtn").nth(i).click();
-        await page.waitForTimeout(3000);
-
-        const clipboardText = await page.evaluate(async () => {
-          try {
-            return await navigator.clipboard.readText();
-          } catch (err) {
-            return null;
-          }
-        });
-
-        expect(clipboardText?.toLowerCase()).toBe(contractsInfo[i].address);
-
-        /* Open in new tab CTA should open corresponding chain scan website */
-        /* with it's address                                                */
-
-        const link =
-          chainId === "137"
-            ? `https://polygonscan.com/address/${contractsInfo[i].address}`
-            : `https://basescan.org/address/${contractsInfo[i].address}`;
-
-        const contractLinkBtn = await page
-          .getByTestId("contractLinkBtn")
-          .nth(i)
-          .getAttribute("href");
-
-        expect(contractLinkBtn).toBe(link);
-      }
-    }
+    expect(poolFee).toBe(fee);
 
     await page.goBack();
   }

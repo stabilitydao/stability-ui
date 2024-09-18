@@ -1,3 +1,26 @@
+/**
+ * Formats a number or string based on the specified format type
+ *
+ * @example
+ * ```
+ * const abbreviated = formatNumber(1234567, "abbreviate"); // "$1.23M"
+ * const formatted = formatNumber(1234567.891, "format"); // "1 234 567.89"
+ * const smallFormatted = formatNumber(0.1234, "smallNumbers"); // "0.12"
+ * ```
+ *
+ * @param {string | number} value - Number or numeric string to be formatted
+ * @param {string} type - The type of formatting to be applied. Options include:
+ *   - "abbreviate": Formats number using abbreviations like K, M, B, etc. with two decimal places
+ *   - "abbreviateInteger": Formats number using abbreviations with no decimal places
+ *   - "chartAbbreviate": Formats number with variable decimal places based on size, using abbreviations for large values
+ *   - "formatWithoutDecimalPart": Formats number with space-separated thousands and no decimal part
+ *   - "format": Formats number with space-separated thousands and two decimal places
+ *   - "formatWithLongDecimalPart": Formats number with space-separated thousands and four decimal places
+ *   - "smallNumbers": Formats small numbers with space-separated thousands and up to two decimal places
+ *
+ * @returns {string | number} Formatted number as a string. For "smallNumbers" type, it can return a number if the value is greater than 0.1
+ */
+
 export const formatNumber = (
   value: string | number,
   type: string
