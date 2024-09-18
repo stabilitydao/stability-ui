@@ -3,6 +3,10 @@ import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 import type { NodeState } from "@stabilitydao/stability/out/api.types";
 
+const shortMachineId = (m: string): string => {
+  return `${m.slice(0, 4)}...${m.slice(-4)}`
+}
+
 interface IProps {
   machineIdHash: string;
 }
@@ -14,12 +18,31 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
 
   return (
     <div>
-      <h1>Node {machineIdHash}</h1>
+      <h1>Node {shortMachineId(machineIdHash)}</h1>
 
       <div className="flex flex-col">
         <div className="flex flex-col mb-5">
           <div className="text-[12px] font-bold">Machine ID hash</div>
           <div>{machineIdHash}</div>
+        </div>
+        {nodeState?.hostname &&
+            <div className="flex flex-col mb-5">
+                <div className="text-[12px] font-bold">Hostname</div>
+                <div>{nodeState.hostname}</div>
+            </div>
+        }
+        {nodeState?.seedNode &&
+            <div className="flex mb-5">
+            <div className="text-[16px]  font-bold bg-green-900 inline-flex px-5 py-2 rounded-2xl">Seed node</div>
+            </div>
+        }
+        <div className="flex flex-col mb-5">
+          <div className="text-[12px] font-bold">Last seen</div>
+          <div>{nodeState?.lastSeen}</div>
+        </div>
+        <div className="flex flex-col mb-5">
+          <div className="text-[12px] font-bold">Lifetime</div>
+          <div>{nodeState?.lifetime}</div>
         </div>
         <div className="flex flex-col mb-5">
           <div className="text-[12px] font-bold">About</div>
@@ -29,8 +52,11 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
           <div className="text-[12px] font-bold">Services</div>
           <div className="flex-col">
             {nodeState?.services.map((service) => (
-              <div key={service.name} className="flex">
-                {service.name}
+              <div key={service.name} className="flex flex-col p-5 bg-gray-900 rounded-2xl mb-7">
+                <div>{service.name}</div>
+                {service.stat && <div className="text-[12px] bg-black p-4 mt-4">
+                    <pre>{JSON.stringify(service.stat, null, 2)}</pre>
+                </div>}
               </div>
             ))}
           </div>
@@ -40,4 +66,4 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
   );
 };
 
-export { Node };
+export {Node, shortMachineId};
