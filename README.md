@@ -5,11 +5,11 @@
 | Name                                                                                                                | Status            | Description                                   |
 |---------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------|
 | **Landing**                                                                                                         | Development Figma | Index page                                    |
+| **AI**                                                                                                              |                   | Chatbot. AI Router.                           |
 | [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                    |
 | --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                    |
 | **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts |
 | **Contest**                                                                                                         |                   | Yield contests                                |
-| **AI**                                                                                                              |                   | Chatbot                                       |
 | **DAO**                                                                                                             |                   | Self-developing DAO portal                    |
 | [**Platform**](https://stability.farm/platform)                                                                     | Development       | Platform portal                               |
 | --- [**Factory**](https://stability.farm/create-vault)                                                              | Development       | Factory of vaults, farms.                     |
@@ -18,7 +18,7 @@
 | --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                            |
 | --- --- **Strategy**                                                                                                |                   | Strategy page                                 |
 | --- [**Integrations**](https://stability.farm/protocols)                                                            | Development       | List of DeFi protocols and organizations      |
-| --- --- **Organization**                                                                                            |                   | Chain page                                    |
+| --- --- **Organization**                                                                                            |                   | Organization page                             |
 | --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform   |
 | --- --- **Chain**                                                                                                   |                   | Chain page                                    |
 | --- [**Assets**](https://stability.farm/assets)                                                                     | Development       | List of supported assets                      |
@@ -35,7 +35,7 @@
 ### 👀 Learn stack
 
 - [astro](https://docs.astro.build/en/getting-started/)
-- react
+- [react](https://react.dev/)
 - [nanostores](https://github.com/nanostores/nanostores)
 - [viem](https://viem.sh/docs/getting-started.html)
 - [wagmi-react](https://wagmi.sh/react/getting-started)
