@@ -2,12 +2,14 @@ import { test, expect } from "@playwright/test";
 
 import axios from "axios";
 
-import { seeds } from "@stabilitydao/stability";
+import { formatUnits } from "viem";
 
-import { getProtocolLogo } from "../../../src/utils/functions/getProtocolLogo";
-import { getStrategyInfo } from "../../../src/utils/functions/getStrategyInfo";
+import { seeds, getAsset } from "@stabilitydao/stability";
 
-import { CHAINS, DEXes } from "@constants";
+import { formatNumber } from "../../../src/utils/functions/formatNumber";
+import { getDate } from "../../../src/utils/functions/getDate";
+
+import { CHAINS, CHAINLINK_STABLECOINS } from "@constants";
 
 // Playwright doesn't work with json
 const tokenlist = {
@@ -234,7 +236,18 @@ const getTokenData = (address: string): any => {
   return undefined;
 };
 
+const isDifferenceWithinTenPercents = (num1: number, num2: number): boolean => {
+  const larger = Math.max(num1, num2);
+  const smaller = Math.min(num1, num2);
+
+  const difference = Math.abs(larger - smaller);
+  const twentyPercentOfLarger = Math.abs(larger * 0.2);
+
+  return difference <= twentyPercentOfLarger;
+};
+
 let allVaults: any[] = [];
+let prices: any = {};
 
 test.beforeEach(async ({ page }) => {
   try {
@@ -248,7 +261,9 @@ test.beforeEach(async ({ page }) => {
         return Object.values(chainVaults).map((vault) => vault);
       })
     );
+
     allVaults = allVaults.flat();
+    prices = response.data?.assetPrices;
   } catch (error) {
     throw new Error(`API Error: ${error}`);
   }
@@ -257,7 +272,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForTimeout(5000);
 });
 
-test("Should display contracts info correctly", async ({ page, context }) => {
+test("Should display assets info correctly", async ({ page }) => {
   test.setTimeout(500000);
 
   await page.waitForSelector("[data-testid='vault']");
@@ -267,9 +282,7 @@ test("Should display contracts info correctly", async ({ page, context }) => {
   for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
     await page.getByTestId("vault").nth(vaultIndex).click();
 
-    await page.waitForSelector("[data-testid='contractsLogo']");
-    await page.waitForSelector("[data-testid='contractsSymbol']");
-    await page.waitForSelector("[data-testid='contractsType']");
+    await page.waitForSelector("[data-testid='assetLogo0']");
 
     const vaultAddress = page.url().slice(-42);
 
@@ -279,163 +292,102 @@ test("Should display contracts info correctly", async ({ page, context }) => {
       ({ address }) => address.toLowerCase() === vaultAddress
     );
 
-    const strategyAssets: string[] =
+    const assetSymbols: string[] =
       vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-    const strategyInfo = getStrategyInfo(vaultData?.symbol);
-
-    const assets = strategyAssets.map((strategyAsset: string) => {
-      const token = getTokenData(strategyAsset);
-      if (token) {
+    const assetDetails = assetSymbols.map((symbol: string) => {
+      const tokenData = getTokenData(symbol);
+      if (tokenData) {
+        const tokenExtended = getAsset(chainId, tokenData.address);
         return {
-          address: token?.address,
-          logo: token?.logoURI,
-          symbol: token?.symbol,
+          address: tokenData?.address,
+          logo: tokenData?.logoURI,
+          symbol: tokenData?.symbol,
+          name: tokenData?.name,
+          website: tokenExtended?.website,
+          description: tokenExtended?.description,
         };
       }
     });
 
-    const isALM =
-      vaultData?.alm &&
-      ["Ichi", "DefiEdge", "Gamma"].includes(vaultData.alm.protocol);
+    for (let assetIndex = 0; assetIndex < assetDetails.length; assetIndex++) {
+      const asset = assetDetails[assetIndex];
 
-    const isUnderlying = vaultData.strategy === "Yearn";
+      /* Token(s) logo, ticker, full name and link to official website should be displayed correctly */
 
-    let underlyingToken = {};
+      const assetLogoSrc = await page
+        .getByTestId(`assetLogo${assetIndex}`)
+        .getAttribute("src");
+      const assetTicker = await page
+        .getByTestId(`assetTicker${assetIndex}`)
+        .textContent();
+      const assetName = await page
+        .getByTestId(`assetName${assetIndex}`)
+        .textContent();
 
-    if (isALM || isUnderlying) {
-      const logo = getProtocolLogo(vaultData.strategyShortId);
-
-      underlyingToken = { symbol: vaultData.underlyingSymbol, logo: logo };
-    }
-    let contractsInfo: any = [];
-
-    if (vaultData?.address) {
-      contractsInfo = [
-        {
-          logo: "proportions",
-          symbol: vaultData?.symbol,
-          type: "Vault",
-          address: vaultData?.address.toLowerCase(),
-          isCopy: false,
-        },
-        {
-          logo: "/logo.svg",
-          symbol: vaultData.strategyShortId,
-          type: "Strategy",
-          address: vaultData?.strategy?.toLowerCase(),
-          isCopy: false,
-        },
-      ];
-
-      if (underlyingToken?.symbol) {
-        contractsInfo.push({
-          logo: underlyingToken?.logo,
-          symbol: underlyingToken?.symbol,
-          type: isALM ? "ALM" : "Underlying",
-          address: vaultData?.underlying,
-          isCopy: false,
-        });
-      }
-      if (vaultData?.pool?.address) {
-        const poolSymbol =
-          assets.length > 1
-            ? `${assets[0]?.symbol}-${assets[1]?.symbol}`
-            : assets[0]?.symbol;
-
-        const dexPool = DEXes.find((dex) =>
-          strategyInfo.protocols.some((protocol) => protocol.name === dex.name)
-        );
-
-        contractsInfo.push({
-          logo: dexPool?.img as string,
-          symbol: poolSymbol,
-          type: "Pool",
-          address: vaultData?.pool?.address,
-          isCopy: false,
-        });
-      }
-      if (assets) {
-        assets.map((asset) => {
-          contractsInfo.push({
-            logo: asset?.logo,
-            symbol: asset?.symbol,
-            type: "Asset",
-            address: asset?.address,
-            isCopy: false,
-          });
-        });
-      }
-    }
-
-    if (contractsInfo.length) {
-      for (let i = 0; i < contractsInfo.length; i++) {
-        /* Row should contain logo, short title, one-word description, first and last part of it's address */
-
-        const contractsLogoSrc = await page
-          .locator('[data-testid="contractsLogo"] img')
-          .nth(i)
-          .getAttribute("src");
-
-        const contractsSymbol = await page
-          .getByTestId("contractsSymbol")
-          .nth(i)
-          .innerText();
-
-        const contractsType = await page
-          .getByTestId("contractsType")
-          .nth(i)
-          .innerText();
-
-        const contractsAddress = await page
-          .getByTestId("contractsAddress")
-          .nth(i)
-          .innerText();
-
-        const address = `${contractsInfo[i].address.slice(0, 6)}...${contractsInfo[i].address.slice(-4)}`;
-        let logo = contractsInfo[i].logo;
-
-        if (contractsInfo[i].logo === "proportions") {
-          logo =
-            `https://api.stabilitydao.org/vault/${chainId}/${vaultData.address}/logo.svg`.toLowerCase();
-        }
-
-        expect(contractsLogoSrc).toBe(logo);
-        expect(contractsSymbol).toBe(contractsInfo[i].symbol);
-        expect(contractsType).toBe(contractsInfo[i].type);
-        expect(contractsAddress).toBe(address);
-
-        /* Copy CTA should works correctly and copy entire address */
-
-        await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-
-        await page.getByTestId("contractCopyBtn").nth(i).click();
-        await page.waitForTimeout(3000);
-
-        const clipboardText = await page.evaluate(async () => {
-          try {
-            return await navigator.clipboard.readText();
-          } catch (err) {
-            return null;
-          }
-        });
-
-        expect(clipboardText?.toLowerCase()).toBe(contractsInfo[i].address);
-
-        /* Open in new tab CTA should open corresponding chain scan website */
-        /* with it's address                                                */
-
-        const link =
-          chainId === "137"
-            ? `https://polygonscan.com/address/${contractsInfo[i].address}`
-            : `https://basescan.org/address/${contractsInfo[i].address}`;
-
-        const contractLinkBtn = await page
-          .getByTestId("contractLinkBtn")
-          .nth(i)
+      if (asset?.website) {
+        const assetWebsiteLink = await page
+          .getByTestId(`assetWebsite${assetIndex}`)
           .getAttribute("href");
+        expect(assetWebsiteLink).toBe(asset?.website);
+      }
 
-        expect(contractLinkBtn).toBe(link);
+      expect(assetLogoSrc).toBe(asset?.logo);
+      expect(assetTicker).toBe(asset?.symbol);
+      expect(assetName).toBe(asset?.name);
+
+      /* Token(s) current price and price on a moment of vault creation should be displayed in USD */
+
+      const displayedPrice = await page
+        .getByTestId(`assetPrice${assetIndex}`)
+        .textContent();
+      const formattedDisplayedPrice = Number(
+        displayedPrice?.slice(1).split(" ").join("")
+      );
+
+      const creationPrice = await page
+        .getByTestId(`assetPriceOnCreation${assetIndex}`)
+        .textContent();
+      const vaultCreationDate = getDate(Number(vaultData.created));
+
+      const currentPrice = prices[chainId][asset?.address]
+        ? Number(prices[chainId][asset?.address].price)
+        : 0;
+
+      const priceAtCreation = formatUnits(
+        BigInt(vaultData.assetsPricesOnCreation[assetIndex]),
+        18
+      );
+      const formattedCreationPrice = `$${formatNumber(priceAtCreation, "smallNumbers")} (${vaultCreationDate})`;
+
+      const isCurrentPrice = isDifferenceWithinTenPercents(
+        formattedDisplayedPrice,
+        currentPrice
+      );
+
+      expect(isCurrentPrice).toBeTruthy();
+
+      expect(creationPrice).toBe(formattedCreationPrice);
+
+      /* Token(s) description should be displayed */
+
+      const tokenDescriptionText = await page
+        .getByTestId(`tokenDescription${assetIndex}`)
+        .innerText();
+      expect(tokenDescriptionText).toBe(asset?.description);
+
+      /* If price feed provided by oracle - oracle label should be displayed */
+
+      const oracleLink =
+        CHAINLINK_STABLECOINS[
+          asset?.symbol as keyof typeof CHAINLINK_STABLECOINS
+        ];
+
+      if (oracleLink) {
+        const trustedOracleLink = await page
+          .getByTestId(`trustedToken${assetIndex}`)
+          .getAttribute("href");
+        expect(trustedOracleLink).toBe(oracleLink);
       }
     }
 

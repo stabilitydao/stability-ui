@@ -75,15 +75,21 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
       <div className="flex flex-col gap-6 ml-4">
         <div className="flex items-center gap-3">
           <img
+            data-testid="poolLogo"
             src={vault.strategyInfo.protocols[1].logoSrc}
             alt={vault.strategyInfo.protocols[1].name}
             className="rounded-full w-7 h-7"
           />
           <div className="flex flex-col">
-            <span className="text-[16px]">
+            <span data-testid="poolName" className="text-[16px]">
               {vault.strategyInfo.protocols[1].name}
             </span>
-            <span className="text-[14px] text-[#8d8e96]">{poolSymbol}</span>
+            <span
+              data-testid="poolSymbol"
+              className="text-[14px] text-[#8d8e96]"
+            >
+              {poolSymbol}
+            </span>
           </div>
         </div>
 
@@ -91,23 +97,28 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex flex-col gap-5">
             <div className="flex flex-col">
               <span className="text-[14px] text-[#8d8e96]">TVL</span>
-              <span className="text-[16px]">
+              <span data-testid="poolTVL" className="text-[16px]">
                 {formatNumber(vault.pool.tvl, "abbreviate")}
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-[14px] text-[#8d8e96]">FEE</span>
-              <span className="text-[16px]">{vault.pool.fee}%</span>
+              <span data-testid="poolFee" className="text-[16px]">
+                {vault.pool.fee}%
+              </span>
             </div>
           </div>
           <div className="flex flex-col gap-5">
             {!!poolAssets &&
-              poolAssets.map((poolAsset) => (
+              poolAssets.map((poolAsset, index: number) => (
                 <div key={poolAsset.amount} className="flex flex-col">
                   <span className="text-[14px] text-[#8d8e96]">
                     {poolAsset.symbol}
                   </span>
-                  <span className="text-[16px]">
+                  <span
+                    data-testid={`poolAsset${index}`}
+                    className="text-[16px]"
+                  >
                     {formatNumber(poolAsset.amount, "format")} (
                     {poolAsset.percent.toFixed(2)}%)
                   </span>

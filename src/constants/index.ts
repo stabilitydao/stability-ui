@@ -1,4 +1,5 @@
 import type { TTableFilters, TTableColumn } from "@types";
+
 import {
   USDC,
   USDT,

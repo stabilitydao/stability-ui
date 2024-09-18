@@ -1,112 +1,178 @@
-// import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-// import axios from "axios";
+import axios from "axios";
 
-// import { formatUnits } from "viem";
+import { formatUnits } from "viem";
 
-// import { seeds } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
-// // import { getAsset } from "@stabilitydao/stability";
+import { getDate } from "../../../src/utils/functions/getDate";
+import { getTimeDifference } from "../../../src/utils/functions/getTimeDifference";
 
-// // import { getProtocolLogo } from "../../../src/utils/functions/getProtocolLogo";
-// // import { getStrategyInfo } from "../../../src/utils/functions/getStrategyInfo";
+import { CHAINS } from "@constants";
 
-// import { CHAINS } from "@constants";
+let allVaults: any[] = [];
 
-// let allVaults: any[] = [];
+test.beforeEach(async ({ page }) => {
+  try {
+    const response = await axios.get(seeds[0]);
 
-// test.beforeEach(async ({ page }) => {
-//   try {
-//     const response = await axios.get(seeds[0]);
+    const vaultsData = response.data?.vaults || {};
 
-//     const vaultsData = response.data?.vaults || {};
+    allVaults = await Promise.all(
+      CHAINS.map(async (chain) => {
+        const chainVaults = vaultsData[chain?.id] || {};
+        return Object.values(chainVaults).map((vault) => vault);
+      })
+    );
+    allVaults = allVaults.flat();
+  } catch (error) {
+    throw new Error(`API Error: ${error}`);
+  }
 
-//     allVaults = await Promise.all(
-//       CHAINS.map(async (chain) => {
-//         const chainVaults = vaultsData[chain?.id] || {};
-//         return Object.values(chainVaults).map((vault) => vault);
-//       })
-//     );
-//     allVaults = allVaults.flat();
-//   } catch (error) {
-//     throw new Error(`API Error: ${error}`);
-//   }
+  await page.goto("/", { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(5000);
+});
 
-//   await page.goto("/", { waitUntil: "load", timeout: 60000 });
-//   await page.waitForTimeout(5000);
-// });
+test("Should display vault info correctly", async ({ page, context }) => {
+  test.setTimeout(500000);
 
-// test("Should be contracts info", async ({ page, context }) => {
-//   test.setTimeout(500000);
+  await page.waitForSelector("[data-testid='vault']");
 
-//   await page.waitForSelector("[data-testid='vault']");
+  const vaultsCount = await page.getByTestId("vault").count();
 
-//   const activeVaults = await page.getByTestId("vault").count();
+  for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
+    await page.getByTestId("vault").nth(vaultIndex).click();
 
-//   for (let i = 0; i < activeVaults; i++) {
-//     await page.getByTestId("vault").nth(i).click();
+    await page.waitForSelector("[data-testid='vaultType']");
+    await page.waitForSelector("[data-testid='vaultStatus']");
+    await page.waitForSelector("[data-testid='hardWorkOnDeposit']");
 
-//     await page.waitForSelector("[data-testid='vaultType']");
-//     // await page.waitForSelector("[data-testid='contractsSymbol']");
-//     // await page.waitForSelector("[data-testid='contractsType']");
+    const vaultAddress = page.url().slice(-42);
 
-//     const currentVaultAddress = page.url().slice(-42);
+    const chainId = page.url().match(/\/vault\/(\d+)\//)?.[1] || "137";
 
-//     const currentChain = page.url().match(/\/vault\/(\d+)\//)?.[1] || "137";
+    const nativeCurrency = CHAINS.find(
+      (chain) => chain?.id === chainId
+    )?.nativeCurrency;
 
-//     const nativeCurrency = CHAINS.find(
-//       (chain) => chain?.id === currentChain
-//     )?.nativeCurrency;
+    const vaultData = allVaults.find(
+      ({ address }) => address.toLowerCase() === vaultAddress
+    );
 
-//     const currentVault = allVaults.find(
-//       ({ address }) => address.toLowerCase() === currentVaultAddress
-//     );
+    /* Type of Vault should be displayed correctly */
 
-//     /* Type of Vault should be displayed correctly */
+    const pageVaultType = (
+      await page.getByTestId("vaultType").innerText()
+    ).toLowerCase();
 
-//     const pageVaultType = (
-//       await page.getByTestId("vaultType").innerText()
-//     ).toLowerCase();
+    const APIVaultType = vaultData.vaultType.toLowerCase();
 
-//     const APIVaultType = currentVault.vaultType.toLowerCase();
+    expect(pageVaultType).toBe(APIVaultType);
 
-//     expect(pageVaultType).toBe(APIVaultType);
+    /* All income is automatically reinvested into vault should be displayed */
 
-//     /* All income is automatically reinvested into vault should be displayed */
+    const pageIncomeText = await page
+      .getByTestId("vaultIncomeText")
+      .innerText();
 
-//     const pageIncomeText = await page
-//       .getByTestId("vaultIncomeText")
-//       .innerText();
+    expect(pageIncomeText).toBe(
+      "All income is automatically reinvested into vault"
+    );
 
-//     expect(pageIncomeText).toBe(
-//       "All income is automatically reinvested into vault"
-//     );
+    /* Vault status should Active or Deposits unavailable */
 
-//     /* Vault status should Active or Deposits unavailable */
+    const pageVaultStatus = await page.getByTestId("vaultStatus").innerText();
 
-//     const pageVaultStatus = await page.getByTestId("vaultStatus").innerText();
+    expect(pageVaultStatus).toBe(vaultData?.status);
 
-//     expect(pageVaultStatus).toBe(currentVault?.status);
+    /* Gas reserve should be displayed correctly in native chain currency */
 
-//     /* Gas reserve should be displayed correctly in native chain currency */
+    const pageVaultGasReserve = await page
+      .getByTestId("vaultGasReserve")
+      .innerText();
 
-//     const pageVaultGasReserve = await page
-//       .getByTestId("vaultGasReserve")
-//       .innerText();
+    const gasReserve = !!Number(vaultData?.gasReserve)
+      ? Number(formatUnits(BigInt(vaultData?.gasReserve), 18)).toFixed(5)
+      : "0";
 
-//     const gasReserve = !!Number(currentVault?.gasReserve)
-//       ? Number(formatUnits(BigInt(currentVault?.gasReserve), 18)).toFixed(5)
-//       : "0";
+    const vaultGasReserve = pageVaultGasReserve.split(" ")[0];
 
-//     const vaultGasReserve = pageVaultGasReserve.split(" ")[0];
+    const vaultNativeCurrency = pageVaultGasReserve.split(" ")[1];
 
-//     const vaultNativeCurrency = pageVaultGasReserve.split(" ")[1];
+    expect(gasReserve).toBe(vaultGasReserve);
+    expect(nativeCurrency).toBe(vaultNativeCurrency);
 
-//     expect(gasReserve).toBe(vaultGasReserve);
-//     expect(nativeCurrency).toBe(vaultNativeCurrency);
+    /* Last Hardwork should be displayed in hours and minutes or none */
 
-//     /* Last Hardwork should be displayed in hours and minutes or none */
+    const timeDifference = getTimeDifference(vaultData?.lastHardWork);
 
-//     await page.goBack();
-//   }
-// });
+    if (timeDifference) {
+      let expectedLastHardWorkText = "None";
+
+      if (timeDifference.days) {
+        if (timeDifference.days < 1000) {
+          expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
+        }
+      } else if (timeDifference.hours) {
+        expectedLastHardWorkText = `${timeDifference.hours}h ago`;
+      } else {
+        expectedLastHardWorkText = "<1h ago";
+      }
+
+      const vaultLastHardWork = await page
+        .getByTestId("vaultLastHardWork")
+        .textContent();
+
+      expect(vaultLastHardWork).toContain(expectedLastHardWorkText);
+    }
+
+    /* Hardwork on Deposit should have status YES or NO */
+
+    const hardWorkOnDeposit = vaultData?.hardWorkOnDeposit ? "YES" : "NO";
+
+    const pageHardWorkOnDeposit = await page
+      .getByTestId("hardWorkOnDeposit")
+      .textContent();
+
+    expect(pageHardWorkOnDeposit).toBe(hardWorkOnDeposit);
+
+    /* Created should be displayed correctly in d/mm/yyyy format and */
+    /* summarised days from deployment date                          */
+
+    const date = getDate(Number(vaultData?.created));
+
+    const createdData = {
+      time: date,
+      days: getTimeDifference(vaultData?.created)?.days,
+    };
+
+    const createdText = `${createdData?.time} / ${createdData?.days} days ago`;
+
+    const pageVaultCreated = await page
+      .getByTestId("vaultCreated")
+      .textContent();
+
+    expect(pageVaultCreated).toBe(createdText);
+
+    /* Vault version should be displayed correctly based on it's contract version */
+
+    if (vaultData?.version) {
+      const pageVaultVersion = await page
+        .getByTestId("vaultVersion")
+        .textContent();
+
+      expect(pageVaultVersion).toBe(vaultData?.version);
+    }
+
+    /* Vault NFT token ID should be displayed correctly */
+
+    const pageVaultManagerID = await page
+      .getByTestId("vaultManagerID")
+      .textContent();
+
+    expect(Number(pageVaultManagerID)).toBe(vaultData?.vaultManagerId);
+
+    await page.goBack();
+  }
+});

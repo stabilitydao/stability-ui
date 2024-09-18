@@ -279,7 +279,6 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                   <td className="text-right">-</td>
                 )}
               </tr>
-
               {vault.lifetimeTokensHold.map(
                 (aprsData: THoldData, index: number) => (
                   <tr key={index} className="hover:bg-[#2B3139]">

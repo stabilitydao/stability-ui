@@ -3,6 +3,23 @@ type ReturnData = {
   hours: number;
 };
 
+/**
+ * Function to calculate the difference between the current time and a given unix timestamp
+ *
+ * @example
+ *
+ * ```
+ * const unixTimestamp = 1694515200;
+ * const timeDifference = getTimeDifference(unixTimestamp);
+ * ```
+ *
+ * @param {number | string | bigint} unix - Unix timestamp (in seconds) to compare with the current time
+ *
+ * @returns {Object} Time difference between the current time and the provided timestamp
+ * @returns {number} days - The number of days in the difference
+ * @returns {number} hours - The number of hours in the difference (remaining after subtracting full days)
+ */
+
 export const getTimeDifference = (
   unix: number | string | bigint
 ): ReturnData => {

@@ -1,5 +1,18 @@
 import { PROTOCOLS } from "@constants";
 
+/**
+ * Returns logo URL for a given strategy based on its short name
+ *
+ * @example
+ * ```
+ * const logoUrl = getProtocolLogo("DQMF");
+ * ```
+ *
+ * @param {string} strategyShortName - The short name of the strategy (e.g., "DQMF", "IQMF")
+ *
+ * @returns {string} The URL of logo image for protocol associated with the strategy
+ */
+
 export const getProtocolLogo = (strategyShortName: string): string => {
   let protocolLogo = "";
 

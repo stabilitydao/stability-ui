@@ -187,6 +187,7 @@ const Assets: React.FC<IProps> = memo(
         network === $currentChainID
       );
     }, [$connected, connector, $currentChainID]);
+
     return (
       <div className="p-3 mt-5">
         <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
@@ -242,9 +243,9 @@ const Assets: React.FC<IProps> = memo(
               const creationDate = getDate(Number(created));
 
               /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
-              const trustedLink =
+              const oracleLink =
                 CHAINLINK_STABLECOINS[
-                  tokenAssets?.symbol as keyof typeof CHAINLINK_STABLECOINS
+                  assetData?.symbol as keyof typeof CHAINLINK_STABLECOINS
                 ];
               return (
                 assetData && (
@@ -256,17 +257,27 @@ const Assets: React.FC<IProps> = memo(
                       <div className="flex w-full justify-between items-center flex-wrap">
                         <div className="inline-flex items-center mb-2">
                           <img
+                            data-testid={`assetLogo${index}`}
                             className="rounded-full w-[30px] m-auto mr-2"
                             src={assetData.logoURI}
                           />
-                          <span className="mr-5 font-bold text-[18px]">
+                          <span
+                            data-testid={`assetTicker${index}`}
+                            className="mr-5 font-bold text-[18px]"
+                          >
                             {assetData.symbol}
                           </span>
-                          <span className="text-[18px]">{assetData.name}</span>
+                          <span
+                            data-testid={`assetName${index}`}
+                            className="text-[18px]"
+                          >
+                            {assetData.name}
+                          </span>
                         </div>
                         {tokenAssets?.website && (
                           <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px] mb-2">
                             <a
+                              data-testid={`assetWebsite${index}`}
                               className="flex items-center"
                               href={tokenAssets?.website}
                               target="_blank"
@@ -303,7 +314,10 @@ const Assets: React.FC<IProps> = memo(
                             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                               PRICE
                             </p>
-                            <p className="text-[16px] mt-1">
+                            <p
+                              data-testid={`assetPrice${index}`}
+                              className="text-[16px] mt-1"
+                            >
                               ${formatNumber(price, "smallNumbers")}
                             </p>
                           </div>
@@ -313,7 +327,10 @@ const Assets: React.FC<IProps> = memo(
                             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
                               PRICE AT CREATION
                             </p>
-                            <p className="text-[16px] mt-1">
+                            <p
+                              data-testid={`assetPriceOnCreation${index}`}
+                              className="text-[16px] mt-1"
+                            >
                               ${formatNumber(priceOnCreation, "smallNumbers")} (
                               {creationDate})
                             </p>
@@ -332,10 +349,11 @@ const Assets: React.FC<IProps> = memo(
                           ))}
                         </div>
                       )}
-                      {trustedLink && (
+                      {oracleLink && (
                         <a
+                          data-testid={`trustedToken${index}`}
                           className="w-[200px]"
-                          href={trustedLink}
+                          href={oracleLink}
                           target="_blank"
                         >
                           <img
@@ -344,7 +362,12 @@ const Assets: React.FC<IProps> = memo(
                           />
                         </a>
                       )}
-                      <p className="text-[16px]">{tokenAssets?.description}</p>
+                      <p
+                        data-testid={`tokenDescription${index}`}
+                        className="text-[16px]"
+                      >
+                        {tokenAssets?.description}
+                      </p>
                     </div>
                     {isAddToWallet && (
                       <button

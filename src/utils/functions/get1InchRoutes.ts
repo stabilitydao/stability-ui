@@ -16,6 +16,38 @@ type ReturnData = {
   img: string;
 };
 
+/**
+ * Fetches swap route data from 1inch API for a given token pair and amount
+ *
+ * @example
+ * ```
+ * const swapData = await get1InchRoutes(
+ *   "137",
+ *   "0xTokenAddress1",
+ *   "0xTokenAddress2",
+ *   18,
+ *   "1000000000000000000",
+ *   setError,
+ *   "deposit"
+ * );
+ * ```
+ *
+ * @param {string} network - Network on which the swap will occur (e.g., "137")
+ * @param {TAddress} fromAddress - Contract address of the token being swapped from
+ * @param {TAddress} toAddress - Contract address of the token being swapped to
+ * @param {number} decimals - Number of decimals for the token being swapped from
+ * @param {string | bigint} amount - Amount of tokens being swapped (in smallest unit)
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setError - A React state dispatch function for setting error state
+ * @param {string} type - The type of transaction, e.g., "deposit" or "withdraw"
+ *
+ * @returns {Promise<ReturnData | undefined>} A Promise that resolves to an object containing details of the swap route, or `undefined` if an error occurs
+ *
+ * @remarks
+ * - This function makes multiple attempts (up to 3 retries) to fetch data from the 1inch API in case of errors
+ * - In case of an API failure after retries, the function logs an error and sets the `setError` state to `true`
+ *
+ */
+
 export const get1InchRoutes = async (
   network: string,
   fromAddress: TAddress,

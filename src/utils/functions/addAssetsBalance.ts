@@ -1,5 +1,25 @@
 import type { TBalances, TPlatformGetBalance } from "@types";
 
+/**
+ * Converts platform balance data into a standardized balance object
+ *
+ * @example
+ * ```
+ * const data = [
+ *   ['0x123...', '0xabc...'],
+ *   [],
+ *   [1000, 2000]
+ * ];
+ *
+ * const balances = addAssetsBalance(data);
+ * ```
+ *
+ * @param {TPlatformGetBalance} data - Data array containing platform balance information
+ *
+ * @returns {TBalances | undefined} An object where the keys are asset addresses (in lowercase) and the values are their corresponding balances
+ *   If the lengths of the address and balance arrays do not match, the function logs an error and returns `undefined`
+ */
+
 const addAssetsBalance = (data: TPlatformGetBalance): TBalances | undefined => {
   const assets = data[0].map((address: string) => address.toLowerCase());
   const assetsBalances = data[2];
