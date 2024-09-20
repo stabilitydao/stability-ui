@@ -42,36 +42,36 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
 
         setFilters(updatedFiltersSingle);
         break;
-      case "multiple":
-        // const updatedFiltersMultiple = filters.map((f) =>
-        //   f.name === filterName.name
-        //     ? {
-        //         ...f,
-        //         variants:
-        //           f.variants?.map((variant: TTAbleFiltersVariant) =>
-        //             variant.name === option
-        //               ? { ...variant, state: !variant.state }
-        //               : { ...variant, state: false }
-        //           ) || [],
-        //       }
-        //     : f
-        // );
+      // case "multiple":
+      // const updatedFiltersMultiple = filters.map((f) =>
+      //   f.name === filterName.name
+      //     ? {
+      //         ...f,
+      //         variants:
+      //           f.variants?.map((variant: TTAbleFiltersVariant) =>
+      //             variant.name === option
+      //               ? { ...variant, state: !variant.state }
+      //               : { ...variant, state: false }
+      //           ) || [],
+      //       }
+      //     : f
+      // );
 
-        // const multipleFilter = updatedFiltersMultiple.find(
-        //   (f) => f.name === filterName.name
-        // );
+      // const multipleFilter = updatedFiltersMultiple.find(
+      //   (f) => f.name === filterName.name
+      // );
 
-        // if (multipleFilter?.name.toLowerCase() === "strategy") {
-        //   const strategy =
-        //     multipleFilter?.variants &&
-        //     multipleFilter?.variants.find((variant) => variant.state);
-        //   strategy
-        //     ? params.set("strategy", strategy.name)
-        //     : params.delete("strategy");
-        // }
+      // if (multipleFilter?.name.toLowerCase() === "strategy") {
+      //   const strategy =
+      //     multipleFilter?.variants &&
+      //     multipleFilter?.variants.find((variant) => variant.state);
+      //   strategy
+      //     ? params.set("strategy", strategy.name)
+      //     : params.delete("strategy");
+      // }
 
-        // setFilters(updatedFiltersMultiple);
-        break;
+      // setFilters(updatedFiltersMultiple);
+      // break;
       case "sample":
         const updatedFiltersSample = filters.map((f) =>
           f.name === filterName.name

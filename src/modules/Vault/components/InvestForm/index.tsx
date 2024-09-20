@@ -164,10 +164,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   let isAnyCCFOptionVisible = false;
 
-  const checkButtonApproveDeposit = (apprDepo: string[]) => {
-    const { shortName } = vault.strategyInfo;
+  const { shortId } = vault.strategyInfo;
 
-    if (shortName === "IQMF" || shortName === "IRMF") {
+  const checkButtonApproveDeposit = (apprDepo: string[]) => {
+    if (shortId === "IQMF" || shortId === "IRMF") {
       if (apprDepo.includes("deposit")) return true;
     }
 
@@ -184,10 +184,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
     const assetsBalances = $assetsBalances[network];
     const assetsArray = defaultOption?.assetsArray;
-    const { shortName } = vault.strategyInfo;
 
-    const isIRMF = shortName === "IRMF";
-    const isIQMFOrIRMF = shortName === "IQMF" || isIRMF;
+    const isIRMF = shortId === "IRMF";
+    const isIQMFOrIRMF = shortId === "IQMF" || isIRMF;
 
     for (let i = 0; i < input.length; i++) {
       if (assetsBalances && input[i] > assetsBalances?.[assetsArray[i]]) {
@@ -370,11 +369,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     ///// GET UNDERLYING TOKEN
     try {
       if (vault.underlying != zeroAddress) {
-        const logo = getProtocolLogo(vault.strategyInfo.shortName);
+        const logo = getProtocolLogo(shortId);
         if ($connected) {
           let underlyingSymbol = "";
 
-          if (vault.strategyInfo.shortName === "DQMF") {
+          if (shortId === "DQMF") {
             underlyingSymbol = await _publicClient?.readContract({
               address: vault.underlying,
               abi: ERC20DQMFABI,
@@ -648,10 +647,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const zapDeposit = async () => {
     // break point for curve
-    if (
-      vault?.strategyInfo?.shortName === "CCF" &&
-      defaultOption?.assets.includes(option[0])
-    ) {
+    if (shortId === "CCF" && defaultOption?.assets.includes(option[0])) {
       deposit();
       return;
     }
@@ -746,16 +742,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         let txData = zapTokens.map((tokens: any) => tokens.txData);
 
-        if (
-          vault.strategyInfo.shortName === "IQMF" ||
-          vault.strategyInfo.shortName === "IRMF"
-        )
-          txData.push("");
+        if (shortId === "IQMF" || shortId === "IRMF") txData.push("");
 
-        if (vault.strategyInfo.shortName === "IRMF") {
+        if (shortId === "IRMF") {
           txData.reverse();
         }
-        if (vault.strategyInfo.shortName === "CCF") txData[1] = "";
+        if (shortId === "CCF") txData[1] = "";
 
         gas = await _publicClient?.estimateContractGas({
           address: $platformsData[network]?.zap,
@@ -841,10 +833,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const getZapDepositSwapAmounts = async (amount: string) => {
     setLoader(true);
-    if (
-      vault?.strategyInfo?.shortName === "CCF" &&
-      defaultOption?.assets.includes(option[0])
-    ) {
+    if (shortId === "CCF" && defaultOption?.assets.includes(option[0])) {
       depositCCF(amount);
       return;
     }
@@ -860,7 +849,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       let promises;
       let outData;
-      if (vault?.strategyInfo?.shortName === "CCF") {
+      if (shortId === "CCF") {
         promises = await get1InchRoutes(
           network,
           option[0],
@@ -888,10 +877,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         outData = await Promise.all(promises);
       }
 
-      if (
-        vault.strategyInfo.shortName === "IQMF" ||
-        vault.strategyInfo.shortName === "IRMF"
-      ) {
+      if (shortId === "IQMF" || shortId === "IRMF") {
         outData = outData.filter(
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
@@ -900,10 +886,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setZapTokens(outData);
       let amounts;
 
-      if (
-        vault.strategyInfo.shortName === "IQMF" ||
-        vault.strategyInfo.shortName === "IRMF"
-      ) {
+      if (shortId === "IQMF" || shortId === "IRMF") {
         amounts = vault.assetsProportions.map((proportion) =>
           proportion
             ? parseUnits(
@@ -1146,7 +1129,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       ? sharesOut
       : (parseUnits(zapShares, 18) * BigInt(1)) / BigInt(100);
 
-    if (vault?.strategyInfo?.shortName === "CCF" && option.length < 2) {
+    if (shortId === "CCF" && option.length < 2) {
       input.push(0n);
     }
 
@@ -1186,10 +1169,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
     }
     try {
-      if (
-        vault.strategyInfo.shortName !== "IQMF" &&
-        vault.strategyInfo.shortName !== "IRMF"
-      ) {
+      if (shortId !== "IQMF" && shortId !== "IRMF") {
         gas = await _publicClient?.estimateContractGas({
           address: vault.address,
           abi: VaultABI,
@@ -1266,10 +1246,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
     let localAssets = defaultOption?.assetsArray;
-    if (
-      vault.strategyInfo.shortName === "IQMF" ||
-      vault.strategyInfo.shortName === "IRMF"
-    ) {
+    if (shortId === "IQMF" || shortId === "IRMF") {
       localAssets = vault.assets.map((asset) => asset.address);
     }
     if (underlyingToken?.address === option[0]) {
@@ -1510,10 +1487,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       } else {
         let assetsLength = defaultOption?.assetsArray.map((_: string) => 0n);
         let localAssets = defaultOption?.assetsArray;
-        if (
-          vault.strategyInfo.shortName === "IQMF" ||
-          vault.strategyInfo.shortName === "IRMF"
-        ) {
+        if (shortId === "IQMF" || shortId === "IRMF") {
           assetsLength = [0n, 0n];
           localAssets = vault.assets.map((asset) => asset.address);
         }
@@ -1656,7 +1630,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (vault.strategyInfo.shortName === "CCF") {
+            if (shortId === "CCF") {
               let value;
               let decimals = 18;
               for (const key in inputs) {
@@ -1685,10 +1659,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         }
         try {
           let previewDepositAssets: any;
-          if (
-            vault.strategyInfo.shortName === "IQMF" ||
-            vault.strategyInfo.shortName === "IRMF"
-          ) {
+          if (shortId === "IQMF" || shortId === "IRMF") {
             // IQMF & IRMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
@@ -1743,9 +1714,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const isSingleTokenStrategy = useMemo(() => {
     return (
-      vault.strategyInfo.shortName === "CF" ||
-      (vault.strategyInfo.shortName === "Y" &&
-        vault.assets[0].address === option[0])
+      shortId === "CF" ||
+      (shortId === "Y" && vault.assets[0].address === option[0])
     );
   }, [vault]);
 
@@ -1760,8 +1730,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   // useEffect(() => {
   //   if (
-  //     vault.strategyInfo.shortName === "IQMF" ||
-  //     vault.strategyInfo.shortName === "IRMF"
+  //     shortId === "IQMF" ||
+  //     shortId === "IRMF"
   //   ) {
   //     let assetsData = vault.assets.map((asset: TAsset) =>
   //       asset.address.toLowerCase()
@@ -1994,7 +1964,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         [underlyingToken?.address],
                         underlyingToken?.symbol,
                         underlyingToken?.address,
-                        [getProtocolLogo(vault.strategyInfo.shortName)]
+                        [getProtocolLogo(shortId)]
                       );
                     }}
                   >
@@ -2011,9 +1981,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   </div>
                 )}
                 {/* CRV Strategy don't have zap withdraw */}
-                {!(
-                  vault?.strategyInfo?.shortName === "CCF" && tab === "Withdraw"
-                ) &&
+                {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
                     return (
                       <div
@@ -2310,7 +2278,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           <div className="h-[100px]">
                             {zapTokens && (
                               <>
-                                {vault?.strategyInfo?.shortName !== "CCF" ? (
+                                {shortId !== "CCF" ? (
                                   <div>
                                     {zapTokens?.map((token: any) => (
                                       <div
@@ -2852,7 +2820,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           </>
                         ) : (
                           <div>
-                            {vault?.strategyInfo?.shortName === "CCF" &&
+                            {shortId === "CCF" &&
                             defaultOption?.assets?.includes(option[0]) ? (
                               <>
                                 {button === "deposit" ? (

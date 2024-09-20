@@ -6,8 +6,8 @@ import type { TVault, TTableFilters } from "@types";
 
 describe("initFilters", () => {
   const mockVaults: TVault[] = [
-    { id: "1", strategyInfo: { shortName: "Strategy1" } },
-    { id: "2", strategyInfo: { shortName: "Strategy2" } },
+    { id: "1", strategyInfo: { shortId: "Strategy1" } },
+    { id: "2", strategyInfo: { shortId: "Strategy2" } },
   ];
   const initialFilters: TTableFilters[] = [
     { name: "Strategy", type: "multiple", variants: [] },

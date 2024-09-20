@@ -71,8 +71,6 @@ import type {
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
 
-import { strategies } from "@stabilitydao/stability";
-
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
 
@@ -135,10 +133,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const strategyAssets: string[] =
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-        const strategyInfo = getStrategyInfo(vault?.symbol);
-        console.log(strategyInfo);
-        console.log(strategies.DQMF);
-        const strategyName = strategyInfo?.shortName;
+        const strategyInfo = getStrategyInfo(vault?.symbol, vault.strategyId);
+
+        const strategyName = strategyInfo?.shortId;
 
         const NOW = Math.floor(Date.now() / 1000);
 
@@ -424,32 +421,32 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let yearnProtocols: TYearnProtocol[] = [];
         let strategySpecific: string = "";
 
-        if (vault.strategySpecific && strategyInfo.shortName === "Y") {
+        if (vault.strategySpecific && strategyInfo.shortId === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
             if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
               switch (protocol) {
                 case "aave":
                   yearnProtocols.push({
                     title: "Aave",
-                    link: "/protocols/Aave.png",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.svg",
                   });
                   break;
                 case "compound":
                   yearnProtocols.push({
                     title: "Compound",
-                    link: "/protocols/Compound.png",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.svg",
                   });
                   break;
                 case "stargate":
                   yearnProtocols.push({
                     title: "Stargate",
-                    link: "/protocols/Stargate.svg",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
                   });
                   break;
                 case "stmatic":
                   yearnProtocols.push({
                     title: "Lido",
-                    link: "/protocols/Lido.png",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
                   });
                   break;
                 default:
@@ -464,7 +461,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()];
         } else {
           strategySpecific =
-            strategyInfo?.shortName === "DQMF"
+            strategyInfo?.shortId === "DQMF"
               ? (vault?.strategySpecific?.replace(
                   /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
                   ""

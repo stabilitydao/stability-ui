@@ -29,8 +29,6 @@ const STRATEGIES = [
   "CCF",
   "IRMF",
   "GRMF",
-  "GQF",
-  "QSF",
 ];
 
 const SORT_CASES = [

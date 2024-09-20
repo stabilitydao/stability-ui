@@ -11,20 +11,14 @@ interface IProtocol {
   logoSrc: string;
 }
 
-interface IFeature {
-  name: string;
-  logoSrc?: string;
-  svg?: string;
-}
-
 interface IStrategyInfo {
-  name: string;
-  shortName: string;
-  specific?: string;
-  protocols: IProtocol[];
-  features: IFeature[];
+  id: string;
+  shortId: string;
+  state?: string;
+  contractGithubId?: number;
   color: string;
   bgColor: string;
+  protocols: IProtocol[];
   baseStrategies: string[];
   ammAdapter: string;
   sourceCode: string;
@@ -494,7 +488,6 @@ export type {
   TAddress,
   IProtocol,
   TMultichainPrices,
-  IFeature,
   IStrategyInfo,
   TInputItem,
   TVaultsAddress,

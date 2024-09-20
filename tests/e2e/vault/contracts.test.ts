@@ -282,7 +282,10 @@ test("Should display contracts info correctly", async ({ page, context }) => {
     const strategyAssets: string[] =
       vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-    const strategyInfo = getStrategyInfo(vaultData?.symbol);
+    const strategyInfo = getStrategyInfo(
+      vaultData?.symbol,
+      vaultData?.strategyId
+    );
 
     const assets = strategyAssets.map((strategyAsset: string) => {
       const token = getTokenData(strategyAsset);

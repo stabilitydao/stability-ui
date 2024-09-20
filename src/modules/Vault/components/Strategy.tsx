@@ -96,9 +96,9 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                 color: vault.strategyInfo.color,
               }}
               className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[70px]"
-              title={vault.strategyInfo.name}
+              title={vault.strategyInfo.id}
             >
-              {vault.strategyInfo.shortName}
+              {vault.strategyInfo.shortId}
             </span>
             <span className="px-2 rounded-r-[10px] bg-[#41465a] flex h-8 items-center min-w-[160px]">
               <span className="flex min-w-[42px] justify-center">
@@ -117,19 +117,14 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                 ))}
               </span>
               <span className="flex">
-                {vault.strategyInfo.features.map((feature, i) => (
+                {vault?.strategyInfo?.baseStrategies.includes("Farming") && (
                   <img
-                    key={i}
-                    title={feature.name}
-                    alt={feature.name}
+                    title="Farming"
+                    alt="Farming"
                     className="w-6 h-6 ml-1"
-                    src={
-                      feature.svg
-                        ? `data:image/svg+xml;utf8,${encodeURIComponent(feature.svg)}`
-                        : undefined
-                    }
+                    src="/public/features/Farming.svg"
                   />
-                ))}
+                )}
               </span>
               {vault.yearnProtocols.length ? (
                 <div className="flex">
@@ -174,7 +169,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
               </div>
             ) : (
               <p>
-                {vault.strategyInfo.name}
+                {vault.strategyInfo.id}
                 {vault.strategySpecific ? " " + vault.strategySpecific : ""}
               </p>
             )}

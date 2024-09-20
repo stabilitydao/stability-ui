@@ -430,79 +430,81 @@ describe("getProtocolLogo", () => {
 });
 
 describe("getStrategyInfo", () => {
-  it("should return correct strategy info for GQFS", () => {
-    const vaultSymbol = "GQFS";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+  it("should return correct strategy info for GQMF", () => {
+    const vaultSymbol = "GQMF";
 
-    expect(strategyInfo.name).toBe("Gamma QuickSwap Farm");
-    expect(strategyInfo.shortName).toBe("GQF");
-    expect(strategyInfo.features).toContainEqual({
-      name: "Farming",
-      svg: expect.any(String),
-    });
-    expect(strategyInfo.color).toBe("#de43ff");
-    expect(strategyInfo.il).toEqual({
-      rate: 1,
-      title: "Zero exp",
-      desc: "The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.",
-      color: "#7af996",
-    });
-  });
+    const strategyInfo = getStrategyInfo(
+      vaultSymbol,
+      "Gamma QuickSwap Merkl Farm"
+    );
 
-  it("should return correct strategy info for QSF", () => {
-    const vaultSymbol = "QSF";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+    expect(strategyInfo.id).toBe("Gamma QuickSwap Merkl Farm");
 
-    expect(strategyInfo.name).toBe("QuickSwap Static Farm");
-    expect(strategyInfo.shortName).toBe("QSF");
-    expect(strategyInfo.features).toContainEqual({
-      name: "Farming",
-      svg: expect.any(String),
-    });
-    expect(strategyInfo.color).toBe("#558ac5");
+    expect(strategyInfo.shortId).toBe("GQMF");
+
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.gamma,
+      PROTOCOLS.quickSwap,
+      PROTOCOLS.merkl,
+    ]);
+
     expect(strategyInfo.il).toEqual({
       rate: 0,
       title: "None",
-      desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+      desc: "None",
       color: "#4aff71",
     });
   });
 
   it("should return correct strategy info for CCF", () => {
     const vaultSymbol = "CCF";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
 
-    expect(strategyInfo.name).toBe("Curve Convex Farm");
-    expect(strategyInfo.shortName).toBe("CCF");
+    const strategyId = "Curve Convex Farm";
+
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("Curve Convex Farm");
+    expect(strategyInfo.shortId).toBe("CCF");
     expect(strategyInfo.protocols).toEqual([PROTOCOLS.curve, PROTOCOLS.convex]);
-    expect(strategyInfo.il).toEqual({
-      rate: 1,
-      title: "Zero exp",
-      desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
-      color: "#7af996",
-    });
+    expect(strategyInfo.il).toEqual(IL.CCF);
   });
 
-  it("should return correct strategy info for DQMFN", () => {
-    const vaultSymbol = "DQMFN";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+  it("should return correct strategy info for QSF", () => {
+    const vaultSymbol = "QSF";
+    const strategyId = "QuickSwap Static Merkl Farm";
 
-    expect(strategyInfo.name).toBe("DefiEdge QuickSwap Merkl Farm");
-    expect(strategyInfo.shortName).toBe("DQMF");
-    expect(strategyInfo.il).toEqual({
-      rate: 8,
-      title: "High",
-      desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-      color: "#f55e11",
-    });
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("QuickSwap Static Merkl Farm");
+    expect(strategyInfo.shortId).toBe("QSMF");
+    expect(strategyInfo.protocols).toEqual([PROTOCOLS.quickSwap]);
+    expect(strategyInfo.il).toEqual(IL.QSF);
+  });
+
+  it("should return correct strategy info for DQMF", () => {
+    const vaultSymbol = "DQMF";
+    const strategyId = "DefiEdge QuickSwap Merkl Farm";
+
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("DefiEdge QuickSwap Merkl Farm");
+    expect(strategyInfo.shortId).toBe("DQMF");
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.defiedge,
+      PROTOCOLS.quickSwap,
+      PROTOCOLS.merkl,
+    ]);
+    expect(strategyInfo.il).toEqual(IL.DQMFN);
   });
 
   it("should return correct strategy info for IRMF", () => {
     const vaultSymbol = "IRMF";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+    const strategyId = "Ichi Retro Merkl Farm";
 
-    expect(strategyInfo.name).toBe("Ichi Retro Merkl Farm");
-    expect(strategyInfo.shortName).toBe("IRMF");
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("Ichi Retro Merkl Farm");
+    expect(strategyInfo.shortId).toBe("IRMF");
     expect(strategyInfo.protocols).toEqual([
       PROTOCOLS.ichi,
       PROTOCOLS.retro,
@@ -511,22 +513,35 @@ describe("getStrategyInfo", () => {
     expect(strategyInfo.il).toEqual(IL.IQMF);
   });
 
-  it("should return correct strategy info for Y", () => {
-    const vaultSymbol = "Y";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+  it("should return correct strategy info for GRMF", () => {
+    const vaultSymbol = "GRMF";
 
-    expect(strategyInfo.name).toBe("Yearn");
-    expect(strategyInfo.shortName).toBe("Y");
-    expect(strategyInfo.protocols).toEqual([PROTOCOLS.yearn]);
-    expect(strategyInfo.il).toEqual(IL.Y);
+    const strategyInfo = getStrategyInfo(vaultSymbol, "Gamma Retro Merkl Farm");
+
+    expect(strategyInfo.id).toBe("Gamma Retro Merkl Farm");
+    expect(strategyInfo.shortId).toBe("GRMF");
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.gamma,
+      PROTOCOLS.retro,
+      PROTOCOLS.merkl,
+    ]);
+
+    expect(strategyInfo.il).toEqual({
+      rate: 0,
+      title: "None",
+      desc: "None",
+      color: "#000000",
+    });
   });
 
   it("should return correct strategy info for GUMF", () => {
     const vaultSymbol = "GUMF";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+    const strategyId = "Gamma UniswapV3 Merkl Farm";
 
-    expect(strategyInfo.name).toBe("Gamma UniswapV3 Merkl Farm");
-    expect(strategyInfo.shortName).toBe("GUMF");
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("Gamma UniswapV3 Merkl Farm");
+    expect(strategyInfo.shortId).toBe("GUMF");
     expect(strategyInfo.protocols).toEqual([
       PROTOCOLS.gamma,
       PROTOCOLS.uniswapV3,
@@ -537,14 +552,23 @@ describe("getStrategyInfo", () => {
 
   it("should return correct strategy info for unknown vaultSymbol", () => {
     const vaultSymbol = "UNKNOWN";
-    const strategyInfo = getStrategyInfo(vaultSymbol);
+    const strategyId = "Unknown Strategy";
 
-    expect(strategyInfo.name).toBe("");
-    expect(strategyInfo.shortName).toBe("");
-    expect(strategyInfo.protocols).toEqual([]);
-    expect(strategyInfo.features).toEqual([]);
-    expect(strategyInfo.color).toBe("");
-    expect(strategyInfo.il).toBeUndefined();
+    const strategyInfo = getStrategyInfo(vaultSymbol, strategyId);
+
+    expect(strategyInfo.id).toBe("");
+    expect(strategyInfo.shortId).toBe("");
+    expect(strategyInfo.protocols).toEqual([
+      PROTOCOLS.quickSwap,
+      PROTOCOLS.gamma,
+    ]);
+    expect(strategyInfo.baseStrategies).toEqual([]);
+    expect(strategyInfo.il).toEqual({
+      rate: 0,
+      title: "None",
+      desc: "None",
+      color: "#000000",
+    });
   });
 });
 

@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useMemo } from "react";
+import { memo, useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -26,15 +26,19 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
   const [poolAssets, setPoolAssets] = useState<TPoolAsset[]>([]);
 
-  const poolSymbol = useMemo(() => {
-    if (vault && vault.assets) {
-      if (vault.assets.length > 1) {
-        return `${vault.assets[0].symbol}-${vault.assets[1].symbol}`;
-      } else {
-        return vault.assets[0].symbol;
-      }
-    }
-  }, [vault]);
+  const poolSymbol =
+    vault.assets.length > 1
+      ? `${vault.assets[0].symbol}-${vault.assets[1].symbol}`
+      : vault.assets[0].symbol;
+
+  const dexPool = DEXes.find((dex) =>
+    vault.strategyInfo?.protocols.some((protocol) => protocol.name === dex.name)
+  );
+
+  const protocol =
+    vault.strategyInfo.protocols.length > 1
+      ? vault.strategyInfo.protocols[1]
+      : vault.strategyInfo.protocols[0];
 
   useEffect(() => {
     if (!$assetsPrices[network]) return;
@@ -60,13 +64,6 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
     setPoolAssets(assetsWithPercents);
   }, [vault, $assetsPrices]);
-  const dexPool = useMemo(() => {
-    return DEXes.find((dex) =>
-      vault.strategyInfo.protocols.some(
-        (protocol) => protocol.name === dex.name
-      )
-    );
-  }, [vault.strategyInfo.protocols]);
   return (
     <>
       <div className="flex justify-between items-center h-[60px]">
@@ -76,13 +73,13 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
         <div className="flex items-center gap-3">
           <img
             data-testid="poolLogo"
-            src={vault.strategyInfo.protocols[1].logoSrc}
-            alt={vault.strategyInfo.protocols[1].name}
+            src={protocol.logoSrc}
+            alt={protocol.name}
             className="rounded-full w-7 h-7"
           />
           <div className="flex flex-col">
             <span data-testid="poolName" className="text-[16px]">
-              {vault.strategyInfo.protocols[1].name}
+              {protocol.name}
             </span>
             <span
               data-testid="poolSymbol"
