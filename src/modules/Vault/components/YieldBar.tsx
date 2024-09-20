@@ -147,7 +147,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     : "-"}
                 </td>
               </tr>
-              {vault.strategyInfo.shortName != "CF" && vault.pool && (
+              {vault.strategyInfo.shortId != "CF" && vault.pool && (
                 <tr className="hover:bg-[#2B3139]">
                   <td>Pool swap fees APR</td>
 
@@ -178,7 +178,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 </tr>
               )}
               <tr className="hover:bg-[#2B3139]">
-                {vault.strategyInfo.shortName === "CF" ? (
+                {vault.strategyInfo.shortId === "CF" ? (
                   <td>Strategy APR</td>
                 ) : (
                   <td>Farm APR</td>

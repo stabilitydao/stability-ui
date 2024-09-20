@@ -6,8 +6,8 @@ import type { TVault, TTAbleFiltersVariant, TTableFilters } from "@types";
  * @example
  * ```
  * const vaults = [
- *   { strategyInfo: { shortName: "Strategy A" } },
- *   { strategyInfo: { shortName: "Strategy B" } },
+ *   { strategyInfo: { shortId: "Strategy A" } },
+ *   { strategyInfo: { shortId: "Strategy B" } },
  * ];
  * const filters = [{ name: "Strategy", variants: [] }];
  * initFilters(vaults, filters, setTableFilters, networksHandler);
@@ -26,7 +26,11 @@ export const initFilters = (
   networksHandler: (chain: string) => void
 ): void => {
   const shortNames: string[] = [
-    ...new Set(vaults.map((vault) => vault.strategyInfo.shortName)),
+    ...new Set(
+      vaults
+        .map((vault) => vault.strategyInfo.shortId)
+        .filter((id) => id !== "")
+    ),
   ];
 
   const convertedShortNames = shortNames.map((name: string) => ({
@@ -52,6 +56,7 @@ export const initFilters = (
       f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
     );
   }
+
   if (strategyParam) {
     newFilters = newFilters.map((f) => {
       return f.name.toLowerCase() === "strategy"

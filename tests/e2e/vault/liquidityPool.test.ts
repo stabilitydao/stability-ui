@@ -297,7 +297,10 @@ test("Should display liquidity pool info correctly", async ({ page }) => {
       ({ address }) => address.toLowerCase() === vaultAddress
     );
 
-    const strategyInfo = getStrategyInfo(vaultData?.symbol);
+    const strategyInfo = getStrategyInfo(
+      vaultData?.symbol,
+      vaultData?.strategyId
+    );
 
     const strategyAssets: string[] =
       vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];

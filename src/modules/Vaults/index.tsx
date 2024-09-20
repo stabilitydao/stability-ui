@@ -325,7 +325,7 @@ const Vaults = (): JSX.Element => {
           //   )?.name;
           //   if (strategyName) {
           //     sortedVaults = sortedVaults.filter(
-          //       (vault: TVault) => vault.strategyInfo.shortName === strategyName
+          //       (vault: TVault) => vault.strategyInfo.shortId === strategyName
           //     );
           //   }
           // }
@@ -350,7 +350,7 @@ const Vaults = (): JSX.Element => {
             )?.name;
             if (strategyName) {
               sortedVaults = sortedVaults.filter(
-                (vault: TVault) => vault.strategyInfo.shortName === strategyName
+                (vault: TVault) => vault.strategyInfo.shortId === strategyName
               );
             }
           }
@@ -680,7 +680,7 @@ const Vaults = (): JSX.Element => {
                                 {vault.symbol}
                               </p>
                               <p className="min-[1130px]:hidden text-[#848e9c]">
-                                {vault.strategyInfo.shortName}
+                                {vault.strategyInfo.shortId}
                               </p>
                             </div>
                           </div>
@@ -726,7 +726,7 @@ const Vaults = (): JSX.Element => {
                                 <span
                                   className={`px-2 rounded-[10px] hidden min-[1020px]:flex h-8 items-center ${
                                     (vault.strategySpecific &&
-                                      vault.strategyInfo.shortName != "Y") ||
+                                      vault.strategyInfo.shortId != "Y") ||
                                     vault.strategyInfo.protocols.length > 2
                                       ? "min-w-[100px] w-[170px]"
                                       : ""
@@ -735,7 +735,7 @@ const Vaults = (): JSX.Element => {
                                   <span
                                     className={`flex ${
                                       vault.yearnProtocols.length ||
-                                      vault.strategyInfo.shortName === "CF"
+                                      vault.strategyInfo.shortId === "CF"
                                         ? ""
                                         : "min-w-[50px]"
                                     }`}
@@ -757,21 +757,6 @@ const Vaults = (): JSX.Element => {
                                       )
                                     )}
                                   </span>
-                                  {/* <span className="flex">
-                      {vault.strategyInfo.features.map(
-                        (feature, i) => (
-                          <img
-                            key={i}
-                            title={feature.name}
-                            alt={feature.name}
-                            className="w-6 h-6 ml-1"
-                            src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                              feature.svg
-                            )}`}
-                          />
-                        )
-                      )}
-                    </span> */}
                                   {vault.yearnProtocols.length ? (
                                     <div className="flex">
                                       {vault.yearnProtocols.map((protocol) => (

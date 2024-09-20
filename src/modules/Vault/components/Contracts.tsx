@@ -24,7 +24,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
 
   const initUnderlying = async () => {
     if (isALM || isUnderlying) {
-      const logo = getProtocolLogo(vault.strategyInfo.shortName);
+      const logo = getProtocolLogo(vault.strategyInfo.shortId);
 
       setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
     }
@@ -76,7 +76,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         },
         {
           logo: "/logo.svg",
-          symbol: vault?.strategyInfo?.shortName,
+          symbol: vault?.strategyInfo?.shortId,
           type: "Strategy",
           address: vault?.strategyAddress,
           isCopy: false,
