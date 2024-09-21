@@ -2,8 +2,7 @@ import { useStore } from "@nanostores/react";
 
 import {
   type ApiMainReply,
-  assets,
-  getNetworksTotals,
+  assets, chains, getChainsTotals,
   integrations,
   strategies,
   StrategyShortId,
@@ -20,7 +19,7 @@ const Platform = (): JSX.Element => {
   const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
 
-  const totalNetworks = getNetworksTotals();
+  const totalNetworks = getChainsTotals();
 
   const strategyStatus = {
     live: 0,
@@ -166,31 +165,27 @@ const Platform = (): JSX.Element => {
       >
         <h3 className="text-3xl text-center mb-3">Chains</h3>
         <div className="flex relative">
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-500 items-center justify-center flex-col">
+            <div className="text-4xl">{Object.keys(chains).length}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Total
+            </div>
+          </div>
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
             <div className="text-4xl">{totalNetworks.SUPPORTED}</div>
             <div className="flex self-center justify-center text-[16px]">
               Supported
             </div>
           </div>
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-cyan-200 items-center justify-center flex-col">
-            <div className="text-4xl">{totalNetworks.CHAINLIB_DONE}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Coming soon
-            </div>
-          </div>
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-cyan-200 items-center justify-center flex-col">
             <div className="text-4xl">
-              {totalNetworks.CHAINLIB_DEVELOPMENT +
-                totalNetworks.CHAINLIB_AWAITING}
+              {totalNetworks.AWAITING_DEPLOYMENT + totalNetworks.CHAINLIB_DEVELOPMENT + totalNetworks.AWAITING_DEVELOPER + totalNetworks.AWAITING_ISSUE_CREATION}
             </div>
             <div className="flex self-center justify-center text-[16px]">
               Development
-            </div>
-          </div>
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
-            <div className="text-4xl">{totalNetworks.NOT_SUPPORTED}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Not supported
             </div>
           </div>
         </div>
@@ -203,7 +198,8 @@ const Platform = (): JSX.Element => {
       >
         <h2 className="text-3xl text-center mb-3">Assets</h2>
         <div className="flex relative">
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
             <div className="text-4xl">{assets.length}</div>
             <div className="flex self-center justify-center text-[16px]">
               Assets

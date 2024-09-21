@@ -80,7 +80,7 @@ const Integrations = (): JSX.Element => {
                 </td>
                 <td>{protocol.name}</td>
                 <td>{protocol.category}</td>
-                <td className="text-right">{protocol.networks.length}</td>
+                <td className="text-right">{protocol.chains.length}</td>
                 <td></td>
               </tr>
             ))
