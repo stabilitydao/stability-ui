@@ -29,7 +29,7 @@ const Network = (): JSX.Element => {
             <div className="flex flex-col p-6 pt-4">
               <div className="flex-col">
                 {$apiData.network.nodes[machineId].services.map((service) => (
-                  <div key={service.name} className="flex">
+                  <div key={service.name} className="flex w-[200px]">
                     {shortServiceName(service.name)}
                   </div>
                 ))}
