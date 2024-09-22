@@ -9,12 +9,16 @@ interface IProps {
   title: string;
   img: string;
   metaTitle: string;
+  metaUrl: string;
+  metaDescription: string;
 }
 
 const {
   title,
   img = '/og.png',
   metaTitle = "On-chain asset management, liquidity mining and yield farming platform.",
+  metaUrl = "https://stability.farm/",
+  metaDescription = "On-chain asset management, liquidity mining and yield farming platform.",
 } = Astro.props as IProps;
 ---
 
@@ -31,20 +35,20 @@ const {
       gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
     </script>
     <meta charset="UTF-8" />
-    <meta name="description" content="Asset Management Platform" />
+    <meta name="description" content={metaDescription} />
     <meta name="viewport" content="width=device-width" />
     <meta name="twitter:image:src" content={img} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={metaTitle} />
-    <meta name="twitter:description" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta name="twitter:description" content={metaDescription} />
         <meta property="og:image" content={img} />
     <meta property="twitter:image:height" content="100" />
     <meta property="twitter:image:width" content="100" />
-      <meta property="og:image:alt" content="On-chain asset management, liquidity mining and yield farming platform." />
+      <meta property="og:image:alt" content={metaTitle} />
     <meta property="og:type" content="object" />
     <meta property="og:title" content={metaTitle} />
-    <meta property="og:url" content="https://stability.farm/" />
-    <meta property="og:description" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta property="og:url" content={metaUrl} />
+    <meta property="og:description" content={metaDescription} />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title} - Stability</title>
