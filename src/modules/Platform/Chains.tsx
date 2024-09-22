@@ -37,7 +37,7 @@ const Chains = (): JSX.Element => {
           <tr className="text-[14px] font-bold">
             <td>Chain</td>
             <td className="px-3 text-center">ID</td>
-            <td className="px-3">Multisig</td>
+            <td className="px-3">Treasury</td>
             <td className="px-3">Issue</td>
             <td className="px-3 text-center">Status</td>
           </tr>
@@ -51,7 +51,7 @@ const Chains = (): JSX.Element => {
                       <img
                           src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
                           alt={name}
-                          className="w-[24px] h-[24px] mr-2"
+                          className="w-[24px] h-[24px] mr-2 rounded-full"
                       />
                   }
                   {name}

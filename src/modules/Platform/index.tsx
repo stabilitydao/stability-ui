@@ -59,11 +59,13 @@ const Platform = (): JSX.Element => {
       <h1 className="mb-5">Platform</h1>
 
       <div className="flex flex-wrap">
-        <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
+        <div
+          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
           <div className="text-4xl">${$apiData?.total.tvl}</div>
           <div className="flex self-center justify-center text-[16px]">AUM</div>
         </div>
-        <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
+        <div
+          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
           <div className="text-4xl">{$apiData?.total.activeVaults}</div>
           <div className="flex self-center justify-center text-[16px]">
             Vaults
@@ -97,7 +99,7 @@ const Platform = (): JSX.Element => {
         </div>
       </a>
 
-      <br />
+      <br/>
 
       <a
         className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
@@ -106,53 +108,35 @@ const Platform = (): JSX.Element => {
       >
         <h2 className="text-3xl text-center mb-3">Strategies</h2>
         <div className="flex relative">
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.live}</div>
             <div className="flex self-center justify-center text-[16px]">
               Live
             </div>
           </div>
 
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.dev}</div>
             <div className="flex self-center justify-center text-[16px]">
               Development
             </div>
           </div>
 
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-violet-200 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-violet-200 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.awaiting}</div>
             <div className="flex self-center justify-center text-[16px]">
               Awaiting
             </div>
           </div>
 
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
             <div className="text-4xl">{strategyStatus.proposed}</div>
             <div className="flex self-center justify-center text-[16px]">
               Proposal
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/integrations"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Integrations</h2>
-        <div className="flex relative">
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
-            <div className="text-4xl">{Object.keys(integrations).length}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Organizations
-            </div>
-          </div>
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
-            <div className="text-4xl">{protocolsTotal}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Protocols
             </div>
           </div>
         </div>
@@ -193,6 +177,30 @@ const Platform = (): JSX.Element => {
 
       <a
         className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
+        href="/integrations"
+        title="View all strategies"
+      >
+        <h2 className="text-3xl text-center mb-3">Integrations</h2>
+        <div className="flex relative">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
+            <div className="text-4xl">{Object.keys(integrations).length}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Organizations
+            </div>
+          </div>
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
+            <div className="text-4xl">{protocolsTotal}</div>
+            <div className="flex self-center justify-center text-[16px]">
+              Protocols
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <a
+        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
         href="/assets"
         title="View all strategies"
       >
@@ -205,7 +213,8 @@ const Platform = (): JSX.Element => {
               Assets
             </div>
           </div>
-          <div className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
+          <div
+            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
             <div className="text-4xl">{tokenlist.tokens.length}</div>
             <div className="flex self-center justify-center text-[16px]">
               Tokenlist items
@@ -223,7 +232,7 @@ const Platform = (): JSX.Element => {
             target="_blank"
             title="Go to smart contracts source code on Github"
           >
-            <GitHub />
+            <GitHub/>
             <span className="ml-1">
               💎 Stability Platform {$platformVersions[$currentChainID]}
             </span>
@@ -235,7 +244,7 @@ const Platform = (): JSX.Element => {
             target="_blank"
             title="Go to library source code on Github"
           >
-            <GitHub />
+            <GitHub/>
             <span className="ml-1">
               📦 Stability Integration Library{" "}
               {packageJson.dependencies["@stabilitydao/stability"].replace(
@@ -251,7 +260,7 @@ const Platform = (): JSX.Element => {
             target="_blank"
             title="Go to UI source code on Github"
           >
-            <GitHub />
+            <GitHub/>
             <span className="ml-1">
               👩‍🚀 Stability User Interface {packageJson.version}
             </span>
