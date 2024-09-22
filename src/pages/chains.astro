@@ -1,12 +1,15 @@
 ---
 import {Chains} from '@modules';
 import Layout from '@layouts/Layout.astro';
+import {chains, getSupportedChainNames} from "@stabilitydao/stability";
 ---
 
 <Layout
   title="Chains"
   img="/chains.jpg"
-  metaTitle="Blockchains compatible with Stability Platform"
+  metaTitle="Blockchains known to Stability platform"
+  metaUrl="https://stability.farm/chains"
+  metaDescription={`Total chains: ${Object.keys(chains).length}. Supported: ${getSupportedChainNames().length}. In development: ${Object.keys(chains).filter(c => chains[c].status === 'AWAITING_DEPLOYMENT' || chains[c].status === 'CHAINLIB_DEVELOPMENT' || chains[c].status === 'AWAITING_DEVELOPER' || chains[c].status === 'AWAITING_ISSUE_CREATION').length}.`}
 >
     <div class="platform max-w-[1200px]">
         <Chains client:only="react" />
