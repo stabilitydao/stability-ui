@@ -7,9 +7,15 @@ import { Footer } from "@components/Footer";
 
 interface IProps {
   title: string;
+  img: string;
+  metaTitle: string;
 }
 
-const { title } = Astro.props as IProps;
+const {
+  title,
+  img = '/og.png',
+  metaTitle = "On-chain asset management, liquidity mining and yield farming platform.",
+} = Astro.props as IProps;
 ---
 
 <!doctype html>
@@ -27,16 +33,16 @@ const { title } = Astro.props as IProps;
     <meta charset="UTF-8" />
     <meta name="description" content="Asset Management Platform" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="twitter:image:src" content="/og.png" />
+    <meta name="twitter:image:src" content={img} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta name="twitter:title" content={metaTitle} />
     <meta name="twitter:description" content="On-chain asset management, liquidity mining and yield farming platform." />
-        <meta property="og:image" content="/og.png" /> 
+        <meta property="og:image" content={img} />
     <meta property="twitter:image:height" content="100" />
     <meta property="twitter:image:width" content="100" />
       <meta property="og:image:alt" content="On-chain asset management, liquidity mining and yield farming platform." />
     <meta property="og:type" content="object" />
-    <meta property="og:title" content="On-chain asset management, liquidity mining and yield farming platform." />
+    <meta property="og:title" content={metaTitle} />
     <meta property="og:url" content="https://stability.farm/" />
     <meta property="og:description" content="On-chain asset management, liquidity mining and yield farming platform." />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
