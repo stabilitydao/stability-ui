@@ -3,7 +3,11 @@ import {Chains} from '@modules';
 import Layout from '@layouts/Layout.astro';
 ---
 
-<Layout title="Chains">
+<Layout
+  title="Chains"
+  img="/chains.jpg"
+  metaTitle="Blockchains compatible with Stability Platform"
+>
     <div class="platform max-w-[1200px]">
         <Chains client:only="react" />
     </div>
