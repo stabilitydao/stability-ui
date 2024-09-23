@@ -140,7 +140,7 @@ const CHAINS = [
     name: "Polygon",
     id: "137",
     logoURI:
-      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/chains/polygon.svg",
     explorer: "https://polygonscan.com/address/",
     nativeCurrency: "POL",
     active: true, // main page active networks
@@ -148,7 +148,8 @@ const CHAINS = [
   {
     name: "Base",
     id: "8453",
-    logoURI: "https://www.base.org/document/favicon-32x32.png",
+    logoURI:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/chains/base.svg",
     explorer: "https://basescan.org/address/",
     nativeCurrency: "ETH",
     active: true, // main page active networks
