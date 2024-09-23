@@ -1,4 +1,4 @@
-import { type ApiMainReply, chains } from "@stabilitydao/stability";
+import {type ApiMainReply, chains, getChainBridges} from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 
@@ -49,18 +49,24 @@ const Chains = (): JSX.Element => {
 
       <table>
         <thead>
-          <tr className="text-[14px] font-bold">
-            <td>Chain</td>
-            <td className="px-3 text-center">ID</td>
-            <td className="px-3 text-right">TVL</td>
-            <td className="px-3">Treasury</td>
-            <td className="px-3">Issue</td>
-            <td className="px-3 text-center">Status</td>
-          </tr>
+        <tr className="text-[14px] font-bold">
+          <td>Chain</td>
+          <td className="px-3 text-center">ID</td>
+          <td className="px-3 text-right">TVL</td>
+          <td className="px-3">Treasury</td>
+          <td className="px-3">Issue</td>
+          <td className="px-3 text-center">Status</td>
+          <td className="px-3">Bridges</td>
+        </tr>
         </thead>
         <tbody>
           {Object.entries(chains).map(
-            ([chainId, { name, status, img, multisig, chainLibGithubId }]) => (
+            ([chainId, {
+              name,
+              status,
+              img,
+              multisig, chainLibGithubId
+            }]) => (
               <tr key={chainId}>
                 <td className="py-1">
                   <div className="flex items-center">
@@ -107,6 +113,26 @@ const Chains = (): JSX.Element => {
                 </td>
                 <td className="px-3">
                   <ChainStatus status={status} />
+                </td>
+                <td className="px-3 text-center">
+                  <div className="flex items-center">
+                    {+chainId === 1 ? (
+                      <span className="flex w-full justify-center self-center text-[12px]">all</span>
+                    ) : (
+                      <div className="flex flex-wrap">
+                        {getChainBridges(name).map(b => (
+                          <a
+                            className="inline-flex p-1 hover:bg-gray-700 rounded-xl"
+                            title={b.name}
+                            href={b.dapp}
+                            target="_blank"
+                          >
+                            <img className="w-[20px] h-[20px] rounded-full" src={`https://raw.githubusercontent.com/stabilitydao/.github/main/${b.img}`} alt={b.name} />
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </td>
               </tr>
             )
