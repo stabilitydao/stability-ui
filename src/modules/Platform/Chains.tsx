@@ -1,4 +1,17 @@
-import { chains } from "@stabilitydao/stability";
+import { type ApiMainReply, chains } from "@stabilitydao/stability";
+import { useStore } from "@nanostores/react";
+import { apiData } from "@store";
+
+const formatTvl = (tvl: number): string => {
+  if (tvl > 1_000_000_000) {
+    return "" + (tvl / 1_000_000_000).toFixed(1) + " B";
+  }
+  if (tvl > 3_000_000) {
+    return "" + (tvl / 1_000_000).toFixed(0) + " M";
+  }
+
+  return "" + (tvl / 1_000_000).toFixed(1) + " M";
+};
 
 const shortAddr = (m: string): string => {
   return `${m.slice(0, 4)}...${m.slice(-2)}`;
@@ -28,6 +41,8 @@ const ChainStatus: React.FC<{
 };
 
 const Chains = (): JSX.Element => {
+  const $apiData: ApiMainReply = useStore(apiData);
+
   return (
     <div>
       <h1>Chains</h1>
@@ -37,6 +52,7 @@ const Chains = (): JSX.Element => {
           <tr className="text-[14px] font-bold">
             <td>Chain</td>
             <td className="px-3 text-center">ID</td>
+            <td className="px-3 text-right">TVL</td>
             <td className="px-3">Treasury</td>
             <td className="px-3">Issue</td>
             <td className="px-3 text-center">Status</td>
@@ -60,6 +76,11 @@ const Chains = (): JSX.Element => {
                 </td>
                 <td className="px-3 text-center text-[14px] font-bold">
                   {chainId}
+                </td>
+                <td className="px-3 text-right">
+                  {$apiData?.total.chainTvl[chainId] && (
+                    <span>{formatTvl($apiData.total.chainTvl[chainId])}</span>
+                  )}
                 </td>
                 <td className="px-3 text-[12px]">
                   <div className="flex">
