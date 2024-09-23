@@ -1,5 +1,7 @@
 import type { TTableFilters, TTableColumn } from "@types";
 
+import { chains } from "@stabilitydao/stability";
+
 import {
   USDC,
   USDT,
@@ -137,19 +139,17 @@ const DEXes = [
 
 const CHAINS = [
   {
-    name: "Polygon",
+    name: chains["137"].name,
     id: "137",
-    logoURI:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/chains/polygon.svg",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["137"].img}`,
     explorer: "https://polygonscan.com/address/",
     nativeCurrency: "POL",
     active: true, // main page active networks
   },
   {
-    name: "Base",
+    name: chains["8453"].name,
     id: "8453",
-    logoURI:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/chains/base.svg",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
     explorer: "https://basescan.org/address/",
     nativeCurrency: "ETH",
     active: true, // main page active networks
