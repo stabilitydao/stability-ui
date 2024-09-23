@@ -2,7 +2,7 @@ import { useStore } from "@nanostores/react";
 
 import {
   type ApiMainReply,
-  assets, chains, getChainsTotals,
+  assets, chains, getChainsTotals, getStrategiesTotals,
   integrations,
   strategies,
   StrategyShortId,
@@ -19,7 +19,8 @@ const Platform = (): JSX.Element => {
   const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
 
-  const totalNetworks = getChainsTotals();
+  const chainsTotals = getChainsTotals();
+  const strategiesTotals = getStrategiesTotals()
 
   const strategyStatus = {
     live: 0,
@@ -58,7 +59,7 @@ const Platform = (): JSX.Element => {
     <>
       <h1 className="mb-5">Platform</h1>
 
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap mb-4">
         <div
           className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
           <div className="text-4xl">${$apiData?.total.tvl}</div>
@@ -74,16 +75,107 @@ const Platform = (): JSX.Element => {
       </div>
 
       <a
-        href="/create-vault"
-        className="hover:bg-amber-950 flex flex-col px-3 py-2 rounded-2xl mb-10"
+        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
+        href="/strategies"
+        title="View all strategies"
       >
-        <h2 className="mb-3 text-3xl flex items-center justify-center">
-          Factory
-        </h2>
+        <h2 className="text-3xl text-center mb-3">Strategies</h2>
+        <div className="flex flex-wrap relative mb-5">
+          {[
+            ['Live', strategiesTotals.LIVE, 'text-green-400',],
+            ['Awaiting deployment', strategiesTotals.DEPLOYMENT, 'text-violet-400',],
+            ['Development', strategiesTotals.DEVELOPMENT, 'text-blue-400',],
+            ['Awaiting developer', strategiesTotals.AWAITING, 'text-yellow-200',],
+            ['Blocked', strategiesTotals.BLOCKED, 'text-red-200',],
+            ['Proposal', strategiesTotals.PROPOSAL, 'text-orange-300',],
+          ].map(t => (
+            <div
+              key={t[0]}
+              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
+            >
+              <div className="text-4xl">{t[1]}</div>
+              <div className="flex self-center justify-center text-[14px]">
+                {t[0]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </a>
 
-        <div className="flex relative flex-col">
-          <div>Farms: {$apiData?.total.farms}</div>
-          <div>Available for building: {$apiData?.total.vaultForBuilding}</div>
+      <a
+        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
+        href="/chains"
+        title="View all blockchains"
+      >
+        <h3 className="text-3xl text-center mb-3">Chains</h3>
+        <div className="flex flex-wrap relative mb-5">
+          {[
+            ['Total', Object.keys(chains).length, 'text-gray-400',],
+            ['Supported', chainsTotals.SUPPORTED, 'text-green-400',],
+            ['Awaiting deployment', chainsTotals.AWAITING_DEPLOYMENT, 'text-violet-400',],
+            ['Development', chainsTotals.CHAINLIB_DEVELOPMENT, 'text-blue-400',],
+            ['Awaiting developer', chainsTotals.AWAITING_DEVELOPER, 'text-yellow-200',],
+            ['Awaiting issue', chainsTotals.AWAITING_ISSUE_CREATION, 'text-orange-300',],
+          ].map(t => (
+            <div
+              key={t[0]}
+              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
+            >
+              <div className="text-4xl">{t[1]}</div>
+              <div className="flex self-center justify-center text-[14px]">
+                {t[0]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </a>
+
+
+      <a
+        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
+        href="/integrations"
+        title="View all strategies"
+      >
+        <h2 className="text-3xl text-center mb-3">Integrations</h2>
+        <div className="flex flex-wrap relative mb-5">
+          {[
+            ['Organizations', Object.keys(integrations).length, 'text-amber-200',],
+            ['Protocols', protocolsTotal, 'text-blue-500',],
+          ].map(t => (
+            <div
+              key={t[0]}
+              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
+            >
+              <div className="text-4xl">{t[1]}</div>
+              <div className="flex self-center justify-center text-[14px]">
+                {t[0]}
+              </div>
+            </div>
+          ))}
+        </div>
+      </a>
+
+      <a
+        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
+        href="/assets"
+        title="View all strategies"
+      >
+        <h2 className="text-3xl text-center mb-3">Assets</h2>
+        <div className="flex flex-wrap relative mb-5">
+          {[
+            ['Assets', assets.length, 'text-amber-200',],
+            ['Tokenlist items', tokenlist.tokens.length, 'text-blue-500',],
+          ].map(t => (
+            <div
+              key={t[0]}
+              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
+            >
+              <div className="text-4xl">{t[1]}</div>
+              <div className="flex self-center justify-center text-[14px]">
+                {t[0]}
+              </div>
+            </div>
+          ))}
         </div>
       </a>
 
@@ -99,127 +191,17 @@ const Platform = (): JSX.Element => {
         </div>
       </a>
 
-      <br/>
-
       <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/strategies"
-        title="View all strategies"
+        href="/create-vault"
+        className="hover:bg-amber-950 flex flex-col px-3 py-2 rounded-2xl mb-12"
       >
-        <h2 className="text-3xl text-center mb-3">Strategies</h2>
-        <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
-            <div className="text-4xl">{strategyStatus.live}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Live
-            </div>
-          </div>
+        <h2 className="mb-3 text-3xl flex items-center justify-center">
+        Factory
+        </h2>
 
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-200 items-center justify-center flex-col">
-            <div className="text-4xl">{strategyStatus.dev}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Development
-            </div>
-          </div>
-
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-violet-200 items-center justify-center flex-col">
-            <div className="text-4xl">{strategyStatus.awaiting}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Awaiting
-            </div>
-          </div>
-
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-fuchsia-300 items-center justify-center flex-col">
-            <div className="text-4xl">{strategyStatus.proposed}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Proposal
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/chains"
-        title="View all blockchains"
-      >
-        <h3 className="text-3xl text-center mb-3">Chains</h3>
-        <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-500 items-center justify-center flex-col">
-            <div className="text-4xl">{Object.keys(chains).length}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Total
-            </div>
-          </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-green-200 items-center justify-center flex-col">
-            <div className="text-4xl">{totalNetworks.SUPPORTED}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Supported
-            </div>
-          </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-cyan-200 items-center justify-center flex-col">
-            <div className="text-4xl">
-              {totalNetworks.AWAITING_DEPLOYMENT + totalNetworks.CHAINLIB_DEVELOPMENT + totalNetworks.AWAITING_DEVELOPER + totalNetworks.AWAITING_ISSUE_CREATION}
-            </div>
-            <div className="flex self-center justify-center text-[16px]">
-              Development
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/integrations"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Integrations</h2>
-        <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
-            <div className="text-4xl">{Object.keys(integrations).length}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Organizations
-            </div>
-          </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
-            <div className="text-4xl">{protocolsTotal}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Protocols
-            </div>
-          </div>
-        </div>
-      </a>
-
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/assets"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Assets</h2>
-        <div className="flex relative">
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-amber-200 items-center justify-center flex-col">
-            <div className="text-4xl">{assets.length}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Assets
-            </div>
-          </div>
-          <div
-            className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-blue-500 items-center justify-center flex-col">
-            <div className="text-4xl">{tokenlist.tokens.length}</div>
-            <div className="flex self-center justify-center text-[16px]">
-              Tokenlist items
-            </div>
-          </div>
+        <div className="flex relative flex-col">
+          <div>Farms: {$apiData?.total.farms}</div>
+          <div>Available for building: {$apiData?.total.vaultForBuilding}</div>
         </div>
       </a>
 

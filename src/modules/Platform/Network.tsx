@@ -14,6 +14,8 @@ const Network = (): JSX.Element => {
 
   return (
     <div>
+      <div className="flex mb-5 text-[14px] text-gray-300"><a href="/platform" className="mr-2 font-bold">Platform</a> - <span className="ml-2">Network</span></div>
+
       <h1>Network</h1>
 
       <h2 className="mb-5">Nodes</h2>
@@ -42,4 +44,4 @@ const Network = (): JSX.Element => {
   );
 };
 
-export { Network };
+export {Network};
