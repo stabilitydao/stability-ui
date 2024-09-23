@@ -1571,7 +1571,7 @@
   version "0.13.8"
   resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.13.8.tgz#be4d9ed340811f62d2fefb4491cb67a8ecc966eb"
   integrity sha512-qjGZdRPKcMlZn/73Te1ohTHYJCUStSaLhz3HxOgO7a/LZsy3HeAj2pIq11NrRTvM85WWLvsKvGfHcXTVOSIzKw==
-
+  
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@stablelib/aead/-/aead-1.0.1.tgz#c4b1106df9c23d1b867eb9b276d8f42d5fc4c0c3"
