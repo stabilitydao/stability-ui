@@ -1,4 +1,4 @@
-import {type ApiMainReply, ChainName, chains, getChainBridges} from "@stabilitydao/stability";
+import {type ApiMainReply, chains, getChainBridges} from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 
