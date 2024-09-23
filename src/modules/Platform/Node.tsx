@@ -18,6 +18,12 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
 
   return (
     <div>
+      <div className="flex mb-5 text-[14px] text-gray-300">
+        <a href="/platform" className="mr-2 font-bold">Platform</a>
+        - <a href="/network" className="mx-2 font-bold">Network</a>
+        - <span className="ml-2">Node {shortMachineId(machineIdHash)}</span>
+      </div>
+
       <h1>Node {shortMachineId(machineIdHash)}</h1>
 
       <div className="flex flex-col">
@@ -33,7 +39,7 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
         }
         {nodeState?.seedNode &&
             <div className="flex mb-5">
-            <div className="text-[16px]  font-bold bg-green-900 inline-flex px-5 py-2 rounded-2xl">Seed node</div>
+                <div className="text-[16px]  font-bold bg-green-900 inline-flex px-5 py-2 rounded-2xl">Seed node</div>
             </div>
         }
         <div className="flex flex-col mb-5">
