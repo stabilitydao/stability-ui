@@ -67,7 +67,7 @@ const Strategies = (): JSX.Element => {
         <thead>
         <tr>
           <td className="text-center px-3">ID</td>
-          <td className="text-center px-3">Name</td>
+          <td className=" px-3">Name</td>
           <td className="text-center px-3">State</td>
           <td className="text-center px-3">Issue</td>
         </tr>
@@ -78,16 +78,22 @@ const Strategies = (): JSX.Element => {
           return (
             <tr key={shortId}>
               <td className="px-3 py-1">
-                <span className="flex px-3 rounded-xl"
+                <div className="flex justify-center">
+                <span className="flex px-3 rounded-xl w-[86px]"
                       style={{backgroundColor: strategy.bgColor, color: strategy.color}}>
                   {strategy.shortId}
                 </span>
+                </div>
 
               </td>
               <td className="px-3">{strategy.id}</td>
-              <td className="px-3"><StrategyStatus state={strategy.state}/></td>
+              <td className="px-3">
+                <div className="flex justify-center">
+                  <StrategyStatus state={strategy.state}/>
+                </div>
+              </td>
               <td className="px-3 text-center">
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <a
                     className="inline-flex"
                     href={`https://github.com/stabilitydao/stability-contracts/issues/${strategy.contractGithubId}`}
