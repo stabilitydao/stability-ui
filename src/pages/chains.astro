@@ -1,11 +1,18 @@
 ---
 import {Chains} from '@modules';
 import Layout from '@layouts/Layout.astro';
-import {chains, getSupportedChainNames} from "@stabilitydao/stability";
+import {chains, getSupportedChainNames, getChainsTotals} from "@stabilitydao/stability";
 
-const totalChains = Object.keys(chains).length;
 const supported = getSupportedChainNames().length
-const inDeployment = Object.keys(chains).filter(chainId => chains[chainId].status === 'AWAITING_DEPLOYMENT' || chains[chainId].status === 'CHAINLIB_DEVELOPMENT' || chains[chainId].status === 'AWAITING_DEVELOPER' || chains[chainId].status === 'AWAITING_ISSUE_CREATION').length
+const totalChains = getChainsTotals();
+const totalText = [
+    ['Total', Object.keys(chains).length,],
+    ['Supported', totalChains.SUPPORTED,],
+    ['Awaiting deployment', totalChains.AWAITING_DEPLOYMENT,],
+    ['Development', totalChains.CHAINLIB_DEVELOPMENT,],
+    ['Awaiting developer', totalChains.AWAITING_DEVELOPER,],
+    ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION,],
+].map(t => `${t[0]}: ${t[1]}.`).join(' ')
 ---
 
 <Layout
@@ -13,7 +20,7 @@ const inDeployment = Object.keys(chains).filter(chainId => chains[chainId].statu
   img="/chains.jpg"
   metaTitle="Blockchains known to Stability platform"
   metaUrl="https://stability.farm/chains"
-  metaDescription={`Total chains: ${totalChains}. Supported: ${supported}. In development: ${inDeployment}.`}
+  metaDescription={totalText}
 >
     <div class="platform max-w-[1200px]">
         <Chains client:only="react" />

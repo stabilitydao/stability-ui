@@ -87,7 +87,7 @@ const ChainStatus: React.FC<{
 
 const Chains = (): JSX.Element => {
   const $apiData: ApiMainReply = useStore(apiData);
-  const totalNetworks = getChainsTotals();
+  const totalChains = getChainsTotals();
 
   return (
     <div>
@@ -98,11 +98,11 @@ const Chains = (): JSX.Element => {
       <div className="flex flex-wrap relative mb-5">
         {[
           ['Total', Object.keys(chains).length, 'text-gray-400',],
-          ['Supported', totalNetworks.SUPPORTED, 'text-green-400',],
-          ['Awaiting deployment', totalNetworks.AWAITING_DEPLOYMENT, 'text-violet-400',],
-          ['Development', totalNetworks.CHAINLIB_DEVELOPMENT, 'text-blue-400',],
-          ['Awaiting developer', totalNetworks.AWAITING_DEVELOPER, 'text-yellow-200',],
-          ['Awaiting issue', totalNetworks.AWAITING_ISSUE_CREATION, 'text-orange-300',],
+          ['Supported', totalChains.SUPPORTED, 'text-green-400',],
+          ['Awaiting deployment', totalChains.AWAITING_DEPLOYMENT, 'text-violet-400',],
+          ['Development', totalChains.CHAINLIB_DEVELOPMENT, 'text-blue-400',],
+          ['Awaiting developer', totalChains.AWAITING_DEVELOPER, 'text-yellow-200',],
+          ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION, 'text-orange-300',],
         ].map(t => (
           <div
             key={t[0]}
