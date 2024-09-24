@@ -152,7 +152,7 @@ const Chains = (): JSX.Element => {
               <td className="px-3 text-center text-[14px] font-bold">
                 {chainId}
               </td>
-              <td className="px-3 text-right">
+              <td className="px-3 text-right whitespace-nowrap">
                 {$apiData?.total.chainTvl[chainId] && (
                   <span>{formatTvl($apiData.total.chainTvl[chainId])}</span>
                 )}
