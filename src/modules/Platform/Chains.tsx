@@ -10,7 +10,11 @@ const formatTvl = (tvl: number): string => {
     return "" + (tvl / 1_000_000).toFixed(0) + " M";
   }
 
-  return "" + (tvl / 1_000_000).toFixed(1) + " M";
+  if (tvl > 100_000) {
+    return "" + (tvl / 1_000_000).toFixed(1) + " M";
+  }
+
+  return "" + (tvl / 1_000).toFixed(1) + " K";
 };
 
 const shortAddr = (m: string): string => {
