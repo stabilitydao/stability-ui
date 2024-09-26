@@ -77,7 +77,9 @@ export const get1InchRoutes = async (
     };
   }
 
-  const url = `https://api.stabilitydao.org/swap/${network}/${fromAddress}/${toAddress}/${amount}`;
+  // todo get node with Swap service from main api reply
+  const url = `https://api.stability.farm/swap/${network}/${fromAddress}/${toAddress}/${amount}`;
+  // const url = `https://api.stabilitydao.org/swap/${network}/${fromAddress}/${toAddress}/${amount}`;
 
   const maxRetries = 3;
   let currentRetry = 0;
