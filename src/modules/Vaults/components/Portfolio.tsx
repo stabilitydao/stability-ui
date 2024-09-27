@@ -38,6 +38,8 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
     tvl: "",
   });
 
+  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
+
   const initPortfolio = () => {
     if (!$connected) {
       const totalTvl = vaults.reduce((accumulator, v) => {
@@ -63,12 +65,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        let apr = 0;
-        if ($hideFeeAPR) {
-          apr = v.earningData.apr.withoutFees[$aprFilter];
-        } else {
-          apr = v.earningData.apr.withFees[$aprFilter];
-        }
+        let apr = Number(v?.earningData?.apr?.[aprType][$aprFilter]);
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(v.shareprice);

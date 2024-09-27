@@ -1,63 +1,60 @@
-import {type ApiMainReply, ChainName, chains, getChainBridges, getChainsTotals} from "@stabilitydao/stability";
+import {
+  type ApiMainReply,
+  ChainName,
+  chains,
+  getChainBridges,
+  getChainsTotals,
+} from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 
-const formatTvl = (tvl: number): string => {
-  if (tvl > 1_000_000_000) {
-    return "" + (tvl / 1_000_000_000).toFixed(1) + " B";
-  }
-  if (tvl > 3_000_000) {
-    return "" + (tvl / 1_000_000).toFixed(0) + " M";
-  }
+import { formatNumber } from "@utils";
 
-  if (tvl > 100_000) {
-    return "" + (tvl / 1_000_000).toFixed(1) + " M";
-  }
-
-  return "" + (tvl / 1_000).toFixed(1) + " K";
+const shortAddress = (address: string): string => {
+  return `${address.slice(0, 4)}...${address.slice(-2)}`;
 };
 
-const shortAddr = (m: string): string => {
-  return `${m.slice(0, 4)}...${m.slice(-2)}`;
-};
-
-const BridgesList:React.FC<{
-  chaibId: string;
-  chainNane: ChainName;
-}> = ({ chaibId, chainNane }) => {
-  let bridges = getChainBridges(chainNane)
-  const total = bridges.length
-  if (+chaibId === 1) {
-    return <span className="flex w-full justify-center self-center text-[12px]">all</span>
+const BridgesList: React.FC<{
+  chainId: string;
+  chainName: ChainName;
+}> = ({ chainId, chainName }) => {
+  let bridges = getChainBridges(chainName);
+  const total = bridges.length;
+  if (+chainId === 1) {
+    return (
+      <span className="flex w-full justify-center self-center text-[12px]">
+        all
+      </span>
+    );
   }
 
-  let more
+  let more;
   if (total > 6) {
-    bridges = bridges.slice(0, 5)
-    more = (
-      <span className="text-[12px] ml-1">... +{total - 5}</span>
-    )
+    bridges = bridges.slice(0, 5);
+    more = <span className="text-[12px] ml-1">... +{total - 5}</span>;
   }
 
   return (
-    (
-      <div className="flex flex-wrap items-center">
-        {bridges.map(b => (
-          <a
-            key={b.name}
-            className="inline-flex p-1 hover:bg-gray-700 rounded-xl"
-            title={b.name}
-            href={b.dapp}
-            target="_blank"
-          >
-            <img className="w-[20px] h-[20px] rounded-full" src={`https://raw.githubusercontent.com/stabilitydao/.github/main/${b.img}`} alt={b.name} />
-          </a>
-        ))}
-        {more}
-      </div>
-    )
-  )
-}
+    <div className="flex flex-wrap items-center">
+      {bridges.map((b) => (
+        <a
+          key={b.name}
+          className="inline-flex p-1 hover:bg-gray-700 rounded-xl"
+          title={b.name}
+          href={b.dapp}
+          target="_blank"
+        >
+          <img
+            className="w-[20px] h-[20px] rounded-full"
+            src={`https://raw.githubusercontent.com/stabilitydao/.github/main/${b.img}`}
+            alt={b.name}
+          />
+        </a>
+      ))}
+      {more}
+    </div>
+  );
+};
 
 const ChainStatus: React.FC<{
   status: string;
@@ -89,28 +86,34 @@ const Chains = (): JSX.Element => {
   const $apiData: ApiMainReply = useStore(apiData);
   const totalChains = getChainsTotals();
 
+  const chainsInfo = [
+    ["Total", Object.keys(chains).length, "text-gray-400"],
+    ["Supported", totalChains.SUPPORTED, "text-green-400"],
+    ["Awaiting deployment", totalChains.AWAITING_DEPLOYMENT, "text-violet-400"],
+    ["Development", totalChains.CHAINLIB_DEVELOPMENT, "text-blue-400"],
+    ["Awaiting developer", totalChains.AWAITING_DEVELOPER, "text-yellow-200"],
+    ["Awaiting issue", totalChains.AWAITING_ISSUE_CREATION, "text-orange-300"],
+  ];
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300"><a href="/platform" className="mr-2 font-bold">Platform</a> - <span className="ml-2">Chains</span></div>
+      <div className="flex mb-5 text-[14px] text-gray-300">
+        <a href="/platform" className="mr-2 font-bold">
+          Platform
+        </a>{" "}
+        - <span className="ml-2">Chains</span>
+      </div>
 
       <h1 className="mb-3">Chains</h1>
 
       <div className="flex flex-wrap relative mb-5">
-        {[
-          ['Total', Object.keys(chains).length, 'text-gray-400',],
-          ['Supported', totalChains.SUPPORTED, 'text-green-400',],
-          ['Awaiting deployment', totalChains.AWAITING_DEPLOYMENT, 'text-violet-400',],
-          ['Development', totalChains.CHAINLIB_DEVELOPMENT, 'text-blue-400',],
-          ['Awaiting developer', totalChains.AWAITING_DEVELOPER, 'text-yellow-200',],
-          ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION, 'text-orange-300',],
-        ].map(t => (
+        {chainsInfo.map((chain) => (
           <div
-            key={t[0]}
-            className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
+            key={chain[0]}
+            className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${chain[2]} items-center justify-center flex-col`}
           >
-            <div className="text-4xl">{t[1]}</div>
+            <div className="text-4xl">{chain[1]}</div>
             <div className="flex self-center justify-center text-[14px]">
-              {t[0]}
+              {chain[0]}
             </div>
           </div>
         ))}
@@ -118,83 +121,83 @@ const Chains = (): JSX.Element => {
 
       <table className="w-full">
         <thead className="h-[34px]">
-        <tr className="text-[14px] font-bold">
-          <td>Chain</td>
-          <td className="px-3 text-center">ID</td>
-          <td className="px-3 text-right">TVL</td>
-          <td className="px-3">Treasury</td>
-          <td className="px-3 text-center">Issue</td>
-          <td className="px-3 text-center">Status</td>
-          <td className="px-3 text-center">Bridges</td>
-        </tr>
+          <tr className="text-[14px] font-bold">
+            <td>Chain</td>
+            <td className="px-3 text-center">ID</td>
+            <td className="px-3 text-right">TVL</td>
+            <td className="px-3">Treasury</td>
+            <td className="px-3 text-center">Issue</td>
+            <td className="px-3 text-center">Status</td>
+            <td className="px-3 text-center">Bridges</td>
+          </tr>
         </thead>
         <tbody>
-        {Object.entries(chains).map(
-          ([chainId, {
-            name,
-            status,
-            img,
-            multisig, chainLibGithubId
-          }]) => (
-            <tr key={chainId} className="hover:bg-gray-800">
-              <td className="py-1">
-                <div className="flex items-center">
-                  {img && (
-                    <img
-                      src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
-                      alt={name}
-                      className="w-[24px] h-[24px] mr-2 rounded-full"
-                    />
-                  )}
-                  {name}
-                </div>
-              </td>
-              <td className="px-3 text-center text-[14px] font-bold">
-                {chainId}
-              </td>
-              <td className="px-3 text-right whitespace-nowrap">
-                {$apiData?.total.chainTvl[chainId] && (
-                  <span>{formatTvl($apiData.total.chainTvl[chainId])}</span>
-                )}
-              </td>
-              <td className="px-3 text-[12px]">
-                <div className="flex">
-                  {multisig && <span>{shortAddr(multisig)}</span>}
-                </div>
-              </td>
-              <td>
-                <div className="flex items-center justify-center">
-                  {chainLibGithubId && (
-                    <a
-                      className="inline-flex"
-                      href={`https://github.com/stabilitydao/stability-contracts/issues/${chainLibGithubId}`}
-                      target="_blank"
-                      title="Go to chain library issue page on Github"
-                    >
+          {Object.entries(chains).map(
+            ([chainId, { name, status, img, multisig, chainLibGithubId }]) => (
+              <tr key={chainId} className="hover:bg-gray-800">
+                <td className="py-1">
+                  <div className="flex items-center">
+                    {img && (
                       <img
-                        src="/icons/github.svg"
-                        alt="Github"
-                        className="w-[20px]"
+                        src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
+                        alt={name}
+                        className="w-[24px] h-[24px] mr-2 rounded-full"
                       />
-                    </a>
+                    )}
+                    {name}
+                  </div>
+                </td>
+                <td className="px-3 text-center text-[14px] font-bold">
+                  {chainId}
+                </td>
+                <td className="px-3 text-right whitespace-nowrap">
+                  {$apiData?.total.chainTvl[chainId] && (
+                    <span>
+                      {formatNumber(
+                        $apiData.total.chainTvl[chainId],
+                        "abbreviate"
+                      )}
+                    </span>
                   )}
-                </div>
-              </td>
-              <td className="px-3">
-                <ChainStatus status={status}/>
-              </td>
-              <td className="px-3 text-center">
-                <div className="flex items-center">
-                  <BridgesList chaibId={chainId} chainNane={name}/>
-                </div>
-              </td>
-            </tr>
-          )
-        )}
+                </td>
+                <td className="px-3 text-[12px]">
+                  <div className="flex">
+                    {multisig && <span>{shortAddress(multisig)}</span>}
+                  </div>
+                </td>
+                <td>
+                  <div className="flex items-center justify-center">
+                    {chainLibGithubId && (
+                      <a
+                        className="inline-flex"
+                        href={`https://github.com/stabilitydao/stability-contracts/issues/${chainLibGithubId}`}
+                        target="_blank"
+                        title="Go to chain library issue page on Github"
+                      >
+                        <img
+                          src="/icons/github.svg"
+                          alt="Github"
+                          className="w-[20px]"
+                        />
+                      </a>
+                    )}
+                  </div>
+                </td>
+                <td className="px-3">
+                  <ChainStatus status={status} />
+                </td>
+                <td className="px-3 text-center">
+                  <div className="flex items-center">
+                    <BridgesList chainId={chainId} chainName={name} />
+                  </div>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>
   );
 };
 
-export {Chains};
+export { Chains };

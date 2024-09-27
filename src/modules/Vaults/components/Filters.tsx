@@ -18,7 +18,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
     searchParams.get("strategy") ? searchParams.get("strategy") : "All"
   );
 
-  const dropDownRef = useRef(null);
+  const dropDownRef = useRef<HTMLDivElement>(null);
 
   const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
     const filterName = filters.find((item) => item.name === filter.name);

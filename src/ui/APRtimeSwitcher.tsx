@@ -16,18 +16,22 @@ const APRtimeSwitcher = (): JSX.Element => {
 
   const APRsHandler = (APRType: string) => {
     switch (APRType) {
+      case "latest":
+        aprFilter.set("latest");
+        setActiveAPRType("latest");
+        break;
       case "24h":
         aprFilter.set("daily");
+        setActiveAPRType("daily");
         break;
       case "week":
         aprFilter.set("weekly");
+        setActiveAPRType("weekly");
         break;
       default:
-        aprFilter.set(APRType);
         break;
     }
 
-    setActiveAPRType(APRType);
     setDropDownSelector(false);
   };
 

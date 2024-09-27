@@ -59,13 +59,15 @@ import type {
   TAddress,
   THoldData,
   TYearnProtocol,
-  TPlatformsData,
   TVaults,
   TMultichainPrices,
   TAPIData,
   TPriceInfo,
   TVaultDataKey,
   TPlatformGetBalance,
+  TPlatformData,
+  TBalances,
+  TTokens,
   // TAsset,
 } from "@types";
 
@@ -92,7 +94,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $reload = useStore(reload);
 
   const localVaults: {
-    [network: string]: TVaults[];
+    [network: string]: TVaults;
   } = {};
 
   let prices: TMultichainPrices = {};
@@ -477,53 +479,54 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
 
-        vaults[vault?.address?.toLowerCase()] = {
-          address: vault.address.toLowerCase(),
-          name: vault.name,
-          symbol: vault.symbol,
-          created: vaultCreated,
-          assetsPricesOnCreation: vault.assetsPricesOnCreation,
-          type: vault.vaultType,
-          strategy: vault.strategyId,
-          shareprice: vault.sharePrice,
-          tvl: vault.tvl,
-          strategySpecific,
-          balance: "",
-          lastHardWork: vault.lastHardWork,
-          hardWorkOnDeposit: vault.hardWorkOnDeposit,
-          daily: (Number(APR) / 365).toFixed(2),
-          assets,
-          assetsSymbol,
-          assetsProportions,
-          strategyInfo,
-          il: IL,
-          underlying: vault.underlying,
-          strategyAddress: vault?.strategy?.toLowerCase(),
-          strategyDescription: vault.strategyDescription,
-          status: vault.status,
-          version: vault.version,
-          strategyVersion: strategyVersion,
-          underlyingSymbol: vault?.underlyingSymbol || "",
-          NFTtokenID: vault.vaultManagerId,
-          gasReserve: vault.gasReserve,
-          rebalances,
-          earningData: {
-            apr: APRArray,
-            apy: APYArray,
-            poolSwapFeesAPR,
-            farmAPR,
-          },
-          sortAPR: APRArray?.withFees?.latest,
-          pool: vault.pool,
-          alm: vault.alm,
-          risk: vault?.risk,
-          vsHoldAPR: Number(vsHoldAPR),
-          lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
-          lifetimeTokensHold,
-          isVsActive,
-          yearnProtocols,
-          network: chainID,
-        };
+        (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
+          {
+            address: vault.address.toLowerCase(),
+            name: vault.name,
+            symbol: vault.symbol,
+            created: vaultCreated,
+            assetsPricesOnCreation: vault.assetsPricesOnCreation,
+            type: vault.vaultType,
+            strategy: vault.strategyId,
+            shareprice: vault.sharePrice,
+            tvl: vault.tvl,
+            strategySpecific,
+            balance: "",
+            lastHardWork: vault.lastHardWork,
+            hardWorkOnDeposit: vault.hardWorkOnDeposit,
+            daily: (Number(APR) / 365).toFixed(2),
+            assets,
+            assetsSymbol,
+            assetsProportions,
+            strategyInfo,
+            il: IL,
+            underlying: vault.underlying,
+            strategyAddress: vault?.strategy?.toLowerCase(),
+            strategyDescription: vault.strategyDescription,
+            status: vault.status,
+            version: vault.version,
+            strategyVersion: strategyVersion,
+            underlyingSymbol: vault?.underlyingSymbol || "",
+            NFTtokenID: vault.vaultManagerId,
+            gasReserve: vault.gasReserve,
+            rebalances,
+            earningData: {
+              apr: APRArray,
+              apy: APYArray,
+              poolSwapFeesAPR,
+              farmAPR,
+            },
+            sortAPR: APRArray?.withFees?.latest,
+            pool: vault.pool,
+            alm: vault.alm,
+            risk: vault?.risk,
+            vsHoldAPR: Number(vsHoldAPR),
+            lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
+            lifetimeTokensHold,
+            isVsActive,
+            yearnProtocols,
+            network: chainID,
+          };
 
         return vaults;
       },
@@ -534,9 +537,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const getData = async () => {
     const versions: Record<string, string> = {};
-    const vaultsTokens: { [key: string]: string[] } = {};
-    const platformData: TPlatformsData = {};
-    const assetBalances: { [key: string]: bigint } = {};
+    const vaultsTokens: TTokens = {};
+    const platformData: TPlatformData = {};
+    const assetBalances: { [key: string]: TBalances } = {};
     const vaultsData: TVaultDataKey = {};
 
     await Promise.all(
@@ -546,28 +549,24 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           stabilityAPIData?.vaults?.[chain.id] as Vaults
         ).map(([, vault]) => vault);
 
-        await setVaultsData(
-          APIVaultsData,
-          prices?.[chain.id],
-          String(chain.id)
-        );
+        await setVaultsData(APIVaultsData, prices?.[chain.id], chain.id);
 
         /////***** SET PLATFORM DATA *****/////
 
-        vaultsTokens[String(chain.id)] = stabilityAPIData?.platforms?.[chain.id]
-          ?.bcAssets as TAddress[];
+        vaultsTokens[chain.id] =
+          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
 
-        versions[String(chain.id)] =
-          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform;
+        versions[chain.id] =
+          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
 
-        platformData[String(chain.id)] = {
+        platformData[chain.id] = {
           platform: platforms[chain.id],
-          factory: deployments[chain.id].core.factory.toLowerCase(),
-          buildingPermitToken:
-            stabilityAPIData?.platforms?.[chain.id]?.buildingPermitToken,
-          buildingPayPerVaultToken:
-            stabilityAPIData?.platforms?.[chain.id]?.buildingPayPerVaultToken,
-          zap: deployments[chain.id].core.zap.toLowerCase(),
+          factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
+          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+            ?.buildingPermitToken as TAddress,
+          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+            ?.buildingPayPerVaultToken as TAddress,
+          zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
         };
 
         /////***** SET USER BALANCES *****/////
@@ -587,11 +586,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               args: [address as TAddress],
             })) as TPlatformGetBalance;
 
-            const contractVaults = await localClient?.readContract({
+            const contractVaults = (await localClient?.readContract({
               address: contractBalance[6][1] as TAddress,
               abi: IVaultManagerABI,
               functionName: "vaults",
-            });
+            })) as string[];
 
             if (contractBalance) {
               const buildingPayPerVaultTokenBalance: bigint =
@@ -599,17 +598,19 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               const erc20Balance: { [token: string]: bigint } = {};
               const erc721Balance: { [token: string]: bigint } = {};
               //function -> .set vault/
-              vaultsData[String(chain.id)] = addVaultData(
+
+              vaultsData[chain.id] = addVaultData(
                 contractBalance as TPlatformGetBalance
               );
 
-              assetBalances[String(chain.id)] = addAssetsBalance(
+              assetBalances[chain.id] = addAssetsBalance(
                 contractBalance as TPlatformGetBalance
               );
-              //
 
               for (let i = 0; i < contractBalance[1].length; i++) {
-                erc20Balance[contractBalance[1][i]] = contractBalance[3][i];
+                erc20Balance[String(contractBalance[1][i])] = BigInt(
+                  contractBalance[3][i]
+                );
               }
 
               for (let i = 0; i < contractBalance[6].length; i++) {
@@ -626,7 +627,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               balances.set(contractBalance);
             }
 
-            if (contractVaults) {
+            if (Array.isArray(contractVaults[0])) {
               const vaultsPromise = await Promise.all(
                 contractVaults[0].map(async (vault: string, index: number) => {
                   return {
@@ -655,9 +656,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
       })
     );
-
     isWeb3Load.set(false);
-
     assetsBalances.set(assetBalances);
     vaultData.set(vaultsData);
     vaults.set(localVaults);

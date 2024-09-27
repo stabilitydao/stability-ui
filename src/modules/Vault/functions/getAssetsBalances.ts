@@ -2,7 +2,8 @@ import { formatUnits } from "viem";
 
 import { getTokenData } from "@utils";
 
-import type { SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
+
 import type { TVaultBalance, TBalances, TUnderlyingToken } from "@types";
 
 /**
@@ -23,7 +24,7 @@ import type { TVaultBalance, TBalances, TUnderlyingToken } from "@types";
 
 export const getAssetsBalances = (
   balances: TBalances,
-  setBalances: SetStateAction<TVaultBalance>,
+  setBalances: Dispatch<SetStateAction<TVaultBalance>>,
   options: string[],
   underlyingToken: TUnderlyingToken
 ): void => {

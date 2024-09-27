@@ -1,16 +1,10 @@
-import type { TAddress } from "@types";
-
-type TPropsTokens = {
-  [address: string]: {
-    amount: string;
-  };
-};
+import type { TAddress, TLocalStorageToken, TVaultInput } from "@types";
 
 type TProps = {
   hash: TAddress;
   status: string;
   timestamp: number;
-  tokens: TPropsTokens[];
+  tokens: Record<TAddress, TLocalStorageToken> | TVaultInput;
   type: string;
   vault: TAddress;
 };

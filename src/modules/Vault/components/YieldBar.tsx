@@ -14,9 +14,9 @@ interface IProps {
 }
 
 type TShareData = {
-  sharePriceOnCreation: string;
-  sharePrice: string;
-  yieldPercent: string;
+  sharePriceOnCreation?: string;
+  sharePrice?: string;
+  yieldPercent?: string;
 };
 
 const HoldTable = ({

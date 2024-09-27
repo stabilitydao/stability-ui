@@ -21,8 +21,8 @@ const NETWORKS = ["Polygon", "Base"];
 const STRATEGIES = [
   "Y",
   "IQMF",
-  "GUMF",
   "CF",
+  "GUMF",
   "DQMF",
   "GQMF",
   "QSMF",

@@ -6,7 +6,7 @@ import { vaults, lastTx } from "@store";
 
 import { getTokenData } from "@utils";
 
-import type { TToast } from "@types";
+import type { TLocalStorageToken, TToast } from "@types";
 
 import "./Toast.css";
 
@@ -167,10 +167,10 @@ const Toast: React.FC<IProps> = memo(
                 <p className="capitalize-first">{storeTx?.type}</p>{" "}
                 <div className="flex flex-col justify-center items-center gap-1">
                   {tokens &&
-                    tokens.map((token: any) => (
+                    tokens.map((token: TLocalStorageToken) => (
                       <div
                         className="flex items-center gap-1"
-                        key={token.address}
+                        key={token.amount}
                       >
                         <p>{token.amount}</p>
                         <img

@@ -76,7 +76,7 @@ const BuildForm = ({
     symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
-      $assetsBalances?.[addr] || 0n,
+      $assetsBalances[$currentChainID]?.[addr] || 0n,
       tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
     price: $assetsPrices[$currentChainID][addr]?.price,

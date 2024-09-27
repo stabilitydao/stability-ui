@@ -39,6 +39,7 @@ const getAssetAllowance = async (
   const fromAddress: TAddress =
     tab === "Deposit" && asset === underlyingAddress ? vaultAddress : zap;
 
+  //@ts-ignore
   const allowanceData = await client?.readContract({
     address: address,
     abi: ERC20ABI,

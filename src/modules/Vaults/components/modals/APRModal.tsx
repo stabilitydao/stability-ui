@@ -6,7 +6,7 @@ import { TimeDifferenceIndicator } from "@ui";
 
 import { aprFilter, hideFeeApr } from "@store";
 
-import type { TAPRModal } from "@types";
+import type { TAPRModal, TEarningData } from "@types";
 
 interface IProps {
   state: TAPRModal;
@@ -18,11 +18,24 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
 
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
+  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
+
+  const totalAPYValue = state?.earningData?.apy?.[aprType][$aprFilter] || "0";
+
+  const totalAPRValue = state?.earningData?.apr?.[aprType][$aprFilter];
+
+  const swapFeesAPRValue = state.earningData.poolSwapFeesAPR[$aprFilter];
+
+  const strategyAPRValue = state.earningData.farmAPR[$aprFilter];
+
+  const dailyAPRValue = (
+    Number(state.earningData.apr[aprType][$aprFilter]) / 365
+  ).toFixed(2);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setModalState({
-        earningData: "",
+        earningData: {} as TEarningData,
         daily: 0,
         lastHardWork: "",
         symbol: "",
@@ -56,7 +69,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
         <svg
           onClick={() => {
             setModalState({
-              earningData: "",
+              earningData: {} as TEarningData,
               daily: 0,
               lastHardWork: "",
               symbol: "",
@@ -137,51 +150,29 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
           <div className="text-[16px] w-full">
             <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APY</p>
-              <p className="text-end">
-                {$hideFeeAPR
-                  ? state.earningData.apy.withoutFees[$aprFilter]
-                  : state.earningData.apy.withFees[$aprFilter]}
-                %
-              </p>
+              <p className="text-end">{totalAPYValue}%</p>
             </div>
 
             <div className="font-bold flex items-center justify-between mb-1">
               <p>Total APR</p>
-              <p className="text-end">
-                {$hideFeeAPR
-                  ? state?.earningData?.apr?.withoutFees?.[$aprFilter]
-                  : state.earningData.apr.withFees[$aprFilter]}
-                %
-              </p>
+              <p className="text-end">{totalAPRValue}%</p>
             </div>
             {state.earningData.poolSwapFeesAPR.daily != "-" &&
               !!state?.pool && (
                 <div className="flex items-center justify-between mb-1">
                   <p>Pool swap fees APR</p>
                   <p className={`${$hideFeeAPR && "line-through"} text-end`}>
-                    {state.earningData.poolSwapFeesAPR[$aprFilter]}%
+                    {swapFeesAPRValue}%
                   </p>
                 </div>
               )}
             <div className="flex items-center justify-between mb-1">
               <p>Strategy APR</p>
-              <p className="text-end">
-                {state.earningData.farmAPR[$aprFilter]}%
-              </p>
+              <p className="text-end">{strategyAPRValue}%</p>
             </div>
             <div className="flex items-center justify-between">
               <p>Daily yield</p>
-              <p className="text-end">
-                {$hideFeeAPR
-                  ? (
-                      Number(state.earningData.apr.withoutFees[$aprFilter]) /
-                      365
-                    ).toFixed(2)
-                  : (
-                      Number(state.earningData.apr.withFees[$aprFilter]) / 365
-                    ).toFixed(2)}
-                %
-              </p>
+              <p className="text-end">{dailyAPRValue}%</p>
             </div>
           </div>
           <div className="flex items-center justify-between w-full">

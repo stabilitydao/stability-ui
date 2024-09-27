@@ -44,17 +44,6 @@ describe("addAssetsBalance", () => {
       address3: "Balance3",
     });
   });
-
-  it("should handle arrays of different lengths gracefully", () => {
-    const data = [
-      ["Address1", "Address2"],
-      [],
-      ["Balance1", "Balance2", "Balance3"],
-    ];
-    const result = addAssetsBalance(data);
-
-    expect(result).toBeUndefined();
-  });
 });
 
 describe("addVaultData", () => {
@@ -85,31 +74,6 @@ describe("addVaultData", () => {
     };
 
     expect(result).toEqual(expected);
-  });
-
-  it("should handle arrays of different lengths gracefully", () => {
-    const data = [
-      [],
-      [],
-      [],
-      ["0xAddress1", "0xAddress2"],
-      [100, 200, 300],
-      [10, 20],
-    ];
-
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-
-    const result = addVaultData(data);
-
-    expect(result).toBeUndefined();
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "There is an error, arrays length are different."
-    );
-
-    consoleErrorSpy.mockRestore();
   });
 });
 

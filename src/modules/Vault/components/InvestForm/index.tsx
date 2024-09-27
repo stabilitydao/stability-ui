@@ -59,12 +59,14 @@ import type {
   TVaultInput,
   TVaultBalance,
   TTokenData,
-  TPlatformsData,
+  TPlatformData,
   TVault,
   TBalances,
   TAsset,
   TError,
   TUnderlyingToken,
+  TZAPData,
+  TLocalStorageToken,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -74,7 +76,11 @@ interface IProps {
   vault: TVault;
 }
 
-type TOptionInfo = { address: TAddress; symol: string; logoURI: string };
+type TOptionInfo = {
+  address: string | string[];
+  symbol: string | string[];
+  logoURI: string | string[];
+};
 
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const _publicClient = usePublicClient({
@@ -88,19 +94,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const { switchChain } = useSwitchChain();
 
   const $vaultData = useStore(vaultData);
-  const $account: TAddress = useStore(account);
+  const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
 
   const $transactionSettings = useStore(transactionSettings);
-  const $platformsData: TPlatformsData = useStore(platformsData);
-  const $tokens: TAddress[] = useStore(tokens);
+  const $platformsData: TPlatformData = useStore(platformsData);
+  const $tokens = useStore(tokens);
   const $connected = useStore(connected);
 
   const [tab, setTab] = useState("Deposit");
   const [option, setOption] = useState<string[]>([]);
 
-  const [defaultOption, setDefaultOption] = useState({
+  const [defaultOption, setDefaultOption] = useState<{
+    symbols: string;
+    assets: string;
+    assetsArray: string[];
+    logos: string[];
+  }>({
     symbols: "",
     assets: "",
     assetsArray: [],
@@ -114,11 +125,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [sharesOut, setSharesOut] = useState<bigint | boolean>(false);
 
-  const [withdrawAmount, setWithdrawAmount] = useState<string[] | boolean>(
-    false
-  );
+  const [withdrawAmount, setWithdrawAmount] = useState<
+    {
+      symbol: string;
+      logo: string;
+      amount: string;
+      amountInUSD?: string;
+    }[]
+  >([]);
 
-  const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState();
+  const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<TZAPData[]>([]);
   const [underlyingToken, setUnderlyingToken] = useState<TUnderlyingToken>({
     address: "0x0",
     symbol: "",
@@ -128,19 +144,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     logoURI: "",
   });
 
-  const [underlyingShares, setUnderlyingShares] = useState();
-  const [zapShares, setZapShares] = useState();
+  const [underlyingShares, setUnderlyingShares] = useState<string | boolean>();
+  const [zapShares, setZapShares] = useState<string | boolean>();
   const [button, setButton] = useState<string>("none");
   const [optionTokens, setOptionTokens] = useState<TOptionInfo[]>([]);
-  const [approveIndex, setApproveIndex] = useState(false);
+  const [approveIndex, setApproveIndex] = useState<number | boolean>(false);
   const [ichiAllow, setIchiAllow] = useState<boolean[]>([true, true]);
 
   const [tokenSelector, setTokenSelector] = useState<boolean>(false);
-  const [activeOptionToken, setActiveOptionToken] = useState<{
-    symbol: string;
-    address: string;
-    logoURI: string[];
-  }>({
+  const [activeOptionToken, setActiveOptionToken] = useState<TOptionInfo>({
     symbol: "",
     address: "",
     logoURI: [],
@@ -150,7 +162,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [settings, setSettings] = useState($transactionSettings);
 
-  const [zapTokens, setZapTokens] = useState(false);
+  const [zapTokens, setZapTokens] = useState<TZAPData[]>([]);
   const [zapError, setZapError] = useState<boolean>(false);
   const [rotation, setRotation] = useState<number>(0);
   const [isRefresh, setIsRefresh] = useState(false);
@@ -315,10 +327,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const resetFormAfterTx = () => {
     setButton("none");
-    setZapTokens(false);
-    setZapPreviewWithdraw(false);
+    setZapTokens([]);
+    setZapPreviewWithdraw([]);
     setUnderlyingShares(false);
-    setWithdrawAmount(false);
+    setWithdrawAmount([]);
     setSharesOut(false);
     setZapShares(false);
     resetInputs();
@@ -355,7 +367,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const selectTokensHandler = async () => {
     if (!$tokens[network]) return;
     let filtredTokens = tokenlist.tokens
-      .filter((token) => $tokens[network].includes(token.address.toLowerCase()))
+      .filter((token) =>
+        $tokens[network].includes(token.address.toLowerCase() as TAddress)
+      )
       .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
 
     filtredTokens = filtredTokens.filter(
@@ -374,38 +388,38 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           let underlyingSymbol = "";
 
           if (shortId === "DQMF") {
-            underlyingSymbol = await _publicClient?.readContract({
+            underlyingSymbol = (await _publicClient?.readContract({
               address: vault.underlying,
               abi: ERC20DQMFABI,
               functionName: "symbol",
-            });
+            })) as string;
 
             underlyingSymbol = decodeHex(underlyingSymbol);
           } else {
-            underlyingSymbol = await _publicClient?.readContract({
+            underlyingSymbol = (await _publicClient?.readContract({
               address: vault.underlying,
               abi: ERC20MetadataUpgradeableABI,
               functionName: "symbol",
-            });
+            })) as string;
           }
 
-          const underlyingDecimals = await _publicClient?.readContract({
+          const underlyingDecimals = (await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "decimals",
-          });
-          const underlyingAllowance = await _publicClient?.readContract({
+          })) as number;
+          const underlyingAllowance = (await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "allowance",
             args: [$account as TAddress, vault.address],
-          });
-          const underlyingBalance = await _publicClient?.readContract({
+          })) as bigint;
+          const underlyingBalance = (await _publicClient?.readContract({
             address: vault.underlying,
             abi: ERC20MetadataUpgradeableABI,
             functionName: "balanceOf",
             args: [$account as TAddress],
-          });
+          })) as bigint;
 
           setUnderlyingToken({
             address: vault.underlying,
@@ -442,7 +456,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     debounce(async (amount: string, asset: string) => {
       if (!Number(amount)) {
         setButton("none");
-        setZapTokens(false);
+        setZapTokens([]);
         setLoader(false);
         return;
       }
@@ -462,7 +476,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )
       ) {
         setButton("insufficientBalance");
-        setZapTokens(false);
+        setZapTokens([]);
         return;
       }
 
@@ -475,7 +489,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             args: [[asset as TAddress], [parseUnits(amount, 18)]],
           });
 
-          setUnderlyingShares(formatUnits(previewDepositAssets[1], 18));
+          if (previewDepositAssets) {
+            setUnderlyingShares(
+              formatUnits(previewDepositAssets[1] as bigint, 18)
+            );
+          }
+
           const allowanceData = (await _publicClient?.readContract({
             address: option[0] as TAddress,
             abi: ERC20ABI,
@@ -496,10 +515,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             setButton(tab.toLowerCase());
           }
 
-          checkInputsAllowance(previewDepositAssets[0] as bigint[]);
-          setSharesOut(
-            ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
-          );
+          if (previewDepositAssets) {
+            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+            setSharesOut(
+              ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
+            );
+          }
+
           setLoader(false);
         } catch (err) {
           console.error("UNDERLYING SHARES ERROR:", err);
@@ -516,7 +538,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
           const allowanceData = await getAssetAllowance(
             _publicClient,
-            asset,
+            asset as TAddress,
             tab,
             vault?.address,
             underlyingToken?.address,
@@ -559,8 +581,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     );
 
     setButton("none");
-    setZapTokens(false);
-    setZapPreviewWithdraw(false);
+    setZapTokens([]);
+    setZapPreviewWithdraw([]);
     setLoader(true);
 
     // @ts-ignore
@@ -623,7 +645,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         const allowance = formatUnits(
           await getAssetAllowance(
             _publicClient,
-            option[0],
+            option[0] as TAddress,
             tab,
             vault?.address,
             underlyingToken?.address,
@@ -639,7 +661,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(false);
       }
     } catch (err) {
-      errorHandler(err);
+      if (err instanceof Error) {
+        errorHandler(err);
+      }
     }
 
     setTransactionInProgress(false);
@@ -661,7 +685,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const amount = inputs[option[0]];
     if (underlyingToken?.address === option[0]) {
       try {
-        const shares = parseUnits(underlyingShares, 18);
+        let _strShares =
+          typeof underlyingShares === "string" ? underlyingShares : "0";
+
+        const shares = parseUnits(_strShares, 18);
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
         const out = shares - (shares * decimalPercent) / 100n;
@@ -723,13 +750,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     } else {
       try {
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-        const shares = parseUnits(zapShares, 18);
+        let _strShares = typeof zapShares === "string" ? zapShares : "0";
+
+        const shares = parseUnits(_strShares, 18);
 
         const out = shares - (shares * decimalPercent) / 100n;
 
@@ -738,9 +769,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           getTokenData(option[0])?.decimals || 18
         );
 
-        const router = zapTokens[0].router || zapTokens[1].router;
+        const router = zapTokens[0]?.router || zapTokens[1]?.router;
 
-        let txData = zapTokens.map((tokens: any) => tokens.txData);
+        let txData = zapTokens?.map((tokens: any) => tokens.txData);
 
         if (shortId === "IQMF" || shortId === "IRMF") txData.push("");
 
@@ -755,9 +786,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "deposit",
           args: [
             vault.address,
-            option[0],
+            option[0] as TAddress,
             amountIn,
-            router,
+            router as TAddress,
             txData,
             out,
             $account as TAddress,
@@ -773,9 +804,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "deposit",
           args: [
             vault.address,
-            option[0],
+            option[0] as TAddress,
             amountIn,
-            router,
+            router as TAddress,
             txData,
             out,
             $account as TAddress,
@@ -803,7 +834,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     }
     setTransactionInProgress(false);
@@ -813,6 +846,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const decimals = getTokenData(option[0])?.decimals || 18;
     if (option) {
       let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
+
       try {
         let previewDepositAssets: any;
         previewDepositAssets = await _publicClient?.readContract({
@@ -822,7 +856,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           args: [defaultOption?.assetsArray as TAddress[], amounts],
         });
         setZapShares(formatUnits(previewDepositAssets[1], 18));
-        checkInputsAllowance(option[0]);
+        checkInputsAllowance(amounts);
       } catch (err) {
         console.error("Error: the asset balance is too low to convert.", err);
       }
@@ -840,25 +874,29 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
-      const zapAmounts = await _publicClient?.readContract({
+      const zapAmounts = (await _publicClient?.readContract({
         address: $platformsData[network]?.zap,
         abi: ZapABI,
         functionName: "getDepositSwapAmounts",
-        args: [vault.address, option[0], parseUnits(amount, decimals)],
-      });
+        args: [
+          vault.address,
+          option[0] as TAddress,
+          parseUnits(amount, decimals),
+        ],
+      })) as [TAddress[], bigint[]];
 
       let promises;
-      let outData;
+      let outData: TZAPData[] = [];
       if (shortId === "CCF") {
-        promises = await get1InchRoutes(
+        promises = (await get1InchRoutes(
           network,
-          option[0],
-          zapAmounts[0][1],
+          option[0] as TAddress,
+          zapAmounts[0][1] as TAddress,
           decimals,
           String(zapAmounts[1][0] + zapAmounts[1][1]),
           setZapError,
           "deposit"
-        );
+        )) as TZAPData;
         outData = [promises, promises];
       } else {
         promises = zapAmounts[0].map(
@@ -866,7 +904,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             vault.assetsProportions[index] &&
             (await get1InchRoutes(
               network,
-              option[0],
+              option[0] as TAddress,
               toAddress,
               decimals,
               String(zapAmounts[1][index]),
@@ -874,7 +912,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               "deposit"
             ))
         );
-        outData = await Promise.all(promises);
+        outData = (await Promise.all(promises)) as TZAPData[];
       }
 
       if (shortId === "IQMF" || shortId === "IRMF") {
@@ -917,11 +955,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         functionName: "previewDepositAssets",
         args: [defaultOption?.assetsArray as TAddress[], amounts],
       });
-      setZapShares(formatUnits(previewDepositAssets[1], 18));
+
+      let _previewDepositAssets: bigint = 0n;
+
+      if (
+        Array.isArray(previewDepositAssets) &&
+        previewDepositAssets.length > 1
+      ) {
+        _previewDepositAssets = previewDepositAssets[1];
+      }
+
+      setZapShares(formatUnits(_previewDepositAssets, 18));
       if ($connected) {
         const allowanceData = await getAssetAllowance(
           _publicClient,
-          option[0],
+          option[0] as TAddress,
           tab,
           vault?.address,
           underlyingToken?.address,
@@ -995,15 +1043,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           ],
         });
 
+        let _newAllowance =
+          typeof newAllowance === "bigint" ? newAllowance : 0n;
+
         if (
-          Number(formatUnits(newAllowance, 18)) >= Number(inputs[option[0]])
+          Number(formatUnits(_newAllowance, 18)) >= Number(inputs[option[0]])
         ) {
           setButton("withdraw");
         }
         setLoader(false);
       }
     } catch (err) {
-      errorHandler(err);
+      if (err instanceof Error) {
+        errorHandler(err);
+      }
     }
     setTransactionInProgress(false);
   };
@@ -1014,7 +1067,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const currentBalances: TBalances = await getPlatformBalance(
       _publicClient,
       network,
-      $account
+      $account as TAddress
     );
 
     setRotation(rotation + 360);
@@ -1035,11 +1088,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         : parseUnits(amount, decimals);
 
     setError(DEFAULT_ERROR);
+
     const needApprove = option.filter(
-      (asset: TAddress) =>
+      (asset) =>
         formatUnits(allowance[asset], Number(getTokenData(asset)?.decimals)) <
         inputs[asset]
     );
+
     if (vault.address) {
       try {
         const gas = await _publicClient?.estimateContractGas({
@@ -1111,7 +1166,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ) {
           setButton("deposit");
         }
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     }
     setApproveIndex(false);
@@ -1125,9 +1182,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
     const lastAsset = option[0];
     // only for CCF strategy
+
+    let _strShares = typeof zapShares === "string" ? zapShares : "0";
+
     const shares = sharesOut
       ? sharesOut
-      : (parseUnits(zapShares, 18) * BigInt(1)) / BigInt(100);
+      : (parseUnits(_strShares, 18) * BigInt(1)) / BigInt(100);
 
     if (shortId === "CCF" && option.length < 2) {
       input.push(0n);
@@ -1142,7 +1202,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
     const changedInput = assets?.indexOf(lastAsset);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
-    const out = shares - (shares * decimalPercent) / 100n;
+
+    const out = BigInt(shares) - (BigInt(shares) * decimalPercent) / 100n;
 
     let transaction,
       depositAssets: any,
@@ -1230,7 +1291,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
     } catch (err) {
-      errorHandler(err);
+      if (err instanceof Error) {
+        errorHandler(err);
+      }
     }
     setTransactionInProgress(false);
   };
@@ -1252,16 +1315,19 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     if (underlyingToken?.address === option[0]) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-      const txTokens = withdrawAmount.reduce((result, token) => {
-        result[underlyingToken.address] = {
-          amount: token.amount,
-          symbol: token.symbol,
-          logo: token.logo,
-        };
-        return result;
-      }, {});
+      const txTokens = withdrawAmount?.reduce(
+        (result, token) => {
+          result[underlyingToken.address as TAddress] = {
+            amount: token.amount,
+            symbol: token.symbol,
+            logo: token.logo,
+          };
+          return result;
+        },
+        {} as Record<TAddress, TLocalStorageToken>
+      );
 
-      const withdrawAmounts = withdrawAmount.map((obj: any) => {
+      const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const amount = parseUnits(obj.amount, 18);
         return amount - (amount * decimalPercent) / 100n;
       });
@@ -1304,24 +1370,31 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     } else if (
       (defaultOption?.assets === option[0] && option.length < 2) ||
       option.length > 1
     ) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
-      const txTokens = withdrawAmount.reduce((result, token) => {
-        const JSONToken = tokenlist.tokens.find(
-          (t) => t.symbol === token.symbol
-        );
-        result[JSONToken.address] = {
-          amount: token.amount,
-        };
-        return result;
-      }, {});
+      const txTokens = withdrawAmount?.reduce(
+        (result, token) => {
+          const JSONToken = tokenlist.tokens.find(
+            (t) => t.symbol === token.symbol
+          );
 
-      const withdrawAmounts = withdrawAmount.map((obj: any) => {
+          result[JSONToken?.address as TAddress] = {
+            amount: token.amount,
+          };
+
+          return result;
+        },
+        {} as Record<TAddress, TLocalStorageToken>
+      );
+
+      const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const decimals = tokenlist.tokens.find(
           (token) => token.symbol === obj.symbol
         )?.decimals;
@@ -1368,7 +1441,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     } else {
       const optionAmount = zapPreviewWithdraw.reduce(
@@ -1397,8 +1472,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "withdraw",
           args: [
             vault.address,
-            option[0],
-            router,
+            option[0] as TAddress,
+            router as TAddress,
             txData,
             sharesToBurn,
             minAmountOut,
@@ -1415,8 +1490,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "withdraw",
           args: [
             vault.address,
-            option[0],
-            router,
+            option[0] as TAddress,
+            router as TAddress,
             txData,
             sharesToBurn,
             minAmountOut,
@@ -1443,7 +1518,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
-        errorHandler(err);
+        if (err instanceof Error) {
+          errorHandler(err);
+        }
       }
     }
     setTransactionInProgress(false);
@@ -1455,8 +1532,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         formatUnits($vaultData[network][vault.address].vaultUserBalance, 18)
       );
       if (!Number(value)) {
-        setWithdrawAmount(false);
-        setZapPreviewWithdraw(false);
+        setWithdrawAmount([]);
+        setZapPreviewWithdraw([]);
         return;
       }
 
@@ -1496,7 +1573,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [localAssets, currentValue, assetsLength],
+          args: [localAssets as TAddress[], currentValue, assetsLength],
           account: $account as TAddress,
         });
         if (
@@ -1529,7 +1606,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             const allowanceData: any = formatUnits(
               await getAssetAllowance(
                 _publicClient,
-                option[0],
+                option[0] as TAddress,
                 tab,
                 vault?.address,
                 underlyingToken?.address,
@@ -1539,11 +1616,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             );
 
             const promises = result.map(
-              async (amount, index) =>
+              async (amount: bigint, index: number) =>
                 await get1InchRoutes(
                   network,
-                  localAssets[index],
-                  option[0],
+                  localAssets[index] as TAddress,
+                  option[0] as TAddress,
                   Number(getTokenData(localAssets[index])?.decimals),
                   amount,
                   setZapError,
@@ -1552,6 +1629,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             );
 
             const outData = await Promise.all(promises);
+
             setZapPreviewWithdraw(outData);
 
             if (Number(allowanceData) < Number(value)) {
@@ -1641,8 +1719,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   break;
                 }
               }
-              if (value?.amount) {
-                amounts.push(parseUnits(value?.amount, decimals));
+              if (value) {
+                amounts.push(parseUnits(value, decimals));
               } else {
                 amounts.push(parseUnits("0", decimals));
               }
@@ -1773,12 +1851,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setButton("none");
     setSharesOut(false);
-    setWithdrawAmount(false);
+    setWithdrawAmount([]);
     setUnderlyingShares(false);
     setZapShares(false);
-    setZapTokens(false);
+    setZapTokens([]);
     setZapError(false);
-    setZapPreviewWithdraw(false);
+    setZapPreviewWithdraw([]);
     setLoader(false);
   }, [option, $connected]);
 
@@ -1799,7 +1877,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   useEffect(() => {
-    setZapTokens(false);
+    setZapTokens([]);
   }, [inputs]);
 
   ///// interval refresh data
@@ -1890,14 +1968,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
-                    {activeOptionToken?.logoURI?.map((logo: string) => (
-                      <img
-                        key={Math.random()}
-                        className="max-w-6 max-h-6 rounded-full"
-                        src={logo}
-                        alt="logo"
-                      />
-                    ))}
+                    {Array.isArray(activeOptionToken?.logoURI) &&
+                      activeOptionToken?.logoURI?.map((logo: string) => (
+                        <img
+                          key={Math.random()}
+                          className="max-w-6 max-h-6 rounded-full"
+                          src={logo}
+                          alt="logo"
+                        />
+                      ))}
                   </div>
                   <p className="text-[16px] md:text-[15px] lg:text-[20px]">
                     {activeOptionToken?.symbol}
@@ -1986,15 +2065,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     return (
                       <div
                         className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
-                        key={address}
+                        key={address as string}
                         onClick={() => {
-                          optionHandler([address], symbol, address, [logoURI]);
+                          optionHandler(
+                            [address as string],
+                            symbol as string,
+                            address as string,
+                            [logoURI as string]
+                          );
                         }}
                       >
                         {logoURI && (
                           <img
                             className="max-w-6 max-h-6 rounded-full"
-                            src={logoURI}
+                            src={logoURI as string}
                             alt="logo"
                           />
                         )}
@@ -2137,12 +2221,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             <p>
                               $
                               {$assetsPrices[network] &&
-                              inputs[asset] > 0 &&
+                              Number(inputs[asset]) > 0 &&
                               underlyingToken?.address != option[0]
                                 ? (
                                     Number(
                                       $assetsPrices[network][asset].price
-                                    ) * inputs[asset]
+                                    ) * Number(inputs[asset])
                                   ).toFixed(2)
                                 : 0}
                             </p>
@@ -2171,7 +2255,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               />
                             </div>
                             {Number(
-                              formatUnits(sharesOut * BigInt(100), 18)
+                              formatUnits(BigInt(sharesOut) * BigInt(100), 18)
                             ).toFixed(12)}{" "}
                             ($
                             {(
@@ -2257,11 +2341,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     <p>
                       $
                       {$assetsPrices[network] &&
-                      inputs[option[0]] > 0 &&
+                      Number(inputs[option[0]]) > 0 &&
                       underlyingToken?.address !== option[0]
                         ? (
                             Number($assetsPrices[network][option[0]].price) *
-                            inputs[option[0]]
+                            Number(inputs[option[0]])
                           ).toFixed(2)
                         : 0}
                     </p>
@@ -2276,7 +2360,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           <AssetsSkeleton />
                         ) : (
                           <div className="h-[100px]">
-                            {zapTokens && (
+                            {!!zapTokens.length && (
                               <>
                                 {shortId !== "CCF" ? (
                                   <div>
@@ -2425,18 +2509,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               ) : (
                                 <div>
                                   {(underlyingShares &&
-                                    inputs[option[0]] > 0) ||
-                                  (zapShares && inputs[option[0]] > 0) ? (
+                                    Number(inputs[option[0]]) > 0) ||
+                                  (zapShares &&
+                                    Number(inputs[option[0]]) > 0) ? (
                                     <p>
-                                      {underlyingShares && inputs[option[0]] > 0
+                                      {underlyingShares &&
+                                      Number(inputs[option[0]]) > 0
                                         ? `${underlyingShares} ($${(
-                                            underlyingShares *
+                                            Number(underlyingShares) *
                                             Number(vault.shareprice)
                                           ).toFixed(2)})`
                                         : zapShares &&
-                                          inputs[option[0]] > 0 &&
+                                          Number(inputs[option[0]]) > 0 &&
                                           `${zapShares} ($${(
-                                            zapShares * Number(vault.shareprice)
+                                            Number(zapShares) *
+                                            Number(vault.shareprice)
                                           ).toFixed(2)})`}
                                     </p>
                                   ) : (
@@ -2523,8 +2610,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
                 <p>
                   $
-                  {$assetsPrices[network] && inputs[option[0]] > 0
-                    ? (Number(vault.shareprice) * inputs[option[0]]).toFixed(2)
+                  {$assetsPrices[network] && Number(inputs[option[0]]) > 0
+                    ? (
+                        Number(vault.shareprice) * Number(inputs[option[0]])
+                      ).toFixed(2)
                     : 0}
                 </p>
               </div>
@@ -2563,7 +2652,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         <ShareSkeleton height={32} />
                       ) : (
                         <p>
-                          {withdrawAmount
+                          {!!withdrawAmount.length
                             ? withdrawAmount[index]?.amountInUSD
                               ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
                               : `${withdrawAmount[index]?.amount}`
@@ -2584,18 +2673,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       <AssetsSkeleton />
                     ) : (
                       <div>
-                        {zapPreviewWithdraw &&
+                        {!!zapPreviewWithdraw.length &&
                           zapPreviewWithdraw?.map(
-                            ({
-                              address,
-                              amountIn,
-                              amountOut,
-                            }: {
-                              address: TAddress;
-                              amountIn: string;
-                              amountOut: string;
-                              symbol: string;
-                            }) => (
+                            ({ address, amountIn, amountOut }) => (
                               <div key={amountIn}>
                                 {address.toLowerCase() !==
                                   option[0].toLowerCase() && (
@@ -2673,7 +2753,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           <ShareSkeleton height={32} />
                         ) : (
                           <div>
-                            {zapPreviewWithdraw ? (
+                            {!!zapPreviewWithdraw.length ? (
                               <div className="flex items-center gap-1">
                                 <p>
                                   {(

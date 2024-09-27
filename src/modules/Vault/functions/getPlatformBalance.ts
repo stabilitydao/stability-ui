@@ -18,14 +18,14 @@ import type { TAddress, TBalances } from "@types";
  * @param {string} network - Network
  * @param {TAddress} address - User wallet address for which the balance is retrieved
  *
- * @returns {Promise<TBalances | undefined>} Promise that resolves to the balances of assets for the given platform, or `undefined` if an error occurs
+ * @returns {Promise<TBalances>} Promise that resolves to the balances of assets for the given platform
  */
 
 export const getPlatformBalance = async (
   publicClient: any,
   network: string,
   address: TAddress
-): Promise<TBalances | undefined> => {
+): Promise<TBalances> => {
   const contractBalance = await publicClient?.readContract({
     address: platforms[network],
     abi: PlatformABI,
