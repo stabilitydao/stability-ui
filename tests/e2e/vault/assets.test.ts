@@ -280,6 +280,7 @@ test("Should display assets info correctly", async ({ page }) => {
   const vaultsCount = await page.getByTestId("vault").count();
 
   for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
+    console.log(vaultIndex);
     await page.getByTestId("vault").nth(vaultIndex).click();
 
     await page.waitForSelector("[data-testid='assetLogo0']");
@@ -291,6 +292,7 @@ test("Should display assets info correctly", async ({ page }) => {
     const vaultData = allVaults.find(
       ({ address }) => address.toLowerCase() === vaultAddress
     );
+    console.log(vaultData.symbol);
 
     const assetSymbols: string[] =
       vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];

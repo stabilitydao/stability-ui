@@ -52,8 +52,8 @@ const CustomTooltip = ({
   payload,
   APRType,
 }: {
-  active: boolean;
-  payload: TChartPayload[];
+  active?: boolean;
+  payload?: TChartPayload[];
   APRType: string;
 }) => {
   if (active && payload && payload.length) {

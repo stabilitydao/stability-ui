@@ -122,7 +122,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                     title="Farming"
                     alt="Farming"
                     className="w-6 h-6 ml-1"
-                    src="/public/features/Farming.svg"
+                    src="/features/Farming.svg"
                   />
                 )}
               </span>
