@@ -7,7 +7,7 @@ import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
-import type { TAddress, TPlatformsData, TVault } from "@types";
+import type { TAddress, TPlatformData, TVault } from "@types";
 
 interface IProps {
   network: string;
@@ -16,7 +16,7 @@ interface IProps {
 
 const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   const $connected = useStore(connected);
-  const $platformsData: TPlatformsData = useStore(platformsData);
+  const $platformsData: TPlatformData = useStore(platformsData);
   const $apiData = useStore(apiData);
 
   const vaultTypes = $apiData.platforms[network].versions.vaultType;
@@ -122,7 +122,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                     title="Farming"
                     alt="Farming"
                     className="w-6 h-6 ml-1"
-                    src="/public/features/Farming.svg"
+                    src="/features/Farming.svg"
                   />
                 )}
               </span>

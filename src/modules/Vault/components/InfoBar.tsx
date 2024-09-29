@@ -22,6 +22,7 @@ interface IProps {
 const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
+  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [userBalances, setUserBalances] = useState({
@@ -38,15 +39,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   });
 
   useEffect(() => {
-    let apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
+    let apr = vault?.earningData?.apr?.[aprType][$aprFilter];
+    let apy = vault?.earningData?.apy?.[aprType][$aprFilter];
 
-    if ($hideFeeAPR) {
-      apr = vault?.earningData?.apr?.withoutFees?.[$aprFilter];
-      apy = vault?.earningData?.apy?.withoutFees?.[$aprFilter];
-    } else {
-      apr = vault?.earningData?.apr?.withFees?.[$aprFilter];
-      apy = vault?.earningData?.apy?.withFees?.[$aprFilter];
-    }
+    let monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
 
     monthlyAPR = Number(apr) / 12;
     monthlyEarn = ((userBalances.USDBalance * monthlyAPR) / 100).toFixed(2);

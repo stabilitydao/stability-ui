@@ -1,9 +1,9 @@
 ---
 import {Chains} from '@modules';
 import Layout from '@layouts/Layout.astro';
-import {chains, getSupportedChainNames, getChainsTotals} from "@stabilitydao/stability";
+import {chains,  getChainsTotals} from "@stabilitydao/stability";
 
-const supported = getSupportedChainNames().length
+
 const totalChains = getChainsTotals();
 const totalText = [
     ['Total', Object.keys(chains).length,],
@@ -12,7 +12,7 @@ const totalText = [
     ['Development', totalChains.CHAINLIB_DEVELOPMENT,],
     ['Awaiting developer', totalChains.AWAITING_DEVELOPER,],
     ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION,],
-].map(t => `${t[0]}: ${t[1]}.`).join(' ')
+].map(text => `${text[0]}: ${text[1]}.`).join(' ')
 ---
 
 <Layout

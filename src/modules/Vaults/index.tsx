@@ -69,12 +69,22 @@ import type {
   // TAddress,
   // TUpgradesTable,
   TEarningData,
+  TVaults,
 } from "@types";
 
 // type TToken = {
 //   logo: string;
 //   price: string;
 // };
+
+type TVSHoldModalState = {
+  lifetimeTokensHold: THoldData[];
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
+  created: number;
+  state: boolean;
+  isVsActive: boolean;
+};
 
 const Vaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
@@ -105,7 +115,7 @@ const Vaults = (): JSX.Element => {
     pool: {},
   });
 
-  const [vsHoldModal, setVsHoldModal] = useState({
+  const [vsHoldModal, setVsHoldModal] = useState<TVSHoldModalState>({
     lifetimeTokensHold: [],
     vsHoldAPR: 0,
     lifetimeVsHoldAPR: 0,
@@ -131,6 +141,7 @@ const Vaults = (): JSX.Element => {
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
+  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
   const userVaultsCondition =
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
@@ -288,13 +299,13 @@ const Vaults = (): JSX.Element => {
       }
     });
 
-    //@ts-ignore
-    const mixedVaults: { [key: string]: TVault } = Object.values(
+    const mixedVaults: TVaults = Object.values(
       activeNetworksVaults
-    ).reduce<{
-      [key: string]: TVault;
-    }>((acc, value) => {
-      return { ...acc, ...value };
+    ).reduce<TVaults>((acc, value) => {
+      if (typeof value === "object" && !Array.isArray(value)) {
+        return { ...acc, ...(value as TVaults) };
+      }
+      return acc;
     }, {});
 
     let sortedVaults = Object.values(mixedVaults).sort(
@@ -364,12 +375,10 @@ const Vaults = (): JSX.Element => {
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
         if (state.keyName === "earningData") {
-          const fees = $hideFeeAPR ? "withoutFees" : "withFees";
-
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
-              a[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
-              b[state.keyName as keyof TVault]?.apr[fees][$aprFilter],
+              a[state.keyName as keyof TVault]?.apr[aprType][$aprFilter],
+              b[state.keyName as keyof TVault]?.apr[aprType][$aprFilter],
               state.dataType,
               state.sortType
             )
@@ -377,8 +386,8 @@ const Vaults = (): JSX.Element => {
         } else {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
-              a[state.keyName as keyof TVault],
-              b[state.keyName as keyof TVault],
+              String(a[state.keyName as keyof TVault]),
+              String(b[state.keyName as keyof TVault]),
               state.dataType,
               state.sortType
             )
@@ -403,12 +412,12 @@ const Vaults = (): JSX.Element => {
 
   const initVaults = async () => {
     if ($vaults) {
-      //@ts-ignore
-      const mixedVaults: { [key: string]: TVault } = Object.values(
-        $vaults
-      ).reduce<{ [key: string]: TVault }>((acc, value) => {
-        return { ...acc, ...value };
-      }, {});
+      const mixedVaults: TVaults = Object.values($vaults).reduce<TVaults>(
+        (acc, value) => {
+          return { ...acc, ...(value as TVaults) };
+        },
+        {}
+      );
 
       const vaults: TVault[] = Object.values(mixedVaults).sort(
         (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
@@ -473,6 +482,7 @@ const Vaults = (): JSX.Element => {
       </div>
     );
   }
+
   return (
     <>
       <div
@@ -636,6 +646,23 @@ const Vaults = (): JSX.Element => {
                     const network = CHAINS.find(
                       (chain) => chain.id === vault.network
                     );
+
+                    const aprValue =
+                      vault?.earningData?.apr?.[aprType][$aprFilter] || "0";
+
+                    const apyValue =
+                      vault?.earningData?.apy?.[aprType][$aprFilter] || "0";
+
+                    const swapFeesAPRValue =
+                      vault.earningData.poolSwapFeesAPR[$aprFilter] || "0";
+
+                    const strategyAPRValue =
+                      vault.earningData.farmAPR[$aprFilter] || "0";
+
+                    const dailyAPRValue = (
+                      Number(vault?.earningData?.apr?.[aprType][$aprFilter]) /
+                      365
+                    ).toFixed(2);
 
                     return (
                       <tr
@@ -810,14 +837,7 @@ const Vaults = (): JSX.Element => {
                                 : "text-[#eaecef]"
                             }`}
                           >
-                            <p className="text-end">
-                              {$hideFeeAPR
-                                ? vault?.earningData?.apr.withoutFees[
-                                    $aprFilter
-                                  ]
-                                : vault?.earningData?.apr.withFees[$aprFilter]}
-                              %
-                            </p>
+                            <p className="text-end">{aprValue}%</p>
                           </div>
                           <div className="visible__tooltip">
                             <div className="flex items-start flex-col gap-4">
@@ -837,30 +857,11 @@ const Vaults = (): JSX.Element => {
                                 )}
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Total APY</p>
-
-                                  <p className="text-end">
-                                    {$hideFeeAPR
-                                      ? vault.earningData.apy.withoutFees[
-                                          $aprFilter
-                                        ]
-                                      : vault.earningData.apy.withFees[
-                                          $aprFilter
-                                        ]}
-                                    %
-                                  </p>
+                                  <p className="text-end">{apyValue}%</p>
                                 </div>
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Total APR</p>
-                                  <p className="text-end">
-                                    {$hideFeeAPR
-                                      ? vault.earningData.apr.withoutFees[
-                                          $aprFilter
-                                        ]
-                                      : vault?.earningData?.apr?.withFees[
-                                          $aprFilter
-                                        ]}
-                                    %
-                                  </p>
+                                  <p className="text-end">{aprValue}%</p>
                                 </div>
 
                                 {vault?.earningData?.poolSwapFeesAPR.daily !=
@@ -873,41 +874,19 @@ const Vaults = (): JSX.Element => {
                                           $hideFeeAPR && "line-through"
                                         } text-end`}
                                       >
-                                        {
-                                          vault.earningData.poolSwapFeesAPR[
-                                            $aprFilter
-                                          ]
-                                        }
-                                        %
+                                        {swapFeesAPRValue}%
                                       </p>
                                     </div>
                                   )}
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Strategy APR</p>
                                   <p className="text-end">
-                                    {vault.earningData.farmAPR[$aprFilter]}%
+                                    {strategyAPRValue}%
                                   </p>
                                 </div>
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Daily</p>
-                                  <p className="text-end">
-                                    {$hideFeeAPR
-                                      ? (
-                                          Number(
-                                            vault.earningData.apr.withoutFees[
-                                              $aprFilter
-                                            ]
-                                          ) / 365
-                                        ).toFixed(2)
-                                      : (
-                                          Number(
-                                            vault.earningData.apr.withFees[
-                                              $aprFilter
-                                            ]
-                                          ) / 365
-                                        ).toFixed(2)}
-                                    %
-                                  </p>
+                                  <p className="text-end">{dailyAPRValue}%</p>
                                 </div>
                               </div>
                               <div className="flex items-center justify-between w-full">

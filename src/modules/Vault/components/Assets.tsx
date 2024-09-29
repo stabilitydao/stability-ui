@@ -45,8 +45,8 @@ const ChartTooltip = ({
   active,
   payload,
 }: {
-  active: boolean;
-  payload: IPayload[];
+  active?: boolean;
+  payload?: IPayload[];
 }) => {
   if (active && payload) {
     return (

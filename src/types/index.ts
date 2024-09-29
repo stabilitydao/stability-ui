@@ -27,13 +27,18 @@ interface IStrategyInfo {
 
 // types
 type TPlatformData = {
-  platform: TAddress;
-  factory: TAddress;
-  buildingPermitToken: TAddress;
-  buildingPayPerVaultToken: TAddress;
-  zap: TAddress;
+  [key: string]: {
+    platform: TAddress;
+    factory: TAddress;
+    buildingPermitToken: TAddress;
+    buildingPayPerVaultToken: TAddress;
+    zap: TAddress;
+  };
 };
-type TPlatformsData = Record<TAddress, TPlatformData>;
+
+type TTokens = {
+  [chainId: string]: TAddress[];
+};
 
 type TPlatformGetData = [
   string[],
@@ -95,30 +100,33 @@ type TAPRData = {
   weekly: string;
 };
 
-type TEarningData =
-  | {
-      apr: {
-        withFees: TAPRData;
-        withoutFees: TAPRData;
-      };
-      apy: {
-        withFees: TAPRData;
-        withoutFees: TAPRData;
-      };
-      poolSwapFeesAPR: TAPRData;
-      farmAPR: TAPRData;
-    }
-  | {};
+type TEarningData = {
+  apr: {
+    withFees: TAPRData;
+    withoutFees: TAPRData;
+  };
+  apy: {
+    withFees: TAPRData;
+    withoutFees: TAPRData;
+  };
+  poolSwapFeesAPR: TAPRData;
+  farmAPR: TAPRData;
+};
 
 type TVaults = {
   [vaultAddress: string]: TVault;
 };
 
 type TVaultData = {
-  vaultSharePrice: bigint;
-  vaultUserBalance: bigint;
+  [address: TAddress]: {
+    vaultSharePrice: bigint;
+    vaultUserBalance: bigint;
+  };
 };
-type TVaultDataKey = Record<string, TVaultData>;
+
+type TVaultDataKey = {
+  [chainId: string]: TVaultData;
+};
 
 type TToken = {
   chainId: number;
@@ -155,15 +163,17 @@ type TAsset = {
 };
 
 type TPool = {
-  address: TAddress;
-  ammAlgoName: string;
-  ammName: string;
-  amountToken0: number;
-  amountToken1: number;
-  fee: number;
-  tick: number;
-  tvl: number;
+  address?: TAddress;
+  ammAlgoName?: string;
+  ammName?: string;
+  amountToken0?: number;
+  amountToken1?: number;
+  fee?: number;
+  tick?: number;
+  tvl?: number;
 };
+
+type TAPRPeriod = "latest" | "daily" | "weekly";
 
 type TAlmPosition = {
   amountToken0: number;
@@ -186,12 +196,10 @@ type TRisk = {
   isRektStrategy: boolean | string;
   symbol: string;
 };
-type TRebalances =
-  | {
-      daily: number;
-      weekly: number;
-    }
-  | {};
+type TRebalances = {
+  daily: number;
+  weekly: number;
+};
 
 type THoldData = {
   symbol: string;
@@ -243,6 +251,16 @@ type TVault = {
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
   network: string;
+};
+
+type TZAPData = {
+  address: string;
+  amountIn: string;
+  amountOut: string;
+  img: string;
+  router: string;
+  symbol: string;
+  txData: string;
 };
 
 type TTableColumn = {
@@ -324,6 +342,8 @@ type TVaultBalance = {
 type TVaultInput = {
   [assetAdress: string]: string;
 };
+
+type TLocalStorageToken = { amount: string; symbol?: string; logo?: string };
 
 type TVaultAllowance = {
   [asset: string]: bigint;
@@ -467,11 +487,23 @@ type TAPIData = {
   assetPrices?: TMultichainPrices;
   vaults?: TVaults;
   underlyings?: TVaults;
-  platforms?: {};
+  platforms?: {
+    [chainID: string]: {
+      buildingPermitToken: TAddress;
+      buildingPayPerVaultToken: TAddress;
+      bcAssets: TAddress[];
+      versions: {
+        platform: string;
+        strategy: {
+          [strategyId: string]: string;
+        };
+      };
+    };
+  };
 };
 
 export type {
-  TPlatformsData,
+  TPlatformData,
   TUserBalance,
   TInitParams,
   TAllowedBBTokenVaults,
@@ -512,6 +544,7 @@ export type {
   TContractInfo,
   TPieChartData,
   TRisk,
+  TZAPData,
   THoldData,
   TUpgradesTable,
   TYearnProtocol,
@@ -524,4 +557,7 @@ export type {
   TPlatformGetBalance,
   TChain,
   TUnderlyingToken,
+  TTokens,
+  TAPRPeriod,
+  TLocalStorageToken,
 };

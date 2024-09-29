@@ -1,8 +1,8 @@
-import type { TToken } from "@types";
+import type { TAsset, TToken } from "@types";
 
 interface IProps {
   proportions: number[];
-  assets: TToken[];
+  assets: TToken[] | TAsset[];
   type: string;
 }
 

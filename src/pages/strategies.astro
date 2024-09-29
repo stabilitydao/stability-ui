@@ -1,8 +1,12 @@
 ---
 import {Strategies} from '@modules';
+
 import Layout from '@layouts/Layout.astro';
+
 import {getStrategiesTotals} from "@stabilitydao/stability";
+
 const strategiesTotals = getStrategiesTotals()
+
 const totalText = [
     ['Live', strategiesTotals.LIVE,],
     ['Awaiting deployment', strategiesTotals.DEPLOYMENT,],
@@ -10,7 +14,8 @@ const totalText = [
     ['Awaiting developer', strategiesTotals.AWAITING,],
     ['Blocked', strategiesTotals.BLOCKED,],
     ['Proposal', strategiesTotals.PROPOSAL,],
-].map(t => `${t[0]}: ${t[1]}.`).join(' ')
+].map(text => `${text[0]}: ${text[1]}.`).join(' ')
+
 ---
 
 <Layout

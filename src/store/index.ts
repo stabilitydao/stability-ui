@@ -5,37 +5,39 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_TRANSACTION_SETTINGS, APRsType } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import type {
-  TPlatformsData,
+  TPlatformData,
   TUserBalance,
-  TVaults,
   TBalances,
   TAddress,
   TSettings,
   TError,
   TMultichainPrices,
+  TTokens,
+  TVaultDataKey,
+  TAPRPeriod,
 } from "@types";
 
 // atoms
-const account = atom<TAddress>("");
+const account = atom<TAddress | undefined>();
 const publicClient = atom<any>();
-const platformsData = atom<TPlatformsData>({});
+const platformsData = atom<TPlatformData>({});
 
 const platformVersions = atom<Record<string, string>>({});
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
 const assetsPrices = atom<TMultichainPrices>({});
-const assetsBalances = atom<TBalances>({});
-const vaultData = atom<TVaults>({});
+const assetsBalances = atom<{ [key: string]: TBalances }>({});
+const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
 const balances = atom<any>();
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
 
-const tokens = atom<TAddress[]>([]);
+const tokens = atom<TTokens>({});
 
 const connected = atom<boolean | undefined>();
 
@@ -53,7 +55,7 @@ const vaults = deepMap<any>(false);
 
 // portfolio
 const hideFeeApr = atom(false);
-const aprFilter = atom<string>(APRsType[1]);
+const aprFilter = atom<TAPRPeriod>("daily");
 
 //// tanstack query
 

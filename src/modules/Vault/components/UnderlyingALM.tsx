@@ -17,7 +17,7 @@ import {
   retroIchiFactory,
 } from "@web3";
 
-import type { TVault } from "@types";
+import type { TAddress, TVault } from "@types";
 
 interface IProps {
   network: string;
@@ -109,7 +109,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
             },
           ],
           functionName: "getProtocolPerformanceFeeRate",
-          args: [vault.pool.address, vault.strategyAddress],
+          args: [vault?.pool?.address as TAddress, vault.strategyAddress],
         });
         const defiedgeFees = `${formatUnits(
           managerFee + protocolPerformanceFee,

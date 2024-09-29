@@ -95,7 +95,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
             <div className="flex flex-col">
               <span className="text-[14px] text-[#8d8e96]">TVL</span>
               <span data-testid="poolTVL" className="text-[16px]">
-                {formatNumber(vault.pool.tvl, "abbreviate")}
+                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
               </span>
             </div>
             <div className="flex flex-col">

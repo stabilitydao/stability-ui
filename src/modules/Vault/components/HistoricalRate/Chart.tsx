@@ -50,19 +50,19 @@ const CustomTooltip = ({
   active,
   payload,
 }: {
-  active: boolean;
-  payload: TChartPayload[];
+  active?: boolean;
+  payload?: TChartPayload[];
 }) => {
-  const PDataKey =
-    payload[0]?.dataKey === "TVL" ? (
-      <p>{`TVL: $${payload[0].value}`}</p>
-    ) : payload[0]?.dataKey === "sharePrice" ? (
-      <p>{`Price: $${payload[0].value}`}</p>
-    ) : (
-      ""
-    );
-
   if (active && payload && payload.length) {
+    const PDataKey =
+      payload[0]?.dataKey === "TVL" ? (
+        <p>{`TVL: $${payload[0].value}`}</p>
+      ) : payload[0]?.dataKey === "sharePrice" ? (
+        <p>{`Price: $${payload[0].value}`}</p>
+      ) : (
+        ""
+      );
+
     return (
       <div className="bg-[#1c1c23] text-[#fff] rounded-md text-[14px]">
         <div className="px-5 py-3">
