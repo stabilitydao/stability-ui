@@ -1806,38 +1806,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
 
-  // useEffect(() => {
-  //   if (
-  //     shortId === "IQMF" ||
-  //     shortId === "IRMF"
-  //   ) {
-  //     let assetsData = vault.assets.map((asset: TAsset) =>
-  //       asset.address.toLowerCase()
-  //     );
-  //     switch (tab) {
-  //       case "Deposit":
-  //         assetsData = assetsData.filter(
-  //           (_, index) => vault.assetsProportions[index]
-  //         );
-  //         if (assetsData?.length) {
-  //           setAssets(assetsData);
-  //           setOption(assetsData);
-  //           defaultAssetsOption(assetsData);
-  //         }
-  //         break;
-  //       case "Withdraw":
-  //         if (assetsData?.length) {
-  //           setAssets(assetsData);
-  //           setOption(assetsData);
-  //           defaultAssetsOption(assetsData);
-  //         }
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // }, [tab]);
-
   useEffect(() => {
     checkAllowance();
     getAssetsBalances(
@@ -1881,6 +1849,32 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [inputs]);
 
   ///// interval refresh data
+  // useEffect(() => {
+  //   if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
+  //     const reload = async () => {
+  //       if (transactionInProgress) return;
+  //       if (inputs[option[0]]) {
+  //         if (tab === "Deposit") {
+  //           await getZapDepositSwapAmounts(inputs[option[0]]);
+  //         }
+  //         if (tab === "Withdraw") {
+  //           await previewWithdraw(inputs[option[0]]);
+  //         }
+  //       }
+  //     };
+
+  //     const intervalId = setInterval(reload, 10000);
+
+  //     return () => clearInterval(intervalId);
+  //   }
+  // }, [
+  //   zapTokens,
+  //   withdrawAmount,
+  //   zapPreviewWithdraw,
+  //   button,
+  //   transactionInProgress,
+  // ]);
+
   useEffect(() => {
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
@@ -1895,9 +1889,29 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         }
       };
 
-      const intervalId = setInterval(reload, 10000);
+      let intervalId: ReturnType<typeof setInterval> | undefined;
 
-      return () => clearInterval(intervalId);
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          intervalId = setInterval(reload, 10000);
+        } else {
+          clearInterval(intervalId);
+        }
+      };
+
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+      if (document.visibilityState === "visible") {
+        intervalId = setInterval(reload, 10000);
+      }
+
+      return () => {
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+        clearInterval(intervalId);
+      };
     }
   }, [
     zapTokens,
@@ -1982,18 +1996,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     {activeOptionToken?.symbol}
                   </p>
                 </div>
-                <svg
-                  width="15"
-                  height="9"
-                  viewBox="0 0 15 9"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                <img
                   className={`transition delay-[50ms] ${
                     tokenSelector ? "rotate-[180deg]" : "rotate-[0deg]"
                   }`}
-                >
-                  <path d="M1 1L7.5 7.5L14 1" stroke="white" />
-                </svg>
+                  src="/icons/arrow-down.svg"
+                  alt="arrowDown"
+                />
               </div>
 
               <div
@@ -2126,10 +2135,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className={`settingsModal cursor-pointer transition-transform transform ${
-                  settingsModal ? "rotate-180" : "rotate-0"
-                }`}
-                onClick={() => setSettingsModal((prev) => !prev)}
               >
                 <path
                   className="settingsModal"
@@ -2324,7 +2329,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           } `}
                         />
                       )}
-                      {$connected && balances[option[0]] ? (
+                      {!!$connected && !!balances[option[0]] && (
                         <button
                           onClick={() =>
                             zapInputHandler(balances[option[0]], option[0])
@@ -2334,22 +2339,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         >
                           MAX
                         </button>
-                      ) : null}
+                      )}
                     </div>
                   </div>
-                  <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                    <p>
-                      $
-                      {$assetsPrices[network] &&
-                      Number(inputs[option[0]]) > 0 &&
-                      underlyingToken?.address !== option[0]
-                        ? (
-                            Number($assetsPrices[network][option[0]].price) *
-                            Number(inputs[option[0]])
-                          ).toFixed(2)
-                        : 0}
-                    </p>
-                  </div>
+                  <p className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
+                    $
+                    {$assetsPrices[network] &&
+                    Number(inputs[option[0]]) > 0 &&
+                    underlyingToken?.address !== option[0]
+                      ? (
+                          Number($assetsPrices[network][option[0]].price) *
+                          Number(inputs[option[0]])
+                        ).toFixed(2)
+                      : 0}
+                  </p>
                   <div className="my-2 ml-2 flex flex-col gap-2">
                     {isNotUnderlying && (
                       <>
