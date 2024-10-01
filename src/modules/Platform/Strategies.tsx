@@ -4,6 +4,8 @@ import {
   type StrategyShortId,
 } from "@stabilitydao/stability";
 
+import { Breadcrumbs } from "@ui";
+
 const StrategyStatus: React.FC<{
   state: string;
 }> = ({ state }) => {
@@ -37,7 +39,6 @@ const StrategyStatus: React.FC<{
     </span>
   );
 };
-
 const Strategies = (): JSX.Element => {
   const strategiesTotals = getStrategiesTotals();
 
@@ -51,12 +52,7 @@ const Strategies = (): JSX.Element => {
   ];
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300">
-        <a href="/platform" className="mr-2 font-bold">
-          Platform
-        </a>{" "}
-        - <span className="ml-2">Strategies</span>
-      </div>
+      <Breadcrumbs links={["Platform", "Strategies"]} />
 
       <h1>Strategies</h1>
 

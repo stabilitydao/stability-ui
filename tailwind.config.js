@@ -7,6 +7,9 @@ export default {
         button: "#262830", //"#2c2f38",
         modal: "#1C1D2D",
       },
+      fontFamily: {
+        manrope: ['Manrope', 'sans-serif'],
+      },
     },
   },
   plugins: [],

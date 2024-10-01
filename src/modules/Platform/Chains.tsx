@@ -5,8 +5,11 @@ import {
   getChainBridges,
   getChainsTotals,
 } from "@stabilitydao/stability";
+
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
+
+import { Breadcrumbs } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -96,12 +99,7 @@ const Chains = (): JSX.Element => {
   ];
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300">
-        <a href="/platform" className="mr-2 font-bold">
-          Platform
-        </a>{" "}
-        - <span className="ml-2">Chains</span>
-      </div>
+      <Breadcrumbs links={["Platform", "Chains"]} />
 
       <h1 className="mb-3">Chains</h1>
 

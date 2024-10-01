@@ -1,5 +1,8 @@
 import { type ApiMainReply } from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
+
+import { Breadcrumbs } from "@ui";
+
 import { apiData } from "@store";
 import type { NodeState } from "@stabilitydao/stability/out/api.types";
 
@@ -18,16 +21,9 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
 
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300">
-        <a href="/platform" className="mr-2 font-bold">
-          Platform
-        </a>
-        -{" "}
-        <a href="/network" className="mx-2 font-bold">
-          Network
-        </a>
-        - <span className="ml-2">Node {shortMachineId(machineIdHash)}</span>
-      </div>
+      <Breadcrumbs
+        links={["Platform", "Network", `Node ${shortMachineId(machineIdHash)}`]}
+      />
 
       <h1>Node {shortMachineId(machineIdHash)}</h1>
 

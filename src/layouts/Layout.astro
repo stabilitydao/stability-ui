@@ -41,15 +41,18 @@ const {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={metaTitle} />
     <meta name="twitter:description" content={metaDescription} />
-        <meta property="og:image" content={img} />
+    <meta property="og:image" content={img} />
     <meta property="twitter:image:height" content="100" />
     <meta property="twitter:image:width" content="100" />
-      <meta property="og:image:alt" content={metaTitle} />
+    <meta property="og:image:alt" content={metaTitle} />
     <meta property="og:type" content="object" />
     <meta property="og:title" content={metaTitle} />
     <meta property="og:url" content={metaUrl} />
     <meta property="og:description" content={metaDescription} />
     <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
     <title>{title} - Stability</title>
     <!-- <ViewTransitions /> -->
@@ -165,22 +168,21 @@ const {
 	.menu > a {
 		margin: 0;
 		min-width: 90px;
-		height: 60px;
+		height: 40px;
 		color: #fcf3f6;
 		display: flex;
 		align-self: center;
 		align-items: center;
 		justify-content: center;
-		text-decoration: none;
-		font-size: 17px;
-		border-bottom: 3px solid transparent;
-		padding-top: 3px;
+		font-weight: 600;
+		padding: 10px 16px;
 	}
 	.menu > a.active {
-		border-bottom: 3px solid #9b7ff7;
+		background: #3D1E9F;
+		border-radius: 16px;
 	}
 	.menu > a:hover {
-		background-color: #3e294c;
+		background-color: #2B1570;
 	}
 
 	main {

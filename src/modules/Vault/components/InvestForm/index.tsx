@@ -1849,32 +1849,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [inputs]);
 
   ///// interval refresh data
-  // useEffect(() => {
-  //   if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
-  //     const reload = async () => {
-  //       if (transactionInProgress) return;
-  //       if (inputs[option[0]]) {
-  //         if (tab === "Deposit") {
-  //           await getZapDepositSwapAmounts(inputs[option[0]]);
-  //         }
-  //         if (tab === "Withdraw") {
-  //           await previewWithdraw(inputs[option[0]]);
-  //         }
-  //       }
-  //     };
-
-  //     const intervalId = setInterval(reload, 10000);
-
-  //     return () => clearInterval(intervalId);
-  //   }
-  // }, [
-  //   zapTokens,
-  //   withdrawAmount,
-  //   zapPreviewWithdraw,
-  //   button,
-  //   transactionInProgress,
-  // ]);
-
   useEffect(() => {
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {

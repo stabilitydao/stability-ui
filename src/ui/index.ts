@@ -14,6 +14,8 @@ import { Skeleton } from "./Skeleton";
 import { TimeDifferenceIndicator } from "./TimeDifferenceIndicator";
 import { VaultState } from "./VaultState";
 import { VaultType } from "./VaultType";
+import {Breadcrumbs} from "./Breadcrumbs";
+
 
 export {
   Toast,
@@ -31,5 +33,5 @@ export {
   Skeleton,
   TimeDifferenceIndicator,
   VaultState,
-  VaultType,
+  VaultType,Breadcrumbs
 };
