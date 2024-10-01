@@ -209,19 +209,21 @@ const Wallet = (): JSX.Element => {
   );
 
   return (
-    <div className="flex flex-nowrap justify-end whitespace-nowrap">
+    <div className="flex gap-3 min-[601px]:flex-row flex-col-reverse flex-nowrap justify-end whitespace-nowrap text-[#F9F8FA] text-[16px] font-semibold">
       {currentChain && (
         <button
-          className="bg-[#272451] sm:py-1 px-3 rounded-xl mx-2 sm:mx-4 flex items-center sm:gap-1"
+          className="bg-[#1F0F50] h-10 sm:py-1 px-3 rounded-xl sm:gap-1 min-[601px]:justify-normal flex items-center justify-center"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
           <img
-            className="w-5 h-5 rounded-full sm:mx-1"
+            className="w-5 h-5 rounded-full mx-1 min-[601px]:mx-0 sm:mx-1"
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
-          <p className="hidden sm:flex"> {currentChain?.name}</p>
+          <p className="flex min-[601px]:hidden sm:flex">
+            {currentChain?.name}
+          </p>
         </button>
       )}
       {isSwitchNetwork && (
@@ -234,7 +236,7 @@ const Wallet = (): JSX.Element => {
       )}
       <button
         data-testid="connectButton"
-        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] flex items-center justify-center gap-1"
+        className="bg-[#612FFB] h-10 py-0.5 px-4 rounded-xl min-w-[120px] flex items-center justify-center gap-1"
         onClick={() => openProfile()}
       >
         {$account && providerImage && (
