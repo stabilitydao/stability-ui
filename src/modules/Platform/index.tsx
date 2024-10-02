@@ -2,8 +2,8 @@ import { useStore } from "@nanostores/react";
 
 import {
   type ApiMainReply,
-  assets, chains, getChainsTotals, getStrategiesTotals,
-  integrations,
+  assets, ChainStatus, chainStatusInfo, getChainsTotals, getStrategiesTotals,
+  integrations, seeds,
   strategies,
   StrategyShortId,
   StrategyState,
@@ -13,6 +13,11 @@ import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { apiData, currentChainID, platformVersions } from "@store";
 
 import packageJson from "../../../package.json";
+import {CountersBlock} from "../../ui/CountersBlock.tsx";
+
+function numberWithSpaces(x: number|string) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
 
 const Platform = (): JSX.Element => {
   const $currentChainID = useStore(currentChainID);
@@ -57,159 +62,125 @@ const Platform = (): JSX.Element => {
 
   return (
     <>
-      <h1 className="mb-5">Platform</h1>
+      <h1 className="mb-5 text-[36px]">Platform</h1>
 
-      <div className="flex flex-wrap mb-4">
-        <div
-          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
-          <div className="text-4xl">${$apiData?.total.tvl}</div>
-          <div className="flex self-center justify-center text-[16px]">AUM</div>
-        </div>
-        <div
-          className="flex w-[160px] h-[120px] mx-[20px] rounded-full text-gray-200 items-center justify-center flex-col">
-          <div className="text-4xl">{$apiData?.total.activeVaults}</div>
-          <div className="flex self-center justify-center text-[16px]">
-            Vaults
+      <div className="flex flex-wrap mb-4 p-[36px] ">
+        {[
+          ['AUM', `\$${numberWithSpaces($apiData?.total.tvl || 0)}`,],
+          ['Users earned', `\$${numberWithSpaces($apiData?.total.usersEarned.toFixed(0) || 0)}`,],
+          ['Vaults', $apiData?.total.activeVaults,],
+        ].map(t => (
+          <div
+            key={t[0]}
+            className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col">
+            <div className="text-[36px]">{t[1]}</div>
+            <div className="flex self-center justify-center text-[16px]">{t[0]}</div>
           </div>
-        </div>
+        ))}
       </div>
 
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/strategies"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Strategies</h2>
-        <div className="flex flex-wrap relative mb-5">
-          {[
-            ['Live', strategiesTotals.LIVE, 'text-green-400',],
-            ['Awaiting deployment', strategiesTotals.DEPLOYMENT, 'text-violet-400',],
-            ['Development', strategiesTotals.DEVELOPMENT, 'text-blue-400',],
-            ['Awaiting developer', strategiesTotals.AWAITING, 'text-yellow-200',],
-            ['Blocked', strategiesTotals.BLOCKED, 'text-red-200',],
-            ['Proposal', strategiesTotals.PROPOSAL, 'text-orange-300',],
-          ].map(t => (
-            <div
-              key={t[0]}
-              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
-            >
-              <div className="text-4xl">{t[1]}</div>
-              <div className="flex self-center justify-center text-[14px]">
-                {t[0]}
-              </div>
-            </div>
-          ))}
-        </div>
-      </a>
+      <CountersBlock
+        title="Strategies"
+        link="/strategies"
+        linkTitle="Go to strategies"
+        counters={[
+          ['Live', strategiesTotals.LIVE, '#4FAE2D',],
+          ['Awaiting deployment', strategiesTotals.DEPLOYMENT, '#612FFB',],
+          ['Development', strategiesTotals.DEVELOPMENT, '#2D67FB',],
+          ['Awaiting developer', strategiesTotals.AWAITING, '#E1E114',],
+          ['Blocked', strategiesTotals.BLOCKED, '#E01A1A',],
+          ['Proposal', strategiesTotals.PROPOSAL, '#FB8B13',],
+        ].map(t => {
+          return {
+            color: t[2].toString(),
+            name: t[0].toString(),
+            value: t[1].toString(),
+          }
+        })}
+      />
 
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/chains"
-        title="View all blockchains"
-      >
-        <h3 className="text-3xl text-center mb-3">Chains</h3>
-        <div className="flex flex-wrap relative mb-5">
-          {[
-            ['Total', Object.keys(chains).length, 'text-gray-400',],
-            ['Supported', chainsTotals.SUPPORTED, 'text-green-400',],
-            ['Awaiting deployment', chainsTotals.AWAITING_DEPLOYMENT, 'text-violet-400',],
-            ['Development', chainsTotals.CHAINLIB_DEVELOPMENT, 'text-blue-400',],
-            ['Awaiting developer', chainsTotals.AWAITING_DEVELOPER, 'text-yellow-200',],
-            ['Awaiting issue', chainsTotals.AWAITING_ISSUE_CREATION, 'text-orange-300',],
-          ].map(t => (
-            <div
-              key={t[0]}
-              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
-            >
-              <div className="text-4xl">{t[1]}</div>
-              <div className="flex self-center justify-center text-[14px]">
-                {t[0]}
-              </div>
-            </div>
-          ))}
-        </div>
-      </a>
+      <CountersBlock
+        title="Chains"
+        link="/chains"
+        linkTitle="View all blockchains"
+        counters={Object.keys(chainStatusInfo).map(status => {
+          return {
+            color: chainStatusInfo[status as ChainStatus].color,
+            name: chainStatusInfo[status as ChainStatus].title,
+            value: chainsTotals[status as ChainStatus].toString(),
+          }
+        })}
+      />
 
+      <CountersBlock
+        title="Integrations"
+        link="/integrations"
+        linkTitle="View all organizations and protocols"
+        counters={[
+          ['Organizations', Object.keys(integrations).length, '#612FFB',],
+          ['Protocols', protocolsTotal, '#05B5E1',],
+        ].map(t => {
+          return {
+            color: t[2].toString(),
+            name: t[0].toString(),
+            value: t[1].toString(),
+          }
+        })}
+      />
 
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/integrations"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Integrations</h2>
-        <div className="flex flex-wrap relative mb-5">
-          {[
-            ['Organizations', Object.keys(integrations).length, 'text-amber-200',],
-            ['Protocols', protocolsTotal, 'text-blue-500',],
-          ].map(t => (
-            <div
-              key={t[0]}
-              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
-            >
-              <div className="text-4xl">{t[1]}</div>
-              <div className="flex self-center justify-center text-[14px]">
-                {t[0]}
-              </div>
-            </div>
-          ))}
-        </div>
-      </a>
+      <CountersBlock
+        title="Assets"
+        link="/assets"
+        linkTitle="View all assets"
+        counters={[
+          ['Assets', assets.length, '#E1E114',],
+          ['Tokenlist items', tokenlist.tokens.length, '#2D67FB',],
+        ].map(t => {
+          return {
+            color: t[2].toString(),
+            name: t[0].toString(),
+            value: t[1].toString(),
+          }
+        })}
+      />
 
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/assets"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl text-center mb-3">Assets</h2>
-        <div className="flex flex-wrap relative mb-5">
-          {[
-            ['Assets', assets.length, 'text-amber-200',],
-            ['Tokenlist items', tokenlist.tokens.length, 'text-blue-500',],
-          ].map(t => (
-            <div
-              key={t[0]}
-              className={`flex w-[140px] h-[120px] mx-[20px] rounded-full ${t[2]} items-center justify-center flex-col`}
-            >
-              <div className="text-4xl">{t[1]}</div>
-              <div className="flex self-center justify-center text-[14px]">
-                {t[0]}
-              </div>
-            </div>
-          ))}
-        </div>
-      </a>
+      <CountersBlock
+        title="Network"
+        link="/network"
+        linkTitle="View Stability Network"
+        counters={[
+          ['Nodes', Object.keys($apiData?.network.nodes || []).length, '#2D67FB',],
+          ['Seed nodes', seeds.length, '#4FAE2D',],
+        ].map(t => {
+          return {
+            color: t[2].toString(),
+            name: t[0].toString(),
+            value: t[1].toString(),
+          }
+        })}
+      />
 
-      <a
-        className="hover:bg-gray-900 px-3 py-5 rounded-xl mb-6 flex flex-col"
-        href="/network"
-        title="View all strategies"
-      >
-        <h2 className="text-3xl mb-3">Network</h2>
-        <div className="flex mb-10 flex-col">
-          <div>Status: {$apiData?.network.status}</div>
-          <div>Nodes: {Object.keys($apiData?.network.nodes || []).length}</div>
-        </div>
-      </a>
-
-      <a
-        href="/create-vault"
-        className="hover:bg-amber-950 flex flex-col px-3 py-2 rounded-2xl mb-12"
-      >
-        <h2 className="mb-3 text-3xl flex items-center justify-center">
-        Factory
-        </h2>
-
-        <div className="flex relative flex-col">
-          <div>Farms: {$apiData?.total.farms}</div>
-          <div>Available for building: {$apiData?.total.vaultForBuilding}</div>
-        </div>
-      </a>
+      <CountersBlock
+        title="Factory"
+        link="/create-vault"
+        linkTitle="Gp to Factory"
+        counters={[
+          ['Available for building', $apiData?.total.vaultForBuilding || '-', '#2D67FB',],
+          ['Farms', $apiData?.total.farms || '-', '#4FAE2D',],
+        ].map(t => {
+          return {
+            color: t[2].toString(),
+            name: t[0].toString(),
+            value: t[1].toString(),
+          }
+        })}
+      />
 
       <h2 className="text-3xl text-center mb-3">Software</h2>
       <div className="mb-10 flex items-center gap-2">
         <div className="flex flex-col w-full">
           <a
-            className="hover:bg-cyan-950 px-3 py-3 rounded-xl flex items-center"
+            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
             href="https://github.com/stabilitydao/stability-contracts"
             target="_blank"
             title="Go to smart contracts source code on Github"
@@ -221,7 +192,7 @@ const Platform = (): JSX.Element => {
           </a>
 
           <a
-            className="hover:bg-cyan-950 px-3 py-3 rounded-xl flex items-center"
+            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
             href="https://github.com/stabilitydao/stability"
             target="_blank"
             title="Go to library source code on Github"
@@ -237,7 +208,7 @@ const Platform = (): JSX.Element => {
           </a>
 
           <a
-            className="hover:bg-cyan-950 px-3 py-3 rounded-xl mb-6 flex items-center w-full"
+            className="hover:bg-[#141033] px-3 py-3 rounded-xl mb-6 flex items-center w-full"
             href="https://github.com/stabilitydao/stability-ui"
             target="_blank"
             title="Go to UI source code on Github"

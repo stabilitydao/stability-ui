@@ -1,4 +1,8 @@
-# Stability User Interface
+# 👩‍🚀 Stability User Interface
+
+## Design System
+
+[Stability Design System - Figma](https://www.figma.com/design/jstG6d7opvG4MCahqhlgiR/Stability-Design-System)
 
 ## Pages
 
