@@ -61,10 +61,14 @@ const Platform = (): JSX.Element => {
   }
 
   return (
-    <>
-      <h1 className="mb-5 text-[36px]">Platform</h1>
+    <div className="flex flex-col min-[1440px]:min-w-[1338px] gap-[36px]">
+      <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
-      <div className="flex flex-wrap mb-4 p-[36px] ">
+      <div className="p-[36px] hidden">
+        Beta coming 2025. Enjoy this MVP (alpha Version) now.
+      </div>
+
+      <div className="flex flex-wrap p-[36px] ">
         {[
           ['AUM', `\$${numberWithSpaces($apiData?.total.tvl || 0)}`,],
           ['Users earned', `\$${numberWithSpaces($apiData?.total.usersEarned.toFixed(0) || 0)}`,],
@@ -72,7 +76,7 @@ const Platform = (): JSX.Element => {
         ].map(t => (
           <div
             key={t[0]}
-            className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col">
+              className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col">
             <div className="text-[36px]">{t[1]}</div>
             <div className="flex self-center justify-center text-[16px]">{t[0]}</div>
           </div>
@@ -176,7 +180,7 @@ const Platform = (): JSX.Element => {
         })}
       />
 
-      <h2 className="text-3xl text-center mb-3">Software</h2>
+      <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>
       <div className="mb-10 flex items-center gap-2">
         <div className="flex flex-col w-full">
           <a
@@ -220,7 +224,7 @@ const Platform = (): JSX.Element => {
           </a>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
