@@ -64,8 +64,19 @@ const Platform = (): JSX.Element => {
     <div className="flex flex-col min-[1440px]:min-w-[1338px] gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
-      <div className="p-[36px] hidden">
-        Beta coming 2025. Enjoy this MVP (alpha Version) now.
+      <div className="flex p-[16px] gap-[8px] bg-[#441B06] rounded-[24px]">
+        <svg className="mt-[2px]" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 9V13M12 17H12.01M21.7299 18L13.7299 3.99998C13.5555 3.69218 13.3025 3.43617 12.9969 3.25805C12.6912 3.07993 12.3437 2.98608 11.9899 2.98608C11.6361 2.98608 11.2887 3.07993 10.983 3.25805C10.6773 3.43617 10.4244 3.69218 10.2499 3.99998L2.24993 18C2.07361 18.3053 1.98116 18.6519 1.98194 19.0045C1.98272 19.3571 2.07671 19.7032 2.25438 20.0078C2.43204 20.3124 2.68708 20.5646 2.99362 20.7388C3.30017 20.9131 3.64734 21.0032 3.99993 21H19.9999C20.3508 20.9996 20.6955 20.9069 20.9992 20.7313C21.303 20.5556 21.5551 20.3031 21.7304 19.9991C21.9057 19.6951 21.998 19.3504 21.9979 18.9995C21.9978 18.6486 21.9054 18.3039 21.7299 18Z"
+            stroke="#FB8B13" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <div className="flex text-[18px] font-semibold" style={{lineHeight: '24px'}}>
+          This is an early Alpha version of the Stability platform, a minimum viable product.
+          <br/>
+          Only the critical scope of vault contracts has been audited.
+          <br/>
+          Beta version coming in 2025.
+        </div>
       </div>
 
       <div className="flex flex-wrap p-[36px] ">
@@ -76,7 +87,7 @@ const Platform = (): JSX.Element => {
         ].map(t => (
           <div
             key={t[0]}
-              className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col">
+            className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col">
             <div className="text-[36px]">{t[1]}</div>
             <div className="flex self-center justify-center text-[16px]">{t[0]}</div>
           </div>

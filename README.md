@@ -6,27 +6,29 @@
 
 ## Pages
 
-| Name                                                                                                                | Status            | Description                                   |
-|---------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------------|
-| **Landing**                                                                                                         | Development Figma | Index page                                    |
-| **AI**                                                                                                              |                   | Chatbot. AI Router.                           |
-| [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                    |
-| --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                    |
-| **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts |
-| **Contest**                                                                                                         |                   | Yield contests                                |
-| **DAO**                                                                                                             |                   | Self-developing DAO portal                    |
-| [**Platform**](https://stability.farm/platform)                                                                     | Development       | Platform portal                               |
-| --- [**Factory**](https://stability.farm/create-vault)                                                              | Development       | Factory of vaults, farms.                     |
-| --- [**Network**](https://stability.farm/network)                                                                   | Development       | Stability p2p network nodes                   |
-| --- --- [**Node**](https://stability.farm/network/6e9a70eb6628e1295772218defdf254ce3200890cb16cc588c4dab5000972edd) | Development       | Node page                                     |
-| --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                            |
-| --- --- **Strategy**                                                                                                |                   | Strategy page                                 |
-| --- [**Integrations**](https://stability.farm/protocols)                                                            | Development       | List of DeFi protocols and organizations      |
-| --- --- **Organization**                                                                                            |                   | Organization page                             |
-| --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform   |
-| --- --- **Chain**                                                                                                   |                   | Chain page                                    |
-| --- [**Assets**](https://stability.farm/assets)                                                                     | Development       | List of supported assets                      |
-| --- --- **Asset**                                                                                                   |                   | Asset page                                    |
+| Name                                                                                                                | Status            | Description                                     |
+|---------------------------------------------------------------------------------------------------------------------|-------------------|-------------------------------------------------|
+| **Landing**                                                                                                         | Development Figma | Index page                                      |
+| **AI**                                                                                                              |                   | Chatbot. AI Router.                             |
+| [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                      |
+| **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts   |
+| --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                      |
+| [**Users**](https://stability.farm/users)                                                                           | Development       | Users portal: active contests, leaderboard, etc |
+| --- **Contests**                                                                                                    |                   | All yield contests                              |
+| --- --- **Contest**                                                                                                 |                   | Contest page                                    |
+| **DAO**                                                                                                             |                   | Self-developing DAO portal                      |
+| [**Platform**](https://stability.farm/platform)                                                                     | Development       | Platform portal                                 |
+| --- [**Factory**](https://stability.farm/create-vault)                                                              | Development       | Factory of vaults, farms.                       |
+| --- [**Network**](https://stability.farm/network)                                                                   | Development       | Stability p2p network nodes                     |
+| --- --- [**Node**](https://stability.farm/network/6e9a70eb6628e1295772218defdf254ce3200890cb16cc588c4dab5000972edd) | Development       | Node page                                       |
+| --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                              |
+| --- --- **Strategy**                                                                                                |                   | Strategy page                                   |
+| --- [**Integrations**](https://stability.farm/integrations)                                                         | Development       | List of DeFi protocols and organizations        |
+| --- --- **Organization**                                                                                            |                   | Organization page                               |
+| --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform     |
+| --- --- **Chain**                                                                                                   |                   | Chain page                                      |
+| --- [**Assets**](https://stability.farm/assets)                                                                     | Development       | List of supported assets                        |
+| --- --- **Asset**                                                                                                   |                   | Asset page                                      |
 
 ## Coverage
 

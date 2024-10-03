@@ -1,0 +1,17 @@
+---
+import {Users} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Users">
+    <div class="platform">
+        <Users client:only="react" />
+    </div>
+</Layout>
+
+<style is:global>
+    .what-to-build table td {
+        padding: 0 20px;
+    }
+    
+</style>
