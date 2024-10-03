@@ -672,8 +672,8 @@ const Vaults = (): JSX.Element => {
                         onClick={() => toVault(vault.network, vault.address)}
                         data-testid="vault"
                       >
-                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#181A20] min-[1020px]:bg-transparent z-10">
-                          <div className="flex items-center">
+                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#130932] min-[1020px]:bg-transparent z-10">
+                          <div className="flex items-center min-[1020px]:ml-0 ml-[18px]">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
                                   className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
