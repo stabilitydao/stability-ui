@@ -70,7 +70,7 @@ const Header = (): JSX.Element => {
             Platform
           </a>
         </div>
-        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[10px] gap-3">
+        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[15px] gap-3">
           <Wallet />
           <div className="burger-menu" onClick={toggleMenu}>
             {menu ? (

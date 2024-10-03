@@ -70,24 +70,24 @@ const Strategies = (): JSX.Element => {
         ))}
       </div>
 
-      <table className="w-full">
-        <thead>
-          <tr>
-            <td className="text-center px-3">ID</td>
-            <td className=" px-3">Name</td>
-            <td className="text-center px-3">State</td>
-            <td className="text-center px-3">Issue</td>
+      <table className="w-full font-manrope">
+        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+          <tr className="text-[12px] uppercase">
+            <td className="text-center px-4 py-2">ID</td>
+            <td className="text-left px-4 py-2">Name</td>
+            <td className="text-center px-4 py-2">State</td>
+            <td className="text-center px-4 py-2">Issue</td>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-[14px]">
           {Object.keys(strategies).map((shortId: string) => {
             const strategy = strategies[shortId as StrategyShortId];
             return (
-              <tr key={shortId}>
-                <td className="px-3 py-1">
+              <tr className="h-[48px] hover:bg-[#130932]" key={shortId}>
+                <td className="px-4 py-3">
                   <div className="flex justify-center">
                     <span
-                      className="flex px-3 rounded-xl w-[86px]"
+                      className="flex justify-center px-3 rounded-xl w-[86px]"
                       style={{
                         backgroundColor: strategy.bgColor,
                         color: strategy.color,
@@ -97,13 +97,13 @@ const Strategies = (): JSX.Element => {
                     </span>
                   </div>
                 </td>
-                <td className="px-3">{strategy.id}</td>
-                <td className="px-3">
+                <td className="px-4 py-3">{strategy.id}</td>
+                <td className="px-4 py-3">
                   <div className="flex justify-center">
                     <StrategyStatus state={strategy.state} />
                   </div>
                 </td>
-                <td className="px-3 text-center">
+                <td className="px-4 py-3 text-center">
                   <div className="flex items-center justify-center">
                     <a
                       className="inline-flex"

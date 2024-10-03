@@ -28,19 +28,19 @@ const Integrations = (): JSX.Element => {
 
       <h1>Integrations</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <td className="px-4 text-center text-sm font-bold">Organization</td>
-            <td className="px-4 text-center text-sm font-bold">Links</td>
-            <td className=" text-sm font-bold">Protocols</td>
-            <td className=" text-sm font-bold">Usage</td>
+      <table className="w-full font-manrope">
+        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+          <tr className="text-[12px] font-bold uppercase">
+            <td className="px-4 py-2 text-center">Organization</td>
+            <td className="px-4 py-2 text-center">Links</td>
+            <td className="px-4 py-2">Protocols</td>
+            <td className="px-4 py-2">Usage</td>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-[14px]">
           {Object.entries(integrations).map(([, organization]) => (
-            <tr key={organization.name}>
-              <td className="px-4">
+            <tr className="h-[48px] hover:bg-[#130932]" key={organization.name}>
+              <td className="px-4 py-3">
                 <div className="flex items-center py-2">
                   <img
                     className="w-[32px]"
@@ -50,7 +50,7 @@ const Integrations = (): JSX.Element => {
                   <span className="ml-2">{organization.name}</span>
                 </div>
               </td>
-              <td className="px-4">
+              <td className="px-4 py-3">
                 <div className="flex items-center">
                   <a
                     href={organization.website}
@@ -98,7 +98,7 @@ const Integrations = (): JSX.Element => {
                   )}
                 </div>
               </td>
-              <td>
+              <td className="px-4 py-3">
                 <div className="flex flex-col">
                   {Object.keys(organization.protocols).map((propocolId) => (
                     <ProtocolBadge

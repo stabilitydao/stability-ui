@@ -15,7 +15,7 @@ const Users = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
 
   return (
-    <div className="flex flex-col min-[1440px]:min-w-[1000px] gap-[36px]">
+    <div className="flex flex-col xl:min-w-[1000px] gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Users</h1>
 
       {$apiData ? (
