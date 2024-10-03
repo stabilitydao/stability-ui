@@ -13,8 +13,8 @@ import { Breadcrumbs } from "@ui";
 
 import { formatNumber } from "@utils";
 
-const shortAddress = (address: string): string => {
-  return `${address.slice(0, 4)}...${address.slice(-2)}`;
+const shortAddress = (address: string, firstChars: number = 4, lastChars: number = 2): string => {
+  return `${address.slice(0, firstChars)}..${address.slice(-lastChars)}`;
 };
 
 const BridgesList: React.FC<{
@@ -198,4 +198,4 @@ const Chains = (): JSX.Element => {
   );
 };
 
-export { Chains };
+export { Chains, shortAddress };
