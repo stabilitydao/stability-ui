@@ -9,6 +9,7 @@ import { Integrations } from "./Platform/Integrations";
 import { Network } from "./Platform/Network";
 import { Node } from "./Platform/Node";
 import { Strategies } from "./Platform/Strategies";
+import { Users } from "./Users";
 
 export {
   CreateVault,
@@ -22,4 +23,5 @@ export {
   Network,
   Strategies,
   Node,
+  Users,
 };
