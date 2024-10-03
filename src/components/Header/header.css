@@ -30,8 +30,8 @@ body.no-scroll {
     top: 60px;
     left: 0;
     width: 100%;
-    height: 100%;
     z-index: 100;
+    border-radius: 0 0 24px 24px;
   }
   .menu-nav.active {
     display: flex;

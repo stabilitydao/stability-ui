@@ -128,8 +128,9 @@ const Wallet = (): JSX.Element => {
     }
   };
   const initProfile = async () => {
-    if (!$assetsBalances) return; // dublicated for TS
+    if (!$assetsBalances[$currentChainID]) return; // dublicated for TS
     let profileBalance = 0;
+
     const assets = Object.entries($assetsBalances[$currentChainID])
       .filter((token) => token[1] && getTokenData(token[0]))
       .map(([address, data]) => {
@@ -147,6 +148,7 @@ const Wallet = (): JSX.Element => {
           symbol: getTokenData(address)?.symbol,
         };
       });
+
     if (currentChain?.name === "Polygon") {
       const profitMaker = await checkPM();
       if (profitMaker) assets.push(profitMaker);

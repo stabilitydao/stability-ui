@@ -26,11 +26,10 @@ const Header = (): JSX.Element => {
     const body = document.querySelector("body");
     if (body) body.classList.toggle("no-scroll", !menu);
   };
-  console.log(currentPath);
 
   return (
     <WagmiLayout>
-      <header className="font-manrope bg-[#130932] rounded-b-[16px]">
+      <header className="font-manrope bg-[#130932] md:bg-transparent rounded-b-[16px]">
         <span className="title sm:w-4/12 md:w-5/12">
           <a data-testid="stability-logo" href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
