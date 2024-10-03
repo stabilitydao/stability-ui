@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/react";
 
-import { CountersBlock, Breadcrumbs } from "@ui";
+import { CountersBlock } from "@ui";
 
 import {
   type ApiMainReply,
@@ -66,9 +66,9 @@ const Platform = (): JSX.Element => {
   for (const defiOrgCode of Object.keys(integrations)) {
     protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length;
   }
+
   return (
     <div className="flex flex-col min-[1440px]:min-w-[1338px] gap-[36px]">
-      <Breadcrumbs links={["Vaults", "Platform"]} />
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
       <div className="flex p-[16px] gap-[8px] bg-[#441B06] rounded-[24px]">

@@ -5,7 +5,7 @@ import { formatUnits } from "viem";
 
 import { PlatformModal } from "./modals/PlatformModal";
 
-import { HideFeesHandler, Skeleton, APRtimeSwitcher, FeeAPRModal } from "@ui";
+import { Skeleton, APRtimeSwitcher, FeeAPRModal } from "@ui";
 
 import { connected, visible, hideFeeApr, isWeb3Load, aprFilter } from "@store";
 
@@ -167,7 +167,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
           <div className="hidden items-center justify-center gap-2 md:flex">
-            <HideFeesHandler setModalState={setFeeAPRModal} />
+            {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
             <APRtimeSwitcher />
           </div>
         </div>
@@ -345,7 +345,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           </div>
 
           <div className="flex items-center justify-between gap-2 md:hidden">
-            <HideFeesHandler setModalState={setFeeAPRModal} />
+            {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
             <APRtimeSwitcher />
           </div>
         </div>

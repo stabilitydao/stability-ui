@@ -10,6 +10,15 @@ const Header = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1); // remove the first "/"
 
+  const platformPaths = [
+    "platform",
+    "strategies",
+    "chains",
+    "integrations",
+    "assets",
+    "create-vault",
+  ];
+
   const [menu, setMenu] = useState(false);
 
   const toggleMenu = () => {
@@ -17,6 +26,8 @@ const Header = (): JSX.Element => {
     const body = document.querySelector("body");
     if (body) body.classList.toggle("no-scroll", !menu);
   };
+  console.log(currentPath);
+
   return (
     <WagmiLayout>
       <header className="font-manrope bg-[#130932] rounded-b-[16px]">
@@ -31,7 +42,11 @@ const Header = (): JSX.Element => {
         <div className="menu w-2/12 text-[16px]">
           <a
             data-testid="vaults-link"
-            className={currentPath === "" ? "active" : ""}
+            className={
+              currentPath === "" || currentPath.includes("vault/")
+                ? "active"
+                : ""
+            }
             href="/"
           >
             Vaults
@@ -45,7 +60,12 @@ const Header = (): JSX.Element => {
           </a>
           <a
             data-testid="vaults-link"
-            className={currentPath === "platform" ? "active" : ""}
+            className={
+              platformPaths.some((path) => path === currentPath) ||
+              currentPath.includes("network")
+                ? "active"
+                : ""
+            }
             href="/platform"
           >
             Platform
@@ -53,7 +73,6 @@ const Header = (): JSX.Element => {
         </div>
         <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[10px] gap-3">
           <Wallet />
-
           <div className="burger-menu" onClick={toggleMenu}>
             {menu ? (
               <img src="/close.svg" alt="close" />
@@ -64,7 +83,7 @@ const Header = (): JSX.Element => {
         </div>
         <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
           <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "" ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${currentPath === "" || currentPath.includes("vault/") ? "bg-[#2B1570] rounded-[16px]" : ""}`}
             href="/"
           >
             Vaults
@@ -78,7 +97,7 @@ const Header = (): JSX.Element => {
           </a>
           <a
             data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${currentPath === "platform" ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${platformPaths.some((path) => path === currentPath) || currentPath.includes("network") ? "bg-[#2B1570] rounded-[16px]" : ""}`}
             href="/platform"
           >
             Platform

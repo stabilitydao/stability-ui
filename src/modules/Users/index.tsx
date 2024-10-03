@@ -2,7 +2,7 @@ import type { ApiMainReply } from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 import { shortAddress } from "../Platform/Chains";
-import { Breadcrumbs } from "@ui";
+
 import type { TAddress } from "@types";
 
 interface APILeaderboard {
@@ -16,7 +16,6 @@ const Users = (): JSX.Element => {
 
   return (
     <div className="flex flex-col min-[1440px]:min-w-[1000px] gap-[36px]">
-      <Breadcrumbs links={["Vaults", "Users"]} />
       <h1 className="mb-0 text-[40px] font-bold">Users</h1>
 
       {$apiData ? (

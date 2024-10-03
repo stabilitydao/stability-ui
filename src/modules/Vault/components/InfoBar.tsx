@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { formatUnits } from "viem";
 
-import { APRtimeSwitcher, HideFeesHandler, FeeAPRModal } from "@ui";
+import { APRtimeSwitcher, FeeAPRModal } from "@ui";
 
 import { hideFeeApr, aprFilter } from "@store";
 
@@ -127,7 +127,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <HideFeesHandler setModalState={setFeeAPRModal} />
+          {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
           <APRtimeSwitcher />
         </div>
       </div>
