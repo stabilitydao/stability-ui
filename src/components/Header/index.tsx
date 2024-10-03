@@ -17,7 +17,6 @@ const Header = (): JSX.Element => {
     const body = document.querySelector("body");
     if (body) body.classList.toggle("no-scroll", !menu);
   };
-
   return (
     <WagmiLayout>
       <header className="font-manrope bg-[#130932] rounded-b-[16px]">
@@ -37,11 +36,23 @@ const Header = (): JSX.Element => {
           >
             Vaults
           </a>
+          <a
+            data-testid="vaults-link"
+            className={currentPath === "users" ? "active" : ""}
+            href="/users"
+          >
+            Users
+          </a>
+          <a
+            data-testid="vaults-link"
+            className={currentPath === "platform" ? "active" : ""}
+            href="/platform"
+          >
+            Platform
+          </a>
         </div>
-        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[10px]">
-          <div className="min-[601px]:block hidden">
-            <Wallet />
-          </div>
+        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[10px] gap-3">
+          <Wallet />
 
           <div className="burger-menu" onClick={toggleMenu}>
             {menu ? (
@@ -58,9 +69,20 @@ const Header = (): JSX.Element => {
           >
             Vaults
           </a>
-          <div className="w-full">
-            <Wallet />
-          </div>
+          <a
+            data-testid="vaults-link"
+            className={`px-4 py-[10px] font-semibold ${currentPath === "users" ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            href="/users"
+          >
+            Users
+          </a>
+          <a
+            data-testid="vaults-link"
+            className={`px-4 py-[10px] font-semibold ${currentPath === "platform" ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            href="/platform"
+          >
+            Platform
+          </a>
         </nav>
       </header>
     </WagmiLayout>

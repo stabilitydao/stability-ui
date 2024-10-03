@@ -209,8 +209,8 @@ const Wallet = (): JSX.Element => {
   );
 
   return (
-    <div className="flex gap-3 min-[601px]:flex-row flex-col-reverse flex-nowrap justify-end whitespace-nowrap text-[#F9F8FA] text-[16px] font-semibold">
-      {currentChain && (
+    <div className="flex gap-3 flex-nowrap justify-end whitespace-nowrap text-[#F9F8FA] text-[16px] font-semibold">
+      {currentChain && $account && (
         <button
           className="bg-[#1F0F50] h-10 sm:py-1 px-3 rounded-xl sm:gap-1 min-[601px]:justify-normal flex items-center justify-center"
           id="network"
@@ -221,9 +221,7 @@ const Wallet = (): JSX.Element => {
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
-          <p className="flex min-[601px]:hidden sm:flex">
-            {currentChain?.name}
-          </p>
+          <p className="lg:flex hidden">{currentChain?.name}</p>
         </button>
       )}
       {isSwitchNetwork && (
@@ -236,19 +234,27 @@ const Wallet = (): JSX.Element => {
       )}
       <button
         data-testid="connectButton"
-        className="bg-[#612FFB] h-10 py-0.5 px-4 rounded-xl min-w-[120px] flex items-center justify-center gap-1"
+        className="bg-[#612FFB] h-10 py-1 px-3 rounded-xl flex items-center justify-center gap-1 min-w-[52px]"
         onClick={() => openProfile()}
       >
-        {$account && providerImage && (
+        {$account && providerImage ? (
           <img className="w-5" src={providerImage} alt="providerImage" />
+        ) : (
+          <img
+            className="w-5 md:hidden block"
+            src="/public/wallet.svg"
+            alt="walletImage"
+          />
         )}
-        {$account
-          ? `${
-              $visible
-                ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
-                : "*************"
-            }`
-          : "Connect Wallet"}
+        <span className="md:block hidden">
+          {$account
+            ? `${
+                $visible
+                  ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
+                  : "*************"
+              }`
+            : "Connect Wallet"}
+        </span>
       </button>
     </div>
   );

@@ -15,7 +15,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     "Income APR": "min-w-[130px]",
     "VS HODL APR": "min-w-[130px]",
     // Status: "table-cell",
-    RISK: "text-start pl-2 min-w-[95px]",
+    RISK: "text-center pl-2",
     Price: "min-w-[80px]",
     TVL: "min-w-[95px]",
     Balance: "min-w-[100px]",
@@ -51,11 +51,11 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <th
       onClick={tabController}
-      className={`${
+      className={`text-[12px] font-manrope font-semibold ${
         index < 5
           ? `px-2 min-[1130px]:px-4 ${
               value === "Symbol" &&
-              "sticky left-0 md:relative z-10 bg-[#0b0e11] min-w-[150px] w-[200px]"
+              "sticky left-0 md:relative z-10 min-w-[150px] w-[200px]"
             }`
           : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
       } py-2 text-center cursor-pointer whitespace-nowrap ${
@@ -64,26 +64,33 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
       data-testid="sort"
     >
       {value !== "APR / APY" ? (
-        <p className="inline-block">{value}</p>
+        <p
+          className={`inline-block ${table[index].sortType !== "none" ? "text-[#F9F8FA]" : "text-[#958CA1]"}`}
+        >
+          {value}
+        </p>
       ) : (
-        <p className="inline-block">
+        <p
+          className={`inline-block ${table[index].sortType !== "none" ? "text-[#F9F8FA]" : "text-[#958CA1]"}`}
+        >
           {window.innerWidth > 915 || window.innerWidth < 767 ? value : "APR"}
         </p>
       )}
       <svg
+        width="15"
+        height="14"
+        viewBox="0 0 15 14"
         xmlns="http://www.w3.org/2000/svg"
-        width="12"
-        height="7"
-        viewBox="0 0 12 7"
-        fill="none"
-        className={`inline-block ml-[3px] md:ml-[6px]  min-[1130px]:ml-[10px] transition duration-300 ease-in-out ${
+        className={`inline-block ml-1 transition duration-300 ease-in-out ${
           table[index].sortType === "ascendentic" && "rotate-[180deg]"
         }`}
       >
         <path
-          d="M6 7L11.1962 0.25H0.803848L6 7Z"
-          fill={table[index].sortType !== "none" ? "#8076ff" : "white"}
-          fillOpacity="0.6"
+          d="M7.50008 2.91669V11.0834M7.50008 11.0834L11.5834 7.00002M7.50008 11.0834L3.41675 7.00002"
+          stroke={table[index].sortType !== "none" ? "#F9F8FA" : "#958CA1"}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     </th>

@@ -15,7 +15,7 @@ const Breadcrumbs: React.FC<IProps> = ({ links }) => {
               <>
                 <a
                   href={link != "Vaults" ? `/${link.toLowerCase()}` : "/"}
-                  className="text-[#7F768B] mr-1"
+                  className="text-[#7F768B] hover:text-[#A6A0B2] mr-1"
                 >
                   {link}
                 </a>
