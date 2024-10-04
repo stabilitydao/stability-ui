@@ -162,7 +162,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
               <div
                 onClick={() => activeFiltersHandler(filter)}
                 className={`w-[160px] flex items-center justify-center rounded-2xl h-10 hover:bg-[#2B1570] transition duration-100 delay-100 ${
-                  filter.state && "bg-[#612FFB]"
+                  filter.state && "bg-[#612FFB] hover:bg-[#612FFB]"
                 } bg-[#1F0F50] cursor-pointer`}
               >
                 <p
@@ -209,7 +209,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     className={`transition delay-[50ms] ${
                       dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
                     }`}
-                    src="/public/arrow-down.svg"
+                    src="/arrow-down.svg"
                     alt="arrowDown"
                   />
                 </div>
@@ -252,7 +252,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                       onClick={() => activeFiltersHandler(filter, "All")}
                       className={`py-1 px-4 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl transition duration-100 delay-100 ${
                         !filter.state
-                          ? "bg-[#612FFB] text-[#F9F8FA] h-8"
+                          ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
                           : "text-[#8F7AFC] h-full"
                       } rounded-md`}
                     >
@@ -262,7 +262,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                       onClick={() => activeFiltersHandler(filter)}
                       className={`px-2 py-1 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl transition duration-100 delay-100 ${
                         filter.state
-                          ? "bg-[#612FFB] text-[#F9F8FA] h-8"
+                          ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
                           : "text-[#8F7AFC] h-full"
                       } rounded-md`}
                     >

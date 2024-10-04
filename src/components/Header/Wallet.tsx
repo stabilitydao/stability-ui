@@ -244,7 +244,7 @@ const Wallet = (): JSX.Element => {
         ) : (
           <img
             className="w-5 md:hidden block"
-            src="/public/wallet.svg"
+            src="/wallet.svg"
             alt="walletImage"
           />
         )}

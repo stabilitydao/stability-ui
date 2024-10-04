@@ -125,7 +125,7 @@ const APRtimeSwitcher = (): JSX.Element => {
           className={`transition delay-[50ms] ${
             dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
           }`}
-          src="/public/arrow-down.svg"
+          src="/arrow-down.svg"
           alt="arrowDown"
         />
       </div>
