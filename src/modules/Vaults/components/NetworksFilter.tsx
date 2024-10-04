@@ -10,11 +10,11 @@ interface IProps {
 const NetworkFilters: React.FC<IProps> = memo(
   ({ activeNetworks, activeNetworksHandler }) => {
     return (
-      <div className="flex items-center gap-4 mb-4 min-[1020px]:mb-0">
+      <div className="flex items-center gap-2 mb-4 min-[1020px]:mb-0">
         {activeNetworks.map((chain) => (
           <div
-            className={`h-[48px] w-[44px] flex items-center justify-center border-[#3d404b] bg-button cursor-pointer rounded-md ${
-              !chain.active && "opacity-20"
+            className={`h-[48px] w-[44px] flex items-center justify-center  cursor-pointer rounded-2xl ${
+              chain.active ? "bg-[#612FFB]" : "bg-[#2B1570]"
             }`}
             key={chain.name + chain.id}
             title={chain.name}

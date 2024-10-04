@@ -496,14 +496,23 @@ const Vaults = (): JSX.Element => {
           activeNetworks={activeNetworks}
           activeNetworksHandler={activeNetworksHandler}
         />
-        <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
-          <input
-            type="text"
-            className="mt-1 lg:mt-0 w-full bg-button outline-none pl-3 py-[3px] rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#6376AF] transition-all duration-300 h-[30px]"
-            placeholder="Search"
-            ref={search}
-            onChange={() => tableHandler()}
-          />
+        <div className="flex items-center gap-2 flex-col lg:flex-row font-semibold text-[14px]">
+          <label className="relative block w-full">
+            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <img
+                src="/search.svg"
+                alt="Search"
+                className="w-4 h-4 text-[#A6A0B2]"
+              />
+            </span>
+            <input
+              type="text"
+              className="mt-1 lg:mt-0 w-full bg-[#1F0F50] hover:border-[#612FFB] hover:bg-[#2B1570] outline-none py-[3px] rounded-2xl border-[2px] border-[#2B1570] focus:border-[#612FFB] focus:text-[#F9F8FA] text-[#A6A0B2] transition-all duration-300 h-10 pl-10"
+              placeholder="Search"
+              ref={search}
+              onChange={() => tableHandler()}
+            />
+          </label>
           <Filters filters={tableFilters} setFilters={setTableFilters} />
         </div>
       </div>

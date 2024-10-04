@@ -278,7 +278,7 @@ type TTAbleFiltersVariant = {
 type TTableFilters = {
   name: string;
   type: string;
-  variants?: TTAbleFiltersVariant[];
+  variants: TTAbleFiltersVariant[];
   state: boolean;
 };
 
