@@ -21,6 +21,7 @@ import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { apiData, currentChainID, platformVersions } from "@store";
 
 import packageJson from "../../../package.json";
+import {CountersBlockCompact} from "../../ui/CountersBlockCompact.tsx";
 
 function numberWithSpaces(x: number | string) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
@@ -68,7 +69,7 @@ const Platform = (): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-col min-[1440px]:min-w-[1338px] gap-[36px]">
+    <div className="flex flex-col min-[1440px]:w-[1338px] gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
       <div className="flex p-[16px] gap-[8px] bg-[#441B06] rounded-[24px]">
@@ -122,110 +123,112 @@ const Platform = (): JSX.Element => {
         ))}
       </div>
 
-      <CountersBlock
-        title="Strategies"
-        link="/strategies"
-        linkTitle="Go to strategies"
-        counters={[
-          ["Live", strategiesTotals.LIVE, "#4FAE2D"],
-          ["Awaiting deployment", strategiesTotals.DEPLOYMENT, "#612FFB"],
-          ["Development", strategiesTotals.DEVELOPMENT, "#2D67FB"],
-          ["Awaiting developer", strategiesTotals.AWAITING, "#E1E114"],
-          ["Blocked", strategiesTotals.BLOCKED, "#E01A1A"],
-          ["Proposal", strategiesTotals.PROPOSAL, "#FB8B13"],
-        ].map((t) => {
-          return {
-            color: t[2].toString(),
-            name: t[0].toString(),
-            value: t[1].toString(),
-          };
-        })}
-      />
+      <div className="flex flex-wrap">
+        <CountersBlockCompact
+          title="Strategies"
+          link="/strategies"
+          linkTitle="Go to strategies"
+          counters={[
+            ["Live", strategiesTotals.LIVE, "#4FAE2D"],
+            ["Awaiting deployment", strategiesTotals.DEPLOYMENT, "#612FFB"],
+            ["Development", strategiesTotals.DEVELOPMENT, "#2D67FB"],
+            ["Awaiting developer", strategiesTotals.AWAITING, "#E1E114"],
+            ["Blocked", strategiesTotals.BLOCKED, "#E01A1A"],
+            ["Proposal", strategiesTotals.PROPOSAL, "#FB8B13"],
+          ].map((t) => {
+            return {
+              color: t[2].toString(),
+              name: t[0].toString(),
+              value: t[1].toString(),
+            };
+          })}
+        />
 
-      <CountersBlock
-        title="Chains"
-        link="/chains"
-        linkTitle="View all blockchains"
-        counters={Object.keys(chainStatusInfo).map((status) => {
-          return {
-            color: chainStatusInfo[status as ChainStatus].color,
-            name: chainStatusInfo[status as ChainStatus].title,
-            value: chainsTotals[status as ChainStatus].toString(),
-          };
-        })}
-      />
+        <CountersBlockCompact
+          title="Chains"
+          link="/chains"
+          linkTitle="View all blockchains"
+          counters={Object.keys(chainStatusInfo).map((status) => {
+            return {
+              color: chainStatusInfo[status as ChainStatus].color,
+              name: chainStatusInfo[status as ChainStatus].title,
+              value: chainsTotals[status as ChainStatus].toString(),
+            };
+          })}
+        />
 
-      <CountersBlock
-        title="Integrations"
-        link="/integrations"
-        linkTitle="View all organizations and protocols"
-        counters={[
-          ["Organizations", Object.keys(integrations).length, "#612FFB"],
-          ["Protocols", protocolsTotal, "#05B5E1"],
-        ].map((t) => {
-          return {
-            color: t[2].toString(),
-            name: t[0].toString(),
-            value: t[1].toString(),
-          };
-        })}
-      />
+        <CountersBlockCompact
+          title="Integrations"
+          link="/integrations"
+          linkTitle="View all organizations and protocols"
+          counters={[
+            ["Organizations", Object.keys(integrations).length, "#612FFB"],
+            ["Protocols", protocolsTotal, "#05B5E1"],
+          ].map((t) => {
+            return {
+              color: t[2].toString(),
+              name: t[0].toString(),
+              value: t[1].toString(),
+            };
+          })}
+        />
 
-      <CountersBlock
-        title="Assets"
-        link="/assets"
-        linkTitle="View all assets"
-        counters={[
-          ["Assets", assets.length, "#E1E114"],
-          ["Tokenlist items", tokenlist.tokens.length, "#2D67FB"],
-        ].map((t) => {
-          return {
-            color: t[2].toString(),
-            name: t[0].toString(),
-            value: t[1].toString(),
-          };
-        })}
-      />
+        <CountersBlockCompact
+          title="Assets"
+          link="/assets"
+          linkTitle="View all assets"
+          counters={[
+            ["Assets", assets.length, "#E1E114"],
+            ["Tokenlist items", tokenlist.tokens.length, "#2D67FB"],
+          ].map((t) => {
+            return {
+              color: t[2].toString(),
+              name: t[0].toString(),
+              value: t[1].toString(),
+            };
+          })}
+        />
 
-      <CountersBlock
-        title="Network"
-        link="/network"
-        linkTitle="View Stability Network"
-        counters={[
-          [
-            "Nodes",
-            Object.keys($apiData?.network.nodes || []).length,
-            "#2D67FB",
-          ],
-          ["Seed nodes", seeds.length, "#4FAE2D"],
-        ].map((t) => {
-          return {
-            color: t[2].toString(),
-            name: t[0].toString(),
-            value: t[1].toString(),
-          };
-        })}
-      />
+        <CountersBlockCompact
+          title="Network"
+          link="/network"
+          linkTitle="View Stability Network"
+          counters={[
+            [
+              "Nodes",
+              Object.keys($apiData?.network.nodes || []).length,
+              "#2D67FB",
+            ],
+            ["Seed nodes", seeds.length, "#4FAE2D"],
+          ].map((t) => {
+            return {
+              color: t[2].toString(),
+              name: t[0].toString(),
+              value: t[1].toString(),
+            };
+          })}
+        />
 
-      <CountersBlock
-        title="Factory"
-        link="/create-vault"
-        linkTitle="Gp to Factory"
-        counters={[
-          [
-            "Available for building",
-            $apiData?.total.vaultForBuilding || "-",
-            "#2D67FB",
-          ],
-          ["Farms", $apiData?.total.farms || "-", "#4FAE2D"],
-        ].map((t) => {
-          return {
-            color: t[2].toString(),
-            name: t[0].toString(),
-            value: t[1].toString(),
-          };
-        })}
-      />
+        <CountersBlockCompact
+          title="Factory"
+          link="/create-vault"
+          linkTitle="Gp to Factory"
+          counters={[
+            [
+              "Available for building",
+              $apiData?.total.vaultForBuilding || "-",
+              "#2D67FB",
+            ],
+            ["Farms", $apiData?.total.farms || "-", "#4FAE2D"],
+          ].map((t) => {
+            return {
+              color: t[2].toString(),
+              name: t[0].toString(),
+              value: t[1].toString(),
+            };
+          })}
+        />
+      </div>
 
       <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>
       <div className="mb-10 flex items-center gap-2">
