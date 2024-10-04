@@ -1,7 +1,5 @@
 import { useStore } from "@nanostores/react";
 
-import { CountersBlock } from "@ui";
-
 import {
   type ApiMainReply,
   assets,
