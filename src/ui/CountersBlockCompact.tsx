@@ -1,4 +1,4 @@
-import {Counter, type ICounterProps} from "./Counter.tsx";
+import {type ICounterProps} from "./Counter.tsx";
 import {CounterListItem} from "./CounterListItem.tsx";
 
 interface IProps {
