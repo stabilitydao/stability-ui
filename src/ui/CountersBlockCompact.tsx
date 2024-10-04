@@ -25,7 +25,7 @@ const CountersBlockCompact: React.FC<IProps> = ({ title, link, linkTitle, counte
                   strokeLinejoin="round"/>
           </svg>
         </h3>
-        <div className="flex flex-col relative justify-center gap-[12px]">
+        <div className="flex flex-col relative justify-center ">
           {counters.map(t => (
             <CounterListItem key={t.name} color={t.color.toString()} value={t.value.toString()}
                              name={t.name.toString()}/>
