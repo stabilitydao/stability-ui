@@ -13,8 +13,8 @@ const NetworkFilters: React.FC<IProps> = memo(
       <div className="flex items-center gap-2 mb-4 min-[1020px]:mb-0">
         {activeNetworks.map((chain) => (
           <div
-            className={`h-[48px] w-[44px] flex items-center justify-center  cursor-pointer rounded-2xl ${
-              chain.active ? "bg-[#612FFB]" : "bg-[#2B1570]"
+            className={`h-[40px] w-[40px]  flex items-center justify-center cursor-pointer rounded-[16px] hover:bg-[#2B1570] ${
+              chain.active ? "bg-[#1F0F50] border-[#3D1E9F] border-[2px]" : "bg-[#1F0F50]"
             }`}
             key={chain.name + chain.id}
             title={chain.name}
@@ -22,7 +22,7 @@ const NetworkFilters: React.FC<IProps> = memo(
             data-testid="network"
           >
             <img
-              className="h-6 w-6 rounded-full"
+              className="h-[16px] w-[16px] rounded-full"
               src={chain.logoURI}
               alt={chain.name}
             />
