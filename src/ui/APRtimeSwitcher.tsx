@@ -55,17 +55,65 @@ const APRtimeSwitcher = (): JSX.Element => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropDownRef]);
+  //   <div className="relative select-none w-[176px]">
+  //   <div
+  //     onClick={(e) => {
+  //       e.stopPropagation();
+  //       setDropDownSelector((prevState) => !prevState);
+  //     }}
+  //     data-testid="strategyFilterDropdown"
+  //     className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-[#1F0F50] text-[#F9F8FA] rounded-2xl cursor-pointer"
+  //   >
+  //     <p>
+  //       {filter.name}: {activeStrategy}
+  //     </p>
+  //     <img
+  //       className={`transition delay-[50ms] ${
+  //         dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
+  //       }`}
+  //       src="/public/arrow-down.svg"
+  //       alt="arrowDown"
+  //     />
+  //   </div>
+  //   <div
+  //     ref={dropDownRef}
+  //     className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-20 ${
+  //       dropDownSelector
+  //         ? "absolute transition delay-[50ms]"
+  //         : "hidden"
+  //     } `}
+  //   >
+  //     <div className="flex flex-col items-start">
+  //       {filter.variants?.map(
+  //         (variant: TTAbleFiltersVariant, index: number) => (
+  //           <p
+  //             key={variant.name}
+  //             onClick={() =>
+  //               activeFiltersHandler(filter, variant.name)
+  //             }
+  //             className={`${!index && "rounded-t-2xl"} ${index === filter.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
+  //               variant.state ? "bg-[#2B1570]" : ""
+  //             }`}
+  //             data-testid="strategy"
+  //           >
+  //             {variant.name}
+  //           </p>
+  //         )
+  //       )}
+  //     </div>
+  //   </div>
+  // </div>
   return (
-    <div className="relative select-none w-[140px] switcher">
+    <div className="relative select-none w-[160px] switcher font-manrope text-[14px] font-semibold">
       <div
         onClick={(e) => {
           e.stopPropagation();
           setDropDownSelector((prevState) => !prevState);
         }}
         data-testid="APRTimeSwitcher"
-        className="flex items-center justify-between gap-3 rounded-md px-3 h-[30px] bg-button cursor-pointer"
+        className="flex items-center justify-between gap-3 px-3 py-1 bg-[#1F0F50] text-[#F9F8FA] rounded-2xl h-10 cursor-pointer"
       >
-        <p className="text-[16px]">
+        <p>
           APRs:{" "}
           {activeAPRType === "weekly"
             ? "week"
@@ -73,40 +121,39 @@ const APRtimeSwitcher = (): JSX.Element => {
               ? "24h"
               : activeAPRType}
         </p>
-        <svg
-          width="15"
-          height="9"
-          viewBox="0 0 15 9"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <img
           className={`transition delay-[50ms] ${
             dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
           }`}
-        >
-          <path d="M1 1L7.5 7.5L14 1" stroke="white" />
-        </svg>
+          src="/public/arrow-down.svg"
+          alt="arrowDown"
+        />
       </div>
       <div
         ref={dropDownRef}
-        className={`bg-button mt-1 rounded-md w-full z-50 ${
+        className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-20 ${
           dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
         } `}
       >
         <div className="flex flex-col items-start">
-          {APRsType.map((APRType) => (
-            <p
-              key={APRType}
-              onClick={() => APRsHandler(APRType)}
-              className={`py-2 px-3 cursor-pointer text-[16px] w-full ${
-                APRType === activeAPRType
-                  ? "opacity-100"
-                  : "opacity-70 hover:opacity-80"
-              }`}
-              data-testid="APRType"
-            >
-              {APRType}
-            </p>
-          ))}
+          {APRsType.map((APRType, index: number) => {
+            const isActive =
+              activeAPRType.includes(APRType) ||
+              (activeAPRType === "daily" && APRType === "24h");
+
+            return (
+              <p
+                key={APRType}
+                onClick={() => APRsHandler(APRType)}
+                className={`${!index && "rounded-t-2xl"} ${index === APRsType.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
+                  isActive ? "bg-[#2B1570]" : ""
+                }`}
+                data-testid="APRType"
+              >
+                {APRType}
+              </p>
+            );
+          })}
         </div>
       </div>
     </div>

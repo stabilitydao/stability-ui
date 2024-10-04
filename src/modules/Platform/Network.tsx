@@ -2,7 +2,10 @@ import { useStore } from "@nanostores/react";
 
 import { type ApiMainReply } from "@stabilitydao/stability";
 
+import { Breadcrumbs } from "@ui";
+
 import { apiData } from "@store";
+
 import { shortMachineId } from "./Node.tsx";
 
 const shortServiceName = (service: string): string => {
@@ -14,12 +17,7 @@ const Network = (): JSX.Element => {
 
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300">
-        <a href="/platform" className="mr-2 font-bold">
-          Platform
-        </a>{" "}
-        - <span className="ml-2">Network</span>
-      </div>
+      <Breadcrumbs links={["Platform", "Network"]} />
 
       <h1>Network</h1>
 

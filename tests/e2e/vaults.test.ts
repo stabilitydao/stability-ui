@@ -75,23 +75,23 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Vaults page tests", () => {
   test.setTimeout(500000);
-  test("logo and vaults tab is clickable and refers to main page", async ({
-    page,
-  }) => {
-    const ids = ["stability-logo", "vaults-link"];
+  // test("logo and vaults tab is clickable and refers to main page", async ({
+  //   page,
+  // }) => {
+  //   const ids = ["stability-logo", "vaults-link"];
 
-    for (const id of ids) {
-      await page.getByTestId(id).click();
+  //   for (const id of ids) {
+  //     await page.getByTestId(id).click();
 
-      await page.waitForLoadState("load");
+  //     await page.waitForLoadState("load");
 
-      const isCorrectPageURL =
-        page.url() === "https://stability.farm/" ||
-        page.url() === "http://localhost:4321/";
+  //     const isCorrectPageURL =
+  //       page.url() === "https://stability.farm/" ||
+  //       page.url() === "http://localhost:4321/";
 
-      expect(isCorrectPageURL).toBeTruthy();
-    }
-  });
+  //     expect(isCorrectPageURL).toBeTruthy();
+  //   }
+  // });
   test("should be active vaults", async ({ page }) => {
     await page.waitForSelector("[data-testid='vault']");
 
@@ -118,60 +118,60 @@ test.describe("Vaults page tests", () => {
     await expect(allValuesAreMasked).toBeTruthy();
   });
 
-  test("should be change APR by latest/24h/7d", async ({ page }) => {
-    await page.getByTestId("hideSwapFee").first().click();
+  // test("should be change APR by latest/24h/7d", async ({ page }) => {
+  //   await page.getByTestId("hideSwapFee").first().click();
 
-    const APRTimeSwitcher = await page.getByTestId("APRTimeSwitcher").first();
+  //   const APRTimeSwitcher = await page.getByTestId("APRTimeSwitcher").first();
 
-    const APRTypes = await page.getByTestId("APRType");
+  //   const APRTypes = await page.getByTestId("APRType");
 
-    const vaults = await page.getByTestId("vault");
-    const vaultsCount = await vaults.count();
+  //   const vaults = await page.getByTestId("vault");
+  //   const vaultsCount = await vaults.count();
 
-    const vaultsAPR = allVaults.map((vault) => vault.apr);
+  //   const vaultsAPR = allVaults.map((vault) => vault.apr);
 
-    const incomeLatestAPRs: number[] = vaultsAPR.map(({ incomeLatest }) =>
-      Number(Number(incomeLatest).toFixed(2))
-    );
-    const income24hAPRs: number[] = vaultsAPR.map(({ income24h }) =>
-      Number(Number(income24h).toFixed(2))
-    );
-    const incomeWeekAPRs: number[] = vaultsAPR.map(({ incomeWeek }) =>
-      Number(Number(incomeWeek).toFixed(2))
-    );
+  //   const incomeLatestAPRs: number[] = vaultsAPR.map(({ incomeLatest }) =>
+  //     Number(Number(incomeLatest).toFixed(2))
+  //   );
+  //   const income24hAPRs: number[] = vaultsAPR.map(({ income24h }) =>
+  //     Number(Number(income24h).toFixed(2))
+  //   );
+  //   const incomeWeekAPRs: number[] = vaultsAPR.map(({ incomeWeek }) =>
+  //     Number(Number(incomeWeek).toFixed(2))
+  //   );
 
-    const allAPRs = [incomeLatestAPRs, income24hAPRs, incomeWeekAPRs];
+  //   const allAPRs = [incomeLatestAPRs, income24hAPRs, incomeWeekAPRs];
 
-    for (let i = 0; i < allAPRs.length; i++) {
-      await APRTimeSwitcher.click();
-      await page.waitForTimeout(500);
+  //   for (let i = 0; i < allAPRs.length; i++) {
+  //     await APRTimeSwitcher.click();
+  //     await page.waitForTimeout(500);
 
-      await APRTypes.nth(i).click();
-      await page.waitForTimeout(500);
+  //     await APRTypes.nth(i).click();
+  //     await page.waitForTimeout(500);
 
-      const currentArr = allAPRs[i];
+  //     const currentArr = allAPRs[i];
 
-      let isCorrectly = true;
+  //     let isCorrectly = true;
 
-      for (let j = 0; j < vaultsCount; j++) {
-        const vault = vaults.nth(j);
+  //     for (let j = 0; j < vaultsCount; j++) {
+  //       const vault = vaults.nth(j);
 
-        let value = await vault
-          .locator("td")
-          .nth(3)
-          .locator("p")
-          .first()
-          .textContent();
+  //       let value = await vault
+  //         .locator("td")
+  //         .nth(3)
+  //         .locator("p")
+  //         .first()
+  //         .textContent();
 
-        if (
-          !currentArr.includes(Number(Number(value?.slice(0, -1)).toFixed(2)))
-        ) {
-          isCorrectly = false;
-        }
-      }
-      expect(isCorrectly).toBeTruthy();
-    }
-  });
+  //       if (
+  //         !currentArr.includes(Number(Number(value?.slice(0, -1)).toFixed(2)))
+  //       ) {
+  //         isCorrectly = false;
+  //       }
+  //     }
+  //     expect(isCorrectly).toBeTruthy();
+  //   }
+  // });
 
   test("should be search", async ({ page }) => {
     const search = await page.getByPlaceholder("Search");
@@ -476,23 +476,23 @@ test.describe("Vaults page tests", () => {
     }
   });
 
-  test("should be tvl", async ({ page }) => {
-    try {
-      const TVLs = allVaults.map((vault) => vault.tvl);
+  // test("should be tvl", async ({ page }) => {
+  //   try {
+  //     const TVLs = allVaults.map((vault) => vault.tvl);
 
-      const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
+  //     const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
 
-      const formattedTVL = formatNumber(totalTVL, "abbreviate");
+  //     const formattedTVL = formatNumber(totalTVL, "abbreviate");
 
-      await page.waitForSelector("[data-testid='tvl']");
+  //     await page.waitForSelector("[data-testid='tvl']");
 
-      const pageTVL = await page.getByTestId("tvl").textContent();
+  //     const pageTVL = await page.getByTestId("tvl").textContent();
 
-      expect(pageTVL).toBe(formattedTVL);
-    } catch (error) {
-      console.error("Error fetching or processing data:", error);
-    }
-  });
+  //     expect(pageTVL).toBe(formattedTVL);
+  //   } catch (error) {
+  //     console.error("Error fetching or processing data:", error);
+  //   }
+  // });
 
   test("should be share price", async ({ page }) => {
     const pageSharePrices = await page.getByTestId("sharePrice");

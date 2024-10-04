@@ -608,8 +608,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               );
 
               for (let i = 0; i < contractBalance[1].length; i++) {
-                erc20Balance[String(contractBalance[1][i])] = BigInt(
-                  contractBalance[3][i]
+                erc20Balance[String(contractBalance[0][i])] = BigInt(
+                  contractBalance[2][i]
                 );
               }
 

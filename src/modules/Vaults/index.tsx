@@ -22,6 +22,7 @@ import {
   TimeDifferenceIndicator,
   Loader,
   ErrorMessage,
+  RiskIndicator,
   // ShortAddress,
 } from "@ui";
 
@@ -495,14 +496,23 @@ const Vaults = (): JSX.Element => {
           activeNetworks={activeNetworks}
           activeNetworksHandler={activeNetworksHandler}
         />
-        <div className="flex items-center gap-2 flex-col lg:flex-row text-[14px]">
-          <input
-            type="text"
-            className="mt-1 lg:mt-0 w-full bg-button outline-none pl-3 py-[3px] rounded-[4px] border-[2px] border-[#3d404b] focus:border-[#6376AF] transition-all duration-300 h-[30px]"
-            placeholder="Search"
-            ref={search}
-            onChange={() => tableHandler()}
-          />
+        <div className="flex items-center gap-2 flex-col lg:flex-row font-semibold text-[14px]">
+          <label className="relative block w-full">
+            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <img
+                src="/search.svg"
+                alt="Search"
+                className="w-4 h-4 text-[#A6A0B2]"
+              />
+            </span>
+            <input
+              type="text"
+              className="mt-1 lg:mt-0 w-full bg-[#1F0F50] hover:border-[#612FFB] hover:bg-[#2B1570] outline-none py-[3px] rounded-2xl border-[2px] border-[#2B1570] focus:border-[#612FFB] focus:text-[#F9F8FA] text-[#A6A0B2] transition-all duration-300 h-10 pl-10"
+              placeholder="Search"
+              ref={search}
+              onChange={() => tableHandler()}
+            />
+          </label>
           <Filters filters={tableFilters} setFilters={setTableFilters} />
         </div>
       </div>
@@ -618,10 +628,10 @@ const Vaults = (): JSX.Element => {
       </div> */}
 
       <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full rounded-lg select-none mb-9 min-w-[730px] md:min-w-full">
-          <thead className="bg-[#0b0e11]">
-            <tr className="text-[12px] text-[#8f8f8f] uppercase">
-              {tableStates.map((value: any, index: number) => (
+        <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
+          <thead className="bg-[#130932]">
+            <tr className="text-[12px] uppercase">
+              {tableStates.map((value: TTableColumn, index: number) => (
                 <ColumnSort
                   key={value.name + index}
                   index={index}
@@ -632,7 +642,7 @@ const Vaults = (): JSX.Element => {
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="font-manrope font-semibold text-[14px]">
             {isLoading ? (
               <tr className="relative h-[80px]">
                 <td className="absolute left-[50%] transform translate-x-[-50%] mt-5">
@@ -667,12 +677,12 @@ const Vaults = (): JSX.Element => {
                     return (
                       <tr
                         key={vault.name + index}
-                        className="text-center text-[15px] min-[1020px]:hover:bg-[#2B3139] cursor-pointer h-[60px] font-medium relative"
+                        className="text-center min-[1020px]:hover:bg-[#130932] cursor-pointer h-[48px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
                         data-testid="vault"
                       >
-                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#181A20] min-[1020px]:bg-transparent z-10">
-                          <div className="flex items-center">
+                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#130932] min-[1020px]:bg-transparent z-10">
+                          <div className="flex items-center min-[1020px]:ml-0 ml-[18px]">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div
                                   className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
@@ -697,7 +707,7 @@ const Vaults = (): JSX.Element => {
                             <div className="max-w-[150px] min-[1020px]:max-w-[250px] flex items-start flex-col text-[#eaecef]">
                               <p
                                 title={vault.name}
-                                className={`whitespace-nowrap text-[12px] md:text-[15px] ${
+                                className={`whitespace-nowrap text-[12px] md:text-[14px] ${
                                   vault?.risk?.isRektStrategy
                                     ? "text-[#818181]"
                                     : "text-[#fff]"
@@ -831,7 +841,7 @@ const Vaults = (): JSX.Element => {
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <div
-                            className={`text-[15px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault?.risk?.isRektStrategy
                                 ? "text-[#818181]"
                                 : "text-[#eaecef]"
@@ -841,7 +851,7 @@ const Vaults = (): JSX.Element => {
                           </div>
                           <div className="visible__tooltip">
                             <div className="flex items-start flex-col gap-4">
-                              <div className="text-[15px] flex flex-col gap-1 w-full">
+                              <div className="flex flex-col gap-1 w-full">
                                 {!!vault?.risk?.isRektStrategy && (
                                   <div className="flex flex-col items-center gap-2 mb-[10px]">
                                     <h3 className="text-[#f52a11] font-bold">
@@ -890,7 +900,7 @@ const Vaults = (): JSX.Element => {
                                 </div>
                               </div>
                               <div className="flex items-center justify-between w-full">
-                                <p className="text-[14x]">Last Hard Work</p>
+                                <p>Last Hard Work</p>
                                 <TimeDifferenceIndicator
                                   unix={vault.lastHardWork}
                                 />
@@ -917,7 +927,7 @@ const Vaults = (): JSX.Element => {
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
                         >
                           <p
-                            className={`text-[15px] whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault.lifetimeVsHoldAPR < 0 &&
                               getTimeDifference(vault.created).days >= 3 &&
                               "text-[#eb7979]"
@@ -938,10 +948,7 @@ const Vaults = (): JSX.Element => {
                                   <th className="text-right">est Annual</th>
                                 </tr>
                               </thead>
-                              <tbody
-                                data-testid="vsHoldAPRTable"
-                                className="text-[15px]"
-                              >
+                              <tbody data-testid="vsHoldAPRTable">
                                 <tr className="hover:bg-[#2B3139]">
                                   <td className="text-left">VAULT VS HODL</td>
 
@@ -1014,19 +1021,18 @@ const Vaults = (): JSX.Element => {
                             <i></i>
                           </div>
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-start whitespace-nowrap">
-                          {vault?.risk?.isRektStrategy ? (
-                            <span className="uppercase text-[#F52A11]">
-                              {vault?.risk?.symbol}
-                            </span>
-                          ) : (
-                            <span
-                              className="uppercase"
-                              style={{ color: vault.strategyInfo.il?.color }}
-                            >
-                              {vault.strategyInfo.il?.title}
-                            </span>
-                          )}
+                        <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            {vault?.risk?.isRektStrategy ? (
+                              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
+                            ) : (
+                              <RiskIndicator
+                                riskSymbol={
+                                  vault.strategyInfo.il?.title as string
+                                }
+                              />
+                            )}
+                          </div>
                         </td>
                         <td
                           data-testid="sharePrice"
@@ -1034,10 +1040,10 @@ const Vaults = (): JSX.Element => {
                         >
                           ${Number(vault.shareprice).toFixed(3)}
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-right text-[15px]">
+                        <td className="px-2 min-[1130px]:px-4 py-2 text-right">
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
-                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right text-[15px]">
+                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right">
                           {formatNumber(
                             formatFromBigInt(vault.balance, 18),
                             "format"
@@ -1047,7 +1053,7 @@ const Vaults = (): JSX.Element => {
                     );
                   })
                 ) : (
-                  <tr className="text-start text-[15px] h-[60px] font-medium">
+                  <tr className="text-start h-[60px] font-medium">
                     {userVaultsCondition ? (
                       <td>
                         <p className="text-[18px]">
@@ -1074,7 +1080,7 @@ const Vaults = (): JSX.Element => {
                 )}
               </>
             ) : (
-              <tr className="text-start text-[15px] h-[60px] font-medium">
+              <tr className="text-start h-[60px] font-medium">
                 <td>No vaults</td>
               </tr>
             )}

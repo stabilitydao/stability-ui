@@ -286,30 +286,31 @@ const CreateVault = (): JSX.Element => {
   return (
     <WagmiLayout>
       {isCorrectNetwork ? (
-        <div>
+        <div className="flex flex-col items-center">
           <h2 className="text-[22px] mb-3">Compounding vault</h2>
           {compoundingVaultsForBuilding ? (
-            <table className="bg-[#2c2f38] rounded-lg mx-auto">
-              <thead className="h-[50px]">
-                <tr className="text-[18px]">
-                  <td>Strategy logic</td>
-                  <td>Strategy description</td>
-                  <td></td>
+            <table className="font-manrope">
+              <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+                <tr className="text-[12px] uppercase">
+                  <td className="px-4 py-2">Strategy logic</td>
+                  <td className="px-4 py-2">Strategy description</td>
+                  <td className="px-4 py-2"></td>
                 </tr>
               </thead>
-              <tbody className="text-[16px]">
+              <tbody className="text-[14px]">
                 {buildVariants.map((variant, i) => {
                   if (variant.vaultType !== "Compounding") {
                     return;
                   }
+
                   return (
                     <tr
-                      className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                      className="h-[48px] hover:bg-[#130932]"
                       key={variant.strategyDesc + i}
                     >
-                      <td>{variant.strategyId}</td>
-                      <td>{variant.strategyDesc}</td>
-                      <td>
+                      <td className="px-4 py-3">{variant.strategyId}</td>
+                      <td className="px-4 py-3">{variant.strategyDesc}</td>
+                      <td className="px-4 py-3">
                         {variant.canBuild && (
                           <button
                             className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
@@ -396,17 +397,17 @@ const CreateVault = (): JSX.Element => {
             </div>
           </div>
 
-          <table className="hidden md:table bg-[#2c2f38] rounded-lg mx-auto">
-            <thead className="h-[70px]">
-              <tr className="text-[18px] whitespace-nowrap">
-                <td>Vault type</td>
-                <td>Buy-back token</td>
-                <td>Strategy logic</td>
-                <td>Strategy description</td>
-                <td></td>
+          <table className="hidden md:table font-manrope">
+            <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+              <tr className="text-[12px] uppercase">
+                <td className="px-4 py-2">Vault type</td>
+                <td className="px-4 py-2 whitespace-nowrap">Buy-back token</td>
+                <td className="px-4 py-2">Strategy logic</td>
+                <td className="px-4 py-2">Strategy description</td>
+                <td className="px-4 py-2"></td>
               </tr>
             </thead>
-            <tbody className="text-[16px]">
+            <tbody className="text-[14px]">
               {buildVariants.map((variant, i) => {
                 if (variant.vaultType !== "Rewarding") {
                   return;
@@ -418,19 +419,19 @@ const CreateVault = (): JSX.Element => {
                       variant.vaultType +
                       variant.strategyId
                     }
-                    className="border-t border-[#4f5158] py-[10px] transition delay-[10ms] hover:bg-[#3d404b]"
+                    className="h-[48px] hover:bg-[#130932]"
                   >
-                    <td>{variant.vaultType}</td>
-                    <td>
+                    <td className="px-4 py-3">{variant.vaultType}</td>
+                    <td className="px-4 py-3">
                       {
                         getTokenData(
                           buildVariants[i].initParams.initVaultAddresses[0]
                         )?.symbol
                       }
                     </td>
-                    <td>{variant.strategyId}</td>
-                    <td>{variant.strategyDesc}</td>
-                    <td>
+                    <td className="px-4 py-3">{variant.strategyId}</td>
+                    <td className="px-4 py-3">{variant.strategyDesc}</td>
+                    <td className="px-4 py-3">
                       {variant.canBuild && (
                         <button
                           className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"

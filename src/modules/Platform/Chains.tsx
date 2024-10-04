@@ -5,12 +5,19 @@ import {
   getChainBridges,
   getChainsTotals,
 } from "@stabilitydao/stability";
+
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
 
+import { Breadcrumbs } from "@ui";
+
 import { formatNumber } from "@utils";
 
-const shortAddress = (address: string, firstChars: number = 4, lastChars: number = 2): string => {
+const shortAddress = (
+  address: string,
+  firstChars: number = 4,
+  lastChars: number = 2
+): string => {
   return `${address.slice(0, firstChars)}..${address.slice(-lastChars)}`;
 };
 
@@ -96,12 +103,7 @@ const Chains = (): JSX.Element => {
   ];
   return (
     <div>
-      <div className="flex mb-5 text-[14px] text-gray-300">
-        <a href="/platform" className="mr-2 font-bold">
-          Platform
-        </a>{" "}
-        - <span className="ml-2">Chains</span>
-      </div>
+      <Breadcrumbs links={["Platform", "Chains"]} />
 
       <h1 className="mb-3">Chains</h1>
 
@@ -119,23 +121,23 @@ const Chains = (): JSX.Element => {
         ))}
       </div>
 
-      <table className="w-full">
-        <thead className="h-[34px]">
-          <tr className="text-[14px] font-bold">
-            <td>Chain</td>
-            <td className="px-3 text-center">ID</td>
-            <td className="px-3 text-right">TVL</td>
-            <td className="px-3">Treasury</td>
-            <td className="px-3 text-center">Issue</td>
-            <td className="px-3 text-center">Status</td>
-            <td className="px-3 text-center">Bridges</td>
+      <table className="w-full font-manrope">
+        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+          <tr className="text-[12px] uppercase">
+            <td className="px-4 py-2">Chain</td>
+            <td className="px-4 py-2 text-center">ID</td>
+            <td className="px-4 py-2 text-left">TVL</td>
+            <td className="px-4 py-2">Treasury</td>
+            <td className="px-4 py-2 text-center">Issue</td>
+            <td className="px-4 py-2 text-center">Status</td>
+            <td className="px-4 py-2 text-center">Bridges</td>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="text-[14px]">
           {Object.entries(chains).map(
             ([chainId, { name, status, img, multisig, chainLibGithubId }]) => (
-              <tr key={chainId} className="hover:bg-gray-800">
-                <td className="py-1">
+              <tr key={chainId} className="h-[48px] hover:bg-[#130932]">
+                <td className="px-4 py-3">
                   <div className="flex items-center">
                     {img && (
                       <img
@@ -147,10 +149,8 @@ const Chains = (): JSX.Element => {
                     {name}
                   </div>
                 </td>
-                <td className="px-3 text-center text-[14px] font-bold">
-                  {chainId}
-                </td>
-                <td className="px-3 text-right whitespace-nowrap">
+                <td className="px-4 py-3 text-center font-bold">{chainId}</td>
+                <td className="px-4 py-3 text-left whitespace-nowrap">
                   {$apiData?.total.chainTvl[chainId] && (
                     <span>
                       {formatNumber(
@@ -160,12 +160,12 @@ const Chains = (): JSX.Element => {
                     </span>
                   )}
                 </td>
-                <td className="px-3 text-[12px]">
+                <td className="px-4 py-3 text-[12px]">
                   <div className="flex">
                     {multisig && <span>{shortAddress(multisig)}</span>}
                   </div>
                 </td>
-                <td>
+                <td className="px-4 py-3">
                   <div className="flex items-center justify-center">
                     {chainLibGithubId && (
                       <a
@@ -183,10 +183,12 @@ const Chains = (): JSX.Element => {
                     )}
                   </div>
                 </td>
-                <td className="px-3">
-                  <ChainStatus status={status} />
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-center">
+                    <ChainStatus status={status} />
+                  </div>
                 </td>
-                <td className="px-3 text-center">
+                <td className="px-4 py-3 text-center">
                   <div className="flex items-center">
                     <BridgesList chainId={chainId} chainName={name} />
                   </div>

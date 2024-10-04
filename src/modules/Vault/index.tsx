@@ -14,7 +14,7 @@ import { LiquidityPool } from "./components/LiquidityPool";
 import { UnderlyingALM } from "./components/UnderlyingALM";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, Loader, ErrorMessage } from "@ui";
+import { Toast, Loader, ErrorMessage, Breadcrumbs } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -56,6 +56,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full mx-auto">
+        <Breadcrumbs links={["Vaults", localVault.symbol]} />
         <VaultBar vault={localVault} />
         <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
           <div className="w-full md:w-1/2 lg:w-3/5 ">

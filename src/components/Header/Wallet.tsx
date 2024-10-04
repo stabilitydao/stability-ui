@@ -128,8 +128,9 @@ const Wallet = (): JSX.Element => {
     }
   };
   const initProfile = async () => {
-    if (!$assetsBalances) return; // dublicated for TS
+    if (!$assetsBalances[$currentChainID]) return; // dublicated for TS
     let profileBalance = 0;
+
     const assets = Object.entries($assetsBalances[$currentChainID])
       .filter((token) => token[1] && getTokenData(token[0]))
       .map(([address, data]) => {
@@ -147,6 +148,7 @@ const Wallet = (): JSX.Element => {
           symbol: getTokenData(address)?.symbol,
         };
       });
+
     if (currentChain?.name === "Polygon") {
       const profitMaker = await checkPM();
       if (profitMaker) assets.push(profitMaker);
@@ -209,19 +211,19 @@ const Wallet = (): JSX.Element => {
   );
 
   return (
-    <div className="flex flex-nowrap justify-end whitespace-nowrap">
-      {currentChain && (
+    <div className="flex gap-3 flex-nowrap justify-end whitespace-nowrap text-[#F9F8FA] text-[16px] font-semibold">
+      {currentChain && $account && (
         <button
-          className="bg-[#272451] sm:py-1 px-3 rounded-xl mx-2 sm:mx-4 flex items-center sm:gap-1"
+          className="bg-[#1F0F50] h-10 sm:py-1 px-3 rounded-xl sm:gap-1 min-[601px]:justify-normal flex items-center justify-center"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
           <img
-            className="w-5 h-5 rounded-full sm:mx-1"
+            className="w-5 h-5 rounded-full mx-1 min-[601px]:mx-0 sm:mx-1"
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
-          <p className="hidden sm:flex"> {currentChain?.name}</p>
+          <p className="lg:flex hidden">{currentChain?.name}</p>
         </button>
       )}
       {isSwitchNetwork && (
@@ -234,19 +236,27 @@ const Wallet = (): JSX.Element => {
       )}
       <button
         data-testid="connectButton"
-        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-xl sm:mx-4 min-w-[120px] flex items-center justify-center gap-1"
+        className="bg-[#612FFB] h-10 py-1 px-3 rounded-xl flex items-center justify-center gap-1 min-w-[52px]"
         onClick={() => openProfile()}
       >
-        {$account && providerImage && (
+        {$account && providerImage ? (
           <img className="w-5" src={providerImage} alt="providerImage" />
+        ) : (
+          <img
+            className="w-5 md:hidden block"
+            src="/public/wallet.svg"
+            alt="walletImage"
+          />
         )}
-        {$account
-          ? `${
-              $visible
-                ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
-                : "*************"
-            }`
-          : "Connect Wallet"}
+        <span className="md:block hidden">
+          {$account
+            ? `${
+                $visible
+                  ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
+                  : "*************"
+              }`
+            : "Connect Wallet"}
+        </span>
       </button>
     </div>
   );

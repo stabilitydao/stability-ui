@@ -54,7 +54,7 @@ const TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "IL RISK",
+    name: "RISK",
     keyName: "il",
     sortType: "none",
     dataType: "number",
