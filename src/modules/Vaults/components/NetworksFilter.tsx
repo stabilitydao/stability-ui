@@ -14,7 +14,7 @@ const NetworkFilters: React.FC<IProps> = memo(
         {activeNetworks.map((chain) => (
           <div
             className={`h-[40px] w-[40px]  flex items-center justify-center cursor-pointer rounded-[16px] hover:bg-[#2B1570] ${
-              chain.active ? "bg-[#1F0F50] border-[#3D1E9F] border-[2px]" : "bg-[#1F0F50]"
+              chain.active ? "bg-[#1F0F50] border-[#612FFB] border-[1.5px]" : "bg-[#1F0F50]"
             }`}
             key={chain.name + chain.id}
             title={chain.name}
