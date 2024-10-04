@@ -115,17 +115,17 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 <td>Total APY</td>
                 <td data-testid="yieldLatestAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.withFees?.latest}%`
+                    ? `${vault?.earningData?.apy?.latest}%`
                     : "-"}
                 </td>
                 <td data-testid="yieldDailyAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.withFees?.daily}%`
+                    ? `${vault?.earningData?.apy?.daily}%`
                     : "-"}
                 </td>
                 <td data-testid="yieldWeeklyAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.withFees?.weekly}%`
+                    ? `${vault?.earningData?.apy?.weekly}%`
                     : "-"}
                 </td>
               </tr>
@@ -133,17 +133,17 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 <td>Total APR</td>
                 <td data-testid="yieldLatestAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.withFees?.latest}%`
+                    ? `${vault?.earningData?.apr?.latest}%`
                     : "-"}
                 </td>
                 <td data-testid="yieldDailyAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.withFees?.daily}%`
+                    ? `${vault?.earningData?.apr?.daily}%`
                     : "-"}
                 </td>
                 <td data-testid="yieldWeeklyAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.withFees?.weekly}%`
+                    ? `${vault?.earningData?.apr?.weekly}%`
                     : "-"}
                 </td>
               </tr>
