@@ -74,9 +74,9 @@ const Header = (): JSX.Element => {
           <Wallet />
           <div className="burger-menu" onClick={toggleMenu}>
             {menu ? (
-              <img src="/close.svg" alt="close" />
+              <img className="w-4 h-4" src="/close.svg" alt="close" />
             ) : (
-              <img src="/menu.svg" alt="menu" />
+              <img className="w-4 h-4" src="/menu.svg" alt="menu" />
             )}
           </div>
         </div>

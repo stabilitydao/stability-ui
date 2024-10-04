@@ -214,12 +214,12 @@ const Wallet = (): JSX.Element => {
     <div className="flex gap-3 flex-nowrap justify-end whitespace-nowrap text-[#F9F8FA] text-[16px] font-semibold">
       {currentChain && $account && (
         <button
-          className="bg-[#1F0F50] h-10 sm:py-1 px-3 rounded-xl sm:gap-1 min-[601px]:justify-normal flex items-center justify-center"
+          className="bg-[#1F0F50]  h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
           <img
-            className="w-5 h-5 rounded-full mx-1 min-[601px]:mx-0 sm:mx-1"
+            className="w-4 h-4 md:w-5 md:h-5 rounded-full"
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
@@ -236,14 +236,14 @@ const Wallet = (): JSX.Element => {
       )}
       <button
         data-testid="connectButton"
-        className="bg-[#612FFB] h-10 py-1 px-3 rounded-xl flex items-center justify-center gap-1 min-w-[52px]"
+        className="bg-[#612FFB] h-8 md:h-10 md:px-3 md:min-w-[150px] py-1 rounded-xl flex items-center justify-center gap-1 w-8 md:w-full "
         onClick={() => openProfile()}
       >
         {$account && providerImage ? (
-          <img className="w-5" src={providerImage} alt="providerImage" />
+          <img className="w-4 h-4" src={providerImage} alt="providerImage" />
         ) : (
           <img
-            className="w-5 md:hidden block"
+            className="w-4 h-4 md:hidden block"
             src="/wallet.svg"
             alt="walletImage"
           />

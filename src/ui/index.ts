@@ -18,6 +18,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
 import { CountersBlock } from "./CountersBlock";
+import { Checkbox } from "./Checkbox";
 
 export {
   Toast,
@@ -40,4 +41,5 @@ export {
   RiskIndicator,
   ColorIndicator,
   CountersBlock,
+  Checkbox,
 };

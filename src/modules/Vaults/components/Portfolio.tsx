@@ -120,7 +120,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   }, [$hideFeeAPR, $aprFilter, vaults]);
 
   return (
-    <div className="my-2 rounded-sm">
+    <div className="my-2 rounded-sm font-manrope">
       <div className="p-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -174,12 +174,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         <div className="flex items-start justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
           <div className="hidden md:flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+              <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                 DEPOSITED
               </h2>
               <div
                 data-testid="portfolioDeposited"
-                className="text-[1rem] md:text-[1.125rem]"
+                className="text-[18px] text-[#F9F8FA] font-semibold"
               >
                 {$isWeb3Load ? (
                   <div className="mt-2">
@@ -195,12 +195,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </div>
             </div>
             <div className="max-w-[130px] w-full md:max-w-[150px]  flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+              <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                 DAILY YIELD
               </h2>
               <div
                 data-testid="portfolioDaily"
-                className="text-[1rem] md:text-[1.125rem]"
+                className="text-[18px] text-[#F9F8FA] font-semibold"
               >
                 {$isWeb3Load ? (
                   <div className="mt-2">
@@ -212,12 +212,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </div>
             </div>
             <div className="w-[120px] md:w-[180px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+              <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                 MONTHLY YIELD
               </h2>
               <div
                 data-testid="portfolioMonthly"
-                className="text-[1rem] md:text-[1.125rem]"
+                className="text-[18px] text-[#F9F8FA] font-semibold"
               >
                 {$isWeb3Load ? (
                   <div className="mt-2">
@@ -229,12 +229,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </div>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+              <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                 AVG. APR
               </h2>
               <div
                 data-testid="portfolioAPR"
-                className="text-[1rem] md:text-[1.125rem]"
+                className="text-[18px] text-[#F9F8FA] font-semibold"
               >
                 {$isWeb3Load ? (
                   <div className="mt-2">
@@ -246,12 +246,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
               </div>
             </div>
             <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
+              <h2 className="text-[14px]  select-none leading-5 text-[#8D8E96]">
                 AVG. APY
               </h2>
               <div
                 data-testid="portfolioAPY"
-                className="text-[1rem] md:text-[1.125rem]"
+                className="text-[18px] text-[#F9F8FA] font-semibold"
               >
                 {$isWeb3Load ? (
                   <div className="mt-2">
@@ -266,10 +266,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           <div className="md:hidden flex items-start justify-between whitespace-nowrap w-full">
             <div className="flex flex-col gap-5">
               <div className="flex flex-col items-start">
-                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                   DEPOSITED
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[18px] text-[#F9F8FA] font-semibold">
                   {$isWeb3Load ? (
                     <div className="mt-1">
                       <Skeleton height={21} width={100} />
@@ -284,10 +284,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </div>
               </div>
               <div className="flex flex-col items-start">
-                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                   MONTHLY YIELD
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[18px] text-[#F9F8FA] font-semibold">
                   {$isWeb3Load ? (
                     <div className="mt-1">
                       <Skeleton height={21} width={100} />
@@ -298,10 +298,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </div>
               </div>
               <div className="flex flex-col items-start">
-                <h2 className="text-[14px] md:text-[1rem] select-none leading-5 text-[#8D8E96]">
+                <h2 className="text-[14px]  select-none leading-5 text-[#8D8E96]">
                   AVG. APY
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem]">
+                <div className="text-[18px] text-[#F9F8FA] font-semibold">
                   {$isWeb3Load ? (
                     <div className="mt-1">
                       <Skeleton height={21} width={100} />
@@ -314,10 +314,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
             <div className="flex flex-col gap-5">
               <div className="flex flex-col items-start">
-                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                   DAILY YIELD
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem] w-[100px]">
+                <div className="text-[18px] text-[#F9F8FA] font-semibold w-[100px]">
                   {$isWeb3Load ? (
                     <div className="mt-1">
                       <Skeleton height={21} width={100} />
@@ -328,10 +328,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                 </div>
               </div>
               <div className="flex flex-col items-start">
-                <h2 className="text-[14px] md:text-[1rem] select-none text-[#848E9C] leading-5">
+                <h2 className="text-[14px]  select-none text-[#A6A0B2] leading-5">
                   AVG. APR
                 </h2>
-                <div className="text-[1rem] md:text-[1.125rem] w-[100px]">
+                <div className="text-[18px] text-[#F9F8FA] font-semibold w-[100px]">
                   {$isWeb3Load ? (
                     <div className="mt-1">
                       <Skeleton height={21} width={100} />

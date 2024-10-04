@@ -6,9 +6,9 @@ body.no-scroll {
   display: none;
   cursor: pointer;
   background: #1f0f50;
-  border-radius: 16px;
-  width: 40px;
-  height: 40px;
+  border-radius: 12px;
+  width: 32px;
+  height: 32px;
 }
 .menu-nav {
   display: none;
