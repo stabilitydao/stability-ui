@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { TimeDifferenceIndicator } from "@ui";
 
-import { aprFilter, hideFeeApr } from "@store";
+import { aprFilter } from "@store";
 
 import type { TAPRModal, TEarningData } from "@types";
 
@@ -16,20 +16,18 @@ interface IProps {
 const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
-  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
-  const totalAPYValue = state?.earningData?.apy?.[aprType][$aprFilter] || "0";
+  const totalAPYValue = state?.earningData?.apy[$aprFilter] || "0";
 
-  const totalAPRValue = state?.earningData?.apr?.[aprType][$aprFilter];
+  const totalAPRValue = state?.earningData?.apr[$aprFilter];
 
   const swapFeesAPRValue = state.earningData.poolSwapFeesAPR[$aprFilter];
 
   const strategyAPRValue = state.earningData.farmAPR[$aprFilter];
 
   const dailyAPRValue = (
-    Number(state.earningData.apr[aprType][$aprFilter]) / 365
+    Number(state.earningData.apr[$aprFilter]) / 365
   ).toFixed(2);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
@@ -161,9 +159,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
               !!state?.pool && (
                 <div className="flex items-center justify-between mb-1">
                   <p>Pool swap fees APR</p>
-                  <p className={`${$hideFeeAPR && "line-through"} text-end`}>
-                    {swapFeesAPRValue}%
-                  </p>
+                  <p className="text-end">{swapFeesAPRValue}%</p>
                 </div>
               )}
             <div className="flex items-center justify-between mb-1">

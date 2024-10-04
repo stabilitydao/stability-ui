@@ -29,7 +29,6 @@ import {
 import {
   vaults,
   isVaultsLoaded,
-  hideFeeApr,
   error,
   aprFilter,
   connected,
@@ -93,7 +92,6 @@ const Vaults = (): JSX.Element => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $error = useStore(error);
-  const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
   const $connected = useStore(connected);
   // const $publicClient = useStore(publicClient);
@@ -142,7 +140,6 @@ const Vaults = (): JSX.Element => {
   const lastTabIndex = currentTab * PAGINATION_VAULTS;
   const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
   const userVaultsCondition =
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
@@ -378,8 +375,8 @@ const Vaults = (): JSX.Element => {
         if (state.keyName === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
-              a[state.keyName as keyof TVault]?.apr[aprType][$aprFilter],
-              b[state.keyName as keyof TVault]?.apr[aprType][$aprFilter],
+              a[state.keyName as keyof TVault]?.apr[$aprFilter],
+              b[state.keyName as keyof TVault]?.apr[$aprFilter],
               state.dataType,
               state.sortType
             )
@@ -657,11 +654,9 @@ const Vaults = (): JSX.Element => {
                       (chain) => chain.id === vault.network
                     );
 
-                    const aprValue =
-                      vault?.earningData?.apr?.[aprType][$aprFilter] || "0";
+                    const aprValue = vault?.earningData?.apr[$aprFilter] || "0";
 
-                    const apyValue =
-                      vault?.earningData?.apy?.[aprType][$aprFilter] || "0";
+                    const apyValue = vault?.earningData?.apy[$aprFilter] || "0";
 
                     const swapFeesAPRValue =
                       vault.earningData.poolSwapFeesAPR[$aprFilter] || "0";
@@ -670,8 +665,7 @@ const Vaults = (): JSX.Element => {
                       vault.earningData.farmAPR[$aprFilter] || "0";
 
                     const dailyAPRValue = (
-                      Number(vault?.earningData?.apr?.[aprType][$aprFilter]) /
-                      365
+                      Number(vault?.earningData?.apr[$aprFilter]) / 365
                     ).toFixed(2);
 
                     return (
@@ -879,11 +873,7 @@ const Vaults = (): JSX.Element => {
                                   vault?.pool && (
                                     <div className="font-bold flex items-center justify-between">
                                       <p>Pool swap fees APR</p>
-                                      <p
-                                        className={`${
-                                          $hideFeeAPR && "line-through"
-                                        } text-end`}
-                                      >
+                                      <p className="text-end">
                                         {swapFeesAPRValue}%
                                       </p>
                                     </div>

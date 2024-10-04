@@ -54,7 +54,6 @@ const currentChainID = atom("137");
 const vaults = deepMap<any>(false);
 
 // portfolio
-const hideFeeApr = atom(false);
 const aprFilter = atom<TAPRPeriod>("daily");
 
 //// tanstack query
@@ -90,7 +89,6 @@ export {
   apiData,
   transactionSettings,
   platformVersions,
-  hideFeeApr,
   reload,
   error,
   isWeb3Load,

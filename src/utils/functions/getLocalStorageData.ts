@@ -1,4 +1,4 @@
-import { transactionSettings, hideFeeApr, aprFilter } from "@store";
+import { transactionSettings, aprFilter } from "@store";
 
 /**
  * Retrieves and applies local storage data for transaction settings, fee APR visibility, and APR filters
@@ -16,21 +16,16 @@ import { transactionSettings, hideFeeApr, aprFilter } from "@store";
  *
  * @returns {void} This function does not return any values
  *
- * @sideeffects Updates the `transactionSettings`, `hideFeeApr`, and `aprFilter` stores with the retrieved data.
+ * @sideeffects Updates the `transactionSettings` and `aprFilter` stores with the retrieved data.
  */
 
 export const getLocalStorageData = (): void => {
   const savedSettings = localStorage.getItem("transactionSettings");
-  const savedHideFeeAPR = localStorage.getItem("hideFeeAPR");
   const APRsFiler = localStorage.getItem("APRsFiler");
 
   if (savedSettings) {
     const savedData = JSON.parse(savedSettings);
     transactionSettings.set(savedData);
-  }
-  if (savedHideFeeAPR) {
-    const savedData = JSON.parse(savedHideFeeAPR);
-    hideFeeApr.set(savedData);
   }
 
   let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "weekly";

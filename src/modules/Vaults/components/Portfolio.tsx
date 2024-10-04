@@ -7,7 +7,7 @@ import { PlatformModal } from "./modals/PlatformModal";
 
 import { Skeleton, APRtimeSwitcher, FeeAPRModal } from "@ui";
 
-import { connected, visible, hideFeeApr, isWeb3Load, aprFilter } from "@store";
+import { connected, visible, isWeb3Load, aprFilter } from "@store";
 
 import { formatNumber, calculateAPY } from "@utils";
 
@@ -20,7 +20,6 @@ interface IProps {
 const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   const $connected = useStore(connected);
   const $visible = useStore(visible);
-  const $hideFeeAPR = useStore(hideFeeApr);
   const $isWeb3Load = useStore(isWeb3Load);
   const $aprFilter = useStore(aprFilter);
 
@@ -37,8 +36,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
     apy: "0",
     tvl: "",
   });
-
-  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
   const initPortfolio = () => {
     if (!$connected) {
@@ -65,7 +62,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        let apr = Number(v?.earningData?.apr?.[aprType][$aprFilter]);
+        let apr = Number(v?.earningData?.apr?.[$aprFilter]);
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(v.shareprice);
@@ -117,7 +114,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
     if (vaults) {
       initPortfolio();
     }
-  }, [$hideFeeAPR, $aprFilter, vaults]);
+  }, [$aprFilter, vaults]);
 
   return (
     <div className="my-2 rounded-sm font-manrope">
@@ -167,7 +164,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
           <div className="hidden items-center justify-center gap-2 md:flex">
-            {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
             <APRtimeSwitcher />
           </div>
         </div>
@@ -345,7 +341,6 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           </div>
 
           <div className="flex items-center justify-between gap-2 md:hidden">
-            {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
             <APRtimeSwitcher />
           </div>
         </div>

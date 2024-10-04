@@ -6,7 +6,7 @@ import { formatUnits } from "viem";
 
 import { APRtimeSwitcher, FeeAPRModal } from "@ui";
 
-import { hideFeeApr, aprFilter } from "@store";
+import { aprFilter } from "@store";
 
 import { formatFromBigInt, formatNumber } from "@utils";
 
@@ -20,9 +20,7 @@ interface IProps {
 }
 
 const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
-  const $hideFeeAPR = useStore(hideFeeApr);
   const $aprFilter = useStore(aprFilter);
-  const aprType = $hideFeeAPR ? "withoutFees" : "withFees";
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [userBalances, setUserBalances] = useState({
@@ -39,8 +37,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   });
 
   useEffect(() => {
-    let apr = vault?.earningData?.apr?.[aprType][$aprFilter];
-    let apy = vault?.earningData?.apy?.[aprType][$aprFilter];
+    let apr = vault?.earningData?.apr[$aprFilter];
+    let apy = vault?.earningData?.apy[$aprFilter];
 
     let monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
 
@@ -53,7 +51,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     dailyAPR = dailyAPR.toFixed(2);
 
     setEarnData({ apr, apy, monthlyAPR, monthlyEarn, dailyAPR, dailyEarn });
-  }, [$hideFeeAPR, $aprFilter, userBalances]);
+  }, [$aprFilter, userBalances]);
 
   useEffect(() => {
     if (vault?.balance && vault?.shareprice) {
@@ -126,10 +124,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* <HideFeesHandler setModalState={setFeeAPRModal} /> */}
-          <APRtimeSwitcher />
-        </div>
+        <APRtimeSwitcher />
       </div>
       <div className="flex w-full gap-5 p-4">
         <div className="flex items-center flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
