@@ -19,7 +19,7 @@ import {
   setLocalStoreHash,
 } from "@utils";
 
-import { transactionSettings, hideFeeApr, aprFilter } from "@store";
+import { transactionSettings, aprFilter } from "@store";
 
 import { CHAINS, PROTOCOLS, IL } from "@constants";
 
@@ -704,15 +704,6 @@ describe("getLocalStorageData", () => {
     getLocalStorageData();
 
     expect(transactionSettings.set).toHaveBeenCalledWith({ gasLimit: 21000 });
-  });
-
-  it("should load hideFeeAPR from localStorage and set the store", () => {
-    const savedHideFeeAPR = JSON.stringify(true);
-    localStorage.setItem("hideFeeAPR", savedHideFeeAPR);
-
-    getLocalStorageData();
-
-    expect(hideFeeApr.set).toHaveBeenCalledWith(true);
   });
 
   it("should set aprFilter to 'weekly' if localStorage value is 'week'", () => {

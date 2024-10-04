@@ -254,8 +254,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const APRWithoutFees = Number(vault?.apr?.incomeLatest).toFixed(2) || 0;
 
-        const APYWithoutFees = calculateAPY(APRWithoutFees).toFixed(2);
-
         ///////
         const dailyTotalAPRWithFees =
           Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
@@ -263,60 +261,26 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
 
         const APRArray = {
-          withFees: {
-            latest: String(APR),
-            daily: determineAPR(
-              vault.apr?.income24h,
-              dailyTotalAPRWithFees,
-              APR
-            ),
-            weekly: determineAPR(
-              vault.apr?.incomeWeek,
-              weeklyTotalAPRWithFees,
-              APR
-            ),
-          },
-          withoutFees: {
-            latest: APRWithoutFees,
-            daily: determineAPR(
-              vault.apr?.income24h,
-              dailyFarmApr,
-              APRWithoutFees
-            ),
-            weekly: determineAPR(
-              vault.apr?.incomeWeek,
-              weeklyFarmApr,
-              APRWithoutFees
-            ),
-          },
+          latest: String(APR),
+          daily: determineAPR(vault.apr?.income24h, dailyTotalAPRWithFees, APR),
+          weekly: determineAPR(
+            vault.apr?.incomeWeek,
+            weeklyTotalAPRWithFees,
+            APR
+          ),
         };
         const APYArray = {
-          withFees: {
-            latest: APY,
-            daily: determineAPR(
-              vault.apr?.income24h,
-              calculateAPY(dailyTotalAPRWithFees).toFixed(2),
-              APY
-            ),
-            weekly: determineAPR(
-              vault.apr?.incomeWeek,
-              calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
-              APY
-            ),
-          },
-          withoutFees: {
-            latest: APYWithoutFees,
-            daily: determineAPR(
-              vault.apr?.income24h,
-              calculateAPY(dailyFarmApr).toFixed(2),
-              APYWithoutFees
-            ),
-            weekly: determineAPR(
-              vault.apr?.incomeWeek,
-              calculateAPY(weeklyFarmApr).toFixed(2),
-              APYWithoutFees
-            ),
-          },
+          latest: APY,
+          daily: determineAPR(
+            vault.apr?.income24h,
+            calculateAPY(dailyTotalAPRWithFees).toFixed(2),
+            APY
+          ),
+          weekly: determineAPR(
+            vault.apr?.incomeWeek,
+            calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
+            APY
+          ),
         };
 
         const poolSwapFeesAPR =
@@ -516,7 +480,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               poolSwapFeesAPR,
               farmAPR,
             },
-            sortAPR: APRArray?.withFees?.latest,
+            sortAPR: APRArray?.latest,
             pool: vault.pool,
             alm: vault.alm,
             risk: vault?.risk,

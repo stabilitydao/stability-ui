@@ -6,7 +6,6 @@ import { AssetsSkeleton } from "./AssetsSkeleton";
 import { ChartSkeleton } from "./ChartSkeleton";
 import { ErrorMessage } from "./ErrorMessage";
 import { FeeAPRModal } from "./FeeAPRModal";
-import { HideFeesHandler } from "./HideFeesHandler";
 import { Loader } from "./Loader";
 import { ShareSkeleton } from "./ShareSkeleton";
 import { ShortAddress } from "./ShortAddress";
@@ -29,7 +28,6 @@ export {
   ChartSkeleton,
   ErrorMessage,
   FeeAPRModal,
-  HideFeesHandler,
   Loader,
   ShareSkeleton,
   ShortAddress,

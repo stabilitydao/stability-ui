@@ -101,14 +101,8 @@ type TAPRData = {
 };
 
 type TEarningData = {
-  apr: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
-  apy: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
+  apr: TAPRData;
+  apy: TAPRData;
   poolSwapFeesAPR: TAPRData;
   farmAPR: TAPRData;
 };
@@ -278,7 +272,7 @@ type TTAbleFiltersVariant = {
 type TTableFilters = {
   name: string;
   type: string;
-  variants: TTAbleFiltersVariant[];
+  variants?: TTAbleFiltersVariant[];
   state: boolean;
 };
 

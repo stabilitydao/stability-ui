@@ -226,7 +226,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                           onClick={() =>
                             activeFiltersHandler(filter, variant.name)
                           }
-                          className={`${!index && "rounded-t-2xl"} ${index === filter.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
+                          className={`${!index && "rounded-t-2xl"} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
                             variant.state ? "bg-[#2B1570]" : ""
                           }`}
                           data-testid="strategy"
