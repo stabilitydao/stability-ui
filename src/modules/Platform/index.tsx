@@ -1,7 +1,5 @@
 import { useStore } from "@nanostores/react";
 
-import { CountersBlock } from "@ui";
-
 import {
   type ApiMainReply,
   assets,
@@ -21,7 +19,7 @@ import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { apiData, currentChainID, platformVersions } from "@store";
 
 import packageJson from "../../../package.json";
-import {CountersBlockCompact} from "../../ui/CountersBlockCompact.tsx";
+import { CountersBlockCompact } from "../../ui/CountersBlockCompact.tsx";
 
 function numberWithSpaces(x: number | string) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
