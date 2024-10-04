@@ -413,4 +413,21 @@ const {
 			display:none !important;
 		}
 	}
+	/* Checkbox */
+	input[type="checkbox"]::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 6px;
+        height: 10px;
+        border-right: 2px solid white;
+        border-bottom: 2px solid white;
+        transform: translate(-50%, -60%) rotate(45deg);
+        opacity: 0;
+        transition: opacity 0.1s ease;
+	}
+   input[type="checkbox"]:checked::before {
+        opacity: 1;
+    }
 </style>

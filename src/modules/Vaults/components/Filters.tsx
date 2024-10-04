@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, memo } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
+import { Checkbox } from "@ui";
+
 import type { TTableFilters, TTAbleFiltersVariant } from "@types";
 
 interface IProps {
@@ -159,20 +161,15 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
         {filters.map((filter: TTableFilters) => (
           <div data-testid="filter" key={filter.name}>
             {filter.type === "single" ? (
-              <div
-                onClick={() => activeFiltersHandler(filter)}
-                className={`w-[160px] flex items-center justify-center rounded-2xl h-10 hover:bg-[#2B1570] transition duration-100 delay-100 ${
-                  filter.state && "bg-[#612FFB] hover:bg-[#612FFB]"
-                } bg-[#1F0F50] cursor-pointer`}
-              >
-                <p
-                  className={`px-2 py-1 text-center w-full ${
-                    filter.state ? "text-[#F9F8FA]" : "text-[#8F7AFC]"
-                  }`}
-                >
-                  {filter.name}
-                </p>
-              </div>
+              <label className="inline-flex items-center cursor-pointer bg-[#1F0F50] h-10 rounded-2xl">
+                <div className="flex items-center gap-[10px] py-[10px] px-4">
+                  <Checkbox
+                    checked={filter.state}
+                    onChange={() => activeFiltersHandler(filter)}
+                  />
+                  <span className="text-[#F9F8FA]">{filter.name}</span>
+                </div>
+              </label>
             ) : filter.type === "multiple" ? (
               <div
                 key={filter.name}
@@ -250,7 +247,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   <div className="flex items-center justify-center px-1">
                     <p
                       onClick={() => activeFiltersHandler(filter, "All")}
-                      className={`py-1 px-4 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl transition duration-100 delay-100 ${
+                      className={`py-1 px-4 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl ${
                         !filter.state
                           ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
                           : "text-[#8F7AFC] h-full"
@@ -260,7 +257,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     </p>
                     <p
                       onClick={() => activeFiltersHandler(filter)}
-                      className={`px-2 py-1 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl transition duration-100 delay-100 ${
+                      className={`px-2 py-1 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl  ${
                         filter.state
                           ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
                           : "text-[#8F7AFC] h-full"
