@@ -58,22 +58,20 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
       <main className="w-full mx-auto">
         <Breadcrumbs links={["Vaults", localVault.symbol]} />
         <VaultBar vault={localVault} />
-        <div className="flex items-start gap-5 mt-6 flex-col-reverse md:flex-row">
+        <div className="flex items-center md:items-start justify-between gap-3 mt-6 flex-col md:flex-row">
           <div className="w-full md:w-1/2 lg:w-3/5 ">
             <InfoBar network={network} vault={localVault} />
 
-            <HistoricalRate
-              network={network}
-              address={vault.toLowerCase() as TAddress}
-              vaultStrategy={localVault.strategy}
-            />
-
             <Toast network={network} />
           </div>
-          <div className="w-full md:w-1/2 lg:w-2/5">
-            <InvestForm network={network} vault={localVault} />
-          </div>
+          <InvestForm network={network} vault={localVault} />
         </div>
+
+        <HistoricalRate
+          network={network}
+          address={vault.toLowerCase() as TAddress}
+          vaultStrategy={localVault.strategy}
+        />
 
         <div className="my-8 flex flex-col lg:flex-row items-start justify-start gap-5 w-full">
           <div className="w-full lg:w-1/2">

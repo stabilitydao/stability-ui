@@ -1936,7 +1936,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   return (
-    <div className="bg-button rounded-md">
+    <div className="bg-[#130932] rounded-2xl w-[360px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -1944,15 +1944,18 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         resetOptions={resetOptions}
       />
 
-      <form autoComplete="off" className="w-full px-4 pb-5">
-        <div className="flex items-center mt-4 gap-3 relative">
+      <form autoComplete="off" className="w-full p-6">
+        <div className="flex items-center gap-4 relative">
           {optionTokens && (
-            <div className="relative select-none w-full" ref={tokenSelectorRef}>
+            <div
+              className="relative select-none w-[235px] text-[#F9F8FA] text-[14px] font-semibold "
+              ref={tokenSelectorRef}
+            >
               <div
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer"
+                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-10 bg-[#1F0F50] text-[20px] cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -1960,15 +1963,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       activeOptionToken?.logoURI?.map((logo: string) => (
                         <img
                           key={Math.random()}
-                          className="max-w-6 max-h-6 rounded-full"
+                          className="w-6 h-6 rounded-full"
                           src={logo}
                           alt="logo"
                         />
                       ))}
                   </div>
-                  <p className="text-[16px] md:text-[15px] lg:text-[20px]">
-                    {activeOptionToken?.symbol}
-                  </p>
+                  <p>{activeOptionToken?.symbol}</p>
                 </div>
                 <img
                   className={`transition delay-[50ms] ${
@@ -1980,7 +1981,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </div>
 
               <div
-                className={`bg-[#13141f] mt-1 rounded-md w-full z-10 ${
+                className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-30 ${
                   tokenSelector ? "absolute transition delay-[50ms]" : "hidden"
                 } `}
               >
@@ -1993,7 +1994,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       defaultOption?.logos
                     );
                   }}
-                  className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
+                  className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2"
                 >
                   <div
                     className={`flex items-center ${
@@ -2013,14 +2014,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   <p
                     className={`${
                       defaultOption?.logos?.length < 2 ? "ml-2" : "ml-[-4px]"
-                    }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}
+                    }`}
                   >
                     {defaultOption?.symbols}
                   </p>
                 </div>
                 {underlyingToken && (
                   <div
-                    className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                    className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                     onClick={() => {
                       optionHandler(
                         [underlyingToken?.address],
@@ -2032,14 +2033,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   >
                     {underlyingToken?.logoURI && (
                       <img
-                        className="max-w-6 max-h-6 rounded-full "
+                        className="w-6 h-6 rounded-full"
                         src={underlyingToken.logoURI}
                         alt="logo"
                       />
                     )}
-                    <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                      {underlyingToken.symbol}
-                    </p>
+                    <p className="ml-2">{underlyingToken.symbol}</p>
                   </div>
                 )}
                 {/* CRV Strategy don't have zap withdraw */}
@@ -2047,7 +2046,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   optionTokens.map(({ address, symbol, logoURI }) => {
                     return (
                       <div
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                         key={address as string}
                         onClick={() => {
                           optionHandler(
@@ -2060,14 +2059,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       >
                         {logoURI && (
                           <img
-                            className="max-w-6 max-h-6 rounded-full"
+                            className="w-6 h-6 rounded-full"
                             src={logoURI as string}
                             alt="logo"
                           />
                         )}
-                        <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                          {symbol}
-                        </p>
+                        <p className="ml-2">{symbol}</p>
                       </div>
                     );
                   })}
@@ -2076,47 +2073,28 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
 
           {$connected && (
-            <>
-              <svg
-                fill={isRefresh ? "#ffffff" : "#959595"}
-                height="22"
-                width="22"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                viewBox="0 0 512 512"
-                xmlSpace="preserve"
+            <div className="flex items-center gap-5">
+              <img
                 className={`${
                   isRefresh ? "cursor-pointer" : "cursor-default"
                 } transition-transform duration-500`}
                 style={{ transform: `rotate(${rotation}deg)` }}
                 onClick={refreshData}
-              >
-                <g>
-                  <g>
-                    <path
-                      d="M511.957,185.214L512,15.045l-67.587,67.587l-7.574-7.574c-48.332-48.332-112.593-74.95-180.946-74.95
-    C114.792,0.107,0,114.901,0,256s114.792,255.893,255.893,255.893S511.785,397.099,511.785,256h-49.528
-    c0,113.79-92.575,206.365-206.365,206.365S49.528,369.79,49.528,256S142.103,49.635,255.893,49.635
-    c55.124,0,106.947,21.467,145.925,60.445l7.574,7.574l-67.58,67.58L511.957,185.214z"
-                    />
-                  </g>
-                </g>
-              </svg>
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  className="settingsModal"
-                  d="M20.83 14.6C19.9 14.06 19.33 13.07 19.33 12C19.33 10.93 19.9 9.93999 20.83 9.39999C20.99 9.29999 21.05 9.1 20.95 8.94L19.28 6.06C19.22 5.95 19.11 5.89001 19 5.89001C18.94 5.89001 18.88 5.91 18.83 5.94C18.37 6.2 17.85 6.34 17.33 6.34C16.8 6.34 16.28 6.19999 15.81 5.92999C14.88 5.38999 14.31 4.41 14.31 3.34C14.31 3.15 14.16 3 13.98 3H10.02C9.83999 3 9.69 3.15 9.69 3.34C9.69 4.41 9.12 5.38999 8.19 5.92999C7.72 6.19999 7.20001 6.34 6.67001 6.34C6.15001 6.34 5.63001 6.2 5.17001 5.94C5.01001 5.84 4.81 5.9 4.72 6.06L3.04001 8.94C3.01001 8.99 3 9.05001 3 9.10001C3 9.22001 3.06001 9.32999 3.17001 9.39999C4.10001 9.93999 4.67001 10.92 4.67001 11.99C4.67001 13.07 4.09999 14.06 3.17999 14.6H3.17001C3.01001 14.7 2.94999 14.9 3.04999 15.06L4.72 17.94C4.78 18.05 4.89 18.11 5 18.11C5.06 18.11 5.12001 18.09 5.17001 18.06C6.11001 17.53 7.26 17.53 8.19 18.07C9.11 18.61 9.67999 19.59 9.67999 20.66C9.67999 20.85 9.82999 21 10.02 21H13.98C14.16 21 14.31 20.85 14.31 20.66C14.31 19.59 14.88 18.61 15.81 18.07C16.28 17.8 16.8 17.66 17.33 17.66C17.85 17.66 18.37 17.8 18.83 18.06C18.99 18.16 19.19 18.1 19.28 17.94L20.96 15.06C20.99 15.01 21 14.95 21 14.9C21 14.78 20.94 14.67 20.83 14.6ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </>
+                src="/refresh.svg"
+                alt="refresh"
+                title="refresh"
+              />
+
+              <img
+                className={`settingsModal cursor-pointer transition-transform transform ${
+                  settingsModal ? "rotate-180" : "rotate-0"
+                }`}
+                onClick={() => setSettingsModal((prev) => !prev)}
+                src="/settings.svg"
+                alt="settings"
+                title="settings"
+              />
+            </div>
           )}
 
           {settingsModal && (
@@ -2133,15 +2111,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             {option?.length > 1 ||
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
-                <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
+                <div className="flex flex-col items-center justify-center gap-3 mt-3 w-full">
                   {option.map((asset: string, index: number) => (
                     <div key={asset}>
                       {ichiAllow[index] && (
                         <div className="w-full">
                           {!!balances[asset] && (
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>Balance: </p>
-                              <p>{balances[asset]}</p>
+                            <div className="text-[12px] text-[#D6D5DD] flex items-center gap-1 mb-1">
+                              <span>Balance: </span>
+                              <span>{balances[asset]}</span>
                             </div>
                           )}
 
@@ -2254,8 +2232,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <div>
                 <div className="flex flex-col mt-[15px] text-[15px] w-full">
                   {!!balances[option[0]] && (
-                    <div className="text-left text-[gray] ml-2">
-                      Balance: {balances[option[0]]}
+                    <div className="text-[12px] text-[#D6D5DD] flex items-center gap-1 mb-1">
+                      <span>Balance: </span>
+                      <span>{balances[option[0]]}</span>
                     </div>
                   )}
                   <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
@@ -2522,14 +2501,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           <>
             <div className="grid mt-[15px] text-[15px] w-full">
               {!!balances[option[0]] && (
-                <div className="text-left text-[gray] ml-2">
-                  Balance:{" "}
-                  {parseFloat(
-                    formatUnits(
-                      $vaultData[network][vault.address].vaultUserBalance,
-                      18
-                    )
-                  )}
+                <div className="text-[12px] text-[#D6D5DD] flex items-center gap-1 mb-1">
+                  <span>Balance:</span>
+                  <span>
+                    {parseFloat(
+                      formatUnits(
+                        $vaultData[network][vault.address].vaultUserBalance,
+                        18
+                      )
+                    )}
+                  </span>
                 </div>
               )}
 

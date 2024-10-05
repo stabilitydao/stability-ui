@@ -74,33 +74,33 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     [network]
   );
   return (
-    <div className="bg-button rounded-md">
-      <div className="bg-[#1c1c23] rounded-t-md flex justify-between items-center h-[60px] px-4">
+    <div className="bg-[#130932] rounded-2xl font-manrope">
+      <div className="bg-[#0C0620] border-[2px] border-[#130932] rounded-t-2xl flex justify-between items-center h-[62px] px-6">
         <div
           data-testid="infoBarLogo"
-          className="hidden lg:flex items-center gap-[17px]"
+          className="hidden lg:flex items-center gap-0.5"
         >
           <img
             src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
             alt="logo"
-            className="w-7 h-7 rounded-full"
+            className="w-6 h-6 rounded-full"
           />
-          <div className="flex gap-3">
+          <div className="flex gap-0.5">
             <img
-              className="w-7 h-7 rounded-full hidden lg:flex"
+              className="w-6 h-6 rounded-full hidden lg:flex"
               src={vaultChain?.logoURI}
               alt={vaultChain?.name}
               title={vaultChain?.name}
             />
             {!!vault?.strategyInfo?.protocols.length && (
               <div
-                className="lg:flex items-start gap-3 hidden"
+                className="lg:flex items-start gap-0.5 hidden"
                 data-testid="infoBarStrategyesLogo"
               >
                 {vault?.strategyInfo?.protocols.map((protocol, index) => (
                   <img
                     key={protocol?.name + index}
-                    className="w-7 h-7 rounded-full"
+                    className="w-6 h-6 rounded-full"
                     src={protocol?.logoSrc}
                     alt={protocol?.name}
                     title={protocol?.name}
@@ -109,14 +109,14 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               </div>
             )}
             {!!vault.yearnProtocols.length && (
-              <div className="flex gap-3" data-testid="infoBarProtocolsLogo">
+              <div className="flex gap-0.5" data-testid="infoBarProtocolsLogo">
                 {vault.yearnProtocols.map((protocol) => (
                   <img
                     key={protocol.link}
                     src={protocol.link}
                     alt={protocol.title}
                     title={protocol.title}
-                    className="h-7 w-7 rounded-full"
+                    className="h-6 w-6 rounded-full"
                   />
                 ))}
               </div>
@@ -126,25 +126,25 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
         <APRtimeSwitcher />
       </div>
-      <div className="flex w-full gap-5 p-4">
+      <div className="flex w-full gap-5 p-6">
         <div className="flex items-center flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <div className="flex flex-row lg:flex-col items-start gap-5 w-full">
             <div className="w-1/2 lg:w-auto ">
-              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 TVL
               </p>
               <p
                 data-testid="infoBarTVL"
-                className="text-[16px] whitespace-nowrap"
+                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {formatNumber(vault.tvl, "abbreviate")}
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 DEPOSITED
               </p>
-              <div className="text-[16px] flex whitespace-nowrap">
+              <div className="text-[18px] font-semibold flex whitespace-nowrap">
                 <p data-testid="infoBarDeposited" className="mr-1">
                   {formatNumber(userBalances.shareBalance, "format")}
                 </p>
@@ -156,23 +156,23 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] md:text-[12px] min-[950px]:text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 SHARE PRICE
               </p>
               <p
                 data-testid="infoBarSP"
-                className="text-[16px] whitespace-nowrap"
+                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 ${Number(vault.shareprice).toFixed(5)}
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 DAILY
               </p>
               <p
                 data-testid="infoBarDailyAPR"
-                className="text-[16px] whitespace-nowrap"
+                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {earnData.dailyAPR}% / {earnData.dailyEarn}$
               </p>
@@ -180,23 +180,23 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 APR / APY
               </p>
               <p
                 data-testid="infoBarAPR"
-                className="text-[16px] whitespace-nowrap"
+                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {earnData.apr}% / {earnData.apy}%
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#8D8E96]">
+              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
                 MONTHLY
               </p>
               <p
                 data-testid="infoBarMonthlyAPR"
-                className="text-[16px] whitespace-nowrap"
+                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
               </p>

@@ -8,7 +8,7 @@ interface IProps {
 
 const VaultBar: React.FC<IProps> = memo(({ vault }) => {
   return (
-    <div className="flex justify-between items-center p-0">
+    <div className="flex justify-between items-center p-0 font-manrope">
       <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap">
         <span
           data-testid="vaultSymbol"
