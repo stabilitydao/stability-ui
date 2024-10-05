@@ -458,45 +458,29 @@ const HistoricalRate: React.FC<IProps> = memo(
         <div className="rounded-t-md flex justify-between items-center h-[60px] px-4">
           <HeadingText text="Historical Rate" scale={2} />
           {activeChart && (
-            <div className="flex items-center font-semibold relative sm:px-2 px-1 sm:gap-4 gap-2 text-[14px]">
-              <div
-                className="absolute bottom-0 bg-accent-500 rounded-sm"
-                style={{
-                  width: "25%",
-                  height: "1.5px",
-                  left:
-                    activeChart.name === "sharePrice"
-                      ? "75%"
-                      : activeChart.name === "TVL"
-                        ? "50%"
-                        : activeChart.name === "vsHodl"
-                          ? "25%"
-                          : "0%",
-                  transition: "left 0.3s ease",
-                }}
-              ></div>
+            <div className="flex items-center font-semibold relative text-[14px]">
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center p-4 border-b-[1.5px] border-transparent ${activeChart.name === "APR" ? "text-neutral-50" : "text-neutral-500 hover:border-accent-800"}`}
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px] border-transparent ${activeChart.name === "APR" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("APR")}
               >
                 {APRType}
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "vsHodl" ? "text-neutral-50" : "text-neutral-500 hover:border-accent-800"}`}
+                className={`whitespace-nowrap cursor-pointer z-20 p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "vsHodl" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("vsHodl")}
               >
                 VS HODL APR
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "TVL" ? "text-neutral-50" : "text-neutral-500 hover:border-accent-800"}`}
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "TVL" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("TVL")}
               >
                 TVL
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center p-4 border-b-[1.5px]  border-transparent ${
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${
                   activeChart.name === "sharePrice"
-                    ? "text-neutral-50"
+                    ? "text-neutral-50 !border-accent-500"
                     : "text-neutral-500 hover:border-accent-800"
                 }`}
                 onClick={() => chartHandler("sharePrice")}
