@@ -9,7 +9,7 @@ const Checkbox: React.FC<IProps> = ({ checked, onChange }) => {
       checked={checked}
       onChange={onChange}
       type="checkbox"
-      className={`appearance-none h-5 w-5 border-[1.5px] border-[#612FFB] rounded-md ${!checked ? "hover:bg-[#2B1570]" : ""} checked:bg-[#612FFB] checked:border-[#612FFB] focus:outline-none transition duration-300 relative cursor-pointer`}
+      className={`appearance-none h-5 w-5 border-[1.5px] border-accent-500 rounded-md ${!checked ? "hover:bg-accent-800" : ""} checked:bg-accent-500 checked:border-accent-500 focus:outline-none transition duration-300 relative cursor-pointer`}
     />
   );
 };

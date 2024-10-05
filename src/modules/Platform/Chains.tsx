@@ -122,7 +122,7 @@ const Chains = (): JSX.Element => {
       </div>
 
       <table className="w-full font-manrope">
-        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+        <thead className="bg-accent-950 text-neutral-600 h-[36px]">
           <tr className="text-[12px] uppercase">
             <td className="px-4 py-2">Chain</td>
             <td className="px-4 py-2 text-center">ID</td>
@@ -136,7 +136,7 @@ const Chains = (): JSX.Element => {
         <tbody className="text-[14px]">
           {Object.entries(chains).map(
             ([chainId, { name, status, img, multisig, chainLibGithubId }]) => (
-              <tr key={chainId} className="h-[48px] hover:bg-[#130932]">
+              <tr key={chainId} className="h-[48px] hover:bg-accent-950">
                 <td className="px-4 py-3">
                   <div className="flex items-center">
                     {img && (

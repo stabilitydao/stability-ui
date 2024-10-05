@@ -10,7 +10,7 @@ const Assets = (): JSX.Element => {
       <h1>Assets</h1>
 
       <table className="font-manrope w-full">
-        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+        <thead className="bg-accent-950 text-neutral-600 h-[36px]">
           <tr className="text-[12px] uppercase">
             <td className="px-4 py-2">Symbol</td>
             <td className="px-4 py-2">Website</td>
@@ -19,7 +19,7 @@ const Assets = (): JSX.Element => {
         </thead>
         <tbody className="text-[14px]">
           {assets.map(({ addresses, symbol, website }) => (
-            <tr className="h-[48px] hover:bg-[#130932]" key={website}>
+            <tr className="h-[48px] hover:bg-accent-950" key={website}>
               <td className="px-4 py-3">{symbol}</td>
               <td className="px-4 py-3 ">
                 <a

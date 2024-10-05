@@ -2,6 +2,8 @@ import { memo, useMemo, useState, useEffect } from "react";
 
 import { zeroAddress, getAddress } from "viem";
 
+import { HeadingText } from "@ui";
+
 import { getProtocolLogo } from "@utils";
 
 import { DEXes, CHAINS } from "@constants";
@@ -144,9 +146,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
 
   return (
     <div className="rounded-md h-full">
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Contracts</h2>
-      </div>
+      <HeadingText text="Contracts" scale={2} styles="text-left" />
 
       <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">
         <tbody>

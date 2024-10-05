@@ -4,6 +4,8 @@ import { formatUnits } from "viem";
 
 import { useWalletClient, useAccount, usePublicClient } from "wagmi";
 
+import { HeadingText } from "@ui";
+
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 import { getAsset } from "@stabilitydao/stability";
@@ -190,9 +192,7 @@ const Assets: React.FC<IProps> = memo(
 
     return (
       <div className="p-3 mt-5">
-        <h2 className="mb-2 text-[28px] text-start h-[50px] flex items-center ml-1">
-          Assets
-        </h2>
+        <HeadingText text="Assets" scale={2} styles="text-left" />
         <div className="flex justify-center items-center gap-5 mb-5">
           {investedData && <Chart data={investedData} />}
 

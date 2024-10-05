@@ -6,6 +6,8 @@ import { formatUnits } from "viem";
 
 import { readContract } from "@wagmi/core";
 
+import { HeadingText } from "@ui";
+
 import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
@@ -252,9 +254,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Underlying ALM</h2>
-      </div>
+      <HeadingText text="Underlying ALM" scale={2} styles="text-left" />
       <div className="flex flex-col gap-6 ml-4">
         <div className="flex items-center gap-3">
           <img

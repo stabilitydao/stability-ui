@@ -125,6 +125,10 @@ const Chart: React.FC<IProps> = ({ chart }) => {
           tick={({ x, y, payload }) => (
             <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
+          style={{
+            fill: "#958CA1",
+            fontSize: "12px",
+          }}
         />
         <YAxis
           domain={
@@ -139,8 +143,8 @@ const Chart: React.FC<IProps> = ({ chart }) => {
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#8d8e96",
-            fontSize: "16px",
+            fill: "#958CA1",
+            fontSize: "12px",
           }}
           mirror={true}
         />

@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import { HoldModal } from "@ui";
+import { HoldModal, HeadingText } from "@ui";
 
 import { connected } from "@store";
 
@@ -96,9 +96,8 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Yield rates</h2>
-      </div>
+      <HeadingText text="Yield Rates" scale={2} styles="text-left" />
+
       <div className="p-4">
         {!!vault?.earningData && (
           <table className="table table-auto w-full rounded-lg">

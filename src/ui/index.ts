@@ -18,6 +18,7 @@ import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
 import { CountersBlock } from "./CountersBlock";
 import { Checkbox } from "./Checkbox";
+import { HeadingText } from "./HeadingText";
 
 export {
   Toast,
@@ -40,4 +41,5 @@ export {
   ColorIndicator,
   CountersBlock,
   Checkbox,
+  HeadingText,
 };

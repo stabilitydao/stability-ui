@@ -74,8 +74,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     [network]
   );
   return (
-    <div className="bg-[#130932] rounded-2xl font-manrope">
-      <div className="bg-[#0C0620] border-[2px] border-[#130932] rounded-t-2xl flex justify-between items-center h-[62px] px-6">
+    <div className="bg-accent-950 rounded-2xl font-manrope">
+      <div className="bg-accent-1000 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[62px] px-6">
         <div
           data-testid="infoBarLogo"
           className="hidden lg:flex items-center gap-0.5"
@@ -130,7 +130,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         <div className="flex items-center flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <div className="flex flex-row lg:flex-col items-start gap-5 w-full">
             <div className="w-1/2 lg:w-auto ">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 TVL
               </p>
               <p
@@ -141,7 +141,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 DEPOSITED
               </p>
               <div className="text-[18px] font-semibold flex whitespace-nowrap">
@@ -156,7 +156,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 SHARE PRICE
               </p>
               <p
@@ -167,7 +167,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 DAILY
               </p>
               <p
@@ -180,7 +180,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 APR / APY
               </p>
               <p
@@ -191,7 +191,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-[#A6A0B2] mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 MONTHLY
               </p>
               <p

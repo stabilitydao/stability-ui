@@ -29,7 +29,7 @@ const Header = (): JSX.Element => {
 
   return (
     <WagmiLayout>
-      <header className="font-manrope bg-[#130932] md:bg-transparent rounded-b-[16px]">
+      <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px]">
         <span className="title sm:w-4/12 md:w-5/12">
           <a data-testid="stability-logo" href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
@@ -82,21 +82,21 @@ const Header = (): JSX.Element => {
         </div>
         <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
           <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "" || currentPath.includes("vault/") ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${currentPath === "" || currentPath.includes("vault/") ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/"
           >
             Vaults
           </a>
           <a
             data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${currentPath === "users" ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${currentPath === "users" ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/users"
           >
             Users
           </a>
           <a
             data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${platformPaths.some((path) => path === currentPath) || currentPath.includes("network") ? "bg-[#2B1570] rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${platformPaths.some((path) => path === currentPath) || currentPath.includes("network") ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"
           >
             Platform

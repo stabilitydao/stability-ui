@@ -62,7 +62,7 @@ const APRtimeSwitcher = (): JSX.Element => {
   //       setDropDownSelector((prevState) => !prevState);
   //     }}
   //     data-testid="strategyFilterDropdown"
-  //     className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-[#1F0F50] text-[#F9F8FA] rounded-2xl cursor-pointer"
+  //     className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
   //   >
   //     <p>
   //       {filter.name}: {activeStrategy}
@@ -77,7 +77,7 @@ const APRtimeSwitcher = (): JSX.Element => {
   //   </div>
   //   <div
   //     ref={dropDownRef}
-  //     className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-20 ${
+  //     className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
   //       dropDownSelector
   //         ? "absolute transition delay-[50ms]"
   //         : "hidden"
@@ -92,7 +92,7 @@ const APRtimeSwitcher = (): JSX.Element => {
   //               activeFiltersHandler(filter, variant.name)
   //             }
   //             className={`${!index && "rounded-t-2xl"} ${index === filter.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-  //               variant.state ? "bg-[#2B1570]" : ""
+  //               variant.state ? "bg-accent-800" : ""
   //             }`}
   //             data-testid="strategy"
   //           >
@@ -111,7 +111,7 @@ const APRtimeSwitcher = (): JSX.Element => {
           setDropDownSelector((prevState) => !prevState);
         }}
         data-testid="APRTimeSwitcher"
-        className="flex items-center justify-between gap-3 px-3 py-1 bg-[#1F0F50] text-[#F9F8FA] rounded-2xl h-10 cursor-pointer"
+        className="flex items-center justify-between gap-3 px-3 py-1 bg-accent-900 text-neutral-50 rounded-2xl h-10 cursor-pointer"
       >
         <p>
           APRs:{" "}
@@ -131,7 +131,7 @@ const APRtimeSwitcher = (): JSX.Element => {
       </div>
       <div
         ref={dropDownRef}
-        className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-20 ${
+        className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
           dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
         } `}
       >
@@ -146,7 +146,7 @@ const APRtimeSwitcher = (): JSX.Element => {
                 key={APRType}
                 onClick={() => APRsHandler(APRType)}
                 className={`${!index && "rounded-t-2xl"} ${index === APRsType.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-                  isActive ? "bg-[#2B1570]" : ""
+                  isActive ? "bg-accent-800" : ""
                 }`}
                 data-testid="APRType"
               >

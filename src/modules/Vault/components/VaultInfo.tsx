@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { useWalletClient, useAccount } from "wagmi";
 
-import { VaultState, VaultType } from "@ui";
+import { VaultState, VaultType, HeadingText } from "@ui";
 
 import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
@@ -67,9 +67,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Vault</h2>
-      </div>
+      <HeadingText text="Vault" scale={2} styles="text-left" />
 
       <div className="flex flex-col items-start gap-5 p-4">
         <div className="flex flex-col gap-3">

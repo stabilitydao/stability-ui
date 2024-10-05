@@ -3,6 +3,8 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
+import { HeadingText } from "@ui";
+
 import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
@@ -84,9 +86,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, vaultTypes, strategyTypes]);
   return (
     <div>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Strategy</h2>
-      </div>
+      <HeadingText text="Strategy" scale={2} styles="text-left" />
       <div className="flex flex-col items-start gap-3 p-4">
         <div className="flex items-start flex-col gap-3">
           <div className="flex">

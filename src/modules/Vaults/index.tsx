@@ -499,12 +499,12 @@ const Vaults = (): JSX.Element => {
               <img
                 src="/search.svg"
                 alt="Search"
-                className="w-4 h-4 text-[#A6A0B2]"
+                className="w-4 h-4 text-neutral-500"
               />
             </span>
             <input
               type="text"
-              className="mt-1 lg:mt-0 w-full bg-[#1F0F50] hover:border-[#612FFB] hover:bg-[#2B1570] outline-none py-[3px] rounded-2xl border-[2px] border-[#2B1570] focus:border-[#612FFB] focus:text-[#F9F8FA] text-[#A6A0B2] transition-all duration-300 h-10 pl-10"
+              className="mt-1 lg:mt-0 w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10"
               placeholder="Search"
               ref={search}
               onChange={() => tableHandler()}
@@ -626,7 +626,7 @@ const Vaults = (): JSX.Element => {
 
       <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
         <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
-          <thead className="bg-[#130932]">
+          <thead className="bg-accent-950">
             <tr className="text-[12px] uppercase">
               {tableStates.map((value: TTableColumn, index: number) => (
                 <ColumnSort
@@ -671,11 +671,11 @@ const Vaults = (): JSX.Element => {
                     return (
                       <tr
                         key={vault.name + index}
-                        className="text-center min-[1020px]:hover:bg-[#130932] cursor-pointer h-[48px] font-medium relative"
+                        className="text-center min-[1020px]:hover:bg-accent-950 cursor-pointer h-[48px] font-medium relative"
                         onClick={() => toVault(vault.network, vault.address)}
                         data-testid="vault"
                       >
-                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-[#130932] min-[1020px]:bg-transparent z-10">
+                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-accent-950 min-[1020px]:bg-transparent z-10">
                           <div className="flex items-center min-[1020px]:ml-0 ml-[18px]">
                             {/* {vault?.risk?.isRektStrategy ? (
                                 <div

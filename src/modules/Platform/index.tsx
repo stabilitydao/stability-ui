@@ -70,7 +70,7 @@ const Platform = (): JSX.Element => {
     <div className="flex flex-col min-[1440px]:w-[1338px] gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
-      <div className="flex p-[16px] gap-[8px] bg-[#441B06] rounded-[24px]">
+      <div className="flex p-[16px] gap-[8px] bg-warning-950 rounded-[24px]">
         <svg
           className="mt-[2px]"
           width="24"

@@ -96,6 +96,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           tick={({ x, y, payload }) => (
             <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
+          style={{ fill: "#958CA1" }}
         />
         <YAxis
           domain={[min, "auto"]}
@@ -104,8 +105,8 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#8d8e96",
-            fontSize: "16px",
+            fill: "#958CA1",
+            fontSize: "12px",
           }}
         />
 
@@ -113,7 +114,12 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
 
         <Bar dataKey={chart.name} stackId="bar">
           {chart.data.map((_: TChartData, index: number) => (
-            <Cell cursor="pointer" fill="#4626bc" key={`cell-${index}`} />
+            <Cell
+              cursor="pointer"
+              fill="#612FFB"
+              key={`cell-${index}`}
+              radius={[10, 10, 0, 0]}
+            />
           ))}
         </Bar>
       </BarChart>
