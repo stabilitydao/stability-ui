@@ -4,7 +4,13 @@ import { useStore } from "@nanostores/react";
 
 import { formatUnits } from "viem";
 
-import { APRtimeSwitcher, FeeAPRModal } from "@ui";
+import {
+  APRtimeSwitcher,
+  FeeAPRModal,
+  HeadingText,
+  RiskIndicator,
+  TimeDifferenceIndicator,
+} from "@ui";
 
 import { aprFilter } from "@store";
 
@@ -75,9 +81,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div
-        className="bg-accent-800 border-b-[2px] border-accent-800 rounded-t-2xl flex justify-between items-center h-[54px] px-6"
-      >
+      <div className="bg-accent-1000 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[54px] px-6">
         <div
           data-testid="infoBarLogo"
           className="hidden lg:flex items-center gap-0.5"
@@ -88,10 +92,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             className="w-[28px] h-[28px] rounded-full mr-1.5"
           />
 
-          <span className="text-[24px] font-bold">{vault.symbol}</span>
-
+          <HeadingText text={vault.symbol} scale={2} />
         </div>
-
       </div>
 
       <div className="flex w-full gap-5 p-6">
@@ -101,19 +103,15 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 Chain
               </p>
-              <p
-                data-testid="infoBarAPR"
-                className="text-[18px] font-semibold whitespace-nowrap flex items-center"
-              >
+              <div className="text-[18px] font-semibold whitespace-nowrap flex items-center">
                 <img
                   className="w-6 h-6 rounded-full hidden lg:flex mr-1"
                   src={vaultChain?.logoURI}
                   alt={vaultChain?.name}
                   title={vaultChain?.name}
                 />
-                {/*{vault.network}*/}
-                Base
-              </p>
+                {vaultChain?.name}
+              </div>
             </div>
 
             <div className="w-1/2 lg:w-auto">
@@ -150,29 +148,21 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 ${Number(vault.shareprice).toFixed(5)}
               </p>
             </div>
-
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-9">
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 Vault type
               </p>
-              <p
-                data-testid="infoBarAPR"
-                className="text-[18px] font-semibold whitespace-nowrap text-[#00bb99] bg-[#00110a]"
-              >
-                {/*{vault.type}*/}
-                CVault
+              <p className="text-[18px] font-semibold whitespace-nowrap text-[#00bb99] bg-[#00110a]">
+                {vault.type}
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 VS HODL APR
               </p>
-              <p
-                data-testid="infoBarAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
+              <p className="text-[18px] font-semibold whitespace-nowrap">
                 {earnData.apy}%
               </p>
             </div>
@@ -180,10 +170,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 ALM TVL
               </p>
-              <p
-                data-testid="infoBarSP"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
+              <p className="text-[18px] font-semibold whitespace-nowrap">
                 {formatNumber(Number(vault.pool.tvl), "abbreviate")}
               </p>
             </div>
@@ -191,12 +178,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 LAST HARD WORK
               </p>
-              <p
-                data-testid="infoBarSP"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
-                -
-              </p>
+              <TimeDifferenceIndicator unix={vault?.lastHardWork} />
             </div>
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-9">
@@ -204,11 +186,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 Strategy
               </p>
-              <p
-                data-testid="infoBarAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
-
+              <div className="text-[18px] font-semibold whitespace-nowrap">
                 <div className="flex gap-0.5 items-center ">
                   {!!vault?.strategyInfo?.protocols.length && (
                     <div
@@ -227,7 +205,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                     </div>
                   )}
                   {!!vault.yearnProtocols.length && (
-                    <div className="flex gap-0.5" data-testid="infoBarProtocolsLogo">
+                    <div
+                      className="flex gap-0.5"
+                      data-testid="infoBarProtocolsLogo"
+                    >
                       {vault.yearnProtocols.map((protocol) => (
                         <img
                           key={protocol.link}
@@ -240,46 +221,33 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                     </div>
                   )}
                 </div>
-              </p>
+              </div>
             </div>
             <div className="w-1/2 lg:w-auto h-[42px]">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 Period
               </p>
-              <p
-                data-testid="infoBarMonthlyAPR"
-                className="text-[18px] font-semibold whitespace-nowrap flex pt-0.5"
-              >
-                <APRtimeSwitcher/>
-              </p>
+              <APRtimeSwitcher />
             </div>
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 POOL TVL
               </p>
-              <p
-                data-testid="infoBarMonthlyAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
+              <p className="text-[18px] font-semibold whitespace-nowrap">
                 {formatNumber(Number(vault.pool.tvl), "abbreviate")}
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-3">
                 Risk
               </p>
-              <p
-                data-testid="infoBarMonthlyAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
-              >
-                {'s '}
-              </p>
+              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex w-full gap-5 px-6 py-5 bg-accent-900 rounded-b-2xl">
+      <div className="flex w-full gap-5 px-6 py-5 bg-accent-1000 border-[2px] border-accent-950 rounded-b-2xl">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <div className="w-1/2 lg:w-auto">
             <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
@@ -307,7 +275,6 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               {earnData.dailyAPR}% / {earnData.dailyEarn}$
             </p>
           </div>
-
         </div>
 
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
@@ -325,10 +292,9 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-
-      {feeAPRModal && <FeeAPRModal setModalState={setFeeAPRModal}/>}
+      {feeAPRModal && <FeeAPRModal setModalState={setFeeAPRModal} />}
     </div>
   );
 });
 
-export {InfoBar};
+export { InfoBar };

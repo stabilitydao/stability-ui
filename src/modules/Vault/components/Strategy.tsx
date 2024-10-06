@@ -3,7 +3,7 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import { HeadingText } from "@ui";
+import { HeadingText, RiskIndicator } from "@ui";
 
 import { connected, platformsData, apiData } from "@store";
 
@@ -203,20 +203,8 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               RISK
             </p>
-            <div>
-              {vault?.risk?.symbol === "REKT" ||
-              vault?.risk?.symbol === "REKT+" ? (
-                <p className="text-[20px] font-bold text-[#f52a11] mb-2">
-                  {vault?.risk?.symbol}
-                </p>
-              ) : (
-                <p
-                  style={{ color: vault?.strategyInfo?.il?.color }}
-                  className="text-[20px] font-bold mb-2"
-                >
-                  {vault?.risk?.symbol}
-                </p>
-              )}
+            <div className="flex flex-col gap-2 mt-2">
+              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
 
               <div className="flex items-center gap-5 flex-wrap">
                 {vault?.risk?.factors.map((factor) => (
