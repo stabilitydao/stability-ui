@@ -435,12 +435,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               : (vault?.strategySpecific as string);
         }
         /////
-
-        const strategyVersion =
-          stabilityAPIData?.platforms?.[chainID]?.versions?.strategy?.[
-            vault.strategyId
-          ];
-
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
 
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
@@ -469,7 +463,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             strategyDescription: vault.strategyDescription,
             status: vault.status,
             version: vault.version,
-            strategyVersion: strategyVersion,
+            strategyVersion: vault.strategyVersion,
             underlyingSymbol: vault?.underlyingSymbol || "",
             NFTtokenID: vault.vaultManagerId,
             gasReserve: vault.gasReserve,

@@ -252,9 +252,9 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
           {needStrategyUpgrade && (
             <button
               onClick={upgradeStrategy}
-              className="bg-[#1c1c23] py-1 px-2 rounded-md"
+              className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-[10px] px-4 rounded-2xl"
             >
-              Upgrade Strategy
+              Upgrade to {vault?.strategyVersion}
             </button>
           )}
         </div>

@@ -111,7 +111,7 @@ const APRtimeSwitcher = (): JSX.Element => {
           setDropDownSelector((prevState) => !prevState);
         }}
         data-testid="APRTimeSwitcher"
-        className="flex items-center justify-between gap-3 px-3 py-1 bg-accent-900 text-neutral-50 rounded-2xl h-10 cursor-pointer"
+        className="flex items-center justify-between gap-3 px-3 py-1 bg-accent-900 text-neutral-50 rounded-2xl h-8 cursor-pointer"
       >
         <p>
           APRs:{" "}
