@@ -75,7 +75,9 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div className="bg-accent-1000 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[62px] px-6">
+      <div
+        className="bg-accent-800 border-b-[2px] border-accent-800 rounded-t-2xl flex justify-between items-center h-[54px] px-6"
+      >
         <div
           data-testid="infoBarLogo"
           className="hidden lg:flex items-center gap-0.5"
@@ -83,52 +85,49 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           <img
             src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
             alt="logo"
-            className="w-6 h-6 rounded-full"
+            className="w-[28px] h-[28px] rounded-full mr-1.5"
           />
-          <div className="flex gap-0.5">
-            <img
-              className="w-6 h-6 rounded-full hidden lg:flex"
-              src={vaultChain?.logoURI}
-              alt={vaultChain?.name}
-              title={vaultChain?.name}
-            />
-            {!!vault?.strategyInfo?.protocols.length && (
-              <div
-                className="lg:flex items-start gap-0.5 hidden"
-                data-testid="infoBarStrategyesLogo"
-              >
-                {vault?.strategyInfo?.protocols.map((protocol, index) => (
-                  <img
-                    key={protocol?.name + index}
-                    className="w-6 h-6 rounded-full"
-                    src={protocol?.logoSrc}
-                    alt={protocol?.name}
-                    title={protocol?.name}
-                  />
-                ))}
-              </div>
-            )}
-            {!!vault.yearnProtocols.length && (
-              <div className="flex gap-0.5" data-testid="infoBarProtocolsLogo">
-                {vault.yearnProtocols.map((protocol) => (
-                  <img
-                    key={protocol.link}
-                    src={protocol.link}
-                    alt={protocol.title}
-                    title={protocol.title}
-                    className="h-6 w-6 rounded-full"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+
+          <span className="text-[24px] font-bold">{vault.symbol}</span>
+
         </div>
 
-        <APRtimeSwitcher />
       </div>
+
       <div className="flex w-full gap-5 p-6">
-        <div className="flex items-center flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <div className="flex flex-row lg:flex-col items-start gap-5 w-full">
+        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
+          <div className="flex flex-row lg:flex-col items-start gap-9 w-full">
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                Chain
+              </p>
+              <p
+                data-testid="infoBarAPR"
+                className="text-[18px] font-semibold whitespace-nowrap flex items-center"
+              >
+                <img
+                  className="w-6 h-6 rounded-full hidden lg:flex mr-1"
+                  src={vaultChain?.logoURI}
+                  alt={vaultChain?.name}
+                  title={vaultChain?.name}
+                />
+                {/*{vault.network}*/}
+                Base
+              </p>
+            </div>
+
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                Income APR
+              </p>
+              <p
+                data-testid="infoBarAPR"
+                className="text-[18px] font-semibold whitespace-nowrap"
+              >
+                {earnData.apr}%
+              </p>
+            </div>
+
             <div className="w-1/2 lg:w-auto ">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 TVL
@@ -142,21 +141,6 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             </div>
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                DEPOSITED
-              </p>
-              <div className="text-[18px] font-semibold flex whitespace-nowrap">
-                <p data-testid="infoBarDeposited" className="mr-1">
-                  {formatNumber(userBalances.shareBalance, "format")}
-                </p>
-                <p className="whitespace-nowrap md:hidden lg:block">
-                  / ${formatNumber(userBalances.USDBalance, "format")}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
                 SHARE PRICE
               </p>
               <p
@@ -166,48 +150,185 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 ${Number(vault.shareprice).toFixed(5)}
               </p>
             </div>
+
+          </div>
+          <div className="flex flex-row lg:flex-col items-start w-full gap-9">
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                DAILY
+                Vault type
               </p>
               <p
-                data-testid="infoBarDailyAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
+                data-testid="infoBarAPR"
+                className="text-[18px] font-semibold whitespace-nowrap text-[#00bb99] bg-[#00110a]"
               >
-                {earnData.dailyAPR}% / {earnData.dailyEarn}$
+                {/*{vault.type}*/}
+                CVault
               </p>
             </div>
-          </div>
-          <div className="flex flex-row lg:flex-col items-start w-full gap-5">
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                APR / APY
+                VS HODL APR
               </p>
               <p
                 data-testid="infoBarAPR"
                 className="text-[18px] font-semibold whitespace-nowrap"
               >
-                {earnData.apr}% / {earnData.apy}%
+                {earnData.apy}%
               </p>
             </div>
             <div className="w-1/2 lg:w-auto">
               <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                MONTHLY
+                ALM TVL
+              </p>
+              <p
+                data-testid="infoBarSP"
+                className="text-[18px] font-semibold whitespace-nowrap"
+              >
+                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                LAST HARD WORK
+              </p>
+              <p
+                data-testid="infoBarSP"
+                className="text-[18px] font-semibold whitespace-nowrap"
+              >
+                -
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-row lg:flex-col items-start w-full gap-9">
+            <div className="w-1/2 lg:w-auto h-[42px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                Strategy
+              </p>
+              <p
+                data-testid="infoBarAPR"
+                className="text-[18px] font-semibold whitespace-nowrap"
+              >
+
+                <div className="flex gap-0.5 items-center ">
+                  {!!vault?.strategyInfo?.protocols.length && (
+                    <div
+                      className="lg:flex items-start gap-0.5 hidden"
+                      data-testid="infoBarStrategyesLogo"
+                    >
+                      {vault?.strategyInfo?.protocols.map((protocol, index) => (
+                        <img
+                          key={protocol?.name + index}
+                          className="w-6 h-6 rounded-full"
+                          src={protocol?.logoSrc}
+                          alt={protocol?.name}
+                          title={protocol?.name}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {!!vault.yearnProtocols.length && (
+                    <div className="flex gap-0.5" data-testid="infoBarProtocolsLogo">
+                      {vault.yearnProtocols.map((protocol) => (
+                        <img
+                          key={protocol.link}
+                          src={protocol.link}
+                          alt={protocol.title}
+                          title={protocol.title}
+                          className="h-6 w-6 rounded-full"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto h-[42px]">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                Period
+              </p>
+              <p
+                data-testid="infoBarMonthlyAPR"
+                className="text-[18px] font-semibold whitespace-nowrap flex pt-0.5"
+              >
+                <APRtimeSwitcher/>
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                POOL TVL
               </p>
               <p
                 data-testid="infoBarMonthlyAPR"
                 className="text-[18px] font-semibold whitespace-nowrap"
               >
-                {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
+                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
+              </p>
+            </div>
+            <div className="w-1/2 lg:w-auto">
+              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+                Risk
+              </p>
+              <p
+                data-testid="infoBarMonthlyAPR"
+                className="text-[18px] font-semibold whitespace-nowrap"
+              >
+                {'s '}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {feeAPRModal && <FeeAPRModal setModalState={setFeeAPRModal} />}
+      <div className="flex w-full gap-5 px-6 py-5 bg-accent-900 rounded-b-2xl">
+        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
+          <div className="w-1/2 lg:w-auto">
+            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+              DEPOSITED
+            </p>
+            <div className="text-[18px] font-semibold flex whitespace-nowrap">
+              <p data-testid="infoBarDeposited" className="mr-1">
+                {formatNumber(userBalances.shareBalance, "format")}
+              </p>
+              <p className="whitespace-nowrap md:hidden lg:block">
+                / ${formatNumber(userBalances.USDBalance, "format")}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
+          <div className="w-1/2 lg:w-auto">
+            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+              DAILY
+            </p>
+            <p
+              data-testid="infoBarDailyAPR"
+              className="text-[18px] font-semibold whitespace-nowrap"
+            >
+              {earnData.dailyAPR}% / {earnData.dailyEarn}$
+            </p>
+          </div>
+
+        </div>
+
+        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
+          <div className="w-1/2 lg:w-auto">
+            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
+              MONTHLY
+            </p>
+            <p
+              data-testid="infoBarMonthlyAPR"
+              className="text-[18px] font-semibold whitespace-nowrap"
+            >
+              {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+      {feeAPRModal && <FeeAPRModal setModalState={setFeeAPRModal}/>}
     </div>
   );
 });
 
-export { InfoBar };
+export {InfoBar};
