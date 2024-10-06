@@ -2274,10 +2274,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     : 0}
                 </p>
 
-                <div className="my-2 flex flex-col gap-2">
+                <div className="my-2 flex flex-col gap-[2px]">
                   {isNotUnderlying && (
                     <>
-                      <p className="text-[14px] text-neutral-500 mb-3">Swaps</p>
+                      <p className="text-[14px] text-neutral-500 mb-0">Swaps</p>
                       {loader && !transactionInProgress ? (
                         <AssetsSkeleton />
                       ) : (
@@ -2410,7 +2410,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       )}
                     </>
                   )}
-                  <div className="mt-5">
+                  <div className="mt-0">
                     <div className="h-[63px]">
                       <p className="text-[14px] text-neutral-500">
                         You Receive
@@ -2584,7 +2584,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[14px] text-neutral-500 mb-3">Swaps</p>
+                      <p className="text-[14px] text-neutral-500 mb-1">Swaps</p>
                     )}
                     {loader && option.length < 2 && !transactionInProgress ? (
                       <AssetsSkeleton />

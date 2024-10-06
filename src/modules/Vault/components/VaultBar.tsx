@@ -12,9 +12,9 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
       <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap">
         <span
           data-testid="vaultSymbol"
-          className="inline-flex text-[32px] font-medium whitespace-nowrap"
+          className="inline-flex text-[28px] font-medium whitespace-nowrap"
         >
-          {vault.symbol}
+          {vault.name}
         </span>
         {!!vault?.risk?.isRektStrategy && (
           <div className="text-[12px] lg:text-[14px] border border-[#b75457] text-[#f2aeae] bg-[#3f1f24] rounded-md">
@@ -31,10 +31,6 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
             </p>
           </div>
         )}
-
-        <span data-testid="vaultName" className="text-[18px] lg:text-[20px]">
-          {vault.name}
-        </span>
       </div>
     </div>
   );
