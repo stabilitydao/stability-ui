@@ -20,7 +20,7 @@ import { formatFromBigInt, formatNumber } from "@utils";
 
 import { CHAINS } from "@constants";
 
-import type { TVault } from "@types";
+import type { TAPRPeriod, TVault } from "@types";
 
 interface IProps {
   network: string;
@@ -28,7 +28,7 @@ interface IProps {
 }
 
 const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
-  const $aprFilter = useStore(aprFilter);
+  const $aprFilter: TAPRPeriod = useStore(aprFilter);
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [userBalances, setUserBalances] = useState({
@@ -45,8 +45,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   });
 
   useEffect(() => {
-    let apr = vault?.earningData?.apr[$aprFilter];
-    let apy = vault?.earningData?.apy[$aprFilter];
+    let apr = vault.earningData.apr[$aprFilter];
+    let apy = vault.earningData.apy[$aprFilter];
 
     let monthlyAPR, monthlyEarn, dailyAPR, dailyEarn;
 

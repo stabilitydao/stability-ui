@@ -70,6 +70,7 @@ import type {
   // TUpgradesTable,
   TEarningData,
   TVaults,
+  TAPRPeriod,
 } from "@types";
 
 // type TToken = {
@@ -92,7 +93,7 @@ const Vaults = (): JSX.Element => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $error = useStore(error);
-  const $aprFilter = useStore(aprFilter);
+  const $aprFilter: TAPRPeriod = useStore(aprFilter);
   const $connected = useStore(connected);
   // const $publicClient = useStore(publicClient);
   // const $platformVersions = useStore(platformVersions);
@@ -375,8 +376,8 @@ const Vaults = (): JSX.Element => {
         if (state.keyName === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
-              a[state.keyName as keyof TVault]?.apr[$aprFilter],
-              b[state.keyName as keyof TVault]?.apr[$aprFilter],
+              a.earningData.apr[$aprFilter],
+              b.earningData.apr[$aprFilter],
               state.dataType,
               state.sortType
             )
@@ -654,15 +655,15 @@ const Vaults = (): JSX.Element => {
                       (chain) => chain.id === vault.network
                     );
 
-                    const aprValue = vault?.earningData?.apr[$aprFilter] || "0";
+                    const aprValue = vault?.earningData?.apr[$aprFilter];
 
-                    const apyValue = vault?.earningData?.apy[$aprFilter] || "0";
+                    const apyValue = vault.earningData.apy[$aprFilter];
 
                     const swapFeesAPRValue =
-                      vault.earningData.poolSwapFeesAPR[$aprFilter] || "0";
+                      vault.earningData.poolSwapFeesAPR[$aprFilter];
 
                     const strategyAPRValue =
-                      vault.earningData.farmAPR[$aprFilter] || "0";
+                      vault.earningData.farmAPR[$aprFilter];
 
                     const dailyAPRValue = (
                       Number(vault?.earningData?.apr[$aprFilter]) / 365
