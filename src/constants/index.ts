@@ -314,6 +314,8 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
 };
 
+const ZERO_BigInt = BigInt(0);
+
 export {
   APRsType,
   TABLE,
@@ -339,4 +341,5 @@ export {
   DEFAULT_TRANSACTION_SETTINGS,
   DEFAULT_ERROR,
   IL,
+  ZERO_BigInt,
 };

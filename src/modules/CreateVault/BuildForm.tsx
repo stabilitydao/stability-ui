@@ -14,6 +14,8 @@ import { FactoryABI, ERC20ABI, wagmiConfig } from "@web3";
 
 import { getTokenData } from "@utils";
 
+import { ZERO_BigInt } from "@constants";
+
 import {
   account,
   platformsData,
@@ -27,7 +29,6 @@ import {
 import type { TInitParams, TAddress, TInputItem } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
-
 interface IProps {
   vaultType: string;
   strategyId: string;
@@ -73,11 +74,13 @@ const BuildForm = ({
   const BRT = [
     ...new Set([initParams.initVaultAddresses[0], ...defaultBoostTokens]),
   ].map((addr) => ({
-    symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
+    symbol: tokenlist.tokens.find((token: TTokenData) => token.address === addr)
+      ?.symbol,
     address: addr,
     balance: formatUnits(
-      $assetsBalances[$currentChainID]?.[addr] || 0n,
-      tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
+      $assetsBalances[$currentChainID]?.[addr] || ZERO_BigInt,
+      tokenlist.tokens.find((token: TTokenData) => token.address === addr)
+        ?.decimals ?? 18
     ),
     price: $assetsPrices[$currentChainID][addr]?.price,
     sum: "",

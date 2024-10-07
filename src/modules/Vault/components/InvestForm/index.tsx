@@ -51,7 +51,7 @@ import {
   handleInputKeyDown,
 } from "../../functions";
 
-import { DEFAULT_ERROR } from "@constants";
+import { DEFAULT_ERROR, ZERO_BigInt } from "@constants";
 
 import type {
   TAddress,
@@ -367,17 +367,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const selectTokensHandler = async () => {
     if (!$tokens[network]) return;
     let filtredTokens = tokenlist.tokens
-      .filter((token) =>
+      .filter((token: TTokenData) =>
         $tokens[network].includes(token.address.toLowerCase() as TAddress)
       )
-      .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
+      .map(({ address, symbol, logoURI }: TTokenData) => ({
+        address,
+        symbol,
+        logoURI,
+      }));
 
     filtredTokens = filtredTokens.filter(
-      (token) => token.address != defaultOption?.assets
+      (token: TTokenData) => token.address != defaultOption?.assets
     );
     if (defaultOption?.assetsArray?.length < 2) {
       filtredTokens = filtredTokens.filter(
-        (token) => token.address != defaultOption?.assetsArray[0]
+        (token: TTokenData) => token.address != defaultOption?.assetsArray[0]
       );
     }
     ///// GET UNDERLYING TOKEN
@@ -691,7 +695,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         const shares = parseUnits(_strShares, 18);
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-        const out = shares - (shares * decimalPercent) / 100n;
+        const out = shares - (shares * decimalPercent) / BigInt(100);
 
         const txToken: any = {
           [underlyingToken?.address]: {
@@ -762,7 +766,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         const shares = parseUnits(_strShares, 18);
 
-        const out = shares - (shares * decimalPercent) / 100n;
+        const out = shares - (shares * decimalPercent) / BigInt(100);
 
         const amountIn = parseUnits(
           amount,
@@ -845,7 +849,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const depositCCF = async (amount: string) => {
     const decimals = getTokenData(option[0])?.decimals || 18;
     if (option) {
-      let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
+      let amounts: bigint[] = [ZERO_BigInt, parseUnits(amount, decimals)];
 
       try {
         let previewDepositAssets: any;
@@ -932,7 +936,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 getTokenData(outData[0]?.address as TAddress)
                   ?.decimals as number
               )
-            : 0n
+            : ZERO_BigInt
         );
       } else {
         amounts = outData.map((tokenOut) =>
@@ -956,7 +960,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         args: [defaultOption?.assetsArray as TAddress[], amounts],
       });
 
-      let _previewDepositAssets: bigint = 0n;
+      let _previewDepositAssets: bigint = ZERO_BigInt;
 
       if (
         Array.isArray(previewDepositAssets) &&
@@ -1044,7 +1048,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         });
 
         let _newAllowance =
-          typeof newAllowance === "bigint" ? newAllowance : 0n;
+          typeof newAllowance === "bigint" ? newAllowance : ZERO_BigInt;
 
         if (
           Number(formatUnits(_newAllowance, 18)) >= Number(inputs[option[0]])
@@ -1190,7 +1194,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       : (parseUnits(_strShares, 18) * BigInt(1)) / BigInt(100);
 
     if (shortId === "CCF" && option.length < 2) {
-      input.push(0n);
+      input.push(ZERO_BigInt);
     }
 
     for (let i = 0; i < option.length; i++) {
@@ -1203,7 +1207,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const changedInput = assets?.indexOf(lastAsset);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-    const out = BigInt(shares) - (BigInt(shares) * decimalPercent) / 100n;
+    const out =
+      BigInt(shares) - (BigInt(shares) * decimalPercent) / BigInt(100);
 
     let transaction,
       depositAssets: any,
@@ -1221,7 +1226,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
       } else {
         const token = tokenlist.tokens.find(
-          (token) => token.address === option[changedInput ? 0 : 1]
+          (token: TTokenData) => token.address === option[changedInput ? 0 : 1]
         );
 
         const decimals = token ? token.decimals + 18 : 24;
@@ -1252,7 +1257,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         // IQMF strategy only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
-          proportion ? amounts[0] : 0n
+          proportion ? amounts[0] : ZERO_BigInt
         );
         gas = await _publicClient?.estimateContractGas({
           address: vault.address,
@@ -1329,7 +1334,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const amount = parseUnits(obj.amount, 18);
-        return amount - (amount * decimalPercent) / 100n;
+        return amount - (amount * decimalPercent) / BigInt(100);
       });
       try {
         const gas = await _publicClient?.estimateContractGas({
@@ -1382,7 +1387,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       const txTokens = withdrawAmount?.reduce(
         (result, token) => {
           const JSONToken = tokenlist.tokens.find(
-            (t) => t.symbol === token.symbol
+            (t: TTokenData) => t.symbol === token.symbol
           );
 
           result[JSONToken?.address as TAddress] = {
@@ -1396,11 +1401,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const decimals = tokenlist.tokens.find(
-          (token) => token.symbol === obj.symbol
+          (token: TTokenData) => token.symbol === obj.symbol
         )?.decimals;
 
         const amount = parseUnits(obj.amount, decimals ? decimals : 18);
-        return amount - (amount * decimalPercent) / 100n;
+        return amount - (amount * decimalPercent) / BigInt(100);
       });
       try {
         const gas = await _publicClient?.estimateContractGas({
@@ -1550,7 +1555,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [option as TAddress[], currentValue, [0n]],
+          args: [option as TAddress[], currentValue, [ZERO_BigInt]],
           account: $account as TAddress,
         });
         setWithdrawAmount([
@@ -1562,10 +1567,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ]);
         setButton("withdraw");
       } else {
-        let assetsLength = defaultOption?.assetsArray.map((_: string) => 0n);
+        let assetsLength = defaultOption?.assetsArray.map(
+          (_: string) => ZERO_BigInt
+        );
         let localAssets = defaultOption?.assetsArray;
         if (shortId === "IQMF" || shortId === "IRMF") {
-          assetsLength = [0n, 0n];
+          assetsLength = [ZERO_BigInt, ZERO_BigInt];
           localAssets = vault.assets.map((asset) => asset.address);
         }
 
@@ -1667,7 +1674,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       });
 
       if (!allowanceResult[option[i]]) {
-        allowanceResult[option[i]] = 0n;
+        allowanceResult[option[i]] = ZERO_BigInt;
       }
       allowanceResult[option[i]] = allowanceData;
     }
@@ -1726,7 +1733,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               }
             } else {
               const token = tokenlist.tokens.find(
-                (token) => token.address === option[changedInput ? 0 : 1]
+                (token: TTokenData) =>
+                  token.address === option[changedInput ? 0 : 1]
               );
 
               const decimals = token ? token.decimals + 18 : 24;
@@ -1741,7 +1749,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             // IQMF & IRMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
-              (proportion) => (proportion ? amounts[0] : 0n)
+              (proportion) => (proportion ? amounts[0] : ZERO_BigInt)
             );
 
             previewDepositAssets = await _publicClient?.readContract({
@@ -2065,7 +2073,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             src={logoURI as string}
                             alt="logo"
                           />
-                          
                         )}
                         <p className="ml-2">{symbol}</p>
                       </div>

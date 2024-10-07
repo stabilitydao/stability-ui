@@ -7,7 +7,7 @@ import { ChartBar } from "./ChartBar";
 
 import { ChartSkeleton, HeadingText } from "@ui";
 
-import { formatFromBigInt } from "@utils";
+import { formatFromBigInt, getTimeDifference } from "@utils";
 
 import { GRAPH_ENDPOINTS } from "src/constants/env";
 
@@ -19,6 +19,7 @@ interface IProps {
   network: string;
   address: TAddress;
   vaultStrategy: string;
+  lastHardWork: number;
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
@@ -30,14 +31,17 @@ type TActiveChart =
   | undefined;
 
 const HistoricalRate: React.FC<IProps> = memo(
-  ({ network, address, vaultStrategy }) => {
+  ({ network, address, vaultStrategy, lastHardWork }) => {
     const APRType = vaultStrategy === "Compound Farm" ? "APR" : "Farm APR";
+
     const timelineSegments = {
       DAY: "DAY",
       WEEK: "WEEK",
       MONTH: "MONTH",
       YEAR: "YEAR",
     };
+
+    const daysFromLastHardWork = getTimeDifference(lastHardWork).days;
 
     const [chartData, setChartData] = useState<TChartData[]>([]);
     const [activeChart, setActiveChart] = useState<TActiveChart>();
@@ -149,6 +153,12 @@ const HistoricalRate: React.FC<IProps> = memo(
 
       APRChartData = newData.map(formatData);
 
+      if (daysFromLastHardWork >= 3) {
+        APRChartData = APRChartData.filter(
+          (data) => data.unixTimestamp < lastHardWork
+        );
+      }
+
       setChartData(workedData);
       setActiveChart({ name: "APR", data: APRChartData as [] });
     };
@@ -240,7 +250,7 @@ const HistoricalRate: React.FC<IProps> = memo(
             }
           );
 
-          const APRChartData = APRArr.map((obj: TChartData, index: number) => ({
+          let APRChartData = APRArr.map((obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
             date: obj.date,
@@ -248,6 +258,13 @@ const HistoricalRate: React.FC<IProps> = memo(
             x: APRDifferences[index],
             y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
           }));
+
+          if (daysFromLastHardWork >= 3) {
+            APRChartData = APRChartData.filter(
+              (data) => data.unixTimestamp < lastHardWork
+            );
+          }
+
           setActiveChart({
             name: "APR",
             data: APRChartData as [],

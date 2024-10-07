@@ -53,6 +53,7 @@ import {
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
+  ZERO_BigInt,
 } from "@constants";
 
 import type {
@@ -197,114 +198,155 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         });
 
         ///// APR DATA CALCULATION
+        const daysFromLastHardWork = getTimeDifference(
+          vault.lastHardWork as number
+        )?.days;
+
         let poolSwapFeesAPRDaily = 0;
         let poolSwapFeesAPRWeekly = 0;
+        let dailyFarmApr = 0;
+        let weeklyFarmApr = 0;
+        let APR = "0";
+        let APY = "0";
+        let APRWithoutFees = "0";
+        let APRArray = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
+        let APYArray = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
+        let poolSwapFeesAPR = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
+        let farmAPR = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
 
-        const dailyFarmApr = vault.apr?.income24h
-          ? Number(vault.apr?.income24h)
-          : 0;
+        const fee = vault?.almFee?.income || 0;
 
-        const weeklyFarmApr = vault.apr?.incomeWeek
-          ? Number(vault.apr?.incomeWeek)
-          : 0;
+        if (daysFromLastHardWork < 3) {
+          dailyFarmApr = vault.apr?.income24h
+            ? Number(vault.apr?.income24h)
+            : 0;
 
-        if (underlying) {
-          poolSwapFeesAPRDaily = underlying?.apr?.daily || 0;
-          poolSwapFeesAPRWeekly =
-            underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
+          weeklyFarmApr = vault.apr?.incomeWeek
+            ? Number(vault.apr?.incomeWeek)
+            : 0;
+
+          if (underlying) {
+            poolSwapFeesAPRDaily = underlying?.apr?.daily || 0;
+            poolSwapFeesAPRWeekly =
+              underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
+          }
+          if (strategyName === "IQMF" || strategyName === "IRMF") {
+            //////
+            poolSwapFeesAPRDaily =
+              Number(formatUnits(almRebalanceEntity?.[0] || ZERO_BigInt, 8)) -
+              (Number(formatUnits(almRebalanceEntity?.[0] || ZERO_BigInt, 8)) /
+                100) *
+                fee;
+
+            poolSwapFeesAPRWeekly =
+              Number(formatUnits(almRebalanceEntity?.[2] || ZERO_BigInt, 8)) -
+              (Number(formatUnits(almRebalanceEntity?.[2] || ZERO_BigInt, 8)) /
+                100) *
+                fee;
+
+            dailyAPR =
+              Number(formatUnits(almRebalanceEntity?.[1] || ZERO_BigInt, 8)) -
+              (Number(formatUnits(almRebalanceEntity?.[1] || ZERO_BigInt, 8)) /
+                100) *
+                fee;
+
+            if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
+            if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
+            if (!dailyAPR) dailyAPR = 0;
+          }
+
+          APR = (Number(vault?.apr?.incomeLatest) + Number(dailyAPR)).toFixed(
+            2
+          );
+
+          APY = calculateAPY(APR).toFixed(2);
+
+          APRWithoutFees = Number(vault?.apr?.incomeLatest).toFixed(2) || "0";
+
+          ///////
+          const dailyTotalAPRWithFees =
+            Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
+          const weeklyTotalAPRWithFees =
+            Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
+
+          APRArray = {
+            latest: String(APR),
+            daily: determineAPR(
+              vault.apr?.income24h,
+              dailyTotalAPRWithFees,
+              APR
+            ),
+            weekly: determineAPR(
+              vault.apr?.incomeWeek,
+              weeklyTotalAPRWithFees,
+              APR
+            ),
+          };
+          APYArray = {
+            latest: APY,
+            daily: determineAPR(
+              vault.apr?.income24h,
+              calculateAPY(dailyTotalAPRWithFees).toFixed(2),
+              APY
+            ),
+            weekly: determineAPR(
+              vault.apr?.incomeWeek,
+              calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
+              APY
+            ),
+          };
+
+          poolSwapFeesAPR =
+            strategyName != "CF"
+              ? {
+                  latest: Number(dailyAPR).toFixed(2),
+                  daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+                  weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
+                }
+              : { latest: "-", daily: "-", weekly: "-" };
+
+          farmAPR = {
+            latest: APRWithoutFees,
+            daily: determineAPR(
+              vault.apr?.income24h,
+              dailyFarmApr,
+              APRWithoutFees
+            ),
+            weekly: determineAPR(
+              vault.apr?.incomeWeek,
+              weeklyFarmApr,
+              APRWithoutFees
+            ),
+          };
         }
-        if (strategyName === "IQMF" || strategyName === "IRMF") {
-          let fee = vault?.almFee?.income || 0;
 
-          //////
-          poolSwapFeesAPRDaily =
-            Number(formatUnits(almRebalanceEntity?.[0] || 0n, 8)) -
-            (Number(formatUnits(almRebalanceEntity?.[0] || 0n, 8)) / 100) * fee;
+        // rebalances
+        const totalRebalances = vault.almRebalanceRawData || [];
 
-          poolSwapFeesAPRWeekly =
-            Number(formatUnits(almRebalanceEntity?.[2] || 0n, 8)) -
-            (Number(formatUnits(almRebalanceEntity?.[2] || 0n, 8)) / 100) * fee;
+        const _24HRebalances = totalRebalances.filter(
+          (obj: string[]) => Number(obj[3]) >= NOW - 86400
+        ).length;
+        const _7DRebalances = totalRebalances.filter(
+          (obj: string[]) => Number(obj[3]) >= NOW - 86400 * 7
+        ).length;
 
-          dailyAPR =
-            Number(formatUnits(almRebalanceEntity?.[1] || 0n, 8)) -
-            (Number(formatUnits(almRebalanceEntity?.[1] || 0n, 8)) / 100) * fee;
-
-          if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
-          if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
-          if (!dailyAPR) dailyAPR = 0;
-
-          // rebalances
-          const totalRebalances = vault.almRebalanceRawData || [];
-
-          const _24HRebalances = totalRebalances.filter(
-            (obj: string[]) => Number(obj[3]) >= NOW - 86400
-          ).length;
-          const _7DRebalances = totalRebalances.filter(
-            (obj: string[]) => Number(obj[3]) >= NOW - 86400 * 7
-          ).length;
-
-          rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
-        }
-
-        const APR = (
-          Number(vault?.apr?.incomeLatest) + Number(dailyAPR)
-        ).toFixed(2);
-
-        const APY = calculateAPY(APR).toFixed(2);
-
-        const APRWithoutFees = Number(vault?.apr?.incomeLatest).toFixed(2) || 0;
-
-        ///////
-        const dailyTotalAPRWithFees =
-          Number(poolSwapFeesAPRDaily) + Number(dailyFarmApr);
-        const weeklyTotalAPRWithFees =
-          Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
-
-        const APRArray = {
-          latest: String(APR),
-          daily: determineAPR(vault.apr?.income24h, dailyTotalAPRWithFees, APR),
-          weekly: determineAPR(
-            vault.apr?.incomeWeek,
-            weeklyTotalAPRWithFees,
-            APR
-          ),
-        };
-        const APYArray = {
-          latest: APY,
-          daily: determineAPR(
-            vault.apr?.income24h,
-            calculateAPY(dailyTotalAPRWithFees).toFixed(2),
-            APY
-          ),
-          weekly: determineAPR(
-            vault.apr?.incomeWeek,
-            calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
-            APY
-          ),
-        };
-
-        const poolSwapFeesAPR =
-          strategyName != "CF"
-            ? {
-                latest: Number(dailyAPR).toFixed(2),
-                daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
-                weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
-              }
-            : { latest: "-", daily: "-", weekly: "-" };
-
-        const farmAPR = {
-          latest: APRWithoutFees,
-          daily: determineAPR(
-            vault.apr?.income24h,
-            dailyFarmApr,
-            APRWithoutFees
-          ),
-          weekly: determineAPR(
-            vault.apr?.incomeWeek,
-            weeklyFarmApr,
-            APRWithoutFees
-          ),
-        };
+        rebalances = { daily: _24HRebalances, weekly: _7DRebalances };
 
         // IL
         let IL = strategyInfo?.il?.rate || 0;
