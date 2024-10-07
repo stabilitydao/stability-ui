@@ -66,12 +66,12 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <div>
-      <HeadingText text="Vault" scale={2} styles="text-left" />
+      <HeadingText text="Vault" scale={2} styles="text-left ml-4" />
 
       <div className="flex flex-col items-start gap-5 p-4">
         <div className="flex flex-col gap-3">
           <p data-testid="vaultType" className="text-[16px]">
-            <VaultType text="long" type={vault?.type} />
+            <VaultType greater={true} type={vault?.type} />
           </p>
           <p data-testid="vaultIncomeText" className="text-[18px]">
             All income is automatically reinvested into vault

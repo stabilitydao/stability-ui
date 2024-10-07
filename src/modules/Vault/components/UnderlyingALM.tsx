@@ -254,7 +254,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <>
-      <HeadingText text="Underlying ALM" scale={2} styles="text-left" />
+      <HeadingText text="Underlying ALM" scale={2} styles="text-left ml-4" />
       <div className="flex flex-col gap-6 ml-4">
         <div className="flex items-center gap-3">
           <img

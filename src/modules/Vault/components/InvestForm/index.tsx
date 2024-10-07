@@ -2065,6 +2065,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             src={logoURI as string}
                             alt="logo"
                           />
+                          
                         )}
                         <p className="ml-2">{symbol}</p>
                       </div>

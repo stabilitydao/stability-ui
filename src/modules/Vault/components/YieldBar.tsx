@@ -96,7 +96,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
   return (
     <div>
-      <HeadingText text="Yield Rates" scale={2} styles="text-left" />
+      <HeadingText text="Yield Rates" scale={2} styles="text-left ml-4" />
 
       <div className="p-4">
         {!!vault?.earningData && (

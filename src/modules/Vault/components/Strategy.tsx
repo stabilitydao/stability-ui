@@ -86,7 +86,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, vaultTypes, strategyTypes]);
   return (
     <div>
-      <HeadingText text="Strategy" scale={2} styles="text-left" />
+      <HeadingText text="Strategy" scale={2} styles="text-left ml-4" />
       <div className="flex flex-col items-start gap-3 p-4">
         <div className="flex items-start flex-col gap-3">
           <div className="flex">
@@ -195,7 +195,10 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             >
               {vault?.strategyInfo?.il?.title}
             </p>
-            <p className="text-[14px]">{vault?.strategyInfo?.il?.desc != 'None' && vault?.strategyInfo?.il?.desc}</p>
+            <p className="text-[14px]">
+              {vault?.strategyInfo?.il?.desc != "None" &&
+                vault?.strategyInfo?.il?.desc}
+            </p>
           </div>
         </div>
         {!!vault?.risk && vault?.risk?.symbol !== "UNKNOWN" && (

@@ -19,6 +19,7 @@ import { RiskIndicator } from "./RiskIndicator";
 import { CountersBlock } from "./CountersBlock";
 import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
+import { FieldValue } from "./FieldValue";
 
 export {
   Toast,
@@ -42,4 +43,5 @@ export {
   CountersBlock,
   Checkbox,
   HeadingText,
+  FieldValue,
 };
