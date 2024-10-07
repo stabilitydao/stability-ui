@@ -175,7 +175,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
               />
             ) : (
-              <div className="h-[46px]"></div>
+              <div className="h-[72px]"></div>
             )}
 
             <FieldValue
@@ -232,7 +232,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
               />
             ) : (
-              <div className="w-1/2 lg:w-auto h-[46px]"></div>
+              <div className="w-1/2 lg:w-auto h-[72px]"></div>
             )}
 
             <FieldValue
