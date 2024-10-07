@@ -110,144 +110,167 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
       </div>
 
       <div className="flex w-full gap-5 p-6">
-        <div className="flex items-start justify-between flex-nowrap w-full gap-5 lg:gap-0">
-          <div className="flex flex-col items-start gap-9 w-full">
-            <FieldValue
-              name="Assets"
-              value={
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center">
-                    {vault.assets.map((asset) => (
-                      <img
-                        key={asset.address}
-                        src={asset.logo}
-                        alt={asset.symbol}
-                        title={asset.symbol}
-                        className="w-6 h-6 rounded-full"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-[16px] font-semibold">
-                    {vault.assets[0].symbol}{" "}
-                    {vault.assets.length > 1 && `+ ${vault.assets[1].symbol}`}
-                  </p>
-                </div>
-              }
-            />
-
-            <FieldValue
-              name="Income APR"
-              value={<p data-testid="infoBarAPR">{earnData.apr}%</p>}
-            />
-
-            <FieldValue
-              name="TVL"
-              value={
-                <p data-testid="infoBarTVL">
-                  {formatNumber(vault.tvl, "abbreviate")}
-                </p>
-              }
-            />
-
-            <FieldValue
-              name="SHARE PRICE"
-              value={
-                <p data-testid="infoBarSP">
-                  ${Number(vault.shareprice).toFixed(5)}
-                </p>
-              }
-            />
-          </div>
-          <div className="flex flex-col items-start w-full gap-9">
-            <FieldValue
-              name="Vault type"
-              value={<VaultType type={vault.type} greater={true} />}
-            />
-
-            <FieldValue
-              name="VS HODL APR"
-              value={vault.lifetimeVsHoldAPR + "%"}
-            />
-
-            {vault?.alm?.tvl ? (
+        <div className="flex items-start justify-between flex-col flex-nowrap w-full gap-2 md:gap-5">
+          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full">
+            <div className="w-full md:w-1/3 ">
               <FieldValue
-                name="ALM TVL"
-                value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
-              />
-            ) : (
-              <div className="h-[46px]"></div>
-            )}
-
-            <FieldValue
-              name="Last HardWork"
-              value={<TimeDifferenceIndicator unix={vault?.lastHardWork} />}
-            />
-          </div>
-          <div className="flex flex-col items-start w-full gap-9">
-            <FieldValue
-              name="Strategy"
-              value={
-                <div className="flex gap-0.5 items-end h-[29px]">
-                  {!!vault?.strategyInfo?.protocols.length && (
-                    <div
-                      className="lg:flex items-start gap-0.5 hidden"
-                      data-testid="infoBarStrategyesLogo"
-                    >
-                      {vault?.strategyInfo?.protocols.map((protocol, index) => (
+                name="Assets"
+                value={
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      {vault.assets.map((asset) => (
                         <img
-                          key={protocol?.name + index}
+                          key={asset.address}
+                          src={asset.logo}
+                          alt={asset.symbol}
+                          title={asset.symbol}
                           className="w-6 h-6 rounded-full"
-                          src={protocol?.logoSrc}
-                          alt={protocol?.name}
-                          title={protocol?.name}
                         />
                       ))}
                     </div>
-                  )}
-                  {!!vault.yearnProtocols.length && (
-                    <div
-                      className="flex gap-0.5"
-                      data-testid="infoBarProtocolsLogo"
-                    >
-                      {vault.yearnProtocols.map((protocol) => (
-                        <img
-                          key={protocol.link}
-                          src={protocol.link}
-                          alt={protocol.title}
-                          title={protocol.title}
-                          className="h-6 w-6 rounded-full"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              }
-            />
-
-            <FieldValue name="Period" value={<APRtimeSwitcher />} />
-
-            {vault?.pool?.tvl ? (
-              <FieldValue
-                name="POOL TVL"
-                value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                    <p className="text-[16px] font-semibold">
+                      {vault.assets[0].symbol}{" "}
+                      {vault.assets.length > 1 && `+ ${vault.assets[1].symbol}`}
+                    </p>
+                  </div>
+                }
               />
-            ) : (
-              <div className="w-1/2 lg:w-auto h-[46px]"></div>
-            )}
+            </div>
 
-            <FieldValue
-              name="Risk"
-              value={
-                <div className="flex h-[28px] items-center">
-                  <RiskIndicator riskSymbol={vault?.risk?.symbol} />
-                </div>
-              }
-            />
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Vault type"
+                value={<VaultType type={vault.type} greater={true} />}
+              />
+            </div>
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Strategy"
+                value={
+                  <div className="flex gap-0.5 items-end h-[29px]">
+                    {!!vault?.strategyInfo?.protocols.length && (
+                      <div
+                        className="flex items-start gap-0.5"
+                        data-testid="infoBarStrategyesLogo"
+                      >
+                        {vault?.strategyInfo?.protocols.map(
+                          (protocol, index) => (
+                            <img
+                              key={protocol?.name + index}
+                              className="w-6 h-6 rounded-full"
+                              src={protocol?.logoSrc}
+                              alt={protocol?.name}
+                              title={protocol?.name}
+                            />
+                          )
+                        )}
+                      </div>
+                    )}
+                    {!!vault.yearnProtocols.length && (
+                      <div
+                        className="flex gap-0.5"
+                        data-testid="infoBarProtocolsLogo"
+                      >
+                        {vault.yearnProtocols.map((protocol) => (
+                          <img
+                            key={protocol.link}
+                            src={protocol.link}
+                            alt={protocol.title}
+                            title={protocol.title}
+                            className="h-6 w-6 rounded-full"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            </div>
+          </div>
+          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Income APR"
+                value={<p data-testid="infoBarAPR">{earnData.apr}%</p>}
+              />
+            </div>
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="VS HODL APR"
+                value={vault.lifetimeVsHoldAPR + "%"}
+              />
+            </div>
+            <div className="w-full md:w-1/3 ">
+              <FieldValue name="Period" value={<APRtimeSwitcher />} />
+            </div>
+          </div>
+          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="TVL"
+                value={
+                  <p data-testid="infoBarTVL">
+                    {formatNumber(vault.tvl, "abbreviate")}
+                  </p>
+                }
+              />
+            </div>
+            <div className="w-full md:w-1/3 ">
+              {vault?.alm?.tvl ? (
+                <FieldValue
+                  name="ALM TVL"
+                  value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
+                />
+              ) : (
+                <div className="h-[46px]"></div>
+              )}
+            </div>
+
+            <div className="w-full md:w-1/3 ">
+              {vault?.pool?.tvl ? (
+                <FieldValue
+                  name="POOL TVL"
+                  value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                />
+              ) : (
+                <div className="w-1/2 lg:w-auto h-[46px]"></div>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="SHARE PRICE"
+                value={
+                  <p data-testid="infoBarSP">
+                    ${Number(vault.shareprice).toFixed(5)}
+                  </p>
+                }
+              />
+            </div>
+
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Last HardWork"
+                value={<TimeDifferenceIndicator unix={vault?.lastHardWork} />}
+              />
+            </div>
+
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Risk"
+                value={
+                  <div className="flex h-[28px] items-center">
+                    <RiskIndicator riskSymbol={vault?.risk?.symbol} />
+                  </div>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex w-full px-6 py-5 bg-accent-900 rounded-b-2xl">
+      <div className="flex w-full flex-col md:flex-row px-6 py-5 bg-accent-900 rounded-b-2xl">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <FieldValue
             name="DEPOSITED"

@@ -12,7 +12,7 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
       <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap">
         <span
           data-testid="vaultSymbol"
-          className="inline-flex text-[28px] font-medium whitespace-nowrap"
+          className="inline-flex text-[28px] font-medium "
         >
           {vault.name}
         </span>

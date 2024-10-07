@@ -146,7 +146,11 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
 
   return (
     <div className="rounded-md h-full">
-      <HeadingText text="Contracts" scale={2} styles="text-left ml-8" />
+      <HeadingText
+        text="Contracts"
+        scale={2}
+        styles="text-left md:ml-8 md:mb-0 mb-2"
+      />
 
       <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">
         <tbody>

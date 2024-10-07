@@ -455,7 +455,7 @@ const HistoricalRate: React.FC<IProps> = memo(
 
     return (
       <div className="rounded-md mt-5">
-        <div className="rounded-t-md flex justify-between items-center h-[60px] px-4">
+        <div className="rounded-t-md flex flex-col md:flex-row justify-between items-center h-[60px] md:px-4">
           <HeadingText text="Historical Rate" scale={2} />
           {activeChart && (
             <div className="flex items-center font-semibold relative text-[14px]">
@@ -492,7 +492,7 @@ const HistoricalRate: React.FC<IProps> = memo(
         </div>
         {isData ? (
           <>
-            <div className="py-3 px-4">
+            <div className="pb-3 pt-10 md:py-3 md:px-4">
               {activeChart ? (
                 <>
                   {activeChart.name === "APR" ? (

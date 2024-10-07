@@ -68,8 +68,12 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, $assetsPrices]);
   return (
     <>
-      <HeadingText text="Liquidity Pool" scale={2} styles="text-left ml-4" />
-      <div className="flex flex-col gap-6 ml-4">
+      <HeadingText
+        text="Liquidity Pool"
+        scale={2}
+        styles="text-left md:ml-4 md:mb-0 mb-2"
+      />
+      <div className="flex flex-col gap-6 md:ml-4">
         <div className="flex items-center gap-3">
           <img
             data-testid="poolLogo"
