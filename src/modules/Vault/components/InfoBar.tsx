@@ -109,8 +109,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-      <div className="flex w-full gap-5 p-6 pb-0">
-        <div className="flex items-start justify-between flex-col flex-nowrap w-full gap-2 md:gap-[10px]">
+      <div className="flex w-full gap-5 p-6 md:pb-0">
+        <div className="flex items-start justify-between flex-col flex-nowrap w-full md:gap-[10px]">
           <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full">
             <div className="w-full md:w-1/3 ">
               <FieldValue
@@ -187,7 +187,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               />
             </div>
           </div>
-          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+          <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="Income APR"
@@ -204,7 +204,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <FieldValue name="Period" value={<APRtimeSwitcher />} />
             </div>
           </div>
-          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+          <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="TVL"
@@ -237,7 +237,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               )}
             </div>
           </div>
-          <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full ">
+          <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="SHARE PRICE"
@@ -270,7 +270,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-      <div className="flex w-full flex-col md:flex-row px-6 pb-2 pt-6 bg-accent-900 rounded-b-2xl gap-2 md:gap-3">
+      <div className="flex w-full flex-col md:flex-row px-6 pb-6 md:pb-2 pt-6 bg-accent-900 rounded-b-2xl gap-0 md:gap-3">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <FieldValue
             name="DEPOSITED"
