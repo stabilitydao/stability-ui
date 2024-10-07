@@ -83,7 +83,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[54px] px-6">
+      <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[56px] px-6">
         <div
           data-testid="infoBarLogo"
           className="hidden lg:flex justify-between items-center gap-0.5 w-full"
@@ -109,9 +109,16 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-      <div className="flex w-full gap-5 p-6">
-        <div className="flex items-start justify-between flex-col flex-nowrap w-full gap-2 md:gap-5">
+      <div className="flex w-full gap-5 p-6 pb-0">
+        <div className="flex items-start justify-between flex-col flex-nowrap w-full gap-2 md:gap-[10px]">
           <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full">
+            <div className="w-full md:w-1/3 ">
+              <FieldValue
+                name="Vault type"
+                value={<VaultType type={vault.type} greater={true} />}
+              />
+            </div>
+
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="Assets"
@@ -128,19 +135,12 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                         />
                       ))}
                     </div>
-                    <p className="text-[16px] font-semibold">
+                    {/*<p className="text-[16px] font-semibold">
                       {vault.assets[0].symbol}{" "}
                       {vault.assets.length > 1 && `+ ${vault.assets[1].symbol}`}
-                    </p>
+                    </p>*/}
                   </div>
                 }
-              />
-            </div>
-
-            <div className="w-full md:w-1/3 ">
-              <FieldValue
-                name="Vault type"
-                value={<VaultType type={vault.type} greater={true} />}
               />
             </div>
             <div className="w-full md:w-1/3 ">
@@ -270,7 +270,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-      <div className="flex w-full flex-col md:flex-row px-6 py-5 bg-accent-900 rounded-b-2xl">
+      <div className="flex w-full flex-col md:flex-row px-6 pb-2 pt-6 bg-accent-900 rounded-b-2xl gap-2 md:gap-3">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <FieldValue
             name="DEPOSITED"

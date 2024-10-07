@@ -1936,7 +1936,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   return (
-    <div className="bg-accent-950 rounded-2xl w-[360px] font-manrope">
+    <div className="bg-accent-950 rounded-2xl min-w-[360px] w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -1944,18 +1944,19 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         resetOptions={resetOptions}
       />
 
-      <form autoComplete="off" className="w-full p-6">
-        <div className="flex items-center gap-4 relative">
+      <form autoComplete="off" className="w-full p-6 flex flex-col gap-[10px]">
+        <div className="flex items-center gap-4 relative pb-[12px]">
           {optionTokens && (
             <div
-              className="relative select-none w-[235px] text-neutral-50 text-[14px] font-semibold "
+              className="relative select-none min-w-[235px] w-[290px] text-neutral-50 text-[14px] "
               ref={tokenSelectorRef}
             >
+              <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">Select token</div>
               <div
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-10 bg-accent-900 text-[16px] cursor-pointer"
+                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[16px] cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -2065,7 +2066,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             src={logoURI as string}
                             alt="logo"
                           />
-                          
+
                         )}
                         <p className="ml-2">{symbol}</p>
                       </div>
@@ -2076,7 +2077,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
 
           {$connected && (
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 pt-[12px]">
               <img
                 className={`${
                   isRefresh ? "cursor-pointer" : "cursor-default"
@@ -2107,6 +2108,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               setModalState={setSettingsModal}
             />
           )}
+
         </div>
 
         {tab === "Deposit" ? (
@@ -2114,21 +2116,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             {option?.length > 1 ||
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
-                <div className="flex flex-col items-center justify-center gap-2 mt-3 w-[312px]">
+                <div className="flex flex-col items-center justify-center gap-[10px] min-w-[312px] w-[372px]">
                   {option.map((asset: string, index: number) => {
                     const currentAsset = getTokenData(asset) as TTokenData;
                     return (
-                      <div className="min-w-full" key={asset}>
+                      <div className="min-w-full gap-[10px]" key={asset}>
                         {ichiAllow[index] && (
-                          <div className="min-w-full">
+                          <div className="min-w-full h-[64px]">
                             {!!balances[asset] && (
-                              <div className="text-[12px] text-neutral-300 flex items-center gap-1">
+                              <div className="h-[12px] text-[12px] leading-3 text-neutral-500  flex items-center gap-1">
                                 <span>Balance: </span>
                                 <span>{balances[asset]}</span>
                               </div>
                             )}
 
-                            <label className="relative block w-full my-1">
+                            <label className="relative block w-full h-[36px] my-[2px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                 <img
                                   src={currentAsset.logoURI}
@@ -2150,7 +2152,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 onKeyDown={(evt) =>
                                   handleInputKeyDown(evt, inputs[asset])
                                 }
-                                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10 text-[14px]"
+                                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                               />
                               <button
                                 type="button"
@@ -2164,7 +2166,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               </button>
                             </label>
 
-                            <p className="text-[12px] text-neutral-500 flex items-center gap-1">
+                            <p className="h-[12px] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                               $
                               {$assetsPrices[network] &&
                               Number(inputs[asset]) > 0 &&
@@ -2182,17 +2184,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     );
                   })}
                 </div>
-                <div className="mt-5">
+                <div className="h-[64px]">
                   {loader && !transactionInProgress ? (
                     <ShareSkeleton />
                   ) : (
-                    <div className="h-[63px] text-[18px]">
+                    <div className="h-[64px] text-[18px]">
                       {!!sharesOut && (
                         <div>
-                          <p className="text-[14px] text-neutral-500">
+                          <p className="uppercase text-[12px] leading-3 text-neutral-500">
                             You Receive
                           </p>
-                          <div className="flex items-center text-neutral-50 text-[14px]">
+                          <div className="h-[40px] flex items-center text-neutral-50 text-[14px]">
                             <div className="mr-4">
                               <AssetsProportion
                                 proportions={vault.assetsProportions}
@@ -2218,15 +2220,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col mt-[15px] text-[15px] w-full">
+              <div className="flex flex-col text-[15px] w-full">
                 {!!balances[option[0]] && (
-                  <div className="text-[12px] text-neutral-300 flex items-center gap-1">
+                  <div className="h-[12p] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                     <span>Balance: </span>
                     <span>{balances[option[0]]}</span>
                   </div>
                 )}
 
-                <label className="relative block w-full my-1">
+                <label className="relative block w-full h-[40px]">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <img
                       src={activeOptionToken.logoURI[0]}
@@ -2248,7 +2250,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     onKeyDown={(evt) =>
                       handleInputKeyDown(evt, inputs[option[0]])
                     }
-                    className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10 text-[14px]"
+                    className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                   />
                   {!!$connected && !!balances[option[0]] && (
                     <button
@@ -2263,7 +2265,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   )}
                 </label>
 
-                <p className="text-[12px] text-neutral-500 flex items-center gap-1">
+                <p className="h-[12px] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                   $
                   {$assetsPrices[network] &&
                   Number(inputs[option[0]]) > 0 &&
@@ -2275,86 +2277,91 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     : 0}
                 </p>
 
-                <div className="my-2 flex flex-col gap-[2px]">
+                <div className="mt-[10px] flex flex-col">
                   {isNotUnderlying && (
                     <>
-                      <p className="text-[14px] text-neutral-500 mb-0">Swaps</p>
+                      <p className="h-[12px] text-[12px] leading-3 text-neutral-500 uppercase mb-0">Swaps</p>
                       {loader && !transactionInProgress ? (
                         <AssetsSkeleton />
                       ) : (
-                        <div className="h-[100px]">
+                        <div className="flex pb-[12px] h-[52px] mb-[10px]">
                           {!!zapTokens.length && (
                             <>
                               {shortId !== "CCF" ? (
-                                <div>
-                                  {zapTokens?.map((token: any) => (
-                                    <div
-                                      className="text-[14px] flex items-center gap-1"
-                                      key={token.address}
-                                    >
-                                      {token.address.toLowerCase() !==
-                                        option[0].toLowerCase() && (
-                                        <div className="flex items-center gap-1 mt-2">
-                                          <img
-                                            src="/oneInch.svg"
-                                            alt="1inch logo"
-                                            title="1inch"
-                                          />
-                                          {zapError ? (
-                                            <img
-                                              src="/error.svg"
-                                              alt="error img"
-                                              title="error"
-                                            />
-                                          ) : (
-                                            <>
-                                              <div className="flex items-center gap-1">
-                                                <p>
+                                <div className="h-[40px] flex items-center">
+                                  <img
+                                    src="/oneInch.svg"
+                                    alt="1inch logo"
+                                    title="1inch"
+                                    className="w-[26px] h-[26px]"
+                                  />
+                                  <div className="flex whitespace-nowrap gap-3 items-center">
+                                    {zapTokens?.map((token: any) => (
+                                      <div
+                                        className="text-[14px] flex items-center gap-3"
+                                        key={token.address}
+                                      >
+                                        {token.address.toLowerCase() !==
+                                          option[0].toLowerCase() && (
+                                            <div className="flex items-center gap-1 mt-2">
+
+                                              {zapError ? (
+                                                <img
+                                                  src="/error.svg"
+                                                  alt="error img"
+                                                  title="error"
+                                                />
+                                              ) : (
+                                                <>
+                                                  <div className="flex items-center gap-1">
+                                                    {/* <p>
                                                   {Number(
                                                     token.amountIn
                                                   ).toFixed(6)}
-                                                </p>
-                                                <img
-                                                  src={
-                                                    getTokenData(option[0])
-                                                      ?.logoURI
-                                                  }
-                                                  title={
-                                                    getTokenData(option[0])
-                                                      ?.symbol
-                                                  }
-                                                  alt={
-                                                    getTokenData(option[0])
-                                                      ?.symbol
-                                                  }
-                                                  className="w-6 h-6 rounded-full"
-                                                />
-                                              </div>
-                                              -&gt;
-                                              <div className="flex items-center gap-1">
-                                                <p>
+                                                </p>*/}
+                                                    <img
+                                                      src={
+                                                        getTokenData(option[0])
+                                                          ?.logoURI
+                                                      }
+                                                      title={
+                                                        getTokenData(option[0])
+                                                          ?.symbol
+                                                      }
+                                                      alt={
+                                                        getTokenData(option[0])
+                                                          ?.symbol
+                                                      }
+                                                      className="w-6 h-6 rounded-full"
+                                                    />
+                                                  </div>
+                                                  -&gt;
+                                                  <div className="flex items-center gap-1">
+                                                    {/*<p>
                                                   {Number(
                                                     token.amountOut
                                                   ).toFixed(6)}
-                                                </p>
-                                                <img
-                                                  src={token.img}
-                                                  title={token.symbol}
-                                                  alt={token.symbol}
-                                                  className="w-6 h-6 rounded-full"
-                                                />
-                                              </div>
-                                            </>
+                                                </p>*/}
+                                                    <img
+                                                      src={token.img}
+                                                      title={token.symbol}
+                                                      alt={token.symbol}
+                                                      className="w-6 h-6 rounded-full"
+                                                    />
+                                                  </div>
+                                                </>
+                                              )}
+                                            </div>
                                           )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
+                                      </div>
+                                    ))}
+                                  </div>
+
                                 </div>
                               ) : (
                                 <div className="text-[14px]  flex items-center gap-1 ml-2">
                                   <div className="flex items-center gap-1 mt-2">
-                                    <img
+                                  <img
                                       src="/oneInch.svg"
                                       alt="1inch logo"
                                       title="1inch"
@@ -2411,9 +2418,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       )}
                     </>
                   )}
-                  <div className="mt-0">
-                    <div className="h-[63px]">
-                      <p className="text-[14px] text-neutral-500">
+                  <div className="flex mt-0">
+                    <div className="h-[66px]">
+                      <p className="text-[12px] text-neutral-500 uppercase">
                         You Receive
                       </p>
                       <div className="h-[63px]">
@@ -2464,9 +2471,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         ) : (
           <>
-            <div className="grid mt-[15px] text-[15px] w-full">
+            <div className="grid text-[15px] w-full">
               {!!balances[option[0]] && (
-                <div className="text-[12px] text-neutral-300 flex items-center gap-1">
+                <div className="h-[12p] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                   <span>Balance:</span>
                   <span>
                     {parseFloat(
@@ -2479,7 +2486,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </div>
               )}
 
-              <label className="relative block w-full my-1">
+              <label className="relative block w-full">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
                     src={activeOptionToken.logoURI[0]}
@@ -2504,7 +2511,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   }
                   pattern="^[0-9]*[.,]?[0-9]*$"
                   inputMode="decimal"
-                  className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10 text-[14px]"
+                  className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                 />
                 {!!balances[option[0]] && (
                   <button
@@ -2540,11 +2547,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   : 0}
               </p>
             </div>
-            <div className="my-2 flex flex-col gap-2">
+            <div className="min-h-[72px] flex flex-col gap-2">
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
-                <p className="text-[14px] text-neutral-500">You Receive</p>
+                <p className="text-[12px] leading-3 text-neutral-500 uppercase">You Receive</p>
               )}
 
               <div className="h-[100px]">
@@ -2585,7 +2592,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[14px] text-neutral-500 mb-1">Swaps</p>
+                      <p className="text-[14px] text-neutral-500 uppercase mb-1">Swaps</p>
                     )}
                     {loader && option.length < 2 && !transactionInProgress ? (
                       <AssetsSkeleton />
@@ -2656,7 +2663,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
                   <div className="mt-5">
-                    <p className="text-[14px] text-neutral-500">You Receive</p>
+                    <p className="text-[12px] text-neutral-500 uppercase">You Receive</p>
                     <div className="h-[63px]">
                       <div className="flex items-center gap-1">
                         <img
@@ -2722,348 +2729,351 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         )}
 
-        {$connected ? (
-          <>
-            {chain?.id === Number(network) ? (
-              <>
-                {zapError ? (
-                  <button
-                    disabled
-                    className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                  >
-                    Failed to get routes from aggregator
-                  </button>
-                ) : (
-                  <>
-                    {tab === "Deposit" ? (
-                      <>
-                        {option?.length > 1 ||
-                        (defaultOption?.assets === option[0] &&
-                          option.length < 2) ? (
-                          <>
-                            {button === "deposit" ? (
-                              <button
-                                disabled={transactionInProgress}
-                                className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                  transactionInProgress
-                                    ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                    : ""
-                                }`}
-                                type="button"
-                                onClick={deposit}
-                              >
-                                <p>
-                                  {needConfirm
-                                    ? "Confirm in wallet"
-                                    : "Deposit"}
-                                </p>
+        <div className="flex mb-[6px] mt-[4p] w-full flex-col">
+          {$connected ? (
+            <>
+              {chain?.id === Number(network) ? (
+                <>
+                  {zapError ? (
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                    >
+                      Failed to get routes from aggregator
+                    </button>
+                  ) : (
+                    <>
+                      {tab === "Deposit" ? (
+                        <>
+                          {option?.length > 1 ||
+                          (defaultOption?.assets === option[0] &&
+                            option.length < 2) ? (
+                            <>
+                              {button === "deposit" ? (
+                                <button
+                                  disabled={transactionInProgress}
+                                  className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                    transactionInProgress
+                                      ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                      : ""
+                                  }`}
+                                  type="button"
+                                  onClick={deposit}
+                                >
+                                  <p>
+                                    {needConfirm
+                                      ? "Confirm in wallet"
+                                      : "Deposit"}
+                                  </p>
 
-                                {transactionInProgress && (
-                                  <Loader color={"#a6a0b2"} />
-                                )}
-                              </button>
-                            ) : button === "needApprove" ? (
-                              <div className="flex gap-3">
-                                {option.map(
-                                  (asset: any, index: number) =>
-                                    allowance &&
-                                    formatUnits(
-                                      allowance[asset],
-                                      Number(getTokenData(asset)?.decimals)
-                                    ) < inputs[asset] && (
-                                      <button
-                                        disabled={approveIndex !== false}
-                                        className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                          approveIndex === index
-                                            ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                            : ""
-                                        }`}
-                                        key={asset}
-                                        type="button"
-                                        onClick={() =>
-                                          approve(asset as TAddress, index)
-                                        }
-                                      >
-                                        <p>
-                                          {needConfirm
-                                            ? "Confirm in wallet"
-                                            : `Approve ${
+                                  {transactionInProgress && (
+                                    <Loader color={"#a6a0b2"} />
+                                  )}
+                                </button>
+                              ) : button === "needApprove" ? (
+                                <div className="flex gap-3 ">
+                                  {option.map(
+                                    (asset: any, index: number) =>
+                                      allowance &&
+                                      formatUnits(
+                                        allowance[asset],
+                                        Number(getTokenData(asset)?.decimals)
+                                      ) < inputs[asset] && (
+                                        <button
+                                          disabled={approveIndex !== false}
+                                          className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                            approveIndex === index
+                                              ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                              : ""
+                                          }`}
+                                          key={asset}
+                                          type="button"
+                                          onClick={() =>
+                                            approve(asset as TAddress, index)
+                                          }
+                                        >
+                                          <p>
+                                            {needConfirm
+                                              ? "Confirm in wallet"
+                                              : `Approve ${
                                                 getTokenData(asset)?.symbol
                                               }`}
-                                        </p>
-                                        {approveIndex === index && (
-                                          <Loader color={"#a6a0b2"} />
-                                        )}
-                                      </button>
-                                    )
-                                )}
-                              </div>
-                            ) : button === "insufficientBalance" ? (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                              >
-                                Insufficient Balance
-                              </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                              >
-                                {loader ? "Loading..." : "Enter Amount"}
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <div>
-                            {shortId === "CCF" &&
-                            defaultOption?.assets?.includes(option[0]) ? (
-                              <>
-                                {button === "deposit" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                      transactionInProgress
-                                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                        : ""
-                                    }`}
-                                    type="button"
-                                    onClick={deposit}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : "Deposit"}
-                                    </p>
+                                          </p>
+                                          {approveIndex === index && (
+                                            <Loader color={"#a6a0b2"} />
+                                          )}
+                                        </button>
+                                      )
+                                  )}
+                                </div>
+                              ) : button === "insufficientBalance" ? (
+                                <button
+                                  disabled
+                                  className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                >
+                                  Insufficient Balance
+                                </button>
+                              ) : (
+                                <button
+                                  disabled
+                                  className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                >
+                                  {loader ? "Loading..." : "Enter Amount"}
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <div>
+                              {shortId === "CCF" &&
+                              defaultOption?.assets?.includes(option[0]) ? (
+                                <>
+                                  {button === "deposit" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={deposit}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : "Deposit"}
+                                      </p>
 
-                                    {transactionInProgress && (
-                                      <Loader color={"#a6a0b2"} />
-                                    )}
-                                  </button>
-                                ) : button === "needApprove" ? (
-                                  <div className="flex gap-3">
-                                    {option.map((asset: any, index: number) => {
-                                      if (
-                                        allowance &&
-                                        formatUnits(
-                                          allowance[asset],
-                                          Number(getTokenData(asset)?.decimals)
-                                        ) < inputs[asset]
-                                      ) {
-                                        isAnyCCFOptionVisible = true;
-                                        return (
-                                          <button
-                                            disabled={approveIndex !== false}
-                                            className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                              approveIndex === index
-                                                ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                                : ""
-                                            }`}
-                                            key={asset}
-                                            type="button"
-                                            onClick={() =>
-                                              approve(asset as TAddress, index)
-                                            }
-                                          >
-                                            <p>
-                                              {needConfirm
-                                                ? "Confirm in wallet"
-                                                : `Approve ${
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : button === "needApprove" ? (
+                                    <div className="flex gap-3 flex gap-3 mt-[4p]">
+                                      {option.map((asset: any, index: number) => {
+                                        if (
+                                          allowance &&
+                                          formatUnits(
+                                            allowance[asset],
+                                            Number(getTokenData(asset)?.decimals)
+                                          ) < inputs[asset]
+                                        ) {
+                                          isAnyCCFOptionVisible = true;
+                                          return (
+                                            <button
+                                              disabled={approveIndex !== false}
+                                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                                approveIndex === index
+                                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                                  : ""
+                                              }`}
+                                              key={asset}
+                                              type="button"
+                                              onClick={() =>
+                                                approve(asset as TAddress, index)
+                                              }
+                                            >
+                                              <p>
+                                                {needConfirm
+                                                  ? "Confirm in wallet"
+                                                  : `Approve ${
                                                     getTokenData(asset)?.symbol
                                                   }`}
-                                            </p>
-                                            {approveIndex === index && (
-                                              <Loader color={"#a6a0b2"} />
-                                            )}
-                                          </button>
-                                        );
-                                      } else {
-                                        return null;
-                                      }
-                                    })}
-                                    {!isAnyCCFOptionVisible && (
-                                      <button
-                                        disabled={transactionInProgress}
-                                        className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                          transactionInProgress
-                                            ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                            : ""
-                                        }`}
-                                        type="button"
-                                        onClick={deposit}
-                                      >
-                                        <p>
-                                          {needConfirm
-                                            ? "Confirm in wallet"
-                                            : "Deposit"}
-                                        </p>
+                                              </p>
+                                              {approveIndex === index && (
+                                                <Loader color={"#a6a0b2"} />
+                                              )}
+                                            </button>
+                                          );
+                                        } else {
+                                          return null;
+                                        }
+                                      })}
+                                      {!isAnyCCFOptionVisible && (
+                                        <button
+                                          disabled={transactionInProgress}
+                                          className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                            transactionInProgress
+                                              ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                              : ""
+                                          }`}
+                                          type="button"
+                                          onClick={deposit}
+                                        >
+                                          <p>
+                                            {needConfirm
+                                              ? "Confirm in wallet"
+                                              : "Deposit"}
+                                          </p>
 
-                                        {transactionInProgress && (
-                                          <Loader color={"#a6a0b2"} />
-                                        )}
-                                      </button>
-                                    )}
-                                  </div>
-                                ) : button === "insufficientBalance" ? (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                                  >
-                                    Insufficient Balance
-                                  </button>
-                                ) : (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                                  >
-                                    {loader ? "Loading..." : "Enter Amount"}
-                                  </button>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {button === "insufficientBalance" ? (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                                  >
-                                    Insufficient Balance
-                                  </button>
-                                ) : button === "needApprove" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                      transactionInProgress
-                                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                        : ""
-                                    }`}
-                                    type="button"
-                                    onClick={zapApprove}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : `Approve ${
+                                          {transactionInProgress && (
+                                            <Loader color={"#a6a0b2"} />
+                                          )}
+                                        </button>
+                                      )}
+                                    </div>
+                                  ) : button === "insufficientBalance" ? (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      Insufficient Balance
+                                    </button>
+                                  ) : (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      {loader ? "Loading..." : "Enter Amount"}
+                                    </button>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  {button === "insufficientBalance" ? (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      Insufficient Balance
+                                    </button>
+                                  ) : button === "needApprove" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={zapApprove}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : `Approve ${
                                             underlyingToken?.address ===
                                             option[0]
                                               ? underlyingToken.symbol
                                               : getTokenData(option[0])?.symbol
                                           }`}
-                                    </p>
-                                    {transactionInProgress && (
-                                      <Loader color={"#a6a0b2"} />
-                                    )}
-                                  </button>
-                                ) : button === "deposit" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                      transactionInProgress
-                                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                        : ""
-                                    }`}
-                                    type="button"
-                                    onClick={zapDeposit}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : "Deposit"}
-                                    </p>
-                                    {transactionInProgress && (
-                                      <Loader color={"#a6a0b2"} />
-                                    )}
-                                  </button>
-                                ) : (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                                  >
-                                    {loader ? "Loading..." : "Enter Amount"}
-                                  </button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {button === "insufficientBalance" ? (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                          >
-                            Insufficient Balance
-                          </button>
-                        ) : button === "needApprove" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                              transactionInProgress
-                                ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                : ""
-                            }`}
-                            type="button"
-                            onClick={withdrawZapApprove}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Approve"}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#a6a0b2"} />
-                            )}
-                          </button>
-                        ) : button === "withdraw" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            type="button"
-                            className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                              transactionInProgress
-                                ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                : ""
-                            }`}
-                            onClick={withdraw}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Withdraw"}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#a6a0b2"} />
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                          >
-                            {loader ? "Loading..." : "Enter Amount"}
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            ) : (
-              <button
-                onClick={() => switchChain({ chainId: Number(network) })}
-                className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
-                type="button"
-              >
-                Switch Network
-              </button>
-            )}
-          </>
-        ) : (
-          <button
-            type="button"
-            className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
-            onClick={() => open()}
-          >
-            Connect Wallet
-          </button>
-        )}
+                                      </p>
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : button === "deposit" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={zapDeposit}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : "Deposit"}
+                                      </p>
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      {loader ? "Loading..." : "Enter Amount"}
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {button === "insufficientBalance" ? (
+                            <button
+                              disabled
+                              className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                            >
+                              Insufficient Balance
+                            </button>
+                          ) : button === "needApprove" ? (
+                            <button
+                              disabled={transactionInProgress}
+                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                transactionInProgress
+                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                  : ""
+                              }`}
+                              type="button"
+                              onClick={withdrawZapApprove}
+                            >
+                              <p>
+                                {needConfirm ? "Confirm in wallet" : "Approve"}
+                              </p>
+                              {transactionInProgress && (
+                                <Loader color={"#a6a0b2"} />
+                              )}
+                            </button>
+                          ) : button === "withdraw" ? (
+                            <button
+                              disabled={transactionInProgress}
+                              type="button"
+                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                transactionInProgress
+                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                  : ""
+                              }`}
+                              onClick={withdraw}
+                            >
+                              <p>
+                                {needConfirm ? "Confirm in wallet" : "Withdraw"}
+                              </p>
+                              {transactionInProgress && (
+                                <Loader color={"#a6a0b2"} />
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              disabled
+                              className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                            >
+                              {loader ? "Loading..." : "Enter Amount"}
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => switchChain({ chainId: Number(network) })}
+                  className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+                  type="button"
+                >
+                  Switch Network
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              type="button"
+              className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+              onClick={() => open()}
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
+
 
         {error?.state && <InvestError error={error} setError={setError} />}
       </form>

@@ -1,8 +1,9 @@
 const AssetsSkeleton = (): JSX.Element => {
   return (
     <svg
+      className="mb-[10px]"
       width="320"
-      height="100"
+      height="52"
       viewBox="0 0 320 100"
       xmlns="http://www.w3.org/2000/svg"
     >
