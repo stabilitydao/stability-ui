@@ -195,7 +195,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             >
               {vault?.strategyInfo?.il?.title}
             </p>
-            <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
+            <p className="text-[14px]">{vault?.strategyInfo?.il?.desc != 'None' && vault?.strategyInfo?.il?.desc}</p>
           </div>
         </div>
         {!!vault?.risk && vault?.risk?.symbol !== "UNKNOWN" && (
@@ -242,7 +242,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
               onClick={upgradeStrategy}
               className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-[10px] px-4 rounded-2xl"
             >
-              Upgrade to {vault?.strategyVersion}
+              Upgrade to {strategyTypes[vault.strategy]}
             </button>
           )}
         </div>
