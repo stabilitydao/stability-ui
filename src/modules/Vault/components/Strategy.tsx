@@ -86,8 +86,12 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, vaultTypes, strategyTypes]);
   return (
     <div>
-      <HeadingText text="Strategy" scale={2} styles="text-left ml-4" />
-      <div className="flex flex-col items-start gap-3 p-4">
+      <HeadingText
+        text="Strategy"
+        scale={2}
+        styles="text-left md:ml-4 md:mb-0 mb-2"
+      />
+      <div className="flex flex-col items-start gap-3 md:p-4">
         <div className="flex items-start flex-col gap-3">
           <div className="flex">
             <span

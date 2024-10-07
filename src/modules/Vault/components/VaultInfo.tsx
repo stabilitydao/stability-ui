@@ -66,9 +66,13 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <div>
-      <HeadingText text="Vault" scale={2} styles="text-left ml-4" />
+      <HeadingText
+        text="Vault"
+        scale={2}
+        styles="text-left md:ml-4 md:mb-0 mb-2"
+      />
 
-      <div className="flex flex-col items-start gap-5 p-4">
+      <div className="flex flex-col items-start gap-5 md:p-4">
         <div className="flex flex-col gap-3">
           <p data-testid="vaultType" className="text-[16px]">
             <VaultType greater={true} type={vault?.type} />

@@ -191,8 +191,12 @@ const Assets: React.FC<IProps> = memo(
     }, [$connected, connector, $currentChainID]);
 
     return (
-      <div className="p-3 mt-5">
-        <HeadingText text="Assets" scale={2} styles="text-left ml-4" />
+      <div className="md:p-3 mt-5">
+        <HeadingText
+          text="Assets"
+          scale={2}
+          styles="text-left md:ml-4 md:mb-0 mb-2"
+        />
         <div className="flex justify-center items-center gap-5 mb-5">
           {investedData && <Chart data={investedData} />}
 
