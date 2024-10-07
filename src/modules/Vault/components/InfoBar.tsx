@@ -19,6 +19,7 @@ import { formatFromBigInt, formatNumber } from "@utils";
 import { CHAINS } from "@constants";
 
 import type { TVault } from "@types";
+import {NameValue} from "../../../ui/NameValue.tsx";
 
 interface IProps {
   network: string;
@@ -81,7 +82,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div className="bg-accent-1000 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[54px] px-6">
+      <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[54px] px-6">
         <div
           data-testid="infoBarLogo"
           className="hidden lg:flex items-center gap-0.5"
@@ -99,11 +100,8 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
       <div className="flex w-full gap-5 p-6">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <div className="flex flex-row lg:flex-col items-start gap-9 w-full">
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                Chain
-              </p>
-              <div className="text-[18px] font-semibold whitespace-nowrap flex items-center">
+            <NameValue name="Chain" value={
+              <div className="flex items-center">
                 <img
                   className="w-6 h-6 rounded-full hidden lg:flex mr-1"
                   src={vaultChain?.logoURI}
@@ -112,183 +110,153 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 />
                 {vaultChain?.name}
               </div>
-            </div>
+            } />
 
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                Income APR
-              </p>
+            <NameValue name="Income APR" value={
               <p
                 data-testid="infoBarAPR"
-                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {earnData.apr}%
               </p>
-            </div>
+            } />
 
-            <div className="w-1/2 lg:w-auto ">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                TVL
-              </p>
+            <NameValue name="TVL" value={
               <p
                 data-testid="infoBarTVL"
-                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 {formatNumber(vault.tvl, "abbreviate")}
               </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                SHARE PRICE
-              </p>
+            }/>
+
+            <NameValue name="SHARE PRICE" value={
               <p
                 data-testid="infoBarSP"
-                className="text-[18px] font-semibold whitespace-nowrap"
               >
                 ${Number(vault.shareprice).toFixed(5)}
               </p>
-            </div>
+            }/>
+
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-9">
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                Vault type
-              </p>
-              <p className="text-[18px] font-semibold whitespace-nowrap text-[#00bb99] bg-[#00110a]">
+
+            <NameValue name="Vault type" value={
+              <p className="text-[#00bb99] bg-[#00110a]">
                 {vault.type}
               </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                VS HODL APR
-              </p>
-              <p className="text-[18px] font-semibold whitespace-nowrap">
-                {earnData.apy}%
-              </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                ALM TVL
-              </p>
-              <p className="text-[18px] font-semibold whitespace-nowrap">
-                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
-              </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                LAST HARD WORK
-              </p>
-              <TimeDifferenceIndicator unix={vault?.lastHardWork} />
-            </div>
+            }/>
+
+            <NameValue name="VS HODL APR" value={vault.lifetimeVsHoldAPR + '%'} />
+
+            {vault?.alm?.tvl ?
+              <NameValue name="ALM TVL" value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")} />
+              :
+              <div className="h-[46px]"></div>
+            }
+
+            <NameValue name="Last HardWork" value={
+              <TimeDifferenceIndicator unix={vault?.lastHardWork}/>
+            } />
+
           </div>
           <div className="flex flex-row lg:flex-col items-start w-full gap-9">
-            <div className="w-1/2 lg:w-auto h-[42px]">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                Strategy
-              </p>
-              <div className="text-[18px] font-semibold whitespace-nowrap">
-                <div className="flex gap-0.5 items-center ">
-                  {!!vault?.strategyInfo?.protocols.length && (
-                    <div
-                      className="lg:flex items-start gap-0.5 hidden"
-                      data-testid="infoBarStrategyesLogo"
-                    >
-                      {vault?.strategyInfo?.protocols.map((protocol, index) => (
-                        <img
-                          key={protocol?.name + index}
-                          className="w-6 h-6 rounded-full"
-                          src={protocol?.logoSrc}
-                          alt={protocol?.name}
-                          title={protocol?.name}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {!!vault.yearnProtocols.length && (
-                    <div
-                      className="flex gap-0.5"
-                      data-testid="infoBarProtocolsLogo"
-                    >
-                      {vault.yearnProtocols.map((protocol) => (
-                        <img
-                          key={protocol.link}
-                          src={protocol.link}
-                          alt={protocol.title}
-                          title={protocol.title}
-                          className="h-6 w-6 rounded-full"
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+
+            <NameValue name="Strategy" value={
+              <div className="flex gap-0.5 items-end h-[29px]">
+                {!!vault?.strategyInfo?.protocols.length && (
+                  <div
+                    className="lg:flex items-start gap-0.5 hidden"
+                    data-testid="infoBarStrategyesLogo"
+                  >
+                    {vault?.strategyInfo?.protocols.map((protocol, index) => (
+                      <img
+                        key={protocol?.name + index}
+                        className="w-6 h-6 rounded-full"
+                        src={protocol?.logoSrc}
+                        alt={protocol?.name}
+                        title={protocol?.name}
+                      />
+                    ))}
+                  </div>
+                )}
+                {!!vault.yearnProtocols.length && (
+                  <div
+                    className="flex gap-0.5"
+                    data-testid="infoBarProtocolsLogo"
+                  >
+                    {vault.yearnProtocols.map((protocol) => (
+                      <img
+                        key={protocol.link}
+                        src={protocol.link}
+                        alt={protocol.title}
+                        title={protocol.title}
+                        className="h-6 w-6 rounded-full"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="w-1/2 lg:w-auto h-[42px]">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                Period
-              </p>
-              <APRtimeSwitcher />
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-                POOL TVL
-              </p>
-              <p className="text-[18px] font-semibold whitespace-nowrap">
-                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
-              </p>
-            </div>
-            <div className="w-1/2 lg:w-auto">
-              <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-3">
-                Risk
-              </p>
-              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
-            </div>
+            }/>
+
+            <NameValue name="Period" value={
+              <APRtimeSwitcher/>
+            }/>
+
+            {vault?.pool?.tvl ?
+              <NameValue name="POOL TVL" value={
+                <p className="text-[18px] font-semibold whitespace-nowrap">
+                  {formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                </p>
+              }/>
+              :
+              <div className="w-1/2 lg:w-auto h-[46px]"></div>
+            }
+
+            <NameValue name="Risk" value={
+              <div className="flex h-[28px] items-center">
+                <RiskIndicator riskSymbol={vault?.risk?.symbol}/>
+              </div>
+            }/>
+
           </div>
         </div>
       </div>
 
-      <div className="flex w-full gap-5 px-6 py-5 bg-accent-1000 border-[2px] border-accent-950 rounded-b-2xl">
+      <div className="flex w-full gap-0 px-6 py-5 bg-accent-900 rounded-b-2xl">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <div className="w-1/2 lg:w-auto">
-            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-              DEPOSITED
-            </p>
-            <div className="text-[18px] font-semibold flex whitespace-nowrap">
-              <p data-testid="infoBarDeposited" className="mr-1">
-                {formatNumber(userBalances.shareBalance, "format")}
-              </p>
-              <p className="whitespace-nowrap md:hidden lg:block">
-                / ${formatNumber(userBalances.USDBalance, "format")}
-              </p>
+          <NameValue name="DEPOSITED" value={
+            <div className="flex h-[28px] items-center">
+              <div className="text-[18px] font-semibold flex whitespace-nowrap">
+                <p data-testid="infoBarDeposited" className="mr-1">
+                  {formatNumber(userBalances.shareBalance, "format")}
+                </p>
+                <p className="whitespace-nowrap md:hidden lg:block">
+                  / ${formatNumber(userBalances.USDBalance, "format")}
+                </p>
+              </div>
             </div>
-          </div>
+          }/>
+
         </div>
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <div className="w-1/2 lg:w-auto">
-            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-              DAILY
-            </p>
+          <NameValue name="DAILY" value={
             <p
               data-testid="infoBarDailyAPR"
               className="text-[18px] font-semibold whitespace-nowrap"
             >
-              {earnData.dailyAPR}% / {earnData.dailyEarn}$
+              {/*{earnData.dailyAPR}% / */}{earnData.dailyEarn}$
             </p>
-          </div>
+          } />
         </div>
 
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <div className="w-1/2 lg:w-auto">
-            <p className="uppercase text-[14px] leading-3 text-neutral-500 mb-[2px]">
-              MONTHLY
-            </p>
+          <NameValue name="MONTHLY" value={
             <p
               data-testid="infoBarMonthlyAPR"
               className="text-[18px] font-semibold whitespace-nowrap"
             >
-              {earnData.monthlyAPR}% / {earnData.monthlyEarn}$
+              {/*{earnData.monthlyAPR}% / */}{earnData.monthlyEarn}$
             </p>
-          </div>
+          }/>
         </div>
       </div>
 
