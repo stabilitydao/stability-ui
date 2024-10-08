@@ -480,7 +480,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )
       ) {
         setButton("insufficientBalance");
+
         setZapTokens([]);
+        setLoader(false);
         return;
       }
 
@@ -2033,7 +2035,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     {defaultOption?.symbols}
                   </p>
                 </div>
-                {underlyingToken && (
+                {!!underlyingToken.symbol && (
                   <div
                     className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                     onClick={() => {
@@ -2133,13 +2135,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         {ichiAllow[index] && (
                           <div className="min-w-full h-[64px]">
                             {!!balances[asset] && (
-                              <div className="h-[12px] text-[12px] leading-3 text-neutral-500  flex items-center gap-1">
+                              <div className="h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1">
                                 <span>Balance: </span>
                                 <span>{balances[asset]}</span>
                               </div>
                             )}
 
-                            <label className="relative block w-full h-[36px] my-[2px]">
+                            <label className="relative block h-[40px] w-[345px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                 <img
                                   src={currentAsset.logoURI}
@@ -2157,25 +2159,27 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 onChange={(e) =>
                                   handleInputChange(e.target.value, e.target.id)
                                 }
-                                type="text"
                                 onKeyDown={(evt) =>
                                   handleInputKeyDown(evt, inputs[asset])
                                 }
+                                type="text"
                                 className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                               />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  balances[asset] &&
-                                  handleInputChange(balances[asset], asset)
-                                }
-                                className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
-                              >
-                                Max
-                              </button>
+                              {!!$connected && !!balances[option[0]] && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    balances[asset] &&
+                                    handleInputChange(balances[asset], asset)
+                                  }
+                                  className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
+                                >
+                                  Max
+                                </button>
+                              )}
                             </label>
 
-                            <p className="h-[12px] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
+                            <p className="h-3 text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                               $
                               {$assetsPrices[network] &&
                               Number(inputs[asset]) > 0 &&
@@ -2237,7 +2241,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   </div>
                 )}
 
-                <label className="relative block w-full h-[40px]">
+                <label className="relative block h-[40px] w-[345px]">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <img
                       src={activeOptionToken.logoURI[0]}
@@ -2274,7 +2278,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   )}
                 </label>
 
-                <p className="h-[12px] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
+                <p className="h-3 text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                   $
                   {$assetsPrices[network] &&
                   Number(inputs[option[0]]) > 0 &&
@@ -2289,13 +2293,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 <div className="mt-[10px] flex flex-col">
                   {isNotUnderlying && (
                     <>
-                      <p className="h-[12px] text-[12px] leading-3 text-neutral-500 uppercase mb-0">
+                      <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
                         Swaps
                       </p>
+
                       {loader && !transactionInProgress ? (
-                        <AssetsSkeleton />
+                        <div className="flex items-start justify-start">
+                          <AssetsSkeleton />
+                        </div>
                       ) : (
-                        <div className="flex pb-[12px] h-[52px] mb-[10px]">
+                        <div className="flex h-[52px] mb-[10px]">
                           {!!zapTokens.length && (
                             <>
                               {shortId !== "CCF" ? (
@@ -2444,13 +2451,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             </div>
 
                             {loader && !transactionInProgress ? (
-                              <ShareSkeleton height={30} width={300} />
+                              <ShareSkeleton height={24} width={300} />
                             ) : (
                               <div>
                                 {(underlyingShares &&
                                   Number(inputs[option[0]]) > 0) ||
                                 (zapShares && Number(inputs[option[0]]) > 0) ? (
-                                  <p>
+                                  <p className="h-6">
                                     {underlyingShares &&
                                     Number(inputs[option[0]]) > 0
                                       ? `${underlyingShares} ($${(
@@ -2465,7 +2472,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                         ).toFixed(2)})`}
                                   </p>
                                 ) : (
-                                  <p>0 ($0.0)</p>
+                                  <p className="h-6">0 ($0.0)</p>
                                 )}
                               </div>
                             )}
@@ -2495,7 +2502,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </div>
               )}
 
-              <label className="relative block w-full">
+              <label className="relative block w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
                     src={activeOptionToken.logoURI[0]}
@@ -2547,7 +2554,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 )}
               </label>
 
-              <p className="text-[12px] text-neutral-500 flex items-center gap-1">
+              <p className="text-[12px] h-3 text-neutral-500 flex items-center gap-1">
                 $
                 {$assetsPrices[network] && Number(inputs[option[0]]) > 0
                   ? (
@@ -2556,16 +2563,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   : 0}
               </p>
             </div>
-            <div className="min-h-[72px] flex flex-col gap-2">
+            {/* h-[142px] */}
+            <div className="flex flex-col items-start justify-end gap-2">
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
-                <p className="text-[12px] leading-3 text-neutral-500 uppercase">
+                <p className="text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px]">
                   You Receive
                 </p>
               )}
 
-              <div className="h-[100px]">
+              <div className="flex flex-col justify-start items-start">
                 {(option.length > 1 ||
                   isSingleTokenStrategy ||
                   !isNotUnderlying) &&
@@ -2586,10 +2594,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           className="w-6 h-6 rounded-full"
                         />
                       )}
+
                       {loader && !transactionInProgress ? (
-                        <ShareSkeleton height={32} />
+                        <ShareSkeleton height={24} width={300} />
                       ) : (
-                        <p className="text-[14px] text-neutral-50">
+                        <p className="text-[14px] text-neutral-50 h-6">
                           {!!withdrawAmount.length
                             ? withdrawAmount[index]?.amountInUSD
                               ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
@@ -2603,43 +2612,43 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[14px] text-neutral-500 uppercase mb-1">
+                      <p className="text-[12px] text-neutral-500 uppercase mt-[-5px]">
                         Swaps
                       </p>
                     )}
                     {loader && option.length < 2 && !transactionInProgress ? (
-                      <AssetsSkeleton />
+                      <AssetsSkeleton height={40} />
                     ) : (
-                      <div>
+                      <div
+                        className={`${option.length < 2 && "h-10 mb-[10px]"}`}
+                      >
                         {!!zapPreviewWithdraw.length &&
                           zapPreviewWithdraw?.map(
                             ({ address, amountIn, amountOut }) => (
                               <div key={amountIn}>
                                 {address.toLowerCase() !==
                                   option[0].toLowerCase() && (
-                                  <div className="flex">
+                                  <div className="flex items-center h-5">
                                     <img
                                       src="/oneInch.svg"
                                       alt="1inch logo"
                                       title="1inch"
+                                      className="w-[20px] h-[20px]"
                                     />
                                     {!!amountOut ? (
                                       <>
                                         <div className="flex text-[14px] items-center gap-1">
-                                          <p>{Number(amountIn).toFixed(6)}</p>
                                           <img
                                             src={getTokenData(address)?.logoURI}
                                             title={
                                               getTokenData(address)?.symbol
                                             }
                                             alt={getTokenData(address)?.symbol}
-                                            className="w-6 h-6 rounded-full"
+                                            className="w-[18px] h-[18px] rounded-full"
                                           />
                                         </div>
                                         -&gt;
                                         <div className="flex text-[14px] items-center gap-1">
-                                          <p>{Number(amountOut).toFixed(6)}</p>
-
                                           <img
                                             src={
                                               getTokenData(option[0])?.logoURI
@@ -2650,7 +2659,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                             alt={
                                               getTokenData(option[0])?.symbol
                                             }
-                                            className="w-6 h-6 rounded-full"
+                                            className="w-[18px] h-[18px] rounded-full"
                                           />
                                         </div>
                                       </>
@@ -2675,7 +2684,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               {option.length < 2 &&
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
-                  <div className="mt-5">
+                  <div>
                     <p className="text-[12px] text-neutral-500 uppercase">
                       You Receive
                     </p>
@@ -2688,7 +2697,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           className="w-6 h-6 rounded-full"
                         />
                         {loader && !transactionInProgress ? (
-                          <ShareSkeleton height={32} />
+                          <ShareSkeleton height={24} width={300} />
                         ) : (
                           <div className="text-[14px] text-neutral-50">
                             {!!zapPreviewWithdraw.length ? (
@@ -2744,7 +2753,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         )}
 
-        <div className="flex mb-[6px] mt-[4p] w-full flex-col">
+        <div className="flex mb-[6px] w-full flex-col">
           {$connected ? (
             <>
               {chain?.id === Number(network) ? (
@@ -2864,7 +2873,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       )}
                                     </button>
                                   ) : button === "needApprove" ? (
-                                    <div className="flex gap-3 flex gap-3 mt-[4p]">
+                                    <div className="flex gap-3">
                                       {option.map(
                                         (asset: any, index: number) => {
                                           if (

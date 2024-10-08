@@ -104,17 +104,17 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
 
       <div className="md:p-4">
         {!!vault?.earningData && (
-          <table className="table table-auto w-full rounded-lg">
-            <thead className="bg-[#0b0e11]">
-              <tr className="text-[17px] md:text-[15px] lg:text-[19px] text-[#8f8f8f] uppercase">
-                <th></th>
-                <th>Latest</th>
-                <th>24h</th>
+          <table className="font-manrope w-full">
+            <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+              <tr className="text-[14px] uppercase">
+                <th className="px-4 py-2"></th>
+                <th className="text-right py-2">Latest</th>
+                <th className="text-right py-2">24h</th>
                 <th className="text-right">Week</th>
               </tr>
             </thead>
-            <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
-              <tr className="hover:bg-[#2B3139]">
+            <tbody className="text-[14px]">
+              <tr className="h-[48px] hover:bg-accent-950">
                 <td>Total APY</td>
                 <td data-testid="yieldLatestAPY" className="text-right py-1">
                   {!!Number(vault.shareprice)
@@ -132,7 +132,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     : "-"}
                 </td>
               </tr>
-              <tr className="hover:bg-[#2B3139]">
+              <tr className="h-[48px] hover:bg-accent-950">
                 <td>Total APR</td>
                 <td data-testid="yieldLatestAPR" className="text-right py-1">
                   {!!Number(vault.shareprice)
@@ -151,7 +151,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 </td>
               </tr>
               {vault.strategyInfo.shortId != "CF" && vault.pool && (
-                <tr className="hover:bg-[#2B3139]">
+                <tr className="h-[48px] hover:bg-accent-950">
                   <td>Pool swap fees APR</td>
 
                   <td
@@ -180,7 +180,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                   </td>
                 </tr>
               )}
-              <tr className="hover:bg-[#2B3139]">
+              <tr className="h-[48px] hover:bg-accent-950">
                 {vault.strategyInfo.shortId === "CF" ? (
                   <td>Strategy APR</td>
                 ) : (
@@ -214,9 +214,9 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
         )}
 
         {!!vault.lifetimeTokensHold && (
-          <table className="table table-auto w-full rounded-lg mt-5">
-            <thead className="bg-[#0b0e11]">
-              <tr className="text-[17px] md:text-[15px] lg:text-[19px] text-[#8f8f8f] uppercase">
+          <table className="font-manrope w-full mt-5">
+            <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+              <tr className="text-[14px] uppercase">
                 <th>
                   <div className="tooltip">
                     <svg
@@ -245,19 +245,23 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     </div>
                   </div>
                 </th>
-                <th>{getTimeDifference(vault.created).days} days</th>
+                <th className="text-right">
+                  {getTimeDifference(vault.created).days} days
+                </th>
                 <th className="text-right">est Annual</th>
               </tr>
             </thead>
-            <tbody className="text-[13px] min-[450px]:text-[15px] md:text-[13px] lg:text-[19px]">
-              <tr className="hover:bg-[#2B3139]">
+            <tbody className="text-[14px]">
+              <tr className="h-[48px] hover:bg-accent-950">
                 <td>VAULT VS HODL</td>
 
                 {vault.isVsActive ? (
                   <td
                     data-testid="vaultVsHold"
-                    className={`text-right ${
-                      vault.vsHoldAPR > 0 ? "text-[#b0ddb8]" : "text-[#eb7979]"
+                    className={`text-right text-[18px] ${
+                      vault.vsHoldAPR > 0
+                        ? "text-success-400"
+                        : "text-error-400"
                     }`}
                   >
                     {vault.vsHoldAPR > 0 ? "+" : ""}
@@ -269,10 +273,10 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 {vault.isVsActive ? (
                   <td
                     data-testid="vaultVsHoldLifetime"
-                    className={`text-right ${
+                    className={`text-right text-[18px] ${
                       vault.lifetimeVsHoldAPR > 0
-                        ? "text-[#b0ddb8]"
-                        : "text-[#eb7979]"
+                        ? "text-success-400"
+                        : "text-error-400"
                     }`}
                   >
                     {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
@@ -284,16 +288,16 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
               </tr>
               {vault.lifetimeTokensHold.map(
                 (aprsData: THoldData, index: number) => (
-                  <tr key={index} className="hover:bg-[#2B3139]">
+                  <tr key={index} className="h-[48px] hover:bg-accent-950">
                     <td>VAULT VS {aprsData?.symbol} HODL</td>
 
                     {vault.isVsActive ? (
                       <td
                         data-testid={`tokensHold${index}`}
-                        className={`text-right ${
+                        className={`text-right text-[18px] ${
                           Number(aprsData.latestAPR) > 0
-                            ? "text-[#b0ddb8]"
-                            : "text-[#eb7979]"
+                            ? "text-success-400"
+                            : "text-error-400"
                         }`}
                       >
                         {Number(aprsData.latestAPR) > 0 ? "+" : ""}
@@ -306,10 +310,10 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     {vault.isVsActive ? (
                       <td
                         data-testid={`lifetimeTokensHold${index}`}
-                        className={`text-right ${
+                        className={`text-right text-[18px] ${
                           Number(aprsData.latestAPR) > 0
-                            ? "text-[#b0ddb8]"
-                            : "text-[#eb7979]"
+                            ? "text-success-400"
+                            : "text-error-400"
                         }`}
                       >
                         {Number(aprsData.APR) > 0 ? "+" : ""}

@@ -1,11 +1,12 @@
-const AssetsSkeleton = (): JSX.Element => {
+const AssetsSkeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
       className="mb-[10px]"
-      width="320"
+      width="120"
       height="52"
       viewBox="0 0 320 100"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <rect
         x="0"

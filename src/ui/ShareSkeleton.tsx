@@ -1,9 +1,9 @@
 const ShareSkeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
   return (
     <svg
-      width="320"
+      width="900"
       height="63"
-      viewBox="0 0 320 63"
+      viewBox="0 0 900 63"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
