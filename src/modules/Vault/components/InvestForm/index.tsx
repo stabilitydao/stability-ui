@@ -1858,6 +1858,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   ///// interval refresh data
   useEffect(() => {
+    if (!$connected) return;
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
         if (transactionInProgress) return;
@@ -1959,7 +1960,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               className="relative select-none min-w-[235px] w-[290px] text-neutral-50 text-[14px] "
               ref={tokenSelectorRef}
             >
-              <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">Select token</div>
+              <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
+                Select token
+              </div>
               <div
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
@@ -2286,7 +2289,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 <div className="mt-[10px] flex flex-col">
                   {isNotUnderlying && (
                     <>
-                      <p className="h-[12px] text-[12px] leading-3 text-neutral-500 uppercase mb-0">Swaps</p>
+                      <p className="h-[12px] text-[12px] leading-3 text-neutral-500 uppercase mb-0">
+                        Swaps
+                      </p>
                       {loader && !transactionInProgress ? (
                         <AssetsSkeleton />
                       ) : (
@@ -2309,65 +2314,63 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       >
                                         {token.address.toLowerCase() !==
                                           option[0].toLowerCase() && (
-                                            <div className="flex items-center gap-1 mt-2">
-
-                                              {zapError ? (
-                                                <img
-                                                  src="/error.svg"
-                                                  alt="error img"
-                                                  title="error"
-                                                />
-                                              ) : (
-                                                <>
-                                                  <div className="flex items-center gap-1">
-                                                    {/* <p>
+                                          <div className="flex items-center gap-1 mt-2">
+                                            {zapError ? (
+                                              <img
+                                                src="/error.svg"
+                                                alt="error img"
+                                                title="error"
+                                              />
+                                            ) : (
+                                              <>
+                                                <div className="flex items-center gap-1">
+                                                  {/* <p>
                                                   {Number(
                                                     token.amountIn
                                                   ).toFixed(6)}
                                                 </p>*/}
-                                                    <img
-                                                      src={
-                                                        getTokenData(option[0])
-                                                          ?.logoURI
-                                                      }
-                                                      title={
-                                                        getTokenData(option[0])
-                                                          ?.symbol
-                                                      }
-                                                      alt={
-                                                        getTokenData(option[0])
-                                                          ?.symbol
-                                                      }
-                                                      className="w-6 h-6 rounded-full"
-                                                    />
-                                                  </div>
-                                                  -&gt;
-                                                  <div className="flex items-center gap-1">
-                                                    {/*<p>
+                                                  <img
+                                                    src={
+                                                      getTokenData(option[0])
+                                                        ?.logoURI
+                                                    }
+                                                    title={
+                                                      getTokenData(option[0])
+                                                        ?.symbol
+                                                    }
+                                                    alt={
+                                                      getTokenData(option[0])
+                                                        ?.symbol
+                                                    }
+                                                    className="w-6 h-6 rounded-full"
+                                                  />
+                                                </div>
+                                                -&gt;
+                                                <div className="flex items-center gap-1">
+                                                  {/*<p>
                                                   {Number(
                                                     token.amountOut
                                                   ).toFixed(6)}
                                                 </p>*/}
-                                                    <img
-                                                      src={token.img}
-                                                      title={token.symbol}
-                                                      alt={token.symbol}
-                                                      className="w-6 h-6 rounded-full"
-                                                    />
-                                                  </div>
-                                                </>
-                                              )}
-                                            </div>
-                                          )}
+                                                  <img
+                                                    src={token.img}
+                                                    title={token.symbol}
+                                                    alt={token.symbol}
+                                                    className="w-6 h-6 rounded-full"
+                                                  />
+                                                </div>
+                                              </>
+                                            )}
+                                          </div>
+                                        )}
                                       </div>
                                     ))}
                                   </div>
-
                                 </div>
                               ) : (
                                 <div className="text-[14px]  flex items-center gap-1 ml-2">
                                   <div className="flex items-center gap-1 mt-2">
-                                  <img
+                                    <img
                                       src="/oneInch.svg"
                                       alt="1inch logo"
                                       title="1inch"
@@ -2557,7 +2560,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
-                <p className="text-[12px] leading-3 text-neutral-500 uppercase">You Receive</p>
+                <p className="text-[12px] leading-3 text-neutral-500 uppercase">
+                  You Receive
+                </p>
               )}
 
               <div className="h-[100px]">
@@ -2598,7 +2603,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[14px] text-neutral-500 uppercase mb-1">Swaps</p>
+                      <p className="text-[14px] text-neutral-500 uppercase mb-1">
+                        Swaps
+                      </p>
                     )}
                     {loader && option.length < 2 && !transactionInProgress ? (
                       <AssetsSkeleton />
@@ -2669,7 +2676,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
                   <div className="mt-5">
-                    <p className="text-[12px] text-neutral-500 uppercase">You Receive</p>
+                    <p className="text-[12px] text-neutral-500 uppercase">
+                      You Receive
+                    </p>
                     <div className="h-[63px]">
                       <div className="flex items-center gap-1">
                         <img
@@ -2802,8 +2811,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                             {needConfirm
                                               ? "Confirm in wallet"
                                               : `Approve ${
-                                                getTokenData(asset)?.symbol
-                                              }`}
+                                                  getTokenData(asset)?.symbol
+                                                }`}
                                           </p>
                                           {approveIndex === index && (
                                             <Loader color={"#a6a0b2"} />
@@ -2856,45 +2865,55 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                     </button>
                                   ) : button === "needApprove" ? (
                                     <div className="flex gap-3 flex gap-3 mt-[4p]">
-                                      {option.map((asset: any, index: number) => {
-                                        if (
-                                          allowance &&
-                                          formatUnits(
-                                            allowance[asset],
-                                            Number(getTokenData(asset)?.decimals)
-                                          ) < inputs[asset]
-                                        ) {
-                                          isAnyCCFOptionVisible = true;
-                                          return (
-                                            <button
-                                              disabled={approveIndex !== false}
-                                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                                                approveIndex === index
-                                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                                                  : ""
-                                              }`}
-                                              key={asset}
-                                              type="button"
-                                              onClick={() =>
-                                                approve(asset as TAddress, index)
-                                              }
-                                            >
-                                              <p>
-                                                {needConfirm
-                                                  ? "Confirm in wallet"
-                                                  : `Approve ${
-                                                    getTokenData(asset)?.symbol
-                                                  }`}
-                                              </p>
-                                              {approveIndex === index && (
-                                                <Loader color={"#a6a0b2"} />
-                                              )}
-                                            </button>
-                                          );
-                                        } else {
-                                          return null;
+                                      {option.map(
+                                        (asset: any, index: number) => {
+                                          if (
+                                            allowance &&
+                                            formatUnits(
+                                              allowance[asset],
+                                              Number(
+                                                getTokenData(asset)?.decimals
+                                              )
+                                            ) < inputs[asset]
+                                          ) {
+                                            isAnyCCFOptionVisible = true;
+                                            return (
+                                              <button
+                                                disabled={
+                                                  approveIndex !== false
+                                                }
+                                                className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                                  approveIndex === index
+                                                    ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                                    : ""
+                                                }`}
+                                                key={asset}
+                                                type="button"
+                                                onClick={() =>
+                                                  approve(
+                                                    asset as TAddress,
+                                                    index
+                                                  )
+                                                }
+                                              >
+                                                <p>
+                                                  {needConfirm
+                                                    ? "Confirm in wallet"
+                                                    : `Approve ${
+                                                        getTokenData(asset)
+                                                          ?.symbol
+                                                      }`}
+                                                </p>
+                                                {approveIndex === index && (
+                                                  <Loader color={"#a6a0b2"} />
+                                                )}
+                                              </button>
+                                            );
+                                          } else {
+                                            return null;
+                                          }
                                         }
-                                      })}
+                                      )}
                                       {!isAnyCCFOptionVisible && (
                                         <button
                                           disabled={transactionInProgress}
@@ -2958,11 +2977,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                         {needConfirm
                                           ? "Confirm in wallet"
                                           : `Approve ${
-                                            underlyingToken?.address ===
-                                            option[0]
-                                              ? underlyingToken.symbol
-                                              : getTokenData(option[0])?.symbol
-                                          }`}
+                                              underlyingToken?.address ===
+                                              option[0]
+                                                ? underlyingToken.symbol
+                                                : getTokenData(option[0])
+                                                    ?.symbol
+                                            }`}
                                       </p>
                                       {transactionInProgress && (
                                         <Loader color={"#a6a0b2"} />
@@ -3079,7 +3099,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             </button>
           )}
         </div>
-
 
         {error?.state && <InvestError error={error} setError={setError} />}
       </form>

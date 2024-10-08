@@ -71,7 +71,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           network={network}
           address={vault.toLowerCase() as TAddress}
           vaultStrategy={localVault.strategy}
-          lastHardWork={localVault.lastHardWork}
+          lastHardWork={Number(localVault.lastHardWork)}
         />
 
         <div className="my-8 flex flex-col lg:flex-row items-start justify-start gap-5 w-full">
