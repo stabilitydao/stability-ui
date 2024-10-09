@@ -65,13 +65,13 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     >
       {value !== "APR / APY" ? (
         <p
-          className={`inline-block ${table[index].sortType !== "none" ? "text-[#F9F8FA]" : "text-[#958CA1]"}`}
+          className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
         >
           {value}
         </p>
       ) : (
         <p
-          className={`inline-block ${table[index].sortType !== "none" ? "text-[#F9F8FA]" : "text-[#958CA1]"}`}
+          className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
         >
           {window.innerWidth > 915 || window.innerWidth < 767 ? value : "APR"}
         </p>

@@ -3,6 +3,8 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
+import { HeadingText, RiskIndicator } from "@ui";
+
 import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
@@ -84,10 +86,12 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, vaultTypes, strategyTypes]);
   return (
     <div>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Strategy</h2>
-      </div>
-      <div className="flex flex-col items-start gap-3 p-4">
+      <HeadingText
+        text="Strategy"
+        scale={2}
+        styles="text-left md:ml-4 md:mb-0 mb-2"
+      />
+      <div className="flex flex-col items-start gap-3 md:p-4">
         <div className="flex items-start flex-col gap-3">
           <div className="flex">
             <span
@@ -195,7 +199,10 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             >
               {vault?.strategyInfo?.il?.title}
             </p>
-            <p className="text-[14px]">{vault?.strategyInfo?.il?.desc}</p>
+            <p className="text-[14px]">
+              {vault?.strategyInfo?.il?.desc != "None" &&
+                vault?.strategyInfo?.il?.desc}
+            </p>
           </div>
         </div>
         {!!vault?.risk && vault?.risk?.symbol !== "UNKNOWN" && (
@@ -203,20 +210,8 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               RISK
             </p>
-            <div>
-              {vault?.risk?.symbol === "REKT" ||
-              vault?.risk?.symbol === "REKT+" ? (
-                <p className="text-[20px] font-bold text-[#f52a11] mb-2">
-                  {vault?.risk?.symbol}
-                </p>
-              ) : (
-                <p
-                  style={{ color: vault?.strategyInfo?.il?.color }}
-                  className="text-[20px] font-bold mb-2"
-                >
-                  {vault?.risk?.symbol}
-                </p>
-              )}
+            <div className="flex flex-col gap-2 mt-2">
+              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
 
               <div className="flex items-center gap-5 flex-wrap">
                 {vault?.risk?.factors.map((factor) => (
@@ -252,9 +247,9 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
           {needStrategyUpgrade && (
             <button
               onClick={upgradeStrategy}
-              className="bg-[#1c1c23] py-1 px-2 rounded-md"
+              className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-[10px] px-4 rounded-2xl"
             >
-              Upgrade Strategy
+              Upgrade to {strategyTypes[vault.strategy]}
             </button>
           )}
         </div>

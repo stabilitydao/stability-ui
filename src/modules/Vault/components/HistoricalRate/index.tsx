@@ -5,9 +5,9 @@ import axios from "axios";
 import { Chart } from "./Chart";
 import { ChartBar } from "./ChartBar";
 
-import { ChartSkeleton } from "@ui";
+import { ChartSkeleton, HeadingText } from "@ui";
 
-import { formatFromBigInt } from "@utils";
+import { formatFromBigInt, getTimeDifference } from "@utils";
 
 import { GRAPH_ENDPOINTS } from "src/constants/env";
 
@@ -19,6 +19,7 @@ interface IProps {
   network: string;
   address: TAddress;
   vaultStrategy: string;
+  lastHardWork: number;
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
@@ -30,14 +31,17 @@ type TActiveChart =
   | undefined;
 
 const HistoricalRate: React.FC<IProps> = memo(
-  ({ network, address, vaultStrategy }) => {
+  ({ network, address, vaultStrategy, lastHardWork }) => {
     const APRType = vaultStrategy === "Compound Farm" ? "APR" : "Farm APR";
+
     const timelineSegments = {
       DAY: "DAY",
       WEEK: "WEEK",
       MONTH: "MONTH",
       YEAR: "YEAR",
     };
+
+    const daysFromLastHardWork = getTimeDifference(lastHardWork).days;
 
     const [chartData, setChartData] = useState<TChartData[]>([]);
     const [activeChart, setActiveChart] = useState<TActiveChart>();
@@ -149,6 +153,12 @@ const HistoricalRate: React.FC<IProps> = memo(
 
       APRChartData = newData.map(formatData);
 
+      if (daysFromLastHardWork >= 3) {
+        APRChartData = APRChartData.filter(
+          (data) => data.unixTimestamp < lastHardWork
+        );
+      }
+
       setChartData(workedData);
       setActiveChart({ name: "APR", data: APRChartData as [] });
     };
@@ -240,7 +250,7 @@ const HistoricalRate: React.FC<IProps> = memo(
             }
           );
 
-          const APRChartData = APRArr.map((obj: TChartData, index: number) => ({
+          let APRChartData = APRArr.map((obj: TChartData, index: number) => ({
             unixTimestamp: obj.unixTimestamp,
             timestamp: obj.timestamp,
             date: obj.date,
@@ -248,6 +258,13 @@ const HistoricalRate: React.FC<IProps> = memo(
             x: APRDifferences[index],
             y: formatFromBigInt(obj.APR as number, 3, "withDecimals"),
           }));
+
+          if (daysFromLastHardWork >= 3) {
+            APRChartData = APRChartData.filter(
+              (data) => data.unixTimestamp < lastHardWork
+            );
+          }
+
           setActiveChart({
             name: "APR",
             data: APRChartData as [],
@@ -455,57 +472,33 @@ const HistoricalRate: React.FC<IProps> = memo(
 
     return (
       <div className="rounded-md mt-5">
-        <div className="rounded-t-md flex justify-between items-center  h-[60px] px-4">
-          <h2 className="text-start text-[1rem] min-[420px]:text-[1.25rem] md:text-[1rem] min-[960px]:text-[1.5rem] lg:block md:hidden block">
-            Historical rate
-          </h2>
+        <div className="rounded-t-md flex flex-col md:flex-row justify-between items-center h-[60px] md:px-4">
+          <HeadingText text="Historical Rate" scale={2} />
           {activeChart && (
-            <div className="flex items-center relative sm:px-2 px-1 sm:gap-4 gap-2 text-[10px] sm:text-[12px] lg:text-[14px]">
-              <div
-                className="absolute bottom-0 bg-[#6376AF] rounded-sm"
-                style={{
-                  width: "25%",
-                  height: "3px",
-                  left:
-                    activeChart.name === "sharePrice"
-                      ? "75%"
-                      : activeChart.name === "TVL"
-                        ? "50%"
-                        : activeChart.name === "vsHodl"
-                          ? "25%"
-                          : "0%",
-                  transition: "left 0.3s ease",
-                }}
-              ></div>
+            <div className="flex items-center font-semibold relative text-[14px]">
               <p
-                className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
-                  activeChart.name === "APR" ? "opacity-100" : "opacity-80"
-                }`}
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px] border-transparent ${activeChart.name === "APR" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("APR")}
               >
                 {APRType}
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 py-1 ${
-                  activeChart.name === "vsHodl" ? "opacity-100" : "opacity-80"
-                }`}
+                className={`whitespace-nowrap cursor-pointer z-20 p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "vsHodl" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("vsHodl")}
               >
                 VS HODL APR
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
-                  activeChart.name === "TVL" ? "opacity-100" : "opacity-80"
-                }`}
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "TVL" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
                 onClick={() => chartHandler("TVL")}
               >
                 TVL
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer hover:opacity-100 z-20 w-[55px] md:w-[65px] lg:w-[80px] text-center py-1 ${
+                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${
                   activeChart.name === "sharePrice"
-                    ? "opacity-100"
-                    : "opacity-80"
+                    ? "text-neutral-50 !border-accent-500"
+                    : "text-neutral-500 hover:border-accent-800"
                 }`}
                 onClick={() => chartHandler("sharePrice")}
               >
@@ -516,7 +509,7 @@ const HistoricalRate: React.FC<IProps> = memo(
         </div>
         {isData ? (
           <>
-            <div className="py-3 px-4">
+            <div className="pb-3 pt-10 md:py-3 md:px-4">
               {activeChart ? (
                 <>
                   {activeChart.name === "APR" ? (
@@ -531,44 +524,55 @@ const HistoricalRate: React.FC<IProps> = memo(
                 <ChartSkeleton />
               )}
             </div>
+
             {activeChart && (
-              <div className="px-4 flex items-center justify-end text-[16px] pb-1 sm:pb-3">
-                {/* <p
+              <div className="flex items-center justify-end  select-none font-manrope text-[14px] font-semibold">
+                <div className="flex items-center justify-center bg-accent-900 h-10 rounded-2xl w-full max-w-[200px]">
+                  {/* <p
       onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
       className="opacity-50 hover:opacity-100 cursor-pointer"
     >
       1D
     </p> */}
-                <p
-                  onClick={() =>
-                    timelineHandler(timelineSegments.WEEK as TSegment)
-                  }
-                  className={`hover:opacity-100 cursor-pointer px-2 ${
-                    timeline === "WEEK" ? "opacity-100" : "opacity-30"
-                  }`}
-                >
-                  WEEK
-                </p>
-                <p
-                  onClick={() =>
-                    timelineHandler(timelineSegments.MONTH as TSegment)
-                  }
-                  className={`hover:opacity-100 cursor-pointer px-2 ${
-                    timeline === "MONTH" ? "opacity-100" : "opacity-30"
-                  }`}
-                >
-                  MONTH
-                </p>
-                <p
-                  onClick={() =>
-                    timelineHandler(timelineSegments.YEAR as TSegment)
-                  }
-                  className={`hover:opacity-100 cursor-pointer px-2 ${
-                    timeline === "YEAR" ? "opacity-100" : "opacity-30"
-                  }`}
-                >
-                  ALL
-                </p>
+                  <div className="flex items-center justify-center px-1">
+                    <p
+                      onClick={() =>
+                        timelineHandler(timelineSegments.WEEK as TSegment)
+                      }
+                      className={`py-1 px-4 cursor-pointer rounded-xl ${
+                        timeline === "WEEK"
+                          ? "bg-accent-500 text-neutral-50 h-8"
+                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                      }`}
+                    >
+                      Week
+                    </p>
+                    <p
+                      onClick={() =>
+                        timelineHandler(timelineSegments.MONTH as TSegment)
+                      }
+                      className={`py-1 px-4 cursor-pointer  rounded-xl ${
+                        timeline === "MONTH"
+                          ? "bg-accent-500 text-neutral-50 h-8"
+                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                      }`}
+                    >
+                      Month
+                    </p>
+                    <p
+                      onClick={() =>
+                        timelineHandler(timelineSegments.YEAR as TSegment)
+                      }
+                      className={`py-1 px-4 cursor-pointer rounded-xl ${
+                        timeline === "YEAR"
+                          ? "bg-accent-500 text-neutral-50 h-8 hover:bg-accent-500 hover:text-neutral-50"
+                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                      }`}
+                    >
+                      All
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </>

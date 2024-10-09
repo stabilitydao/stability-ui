@@ -1,9 +1,9 @@
 const VaultType = ({
   type,
-  text = "short",
+  greater = false,
 }: {
   type: string;
-  text?: string;
+  greater?: boolean;
 }): JSX.Element => {
   const vaultTypes = [
     {
@@ -21,19 +21,19 @@ const VaultType = ({
 
   const currentType = vaultTypes.find((elem) => elem.type === type);
 
-  return text === "short" ? (
+  return greater ? (
     <span
       title={`${currentType?.type} vault`}
-      className={`text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center rounded-full ${currentType?.styles}`}
+      className={`text-[16px] flex self-center items-center font-bold h-8 px-0 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
     >
-      {currentType?.symbol}
+      {currentType?.type}
     </span>
   ) : (
     <span
       title={`${currentType?.type} vault`}
-      className={`text-[17px] flex font-bold h-8 px-4 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
+      className={`text-[17px] font-bold border-0 inline-flex w-8 h-8 justify-center items-center self-center rounded-full ${currentType?.styles}`}
     >
-      {currentType?.type}
+      {currentType?.symbol}
     </span>
   );
 };

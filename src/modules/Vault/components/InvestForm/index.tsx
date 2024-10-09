@@ -11,7 +11,7 @@ import { SettingsModal } from "./SettingsModal";
 import { TabSwitcher } from "./TabSwitcher";
 import { InvestError } from "./InvestError";
 
-import { Loader, ShareSkeleton, AssetsSkeleton, AssetsProportion } from "@ui";
+import { Loader, ShareSkeleton, AssetsSkeleton } from "@ui";
 
 import {
   vaultData,
@@ -49,9 +49,10 @@ import {
   getPlatformBalance,
   getAssetsBalances,
   handleInputKeyDown,
+  isEmptyObject,
 } from "../../functions";
 
-import { DEFAULT_ERROR } from "@constants";
+import { DEFAULT_ERROR, ZERO_BigInt } from "@constants";
 
 import type {
   TAddress,
@@ -367,17 +368,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const selectTokensHandler = async () => {
     if (!$tokens[network]) return;
     let filtredTokens = tokenlist.tokens
-      .filter((token) =>
+      .filter((token: TTokenData) =>
         $tokens[network].includes(token.address.toLowerCase() as TAddress)
       )
-      .map(({ address, symbol, logoURI }) => ({ address, symbol, logoURI }));
+      .map(({ address, symbol, logoURI }: TTokenData) => ({
+        address,
+        symbol,
+        logoURI,
+      }));
 
     filtredTokens = filtredTokens.filter(
-      (token) => token.address != defaultOption?.assets
+      (token: TTokenData) => token.address != defaultOption?.assets
     );
     if (defaultOption?.assetsArray?.length < 2) {
       filtredTokens = filtredTokens.filter(
-        (token) => token.address != defaultOption?.assetsArray[0]
+        (token: TTokenData) => token.address != defaultOption?.assetsArray[0]
       );
     }
     ///// GET UNDERLYING TOKEN
@@ -454,6 +459,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const debouncedZap = useCallback(
     debounce(async (amount: string, asset: string) => {
+      if (!$connected) {
+        setButton("none");
+        setZapTokens([]);
+        setLoader(false);
+        return;
+      }
+
       if (!Number(amount)) {
         setButton("none");
         setZapTokens([]);
@@ -476,7 +488,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )
       ) {
         setButton("insufficientBalance");
+
         setZapTokens([]);
+        setLoader(false);
         return;
       }
 
@@ -583,9 +597,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setButton("none");
     setZapTokens([]);
     setZapPreviewWithdraw([]);
-    setLoader(true);
+    if (!!amount) {
+      setLoader(true);
+    } else {
+      setLoader(false);
+    }
 
-    // @ts-ignore
+    //@ts-ignore
     debouncedZap(amount, asset);
   };
 
@@ -691,7 +709,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         const shares = parseUnits(_strShares, 18);
         const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-        const out = shares - (shares * decimalPercent) / 100n;
+        const out = shares - (shares * decimalPercent) / BigInt(100);
 
         const txToken: any = {
           [underlyingToken?.address]: {
@@ -762,7 +780,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         const shares = parseUnits(_strShares, 18);
 
-        const out = shares - (shares * decimalPercent) / 100n;
+        const out = shares - (shares * decimalPercent) / BigInt(100);
 
         const amountIn = parseUnits(
           amount,
@@ -845,7 +863,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const depositCCF = async (amount: string) => {
     const decimals = getTokenData(option[0])?.decimals || 18;
     if (option) {
-      let amounts: bigint[] = [0n, parseUnits(amount, decimals)];
+      let amounts: bigint[] = [ZERO_BigInt, parseUnits(amount, decimals)];
 
       try {
         let previewDepositAssets: any;
@@ -932,7 +950,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 getTokenData(outData[0]?.address as TAddress)
                   ?.decimals as number
               )
-            : 0n
+            : ZERO_BigInt
         );
       } else {
         amounts = outData.map((tokenOut) =>
@@ -956,7 +974,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         args: [defaultOption?.assetsArray as TAddress[], amounts],
       });
 
-      let _previewDepositAssets: bigint = 0n;
+      let _previewDepositAssets: bigint = ZERO_BigInt;
 
       if (
         Array.isArray(previewDepositAssets) &&
@@ -1044,7 +1062,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         });
 
         let _newAllowance =
-          typeof newAllowance === "bigint" ? newAllowance : 0n;
+          typeof newAllowance === "bigint" ? newAllowance : ZERO_BigInt;
 
         if (
           Number(formatUnits(_newAllowance, 18)) >= Number(inputs[option[0]])
@@ -1190,7 +1208,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       : (parseUnits(_strShares, 18) * BigInt(1)) / BigInt(100);
 
     if (shortId === "CCF" && option.length < 2) {
-      input.push(0n);
+      input.push(ZERO_BigInt);
     }
 
     for (let i = 0; i < option.length; i++) {
@@ -1203,7 +1221,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const changedInput = assets?.indexOf(lastAsset);
     const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
-    const out = BigInt(shares) - (BigInt(shares) * decimalPercent) / 100n;
+    const out =
+      BigInt(shares) - (BigInt(shares) * decimalPercent) / BigInt(100);
 
     let transaction,
       depositAssets: any,
@@ -1221,7 +1240,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
       } else {
         const token = tokenlist.tokens.find(
-          (token) => token.address === option[changedInput ? 0 : 1]
+          (token: TTokenData) => token.address === option[changedInput ? 0 : 1]
         );
 
         const decimals = token ? token.decimals + 18 : 24;
@@ -1252,7 +1271,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         // IQMF strategy only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
-          proportion ? amounts[0] : 0n
+          proportion ? amounts[0] : ZERO_BigInt
         );
         gas = await _publicClient?.estimateContractGas({
           address: vault.address,
@@ -1329,7 +1348,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const amount = parseUnits(obj.amount, 18);
-        return amount - (amount * decimalPercent) / 100n;
+        return amount - (amount * decimalPercent) / BigInt(100);
       });
       try {
         const gas = await _publicClient?.estimateContractGas({
@@ -1382,7 +1401,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       const txTokens = withdrawAmount?.reduce(
         (result, token) => {
           const JSONToken = tokenlist.tokens.find(
-            (t) => t.symbol === token.symbol
+            (t: TTokenData) => t.symbol === token.symbol
           );
 
           result[JSONToken?.address as TAddress] = {
@@ -1396,11 +1415,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       const withdrawAmounts = withdrawAmount?.map((obj: any) => {
         const decimals = tokenlist.tokens.find(
-          (token) => token.symbol === obj.symbol
+          (token: TTokenData) => token.symbol === obj.symbol
         )?.decimals;
 
         const amount = parseUnits(obj.amount, decimals ? decimals : 18);
-        return amount - (amount * decimalPercent) / 100n;
+        return amount - (amount * decimalPercent) / BigInt(100);
       });
       try {
         const gas = await _publicClient?.estimateContractGas({
@@ -1550,7 +1569,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [option as TAddress[], currentValue, [0n]],
+          args: [option as TAddress[], currentValue, [ZERO_BigInt]],
           account: $account as TAddress,
         });
         setWithdrawAmount([
@@ -1562,10 +1581,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ]);
         setButton("withdraw");
       } else {
-        let assetsLength = defaultOption?.assetsArray.map((_: string) => 0n);
+        let assetsLength = defaultOption?.assetsArray.map(
+          (_: string) => ZERO_BigInt
+        );
         let localAssets = defaultOption?.assetsArray;
         if (shortId === "IQMF" || shortId === "IRMF") {
-          assetsLength = [0n, 0n];
+          assetsLength = [ZERO_BigInt, ZERO_BigInt];
           localAssets = vault.assets.map((asset) => asset.address);
         }
 
@@ -1649,6 +1670,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   );
 
   const previewWithdraw = async (value: string) => {
+    if (!$vaultData[network]) return;
     //@ts-ignore
     debouncedPreviewWithdraw(value);
   };
@@ -1667,7 +1689,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       });
 
       if (!allowanceResult[option[i]]) {
-        allowanceResult[option[i]] = 0n;
+        allowanceResult[option[i]] = ZERO_BigInt;
       }
       allowanceResult[option[i]] = allowanceData;
     }
@@ -1695,6 +1717,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     if (!Number(amount)) return;
+    if (!$connected) return;
 
     setLoader(true);
     if (defaultOption?.assetsArray) {
@@ -1726,7 +1749,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               }
             } else {
               const token = tokenlist.tokens.find(
-                (token) => token.address === option[changedInput ? 0 : 1]
+                (token: TTokenData) =>
+                  token.address === option[changedInput ? 0 : 1]
               );
 
               const decimals = token ? token.decimals + 18 : 24;
@@ -1741,7 +1765,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             // IQMF & IRMF strategy only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
-              (proportion) => (proportion ? amounts[0] : 0n)
+              (proportion) => (proportion ? amounts[0] : ZERO_BigInt)
             );
 
             previewDepositAssets = await _publicClient?.readContract({
@@ -1799,8 +1823,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const isNotUnderlying = useMemo(
     () => !underlyingToken || option[0] !== underlyingToken?.address,
-    [underlyingToken]
+    [underlyingToken, option]
   );
+
+  useEffect(() => {
+    console.log();
+    console.log(underlyingToken);
+    console.log(option);
+  }, [option]);
 
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
@@ -1826,7 +1856,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setZapError(false);
     setZapPreviewWithdraw([]);
     setLoader(false);
-  }, [option, $connected]);
+  }, [option, $connected, tab]);
 
   useEffect(() => {
     resetInputs();
@@ -1844,12 +1874,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
   }, []);
 
-  useEffect(() => {
-    setZapTokens([]);
-  }, [inputs]);
-
   ///// interval refresh data
   useEffect(() => {
+    if (!$connected) return;
     if (zapTokens || withdrawAmount || zapPreviewWithdraw) {
       const reload = async () => {
         if (transactionInProgress) return;
@@ -1936,7 +1963,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   return (
-    <div className="bg-button rounded-md">
+    <div className="bg-accent-950 rounded-2xl min-w-[320px] md:w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -1944,15 +1971,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         resetOptions={resetOptions}
       />
 
-      <form autoComplete="off" className="w-full px-4 pb-5">
-        <div className="flex items-center mt-4 gap-3 relative">
+      <form autoComplete="off" className="w-full p-6 flex flex-col gap-[10px]">
+        <div className="flex items-center gap-4 relative pb-[12px]">
           {optionTokens && (
-            <div className="relative select-none w-full" ref={tokenSelectorRef}>
+            <div
+              className="relative select-none min-w-[235px] w-[290px] text-neutral-50 text-[14px] "
+              ref={tokenSelectorRef}
+            >
+              <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
+                Select token
+              </div>
               <div
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-[#13141f] text-[20px] cursor-pointer"
+                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[16px] cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -1960,13 +1993,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       activeOptionToken?.logoURI?.map((logo: string) => (
                         <img
                           key={Math.random()}
-                          className="max-w-6 max-h-6 rounded-full"
+                          className="w-6 h-6 rounded-full"
                           src={logo}
                           alt="logo"
                         />
                       ))}
                   </div>
-                  <p className="text-[16px] md:text-[15px] lg:text-[20px]">
+                  <p className="whitespace-nowrap">
                     {activeOptionToken?.symbol}
                   </p>
                 </div>
@@ -1980,7 +2013,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </div>
 
               <div
-                className={`bg-[#13141f] mt-1 rounded-md w-full z-10 ${
+                className={`bg-accent-900 mt-2 rounded-2xl w-full z-30 ${
                   tokenSelector ? "absolute transition delay-[50ms]" : "hidden"
                 } `}
               >
@@ -1993,34 +2026,36 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       defaultOption?.logos
                     );
                   }}
-                  className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3"
+                  className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2"
                 >
                   <div
                     className={`flex items-center ${
                       defaultOption?.logos?.length < 2 && "ml-3"
                     }`}
                   >
-                    {defaultOption?.logos?.map((logo: string) => (
-                      <img
-                        key={Math.random()}
-                        className="max-w-6 max-h-6 rounded-full"
-                        src={logo}
-                        alt="logo"
-                      />
-                    ))}
+                    {defaultOption?.logos?.map(
+                      (logo: string, index: number) => (
+                        <img
+                          key={logo + index}
+                          className="max-w-6 max-h-6 rounded-full"
+                          src={logo}
+                          alt="logo"
+                        />
+                      )
+                    )}
                   </div>
 
                   <p
                     className={`${
                       defaultOption?.logos?.length < 2 ? "ml-2" : "ml-[-4px]"
-                    }  text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0`}
+                    }`}
                   >
                     {defaultOption?.symbols}
                   </p>
                 </div>
-                {underlyingToken && (
+                {!!underlyingToken.symbol && (
                   <div
-                    className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                    className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                     onClick={() => {
                       optionHandler(
                         [underlyingToken?.address],
@@ -2032,14 +2067,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   >
                     {underlyingToken?.logoURI && (
                       <img
-                        className="max-w-6 max-h-6 rounded-full "
+                        className="w-6 h-6 rounded-full"
                         src={underlyingToken.logoURI}
                         alt="logo"
                       />
                     )}
-                    <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                      {underlyingToken.symbol}
-                    </p>
+                    <p className="ml-2">{underlyingToken.symbol}</p>
                   </div>
                 )}
                 {/* CRV Strategy don't have zap withdraw */}
@@ -2047,7 +2080,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   optionTokens.map(({ address, symbol, logoURI }) => {
                     return (
                       <div
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-3 gap-3 ml-3"
+                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                         key={address as string}
                         onClick={() => {
                           optionHandler(
@@ -2060,14 +2093,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       >
                         {logoURI && (
                           <img
-                            className="max-w-6 max-h-6 rounded-full"
+                            className="w-6 h-6 rounded-full"
                             src={logoURI as string}
                             alt="logo"
                           />
                         )}
-                        <p className="ml-2 text-[16px] md:text-[15px] lg:text-[20px] py-1 lg:py-0">
-                          {symbol}
-                        </p>
+                        <p className="ml-2">{symbol}</p>
                       </div>
                     );
                   })}
@@ -2076,47 +2107,28 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
 
           {$connected && (
-            <>
-              <svg
-                fill={isRefresh ? "#ffffff" : "#959595"}
-                height="22"
-                width="22"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                viewBox="0 0 512 512"
-                xmlSpace="preserve"
+            <div className="flex items-center gap-5 pt-[12px]">
+              <img
                 className={`${
                   isRefresh ? "cursor-pointer" : "cursor-default"
                 } transition-transform duration-500`}
                 style={{ transform: `rotate(${rotation}deg)` }}
                 onClick={refreshData}
-              >
-                <g>
-                  <g>
-                    <path
-                      d="M511.957,185.214L512,15.045l-67.587,67.587l-7.574-7.574c-48.332-48.332-112.593-74.95-180.946-74.95
-    C114.792,0.107,0,114.901,0,256s114.792,255.893,255.893,255.893S511.785,397.099,511.785,256h-49.528
-    c0,113.79-92.575,206.365-206.365,206.365S49.528,369.79,49.528,256S142.103,49.635,255.893,49.635
-    c55.124,0,106.947,21.467,145.925,60.445l7.574,7.574l-67.58,67.58L511.957,185.214z"
-                    />
-                  </g>
-                </g>
-              </svg>
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  className="settingsModal"
-                  d="M20.83 14.6C19.9 14.06 19.33 13.07 19.33 12C19.33 10.93 19.9 9.93999 20.83 9.39999C20.99 9.29999 21.05 9.1 20.95 8.94L19.28 6.06C19.22 5.95 19.11 5.89001 19 5.89001C18.94 5.89001 18.88 5.91 18.83 5.94C18.37 6.2 17.85 6.34 17.33 6.34C16.8 6.34 16.28 6.19999 15.81 5.92999C14.88 5.38999 14.31 4.41 14.31 3.34C14.31 3.15 14.16 3 13.98 3H10.02C9.83999 3 9.69 3.15 9.69 3.34C9.69 4.41 9.12 5.38999 8.19 5.92999C7.72 6.19999 7.20001 6.34 6.67001 6.34C6.15001 6.34 5.63001 6.2 5.17001 5.94C5.01001 5.84 4.81 5.9 4.72 6.06L3.04001 8.94C3.01001 8.99 3 9.05001 3 9.10001C3 9.22001 3.06001 9.32999 3.17001 9.39999C4.10001 9.93999 4.67001 10.92 4.67001 11.99C4.67001 13.07 4.09999 14.06 3.17999 14.6H3.17001C3.01001 14.7 2.94999 14.9 3.04999 15.06L4.72 17.94C4.78 18.05 4.89 18.11 5 18.11C5.06 18.11 5.12001 18.09 5.17001 18.06C6.11001 17.53 7.26 17.53 8.19 18.07C9.11 18.61 9.67999 19.59 9.67999 20.66C9.67999 20.85 9.82999 21 10.02 21H13.98C14.16 21 14.31 20.85 14.31 20.66C14.31 19.59 14.88 18.61 15.81 18.07C16.28 17.8 16.8 17.66 17.33 17.66C17.85 17.66 18.37 17.8 18.83 18.06C18.99 18.16 19.19 18.1 19.28 17.94L20.96 15.06C20.99 15.01 21 14.95 21 14.9C21 14.78 20.94 14.67 20.83 14.6ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </>
+                src="/refresh.svg"
+                alt="refresh"
+                title="refresh"
+              />
+
+              <img
+                className={`settingsModal cursor-pointer transition-transform transform ${
+                  settingsModal ? "rotate-180" : "rotate-0"
+                }`}
+                onClick={() => setSettingsModal((prev) => !prev)}
+                src="/settings.svg"
+                alt="settings"
+                title="settings"
+              />
+            </div>
           )}
 
           {settingsModal && (
@@ -2133,43 +2145,32 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             {option?.length > 1 ||
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
-                <div className="flex flex-col items-center justify-center gap-3 mt-2 w-full">
-                  {option.map((asset: string, index: number) => (
-                    <div key={asset}>
-                      {ichiAllow[index] && (
-                        <div className="w-full">
-                          {!!balances[asset] && (
-                            <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                              <p>Balance: </p>
-                              <p>{balances[asset]}</p>
+                <div className="flex flex-col items-center justify-center gap-[10px] min-w-[312px] w-[372px]">
+                  {option.map((asset: string, index: number) => {
+                    const currentAsset = getTokenData(asset) as TTokenData;
+                    return (
+                      <div className="min-w-full gap-[10px]" key={asset}>
+                        {ichiAllow[index] && (
+                          <div className="min-w-full h-[64px]">
+                            <div
+                              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[asset] ? "" : "opacity-0"}`}
+                            >
+                              <span>Balance: </span>
+                              <span>
+                                {!!balances[asset] ? balances[asset] : "0"}
+                              </span>
                             </div>
-                          )}
 
-                          <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
-                            <div className="py-3 w-full flex items-center px-4">
-                              <label
-                                htmlFor={asset}
-                                className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
-                              >
-                                {tokenlist.tokens.map((token) => {
-                                  if (token.address.toLowerCase() === asset) {
-                                    return (
-                                      <div
-                                        className="flex items-center gap-2"
-                                        key={token.address}
-                                      >
-                                        <img
-                                          className="rounded-full w-[25px] h-[25px] "
-                                          src={token.logoURI}
-                                          alt={token.name}
-                                        />
-                                      </div>
-                                    );
-                                  }
-                                })}
-                              </label>
+                            <label className="relative block h-[40px] w-[345px]">
+                              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                <img
+                                  src={currentAsset.logoURI}
+                                  alt={currentAsset.name}
+                                  title={currentAsset.name}
+                                  className="w-4 h-4 text-neutral-500 rounded-full"
+                                />
+                              </span>
                               <input
-                                className="w-[75%] flex items-center h-full text-[25px] bg-transparent ml-2"
                                 list="amount"
                                 id={asset}
                                 name="amount"
@@ -2178,26 +2179,27 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 onChange={(e) =>
                                   handleInputChange(e.target.value, e.target.id)
                                 }
-                                type="text"
                                 onKeyDown={(evt) =>
                                   handleInputKeyDown(evt, inputs[asset])
                                 }
+                                type="text"
+                                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                               />
-                              <button
-                                className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-2"
-                                onClick={() =>
-                                  balances[asset] &&
-                                  handleInputChange(balances[asset], asset)
-                                }
-                                type="button"
-                              >
-                                MAX
-                              </button>
-                            </div>
-                          </div>
+                              {!!$connected && !!balances[option[0]] && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    balances[asset] &&
+                                    handleInputChange(balances[asset], asset)
+                                  }
+                                  className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
+                                >
+                                  Max
+                                </button>
+                              )}
+                            </label>
 
-                          <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                            <p>
+                            <p className="h-3 text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
                               $
                               {$assetsPrices[network] &&
                               Number(inputs[asset]) > 0 &&
@@ -2210,29 +2212,35 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 : 0}
                             </p>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="mt-5">
+                <div
+                  className={`${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-start justify-start"}`}
+                >
                   {loader && !transactionInProgress ? (
-                    <ShareSkeleton />
+                    <div
+                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                    >
+                      <ShareSkeleton />
+                    </div>
                   ) : (
-                    <div className="h-[63px] text-[18px]">
-                      {!!sharesOut && (
+                    <div
+                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                    >
+                      {!!sharesOut && !isEmptyObject(inputs) && (
                         <div>
-                          <p className="uppercase leading-3 text-[#8D8E96] text-[18px] my-3">
-                            YOU RECEIVE
+                          <p className="uppercase text-[12px] leading-3 text-neutral-500">
+                            You Receive
                           </p>
-                          <div className="flex items-center">
-                            <div className="mr-4">
-                              <AssetsProportion
-                                proportions={vault.assetsProportions}
-                                assets={vault?.assets}
-                                type="vault"
-                              />
-                            </div>
+                          <div className="h-[40px] flex items-center text-neutral-50 text-[14px]">
+                            <img
+                              src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                              alt="logo"
+                              className="w-7 h-7 rounded-full mr-4"
+                            />
                             {Number(
                               formatUnits(BigInt(sharesOut) * BigInt(100), 18)
                             ).toFixed(12)}{" "}
@@ -2251,109 +2259,97 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </div>
               </>
             ) : (
-              <div>
-                <div className="flex flex-col mt-[15px] text-[15px] w-full">
-                  {!!balances[option[0]] && (
-                    <div className="text-left text-[gray] ml-2">
-                      Balance: {balances[option[0]]}
-                    </div>
-                  )}
-                  <div className="rounded-xl relative max-h-[150px] border-[2px] border-[#6376AF]">
-                    <div className="py-3 w-full flex items-center px-4">
-                      <label
-                        htmlFor={option[0]}
-                        className="flex items-center justify-center bg-[#4e46e521] rounded-xl"
-                      >
-                        {tokenlist.tokens.map((token) => {
-                          if (token.address === option[0]) {
-                            return (
-                              <div
-                                className="flex items-center"
-                                key={token.address}
-                              >
-                                <img
-                                  className="w-[25px] h-[25px] rounded-full"
-                                  src={token.logoURI}
-                                  alt={token.name}
-                                />
-                              </div>
-                            );
-                          }
-                        })}
-                      </label>
+              <div className="flex flex-col text-[15px] w-full">
+                <div
+                  className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+                >
+                  <span>Balance: </span>
+                  <span>
+                    {!!balances[option[0]] ? balances[option[0]] : "0"}
+                  </span>
+                </div>
 
-                      {option && (
-                        <input
-                          list="amount"
-                          id={option[0]}
-                          value={inputs[option[0]]}
-                          name="amount"
-                          type="text"
-                          placeholder="0"
-                          onChange={(e) =>
-                            zapInputHandler(e.target.value, e.target.id)
-                          }
-                          onKeyDown={(evt) =>
-                            handleInputKeyDown(evt, inputs[option[0]])
-                          }
-                          className={`ml-2 flex items-center h-full   bg-transparent ${
-                            underlyingToken?.address === option[0]
-                              ? "text-[16px] w-[70%]"
-                              : "text-[25px] w-[58%]"
-                          } `}
-                        />
-                      )}
-                      {!!$connected && !!balances[option[0]] && (
-                        <button
-                          onClick={() =>
-                            zapInputHandler(balances[option[0]], option[0])
-                          }
-                          className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg ml-auto"
-                          type="button"
-                        >
-                          MAX
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                    $
-                    {$assetsPrices[network] &&
-                    Number(inputs[option[0]]) > 0 &&
-                    underlyingToken?.address !== option[0]
-                      ? (
-                          Number($assetsPrices[network][option[0]].price) *
-                          Number(inputs[option[0]])
-                        ).toFixed(2)
-                      : 0}
-                  </p>
-                  <div className="my-2 ml-2 flex flex-col gap-2">
-                    {isNotUnderlying && (
-                      <>
-                        <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                          SWAPS
-                        </p>
-                        {loader && !transactionInProgress ? (
+                <label className="relative block h-[40px] w-[345px]">
+                  <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <img
+                      src={activeOptionToken.logoURI[0]}
+                      alt={activeOptionToken.symbol as string}
+                      title={activeOptionToken.symbol as string}
+                      className="w-4 h-4 text-neutral-500 rounded-full"
+                    />
+                  </span>
+                  <input
+                    list="amount"
+                    id={option[0]}
+                    value={inputs[option[0]]}
+                    name="amount"
+                    type="text"
+                    placeholder="0"
+                    onChange={(e) =>
+                      zapInputHandler(e.target.value, e.target.id)
+                    }
+                    onKeyDown={(evt) =>
+                      handleInputKeyDown(evt, inputs[option[0]])
+                    }
+                    className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
+                  />
+                  {!!$connected && !!balances[option[0]] && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        zapInputHandler(balances[option[0]], option[0])
+                      }
+                      className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
+                    >
+                      Max
+                    </button>
+                  )}
+                </label>
+
+                <p className="h-3 text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
+                  $
+                  {$assetsPrices[network] &&
+                  Number(inputs[option[0]]) > 0 &&
+                  underlyingToken?.address !== option[0]
+                    ? (
+                        Number($assetsPrices[network][option[0]].price) *
+                        Number(inputs[option[0]])
+                      ).toFixed(2)
+                    : 0}
+                </p>
+
+                <div className="mt-[10px] flex flex-col">
+                  {isNotUnderlying && (
+                    <>
+                      <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
+                        {isEmptyObject(inputs) ? "" : " Swaps"}
+                      </p>
+
+                      {loader && !transactionInProgress ? (
+                        <div className="flex items-start justify-start">
                           <AssetsSkeleton />
-                        ) : (
-                          <div className="h-[100px]">
-                            {!!zapTokens.length && (
-                              <>
-                                {shortId !== "CCF" ? (
-                                  <div>
+                        </div>
+                      ) : (
+                        <div className="flex h-[52px] mb-[10px]">
+                          {!!zapTokens.length && (
+                            <>
+                              {shortId !== "CCF" ? (
+                                <div className="h-[40px] flex items-center">
+                                  <img
+                                    src="/oneInch.svg"
+                                    alt="1inch logo"
+                                    title="1inch"
+                                    className="w-[26px] h-[26px]"
+                                  />
+                                  <div className="flex whitespace-nowrap gap-3 items-center">
                                     {zapTokens?.map((token: any) => (
                                       <div
-                                        className="text-[18px]  flex items-center gap-1 ml-2"
+                                        className="text-[14px] flex items-center gap-3"
                                         key={token.address}
                                       >
                                         {token.address.toLowerCase() !==
                                           option[0].toLowerCase() && (
                                           <div className="flex items-center gap-1 mt-2">
-                                            <img
-                                              src="/oneInch.svg"
-                                              alt="1inch logo"
-                                              title="1inch"
-                                            />
                                             {zapError ? (
                                               <img
                                                 src="/error.svg"
@@ -2363,11 +2359,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                             ) : (
                                               <>
                                                 <div className="flex items-center gap-1">
-                                                  <p>
-                                                    {Number(
-                                                      token.amountIn
-                                                    ).toFixed(6)}
-                                                  </p>
+                                                  {/* <p>
+                                                  {Number(
+                                                    token.amountIn
+                                                  ).toFixed(6)}
+                                                </p>*/}
                                                   <img
                                                     src={
                                                       getTokenData(option[0])
@@ -2386,11 +2382,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                                 </div>
                                                 -&gt;
                                                 <div className="flex items-center gap-1">
-                                                  <p>
-                                                    {Number(
-                                                      token.amountOut
-                                                    ).toFixed(6)}
-                                                  </p>
+                                                  {/*<p>
+                                                  {Number(
+                                                    token.amountOut
+                                                  ).toFixed(6)}
+                                                </p>*/}
                                                   <img
                                                     src={token.img}
                                                     title={token.symbol}
@@ -2405,113 +2401,120 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       </div>
                                     ))}
                                   </div>
-                                ) : (
-                                  <div className="text-[18px]  flex items-center gap-1 ml-2">
-                                    <div className="flex items-center gap-1 mt-2">
-                                      <img
-                                        src="/oneInch.svg"
-                                        alt="1inch logo"
-                                        title="1inch"
-                                      />
-                                      {zapError ? (
-                                        <img
-                                          src="/error.svg"
-                                          alt="error img"
-                                          title="error"
-                                        />
-                                      ) : (
-                                        <>
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(
-                                                zapTokens[0].amountIn
-                                              ).toFixed(6)}
-                                            </p>
-                                            <img
-                                              src={
-                                                getTokenData(option[0])?.logoURI
-                                              }
-                                              title={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              alt={
-                                                getTokenData(option[0])?.symbol
-                                              }
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                          -&gt;
-                                          <div className="flex items-center gap-1">
-                                            <p>
-                                              {Number(
-                                                zapTokens[0].amountOut
-                                              ).toFixed(6)}
-                                            </p>
-                                            <img
-                                              src={zapTokens[0].img}
-                                              title={zapTokens[0].symbol}
-                                              alt={zapTokens[0].symbol}
-                                              className="w-6 h-6 rounded-full"
-                                            />
-                                          </div>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-                    <div className="mt-5">
-                      <div className="h-[63px]">
-                        <p className="uppercase text-left text-[18px] leading-3 text-[#8D8E96] mb-3">
-                          YOU RECEIVE
-                        </p>
-                        <div className="h-[63px]">
-                          <div className="text-left text-[18px]">
-                            <div className="flex items-center">
-                              <div className="mr-4">
-                                <AssetsProportion
-                                  proportions={vault.assetsProportions}
-                                  assets={vault?.assets}
-                                  type="vault"
-                                />
-                              </div>
-
-                              {loader && !transactionInProgress ? (
-                                <ShareSkeleton height={30} width={300} />
+                                </div>
                               ) : (
-                                <div>
-                                  {(underlyingShares &&
-                                    Number(inputs[option[0]]) > 0) ||
-                                  (zapShares &&
-                                    Number(inputs[option[0]]) > 0) ? (
-                                    <p>
-                                      {underlyingShares &&
-                                      Number(inputs[option[0]]) > 0
-                                        ? `${underlyingShares} ($${(
-                                            Number(underlyingShares) *
-                                            Number(vault.shareprice)
-                                          ).toFixed(2)})`
-                                        : zapShares &&
-                                          Number(inputs[option[0]]) > 0 &&
-                                          `${zapShares} ($${(
-                                            Number(zapShares) *
-                                            Number(vault.shareprice)
-                                          ).toFixed(2)})`}
-                                    </p>
-                                  ) : (
-                                    <p>0 ($0.0)</p>
-                                  )}
+                                <div className="text-[14px]  flex items-center gap-1 ml-2">
+                                  <div className="flex items-center gap-1 mt-2">
+                                    <img
+                                      src="/oneInch.svg"
+                                      alt="1inch logo"
+                                      title="1inch"
+                                    />
+                                    {zapError ? (
+                                      <img
+                                        src="/error.svg"
+                                        alt="error img"
+                                        title="error"
+                                      />
+                                    ) : (
+                                      <>
+                                        <div className="flex items-center gap-1">
+                                          <p>
+                                            {Number(
+                                              zapTokens[0].amountIn
+                                            ).toFixed(6)}
+                                          </p>
+                                          <img
+                                            src={
+                                              getTokenData(option[0])?.logoURI
+                                            }
+                                            title={
+                                              getTokenData(option[0])?.symbol
+                                            }
+                                            alt={
+                                              getTokenData(option[0])?.symbol
+                                            }
+                                            className="w-6 h-6 rounded-full"
+                                          />
+                                        </div>
+                                        -&gt;
+                                        <div className="flex items-center gap-1">
+                                          <p>
+                                            {Number(
+                                              zapTokens[0].amountOut
+                                            ).toFixed(6)}
+                                          </p>
+                                          <img
+                                            src={zapTokens[0].img}
+                                            title={zapTokens[0].symbol}
+                                            alt={zapTokens[0].symbol}
+                                            className="w-6 h-6 rounded-full"
+                                          />
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                               )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <div className="flex mt-[-3px]">
+                    <div
+                      className={`${isNotUnderlying ? "h-[66px]" : "h-[122px] flex flex-col justify-end"}`}
+                    >
+                      {!isEmptyObject(inputs) && (
+                        <>
+                          <p className="text-[12px] text-neutral-500 uppercase">
+                            You Receive
+                          </p>
+                          <div
+                            className={`${isNotUnderlying ? "h-[63px]" : "h-[30px]"}`}
+                          >
+                            <div className="text-left text-neutral-50 text-[14px]">
+                              <div className="flex items-center">
+                                <img
+                                  src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                                  alt="logo"
+                                  className="w-7 h-7 rounded-full mr-4"
+                                />
+
+                                {loader && !transactionInProgress ? (
+                                  <ShareSkeleton height={24} width={300} />
+                                ) : (
+                                  <div>
+                                    {(underlyingShares &&
+                                      Number(inputs[option[0]]) > 0) ||
+                                    (zapShares &&
+                                      Number(inputs[option[0]]) > 0) ? (
+                                      <p className="h-6">
+                                        {underlyingShares &&
+                                        Number(inputs[option[0]]) > 0
+                                          ? `${underlyingShares} ($${(
+                                              Number(underlyingShares) *
+                                              Number(vault.shareprice)
+                                            ).toFixed(2)})`
+                                          : zapShares &&
+                                            Number(inputs[option[0]]) > 0 &&
+                                            `${zapShares} ($${(
+                                              Number(zapShares) *
+                                              Number(vault.shareprice)
+                                            ).toFixed(2)})`}
+                                      </p>
+                                    ) : (
+                                      <p className="h-6">0 ($0.0)</p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2520,50 +2523,34 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         ) : (
           <>
-            <div className="grid mt-[15px] text-[15px] w-full">
-              {!!balances[option[0]] && (
-                <div className="text-left text-[gray] ml-2">
-                  Balance:{" "}
-                  {parseFloat(
-                    formatUnits(
-                      $vaultData[network][vault.address].vaultUserBalance,
-                      18
-                    )
-                  )}
-                </div>
-              )}
+            <div className="grid text-[15px] w-full">
+              <div
+                className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+              >
+                <span>Balance: </span>
+                <span>
+                  {!!balances[option[0]] &&
+                  !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                    ? parseFloat(
+                        formatUnits(
+                          $vaultData?.[network]?.[vault.address]
+                            ?.vaultUserBalance,
+                          18
+                        )
+                      )
+                    : "0"}
+                </span>
+              </div>
 
-              <div className="rounded-xl  relative max-h-[150px] border-[2px] border-[#6376AF] w-full">
-                {!!balances[option[0]] && (
-                  <div className="absolute right-0 pt-[15px] pl-[15px] pr-3 pb-3 bottom-[-9%]">
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => {
-                          zapInputHandler(
-                            formatUnits(
-                              $vaultData[network][vault.address]
-                                ?.vaultUserBalance,
-                              18
-                            ),
-                            option[0]
-                          );
-                          previewWithdraw(
-                            formatUnits(
-                              $vaultData[network][vault.address]
-                                ?.vaultUserBalance,
-                              18
-                            )
-                          );
-                        }}
-                        type="button"
-                        className="rounded-md w-14 border border-gray-500 ring-gray-500 hover:ring-1 text-gray-500 text-lg"
-                      >
-                        MAX
-                      </button>
-                    </div>
-                  </div>
-                )}
-
+              <label className="relative block w-[345px]">
+                <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <img
+                    src={activeOptionToken.logoURI[0]}
+                    alt={activeOptionToken.symbol as string}
+                    title={activeOptionToken.symbol as string}
+                    className="w-4 h-4 text-neutral-500 rounded-full"
+                  />
+                </span>
                 <input
                   list="amount"
                   id={option.join(", ")}
@@ -2580,31 +2567,57 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   }
                   pattern="^[0-9]*[.,]?[0-9]*$"
                   inputMode="decimal"
-                  className="py-3 flex items-center h-full  bg-transparent  text-[16px] w-[70%] pl-[10px]"
+                  className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                 />
-              </div>
+                {!!balances[option[0]] && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      zapInputHandler(
+                        formatUnits(
+                          $vaultData[network][vault.address]?.vaultUserBalance,
+                          18
+                        ),
+                        option[0]
+                      );
+                      previewWithdraw(
+                        formatUnits(
+                          $vaultData[network][vault.address]?.vaultUserBalance,
+                          18
+                        )
+                      );
+                    }}
+                    className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
+                  >
+                    Max
+                  </button>
+                )}
+              </label>
 
-              <div className="text-[16px] text-[gray] flex items-center gap-1 ml-2">
-                <p>
-                  $
-                  {$assetsPrices[network] && Number(inputs[option[0]]) > 0
-                    ? (
-                        Number(vault.shareprice) * Number(inputs[option[0]])
-                      ).toFixed(2)
-                    : 0}
-                </p>
-              </div>
+              <p className="text-[12px] h-3 text-neutral-500 flex items-center gap-1">
+                $
+                {$assetsPrices[network] && Number(inputs[option[0]]) > 0
+                  ? (
+                      Number(vault.shareprice) * Number(inputs[option[0]])
+                    ).toFixed(2)
+                  : 0}
+              </p>
             </div>
-            <div className="my-2 ml-2 flex flex-col gap-2">
+
+            <div className="flex flex-col items-start justify-end gap-2">
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
-                <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-2">
-                  YOU RECEIVE
+                <p
+                  className={`text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                >
+                  You Receive
                 </p>
               )}
 
-              <div className="h-[100px]">
+              <div
+                className={`flex flex-col justify-start items-start ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+              >
                 {(option.length > 1 ||
                   isSingleTokenStrategy ||
                   !isNotUnderlying) &&
@@ -2626,9 +2639,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         />
                       )}
                       {loader && !transactionInProgress ? (
-                        <ShareSkeleton height={32} />
+                        <ShareSkeleton height={24} width={300} />
                       ) : (
-                        <p>
+                        <p className="text-[14px] text-neutral-50 h-6">
                           {!!withdrawAmount.length
                             ? withdrawAmount[index]?.amountInUSD
                               ? `${withdrawAmount[index]?.amount} ($${withdrawAmount[index].amountInUSD})`
@@ -2642,43 +2655,45 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                        SWAPS
+                      <p
+                        className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                      >
+                        Swaps
                       </p>
                     )}
                     {loader && option.length < 2 && !transactionInProgress ? (
-                      <AssetsSkeleton />
+                      <AssetsSkeleton height={40} />
                     ) : (
-                      <div>
+                      <div
+                        className={`${option.length < 2 && "h-10 mb-[10px]"} ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                      >
                         {!!zapPreviewWithdraw.length &&
                           zapPreviewWithdraw?.map(
                             ({ address, amountIn, amountOut }) => (
                               <div key={amountIn}>
                                 {address.toLowerCase() !==
                                   option[0].toLowerCase() && (
-                                  <div className="flex">
+                                  <div className="flex items-center h-5">
                                     <img
                                       src="/oneInch.svg"
                                       alt="1inch logo"
                                       title="1inch"
+                                      className="w-[20px] h-[20px]"
                                     />
                                     {!!amountOut ? (
                                       <>
-                                        <div className="flex items-center gap-1">
-                                          <p>{Number(amountIn).toFixed(6)}</p>
+                                        <div className="flex text-[14px] items-center gap-1">
                                           <img
                                             src={getTokenData(address)?.logoURI}
                                             title={
                                               getTokenData(address)?.symbol
                                             }
                                             alt={getTokenData(address)?.symbol}
-                                            className="w-6 h-6 rounded-full"
+                                            className="w-[18px] h-[18px] rounded-full"
                                           />
                                         </div>
                                         -&gt;
-                                        <div className="flex items-center gap-1">
-                                          <p>{Number(amountOut).toFixed(6)}</p>
-
+                                        <div className="flex text-[14px] items-center gap-1">
                                           <img
                                             src={
                                               getTokenData(option[0])?.logoURI
@@ -2689,7 +2704,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                             alt={
                                               getTokenData(option[0])?.symbol
                                             }
-                                            className="w-6 h-6 rounded-full"
+                                            className="w-[18px] h-[18px] rounded-full"
                                           />
                                         </div>
                                       </>
@@ -2714,22 +2729,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               {option.length < 2 &&
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
-                  <div className="mt-5">
-                    <p className="uppercase text-[18px] leading-3 text-[#8D8E96] mb-3">
-                      YOU RECEIVE
+                  <div>
+                    <p
+                      className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                    >
+                      You Receive
                     </p>
                     <div className="h-[63px]">
                       <div className="flex items-center gap-1">
-                        <img
-                          src={getTokenData(option[0])?.logoURI}
-                          alt={getTokenData(option[0])?.symbol}
-                          title={getTokenData(option[0])?.symbol}
-                          className="w-6 h-6 rounded-full"
-                        />
+                        {!isEmptyObject(inputs) && (
+                          <img
+                            src={getTokenData(option[0])?.logoURI}
+                            alt={getTokenData(option[0])?.symbol}
+                            title={getTokenData(option[0])?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                        )}
                         {loader && !transactionInProgress ? (
-                          <ShareSkeleton height={32} />
+                          <ShareSkeleton height={24} width={300} />
                         ) : (
-                          <div>
+                          <div className="text-[14px] text-neutral-50">
                             {!!zapPreviewWithdraw.length ? (
                               <div className="flex items-center gap-1">
                                 <p>
@@ -2771,7 +2790,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 ).toFixed(2)})`}</p>
                               </div>
                             ) : (
-                              <p>0 ($0)</p>
+                              <p>{isEmptyObject(inputs) ? "" : "0 ($0)"}</p>
                             )}
                           </div>
                         )}
@@ -2783,348 +2802,361 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         )}
 
-        {$connected ? (
-          <>
-            {chain?.id === Number(network) ? (
-              <>
-                {zapError ? (
-                  <button
-                    disabled
-                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                  >
-                    Failed to get routes from aggregator
-                  </button>
-                ) : (
-                  <>
-                    {tab === "Deposit" ? (
-                      <>
-                        {option?.length > 1 ||
-                        (defaultOption?.assets === option[0] &&
-                          option.length < 2) ? (
-                          <>
-                            {button === "deposit" ? (
-                              <button
-                                disabled={transactionInProgress}
-                                className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                  transactionInProgress
-                                    ? "bg-transparent flex items-center justify-center gap-2"
-                                    : "bg-[#486556]"
-                                }`}
-                                type="button"
-                                onClick={deposit}
-                              >
-                                <p>
-                                  {needConfirm
-                                    ? "Confirm in wallet"
-                                    : "Deposit"}
-                                </p>
+        <div className="flex mb-[6px] w-full flex-col">
+          {$connected ? (
+            <>
+              {chain?.id === Number(network) ? (
+                <>
+                  {zapError ? (
+                    <button
+                      disabled
+                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                    >
+                      Failed to get routes from aggregator
+                    </button>
+                  ) : (
+                    <>
+                      {tab === "Deposit" ? (
+                        <>
+                          {option?.length > 1 ||
+                          (defaultOption?.assets === option[0] &&
+                            option.length < 2) ? (
+                            <>
+                              {button === "deposit" ? (
+                                <button
+                                  disabled={transactionInProgress}
+                                  className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                    transactionInProgress
+                                      ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                      : ""
+                                  }`}
+                                  type="button"
+                                  onClick={deposit}
+                                >
+                                  <p>
+                                    {needConfirm
+                                      ? "Confirm in wallet"
+                                      : "Deposit"}
+                                  </p>
 
-                                {transactionInProgress && (
-                                  <Loader color={"#486556"} />
-                                )}
-                              </button>
-                            ) : button === "needApprove" ? (
-                              <div className="flex gap-3">
-                                {option.map(
-                                  (asset: any, index: number) =>
-                                    allowance &&
-                                    formatUnits(
-                                      allowance[asset],
-                                      Number(getTokenData(asset)?.decimals)
-                                    ) < inputs[asset] && (
-                                      <button
-                                        disabled={approveIndex !== false}
-                                        className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                          approveIndex === index
-                                            ? "bg-transparent flex items-center justify-center gap-1"
-                                            : "bg-[#486556]"
-                                        }`}
-                                        key={asset}
-                                        type="button"
-                                        onClick={() =>
-                                          approve(asset as TAddress, index)
-                                        }
-                                      >
-                                        <p>
-                                          {needConfirm
-                                            ? "Confirm in wallet"
-                                            : `Approve ${
-                                                getTokenData(asset)?.symbol
-                                              }`}
-                                        </p>
-                                        {approveIndex === index && (
-                                          <Loader color={"#486556"} />
-                                        )}
-                                      </button>
-                                    )
-                                )}
-                              </div>
-                            ) : button === "insufficientBalance" ? (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                              >
-                                INSUFFICIENT BALANCE
-                              </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                              >
-                                {loader ? "LOADING..." : "ENTER AMOUNT"}
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <div>
-                            {shortId === "CCF" &&
-                            defaultOption?.assets?.includes(option[0]) ? (
-                              <>
-                                {button === "deposit" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                      transactionInProgress
-                                        ? "bg-transparent flex items-center justify-center gap-2"
-                                        : "bg-[#486556]"
-                                    }`}
-                                    type="button"
-                                    onClick={deposit}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : "Deposit"}
-                                    </p>
-
-                                    {transactionInProgress && (
-                                      <Loader color={"#486556"} />
-                                    )}
-                                  </button>
-                                ) : button === "needApprove" ? (
-                                  <div className="flex gap-3">
-                                    {option.map((asset: any, index: number) => {
-                                      if (
-                                        allowance &&
-                                        formatUnits(
-                                          allowance[asset],
-                                          Number(getTokenData(asset)?.decimals)
-                                        ) < inputs[asset]
-                                      ) {
-                                        isAnyCCFOptionVisible = true;
-                                        return (
-                                          <button
-                                            disabled={approveIndex !== false}
-                                            className={`mt-2 w-full text-[14px] flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                              approveIndex === index
-                                                ? "bg-transparent flex items-center justify-center gap-1"
-                                                : "bg-[#486556]"
-                                            }`}
-                                            key={asset}
-                                            type="button"
-                                            onClick={() =>
-                                              approve(asset as TAddress, index)
-                                            }
-                                          >
-                                            <p>
-                                              {needConfirm
-                                                ? "Confirm in wallet"
-                                                : `Approve ${
-                                                    getTokenData(asset)?.symbol
-                                                  }`}
-                                            </p>
-                                            {approveIndex === index && (
-                                              <Loader color={"#486556"} />
-                                            )}
-                                          </button>
-                                        );
-                                      } else {
-                                        return null;
-                                      }
-                                    })}
-                                    {!isAnyCCFOptionVisible && (
-                                      <button
-                                        disabled={transactionInProgress}
-                                        className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                          transactionInProgress
-                                            ? "bg-transparent flex items-center justify-center gap-2"
-                                            : "bg-[#486556]"
-                                        }`}
-                                        type="button"
-                                        onClick={deposit}
-                                      >
-                                        <p>
-                                          {needConfirm
-                                            ? "Confirm in wallet"
-                                            : "Deposit"}
-                                        </p>
-
-                                        {transactionInProgress && (
-                                          <Loader color={"#486556"} />
-                                        )}
-                                      </button>
-                                    )}
-                                  </div>
-                                ) : button === "insufficientBalance" ? (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border border-[#AE642E] py-3 rounded-md"
-                                  >
-                                    INSUFFICIENT BALANCE
-                                  </button>
-                                ) : (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                                  >
-                                    {loader ? "LOADING..." : "ENTER AMOUNT"}
-                                  </button>
-                                )}
-                              </>
-                            ) : (
-                              <>
-                                {button === "insufficientBalance" ? (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                                  >
-                                    INSUFFICIENT BALANCE
-                                  </button>
-                                ) : button === "needApprove" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                      transactionInProgress
-                                        ? "bg-transparent flex items-center justify-center gap-2"
-                                        : "bg-[#486556]"
-                                    }`}
-                                    type="button"
-                                    onClick={zapApprove}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : `Approve ${
-                                            underlyingToken?.address ===
-                                            option[0]
-                                              ? underlyingToken.symbol
-                                              : getTokenData(option[0])?.symbol
+                                  {transactionInProgress && (
+                                    <Loader color={"#a6a0b2"} />
+                                  )}
+                                </button>
+                              ) : button === "needApprove" ? (
+                                <div className="flex gap-3 ">
+                                  {option.map(
+                                    (asset: any, index: number) =>
+                                      allowance &&
+                                      formatUnits(
+                                        allowance[asset],
+                                        Number(getTokenData(asset)?.decimals)
+                                      ) < inputs[asset] && (
+                                        <button
+                                          disabled={approveIndex !== false}
+                                          className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                            approveIndex === index
+                                              ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                              : ""
                                           }`}
-                                    </p>
-                                    {transactionInProgress && (
-                                      <Loader color={"#486556"} />
-                                    )}
-                                  </button>
-                                ) : button === "deposit" ? (
-                                  <button
-                                    disabled={transactionInProgress}
-                                    className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                                      transactionInProgress
-                                        ? "bg-transparent flex items-center justify-center gap-2"
-                                        : "bg-[#486556]"
-                                    }`}
-                                    type="button"
-                                    onClick={zapDeposit}
-                                  >
-                                    <p>
-                                      {needConfirm
-                                        ? "Confirm in wallet"
-                                        : "Deposit"}
-                                    </p>
-                                    {transactionInProgress && (
-                                      <Loader color={"#486556"} />
-                                    )}
-                                  </button>
-                                ) : (
-                                  <button
-                                    disabled
-                                    className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                                  >
-                                    {loader ? "LOADING..." : "ENTER AMOUNT"}
-                                  </button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {button === "insufficientBalance" ? (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-[#6F5648] text-[#F2C4A0] border-[#AE642E] py-3 rounded-md"
-                          >
-                            INSUFFICIENT BALANCE
-                          </button>
-                        ) : button === "needApprove" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            type="button"
-                            onClick={withdrawZapApprove}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "Approve"}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
-                            )}
-                          </button>
-                        ) : button === "withdraw" ? (
-                          <button
-                            disabled={transactionInProgress}
-                            type="button"
-                            className={`mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] ${
-                              transactionInProgress
-                                ? "bg-transparent flex items-center justify-center gap-2"
-                                : "bg-[#486556]"
-                            }`}
-                            onClick={withdraw}
-                          >
-                            <p>
-                              {needConfirm ? "Confirm in wallet" : "WITHDRAW"}
-                            </p>
-                            {transactionInProgress && (
-                              <Loader color={"#486556"} />
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            disabled
-                            className="mt-2 w-full flex items-center justify-center bg-transparent text-[#959595] border border-[#3f3f3f] py-3 rounded-md"
-                          >
-                            {loader ? "LOADING..." : "ENTER AMOUNT"}
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </>
-            ) : (
-              <button
-                onClick={() => switchChain({ chainId: Number(network) })}
-                className="mt-2 w-full flex items-center justify-center py-3 rounded-md border text-[#B0DDB8] border-[#488B57] bg-[#486556]"
-                type="button"
-              >
-                SWITCH NETWORK
-              </button>
-            )}
-          </>
-        ) : (
-          <button
-            type="button"
-            className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-            onClick={() => open()}
-          >
-            CONNECT WALLET
-          </button>
-        )}
+                                          key={asset}
+                                          type="button"
+                                          onClick={() =>
+                                            approve(asset as TAddress, index)
+                                          }
+                                        >
+                                          <p>
+                                            {needConfirm
+                                              ? "Confirm in wallet"
+                                              : `Approve ${
+                                                  getTokenData(asset)?.symbol
+                                                }`}
+                                          </p>
+                                          {approveIndex === index && (
+                                            <Loader color={"#a6a0b2"} />
+                                          )}
+                                        </button>
+                                      )
+                                  )}
+                                </div>
+                              ) : button === "insufficientBalance" ? (
+                                <button
+                                  disabled
+                                  className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                >
+                                  Insufficient Balance
+                                </button>
+                              ) : (
+                                <button
+                                  disabled
+                                  className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                >
+                                  {loader ? "Loading..." : "Enter Amount"}
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <div>
+                              {shortId === "CCF" &&
+                              defaultOption?.assets?.includes(option[0]) ? (
+                                <>
+                                  {button === "deposit" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={deposit}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : "Deposit"}
+                                      </p>
+
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : button === "needApprove" ? (
+                                    <div className="flex gap-3">
+                                      {option.map(
+                                        (asset: any, index: number) => {
+                                          if (
+                                            allowance &&
+                                            formatUnits(
+                                              allowance[asset],
+                                              Number(
+                                                getTokenData(asset)?.decimals
+                                              )
+                                            ) < inputs[asset]
+                                          ) {
+                                            isAnyCCFOptionVisible = true;
+                                            return (
+                                              <button
+                                                disabled={
+                                                  approveIndex !== false
+                                                }
+                                                className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                                  approveIndex === index
+                                                    ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                                    : ""
+                                                }`}
+                                                key={asset}
+                                                type="button"
+                                                onClick={() =>
+                                                  approve(
+                                                    asset as TAddress,
+                                                    index
+                                                  )
+                                                }
+                                              >
+                                                <p>
+                                                  {needConfirm
+                                                    ? "Confirm in wallet"
+                                                    : `Approve ${
+                                                        getTokenData(asset)
+                                                          ?.symbol
+                                                      }`}
+                                                </p>
+                                                {approveIndex === index && (
+                                                  <Loader color={"#a6a0b2"} />
+                                                )}
+                                              </button>
+                                            );
+                                          } else {
+                                            return null;
+                                          }
+                                        }
+                                      )}
+                                      {!isAnyCCFOptionVisible && (
+                                        <button
+                                          disabled={transactionInProgress}
+                                          className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                            transactionInProgress
+                                              ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                              : ""
+                                          }`}
+                                          type="button"
+                                          onClick={deposit}
+                                        >
+                                          <p>
+                                            {needConfirm
+                                              ? "Confirm in wallet"
+                                              : "Deposit"}
+                                          </p>
+
+                                          {transactionInProgress && (
+                                            <Loader color={"#a6a0b2"} />
+                                          )}
+                                        </button>
+                                      )}
+                                    </div>
+                                  ) : button === "insufficientBalance" ? (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      Insufficient Balance
+                                    </button>
+                                  ) : (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      {loader ? "Loading..." : "Enter Amount"}
+                                    </button>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  {button === "insufficientBalance" ? (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      Insufficient Balance
+                                    </button>
+                                  ) : button === "needApprove" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={zapApprove}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : `Approve ${
+                                              underlyingToken?.address ===
+                                              option[0]
+                                                ? underlyingToken.symbol
+                                                : getTokenData(option[0])
+                                                    ?.symbol
+                                            }`}
+                                      </p>
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : button === "deposit" ? (
+                                    <button
+                                      disabled={transactionInProgress}
+                                      className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                        transactionInProgress
+                                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                          : ""
+                                      }`}
+                                      type="button"
+                                      onClick={zapDeposit}
+                                    >
+                                      <p>
+                                        {needConfirm
+                                          ? "Confirm in wallet"
+                                          : "Deposit"}
+                                      </p>
+                                      {transactionInProgress && (
+                                        <Loader color={"#a6a0b2"} />
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      disabled
+                                      className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                    >
+                                      {loader ? "Loading..." : "Enter Amount"}
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {button === "insufficientBalance" ? (
+                            <button
+                              disabled
+                              className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                            >
+                              Insufficient Balance
+                            </button>
+                          ) : button === "needApprove" ? (
+                            <button
+                              disabled={transactionInProgress}
+                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                transactionInProgress
+                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                  : ""
+                              }`}
+                              type="button"
+                              onClick={withdrawZapApprove}
+                            >
+                              <p>
+                                {needConfirm ? "Confirm in wallet" : "Approve"}
+                              </p>
+                              {transactionInProgress && (
+                                <Loader color={"#a6a0b2"} />
+                              )}
+                            </button>
+                          ) : button === "withdraw" ? (
+                            <button
+                              disabled={transactionInProgress}
+                              type="button"
+                              className={`mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                transactionInProgress
+                                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                                  : ""
+                              }`}
+                              onClick={withdraw}
+                            >
+                              <p>
+                                {needConfirm ? "Confirm in wallet" : "Withdraw"}
+                              </p>
+                              {transactionInProgress && (
+                                <Loader color={"#a6a0b2"} />
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              disabled
+                              className="mt-2 w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                            >
+                              {loader ? "Loading..." : "Enter Amount"}
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => switchChain({ chainId: Number(network) })}
+                  className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+                  type="button"
+                >
+                  Switch Network
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              type="button"
+              className="mt-2 w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+              onClick={() => open()}
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
 
         {error?.state && <InvestError error={error} setError={setError} />}
       </form>

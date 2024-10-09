@@ -5,7 +5,12 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { useWalletClient, useAccount } from "wagmi";
 
-import { VaultState, VaultType } from "@ui";
+import {
+  VaultState,
+  VaultType,
+  HeadingText,
+  TimeDifferenceIndicator,
+} from "@ui";
 
 import { getTimeDifference, getDate, addAssetToWallet } from "@utils";
 
@@ -23,10 +28,6 @@ interface IProps {
 const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
   const [created, setCreated] = useState<{ time: string; days: number }>();
   const [hardWorkOnDeposit, setHardWorkOnDeposit] = useState("");
-  const [timeDifference, setTimeDifference] = useState<{
-    days: number;
-    hours: number;
-  }>();
 
   const client = useWalletClient();
   const { connector } = useAccount();
@@ -40,8 +41,6 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
       setHardWorkOnDeposit(vault?.hardWorkOnDeposit ? "YES" : "NO");
       setCreated({ time: date, days: getTimeDifference(vault?.created)?.days });
-
-      setTimeDifference(getTimeDifference(vault?.lastHardWork));
     }
   }, [vault]);
 
@@ -67,14 +66,16 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center h-[60px]">
-        <h2 className="text-[28px] text-start ml-4">Vault</h2>
-      </div>
+      <HeadingText
+        text="Vault"
+        scale={2}
+        styles="text-left md:ml-4 md:mb-0 mb-2"
+      />
 
-      <div className="flex flex-col items-start gap-5 p-4">
+      <div className="flex flex-col items-start gap-5 md:p-4">
         <div className="flex flex-col gap-3">
           <p data-testid="vaultType" className="text-[16px]">
-            <VaultType text="long" type={vault?.type} />
+            <VaultType greater={true} type={vault?.type} />
           </p>
           <p data-testid="vaultIncomeText" className="text-[18px]">
             All income is automatically reinvested into vault
@@ -102,43 +103,15 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
         <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
           <div className="flex flex-col">
-            {timeDifference && (
-              <div
-                data-testid="vaultLastHardWork"
-                className="flex flex-col justify-between"
-              >
-                <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
-                  Last Hard Work
-                </p>
-                {timeDifference?.days ? (
-                  <>
-                    {timeDifference?.days < 1000 ? (
-                      <div className="flex text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2 rounded-lg border-[2px] border-[#AE642E] text-center">
-                        {timeDifference.days}
-                        {timeDifference.days > 1 ? " days" : " day"}{" "}
-                        {timeDifference.hours}h ago
-                      </div>
-                    ) : (
-                      <div className="text-[14px] bg-[#6F5648] text-[#F2C4A0] px-2  rounded-lg border-[2px] border-[#AE642E] text-center">
-                        None
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div
-                    className={`text-[14px] px-2 rounded-lg border-[2px] text-center  ${
-                      timeDifference.hours > 4
-                        ? "bg-[#485069] text-[#B4BFDF] border-[#6376AF]"
-                        : "bg-[#486556] text-[#B0DDB8] border-[#488B57]"
-                    }`}
-                  >
-                    {timeDifference?.hours
-                      ? `${timeDifference.hours}h ago`
-                      : "<1h ago"}
-                  </div>
-                )}
-              </div>
-            )}
+            <div
+              data-testid="vaultLastHardWork"
+              className="flex flex-col justify-between"
+            >
+              <p className="uppercase text-[14px] leading-3 text-[#8D8E96] mb-[7px]">
+                Last Hard Work
+              </p>
+              <TimeDifferenceIndicator unix={vault?.lastHardWork} />
+            </div>
           </div>
           <div className="sm:w-1/2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">

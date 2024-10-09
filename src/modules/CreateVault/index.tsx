@@ -290,7 +290,7 @@ const CreateVault = (): JSX.Element => {
           <h2 className="text-[22px] mb-3">Compounding vault</h2>
           {compoundingVaultsForBuilding ? (
             <table className="font-manrope">
-              <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
                 <tr className="text-[12px] uppercase">
                   <td className="px-4 py-2">Strategy logic</td>
                   <td className="px-4 py-2">Strategy description</td>
@@ -305,7 +305,7 @@ const CreateVault = (): JSX.Element => {
 
                   return (
                     <tr
-                      className="h-[48px] hover:bg-[#130932]"
+                      className="h-[48px] hover:bg-accent-950"
                       key={variant.strategyDesc + i}
                     >
                       <td className="px-4 py-3">{variant.strategyId}</td>
@@ -398,7 +398,7 @@ const CreateVault = (): JSX.Element => {
           </div>
 
           <table className="hidden md:table font-manrope">
-            <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+            <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[12px] uppercase">
                 <td className="px-4 py-2">Vault type</td>
                 <td className="px-4 py-2 whitespace-nowrap">Buy-back token</td>
@@ -419,7 +419,7 @@ const CreateVault = (): JSX.Element => {
                       variant.vaultType +
                       variant.strategyId
                     }
-                    className="h-[48px] hover:bg-[#130932]"
+                    className="h-[48px] hover:bg-accent-950"
                   >
                     <td className="px-4 py-3">{variant.vaultType}</td>
                     <td className="px-4 py-3">

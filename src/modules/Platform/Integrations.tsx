@@ -29,7 +29,7 @@ const Integrations = (): JSX.Element => {
       <h1>Integrations</h1>
 
       <table className="w-full font-manrope">
-        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+        <thead className="bg-accent-950 text-neutral-600 h-[36px]">
           <tr className="text-[12px] font-bold uppercase">
             <td className="px-4 py-2 text-center">Organization</td>
             <td className="px-4 py-2 text-center">Links</td>
@@ -39,7 +39,10 @@ const Integrations = (): JSX.Element => {
         </thead>
         <tbody className="text-[14px]">
           {Object.entries(integrations).map(([, organization]) => (
-            <tr className="h-[48px] hover:bg-[#130932]" key={organization.name}>
+            <tr
+              className="h-[48px] hover:bg-accent-950"
+              key={organization.name}
+            >
               <td className="px-4 py-3">
                 <div className="flex items-center py-2">
                   <img

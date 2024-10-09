@@ -161,13 +161,13 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
         {filters.map((filter: TTableFilters) => (
           <div data-testid="filter" key={filter.name}>
             {filter.type === "single" ? (
-              <label className="inline-flex items-center cursor-pointer bg-[#1F0F50] h-10 rounded-2xl">
+              <label className="inline-flex items-center cursor-pointer bg-accent-900 h-10 rounded-2xl">
                 <div className="flex items-center gap-[10px] py-[10px] px-4">
                   <Checkbox
                     checked={filter.state}
                     onChange={() => activeFiltersHandler(filter)}
                   />
-                  <span className="text-[#F9F8FA]">{filter.name}</span>
+                  <span className="text-neutral-50">{filter.name}</span>
                 </div>
               </label>
             ) : filter.type === "multiple" ? (
@@ -197,7 +197,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                     setDropDownSelector((prevState) => !prevState);
                   }}
                   data-testid="strategyFilterDropdown"
-                  className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-[#1F0F50] text-[#F9F8FA] rounded-2xl cursor-pointer"
+                  className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
                 >
                   <p>
                     {filter.name}: {activeStrategy}
@@ -212,7 +212,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 </div>
                 <div
                   ref={dropDownRef}
-                  className={`bg-[#1F0F50] mt-2 rounded-2xl w-full z-20 ${
+                  className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
                     dropDownSelector
                       ? "absolute transition delay-[50ms]"
                       : "hidden"
@@ -227,7 +227,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                             activeFiltersHandler(filter, variant.name)
                           }
                           className={`${!index && "rounded-t-2xl"} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-                            variant.state ? "bg-[#2B1570]" : ""
+                            variant.state ? "bg-accent-800" : ""
                           }`}
                           data-testid="strategy"
                         >
@@ -242,26 +242,26 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
               filter.type === "sample" && (
                 <div
                   key={filter.name}
-                  className="flex items-center justify-center bg-[#1F0F50] h-10 rounded-2xl"
+                  className="flex items-center justify-center bg-accent-900 h-10 rounded-2xl"
                 >
                   <div className="flex items-center justify-center px-1">
                     <p
                       onClick={() => activeFiltersHandler(filter, "All")}
-                      className={`py-1 px-4 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl ${
+                      className={`py-1 px-4 cursor-pointer rounded-xl ${
                         !filter.state
-                          ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
-                          : "text-[#8F7AFC] h-full"
-                      } rounded-md`}
+                          ? "bg-accent-500 text-neutral-50 h-8"
+                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                      }`}
                     >
                       All
                     </p>
                     <p
                       onClick={() => activeFiltersHandler(filter)}
-                      className={`px-2 py-1 cursor-pointer hover:bg-[#2B1570] hover:text-[#8F7AFC] rounded-xl  ${
+                      className={`px-2 py-1 cursor-pointer rounded-xl  ${
                         filter.state
-                          ? "bg-[#612FFB] text-[#F9F8FA] h-8 hover:bg-[#612FFB] hover:text-[#F9F8FA]"
-                          : "text-[#8F7AFC] h-full"
-                      } rounded-md`}
+                          ? "bg-accent-500 text-neutral-50 h-8"
+                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                      }`}
                     >
                       {filter.name}
                     </p>

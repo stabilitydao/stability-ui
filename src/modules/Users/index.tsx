@@ -20,7 +20,7 @@ const Users = (): JSX.Element => {
 
       {$apiData ? (
         <table className="font-manrope">
-          <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+          <thead className="bg-accent-950 text-neutral-600 h-[36px]">
             <tr className="text-[12px] uppercase">
               <td className="px-4 py-2">Rank</td>
               <td className="text-left px-4 py-2">Address</td>
@@ -30,7 +30,7 @@ const Users = (): JSX.Element => {
           </thead>
           <tbody className="text-[14px]">
             {$apiData?.leaderboard.map((user: APILeaderboard, rank: number) => (
-              <tr key={rank} className="h-[48px] hover:bg-[#130932]">
+              <tr key={rank} className="h-[48px] hover:bg-accent-950">
                 <td className="px-4 py-3">{rank + 1}</td>
                 <td className="px-4 py-3" style={{ fontFamily: "monospace" }}>
                   {shortAddress(user.address, 6, 4)}

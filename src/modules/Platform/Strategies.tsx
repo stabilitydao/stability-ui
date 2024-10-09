@@ -71,7 +71,7 @@ const Strategies = (): JSX.Element => {
       </div>
 
       <table className="w-full font-manrope">
-        <thead className="bg-[#130932] text-[#958CA1] h-[36px]">
+        <thead className="bg-accent-950 text-neutral-600 h-[36px]">
           <tr className="text-[12px] uppercase">
             <td className="text-center px-4 py-2">ID</td>
             <td className="text-left px-4 py-2">Name</td>
@@ -83,7 +83,7 @@ const Strategies = (): JSX.Element => {
           {Object.keys(strategies).map((shortId: string) => {
             const strategy = strategies[shortId as StrategyShortId];
             return (
-              <tr className="h-[48px] hover:bg-[#130932]" key={shortId}>
+              <tr className="h-[48px] hover:bg-accent-950" key={shortId}>
                 <td className="px-4 py-3">
                   <div className="flex justify-center">
                     <span

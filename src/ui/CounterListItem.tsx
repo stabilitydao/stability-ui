@@ -10,16 +10,16 @@ const CounterListItem: React.FC<ICounterProps> = ({ color, name, value }) => {
   return (
     <div className="flex h-[58px] justify-between items-center rounded-[24px] gap-[6px] w-full  pl-[16px] pr-[24px]">
       <div className="flex items-center gap-[8px] justify-center">
-        <ColorIndicator color={color}/>
-        <span className="text-[16px] sm:text-[14px] lg:text-[14px] whitespace-nowrap font-normal text-[#A6A0B2]">
+        <ColorIndicator color={color} />
+        <span className="text-[16px] sm:text-[14px] lg:text-[14px] whitespace-nowrap font-normal text-neutral-500">
           {name}
         </span>
       </div>
-      <div className="flex font-semibold text-[18px] text-[#F9F8FA] justify-center">
+      <div className="flex font-semibold text-[18px] text-neutral-50 justify-center">
         {value}
       </div>
     </div>
   );
 };
 
-export {CounterListItem, type ICounterProps};
+export { CounterListItem, type ICounterProps };
