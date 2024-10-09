@@ -1947,7 +1947,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   return (
-    <div className="bg-accent-950 rounded-2xl min-w-[360px] w-[420px] font-manrope">
+    <div className="bg-accent-950 rounded-2xl min-w-[320px] md:w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -2201,7 +2201,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   {loader && !transactionInProgress ? (
                     <ShareSkeleton />
                   ) : (
-                    <div className="h-[64px] text-[18px]">
+                    <div
+                      className={`h-[64px] text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "" : "mt-[-10px]"}`}
+                    >
                       {!!sharesOut && (
                         <div>
                           <p className="uppercase text-[12px] leading-3 text-neutral-500">
@@ -2212,7 +2214,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               <AssetsProportion
                                 proportions={vault.assetsProportions}
                                 assets={vault?.assets}
-                                type="vault"
+                                vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
                               />
                             </div>
                             {Number(
@@ -2434,7 +2436,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       )}
                     </>
                   )}
-                  <div className="flex mt-0">
+                  <div className="flex mt-[-3px]">
                     <div className="h-[66px]">
                       <p className="text-[12px] text-neutral-500 uppercase">
                         You Receive
@@ -2446,7 +2448,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               <AssetsProportion
                                 proportions={vault.assetsProportions}
                                 assets={vault?.assets}
-                                type="vault"
+                                vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
                               />
                             </div>
 
@@ -2563,7 +2565,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   : 0}
               </p>
             </div>
-            {/* h-[142px] */}
             <div className="flex flex-col items-start justify-end gap-2">
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
@@ -2612,7 +2613,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[12px] text-neutral-500 uppercase mt-[-5px]">
+                      <p className="text-[12px] text-neutral-500 uppercase mt-[-3px]">
                         Swaps
                       </p>
                     )}
@@ -2685,7 +2686,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
                   <div>
-                    <p className="text-[12px] text-neutral-500 uppercase">
+                    <p className="text-[12px] text-neutral-500 uppercase mt-[-3px]">
                       You Receive
                     </p>
                     <div className="h-[63px]">
