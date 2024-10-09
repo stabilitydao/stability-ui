@@ -49,6 +49,7 @@ import {
   getPlatformBalance,
   getAssetsBalances,
   handleInputKeyDown,
+  isEmptyObject,
 } from "../../functions";
 
 import { DEFAULT_ERROR, ZERO_BigInt } from "@constants";
@@ -589,9 +590,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setButton("none");
     setZapTokens([]);
     setZapPreviewWithdraw([]);
-    setLoader(true);
+    if (!!amount) {
+      setLoader(true);
+    } else {
+      setLoader(false);
+    }
 
-    // @ts-ignore
+    //@ts-ignore
     debouncedZap(amount, asset);
   };
 
@@ -1836,7 +1841,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setZapError(false);
     setZapPreviewWithdraw([]);
     setLoader(false);
-  }, [option, $connected]);
+  }, [option, $connected, tab]);
 
   useEffect(() => {
     resetInputs();
@@ -1853,10 +1858,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       getIchiAllow();
     }
   }, []);
-
-  useEffect(() => {
-    setZapTokens([]);
-  }, [inputs]);
 
   ///// interval refresh data
   useEffect(() => {
@@ -2204,7 +2205,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     <div
                       className={`h-[64px] text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "" : "mt-[-10px]"}`}
                     >
-                      {!!sharesOut && (
+                      {!!sharesOut && !isEmptyObject(inputs) && (
                         <div>
                           <p className="uppercase text-[12px] leading-3 text-neutral-500">
                             You Receive
@@ -2296,7 +2297,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   {isNotUnderlying && (
                     <>
                       <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
-                        Swaps
+                        {isEmptyObject(inputs) ? "" : " Swaps"}
                       </p>
 
                       {loader && !transactionInProgress ? (
@@ -2438,49 +2439,54 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   )}
                   <div className="flex mt-[-3px]">
                     <div className="h-[66px]">
-                      <p className="text-[12px] text-neutral-500 uppercase">
-                        You Receive
-                      </p>
-                      <div className="h-[63px]">
-                        <div className="text-left text-neutral-50 text-[14px]">
-                          <div className="flex items-center">
-                            <div className="mr-4">
-                              <AssetsProportion
-                                proportions={vault.assetsProportions}
-                                assets={vault?.assets}
-                                vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                              />
-                            </div>
+                      {!isEmptyObject(inputs) && (
+                        <>
+                          <p className="text-[12px] text-neutral-500 uppercase">
+                            You Receive
+                          </p>
+                          <div className="h-[63px]">
+                            <div className="text-left text-neutral-50 text-[14px]">
+                              <div className="flex items-center">
+                                <div className="mr-4">
+                                  <AssetsProportion
+                                    proportions={vault.assetsProportions}
+                                    assets={vault?.assets}
+                                    vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                                  />
+                                </div>
 
-                            {loader && !transactionInProgress ? (
-                              <ShareSkeleton height={24} width={300} />
-                            ) : (
-                              <div>
-                                {(underlyingShares &&
-                                  Number(inputs[option[0]]) > 0) ||
-                                (zapShares && Number(inputs[option[0]]) > 0) ? (
-                                  <p className="h-6">
-                                    {underlyingShares &&
-                                    Number(inputs[option[0]]) > 0
-                                      ? `${underlyingShares} ($${(
-                                          Number(underlyingShares) *
-                                          Number(vault.shareprice)
-                                        ).toFixed(2)})`
-                                      : zapShares &&
-                                        Number(inputs[option[0]]) > 0 &&
-                                        `${zapShares} ($${(
-                                          Number(zapShares) *
-                                          Number(vault.shareprice)
-                                        ).toFixed(2)})`}
-                                  </p>
+                                {loader && !transactionInProgress ? (
+                                  <ShareSkeleton height={24} width={300} />
                                 ) : (
-                                  <p className="h-6">0 ($0.0)</p>
+                                  <div>
+                                    {(underlyingShares &&
+                                      Number(inputs[option[0]]) > 0) ||
+                                    (zapShares &&
+                                      Number(inputs[option[0]]) > 0) ? (
+                                      <p className="h-6">
+                                        {underlyingShares &&
+                                        Number(inputs[option[0]]) > 0
+                                          ? `${underlyingShares} ($${(
+                                              Number(underlyingShares) *
+                                              Number(vault.shareprice)
+                                            ).toFixed(2)})`
+                                          : zapShares &&
+                                            Number(inputs[option[0]]) > 0 &&
+                                            `${zapShares} ($${(
+                                              Number(zapShares) *
+                                              Number(vault.shareprice)
+                                            ).toFixed(2)})`}
+                                      </p>
+                                    ) : (
+                                      <p className="h-6">0 ($0.0)</p>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                            )}
+                            </div>
                           </div>
-                        </div>
-                      </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2565,16 +2571,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   : 0}
               </p>
             </div>
+
             <div className="flex flex-col items-start justify-end gap-2">
               {(option.length > 1 ||
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
-                <p className="text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px]">
+                <p
+                  className={`text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                >
                   You Receive
                 </p>
               )}
 
-              <div className="flex flex-col justify-start items-start">
+              <div
+                className={`flex flex-col justify-start items-start ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+              >
                 {(option.length > 1 ||
                   isSingleTokenStrategy ||
                   !isNotUnderlying) &&
@@ -2595,7 +2606,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           className="w-6 h-6 rounded-full"
                         />
                       )}
-
                       {loader && !transactionInProgress ? (
                         <ShareSkeleton height={24} width={300} />
                       ) : (
@@ -2613,7 +2623,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {!isSingleTokenStrategy && isNotUnderlying && (
                   <div>
                     {option.length < 2 && (
-                      <p className="text-[12px] text-neutral-500 uppercase mt-[-3px]">
+                      <p
+                        className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                      >
                         Swaps
                       </p>
                     )}
@@ -2621,7 +2633,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       <AssetsSkeleton height={40} />
                     ) : (
                       <div
-                        className={`${option.length < 2 && "h-10 mb-[10px]"}`}
+                        className={`${option.length < 2 && "h-10 mb-[10px]"} ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
                       >
                         {!!zapPreviewWithdraw.length &&
                           zapPreviewWithdraw?.map(
@@ -2686,17 +2698,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 isNotUnderlying &&
                 !isSingleTokenStrategy && (
                   <div>
-                    <p className="text-[12px] text-neutral-500 uppercase mt-[-3px]">
+                    <p
+                      className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                    >
                       You Receive
                     </p>
                     <div className="h-[63px]">
                       <div className="flex items-center gap-1">
-                        <img
-                          src={getTokenData(option[0])?.logoURI}
-                          alt={getTokenData(option[0])?.symbol}
-                          title={getTokenData(option[0])?.symbol}
-                          className="w-6 h-6 rounded-full"
-                        />
+                        {!isEmptyObject(inputs) && (
+                          <img
+                            src={getTokenData(option[0])?.logoURI}
+                            alt={getTokenData(option[0])?.symbol}
+                            title={getTokenData(option[0])?.symbol}
+                            className="w-6 h-6 rounded-full"
+                          />
+                        )}
                         {loader && !transactionInProgress ? (
                           <ShareSkeleton height={24} width={300} />
                         ) : (
@@ -2742,7 +2758,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 ).toFixed(2)})`}</p>
                               </div>
                             ) : (
-                              <p>0 ($0)</p>
+                              <p>{isEmptyObject(inputs) ? "" : "0 ($0)"}</p>
                             )}
                           </div>
                         )}

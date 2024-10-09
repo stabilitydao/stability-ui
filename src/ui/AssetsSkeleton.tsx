@@ -11,13 +11,13 @@ const AssetsSkeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
       <rect
         x="0"
         y="0"
-        rx="10"
-        ry="10"
+        rx="40"
+        ry="40"
         width="320"
         height="100"
         fill="#a995ff"
       />
-      <rect x="0" y="0" rx="10" ry="10" width="320" height="100" fill="#15113A">
+      <rect x="0" y="0" rx="40" ry="40" width="320" height="100" fill="#15113A">
         <animate
           attributeName="opacity"
           dur="2s"
