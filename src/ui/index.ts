@@ -1,7 +1,6 @@
 import { Toast } from "./Toast";
 import { HoldModal } from "./Toast/HoldModal";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
-import { AssetsProportion } from "./AssetsProportion";
 import { AssetsSkeleton } from "./AssetsSkeleton";
 import { ChartSkeleton } from "./ChartSkeleton";
 import { ErrorMessage } from "./ErrorMessage";
@@ -25,7 +24,6 @@ export {
   Toast,
   HoldModal,
   APRtimeSwitcher,
-  AssetsProportion,
   AssetsSkeleton,
   ChartSkeleton,
   ErrorMessage,

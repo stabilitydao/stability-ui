@@ -296,8 +296,8 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
 
           <div className="flex flex-col gap-5">
             {!!almAssets &&
-              almAssets.map((almAsset) => (
-                <div key={almAsset.amount} className="flex flex-col">
+              almAssets.map((almAsset, index: number) => (
+                <div key={almAsset.amount + index} className="flex flex-col">
                   <span className="text-[14px] text-[#8d8e96]">
                     {almAsset.symbol}
                   </span>
@@ -375,8 +375,8 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
                       <img src="/icons/close.svg" alt="No" />
                     )}
                   </td>
-                  {position.amounts.map((amount) => (
-                    <td key={amount} className="text-right py-1">
+                  {position.amounts.map((amount, index: number) => (
+                    <td key={amount + index} className="text-right py-1">
                       {amount}
                     </td>
                   ))}

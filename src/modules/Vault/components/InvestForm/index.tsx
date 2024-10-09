@@ -11,7 +11,7 @@ import { SettingsModal } from "./SettingsModal";
 import { TabSwitcher } from "./TabSwitcher";
 import { InvestError } from "./InvestError";
 
-import { Loader, ShareSkeleton, AssetsSkeleton, AssetsProportion } from "@ui";
+import { Loader, ShareSkeleton, AssetsSkeleton } from "@ui";
 
 import {
   vaultData,
@@ -459,6 +459,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const debouncedZap = useCallback(
     debounce(async (amount: string, asset: string) => {
+      if (!$connected) {
+        setButton("none");
+        setZapTokens([]);
+        setLoader(false);
+        return;
+      }
+
       if (!Number(amount)) {
         setButton("none");
         setZapTokens([]);
@@ -1663,6 +1670,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   );
 
   const previewWithdraw = async (value: string) => {
+    if (!$vaultData[network]) return;
     //@ts-ignore
     debouncedPreviewWithdraw(value);
   };
@@ -1709,6 +1717,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     if (!Number(amount)) return;
+    if (!$connected) return;
 
     setLoader(true);
     if (defaultOption?.assetsArray) {
@@ -1814,8 +1823,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const isNotUnderlying = useMemo(
     () => !underlyingToken || option[0] !== underlyingToken?.address,
-    [underlyingToken]
+    [underlyingToken, option]
   );
+
+  useEffect(() => {
+    console.log();
+    console.log(underlyingToken);
+    console.log(option);
+  }, [option]);
 
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
@@ -2018,14 +2033,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       defaultOption?.logos?.length < 2 && "ml-3"
                     }`}
                   >
-                    {defaultOption?.logos?.map((logo: string) => (
-                      <img
-                        key={Math.random()}
-                        className="max-w-6 max-h-6 rounded-full"
-                        src={logo}
-                        alt="logo"
-                      />
-                    ))}
+                    {defaultOption?.logos?.map(
+                      (logo: string, index: number) => (
+                        <img
+                          key={logo + index}
+                          className="max-w-6 max-h-6 rounded-full"
+                          src={logo}
+                          alt="logo"
+                        />
+                      )
+                    )}
                   </div>
 
                   <p
@@ -2135,12 +2152,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       <div className="min-w-full gap-[10px]" key={asset}>
                         {ichiAllow[index] && (
                           <div className="min-w-full h-[64px]">
-                            {!!balances[asset] && (
-                              <div className="h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1">
-                                <span>Balance: </span>
-                                <span>{balances[asset]}</span>
-                              </div>
-                            )}
+                            <div
+                              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[asset] ? "" : "opacity-0"}`}
+                            >
+                              <span>Balance: </span>
+                              <span>
+                                {!!balances[asset] ? balances[asset] : "0"}
+                              </span>
+                            </div>
 
                             <label className="relative block h-[40px] w-[345px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -2198,12 +2217,18 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     );
                   })}
                 </div>
-                <div className="h-[64px]">
+                <div
+                  className={`${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-start justify-start"}`}
+                >
                   {loader && !transactionInProgress ? (
-                    <ShareSkeleton />
+                    <div
+                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                    >
+                      <ShareSkeleton />
+                    </div>
                   ) : (
                     <div
-                      className={`h-[64px] text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "" : "mt-[-10px]"}`}
+                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
                     >
                       {!!sharesOut && !isEmptyObject(inputs) && (
                         <div>
@@ -2211,13 +2236,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             You Receive
                           </p>
                           <div className="h-[40px] flex items-center text-neutral-50 text-[14px]">
-                            <div className="mr-4">
-                              <AssetsProportion
-                                proportions={vault.assetsProportions}
-                                assets={vault?.assets}
-                                vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                              />
-                            </div>
+                            <img
+                              src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                              alt="logo"
+                              className="w-7 h-7 rounded-full mr-4"
+                            />
                             {Number(
                               formatUnits(BigInt(sharesOut) * BigInt(100), 18)
                             ).toFixed(12)}{" "}
@@ -2237,12 +2260,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </>
             ) : (
               <div className="flex flex-col text-[15px] w-full">
-                {!!balances[option[0]] && (
-                  <div className="h-[12p] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
-                    <span>Balance: </span>
-                    <span>{balances[option[0]]}</span>
-                  </div>
-                )}
+                <div
+                  className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+                >
+                  <span>Balance: </span>
+                  <span>
+                    {!!balances[option[0]] ? balances[option[0]] : "0"}
+                  </span>
+                </div>
 
                 <label className="relative block h-[40px] w-[345px]">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -2437,23 +2462,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       )}
                     </>
                   )}
+
                   <div className="flex mt-[-3px]">
-                    <div className="h-[66px]">
+                    <div
+                      className={`${isNotUnderlying ? "h-[66px]" : "h-[122px] flex flex-col justify-end"}`}
+                    >
                       {!isEmptyObject(inputs) && (
                         <>
                           <p className="text-[12px] text-neutral-500 uppercase">
                             You Receive
                           </p>
-                          <div className="h-[63px]">
+                          <div
+                            className={`${isNotUnderlying ? "h-[63px]" : "h-[30px]"}`}
+                          >
                             <div className="text-left text-neutral-50 text-[14px]">
                               <div className="flex items-center">
-                                <div className="mr-4">
-                                  <AssetsProportion
-                                    proportions={vault.assetsProportions}
-                                    assets={vault?.assets}
-                                    vaultLogo={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                                  />
-                                </div>
+                                <img
+                                  src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                                  alt="logo"
+                                  className="w-7 h-7 rounded-full mr-4"
+                                />
 
                                 {loader && !transactionInProgress ? (
                                   <ShareSkeleton height={24} width={300} />
@@ -2496,19 +2524,23 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ) : (
           <>
             <div className="grid text-[15px] w-full">
-              {!!balances[option[0]] && (
-                <div className="h-[12p] text-[12px] leading-3 text-neutral-500 flex items-center gap-1">
-                  <span>Balance:</span>
-                  <span>
-                    {parseFloat(
-                      formatUnits(
-                        $vaultData[network][vault.address].vaultUserBalance,
-                        18
+              <div
+                className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+              >
+                <span>Balance: </span>
+                <span>
+                  {!!balances[option[0]] &&
+                  !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                    ? parseFloat(
+                        formatUnits(
+                          $vaultData?.[network]?.[vault.address]
+                            ?.vaultUserBalance,
+                          18
+                        )
                       )
-                    )}
-                  </span>
-                </div>
-              )}
+                    : "0"}
+                </span>
+              </div>
 
               <label className="relative block w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
