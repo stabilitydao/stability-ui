@@ -139,6 +139,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
     () => vault.strategy === "Yearn",
     [vault.strategy]
   );
+
   const explorer = useMemo(
     () => CHAINS.find((chain) => chain.id === network)?.explorer,
     [network]
@@ -148,7 +149,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
     <div className="rounded-md h-full">
       <HeadingText text="Contracts" scale={2} styles="text-left md:mb-0 mb-2" />
 
-      <table className="w-full mx-auto lg:max-w-[500px] text-[16px]">
+      <table className="w-full lg:max-w-[500px] text-[16px]">
         <tbody>
           {contracts.map(
             ({ address, logo, symbol, type, isCopy }, index: number) => (

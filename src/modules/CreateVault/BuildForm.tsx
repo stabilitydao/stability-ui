@@ -74,13 +74,11 @@ const BuildForm = ({
   const BRT = [
     ...new Set([initParams.initVaultAddresses[0], ...defaultBoostTokens]),
   ].map((addr) => ({
-    symbol: tokenlist.tokens.find((token: TTokenData) => token.address === addr)
-      ?.symbol,
+    symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
       $assetsBalances[$currentChainID]?.[addr] || ZERO_BigInt,
-      tokenlist.tokens.find((token: TTokenData) => token.address === addr)
-        ?.decimals ?? 18
+      tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
     price: $assetsPrices[$currentChainID][addr]?.price,
     sum: "",

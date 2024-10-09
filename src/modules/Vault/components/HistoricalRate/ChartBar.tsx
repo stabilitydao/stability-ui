@@ -81,6 +81,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
       );
     }
   }, [chart]);
+  // B2A5FD
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart
@@ -118,7 +119,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
               cursor="pointer"
               fill="#612FFB"
               key={`cell-${index}`}
-              radius={[10, 10, 0, 0]}
+              radius={[10, 10, 0, 0] as any}
             />
           ))}
         </Bar>

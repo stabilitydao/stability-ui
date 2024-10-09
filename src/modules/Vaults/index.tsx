@@ -20,7 +20,7 @@ import { NetworkFilters } from "./components/NetworksFilter";
 
 import {
   TimeDifferenceIndicator,
-  Loader,
+  FullPageLoader,
   ErrorMessage,
   RiskIndicator,
   // ShortAddress,
@@ -644,7 +644,7 @@ const Vaults = (): JSX.Element => {
             {isLoading ? (
               <tr className="relative h-[80px]">
                 <td className="absolute left-[50%] transform translate-x-[-50%] mt-5">
-                  <Loader width="100" height="100" />
+                  <FullPageLoader />
                 </td>
               </tr>
             ) : localVaults?.length ? (

@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from "react";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { Chart } from "./Chart";
 import { ChartBar } from "./ChartBar";
@@ -49,6 +49,11 @@ const HistoricalRate: React.FC<IProps> = memo(
       timelineSegments.WEEK as TSegment
     );
     const [isData, setIsData] = useState(true);
+    const [graphError, setGraphError] = useState({
+      isError: false,
+      httpStatus: "",
+      errorMessage: "",
+    });
 
     const formatData = (obj: TChartData) => {
       const date = new Date(Number(obj.timestamp) * 1000);
@@ -81,86 +86,106 @@ const HistoricalRate: React.FC<IProps> = memo(
       let entities = 0;
       let status = true;
 
-      while (status) {
-        const HISTORY_QUERY = `{
-            vaultHistoryEntities(
-              orderBy: timestamp, 
-              orderDirection: asc,
-              where: {address: "${address}", periodVsHoldAPR_not: null}
-              skip: ${entities}
-            ) {
-                APR
-                APR24H
-                periodVsHoldAPR
-                address
-                sharePrice
-                TVL
-                timestamp
-            }}`;
+      try {
+        while (status) {
+          const HISTORY_QUERY = `{
+              vaultHistoryEntities(
+                orderBy: timestamp, 
+                orderDirection: asc,
+                where: {address: "${address}", periodVsHoldAPR_not: null}
+                skip: ${entities}
+              ) {
+                  APR
+                  APR24H
+                  periodVsHoldAPR
+                  address
+                  sharePrice
+                  TVL
+                  timestamp
+              }}`;
 
-        const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
-          query: HISTORY_QUERY,
-        });
+          const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
+            query: HISTORY_QUERY,
+          });
 
-        DATA.push(...graphResponse.data.data.vaultHistoryEntities);
+          DATA.push(...graphResponse.data.data.vaultHistoryEntities);
 
-        if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
-          status = false;
+          if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
+            status = false;
+          }
+          entities += 100;
         }
-        entities += 100;
-      }
 
-      const workedData = DATA.map(formatData);
+        const workedData = DATA.map(formatData);
 
-      let APRChartData = workedData
-        .filter(
-          (obj) =>
-            obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
-        )
-        .map((obj) => ({
-          unixTimestamp: obj.unixTimestamp,
-          timestamp: obj.timestamp,
-          date: obj.date,
-          APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
-          APR24H: obj.APR24H,
-          vsHoldAPR: Number(obj.periodVsHoldAPR).toFixed(3),
-        }));
+        let APRChartData = workedData
+          .filter(
+            (obj) =>
+              obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
+          )
+          .map((obj) => ({
+            unixTimestamp: obj.unixTimestamp,
+            timestamp: obj.timestamp,
+            date: obj.date,
+            APR: formatFromBigInt(obj.APR, 3, "withDecimals"),
+            APR24H: obj.APR24H,
+            vsHoldAPR: Number(obj.periodVsHoldAPR).toFixed(3),
+          }));
 
-      if (!APRChartData.length) {
-        setIsData(false);
-        return;
-      }
-      const lastTimestamp = APRChartData[APRChartData.length - 1].unixTimestamp;
+        if (!APRChartData.length) {
+          setIsData(false);
+          return;
+        }
+        const lastTimestamp =
+          APRChartData[APRChartData.length - 1].unixTimestamp;
 
-      time = APRChartData[0].unixTimestamp;
+        time = APRChartData[0].unixTimestamp;
 
-      do {
-        let sortedAPRs = APRChartData.filter(
-          (obj) => obj.unixTimestamp >= time
-        );
+        do {
+          let sortedAPRs = APRChartData.filter(
+            (obj) => obj.unixTimestamp >= time
+          );
 
-        let firstEl = sortedAPRs[0] || APRChartData[APRChartData.length - 1];
+          let firstEl = sortedAPRs[0] || APRChartData[APRChartData.length - 1];
 
-        newData.push({ ...firstEl, timestamp: time });
-        time += 3600;
-        if (time >= lastTimestamp) {
-          newData.push({
-            ...APRChartData[APRChartData.length - 1],
-            timestamp: APRChartData[APRChartData.length - 1].unixTimestamp,
+          newData.push({ ...firstEl, timestamp: time });
+          time += 3600;
+          if (time >= lastTimestamp) {
+            newData.push({
+              ...APRChartData[APRChartData.length - 1],
+              timestamp: APRChartData[APRChartData.length - 1].unixTimestamp,
+            });
+          }
+        } while (time < lastTimestamp);
+
+        APRChartData = newData.map(formatData);
+
+        if (daysFromLastHardWork >= 3) {
+          APRChartData = APRChartData.filter(
+            (data) => data.unixTimestamp < lastHardWork
+          );
+        }
+
+        setChartData(workedData);
+        setActiveChart({ name: "APR", data: APRChartData as [] });
+      } catch (error) {
+        const err = error as AxiosError;
+        if (err.response) {
+          setGraphError({
+            isError: true,
+            httpStatus: `HTTP Status: ${err.response.status}`,
+            errorMessage: `Error Message: ${err.response.statusText}`,
+          });
+        } else {
+          setGraphError({
+            isError: true,
+            httpStatus: "",
+            errorMessage: `Error Message: ${err.message}`,
           });
         }
-      } while (time < lastTimestamp);
-
-      APRChartData = newData.map(formatData);
-
-      if (daysFromLastHardWork >= 3) {
-        APRChartData = APRChartData.filter(
-          (data) => data.unixTimestamp < lastHardWork
-        );
+        setIsData(false);
+        throw new Error(err.message);
       }
-
-      setChartData(workedData);
-      setActiveChart({ name: "APR", data: APRChartData as [] });
     };
 
     const chartHandler = (chartType: string, segment: TSegment = timeline) => {
@@ -577,9 +602,21 @@ const HistoricalRate: React.FC<IProps> = memo(
             )}
           </>
         ) : (
-          <h3 className="flex items-center justify-center h-[320px]">
-            No available data
-          </h3>
+          <div className="h-[320px] flex items-center justify-center">
+            {graphError.isError ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <HeadingText text="Unable to load subgraph" scale={2} />
+                {!!graphError.httpStatus && (
+                  <HeadingText text={graphError.httpStatus} scale={3} />
+                )}
+                {!!graphError.errorMessage && (
+                  <HeadingText text={graphError.errorMessage} scale={3} />
+                )}
+              </div>
+            ) : (
+              <HeadingText text="No available data" scale={2} />
+            )}
+          </div>
         )}
       </div>
     );
