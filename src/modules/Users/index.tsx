@@ -48,7 +48,7 @@ const Users = (): JSX.Element => {
           </tbody>
         </table>
       ) : (
-        <span>Loading</span>
+        <span>Loading...</span>
       )}
     </div>
   );

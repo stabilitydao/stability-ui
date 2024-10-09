@@ -1,14 +1,11 @@
 import { Toast } from "./Toast";
 import { HoldModal } from "./Toast/HoldModal";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
-import { AssetsSkeleton } from "./AssetsSkeleton";
-import { ChartSkeleton } from "./ChartSkeleton";
 import { ErrorMessage } from "./ErrorMessage";
 import { FeeAPRModal } from "./FeeAPRModal";
 import { Loader } from "./Loader";
-import { ShareSkeleton } from "./ShareSkeleton";
+import { FullPageLoader } from "./FullPageLoader";
 import { ShortAddress } from "./ShortAddress";
-import { Skeleton } from "./Skeleton";
 import { TimeDifferenceIndicator } from "./TimeDifferenceIndicator";
 import { VaultState } from "./VaultState";
 import { VaultType } from "./VaultType";
@@ -20,6 +17,11 @@ import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
 
+import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
+import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
+import { ShareSkeleton } from "./Skeletons/ShareSkeleton";
+import { Skeleton } from "./Skeletons/Skeleton";
+
 export {
   Toast,
   HoldModal,
@@ -29,6 +31,7 @@ export {
   ErrorMessage,
   FeeAPRModal,
   Loader,
+  FullPageLoader,
   ShareSkeleton,
   ShortAddress,
   Skeleton,

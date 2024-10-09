@@ -24,7 +24,7 @@ const VaultType = ({
   return greater ? (
     <span
       title={`${currentType?.type} vault`}
-      className={`text-[16px] flex self-center items-center font-bold h-8 px-0 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
+      className={`text-[16px] flex self-center items-center justify-center font-bold h-8 px-0 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
     >
       {currentType?.type}
     </span>
