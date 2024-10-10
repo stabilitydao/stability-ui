@@ -643,7 +643,7 @@ const Vaults = (): JSX.Element => {
           <tbody className="font-manrope font-semibold text-[14px]">
             {isLoading ? (
               <tr className="relative h-[80px]">
-                <td className="absolute left-[50%] transform translate-x-[-50%] mt-5">
+                <td className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
                   <FullPageLoader />
                 </td>
               </tr>
