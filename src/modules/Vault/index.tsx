@@ -14,7 +14,7 @@ import { LiquidityPool } from "./components/LiquidityPool";
 import { UnderlyingALM } from "./components/UnderlyingALM";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, Loader, ErrorMessage, Breadcrumbs } from "@ui";
+import { Toast, FullPageLoader, ErrorMessage, Breadcrumbs } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -93,11 +93,9 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            {localVault.assets.length > 1 &&
-              localVault?.pool &&
-              localVault?.strategy != "Curve Convex Farm" && (
-                <LiquidityPool network={network} vault={localVault} />
-              )}
+            {localVault.assets.length > 1 && localVault?.pool && (
+              <LiquidityPool network={network} vault={localVault} />
+            )}
           </div>
           <div className="w-full lg:w-1/2">
             {isALM && <UnderlyingALM network={network} vault={localVault} />}
@@ -115,7 +113,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
     </WagmiLayout>
   ) : (
     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <Loader width="100" height="100" />
+      <FullPageLoader />
     </div>
   );
 };
