@@ -46,7 +46,7 @@ const HistoricalRate: React.FC<IProps> = memo(
     const [chartData, setChartData] = useState<TChartData[]>([]);
     const [activeChart, setActiveChart] = useState<TActiveChart>();
     const [timeline, setTimeline] = useState<TSegment>(
-      timelineSegments.WEEK as TSegment
+      timelineSegments.YEAR as TSegment
     );
     const [isData, setIsData] = useState(true);
     const [graphError, setGraphError] = useState({
@@ -121,7 +121,7 @@ const HistoricalRate: React.FC<IProps> = memo(
         let APRChartData = workedData
           .filter(
             (obj) =>
-              obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
+              obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.YEAR
           )
           .map((obj) => ({
             unixTimestamp: obj.unixTimestamp,

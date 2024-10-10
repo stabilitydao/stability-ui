@@ -2520,7 +2520,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <div
                 className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
               >
-                <span>Balance: </span>
+                <span>Balance:</span>
                 <span>
                   {!!balances[option[0]] &&
                   !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
@@ -2724,12 +2724,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 !isSingleTokenStrategy && (
                   <div>
                     <p
-                      className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                      className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${
+                        isEmptyObject(inputs) ||
+                        !$vaultData?.[network]?.[vault.address]
+                          ?.vaultUserBalance
+                          ? "opacity-0"
+                          : ""
+                      }`}
                     >
                       You Receive
                     </p>
                     <div className="h-[63px]">
-                      <div className="flex items-center gap-1">
+                      <div
+                        className={`flex items-center gap-1 ${!$vaultData?.[network]?.[vault.address]?.vaultUserBalance ? "opacity-0" : ""} `}
+                      >
                         {!isEmptyObject(inputs) && (
                           <img
                             src={getTokenData(option[0])?.logoURI}
