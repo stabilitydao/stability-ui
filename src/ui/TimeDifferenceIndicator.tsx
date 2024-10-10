@@ -19,14 +19,14 @@ const TimeDifferenceIndicator: React.FC<IProps> = ({
       <div className="font-manrope font-semibold">
         {timeDifference.days < 1000 ? (
           <div
-            className={`${baseClasses} ${sizeClasses} bg-warning-950 text-warning-400`}
+            className={`${baseClasses} ${sizeClasses} bg-warning-950 border border-warning-400 text-warning-400`}
           >
             {timeDifference.days} {timeDifference.days > 1 ? "days" : "day"}{" "}
             {timeDifference.hours}h ago
           </div>
         ) : (
           <div
-            className={`${baseClasses} ${sizeClasses} bg-warning-950 text-warning-400`}
+            className={`${baseClasses} ${sizeClasses} bg-warning-950 border border-warning-400 text-warning-400`}
           >
             None
           </div>
@@ -40,8 +40,8 @@ const TimeDifferenceIndicator: React.FC<IProps> = ({
       <div
         className={`${baseClasses} ${sizeClasses} ${
           timeDifference.hours > 4
-            ? "bg-accent-950 text-accent-400"
-            : "bg-success-950 text-success-400"
+            ? "bg-accent-950 text-accent-400 border border-accent-400"
+            : "bg-success-950 border border-success-400 text-success-400"
         }`}
       >
         {timeDifference.hours}h ago
