@@ -5,7 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+import { DEFAULT_ERROR, DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import type {
   TPlatformData,
@@ -42,7 +42,7 @@ const tokens = atom<TTokens>({});
 const connected = atom<boolean | undefined>();
 
 const reload = atom<boolean>(false);
-const error = atom<TError>({ state: false, type: "", description: "" });
+const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
 
 const apiData = atom<any>();

@@ -9,7 +9,6 @@ import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
 import { SettingsModal } from "./SettingsModal";
 import { TabSwitcher } from "./TabSwitcher";
-import { InvestError } from "./InvestError";
 
 import { Loader, ShareSkeleton, AssetsSkeleton } from "@ui";
 
@@ -23,6 +22,7 @@ import {
   lastTx,
   connected,
   transactionSettings,
+  error,
 } from "@store";
 
 import {
@@ -64,7 +64,6 @@ import type {
   TVault,
   TBalances,
   TAsset,
-  TError,
   TUnderlyingToken,
   TZAPData,
   TLocalStorageToken,
@@ -171,8 +170,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [needConfirm, setNeedConfirm] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
 
-  const [error, setError] = useState<TError>(DEFAULT_ERROR);
-
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
   let isAnyCCFOptionVisible = false;
@@ -247,8 +244,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           : 150;
 
       const errorMessage = err.message.substring(0, errorMessageLength) + "...";
-
-      setError({ state: true, type: errName, description: errorMessage });
+      error.set({ state: true, type: errName, description: errorMessage });
     }
     setLoader(false);
     setNeedConfirm(false);
@@ -609,7 +605,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const zapApprove = async () => {
     ///// ZAP TOKENS & UNDERLYING TOKENS
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
     const amount = inputs[option[0]];
 
@@ -695,7 +691,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
 
     ///// UNDERLYING
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
     setLoader(true);
 
@@ -1014,7 +1010,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const withdrawZapApprove = async () => {
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
 
     const amount = inputs[option[0]];
@@ -1105,7 +1101,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         ? maxUint256
         : parseUnits(amount, decimals);
 
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
 
     const needApprove = option.filter(
       (asset) =>
@@ -1193,7 +1189,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const deposit = async () => {
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
     let assets: string[] = [];
     let input: any = [];
@@ -1318,7 +1314,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const withdraw = async () => {
-    setError(DEFAULT_ERROR);
+    error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
     const sharesToBurn = parseUnits(inputs[option[0]], 18);
 
@@ -3157,8 +3153,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             </button>
           )}
         </div>
-
-        {error?.state && <InvestError error={error} setError={setError} />}
       </form>
     </div>
   );

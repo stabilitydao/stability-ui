@@ -12,12 +12,12 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
 
   if ($error.state && type === "API") {
     return (
-      <div className="mt-5 text-[14px]">
+      <div className="mt-5 text-[16px] font-manrope bg-accent-950 text-neutral-50 rounded-[32px]">
         <div className="flex items-center justify-center flex-col gap-3">
           <p> {$error.description.slice(0, 20)}...</p>
           <button
             onClick={() => reload.set(!$reload)}
-            className="bg-button px-3 py-2 rounded-md"
+            className="bg-accent-500 text-neutral-50 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"
           >
             Reload
           </button>
@@ -27,7 +27,7 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
   }
   if ($error.state && type === "WEB3") {
     return (
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 text-[14px] max-w-[700px] w-full bg-[#1c1c23] rounded-md flex flex-col items-center justify-center mt-3 z-[200]">
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 font-manrope text-[16px] max-w-[700px] w-full bg-accent-950 rounded-[32px] flex flex-col items-center justify-center mt-3 z-[200] text-neutral-50">
         <svg
           onClick={() => error.set({ state: false, type: "", description: "" })}
           className="absolute right-5 top-5 cursor-pointer"
@@ -88,10 +88,10 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
             </filter>
           </defs>
         </svg>
-        <p className="py-8 px-3"> {$error.description.slice(0, 20)}...</p>
+        <p className="py-8 px-3">{$error.description.slice(0, 25)}...</p>
         <button
           onClick={() => reload.set(!$reload)}
-          className="bg-button px-3 py-2 rounded-md mb-2"
+          className="bg-accent-500 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"
         >
           Reload
         </button>
