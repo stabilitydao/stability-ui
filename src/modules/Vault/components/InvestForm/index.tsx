@@ -2598,14 +2598,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 isSingleTokenStrategy ||
                 !isNotUnderlying) && (
                 <p
-                  className={`text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                  className={`text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px] ${
+                    isEmptyObject(inputs) ||
+                    !$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                      ? "opacity-0"
+                      : ""
+                  }`}
                 >
                   You Receive
                 </p>
               )}
 
               <div
-                className={`flex flex-col justify-start items-start ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                className={`flex flex-col justify-start items-start ${
+                  isEmptyObject(inputs) ||
+                  !$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                    ? "opacity-0"
+                    : ""
+                }`}
               >
                 {(option.length > 1 ||
                   isSingleTokenStrategy ||
@@ -2732,7 +2742,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </p>
                     <div className="h-[63px]">
                       <div
-                        className={`flex items-center gap-1 ${!$vaultData?.[network]?.[vault.address]?.vaultUserBalance ? "opacity-0" : ""} `}
+                        className={`flex items-center gap-1 ${
+                          !$vaultData?.[network]?.[vault.address]
+                            ?.vaultUserBalance
+                            ? "opacity-0"
+                            : ""
+                        } `}
                       >
                         {!isEmptyObject(inputs) && (
                           <img
