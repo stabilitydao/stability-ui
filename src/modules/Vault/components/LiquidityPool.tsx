@@ -36,7 +36,6 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
   const dexPool = DEXes.find((dex) =>
     vault.strategyInfo?.protocols.some((protocol) => protocol.name === dex.name)
   );
-  console.log(vault.strategyInfo.protocols);
 
   let protocol = { logoSrc: "", name: "" };
 
@@ -73,7 +72,6 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
     setPoolAssets(assetsWithPercents);
   }, [vault, $assetsPrices]);
-  console.log(vault.pool);
   return (
     <>
       <HeadingText
