@@ -2839,7 +2839,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       ? "Confirm in wallet"
                                       : "Deposit"}
                                   </p>
-
                                   {transactionInProgress && (
                                     <Loader color={"#a6a0b2"} />
                                   )}

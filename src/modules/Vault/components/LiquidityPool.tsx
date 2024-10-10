@@ -2,7 +2,7 @@ import { memo, useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { HeadingText } from "@ui";
+import { HeadingText, FieldValue } from "@ui";
 
 import { DEXes } from "@constants";
 
@@ -37,10 +37,16 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
     vault.strategyInfo?.protocols.some((protocol) => protocol.name === dex.name)
   );
 
-  const protocol =
-    vault.strategyInfo.protocols.length > 1
-      ? vault.strategyInfo.protocols[1]
-      : vault.strategyInfo.protocols[0];
+  let protocol = { logoSrc: "", name: "" };
+
+  if (vault?.strategy === "Curve Convex Farm") {
+    protocol = vault.strategyInfo.protocols[0];
+  } else {
+    protocol =
+      vault.strategyInfo.protocols.length > 1
+        ? vault.strategyInfo.protocols[1]
+        : vault.strategyInfo.protocols[0];
+  }
 
   useEffect(() => {
     if (!$assetsPrices[network]) return;
@@ -82,12 +88,12 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
             className="rounded-full w-7 h-7"
           />
           <div className="flex flex-col">
-            <span data-testid="poolName" className="text-[16px]">
+            <span data-testid="poolName" className="text-[18px] font-semibold">
               {protocol.name}
             </span>
             <span
               data-testid="poolSymbol"
-              className="text-[14px] text-[#8d8e96]"
+              className="text-[12px] leading-3 text-neutral-500"
             >
               {poolSymbol}
             </span>
@@ -96,43 +102,39 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
         <div className="flex items-start gap-10 flex-wrap">
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col">
-              <span className="text-[14px] text-[#8d8e96]">TVL</span>
-              <span data-testid="poolTVL" className="text-[16px]">
-                {formatNumber(Number(vault.pool.tvl), "abbreviate")}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[14px] text-[#8d8e96]">FEE</span>
-              <span data-testid="poolFee" className="text-[16px]">
-                {vault.pool.fee}%
-              </span>
-            </div>
+            <FieldValue
+              name="TVL"
+              value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+            />
+
+            {!!vault.pool.fee && (
+              <FieldValue name="FEE" value={`${vault.pool.fee}%`} />
+            )}
           </div>
           <div className="flex flex-col gap-5">
             {!!poolAssets &&
               poolAssets.map((poolAsset, index: number) => (
-                <div key={poolAsset.amount} className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
+                <div
+                  key={poolAsset.amount}
+                  className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col"
+                >
+                  <div className="h-[12px] flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
                     {poolAsset.symbol}
-                  </span>
-                  <span
+                  </div>
+                  <div
                     data-testid={`poolAsset${index}`}
-                    className="text-[16px]"
+                    className="h-[40px] flex items-center text-[18px] font-semibold whitespace-nowrap"
                   >
                     {formatNumber(poolAsset.amount, "format")} (
                     {poolAsset.percent.toFixed(2)}%)
-                  </span>
+                  </div>
                 </div>
               ))}
           </div>
 
           {!!dexPool && (
             <div>
-              <div className="flex flex-col">
-                <span className="text-[14px] text-[#8d8e96]">ALGO</span>
-                <span className="text-[16px]">{dexPool.algo}</span>
-              </div>
+              <FieldValue name="ALGO" value={dexPool.algo} />
             </div>
           )}
         </div>

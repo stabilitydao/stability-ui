@@ -46,7 +46,7 @@ const HistoricalRate: React.FC<IProps> = memo(
     const [chartData, setChartData] = useState<TChartData[]>([]);
     const [activeChart, setActiveChart] = useState<TActiveChart>();
     const [timeline, setTimeline] = useState<TSegment>(
-      timelineSegments.YEAR as TSegment
+      timelineSegments.WEEK as TSegment
     );
     const [isData, setIsData] = useState(true);
     const [graphError, setGraphError] = useState({
@@ -121,7 +121,7 @@ const HistoricalRate: React.FC<IProps> = memo(
         let APRChartData = workedData
           .filter(
             (obj) =>
-              obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.YEAR
+              obj.APR && obj.unixTimestamp >= NOW - TIMESTAMPS_IN_SECONDS.WEEK
           )
           .map((obj) => ({
             unixTimestamp: obj.unixTimestamp,
@@ -136,10 +136,9 @@ const HistoricalRate: React.FC<IProps> = memo(
           setIsData(false);
           return;
         }
+
         const lastTimestamp =
           APRChartData[APRChartData.length - 1].unixTimestamp;
-
-        time = APRChartData[0].unixTimestamp;
 
         do {
           let sortedAPRs = APRChartData.filter(
@@ -192,7 +191,7 @@ const HistoricalRate: React.FC<IProps> = memo(
       const NOW = Math.floor(Date.now() / 1000);
       const TIME: number = TIMESTAMPS_IN_SECONDS[segment];
 
-      let time = 0,
+      let time = NOW - TIME,
         newData;
 
       const lastTimestamp = chartData[chartData.length - 1].unixTimestamp;
@@ -204,7 +203,6 @@ const HistoricalRate: React.FC<IProps> = memo(
           );
 
           newData = [];
-          time = APRArr[0].unixTimestamp;
 
           if (segment === "MONTH") {
             do {
@@ -223,6 +221,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               }
             } while (time < lastTimestamp);
           } else if (segment === "YEAR") {
+            time = APRArr[0].unixTimestamp;
             do {
               let sortedAPRs = APRArr.filter(
                 (obj) => obj.unixTimestamp >= time
@@ -300,7 +299,10 @@ const HistoricalRate: React.FC<IProps> = memo(
             (obj: TChartData) => obj.unixTimestamp >= NOW - TIME
           );
           newData = [];
-          time = TVLArr[0].unixTimestamp;
+
+          if (segment === "YEAR") {
+            time = TVLArr[0].unixTimestamp;
+          }
 
           do {
             let sortedAPRs = TVLArr.filter((obj) => obj.unixTimestamp < time);
@@ -354,7 +356,10 @@ const HistoricalRate: React.FC<IProps> = memo(
           );
 
           newData = [];
-          time = priceArr[0].unixTimestamp;
+
+          if (segment === "YEAR") {
+            time = priceArr[0].unixTimestamp;
+          }
 
           do {
             let sortedData = priceArr.filter((obj) => obj.unixTimestamp < time);
@@ -414,7 +419,6 @@ const HistoricalRate: React.FC<IProps> = memo(
           );
 
           newData = [];
-          time = vsHoldArr[0].unixTimestamp;
 
           if (segment === "MONTH") {
             do {
@@ -433,6 +437,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               }
             } while (time < lastTimestamp);
           } else if (segment === "YEAR") {
+            time = vsHoldArr[0].unixTimestamp;
             do {
               let sortedAPRs = vsHoldArr.filter(
                 (obj) => obj.unixTimestamp >= time
