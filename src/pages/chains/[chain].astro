@@ -1,0 +1,11 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { Chain } from "@modules";
+const { chain } = Astro.params;
+---
+
+<Layout title="Chain">
+    <div class="my-vault max-w-[1200px]">
+        <Chain chain={chain} client:only="react" />
+    </div>
+</Layout>
