@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
+import type { Chain } from "@stabilitydao/stability";
+
 // interfaces
 interface IL {
   rate: number;
@@ -23,6 +26,11 @@ interface IStrategyInfo {
   ammAdapter: string;
   sourceCode: string;
   il?: IL;
+}
+
+interface IChainData extends Chain {
+  chainId: number;
+  tvl: number;
 }
 
 // types
@@ -471,6 +479,13 @@ type TError = {
   description: string;
 };
 
+type TSort = {
+  table: TTableColumn[];
+  setTable: Dispatch<SetStateAction<TTableColumn[]>>;
+  tableData: IChainData[];
+  setTableData: Dispatch<SetStateAction<IChainData[]>>;
+};
+
 //// API
 
 type TAPIData = {
@@ -554,4 +569,6 @@ export type {
   TTokens,
   TAPRPeriod,
   TLocalStorageToken,
+  IChainData,
+  TSort,
 };

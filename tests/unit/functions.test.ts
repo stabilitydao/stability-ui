@@ -17,6 +17,8 @@ import {
   addAssetToWallet,
   getLocalStorageData,
   setLocalStoreHash,
+  dataSorter,
+  getShortAddress,
 } from "@utils";
 
 import { transactionSettings, aprFilter } from "@store";
@@ -760,5 +762,76 @@ describe("setLocalStoreHash", () => {
     const storedItem = localStorage.getItem("lastTx");
     expect(storedItem).not.toBeNull();
     expect(JSON.parse(storedItem as string)).toEqual(testObj);
+  });
+});
+
+describe("dataSorter ", () => {
+  it("should sort numbers in ascending order", () => {
+    expect(dataSorter("1", "2", "number", "ascendentic")).toBeLessThan(0);
+    expect(dataSorter("2", "1", "number", "ascendentic")).toBeGreaterThan(0);
+    expect(dataSorter("1", "1", "number", "ascendentic")).toBe(0);
+  });
+
+  it("should sort numbers in descending order", () => {
+    expect(dataSorter("1", "2", "number", "descendentic")).toBeGreaterThan(0);
+    expect(dataSorter("2", "1", "number", "descendentic")).toBeLessThan(0);
+    expect(dataSorter("1", "1", "number", "descendentic")).toBe(0);
+  });
+
+  it("should sort strings in ascending order", () => {
+    expect(dataSorter("apple", "banana", "string", "ascendentic")).toBeLessThan(
+      0
+    );
+    expect(
+      dataSorter("banana", "apple", "string", "ascendentic")
+    ).toBeGreaterThan(0);
+    expect(dataSorter("apple", "apple", "string", "ascendentic")).toBe(0);
+  });
+
+  it("should sort strings in descending order", () => {
+    expect(
+      dataSorter("apple", "banana", "string", "descendentic")
+    ).toBeGreaterThan(0);
+    expect(
+      dataSorter("banana", "apple", "string", "descendentic")
+    ).toBeLessThan(0);
+    expect(dataSorter("apple", "apple", "string", "descendentic")).toBe(0);
+  });
+
+  it("should return 0 for unknown data types", () => {
+    expect(dataSorter("any", "thing", "unknown", "ascendentic")).toBe(0);
+    expect(dataSorter("any", "thing", "unknown", "descendentic")).toBe(0);
+  });
+});
+
+describe("getShortAddress", () => {
+  it("should return shortened address with default first and last characters", () => {
+    const address = "0x1234567890abcdef1234567890abcdef12345678";
+    const result = getShortAddress(address);
+    expect(result).toBe("0x12..78");
+  });
+
+  it("should return shortened address with custom first and last characters", () => {
+    const address = "0x1234567890abcdef1234567890abcdef12345678";
+    const result = getShortAddress(address, 6, 4);
+    expect(result).toBe("0x123456..5678");
+  });
+
+  it("should handle very short addresses correctly", () => {
+    const address = "0x12";
+    const result = getShortAddress(address);
+    expect(result).toBe("0x12..12");
+  });
+
+  it("should handle edge cases when firstChars + lastChars exceed the address length", () => {
+    const address = "0x1234";
+    const result = getShortAddress(address, 6, 4);
+    expect(result).toBe("0x1234..1234");
+  });
+
+  it("should return full address if firstChars + lastChars covers the whole address", () => {
+    const address = "0xabcdef";
+    const result = getShortAddress(address, 3, 3);
+    expect(result).toBe("0xab..ef");
   });
 });

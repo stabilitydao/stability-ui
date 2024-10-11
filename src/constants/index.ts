@@ -1,6 +1,6 @@
-import type { TTableFilters, TTableColumn } from "@types";
-
 import { chains } from "@stabilitydao/stability";
+
+import { TABLE_FILTERS, TABLE, CHAINS_TABLE } from "./tables";
 
 import {
   USDC,
@@ -19,67 +19,6 @@ import {
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
-
-const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
-  {
-    name: "Assets",
-    keyName: "assetsSymbol",
-    sortType: "none",
-    dataType: "string",
-  },
-  // { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
-  // {
-  //   name: "Type",
-  //   keyName: "type",
-  //   sortType: "none",
-  //   dataType: "string",
-  // },
-  {
-    name: "Strategy",
-    keyName: "strategy",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Income APR",
-    keyName: "earningData",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "VS HODL APR",
-    keyName: "lifetimeVsHoldAPR",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "RISK",
-    keyName: "il",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "Price",
-    keyName: "shareprice",
-    sortType: "none",
-    dataType: "number",
-  },
-  { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  {
-    name: "Balance",
-    keyName: "balance",
-    sortType: "none",
-    dataType: "number",
-  },
-];
-
-const TABLE_FILTERS: TTableFilters[] = [
-  { name: "Stablecoins", type: "single", state: false },
-  { name: "Strategy", type: "dropdown", state: true },
-  { name: "My vaults", type: "sample", state: false },
-  { name: "Active", type: "sample", state: true },
-];
 
 const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV];
 
@@ -320,6 +259,7 @@ export {
   APRsType,
   TABLE,
   TABLE_FILTERS,
+  CHAINS_TABLE,
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,

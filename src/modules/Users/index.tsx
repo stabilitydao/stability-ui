@@ -1,7 +1,8 @@
 import type { ApiMainReply } from "@stabilitydao/stability";
 import { useStore } from "@nanostores/react";
 import { apiData } from "@store";
-import { shortAddress } from "../Platform/Chains";
+
+import { getShortAddress } from "@utils";
 
 import type { TAddress } from "@types";
 
@@ -33,7 +34,7 @@ const Users = (): JSX.Element => {
               <tr key={rank} className="h-[48px] hover:bg-accent-950">
                 <td className="px-4 py-3">{rank + 1}</td>
                 <td className="px-4 py-3" style={{ fontFamily: "monospace" }}>
-                  {shortAddress(user.address, 6, 4)}
+                  {getShortAddress(user.address, 6, 4)}
                 </td>
                 <td className="text-right px-4 py-3">
                   {user.earned.toFixed(2)}
