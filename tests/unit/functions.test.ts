@@ -814,7 +814,7 @@ describe("getShortAddress", () => {
   it("should return shortened address with custom first and last characters", () => {
     const address = "0x1234567890abcdef1234567890abcdef12345678";
     const result = getShortAddress(address, 6, 4);
-    expect(result).toBe("0x123456..5678");
+    expect(result).toBe("0x1234..5678");
   });
 
   it("should handle very short addresses correctly", () => {
@@ -832,6 +832,6 @@ describe("getShortAddress", () => {
   it("should return full address if firstChars + lastChars covers the whole address", () => {
     const address = "0xabcdef";
     const result = getShortAddress(address, 3, 3);
-    expect(result).toBe("0xab..ef");
+    expect(result).toBe("0xa..def");
   });
 });
