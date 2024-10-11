@@ -5,7 +5,6 @@ import { ErrorMessage } from "./ErrorMessage";
 import { FeeAPRModal } from "./FeeAPRModal";
 import { Loader } from "./Loader";
 import { FullPageLoader } from "./FullPageLoader";
-import { ShortAddress } from "./ShortAddress";
 import { TimeDifferenceIndicator } from "./TimeDifferenceIndicator";
 import { VaultState } from "./VaultState";
 import { VaultType } from "./VaultType";
@@ -16,6 +15,7 @@ import { CountersBlock } from "./CountersBlock";
 import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
+import { TableColumnSort } from "./TableColumnSort";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -33,7 +33,6 @@ export {
   Loader,
   FullPageLoader,
   ShareSkeleton,
-  ShortAddress,
   Skeleton,
   TimeDifferenceIndicator,
   VaultState,
@@ -45,4 +44,5 @@ export {
   Checkbox,
   HeadingText,
   FieldValue,
+  TableColumnSort,
 };

@@ -15,6 +15,9 @@ import { getProtocolLogo } from "./functions/getProtocolLogo";
 import { determineAPR } from "./functions/determineAPR";
 import { addAssetToWallet } from "./functions/addAssetToWallet";
 import { getLocalStorageData } from "./functions/getLocalStorageData";
+import { dataSorter } from "./functions/dataSorter";
+import { getShortAddress } from "./functions/getShortAddress";
+import { sortTable } from "./functions/sortTable";
 
 export {
   getTokenData,
@@ -34,4 +37,7 @@ export {
   determineAPR,
   addAssetToWallet,
   getLocalStorageData,
+  dataSorter,
+  getShortAddress,
+  sortTable,
 };

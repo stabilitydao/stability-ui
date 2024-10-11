@@ -23,7 +23,6 @@ import {
   FullPageLoader,
   ErrorMessage,
   RiskIndicator,
-  // ShortAddress,
 } from "@ui";
 
 import {
@@ -37,12 +36,13 @@ import {
   // assetsPrices,
 } from "@store";
 
-import { dataSorter, toVault, initFilters } from "./functions";
+import { toVault, initFilters } from "./functions";
 
 import {
   formatNumber,
   formatFromBigInt,
   getTimeDifference,
+  dataSorter,
   // getDate,
   // getTokenData,
 } from "@utils";

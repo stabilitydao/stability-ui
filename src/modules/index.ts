@@ -3,12 +3,12 @@ import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
 import { AI } from "./AI";
 import { Platform } from "./Platform";
-import { Assets } from "./Platform/Assets";
-import { Chains } from "./Platform/Chains";
-import { Integrations } from "./Platform/Integrations";
-import { Network } from "./Platform/Network";
-import { Node } from "./Platform/Node";
-import { Strategies } from "./Platform/Strategies";
+import { Assets } from "./Platform/components/Assets";
+import { Chains } from "./Platform/components/Chains";
+import { Integrations } from "./Platform/components/Integrations";
+import { Network } from "./Platform/components/Network";
+import { Node } from "./Platform/components/Node";
+import { Strategies } from "./Platform/components/Strategies";
 import { Users } from "./Users";
 
 export {
