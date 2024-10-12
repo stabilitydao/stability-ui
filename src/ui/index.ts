@@ -12,6 +12,7 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
 import { CountersBlock } from "./CountersBlock";
+import { CountersBlockCompact } from "./CountersBlockCompact";
 import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
@@ -41,6 +42,7 @@ export {
   RiskIndicator,
   ColorIndicator,
   CountersBlock,
+  CountersBlockCompact,
   Checkbox,
   HeadingText,
   FieldValue,

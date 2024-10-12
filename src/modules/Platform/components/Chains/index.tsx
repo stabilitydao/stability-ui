@@ -8,13 +8,13 @@ import { apiData } from "@store";
 
 import { Breadcrumbs, TableColumnSort } from "@ui";
 
-import { BridgesList, ChainStatus } from "../ui";
+import { BridgesList, ChainStatus } from "../../ui";
 
 import { formatNumber, sortTable, getShortAddress } from "@utils";
 
 import { CHAINS_TABLE } from "@constants";
 
-import { CHAINS_INFO } from "../constants";
+import { CHAINS_INFO } from "../../constants";
 
 import type { TTableColumn, IChainData } from "@types";
 

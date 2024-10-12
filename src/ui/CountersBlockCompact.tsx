@@ -1,5 +1,6 @@
-import { type ICounterProps } from "./Counter.tsx";
-import { CounterListItem } from "./CounterListItem.tsx";
+import { CounterListItem } from "./CounterListItem";
+
+import type { ICounterProps } from "./Counter";
 
 interface IProps {
   title: string;
@@ -42,12 +43,12 @@ const CountersBlockCompact: React.FC<IProps> = ({
           </svg>
         </h3>
         <div className="flex flex-col relative justify-center ">
-          {counters.map((t) => (
+          {counters.map((counter) => (
             <CounterListItem
-              key={t.name}
-              color={t.color.toString()}
-              value={t.value.toString()}
-              name={t.name.toString()}
+              key={counter.name}
+              color={counter.color.toString()}
+              value={counter.value.toString()}
+              name={counter.name.toString()}
             />
           ))}
         </div>

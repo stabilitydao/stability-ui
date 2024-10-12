@@ -1,6 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 
-import type { TTableColumn, IChainData, TSort } from "@types";
+import type {
+  TTableColumn,
+  TSort,
+  TTableData,
+  TDispatchedTableData,
+} from "@types";
 
 type TProps = {
   index: number;
@@ -8,8 +13,8 @@ type TProps = {
   sort: ({ table, setTable, tableData, setTableData }: TSort) => void;
   table: TTableColumn[];
   setTable: Dispatch<SetStateAction<TTableColumn[]>>;
-  tableData: IChainData[];
-  setTableData: Dispatch<SetStateAction<IChainData[]>>;
+  tableData: TTableData;
+  setTableData: TDispatchedTableData;
 };
 
 const TableColumnSort: React.FC<TProps> = ({

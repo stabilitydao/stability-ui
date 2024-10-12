@@ -1,6 +1,13 @@
 import { chains } from "@stabilitydao/stability";
 
-import { TABLE_FILTERS, TABLE, CHAINS_TABLE } from "./tables";
+import {
+  TABLE_FILTERS,
+  TABLE,
+  CHAINS_TABLE,
+  ASSETS_TABLE,
+  INTEGRATIONS_TABLE,
+  STRATEGIES_TABLE,
+} from "./tables";
 
 import {
   USDC,
@@ -282,4 +289,7 @@ export {
   DEFAULT_ERROR,
   IL,
   ZERO_BigInt,
+  ASSETS_TABLE,
+  INTEGRATIONS_TABLE,
+  STRATEGIES_TABLE,
 };

@@ -1,27 +1,38 @@
-import { DefiCategory, integrations } from "@stabilitydao/stability";
+import { useState, useEffect } from "react";
 
-import { Breadcrumbs } from "@ui";
+import { integrations } from "@stabilitydao/stability";
 
-const ProtocolBadge: React.FC<{
-  name: string;
-  category: DefiCategory;
-  supportedChains: number;
-}> = ({ name, category, supportedChains }) => {
-  let categoryFont = "text-[16px]";
-  return (
-    <div className="inline-flex bg-blue-950 self-start h-[36px] items-center rounded-2xl my-2 px-2">
-      <span className={`flex px-3 border-r-2 min-w-[104px] ${categoryFont}`}>
-        {category}
-      </span>
-      <span className="flex px-3 border-r-2 min-w-[160px]">{name}</span>
-      <span className="flex px-3 min-w-[50px] justify-center">
-        {supportedChains}
-      </span>
-    </div>
-  );
-};
+import { ProtocolBadge } from "../ui";
+
+import { Breadcrumbs, TableColumnSort } from "@ui";
+
+import { sortTable } from "@utils";
+
+import { INTEGRATIONS_TABLE } from "@constants";
+
+import type { TTableColumn } from "@types";
+
+import type { DeFiOrganization } from "@stabilitydao/stability";
 
 const Integrations = (): JSX.Element => {
+  const [tableStates, setTableStates] = useState(INTEGRATIONS_TABLE);
+  const [tableData, setTableData] = useState<DeFiOrganization[]>([]);
+
+  const initTableData = async () => {
+    if (integrations) {
+      const integrationsData = Object.entries(integrations).map(
+        (integration) => ({
+          ...integration[1],
+          protocolsLength: Object.keys(integration[1].protocols).length,
+        })
+      );
+      setTableData(integrationsData);
+    }
+  };
+
+  useEffect(() => {
+    initTableData();
+  }, []);
   return (
     <div>
       <Breadcrumbs links={["Platform", "Integrations"]} />
@@ -31,93 +42,97 @@ const Integrations = (): JSX.Element => {
       <table className="w-full font-manrope">
         <thead className="bg-accent-950 text-neutral-600 h-[36px]">
           <tr className="text-[12px] font-bold uppercase">
-            <td className="px-4 py-2 text-center">Organization</td>
-            <td className="px-4 py-2 text-center">Links</td>
-            <td className="px-4 py-2">Protocols</td>
-            <td className="px-4 py-2">Usage</td>
+            {tableStates.map((value: TTableColumn, index: number) => (
+              <TableColumnSort
+                key={value.name + index}
+                index={index}
+                value={value.name}
+                sort={sortTable}
+                table={tableStates}
+                setTable={setTableStates}
+                tableData={tableData}
+                setTableData={setTableData}
+              />
+            ))}
           </tr>
         </thead>
         <tbody className="text-[14px]">
-          {Object.entries(integrations).map(([, organization]) => (
-            <tr
-              className="h-[48px] hover:bg-accent-950"
-              key={organization.name}
-            >
-              <td className="px-4 py-3">
-                <div className="flex items-center py-2">
-                  <img
-                    className="w-[32px]"
-                    src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${organization.img}`}
-                    alt={organization.name}
-                  />
-                  <span className="ml-2">{organization.name}</span>
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center">
-                  <a
-                    href={organization.website}
-                    className="hover:bg-gray-700 p-2"
-                    target="_blank"
-                    title="Go to organization's website"
-                  >
+          {tableData.map(
+            ({ name, img, website, github, defiLlama, protocols }) => (
+              <tr className="h-[48px] hover:bg-accent-950" key={name}>
+                <td className="px-4 py-3">
+                  <div className="flex items-center py-2">
                     <img
-                      src="/icons/web.svg"
-                      alt="Website"
-                      className="w-[20px]"
+                      className="w-[32px]"
+                      src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${img}`}
+                      alt={name}
                     />
-                  </a>
-                  {organization.github ? (
+                    <span className="ml-2">{name}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
                     <a
-                      href={`https://github.com/${organization.github}`}
+                      href={website}
                       className="hover:bg-gray-700 p-2"
                       target="_blank"
-                      title="Go to organization's guthub"
+                      title="Go to organization's website"
                     >
                       <img
-                        src="/icons/github.svg"
-                        alt="Github"
+                        src="/icons/web.svg"
+                        alt="Website"
                         className="w-[20px]"
                       />
                     </a>
-                  ) : (
-                    <span className="w-[22px] m-2" />
-                  )}
-                  {organization.defiLlama ? (
-                    <a
-                      href={`https://defillama.com/protocol/${organization.defiLlama}`}
-                      className="hover:bg-gray-700 p-2"
-                      target="_blank"
-                      title="Go to Defillama"
-                    >
-                      <img
-                        src="/icons/defillama.svg"
-                        alt="DefiLlama"
-                        className="w-[20px]"
+                    {github ? (
+                      <a
+                        href={`https://github.com/${github}`}
+                        className="hover:bg-gray-700 p-2"
+                        target="_blank"
+                        title="Go to organization's guthub"
+                      >
+                        <img
+                          src="/icons/github.svg"
+                          alt="Github"
+                          className="w-[20px]"
+                        />
+                      </a>
+                    ) : (
+                      <span className="w-[22px] m-2" />
+                    )}
+                    {defiLlama ? (
+                      <a
+                        href={`https://defillama.com/protocol/${defiLlama}`}
+                        className="hover:bg-gray-700 p-2"
+                        target="_blank"
+                        title="Go to Defillama"
+                      >
+                        <img
+                          src="/icons/defillama.svg"
+                          alt="DefiLlama"
+                          className="w-[20px]"
+                        />
+                      </a>
+                    ) : (
+                      <span className="w-[22px] m-2" />
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col">
+                    {Object.keys(protocols).map((propocolId) => (
+                      <ProtocolBadge
+                        key={propocolId}
+                        name={protocols[propocolId].name}
+                        category={protocols[propocolId].category}
+                        supportedChains={protocols[propocolId].chains.length}
                       />
-                    </a>
-                  ) : (
-                    <span className="w-[22px] m-2" />
-                  )}
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex flex-col">
-                  {Object.keys(organization.protocols).map((propocolId) => (
-                    <ProtocolBadge
-                      key={propocolId}
-                      name={organization.protocols[propocolId].name}
-                      category={organization.protocols[propocolId].category}
-                      supportedChains={
-                        organization.protocols[propocolId].chains.length
-                      }
-                    />
-                  ))}
-                </div>
-              </td>
-              <td></td>
-            </tr>
-          ))}
+                    ))}
+                  </div>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>
