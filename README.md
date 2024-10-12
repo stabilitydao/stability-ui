@@ -11,8 +11,8 @@
 | **Landing**                                                                                                         | Development Figma | Index page                                      |
 | **AI**                                                                                                              |                   | Chatbot. AI Router.                             |
 | [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                      |
-| **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts   |
 | --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                      |
+| **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts   |
 | [**Users**](https://stability.farm/users)                                                                           | Development       | Users portal: active contests, leaderboard, etc |
 | --- **Contests**                                                                                                    |                   | All yield contests                              |
 | --- --- **Contest**                                                                                                 |                   | Contest page                                    |
@@ -26,7 +26,7 @@
 | --- [**Integrations**](https://stability.farm/integrations)                                                         | Development       | List of DeFi protocols and organizations        |
 | --- --- **Organization**                                                                                            |                   | Organization page                               |
 | --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform     |
-| --- --- **Chain**                                                                                                   |                   | Chain page                                      |
+| --- --- [**Chain**](https://stability.farm/chains/137)                                                              |                   | Chain page                                      |
 | --- [**Assets**](https://stability.farm/assets)                                                                     | Development       | List of supported assets                        |
 | --- --- **Asset**                                                                                                   |                   | Asset page                                      |
 

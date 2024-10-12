@@ -295,4 +295,4 @@ const GitHub: React.FC<{}> = () => {
   );
 };
 
-export { Platform };
+export { Platform, numberWithSpaces };
