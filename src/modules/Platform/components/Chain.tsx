@@ -4,11 +4,9 @@ import { useStore } from "@nanostores/react";
 
 import { apiData } from "@store";
 
-import { getShortAddress } from "@utils";
-
 import { Breadcrumbs } from "@ui";
 
-import { ChainStatus, BridgesList } from "../ui";
+import { ChainStatus } from "../ui";
 import {numberWithSpaces} from "../index.tsx";
 
 interface IProps {
