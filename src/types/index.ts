@@ -283,6 +283,7 @@ type TTableColumn = {
   keyName: string;
   sortType: string;
   dataType: string;
+  unsortable?: boolean;
 };
 
 type TTAbleFiltersVariant = {

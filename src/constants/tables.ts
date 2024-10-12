@@ -110,9 +110,10 @@ const ASSETS_TABLE: TTableColumn[] = [
   },
   {
     name: "Website",
-    keyName: "website",
+    keyName: "",
     sortType: "none",
-    dataType: "string",
+    dataType: "",
+    unsortable: true,
   },
   {
     name: "Addresses",
@@ -130,9 +131,10 @@ const INTEGRATIONS_TABLE: TTableColumn[] = [
   },
   {
     name: "Links",
-    keyName: "website",
+    keyName: "",
     sortType: "none",
-    dataType: "string",
+    dataType: "",
+    unsortable: true,
   },
   {
     name: "Protocols",
