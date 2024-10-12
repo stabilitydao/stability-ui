@@ -128,6 +128,7 @@ const Chains = (): JSX.Element => {
                           href={`https://github.com/stabilitydao/stability-contracts/issues/${chainLibGithubId}`}
                           target="_blank"
                           title="Go to chain library issue page on Github"
+                          onClick={(event) => event.stopPropagation()}
                         >
                           <img
                             src="/icons/github.svg"
