@@ -5,6 +5,7 @@ import { AI } from "./AI";
 import { Platform } from "./Platform";
 import { Assets } from "./Platform/components/Assets";
 import { Chains } from "./Platform/components/Chains";
+import { Chain } from "./Platform/components/Chain";
 import { Integrations } from "./Platform/components/Integrations";
 import { Network } from "./Platform/components/Network";
 import { Node } from "./Platform/components/Node";
@@ -19,6 +20,7 @@ export {
   Platform,
   Assets,
   Chains,
+  Chain,
   Integrations,
   Network,
   Strategies,

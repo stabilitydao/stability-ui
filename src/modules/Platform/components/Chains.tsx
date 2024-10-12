@@ -20,6 +20,10 @@ import type { TTableColumn, IChainData } from "@types";
 
 import type { ApiMainReply } from "@stabilitydao/stability";
 
+const toChain = (chainId: number): void => {
+  window.location.href = `/chains/${chainId}`;
+};
+
 const Chains = (): JSX.Element => {
   const $apiData: ApiMainReply = useStore(apiData);
 
@@ -90,7 +94,11 @@ const Chains = (): JSX.Element => {
                 chainLibGithubId,
                 tvl,
               }) => (
-                <tr key={chainId} className="h-[48px] hover:bg-accent-950">
+                <tr
+                  onClick={() => toChain(chainId)}
+                  key={chainId}
+                  className="h-[48px] hover:bg-accent-950 cursor-pointer"
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center">
                       {img && (

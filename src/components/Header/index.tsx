@@ -61,7 +61,8 @@ const Header = (): JSX.Element => {
             data-testid="vaults-link"
             className={
               platformPaths.some((path) => path === currentPath) ||
-              currentPath.includes("network")
+              currentPath.includes("network") ||
+              currentPath.includes("chains")
                 ? "active"
                 : ""
             }

@@ -11,6 +11,8 @@ const ChainStatus: React.FC<TProps> = ({ status }) => {
     bg = "bg-violet-800";
   } else if (status === "AWAITING_ISSUE_CREATION") {
     bg = "bg-orange-900";
+  } else if (status === "AWAITING_DEVELOPER") {
+    bg = "bg-yellow-700";
   }
 
   return (
@@ -21,7 +23,8 @@ const ChainStatus: React.FC<TProps> = ({ status }) => {
         .replace("AWAITING_DEPLOYMENT", "Awaiting deployment")
         .replace("NOT_SUPPORTED", "Not supported")
         .replace("SUPPORTED", "Supported")
-        .replace("AWAITING_ISSUE_CREATION", "Awaiting issue creation")}
+        .replace("AWAITING_ISSUE_CREATION", "Awaiting issue creation")
+        .replace("AWAITING_DEVELOPER", "Awaiting developer")}
     </span>
   );
 };
