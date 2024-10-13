@@ -6,7 +6,7 @@ import { useStore } from "@nanostores/react";
 
 import { apiData } from "@store";
 
-import { Breadcrumbs, TableColumnSort } from "@ui";
+import { Breadcrumbs, HeadingText, TableColumnSort } from "@ui";
 
 import { BridgesList, ChainStatus } from "../../ui";
 
@@ -50,9 +50,9 @@ const Chains = (): JSX.Element => {
     <div>
       <Breadcrumbs links={["Platform", "Chains"]} />
 
-      <h1 className="mb-3">Chains</h1>
+      <HeadingText text="Chains" scale={1} styles="mt-3" />
 
-      <div className="flex flex-wrap relative mb-5">
+      <div className="flex items-center justify-center flex-wrap relative mb-5">
         {CHAINS_INFO.map(({ name, length, color }) => (
           <div
             key={name}
@@ -66,57 +66,60 @@ const Chains = (): JSX.Element => {
         ))}
       </div>
 
-      <table className="w-full font-manrope">
-        <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-          <tr className="text-[12px] uppercase">
-            {tableStates.map((value: TTableColumn, index: number) => (
-              <TableColumnSort
-                key={value.name + index}
-                index={index}
-                value={value.name}
-                sort={sortTable}
-                table={tableStates}
-                setTable={setTableStates}
-                tableData={tableData}
-                setTableData={setTableData}
-              />
-            ))}
-          </tr>
-        </thead>
-        <tbody className="text-[14px]">
-          {!!tableData.length &&
-            tableData.map(
-              ({
-                chainId,
-                name,
-                status,
-                img,
-                // chainLibGithubId,
-                // multisig,
-                tvl,
-              }) => (
-                <tr
-                  onClick={() => toChain(chainId)}
-                  key={chainId}
-                  className="h-[48px] hover:bg-accent-950 cursor-pointer"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      {img && (
-                        <img
-                          src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
-                          alt={name}
-                          className="w-[24px] h-[24px] mr-2 rounded-full"
-                        />
-                      )}
-                      {name}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center font-bold">{chainId}</td>
-                  <td className="px-4 py-3 text-left whitespace-nowrap">
-                    {formatNumber(tvl, "abbreviate")}
-                  </td>
-                  {/* <td className="px-4 py-3 text-[12px]">
+      <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
+        <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+          <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+            <tr className="text-[12px] uppercase">
+              {tableStates.map((value: TTableColumn, index: number) => (
+                <TableColumnSort
+                  key={value.name + index}
+                  index={index}
+                  value={value.name}
+                  sort={sortTable}
+                  table={tableStates}
+                  setTable={setTableStates}
+                  tableData={tableData}
+                  setTableData={setTableData}
+                />
+              ))}
+            </tr>
+          </thead>
+          <tbody className="text-[14px]">
+            {!!tableData.length &&
+              tableData.map(
+                ({
+                  chainId,
+                  name,
+                  status,
+                  img,
+                  // chainLibGithubId,
+                  // multisig,
+                  tvl,
+                }) => (
+                  <tr
+                    onClick={() => toChain(chainId)}
+                    key={chainId}
+                    className="h-[48px] hover:bg-accent-950 cursor-pointer"
+                  >
+                    <td className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
+                      <div className="flex whitespace-nowrap items-center">
+                        {img && (
+                          <img
+                            src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
+                            alt={name}
+                            className="w-[24px] h-[24px] mr-2 rounded-full"
+                          />
+                        )}
+                        {name}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center font-bold">
+                      {chainId}
+                    </td>
+                    <td className="px-4 py-3 text-left whitespace-nowrap">
+                      {formatNumber(tvl, "abbreviate")}
+                    </td>
+                    {/* <td className="px-4 py-3 text-[12px]">
                     <div className="flex">
                       {multisig && <span>{getShortAddress(multisig)}</span>}
                     </div>
@@ -140,21 +143,22 @@ const Chains = (): JSX.Element => {
                       )}
                     </div>
                   </td> */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center">
-                      <ChainStatus status={status} />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center">
-                      <BridgesList chainId={chainId} chainName={name} />
-                    </div>
-                  </td>
-                </tr>
-              )
-            )}
-        </tbody>
-      </table>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center">
+                        <ChainStatus status={status} />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex md:justify-center items-center">
+                        <BridgesList chainId={chainId} chainName={name} />
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { Integrations } from "./Platform/components/Integrations";
 import { Network } from "./Platform/components/Network";
 import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
+import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Users } from "./Users";
 
 export {
@@ -26,4 +27,5 @@ export {
   Strategies,
   Node,
   Users,
+  Strategy,
 };

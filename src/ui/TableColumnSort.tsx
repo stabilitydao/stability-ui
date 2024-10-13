@@ -59,7 +59,7 @@ const TableColumnSort: React.FC<TProps> = ({
   return (
     <th
       onClick={tabController}
-      className={`text-[12px] px-2 font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"}`}
+      className={`text-[12px] px-2 font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} ${!index ? "sticky left-0 md:relative z-10 w-[150px] bg-accent-950" : ""}`}
     >
       <p
         className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}

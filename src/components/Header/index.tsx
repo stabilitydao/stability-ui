@@ -27,6 +27,13 @@ const Header = (): JSX.Element => {
     if (body) body.classList.toggle("no-scroll", !menu);
   };
 
+  const isPlatform =
+    platformPaths.some((path) => path === currentPath) ||
+    currentPath.includes("network/") ||
+    currentPath.includes("chains/") ||
+    currentPath.includes("strategies/");
+
+  const isVaults = currentPath === "" || currentPath.includes("vault/");
   return (
     <WagmiLayout>
       <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px]">
@@ -41,11 +48,7 @@ const Header = (): JSX.Element => {
         <div className="menu w-2/12 text-[16px]">
           <a
             data-testid="vaults-link"
-            className={
-              currentPath === "" || currentPath.includes("vault/")
-                ? "active"
-                : ""
-            }
+            className={isVaults ? "active" : ""}
             href="/"
           >
             Vaults
@@ -59,13 +62,7 @@ const Header = (): JSX.Element => {
           </a>
           <a
             data-testid="vaults-link"
-            className={
-              platformPaths.some((path) => path === currentPath) ||
-              currentPath.includes("network") ||
-              currentPath.includes("chains")
-                ? "active"
-                : ""
-            }
+            className={isPlatform ? "active" : ""}
             href="/platform"
           >
             Platform
@@ -83,7 +80,7 @@ const Header = (): JSX.Element => {
         </div>
         <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
           <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "" || currentPath.includes("vault/") ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${isVaults ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/"
           >
             Vaults
@@ -97,7 +94,7 @@ const Header = (): JSX.Element => {
           </a>
           <a
             data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${platformPaths.some((path) => path === currentPath) || currentPath.includes("network") ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"
           >
             Platform
