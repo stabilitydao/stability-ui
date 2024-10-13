@@ -3,8 +3,7 @@ import {
   chains,
   getChainBridges,
   getChainProtocols, getChainStrategies, getStrategyProtocols,
-  integrations,
-  ChainStatus as CS
+  integrations
 } from "@stabilitydao/stability";
 
 import { useStore } from "@nanostores/react";
