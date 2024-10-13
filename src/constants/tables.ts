@@ -80,22 +80,22 @@ const CHAINS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "Treasury",
-    keyName: "multisig",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Issue",
-    keyName: "chainLibGithubId",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "Treasury",
+  //   keyName: "multisig",
+  //   sortType: "none",
+  //   dataType: "string",
+  // },
+  // {
+  //   name: "Issue",
+  //   keyName: "chainLibGithubId",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   { name: "Status", keyName: "status", sortType: "none", dataType: "string" },
   {
     name: "Bridges",
-    keyName: "chainId", //temp
+    keyName: "bridgesCount",
     sortType: "none",
     dataType: "number",
   },
