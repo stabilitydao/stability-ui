@@ -2,8 +2,6 @@ import { dataSorter } from "./dataSorter";
 
 import type { TTableColumn, TSort } from "@types";
 
-import type { Chain } from "@stabilitydao/stability";
-
 const sortTable = ({
   table,
   setTable,
@@ -16,8 +14,8 @@ const sortTable = ({
     if (state.sortType !== "none") {
       sortedVaults = [...sortedVaults].sort((a, b) =>
         dataSorter(
-          String(a[state.keyName as keyof Chain]),
-          String(b[state.keyName as keyof Chain]),
+          String(a[state.keyName]),
+          String(b[state.keyName]),
           state.dataType,
           state.sortType
         )

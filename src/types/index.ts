@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import type { Chain } from "@stabilitydao/stability";
+import type { Chain, DeFiOrganization } from "@stabilitydao/stability";
 
 // interfaces
 interface IL {
@@ -32,6 +32,19 @@ interface IChainData extends Chain {
   chainId: number;
   tvl: number;
 }
+type TAssetData = {
+  symbol: string;
+  website: string;
+  addresses: number;
+};
+type TTableStrategy = {
+  id: string;
+  shortId: string;
+  state: string;
+  contractGithubId: number | "is-being-created";
+  color: string;
+  bgColor: string;
+};
 
 // types
 type TPlatformData = {
@@ -270,6 +283,7 @@ type TTableColumn = {
   keyName: string;
   sortType: string;
   dataType: string;
+  unsortable?: boolean;
 };
 
 type TTAbleFiltersVariant = {
@@ -471,6 +485,14 @@ type TIQMFAlm = {
   totalUSD: string;
 };
 
+type TStrategyState =
+  | "LIVE"
+  | "DEPLOYMENT"
+  | "DEVELOPMENT"
+  | "AWAITING"
+  | "BLOCKED"
+  | "PROPOSAL";
+
 //// EVENTS
 
 type TError = {
@@ -479,11 +501,23 @@ type TError = {
   description: string;
 };
 
+type TTableData =
+  | IChainData[]
+  | TAssetData[]
+  | DeFiOrganization[]
+  | TTableStrategy[];
+
+type TDispatchedTableData =
+  | Dispatch<SetStateAction<IChainData[]>>
+  | Dispatch<SetStateAction<TAssetData[]>>
+  | Dispatch<SetStateAction<DeFiOrganization[]>>
+  | Dispatch<SetStateAction<TTableStrategy[]>>;
+
 type TSort = {
   table: TTableColumn[];
   setTable: Dispatch<SetStateAction<TTableColumn[]>>;
-  tableData: IChainData[];
-  setTableData: Dispatch<SetStateAction<IChainData[]>>;
+  tableData: TTableData | any;
+  setTableData: TDispatchedTableData;
 };
 
 //// API
@@ -571,4 +605,9 @@ export type {
   TLocalStorageToken,
   IChainData,
   TSort,
+  TAssetData,
+  TTableData,
+  TDispatchedTableData,
+  TStrategyState,
+  TTableStrategy,
 };

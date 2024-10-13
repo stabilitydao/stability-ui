@@ -156,6 +156,11 @@ export const formatNumber = (
 
       changedValue = smallFormattedValue;
       break;
+    case "withSpaces":
+      value = String(value);
+
+      changedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      break;
     default:
       break;
   }

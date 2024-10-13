@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { chains } from "@stabilitydao/stability";
+import { chains, getChainBridges } from "@stabilitydao/stability";
 
 import { useStore } from "@nanostores/react";
 
@@ -8,13 +8,13 @@ import { apiData } from "@store";
 
 import { Breadcrumbs, TableColumnSort } from "@ui";
 
-import { BridgesList, ChainStatus } from "../ui";
+import { BridgesList, ChainStatus } from "../../ui";
 
-import { formatNumber, sortTable, getShortAddress } from "@utils";
+import { formatNumber, sortTable } from "@utils";
 
 import { CHAINS_TABLE } from "@constants";
 
-import { CHAINS_INFO } from "../constants";
+import { CHAINS_INFO } from "../../constants";
 
 import type { TTableColumn, IChainData } from "@types";
 
@@ -35,6 +35,7 @@ const Chains = (): JSX.Element => {
       const chainsData = Object.entries(chains).map((chain) => ({
         ...chain[1],
         chainId: Number(chain[1].chainId),
+        bridgesCount: getChainBridges(chain[1].name).length,
         tvl: $apiData?.total.chainTvl[chain[0]] || 0,
       }));
 
@@ -90,8 +91,8 @@ const Chains = (): JSX.Element => {
                 name,
                 status,
                 img,
-                multisig,
-                chainLibGithubId,
+                // chainLibGithubId,
+                // multisig,
                 tvl,
               }) => (
                 <tr
@@ -115,7 +116,7 @@ const Chains = (): JSX.Element => {
                   <td className="px-4 py-3 text-left whitespace-nowrap">
                     {formatNumber(tvl, "abbreviate")}
                   </td>
-                  <td className="px-4 py-3 text-[12px]">
+                  {/* <td className="px-4 py-3 text-[12px]">
                     <div className="flex">
                       {multisig && <span>{getShortAddress(multisig)}</span>}
                     </div>
@@ -128,6 +129,7 @@ const Chains = (): JSX.Element => {
                           href={`https://github.com/stabilitydao/stability-contracts/issues/${chainLibGithubId}`}
                           target="_blank"
                           title="Go to chain library issue page on Github"
+                          onClick={(event) => event.stopPropagation()}
                         >
                           <img
                             src="/icons/github.svg"
@@ -137,7 +139,7 @@ const Chains = (): JSX.Element => {
                         </a>
                       )}
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center">
                       <ChainStatus status={status} />

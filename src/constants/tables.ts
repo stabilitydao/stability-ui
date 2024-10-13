@@ -80,25 +80,101 @@ const CHAINS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "Treasury",
-    keyName: "multisig",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Issue",
-    keyName: "chainLibGithubId",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "Treasury",
+  //   keyName: "multisig",
+  //   sortType: "none",
+  //   dataType: "string",
+  // },
+  // {
+  //   name: "Issue",
+  //   keyName: "chainLibGithubId",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   { name: "Status", keyName: "status", sortType: "none", dataType: "string" },
   {
     name: "Bridges",
-    keyName: "chainId", //temp
+    keyName: "bridgesCount",
     sortType: "none",
     dataType: "number",
   },
 ];
 
-export { TABLE_FILTERS, TABLE, CHAINS_TABLE };
+const ASSETS_TABLE: TTableColumn[] = [
+  {
+    name: "Symbol",
+    keyName: "symbol",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Website",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Addresses",
+    keyName: "addresses",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+const INTEGRATIONS_TABLE: TTableColumn[] = [
+  {
+    name: "Organization",
+    keyName: "name",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Links",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Protocols",
+    keyName: "protocolsLength",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+const STRATEGIES_TABLE: TTableColumn[] = [
+  {
+    name: "Id",
+    keyName: "shortId",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Name",
+    keyName: "id",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "State",
+    keyName: "state",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Issue",
+    keyName: "contractGithubId",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+export {
+  TABLE_FILTERS,
+  TABLE,
+  CHAINS_TABLE,
+  ASSETS_TABLE,
+  INTEGRATIONS_TABLE,
+  STRATEGIES_TABLE,
+};

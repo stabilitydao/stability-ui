@@ -1,6 +1,12 @@
-import { chains, getChainsTotals } from "@stabilitydao/stability";
+import {
+  chains,
+  getChainsTotals,
+  getStrategiesTotals,
+} from "@stabilitydao/stability";
 
 const TOTAL_CHAINS = getChainsTotals();
+
+const TOTAL_STRATEGIES = getStrategiesTotals();
 
 const CHAINS_INFO = [
   {
@@ -36,4 +42,38 @@ const CHAINS_INFO = [
   },
 ];
 
-export { CHAINS_INFO };
+const STRATEGIES_INFO = [
+  { name: "Live", state: TOTAL_STRATEGIES.LIVE, color: "text-green-400" },
+  {
+    name: "Awaiting deployment",
+    state: TOTAL_STRATEGIES.DEPLOYMENT,
+    color: "text-violet-400",
+  },
+  {
+    name: "Development",
+    state: TOTAL_STRATEGIES.DEVELOPMENT,
+    color: "text-blue-400",
+  },
+  {
+    name: "Awaiting developer",
+    state: TOTAL_STRATEGIES.AWAITING,
+    color: "text-yellow-200",
+  },
+  { name: "Blocked", state: TOTAL_STRATEGIES.BLOCKED, color: "text-red-200" },
+  {
+    name: "Proposal",
+    state: TOTAL_STRATEGIES.PROPOSAL,
+    color: "text-orange-300",
+  },
+];
+
+const STATE_COLORS = {
+  LIVE: "bg-green-800",
+  DEPLOYMENT: "bg-violet-800",
+  DEVELOPMENT: "bg-blue-700",
+  AWAITING: "bg-orange-900",
+  BLOCKED: "bg-red-900",
+  PROPOSAL: "bg-yellow-800",
+};
+
+export { CHAINS_INFO, STRATEGIES_INFO, STATE_COLORS };
