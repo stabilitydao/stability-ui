@@ -1,4 +1,5 @@
-name: End-to-End Tests(Playwright)
+name: End-to-End Tests (Playwright)
+
 on:
   push:
     branches: [main, master]
@@ -9,17 +10,28 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2 libicu-dev libffi-dev libx264-dev
+
       - name: Install dependencies
         run: yarn install
+
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
+
       - name: Run Playwright tests
         run: yarn test:e2e
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
