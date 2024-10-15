@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: lts/*
 
+      - name: Update APT packages
+        run: sudo apt-get update
+
       - name: Install dependencies
         run: yarn install
 
