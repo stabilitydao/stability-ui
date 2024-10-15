@@ -45,9 +45,6 @@
 //   test.setTimeout(500000);
 
 //   await page.waitForSelector("[data-testid='vault']");
-//   await page.waitForSelector("[data-testid='hideSwapFee']");
-
-//   await page.getByTestId("hideSwapFee").first().click();
 
 //   const vaultsCount = await page.getByTestId("vault").count();
 

@@ -42,6 +42,7 @@ export const getAssetsBalances = (
       }
     }
   }
+
   if (underlyingToken?.address === options[0]) {
     balance[options[0]] = underlyingToken.balance;
   }
