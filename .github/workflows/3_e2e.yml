@@ -13,15 +13,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libicu-dev libffi-dev libx264-dev
 
       - name: Install dependencies
         run: yarn install
