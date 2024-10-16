@@ -33,6 +33,7 @@
     "http-proxy-middleware": "^2.0.6",
     "nanostores": "^0.9.3",
     "openai": "^4.0.0",
+    "playwright": "^1.48.0",
     "proxy-middleware": "^0.15.0",
     "react": "^18.0.0",
     "react-device-detect": "^2.2.3",
@@ -46,7 +47,7 @@
   },
   "devDependencies": {
     "@currents/playwright": "1.4.5",
-    "@playwright/test": "1.44.1",
+    "@playwright/test": "1.48.0",
     "@types/node": "^20.14.10",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
