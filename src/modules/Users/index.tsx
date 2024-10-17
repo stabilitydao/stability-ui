@@ -19,7 +19,7 @@ import { TABLE_TYPES } from "./constants";
 
 import type { TTableColumn, TLeaderboard } from "@types";
 
-import type { ApiMainReply } from "@stabilitydao/stability";
+import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 
 const Users = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
@@ -31,9 +31,9 @@ const Users = (): JSX.Element => {
     findAllValidPeriods(contests);
 
   const periodsData = [
-    contests[previousPeriod],
-    contests[currentPeriod],
-    contests[nextPeriod],
+    contests[previousPeriod as keyof YieldContest],
+    contests[currentPeriod as keyof YieldContest],
+    contests[nextPeriod as keyof YieldContest],
   ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
@@ -42,7 +42,8 @@ const Users = (): JSX.Element => {
   const [tableData, setTableData] = useState<TLeaderboard[]>([]);
 
   const initTableData = async () => {
-    if (allContests?.[activeContest]) {
+    if (!!allContests.ACTIVE?.length) {
+      //@ts-ignore
       let contestData = allContests[activeContest].sort(
         (a: TLeaderboard, b: TLeaderboard) => b.earned - a.earned
       );
@@ -59,8 +60,8 @@ const Users = (): JSX.Element => {
 
   const allContests = useMemo(
     () => ({
-      PAST: $apiData?.leaderboards?.[previousPeriod],
-      ACTIVE: $apiData?.leaderboards?.[currentPeriod],
+      PAST: $apiData?.leaderboards?.[previousPeriod as keyof YieldContest],
+      ACTIVE: $apiData?.leaderboards?.[currentPeriod as keyof YieldContest],
       ABSOLUTE: $apiData?.leaderboards.absolute,
     }),
     [$apiData?.leaderboards]
@@ -81,15 +82,17 @@ const Users = (): JSX.Element => {
       <div className="flex justify-center items-center font-semibold relative text-[14px]">
         {TABLE_TYPES.map((type: string) => {
           const isActive = activeContest === type;
+          // @ts-ignore
           const hasContestData = !!allContests[type]?.length;
+
           let dateRange = type;
 
           switch (type) {
             case "PAST":
-              dateRange = `${formatTimestampToDate(contests[previousPeriod].start)} - ${formatTimestampToDate(contests[previousPeriod].end)}`;
+              dateRange = `${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].end)}`;
               break;
             case "ACTIVE":
-              dateRange = `${formatTimestampToDate(contests[currentPeriod].start)} - ${formatTimestampToDate(contests[currentPeriod].end)}`;
+              dateRange = `${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].end)}`;
               break;
 
             default:
@@ -140,7 +143,9 @@ const Users = (): JSX.Element => {
                     {getShortAddress(user.address, 6, 4)}
                   </td>
                   <td className="text-center px-4 py-3">
-                    {user.earned.toFixed(2)}
+                    {user.earned <= 0.01
+                      ? user.earned.toFixed(4)
+                      : user.earned.toFixed(2)}
                   </td>
                   <td className="text-center px-4 py-3">
                     {user.deposit

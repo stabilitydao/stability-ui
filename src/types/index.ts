@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
-import type { Chain, DeFiOrganization } from "@stabilitydao/stability";
+import type {
+  Chain,
+  DeFiOrganization,
+  YieldContest,
+} from "@stabilitydao/stability";
 
 // interfaces
 interface IL {
@@ -553,6 +557,9 @@ type TAPIData = {
     };
   };
 };
+type TContests = {
+  [contestId: string]: YieldContest;
+};
 
 export type {
   TPlatformData,
@@ -620,4 +627,5 @@ export type {
   TStrategyState,
   TTableStrategy,
   TLeaderboard,
+  TContests,
 };
