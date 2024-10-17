@@ -85,7 +85,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     <div className="bg-accent-950 rounded-2xl font-manrope">
       <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[56px] px-6">
         <div
-          data-testid="infoBarLogo"
+          data-testid="infoBarHeader"
           className="hidden lg:flex justify-between items-center gap-0.5 w-full"
         >
           <div className="flex items-center">
@@ -116,6 +116,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <FieldValue
                 name="Vault type"
                 value={<VaultType type={vault.type} greater={true} />}
+                testId="infoBarVaultType"
               />
             </div>
 
@@ -141,6 +142,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                     </p>*/}
                   </div>
                 }
+                testId="infoBarAssetsLogo"
               />
             </div>
             <div className="w-full md:w-1/3 ">
@@ -198,6 +200,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <FieldValue
                 name="VS HODL APR"
                 value={vault.lifetimeVsHoldAPR + "%"}
+                testId="infoBarVSHodlAPR"
               />
             </div>
             <div className="w-full md:w-1/3 ">
@@ -220,6 +223,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 <FieldValue
                   name="ALM TVL"
                   value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
+                  testId="infoBarAlmTVL"
                 />
               ) : (
                 <div className="h-[46px]"></div>
@@ -231,6 +235,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 <FieldValue
                   name="POOL TVL"
                   value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                  testId="infoBarPoolTVL"
                 />
               ) : (
                 <div className="w-1/2 lg:w-auto h-[46px]"></div>
@@ -253,6 +258,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <FieldValue
                 name="Last HardWork"
                 value={<TimeDifferenceIndicator unix={vault?.lastHardWork} />}
+                testId="infoBarHardWork"
               />
             </div>
 

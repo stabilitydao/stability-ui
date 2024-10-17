@@ -1,198 +1,432 @@
-// import { test, expect } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
-// import axios from "axios";
+import axios from "axios";
 
-// import { seeds } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
-// import { formatNumber } from "../../../src/utils/functions/formatNumber";
+import { formatNumber } from "../../../src/utils/functions/formatNumber";
+import { getStrategyInfo } from "../../../src/utils/functions/getStrategyInfo";
+import { getTimeDifference } from "../../../src/utils/functions/getTimeDifference";
 
-// import { CHAINS } from "@constants";
+import { CHAINS } from "@constants";
 
-// let allVaults: any[] = [];
+// Playwright doesn't work with json
+const tokenlist = {
+  name: "Stability Token List",
+  logoURI: "https://stability.farm/logo.svg",
+  keywords: [],
+  timestamp: "2024-06-28T00:00:00+00:00",
+  version: {
+    major: 1,
+    minor: 3,
+    patch: 0,
+  },
+  tags: {
+    stablecoin: {
+      name: "Stablecoin",
+      description:
+        "Tokens that are fixed to an external asset, e.g. the US dollar",
+    },
+    bridged: {
+      name: "Bridged",
+      description: "Tokens that are bridged to current chain from another",
+    },
+    lst: {
+      name: "Liquid Staking",
+      description: "Liquid staking token",
+    },
+    wNative: {
+      name: "Wrapped native coin",
+      description:
+        "WETH9 or similar contract for wrapping native coin to ERC20 token",
+    },
+  },
+  tokens: [
+    {
+      chainId: 137,
+      address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+      symbol: "USDC.e",
+      name: "Bridged USDC",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 137,
+      address: "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
+      symbol: "USDC",
+      name: "USD Coin",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 137,
+      address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
+      symbol: "USDT",
+      name: "(PoS) Tether USD",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdt.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 137,
+      address: "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+      symbol: "DAI",
+      name: "Dai Stablecoin",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/dai.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 137,
+      address: "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
+      symbol: "WMATIC",
+      name: "Wrapped Matic",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+      tags: ["wNative"],
+    },
+    {
+      chainId: 137,
+      address: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
+      symbol: "WETH",
+      name: "Wrapped Ether",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/eth.jpg",
+      tags: ["bridged"],
+    },
+    {
+      chainId: 137,
+      address: "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
+      symbol: "WBTC",
+      name: "(PoS) Wrapped BTC",
+      decimals: 8,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/btc.jpg",
+      tags: ["bridged"],
+    },
+    {
+      chainId: 137,
+      address: "0x48469a0481254d5945e7e56c1eb9861429c02f44",
+      symbol: "PROFIT",
+      name: "Stability",
+      decimals: 18,
+      logoURI: "https://stabilitydao.org/profit.png",
+    },
+    {
+      chainId: 137,
+      address: "0x9844a1c30462b55cd383a2c06f90bb4171f9d4bb",
+      symbol: "SDIV",
+      name: "Stability Dividend",
+      decimals: 18,
+      logoURI: "https://stabilitydao.org/SDIV.svg",
+    },
+    {
+      chainId: 137,
+      address: "0xc4ce1d6f5d98d65ee25cf85e9f2e9dcfee6cb5d6",
+      symbol: "crvUSD",
+      name: "Curve.Fi USD",
+      decimals: 18,
+      logoURI: "https://polygonscan.com/token/images/crvusd_32.png",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 8453,
+      address: "0x4200000000000000000000000000000000000006",
+      symbol: "WETH",
+      name: "Wrapped Ether",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/eth.jpg",
+      tags: ["wNative"],
+    },
+    {
+      chainId: 8453,
+      address: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+      symbol: "wstETH",
+      name: "Wrapped Liquid Staked Ether 2.0",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/wsteth.jpg",
+      tags: ["lst", "bridged"],
+    },
+    {
+      chainId: 8453,
+      address: "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
+      symbol: "cbETH",
+      name: "Coinbase Wrapped Staked ETH",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/network/ethereum/0xBe9895146f7AF43049ca1c1AE358B0541Ea49704.jpg",
+      tags: ["lst"],
+    },
+    {
+      chainId: 8453,
+      address: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      symbol: "USDT",
+      name: "Tether USD",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdt.jpg",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 8453,
+      address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      symbol: "USDC",
+      name: "USDC",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 8453,
+      address: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA",
+      symbol: "USDbC",
+      name: "USD Base Coin",
+      decimals: 6,
+      logoURI: "https://basescan.org/token/images/usdbc_ofc_32.png",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 8453,
+      address: "0x417Ac0e078398C154EdFadD9Ef675d30Be60Af93",
+      symbol: "crvUSD",
+      name: "Curve.Fi USD",
+      decimals: 18,
+      logoURI: "https://polygonscan.com/token/images/crvusd_32.png",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 8453,
+      address: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      symbol: "DAI",
+      name: "Dai Stablecoin",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/dai.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+  ],
+};
 
-// const isDifferenceWithinTenPercents = (num1: number, num2: number): boolean => {
-//   const larger = Math.max(num1, num2);
-//   const smaller = Math.min(num1, num2);
+const getTokenData = (address: string): any => {
+  for (const token of tokenlist.tokens) {
+    if (token.address.toLowerCase() === address.toLowerCase()) {
+      return {
+        address: token.address.toLowerCase(),
+        chainId: token.chainId,
+        decimals: token.decimals,
+        name: token.name,
+        symbol: token.symbol,
+        logoURI: token.logoURI,
+        tags: token?.tags,
+      };
+    }
+  }
+  return undefined;
+};
 
-//   const difference = Math.abs(larger - smaller);
-//   const twentyPercentOfLarger = Math.abs(larger * 0.2);
+let allVaults: any[] = [];
 
-//   return difference <= twentyPercentOfLarger;
-// };
+const isDifferenceWithinTenPercents = (num1: number, num2: number): boolean => {
+  const larger = Math.max(num1, num2);
+  const smaller = Math.min(num1, num2);
 
-// test.beforeEach(async ({ page }) => {
-//   try {
-//     const response = await axios.get(seeds[0]);
+  const difference = Math.abs(larger - smaller);
+  const twentyPercentOfLarger = Math.abs(larger * 0.2);
 
-//     const vaultsData = response.data?.vaults || {};
+  return difference <= twentyPercentOfLarger;
+};
 
-//     allVaults = await Promise.all(
-//       CHAINS.map(async (chain) => {
-//         const chainVaults = vaultsData[chain?.id] || {};
-//         return Object.values(chainVaults).map((vault) => vault);
-//       })
-//     );
-//     allVaults = allVaults.flat();
-//   } catch (error) {
-//     throw new Error(`API Error: ${error}`);
-//   }
+test.beforeEach(async ({ page }) => {
+  try {
+    const response = await axios.get(seeds[0]);
 
-//   await page.goto("/", { waitUntil: "load", timeout: 60000 });
-//   await page.waitForTimeout(5000);
-// });
+    const vaultsData = response.data?.vaults || {};
 
-// test("Should display basic info correctly", async ({ page }) => {
-//   test.setTimeout(500000);
+    allVaults = await Promise.all(
+      CHAINS.map(async (chain) => {
+        const chainVaults = vaultsData[chain?.id] || {};
+        return Object.values(chainVaults).map((vault) => vault);
+      })
+    );
+    allVaults = allVaults.flat();
+  } catch (error) {
+    throw new Error(`API Error: ${error}`);
+  }
 
-//   await page.waitForSelector("[data-testid='vault']");
+  await page.goto("/", { waitUntil: "load", timeout: 60000 });
+  await page.waitForTimeout(5000);
+});
 
-//   const vaultsCount = await page.getByTestId("vault").count();
+test("Should display basic info correctly", async ({ page }) => {
+  test.setTimeout(500000);
 
-//   for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
-//     await page.getByTestId("vault").nth(vaultIndex).click();
+  await page.waitForSelector("[data-testid='vault']");
 
-//     await page.waitForSelector("[data-testid='vaultSymbol']");
-//     await page.waitForSelector("[data-testid='vaultName']");
-//     await page.waitForSelector("[data-testid='infoBarLogo']");
+  const vaultsCount = await page.getByTestId("vault").count();
 
-//     const vaultAddress = page.url().slice(-42);
+  for (let vaultIndex = 0; vaultIndex < vaultsCount; vaultIndex++) {
+    await page.getByTestId("vault").nth(vaultIndex).click();
 
-//     const vaultData = allVaults.find(
-//       ({ address }) => address.toLowerCase() === vaultAddress
-//     );
+    await page.waitForSelector("[data-testid='infoBarHeader']");
 
-//     /* Short and full vault name should display correctly */
+    const vaultAddress = page.url().slice(-42);
 
-//     const symbol = await page.getByTestId("vaultSymbol").innerText();
-//     const name = await page.getByTestId("vaultName").innerText();
+    const vaultData = allVaults.find(
+      ({ address }) => address.toLowerCase() === vaultAddress
+    );
 
-//     expect(vaultData.symbol === symbol).toBeTruthy();
-//     expect(vaultData.name === name).toBeTruthy();
+    /* Vault symbol should display correctly */
+    const infoBarHeader = await page.getByTestId("infoBarHeader").innerText();
 
-//     /* Vault logo, chain logo and protocols logos under strategy */
-//     /* should be displayed correctly in one line                 */
+    const isVaultSymbol = infoBarHeader.includes(vaultData.symbol);
 
-//     const logo = await page.getByTestId("infoBarLogo");
+    expect(isVaultSymbol).toBeTruthy();
 
-//     const strategyesLogo = await page.getByTestId("infoBarStrategyesLogo");
+    /* Vault type should display correctly */
+    const barVaultType = await page.getByTestId("infoBarVaultType").innerText();
 
-//     const protocolsLogo = await page.getByTestId("infoBarProtocolsLogo");
+    const APIVaultType = vaultData.vaultType.toLowerCase();
 
-//     const isLogoFlex = await logo.evaluate((element) => {
-//       return window.getComputedStyle(element).display === "flex";
-//     });
+    expect(barVaultType.toLowerCase()).toBe(APIVaultType);
 
-//     let isStrategyFlex = false;
+    /* Assets should display correctly */
+    const logoDiv = await page.getByTestId("infoBarAssetsLogo");
 
-//     const strategyLogoCount = await strategyesLogo.count();
+    const imgElements = await logoDiv.locator("img");
 
-//     if (strategyLogoCount > 0) {
-//       isStrategyFlex = await strategyesLogo.evaluate((element) => {
-//         return window.getComputedStyle(element).display === "flex";
-//       });
-//     }
+    const imgCount = await imgElements.count();
 
-//     let isProtocolsFlex = false;
+    for (let i = 0; i < imgCount; i++) {
+      const imgSrc = await imgElements.nth(i).getAttribute("title");
 
-//     const protocolsLogoCount = await protocolsLogo.count();
+      const tokenSymbol = getTokenData(vaultData.assets[i]).symbol;
 
-//     if (protocolsLogoCount > 0) {
-//       isProtocolsFlex = await protocolsLogo.evaluate((element) => {
-//         return window.getComputedStyle(element).display === "flex";
-//       });
-//     }
+      expect(imgSrc).toBe(tokenSymbol);
+    }
 
-//     expect(isLogoFlex).toBeTruthy();
+    /* Strategies should display correctly */
+    const strategyesLogo = await page.getByTestId("infoBarStrategyesLogo");
 
-//     if (strategyLogoCount > 0) {
-//       expect(isStrategyFlex).toBeTruthy();
-//     }
-//     if (protocolsLogoCount > 0) {
-//       expect(isProtocolsFlex).toBeTruthy();
-//     }
+    const strategyesImg = await strategyesLogo.locator("img");
 
-//     /* TVL should be displayed correctly per vault */
-//     const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
+    const strategyesCount = await strategyesImg.count();
 
-//     let lastChar = vaultTVL[vaultTVL.length - 1];
+    const strategyInfo = getStrategyInfo(
+      vaultData?.symbol,
+      vaultData.strategyId
+    );
 
-//     const formattedTVL = isNaN(Number(lastChar))
-//       ? Number(vaultTVL.slice(1, -1))
-//       : Number(vaultTVL.slice(1));
+    for (let i = 0; i < strategyesCount; i++) {
+      const imgSrc = await strategyesImg.nth(i).getAttribute("title");
 
-//     const totalTVL = String(formatNumber(vaultData.tvl, "abbreviate"));
+      expect(imgSrc).toBe(strategyInfo.protocols[i].name);
+    }
+    /* Income APR should be displayed correctly */
+    const incomeAPR = await page.getByTestId("infoBarAPR").innerText();
 
-//     lastChar = totalTVL[totalTVL.length - 1];
+    // todo: income apr + period
 
-//     const formattedTotalTVL = isNaN(Number(lastChar))
-//       ? Number(totalTVL.slice(1, -1))
-//       : Number(totalTVL.slice(1));
+    /* VS HODL APR should be displayed correctly */
+    const vsHodlAPR = (
+      await page.getByTestId("infoBarVSHodlAPR").innerText()
+    ).slice(0, -1);
 
-//     const isTVL = isDifferenceWithinTenPercents(
-//       formattedTVL,
-//       formattedTotalTVL
-//     );
+    const lifetimeVsHoldAPR =
+      vaultData.apr?.vsHoldLifetime &&
+      getTimeDifference(vaultData.created)?.days >= 3
+        ? Number(vaultData.apr?.vsHoldLifetime).toFixed(2)
+        : 0;
 
-//     expect(isTVL).toBeTruthy();
+    expect(Number(vsHodlAPR)).toBe(Number(lifetimeVsHoldAPR));
 
-//     /* Share price should be displayed correctly */
-//     const vaultSP = await page.getByTestId("infoBarSP").innerText();
+    // /* TVL should be displayed correctly per vault */
+    const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
 
-//     expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(
-//       Number(vaultData.sharePrice).toFixed(1)
-//     );
+    let lastChar = vaultTVL[vaultTVL.length - 1];
 
-//     /* Deposited amount should be 0 if user have no deps in vault or disconnected */
+    const formattedTVL = isNaN(Number(lastChar))
+      ? Number(vaultTVL.slice(1, -1))
+      : Number(vaultTVL.slice(1));
 
-//     const deposited = await page.getByTestId("infoBarDeposited").innerText();
+    const totalTVL = String(formatNumber(vaultData.tvl, "abbreviate"));
 
-//     expect(deposited).toBe("0");
+    lastChar = totalTVL[totalTVL.length - 1];
 
-//     /* Daily/Monthly percentage amounts should be displayed correctly */
-//     /* APRs terms rate should filter APR/APY by latest/24h/7d         */
+    const formattedTotalTVL = isNaN(Number(lastChar))
+      ? Number(totalTVL.slice(1, -1))
+      : Number(totalTVL.slice(1));
 
-//     const APRSwitcher = await page.getByTestId("APRTimeSwitcher").first();
-//     const APRTypes = await page.getByTestId("APRType");
+    const isTVL = isDifferenceWithinTenPercents(
+      formattedTVL,
+      formattedTotalTVL
+    );
 
-//     const APRs = [
-//       vaultData.apr.incomeLatest,
-//       vaultData.apr.income24h,
-//       vaultData.apr.incomeWeek,
-//     ];
+    expect(isTVL).toBeTruthy();
 
-//     const toAPR = (apr: number) => ({
-//       APR: apr.toFixed(),
-//       dailyAPR: (apr / 365).toFixed(),
-//       monthlyAPR: (apr / 12).toFixed(),
-//     });
+    /* ALM TVL should be dispalyed correctly */
+    if (vaultData?.alm?.tvl) {
+      const infoBarAlmTVL = await page.getByTestId("infoBarAlmTVL").innerText();
 
-//     const allAPRs = APRs.map((apr) => toAPR(Number(apr)));
+      const almTVL = formatNumber(Number(vaultData?.alm?.tvl), "abbreviate");
 
-//     for (let i = 0; i < allAPRs.length; i++) {
-//       await APRSwitcher.click();
-//       await APRTypes.nth(i).click();
-//       await page.waitForTimeout(500);
+      expect(infoBarAlmTVL).toBe(almTVL);
+    }
 
-//       const { APR, dailyAPR, monthlyAPR } = allAPRs[i];
+    /* Pool TVL should be dispalyed correctly */
+    if (vaultData?.pool?.tvl) {
+      const infoBarPoolTVL = await page
+        .getByTestId("infoBarPoolTVL")
+        .innerText();
 
-//       const APRText = await page.getByTestId("infoBarAPR").innerText();
+      const poolTVL = formatNumber(Number(vaultData?.pool?.tvl), "abbreviate");
 
-//       const dailyAPRText = await page
-//         .getByTestId("infoBarDailyAPR")
-//         .innerText();
+      expect(infoBarPoolTVL).toBe(poolTVL);
+    }
 
-//       const monthlyAPRText = await page
-//         .getByTestId("infoBarMonthlyAPR")
-//         .innerText();
+    /* Share price should be displayed correctly */
+    const vaultSP = await page.getByTestId("infoBarSP").innerText();
 
-//       const extractAPR = (text: string) =>
-//         Number(text.slice(0, text.indexOf("%")).trim());
+    expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(
+      Number(vaultData.sharePrice).toFixed(1)
+    );
 
-//       expect(extractAPR(APRText).toFixed()).toBe(APR);
-//       expect(extractAPR(dailyAPRText).toFixed()).toBe(dailyAPR);
-//       expect(extractAPR(monthlyAPRText).toFixed()).toBe(monthlyAPR);
-//     }
+    /* Last Hardwork should be displayed in hours and minutes or none */
+    const infoBarHardWork = await page
+      .getByTestId("infoBarHardWork")
+      .innerText();
 
-//     await page.goBack();
-//   }
-// });
+    const timeDifference = getTimeDifference(vaultData?.lastHardWork);
+
+    if (timeDifference) {
+      let expectedLastHardWorkText = "None";
+
+      if (timeDifference.days) {
+        if (timeDifference.days < 1000) {
+          expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
+        }
+      } else {
+        expectedLastHardWorkText = `${timeDifference.hours}h ago`;
+      }
+
+      expect(infoBarHardWork).toContain(expectedLastHardWorkText);
+    }
+
+    /* Deposited amount should be 0 if user have no deps in vault or disconnected */
+    const deposited = await page.getByTestId("infoBarDeposited").innerText();
+
+    expect(deposited).toBe("0");
+
+    await page.goBack();
+  }
+});

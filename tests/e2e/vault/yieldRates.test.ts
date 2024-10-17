@@ -323,7 +323,7 @@ test("Should display yield rates info correctly", async ({ page }) => {
     const lifetimeVsHoldAPR =
       vaultData.apr?.vsHoldLifetime &&
       getTimeDifference(vaultData.created)?.days >= 3
-        ? Number(vaultData.apr?.vsHoldLifetime).toFixed(1)
+        ? Number(vaultData.apr?.vsHoldLifetime).toFixed(2)
         : 0;
 
     const currentTime = Math.floor(Date.now() / 1000);
@@ -339,7 +339,7 @@ test("Should display yield rates info correctly", async ({ page }) => {
     const vsHoldAPR = (
       (Number(lifetimeVsHoldAPR) / 365) *
       Number(daysFromCreation)
-    ).toFixed(1);
+    ).toFixed(2);
 
     if (isVsActive) {
       const vaultVsHold = await page.getByTestId("vaultVsHold").innerText();
@@ -369,55 +369,61 @@ test("Should display yield rates info correctly", async ({ page }) => {
     }
     /* VAULT VS Vault token HODL percentage amount should be displayed */
     /* from deployed date and Est Annual correctly                     */
-    // let lifetimeTokensHold: any = [];
+    let lifetimeTokensHold: any = [];
 
-    // const strategyAssets: string[] =
-    //   vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
+    const strategyAssets: string[] =
+      vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-    // if (vaultData.apr?.vsHoldAssetsLifetime) {
-    //   lifetimeTokensHold = strategyAssets.map((_: string, index: number) => {
-    //     const yearPercentDiff =
-    //       Number(vaultData.apr?.vsHoldAssetsLifetime[index]) || 0;
+    if (vaultData.apr?.vsHoldAssetsLifetime) {
+      lifetimeTokensHold = strategyAssets.map((_: string, index: number) => {
+        const yearPercentDiff =
+          Number(vaultData.apr?.vsHoldAssetsLifetime[index]) || 0;
 
-    //     const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
+        const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
 
-    //     return {
-    //       latestAPR: percentDiff.toFixed(1),
-    //       APR: yearPercentDiff.toFixed(1),
-    //     };
-    //   });
-    // }
+        return {
+          latestAPR: percentDiff.toFixed(2),
+          APR: yearPercentDiff.toFixed(2),
+        };
+      });
+    }
 
-    // if (isVsActive) {
-    //   lifetimeTokensHold.forEach(async (token: any, index: number) => {
-    //     const tokenHold = await page
-    //       .getByTestId(`tokensHold${index}`)
-    //       .innerText();
-    //     const lifetimeTokenHold = await page
-    //       .getByTestId(`lifetimeTokensHold${index}`)
-    //       .innerText();
+    if (isVsActive) {
+      for (const [index, token] of lifetimeTokensHold.entries()) {
+        await page.waitForSelector(`[data-testid='tokensHold${index}']`);
+        await page.waitForSelector(
+          `[data-testid='lifetimeTokensHold${index}']`
+        );
 
-    //     let tokenHoldNumber = tokenHold.includes("+")
-    //       ? Number(tokenHold.slice(1, -1))
-    //       : Number(tokenHold.slice(0, -1));
-    //     let lifetimeTokenHoldNumber = lifetimeTokenHold.includes("+")
-    //       ? Number(lifetimeTokenHold.slice(1, -1))
-    //       : Number(lifetimeTokenHold.slice(0, -1));
+        const tokenHold = await page
+          .getByTestId(`tokensHold${index}`)
+          .innerText();
+        const lifetimeTokenHold = await page
+          .getByTestId(`lifetimeTokensHold${index}`)
+          .innerText();
 
-    //     const isTokenHoldNumber = isDifferenceWithinTwentyPercent(
-    //       Number(token.latestAPR),
-    //       tokenHoldNumber
-    //     );
+        let tokenHoldNumber = tokenHold.includes("+")
+          ? Number(tokenHold.slice(1, -1))
+          : Number(tokenHold.slice(0, -1));
 
-    //     const isLifetimeTokenHoldNumber = isDifferenceWithinTwentyPercent(
-    //       Number(token.APR),
-    //       lifetimeTokenHoldNumber
-    //     );
+        let lifetimeTokenHoldNumber = lifetimeTokenHold.includes("+")
+          ? Number(lifetimeTokenHold.slice(1, -1))
+          : Number(lifetimeTokenHold.slice(0, -1));
 
-    //     expect(isTokenHoldNumber).toBeTruthy();
-    //     expect(isLifetimeTokenHoldNumber).toBeTruthy();
-    //   });
-    // }
+        const isTokenHoldNumber = isDifferenceWithinTwentyPercent(
+          Number(token.latestAPR),
+          tokenHoldNumber
+        );
+
+        const isLifetimeTokenHoldNumber = isDifferenceWithinTwentyPercent(
+          Number(token.APR),
+          lifetimeTokenHoldNumber
+        );
+
+        expect(isTokenHoldNumber).toBeTruthy();
+        expect(isLifetimeTokenHoldNumber).toBeTruthy();
+      }
+    }
 
     await page.goBack();
   }
