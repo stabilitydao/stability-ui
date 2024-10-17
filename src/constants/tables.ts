@@ -188,7 +188,7 @@ const USERS_TABLE: TTableColumn[] = [
   {
     name: "Earned",
     keyName: "earned",
-    sortType: "none",
+    sortType: "descendentic",
     dataType: "number",
   },
   {

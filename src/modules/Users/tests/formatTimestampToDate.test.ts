@@ -3,28 +3,53 @@ import { describe, it, expect } from "vitest";
 import { formatTimestampToDate } from "../functions";
 
 describe("formatTimestampToDate", () => {
-  it("should format timestamp correctly", () => {
+  it("should format timestamp correctly for 1st January", () => {
     const timestamp = 1672531199;
-    expect(formatTimestampToDate(timestamp)).toBe("1.01");
+    expect(formatTimestampToDate(timestamp)).toBe("1st Jan");
   });
 
-  it("should handle timestamps with single-digit months", () => {
-    const timestamp = 1672537600;
-    expect(formatTimestampToDate(timestamp)).toBe("1.01");
+  it("should format timestamp correctly for 2nd January", () => {
+    const timestamp = 1672666300;
+    expect(formatTimestampToDate(timestamp)).toBe("2nd Jan");
   });
 
-  it("should handle timestamps with single-digit days", () => {
-    const timestamp = 1672536400;
-    expect(formatTimestampToDate(timestamp)).toBe("1.01");
+  it("should format timestamp correctly for 3rd January", () => {
+    const timestamp = 1672766300;
+    expect(formatTimestampToDate(timestamp)).toBe("3rd Jan");
   });
 
-  it("should handle leap years correctly", () => {
-    const leapYearTimestamp = 1582934400;
-    expect(formatTimestampToDate(leapYearTimestamp)).toBe("29.02");
+  it("should format timestamp correctly for 4th January", () => {
+    const timestamp = 1672866300;
+    expect(formatTimestampToDate(timestamp)).toBe("4th Jan");
   });
 
-  it("should handle edge cases", () => {
-    const edgeCaseTimestamp = 1640908800;
-    expect(formatTimestampToDate(edgeCaseTimestamp)).toBe("31.12");
+  it("should format timestamp correctly for 11th January", () => {
+    const timestamp = 1673446300;
+    expect(formatTimestampToDate(timestamp)).toBe("11th Jan");
+  });
+
+  it("should format timestamp correctly for 12th January", () => {
+    const timestamp = 1673546300;
+    expect(formatTimestampToDate(timestamp)).toBe("12th Jan");
+  });
+
+  it("should format timestamp correctly for 13th January", () => {
+    const timestamp = 1673646300;
+    expect(formatTimestampToDate(timestamp)).toBe("13th Jan");
+  });
+
+  it("should format timestamp correctly for 21st January", () => {
+    const timestamp = 1674276300;
+    expect(formatTimestampToDate(timestamp)).toBe("21st Jan");
+  });
+
+  it("should format timestamp correctly for 22nd January", () => {
+    const timestamp = 1674376300;
+    expect(formatTimestampToDate(timestamp)).toBe("22nd Jan");
+  });
+
+  it("should format timestamp correctly for 23rd January", () => {
+    const timestamp = 1674476300;
+    expect(formatTimestampToDate(timestamp)).toBe("23rd Jan");
   });
 });
