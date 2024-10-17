@@ -29,7 +29,7 @@ const Assets = (): JSX.Element => {
     initTableData();
   }, []);
   return (
-    <div>
+    <div className="max-w-[1200px] w-full">
       <Breadcrumbs links={["Platform", "Assets"]} />
 
       <HeadingText text="Assets" scale={1} />

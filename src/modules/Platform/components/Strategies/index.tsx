@@ -41,7 +41,7 @@ const Strategies = (): JSX.Element => {
   }, []);
 
   return (
-    <div>
+    <div className="max-w-[1200px] w-full">
       <Breadcrumbs links={["Platform", "Strategies"]} />
 
       <HeadingText text="Strategies" scale={1} />

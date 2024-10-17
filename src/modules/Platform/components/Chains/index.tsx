@@ -47,7 +47,7 @@ const Chains = (): JSX.Element => {
     initTableData();
   }, [$apiData]);
   return (
-    <div>
+    <div className="max-w-[1200px] w-full">
       <Breadcrumbs links={["Platform", "Chains"]} />
 
       <HeadingText text="Chains" scale={1} styles="mt-3" />

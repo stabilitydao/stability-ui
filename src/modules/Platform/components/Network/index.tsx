@@ -16,7 +16,7 @@ const Network = (): JSX.Element => {
   const $apiData: ApiMainReply = useStore(apiData);
 
   return (
-    <div>
+    <div className="max-w-[1200px] w-full">
       <Breadcrumbs links={["Platform", "Network"]} />
 
       <HeadingText text="Network" scale={1} />

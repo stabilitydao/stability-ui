@@ -122,7 +122,7 @@ const Platform = (): JSX.Element => {
   ];
 
   return (
-    <div className="flex flex-col min-[1440px]:w-[1338px] gap-[36px]">
+    <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
       <div className="px-6">

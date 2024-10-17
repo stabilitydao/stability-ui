@@ -1,4 +1,4 @@
-import { HeadingText } from "@ui";
+import { Badge, HeadingText } from "@ui";
 
 import { formatTimestampToDate } from "../functions";
 
@@ -25,18 +25,13 @@ const Contests = ({ periodsData }: IContestsProps): JSX.Element => {
                     {formatTimestampToDate(contest.end)}
                   </span>
                 </div>
-                <div
-                  className={
-                    "h-[25px] text-[12px] inline-flex w-[100px] justify-center items-center font-semibold px-[8px] rounded-[100px] mb-2 " +
-                    (!index
-                      ? "bg-neutral-950 text-neutral-500"
-                      : index === 1
-                        ? "bg-success-950 border-[1px] border-success-400 text-success-400"
-                        : "bg-accent-950 border-[1px] border-accent-400 text-accent-400")
+                <Badge
+                  state={
+                    !index ? "default" : index === 1 ? "success" : "accent"
                   }
-                >
-                  {!index ? "Ended" : index === 1 ? "Ongoing" : "Future"}
-                </div>
+                  text={!index ? "Ended" : index === 1 ? "Ongoing" : "Future"}
+                  greater={true}
+                />
 
                 {!!contest.rewards.length && (
                   <div className="flex flex-col">

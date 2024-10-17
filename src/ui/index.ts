@@ -17,6 +17,7 @@ import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
 import { TableColumnSort } from "./TableColumnSort";
+import { Badge } from "./Badge";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -47,4 +48,5 @@ export {
   HeadingText,
   FieldValue,
   TableColumnSort,
+  Badge,
 };

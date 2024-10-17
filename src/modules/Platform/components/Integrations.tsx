@@ -34,7 +34,7 @@ const Integrations = (): JSX.Element => {
     initTableData();
   }, []);
   return (
-    <div>
+    <div className="max-w-[1200px] w-full">
       <Breadcrumbs links={["Platform", "Integrations"]} />
 
       <HeadingText text="Integrations" scale={1} />

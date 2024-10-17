@@ -27,14 +27,14 @@ const Users = (): JSX.Element => {
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
 
-  const { currentPeriod, previousPeriod, nextPeriod } =
-    findAllValidPeriods(contests);
+  // nextPeriod
+  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
 
-  const periodsData = [
-    contests[previousPeriod as keyof YieldContest],
-    contests[currentPeriod as keyof YieldContest],
-    contests[nextPeriod as keyof YieldContest],
-  ];
+  // const periodsData = [
+  //   contests[previousPeriod as keyof YieldContest],
+  //   contests[currentPeriod as keyof YieldContest],
+  //   contests[nextPeriod as keyof YieldContest],
+  // ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -72,7 +72,7 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   return (
-    <div className="flex flex-col xl:min-w-[1000px] gap-[36px]">
+    <div className="flex flex-col xl:min-w-[1000px] max-w-[1200px] gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
       {/* periodsData */}
       <Contests
