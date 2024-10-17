@@ -94,6 +94,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const { switchChain } = useSwitchChain();
 
   const $vaultData = useStore(vaultData);
+
   const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
@@ -1821,6 +1822,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     [underlyingToken, option]
   );
 
+  const isSingleTokenStrategyZap = useMemo(() => {
+    if (isSingleTokenStrategy) {
+      return isSingleTokenStrategy && option[0] != defaultOption.assets;
+    }
+    return option[0] != defaultOption.assets;
+  }, [isSingleTokenStrategy, option, defaultOption]);
+
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
@@ -2595,7 +2603,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
             <div className="flex flex-col items-start justify-end gap-2">
               {(option.length > 1 ||
-                isSingleTokenStrategy ||
+                (isSingleTokenStrategy && !isSingleTokenStrategyZap) ||
                 !isNotUnderlying) && (
                 <p
                   className={`text-[12px] flex justify-end items-end leading-3 text-neutral-500 uppercase mt-[75px] ${
@@ -2618,7 +2626,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 }`}
               >
                 {(option.length > 1 ||
-                  isSingleTokenStrategy ||
+                  (isSingleTokenStrategy && !isSingleTokenStrategyZap) ||
                   !isNotUnderlying) &&
                   option.map((address, index) => (
                     <div className="flex items-center gap-1" key={address}>
@@ -2727,7 +2735,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
               {option.length < 2 &&
                 isNotUnderlying &&
-                !isSingleTokenStrategy && (
+                isSingleTokenStrategyZap && (
                   <div>
                     <p
                       className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${

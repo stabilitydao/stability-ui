@@ -7,6 +7,7 @@ import {
   ASSETS_TABLE,
   INTEGRATIONS_TABLE,
   STRATEGIES_TABLE,
+  USERS_TABLE,
 } from "./tables";
 
 import {
@@ -292,4 +293,5 @@ export {
   ASSETS_TABLE,
   INTEGRATIONS_TABLE,
   STRATEGIES_TABLE,
+  USERS_TABLE,
 };

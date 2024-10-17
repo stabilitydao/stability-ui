@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
-import type { Chain, DeFiOrganization } from "@stabilitydao/stability";
+import type {
+  Chain,
+  DeFiOrganization,
+  YieldContest,
+} from "@stabilitydao/stability";
 
 // interfaces
 interface IL {
@@ -286,6 +290,13 @@ type TTableColumn = {
   unsortable?: boolean;
 };
 
+type TLeaderboard = {
+  rank: number;
+  address: TAddress;
+  deposit: number;
+  earned: number;
+};
+
 type TTAbleFiltersVariant = {
   name: string;
   state: boolean;
@@ -505,13 +516,15 @@ type TTableData =
   | IChainData[]
   | TAssetData[]
   | DeFiOrganization[]
-  | TTableStrategy[];
+  | TTableStrategy[]
+  | TLeaderboard[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
   | Dispatch<SetStateAction<TAssetData[]>>
   | Dispatch<SetStateAction<DeFiOrganization[]>>
-  | Dispatch<SetStateAction<TTableStrategy[]>>;
+  | Dispatch<SetStateAction<TTableStrategy[]>>
+  | Dispatch<SetStateAction<TLeaderboard[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -543,6 +556,9 @@ type TAPIData = {
       };
     };
   };
+};
+type TContests = {
+  [contestId: string]: YieldContest;
 };
 
 export type {
@@ -610,4 +626,6 @@ export type {
   TDispatchedTableData,
   TStrategyState,
   TTableStrategy,
+  TLeaderboard,
+  TContests,
 };
