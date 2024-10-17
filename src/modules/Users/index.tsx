@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
+import { Contests } from "./components";
+
 import { FullPageLoader, HeadingText, TableColumnSort } from "@ui";
 
 import { getShortAddress, sortTable } from "@utils";
 
-import { findCurrentAndPreviousPeriod } from "./functions";
+import { findAllValidPeriods, formatTimestampToDate } from "./functions";
 
 import { apiData } from "@store";
 
@@ -25,8 +27,14 @@ const Users = (): JSX.Element => {
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
 
-  const { currentPeriod, previousPeriod } =
-    findCurrentAndPreviousPeriod(contests);
+  const { currentPeriod, previousPeriod, nextPeriod } =
+    findAllValidPeriods(contests);
+
+  const periodsData = [
+    contests[previousPeriod],
+    contests[currentPeriod],
+    contests[nextPeriod],
+  ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -66,19 +74,40 @@ const Users = (): JSX.Element => {
     <div className="flex flex-col xl:min-w-[1000px] gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
 
+      <Contests periodsData={periodsData} />
+
+      <HeadingText text="Leaderboard" scale={2} styles="mb-0" />
+
       <div className="flex justify-center items-center font-semibold relative text-[14px]">
-        {TABLE_TYPES.map((type: string) => (
-          <p
-            key={type}
-            className={`w-[100px] whitespace-nowrap z-20 text-center p-4 border-b-[1.5px] border-transparent ${allContests[type]?.length ? "cursor-pointer" : "cursor-default hover:border-transparent opacity-50"} ${activeContest === type ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
-            onClick={() => allContests[type]?.length && setActiveContest(type)}
-          >
-            {type}
-          </p>
-        ))}
+        {TABLE_TYPES.map((type: string) => {
+          const isActive = activeContest === type;
+          const hasContestData = !!allContests[type]?.length;
+          let dateRange = type;
+
+          switch (type) {
+            case "PAST":
+              dateRange = `${formatTimestampToDate(contests[previousPeriod].start)} - ${formatTimestampToDate(contests[previousPeriod].end)}`;
+              break;
+            case "ACTIVE":
+              dateRange = `${formatTimestampToDate(contests[currentPeriod].start)} - ${formatTimestampToDate(contests[currentPeriod].end)}`;
+              break;
+
+            default:
+              break;
+          }
+          return (
+            <p
+              key={type}
+              className={`w-[120px] whitespace-nowrap z-20 text-center p-4 border-b-[1.5px] border-transparent ${hasContestData ? "cursor-pointer" : "cursor-default hover:border-transparent opacity-50"} ${isActive ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+              onClick={() => hasContestData && setActiveContest(type)}
+            >
+              {dateRange}
+            </p>
+          );
+        })}
       </div>
 
-      {$apiData?.leaderboards ? (
+      {tableData.length ? (
         <table className="font-manrope">
           <thead className="bg-accent-950 text-neutral-600 h-[36px]">
             <tr className="text-[12px] uppercase">

@@ -37,7 +37,7 @@ const Header = (): JSX.Element => {
   return (
     <WagmiLayout>
       <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px]">
-        <span className="title sm:w-4/12 md:w-5/12">
+        <span className="title">
           <a data-testid="stability-logo" href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
             <span className="block text-[20px] font-semibold text-[#A995FF]">
@@ -45,7 +45,7 @@ const Header = (): JSX.Element => {
             </span>
           </a>
         </span>
-        <div className="menu w-2/12 text-[16px]">
+        <div className="menu text-[16px]">
           <a
             data-testid="vaults-link"
             className={isVaults ? "active" : ""}
@@ -60,7 +60,7 @@ const Header = (): JSX.Element => {
             Platform
           </a>
         </div>
-        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[15px] gap-3">
+        <div className="flex justify-end mr-[15px] gap-3">
           <Wallet />
           <div className="burger-menu" onClick={toggleMenu}>
             {menu ? (

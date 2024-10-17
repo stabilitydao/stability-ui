@@ -1,3 +1,4 @@
-import { findCurrentAndPreviousPeriod } from "./findCurrentAndPreviousPeriod";
+import { findAllValidPeriods } from "./findAllValidPeriods";
+import { formatTimestampToDate } from "./formatTimestampToDate";
 
-export { findCurrentAndPreviousPeriod };
+export { findAllValidPeriods, formatTimestampToDate };
