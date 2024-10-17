@@ -170,6 +170,35 @@ const STRATEGIES_TABLE: TTableColumn[] = [
   },
 ];
 
+const USERS_TABLE: TTableColumn[] = [
+  {
+    name: "Rank",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Earned",
+    keyName: "earned",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Deposit",
+    keyName: "deposit",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -177,4 +206,5 @@ export {
   ASSETS_TABLE,
   INTEGRATIONS_TABLE,
   STRATEGIES_TABLE,
+  USERS_TABLE,
 };

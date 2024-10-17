@@ -286,6 +286,13 @@ type TTableColumn = {
   unsortable?: boolean;
 };
 
+type TLeaderboard = {
+  rank: number;
+  address: TAddress;
+  deposit: number;
+  earned: number;
+};
+
 type TTAbleFiltersVariant = {
   name: string;
   state: boolean;
@@ -505,13 +512,15 @@ type TTableData =
   | IChainData[]
   | TAssetData[]
   | DeFiOrganization[]
-  | TTableStrategy[];
+  | TTableStrategy[]
+  | TLeaderboard[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
   | Dispatch<SetStateAction<TAssetData[]>>
   | Dispatch<SetStateAction<DeFiOrganization[]>>
-  | Dispatch<SetStateAction<TTableStrategy[]>>;
+  | Dispatch<SetStateAction<TTableStrategy[]>>
+  | Dispatch<SetStateAction<TLeaderboard[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -610,4 +619,5 @@ export type {
   TDispatchedTableData,
   TStrategyState,
   TTableStrategy,
+  TLeaderboard,
 };
