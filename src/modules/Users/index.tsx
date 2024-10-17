@@ -74,12 +74,14 @@ const Users = (): JSX.Element => {
   return (
     <div className="flex flex-col xl:min-w-[1000px] gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
-
-      <Contests periodsData={periodsData} />
+      {/* periodsData */}
+      <Contests
+        periodsData={Object.entries(contests).map((contest) => contest[1])}
+      />
 
       <HeadingText text="Leaderboard" scale={2} styles="mb-0" />
 
-      <div className="flex justify-center items-center font-semibold relative text-[14px]">
+      <div className="flex flex-wrap justify-center items-center font-semibold relative text-[14px]">
         {TABLE_TYPES.map((type: string) => {
           const isActive = activeContest === type;
           // @ts-ignore

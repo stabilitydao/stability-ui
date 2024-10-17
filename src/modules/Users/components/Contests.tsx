@@ -18,10 +18,13 @@ const Contests = ({ periodsData }: IContestsProps): JSX.Element => {
             <div key={contest.start} className="w-1/3 p-8">
               <div className="bg-accent-950 h-full rounded-2xl p-5 flex flex-col gap-3 items-scenter justify-start text-[18px]">
                 <span className="text-[24px] font-bold">{contest.name}</span>
-                <p className="flex items-center text-accent-300 mb-2">
+                <div className="flex items-center text-accent-300 mb-2">
                   <img src="/calendar.svg" alt="calendar" className="mr-2" />
-                  {`${formatTimestampToDate(contest.start)} - ${formatTimestampToDate(contest.end)}`}
-                </p>
+                  <span>
+                    ${formatTimestampToDate(contest.start)} - $
+                    {formatTimestampToDate(contest.end)}
+                  </span>
+                </div>
                 <div
                   className={
                     "h-[25px] text-[12px] inline-flex w-[100px] justify-center items-center font-semibold px-[8px] rounded-[100px] mb-2 " +
