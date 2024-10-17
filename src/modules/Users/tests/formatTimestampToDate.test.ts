@@ -4,7 +4,7 @@ import { formatTimestampToDate } from "../functions";
 
 describe("formatTimestampToDate", () => {
   it("should format timestamp correctly for 1st January", () => {
-    const timestamp = 1672531199;
+    const timestamp = 1672541199;
     expect(formatTimestampToDate(timestamp)).toBe("1st Jan");
   });
 
