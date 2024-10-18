@@ -83,10 +83,13 @@ const Users = (): JSX.Element => {
 
       <ContestsOverview periodsData={periodsData} />
 
-      <div className="flex flex-col items-center mt-[-30px]">
-        <button className="bg-accent-900 max-w-[250px] text-[14px] font-semibold h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full">
-          <a href="/contests">All Contests</a>
-        </button>
+      <div className="flex flex-col items-center ">
+        <a
+          className="bg-accent-900 max-w-[250px] min-w-[100px] text-[14px] font-semibold h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
+          href="/contests"
+        >
+          All Contests
+        </a>
       </div>
 
       <HeadingText text="Leaderboard" scale={2} styles="mb-0" />
@@ -101,7 +104,10 @@ const Users = (): JSX.Element => {
 
           switch (type) {
             case "PAST":
-              dateRange = `${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].end)}`;
+              if (previousPeriod) {
+                dateRange = `${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].end)}`;
+              }
+
               break;
             case "ACTIVE":
               dateRange = `${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].end)}`;
