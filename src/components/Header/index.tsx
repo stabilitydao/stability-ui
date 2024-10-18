@@ -53,7 +53,14 @@ const Header = (): JSX.Element => {
           >
             Vaults
           </a>
-          <a className={currentPath === "users" ? "active" : ""} href="/users">
+          <a
+            className={
+              currentPath === "users" || currentPath.includes("contests")
+                ? "active"
+                : ""
+            }
+            href="/users"
+          >
             Users
           </a>
           <a className={isPlatform ? "active" : ""} href="/platform">
@@ -78,7 +85,7 @@ const Header = (): JSX.Element => {
             Vaults
           </a>
           <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "users" ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${currentPath === "users" || currentPath.includes("contests") ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/users"
           >
             Users

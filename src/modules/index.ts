@@ -12,6 +12,8 @@ import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Users } from "./Users";
+import { Contests } from "./Contests";
+import { Contest } from "./Contests/Contest";
 
 export {
   CreateVault,
@@ -28,4 +30,6 @@ export {
   Node,
   Users,
   Strategy,
+  Contests,
+  Contest,
 };

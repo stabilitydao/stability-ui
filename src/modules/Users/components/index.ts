@@ -1,3 +1,3 @@
-import { Contests } from "./Contests";
+import { ContestsOverview } from "./ContestsOverview";
 
-export { Contests };
+export { ContestsOverview };

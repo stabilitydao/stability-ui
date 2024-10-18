@@ -15,19 +15,31 @@
  * @returns {string} String representing the date in the format "day[suffix] month"
  */
 
+//todo: rewrite description & tests
+
 import { MONTHS } from "@constants";
 
-const formatTimestampToDate = (timestamp: number): string => {
+const formatTimestampToDate = (
+  timestamp: number,
+  withYear: boolean = false
+): string => {
   const date = new Date(timestamp * 1000);
   const day = date.getDate();
   const month = date.getMonth();
+  const year = date.getFullYear();
 
   const suffixes = ["th", "st", "nd", "rd"];
 
   const suffix =
     day >= 11 && day <= 13 ? suffixes[0] : suffixes[day % 10] || suffixes[0];
 
-  return `${day}${suffix} ${MONTHS[month]}`;
+  let formattedDate = `${day}${suffix} ${MONTHS[month]}`;
+
+  if (withYear) {
+    formattedDate += ` ${year}`;
+  }
+
+  return formattedDate;
 };
 
 export { formatTimestampToDate };

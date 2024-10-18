@@ -1567,7 +1567,7 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@stabilitydao/stability@=0.18.3":
+"@stabilitydao/stability@^0.18.3":
   version "0.18.3"
   resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.18.3.tgz#866a52aad0012b00975085ed486a42881be092a2"
   integrity sha512-QkAHhfZvwtZ8QGC31w9yR7WZb2BWVv2woMHiv3By4wWoWfGKj8QCJzHNHr6SIlTVe2Z9BOTtuGAJ8HcBTkGV9w==

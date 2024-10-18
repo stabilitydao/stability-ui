@@ -1,0 +1,10 @@
+---
+import {Contests} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Network">
+    <div class="max-w-[1200px]">
+        <Contests client:only="react" />
+    </div>
+</Layout>

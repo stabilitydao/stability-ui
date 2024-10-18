@@ -517,14 +517,16 @@ type TTableData =
   | TAssetData[]
   | DeFiOrganization[]
   | TTableStrategy[]
-  | TLeaderboard[];
+  | TLeaderboard[]
+  | IExtendedYieldContest[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
   | Dispatch<SetStateAction<TAssetData[]>>
   | Dispatch<SetStateAction<DeFiOrganization[]>>
   | Dispatch<SetStateAction<TTableStrategy[]>>
-  | Dispatch<SetStateAction<TLeaderboard[]>>;
+  | Dispatch<SetStateAction<TLeaderboard[]>>
+  | Dispatch<SetStateAction<IExtendedYieldContest[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -557,9 +559,16 @@ type TAPIData = {
     };
   };
 };
+
 type TContests = {
   [contestId: string]: YieldContest;
 };
+
+interface IExtendedYieldContest extends YieldContest {
+  id: string;
+  status: number;
+  rewardsLength: number;
+}
 
 export type {
   TPlatformData,
@@ -628,4 +637,5 @@ export type {
   TTableStrategy,
   TLeaderboard,
   TContests,
+  IExtendedYieldContest,
 };

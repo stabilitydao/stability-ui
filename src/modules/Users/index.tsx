@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
-import { Contests } from "./components";
+import { ContestsOverview } from "./components";
 
 import { FullPageLoader, HeadingText, TableColumnSort } from "@ui";
 
-import { getShortAddress, sortTable } from "@utils";
+import { getShortAddress, sortTable, formatTimestampToDate } from "@utils";
 
-import { findAllValidPeriods, formatTimestampToDate } from "./functions";
+import { findAllValidPeriods } from "./functions";
 
 import { apiData } from "@store";
 
@@ -27,14 +27,20 @@ const Users = (): JSX.Element => {
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
 
-  // nextPeriod
-  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
+  const { currentPeriod, previousPeriod, nextPeriod } =
+    findAllValidPeriods(contests);
 
-  // const periodsData = [
-  //   contests[previousPeriod as keyof YieldContest],
-  //   contests[currentPeriod as keyof YieldContest],
-  //   contests[nextPeriod as keyof YieldContest],
-  // ];
+  const periodsData = [
+    {
+      id: previousPeriod || "",
+      ...contests[previousPeriod as keyof YieldContest],
+    },
+    {
+      id: currentPeriod || "",
+      ...contests[currentPeriod as keyof YieldContest],
+    },
+    { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
+  ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -74,10 +80,14 @@ const Users = (): JSX.Element => {
   return (
     <div className="flex flex-col xl:min-w-[1000px] max-w-[1200px] gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
-      {/* periodsData */}
-      <Contests
-        periodsData={Object.entries(contests).map((contest) => contest[1])}
-      />
+
+      <ContestsOverview periodsData={periodsData} />
+
+      <div className="flex flex-col items-center mt-[-30px]">
+        <button className="bg-accent-900 max-w-[250px] text-[14px] font-semibold h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full">
+          <a href="/contests">All Contests</a>
+        </button>
+      </div>
 
       <HeadingText text="Leaderboard" scale={2} styles="mb-0" />
 

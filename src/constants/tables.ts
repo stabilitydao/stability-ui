@@ -199,6 +199,41 @@ const USERS_TABLE: TTableColumn[] = [
   },
 ];
 
+const CONTESTS_TABLE: TTableColumn[] = [
+  {
+    name: "Status",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Name",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Dates",
+    keyName: "start",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Task",
+    keyName: "minEarn",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Rewards",
+    keyName: "rewardsLength",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -207,4 +242,5 @@ export {
   INTEGRATIONS_TABLE,
   STRATEGIES_TABLE,
   USERS_TABLE,
+  CONTESTS_TABLE,
 };
