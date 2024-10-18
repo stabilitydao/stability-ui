@@ -84,6 +84,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
           isCopy: false,
         },
       ];
+
       if (underlyingToken?.symbol) {
         contractsInfo.push({
           logo: underlyingToken.logo,

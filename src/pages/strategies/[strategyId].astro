@@ -1,0 +1,11 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { Strategy } from "@modules";
+const { strategyId } = Astro.params as {strategyId:string};
+---
+
+<Layout>
+    <div class="my-vault max-w-[1200px]">
+        <Strategy strategyId={strategyId} client:only="react" />
+    </div>
+</Layout>

@@ -18,6 +18,8 @@ import { getLocalStorageData } from "./functions/getLocalStorageData";
 import { dataSorter } from "./functions/dataSorter";
 import { getShortAddress } from "./functions/getShortAddress";
 import { sortTable } from "./functions/sortTable";
+import { formatTimestampToDate } from "./functions/formatTimestampToDate";
+import { getNFTSymbol } from "./functions/getNFTSymbol";
 
 export {
   getTokenData,
@@ -40,4 +42,6 @@ export {
   dataSorter,
   getShortAddress,
   sortTable,
+  formatTimestampToDate,
+  getNFTSymbol,
 };

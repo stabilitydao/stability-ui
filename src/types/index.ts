@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
-import type { Chain, DeFiOrganization } from "@stabilitydao/stability";
+import type {
+  Chain,
+  DeFiOrganization,
+  YieldContest,
+} from "@stabilitydao/stability";
 
 // interfaces
 interface IL {
@@ -286,6 +290,13 @@ type TTableColumn = {
   unsortable?: boolean;
 };
 
+type TLeaderboard = {
+  rank?: number;
+  address: TAddress;
+  deposit: number;
+  earned: number;
+};
+
 type TTAbleFiltersVariant = {
   name: string;
   state: boolean;
@@ -505,13 +516,17 @@ type TTableData =
   | IChainData[]
   | TAssetData[]
   | DeFiOrganization[]
-  | TTableStrategy[];
+  | TTableStrategy[]
+  | TLeaderboard[]
+  | IExtendedYieldContest[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
   | Dispatch<SetStateAction<TAssetData[]>>
   | Dispatch<SetStateAction<DeFiOrganization[]>>
-  | Dispatch<SetStateAction<TTableStrategy[]>>;
+  | Dispatch<SetStateAction<TTableStrategy[]>>
+  | Dispatch<SetStateAction<TLeaderboard[]>>
+  | Dispatch<SetStateAction<IExtendedYieldContest[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -544,6 +559,16 @@ type TAPIData = {
     };
   };
 };
+
+type TContests = {
+  [contestId: string]: YieldContest;
+};
+
+interface IExtendedYieldContest extends YieldContest {
+  id: string;
+  status: number;
+  rewardsLength: number;
+}
 
 export type {
   TPlatformData,
@@ -610,4 +635,7 @@ export type {
   TDispatchedTableData,
   TStrategyState,
   TTableStrategy,
+  TLeaderboard,
+  TContests,
+  IExtendedYieldContest,
 };

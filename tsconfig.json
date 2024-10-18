@@ -20,6 +20,8 @@
       "@types": ["src/types"],
       "@modules": ["src/modules"],
       "@ui": ["src/ui"]
-    }
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }

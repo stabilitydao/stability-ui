@@ -1,0 +1,11 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Contest} from "@modules"
+const { contestId } = Astro.params;
+---
+
+<Layout title="Contest">
+    <div class="my-vault  max-w-[1200px]">
+        <Contest contestId={contestId} client:only="react" />
+    </div>
+</Layout>
