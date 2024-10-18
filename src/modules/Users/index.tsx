@@ -81,6 +81,7 @@ const Users = (): JSX.Element => {
     <div className="flex flex-col xl:min-w-[1000px] max-w-[1200px] gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
 
+      <HeadingText text="Contests" scale={2} styles="mb-0" />
       <ContestsOverview periodsData={periodsData} />
 
       <div className="flex flex-col items-center ">

@@ -9,6 +9,7 @@ import {
   STRATEGIES_TABLE,
   USERS_TABLE,
   CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
 } from "./tables";
 
 import {
@@ -296,4 +297,5 @@ export {
   STRATEGIES_TABLE,
   USERS_TABLE,
   CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
 };

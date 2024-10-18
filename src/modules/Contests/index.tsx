@@ -45,6 +45,10 @@ const Contests = (): JSX.Element => {
           status = 1;
         }
 
+        const rewardsLength = Array.isArray(contest[1].rewards)
+          ? contest[1].rewards.length
+          : contest[1].rewards;
+
         return {
           id: contest[0],
           name: contest[1].name,
@@ -53,7 +57,7 @@ const Contests = (): JSX.Element => {
           end: contest[1].end,
           minEarn: contest[1].minEarn,
           rewards: contest[1].rewards,
-          rewardsLength: contest[1].rewards.length,
+          rewardsLength,
         };
       });
 
@@ -64,7 +68,6 @@ const Contests = (): JSX.Element => {
   useEffect(() => {
     initTableData();
   }, [contests]);
-
   return (
     <div className="xl:w-[1200px]  w-full max-w-[1200px]">
       <Breadcrumbs links={["Users", "Contests"]} />
@@ -117,13 +120,17 @@ const Contests = (): JSX.Element => {
                             greater={true}
                           />
                         </td>
-                        <td className="px-4 py-3 text-center">{name}</td>
+                        <td
+                          className={`px-4 py-3 text-center ${contests[id].hidden ? "text-neutral-500" : ""}`}
+                        >
+                          {name}
+                        </td>
                         <td className="text-center px-4 py-3">
                           {`${formatTimestampToDate(start, true)} - ${formatTimestampToDate(end, true)}`}
                         </td>
                         <td className="text-center px-4 py-3">{minEarn}</td>
                         <td className="text-left px-4 py-3">
-                          {rewards != "TBA" && rewards.length ? (
+                          {Array.isArray(rewards) ? (
                             <div className="flex items-center flex-wrap gap-2">
                               {rewards?.map((reward, index: number) => (
                                 <div key={index} className="flex items-center">

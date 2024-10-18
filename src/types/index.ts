@@ -291,7 +291,7 @@ type TTableColumn = {
 };
 
 type TLeaderboard = {
-  rank: number;
+  rank?: number;
   address: TAddress;
   deposit: number;
   earned: number;

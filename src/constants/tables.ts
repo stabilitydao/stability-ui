@@ -234,6 +234,28 @@ const CONTESTS_TABLE: TTableColumn[] = [
   },
 ];
 
+const LEADERBOARD_TABLE: TTableColumn[] = [
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Deposit",
+    keyName: "deposit",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Earned",
+    keyName: "earned",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -243,4 +265,5 @@ export {
   STRATEGIES_TABLE,
   USERS_TABLE,
   CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
 };
