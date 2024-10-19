@@ -3,7 +3,13 @@ import {Platform} from '@modules';
 import Layout from '@layouts/Layout.astro';
 ---
 
-<Layout title="Platform">
+<Layout
+  title="Platform"
+  img="/platform.jpg"
+  metaTitle="Stability Platform"
+  metaUrl="https://stability.farm/platfprm"
+  metaDescription="If you are interested in what is under the hood of an on-chain asset management platform, then this page is for you."
+>
     <div class="platform">
         <Platform client:only="react" />
     </div>
