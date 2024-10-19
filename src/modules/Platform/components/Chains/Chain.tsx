@@ -80,7 +80,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
   const strategies = getChainStrategies(chainData.name);
 
   return (
-    <div className="flex flex-col lg:w-[960px]">
+    <div className="flex flex-col max-w-[1200px] w-full lg:w-[960px]  xl:min-w-[1200px]">
       <Breadcrumbs links={["Platform", "Chains", chainData.name]} />
 
       <div className="flex flex-col gap-[30px]">

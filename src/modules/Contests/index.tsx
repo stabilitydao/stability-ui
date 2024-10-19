@@ -69,7 +69,7 @@ const Contests = (): JSX.Element => {
     initTableData();
   }, [contests]);
   return (
-    <div className="xl:w-[1200px]  w-full max-w-[1200px]">
+    <div className="xl:min-w-[1200px] w-full max-w-[1200px]">
       <Breadcrumbs links={["Users", "Contests"]} />
       <HeadingText text="Contests" scale={1} />
       {tableData.length ? (

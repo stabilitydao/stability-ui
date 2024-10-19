@@ -16,7 +16,7 @@ const Strategy: React.FC<IProps> = ({ strategyId }) => {
   const strategy: Strategy =
     strategies[strategyId.toUpperCase() as keyof typeof StrategyShortId] || {};
   return (
-    <div className="flex flex-col lg:w-[960px]">
+    <div className="flex flex-col lg:w-[960px] xl:min-w-[1200px]">
       <Breadcrumbs
         links={["Platform", "Strategies", strategyId.toUpperCase()]}
       />

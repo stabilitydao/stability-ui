@@ -78,7 +78,7 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   return (
-    <div className="flex flex-col xl:min-w-[1000px] max-w-[1200px] gap-[36px]">
+    <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
 
       <HeadingText text="Contests" scale={2} styles="mb-0" />
