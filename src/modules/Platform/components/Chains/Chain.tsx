@@ -203,7 +203,9 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                   src={`https://raw.githubusercontent.com/stabilitydao/.github/main/${bridge.img}`}
                   alt={bridge.name}
                 />
-                <span className="text-center">{bridge.name}</span>
+                <span className="text-center truncated-text">
+                  {bridge.name}
+                </span>
               </a>
             ))}
           </div>
