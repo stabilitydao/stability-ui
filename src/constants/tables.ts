@@ -242,15 +242,16 @@ const LEADERBOARD_TABLE: TTableColumn[] = [
     dataType: "",
     unsortable: true,
   },
+
   {
-    name: "Deposit",
-    keyName: "deposit",
+    name: "Earned",
+    keyName: "earned",
     sortType: "none",
     dataType: "number",
   },
   {
-    name: "Earned",
-    keyName: "earned",
+    name: "Deposit",
+    keyName: "deposit",
     sortType: "none",
     dataType: "number",
   },

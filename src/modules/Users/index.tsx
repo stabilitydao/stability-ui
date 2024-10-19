@@ -128,53 +128,56 @@ const Users = (): JSX.Element => {
           );
         })}
       </div>
-
       {tableData.length ? (
-        <table className="font-manrope">
-          <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-            <tr className="text-[12px] uppercase">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <TableColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  sort={sortTable}
-                  table={tableStates}
-                  setTable={setTableStates}
-                  tableData={tableData}
-                  setTableData={setTableData}
-                />
-              ))}
-            </tr>
-          </thead>
-          <tbody className="text-[14px]">
-            {!!tableData.length &&
-              tableData.map((user: TLeaderboard) => (
-                <tr
-                  key={user.deposit + user.rank}
-                  className="h-[48px] hover:bg-accent-950"
-                >
-                  <td className="px-4 py-3 text-center">{user.rank}</td>
-                  <td
-                    className="px-4 py-3 text-center"
-                    style={{ fontFamily: "monospace" }}
+        <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
+          <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+            <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+              <tr className="text-[12px] uppercase">
+                {tableStates.map((value: TTableColumn, index: number) => (
+                  <TableColumnSort
+                    key={value.name + index}
+                    index={index}
+                    value={value.name}
+                    sort={sortTable}
+                    table={tableStates}
+                    setTable={setTableStates}
+                    tableData={tableData}
+                    setTableData={setTableData}
+                  />
+                ))}
+              </tr>
+            </thead>
+            <tbody className="text-[14px]">
+              {!!tableData.length &&
+                tableData.map((user: TLeaderboard) => (
+                  <tr
+                    key={user.address}
+                    className="h-[48px] hover:bg-accent-950"
                   >
-                    {getShortAddress(user.address, 6, 4)}
-                  </td>
-                  <td className="text-center px-4 py-3">
-                    {user.earned <= 0.01
-                      ? user.earned.toFixed(4)
-                      : user.earned.toFixed(2)}
-                  </td>
-                  <td className="text-center px-4 py-3">
-                    {user.deposit
-                      ? (Math.round(user.deposit * 100) / 100).toFixed(2)
-                      : ""}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+                    <td className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
+                      {user.rank}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-center"
+                      style={{ fontFamily: "monospace" }}
+                    >
+                      {getShortAddress(user.address, 6, 4)}
+                    </td>
+                    <td className="text-center px-4 py-3">
+                      {user.earned <= 0.01
+                        ? user.earned.toFixed(4)
+                        : user.earned.toFixed(2)}
+                    </td>
+                    <td className="text-center px-4 py-3">
+                      {user.deposit
+                        ? (Math.round(user.deposit * 100) / 100).toFixed(2)
+                        : ""}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <FullPageLoader />
       )}

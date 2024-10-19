@@ -72,9 +72,9 @@ const Contests = (): JSX.Element => {
     <div className="xl:w-[1200px]  w-full max-w-[1200px]">
       <Breadcrumbs links={["Users", "Contests"]} />
       <HeadingText text="Contests" scale={1} />
-      <div className="flex flex-col items-center w-full">
-        {tableData.length ? (
-          <table className="font-manrope w-full">
+      {tableData.length ? (
+        <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[800px]">
+          <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[800px] lg:min-w-full">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[12px] uppercase">
                 {tableStates.map((value: TTableColumn, index: number) => (
@@ -113,7 +113,7 @@ const Contests = (): JSX.Element => {
                         className="h-[48px] hover:bg-accent-950 cursor-pointer"
                         onClick={() => toContest(id)}
                       >
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 text-center sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10">
                           <Badge
                             state={badgeState}
                             text={badgeText}
@@ -183,10 +183,10 @@ const Contests = (): JSX.Element => {
                 )}
             </tbody>
           </table>
-        ) : (
-          <FullPageLoader />
-        )}
-      </div>
+        </div>
+      ) : (
+        <FullPageLoader />
+      )}
     </div>
   );
 };

@@ -837,7 +837,6 @@ describe("getShortAddress", () => {
   });
 });
 
-//todo: update this test
 describe("formatTimestampToDate", () => {
   it("should format timestamp correctly for 1st January", () => {
     const timestamp = 1672541199;
@@ -887,5 +886,30 @@ describe("formatTimestampToDate", () => {
   it("should format timestamp correctly for 23rd January", () => {
     const timestamp = 1674476300;
     expect(formatTimestampToDate(timestamp)).toBe("23rd Jan");
+  });
+
+  it("should format timestamp correctly for 1st January with year", () => {
+    const timestamp = 1672541199;
+    expect(formatTimestampToDate(timestamp, true)).toBe("1st Jan 2023");
+  });
+
+  it("should format timestamp correctly for 2nd January with year", () => {
+    const timestamp = 1672666300;
+    expect(formatTimestampToDate(timestamp, true)).toBe("2nd Jan 2023");
+  });
+
+  it("should format timestamp correctly for 11th January with year", () => {
+    const timestamp = 1673446300;
+    expect(formatTimestampToDate(timestamp, true)).toBe("11th Jan 2023");
+  });
+
+  it("should format timestamp correctly for 21st January with year", () => {
+    const timestamp = 1674276300;
+    expect(formatTimestampToDate(timestamp, true)).toBe("21st Jan 2023");
+  });
+
+  it("should format timestamp correctly for 23rd January with year", () => {
+    const timestamp = 1674476300;
+    expect(formatTimestampToDate(timestamp, true)).toBe("23rd Jan 2023");
   });
 });
