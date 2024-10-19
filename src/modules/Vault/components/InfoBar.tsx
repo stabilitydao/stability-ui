@@ -83,7 +83,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   );
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl flex justify-between items-center h-[56px] px-6">
+      <div className="bg-accent-900 border-[2px] border-accent-950 rounded-t-2xl lg:flex hidden justify-between items-center h-[56px] px-6">
         <div
           data-testid="infoBarHeader"
           className="hidden lg:flex justify-between items-center gap-0.5 w-full"
