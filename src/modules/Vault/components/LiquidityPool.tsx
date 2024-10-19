@@ -105,10 +105,15 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
             <FieldValue
               name="TVL"
               value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+              testId="poolTVL"
             />
 
             {!!vault.pool.fee && (
-              <FieldValue name="FEE" value={`${vault.pool.fee}%`} />
+              <FieldValue
+                name="FEE"
+                value={`${vault.pool.fee}%`}
+                testId="poolFee"
+              />
             )}
           </div>
           <div className="flex flex-col gap-5">
@@ -116,6 +121,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
               poolAssets.map((poolAsset, index: number) => (
                 <div
                   key={poolAsset.amount}
+                  data-testid="poolAsset"
                   className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col"
                 >
                   <div className="h-[12px] flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">

@@ -21,7 +21,7 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
     $apiData?.network.nodes[machineIdHash];
 
   return (
-    <div>
+    <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
       <Breadcrumbs
         links={["Platform", "Network", `Node ${shortMachineId(machineIdHash)}`]}
       />

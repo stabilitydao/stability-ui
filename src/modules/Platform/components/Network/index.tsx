@@ -2,11 +2,11 @@ import { useStore } from "@nanostores/react";
 
 import { type ApiMainReply } from "@stabilitydao/stability";
 
-import { Breadcrumbs } from "@ui";
+import { Breadcrumbs, HeadingText } from "@ui";
 
 import { apiData } from "@store";
 
-import { shortMachineId } from "./Node.tsx";
+import { shortMachineId } from "./Node";
 
 const shortServiceName = (service: string): string => {
   return service.replace(/ v[0-9a-z\.\-]+$/, "");
@@ -16,14 +16,14 @@ const Network = (): JSX.Element => {
   const $apiData: ApiMainReply = useStore(apiData);
 
   return (
-    <div>
+    <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
       <Breadcrumbs links={["Platform", "Network"]} />
 
-      <h1>Network</h1>
+      <HeadingText text="Network" scale={1} />
 
-      <h2 className="mb-5">Nodes</h2>
+      <HeadingText text="Nodes" scale={2} styles="mb-7" />
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex items-stretch justify-center flex-wrap gap-4">
         {Object.keys($apiData?.network.nodes || []).map((machineId) => (
           <a
             key={machineId}

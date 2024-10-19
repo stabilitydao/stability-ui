@@ -71,7 +71,7 @@ const CHAINS_TABLE: TTableColumn[] = [
   {
     name: "ID",
     keyName: "chainId",
-    sortType: "none",
+    sortType: "ascendentic",
     dataType: "number",
   },
   {
@@ -96,6 +96,12 @@ const CHAINS_TABLE: TTableColumn[] = [
   {
     name: "Bridges",
     keyName: "bridgesCount",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Protocols",
+    keyName: "protocolsCount",
     sortType: "none",
     dataType: "number",
   },
@@ -170,6 +176,93 @@ const STRATEGIES_TABLE: TTableColumn[] = [
   },
 ];
 
+const USERS_TABLE: TTableColumn[] = [
+  {
+    name: "Rank",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Earned",
+    keyName: "earned",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
+    name: "Deposit",
+    keyName: "deposit",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+const CONTESTS_TABLE: TTableColumn[] = [
+  {
+    name: "Status",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Name",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Dates",
+    keyName: "start",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Task",
+    keyName: "minEarn",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Rewards",
+    keyName: "rewardsLength",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+const LEADERBOARD_TABLE: TTableColumn[] = [
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+
+  {
+    name: "Earned",
+    keyName: "earned",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Deposit",
+    keyName: "deposit",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -177,4 +270,7 @@ export {
   ASSETS_TABLE,
   INTEGRATIONS_TABLE,
   STRATEGIES_TABLE,
+  USERS_TABLE,
+  CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
 };

@@ -4,7 +4,7 @@ import { assets } from "@stabilitydao/stability";
 
 import { sortTable } from "@utils";
 
-import { Breadcrumbs, TableColumnSort } from "@ui";
+import { Breadcrumbs, TableColumnSort, HeadingText } from "@ui";
 
 import { ASSETS_TABLE } from "@constants";
 
@@ -29,10 +29,10 @@ const Assets = (): JSX.Element => {
     initTableData();
   }, []);
   return (
-    <div>
+    <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
       <Breadcrumbs links={["Platform", "Assets"]} />
 
-      <h1>Assets</h1>
+      <HeadingText text="Assets" scale={1} />
 
       <table className="font-manrope w-full">
         <thead className="bg-accent-950 text-neutral-600 h-[36px]">

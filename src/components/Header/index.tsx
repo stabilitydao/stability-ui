@@ -21,16 +21,17 @@ const Header = (): JSX.Element => {
 
   const [menu, setMenu] = useState(false);
 
-  const toggleMenu = () => {
-    setMenu((prev) => !prev);
-    const body = document.querySelector("body");
-    if (body) body.classList.toggle("no-scroll", !menu);
-  };
+  const isPlatform =
+    platformPaths.some((path) => path === currentPath) ||
+    currentPath.includes("network/") ||
+    currentPath.includes("chains/") ||
+    currentPath.includes("strategies/");
 
+  const isVaults = currentPath === "" || currentPath.includes("vault/");
   return (
     <WagmiLayout>
-      <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px]">
-        <span className="title sm:w-4/12 md:w-5/12">
+      <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
+        <span className="title">
           <a data-testid="stability-logo" href="/" title="Stability">
             <img src="/logo.svg" alt="Stability logo" />
             <span className="block text-[20px] font-semibold text-[#A995FF]">
@@ -38,42 +39,31 @@ const Header = (): JSX.Element => {
             </span>
           </a>
         </span>
-        <div className="menu w-2/12 text-[16px]">
+        <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
           <a
             data-testid="vaults-link"
-            className={
-              currentPath === "" || currentPath.includes("vault/")
-                ? "active"
-                : ""
-            }
+            className={isVaults ? "active" : ""}
             href="/"
           >
             Vaults
           </a>
           <a
-            data-testid="vaults-link"
-            className={currentPath === "users" ? "active" : ""}
+            className={
+              currentPath === "users" || currentPath.includes("contests")
+                ? "active"
+                : ""
+            }
             href="/users"
           >
             Users
           </a>
-          <a
-            data-testid="vaults-link"
-            className={
-              platformPaths.some((path) => path === currentPath) ||
-              currentPath.includes("network") ||
-              currentPath.includes("chains")
-                ? "active"
-                : ""
-            }
-            href="/platform"
-          >
+          <a className={isPlatform ? "active" : ""} href="/platform">
             Platform
           </a>
         </div>
-        <div className="flex sm:w-8/12 md:w-5/12 justify-end mr-[15px] gap-3">
+        <div className="flex justify-end mr-[15px] gap-3">
           <Wallet />
-          <div className="burger-menu" onClick={toggleMenu}>
+          <div className="burger-menu" onClick={() => setMenu((prev) => !prev)}>
             {menu ? (
               <img className="w-4 h-4" src="/close.svg" alt="close" />
             ) : (
@@ -83,21 +73,19 @@ const Header = (): JSX.Element => {
         </div>
         <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
           <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "" || currentPath.includes("vault/") ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${isVaults ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/"
           >
             Vaults
           </a>
           <a
-            data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${currentPath === "users" ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${currentPath === "users" || currentPath.includes("contests") ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/users"
           >
             Users
           </a>
           <a
-            data-testid="vaults-link"
-            className={`px-4 py-[10px] font-semibold ${platformPaths.some((path) => path === currentPath) || currentPath.includes("network") ? "bg-accent-800 rounded-[16px]" : ""}`}
+            className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"
           >
             Platform
