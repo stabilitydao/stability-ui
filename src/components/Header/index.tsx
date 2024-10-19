@@ -21,12 +21,6 @@ const Header = (): JSX.Element => {
 
   const [menu, setMenu] = useState(false);
 
-  const toggleMenu = () => {
-    setMenu((prev) => !prev);
-    const body = document.querySelector("body");
-    if (body) body.classList.toggle("no-scroll", !menu);
-  };
-
   const isPlatform =
     platformPaths.some((path) => path === currentPath) ||
     currentPath.includes("network/") ||
@@ -69,7 +63,7 @@ const Header = (): JSX.Element => {
         </div>
         <div className="flex justify-end mr-[15px] gap-3">
           <Wallet />
-          <div className="burger-menu" onClick={toggleMenu}>
+          <div className="burger-menu" onClick={() => setMenu((prev) => !prev)}>
             {menu ? (
               <img className="w-4 h-4" src="/close.svg" alt="close" />
             ) : (
