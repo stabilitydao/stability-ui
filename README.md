@@ -22,7 +22,7 @@
 | --- [**Network**](https://stability.farm/network)                                                                   | Development       | Stability p2p network nodes                     |
 | --- --- [**Node**](https://stability.farm/network/6e9a70eb6628e1295772218defdf254ce3200890cb16cc588c4dab5000972edd) | Development       | Node page                                       |
 | --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                              |
-| --- --- **Strategy**                                                                                                |                   | Strategy page                                   |
+| --- --- [**Strategy**](https://stability.farm/strategies/qsmf)                                                      |                   | Strategy page                                   |
 | --- [**Integrations**](https://stability.farm/integrations)                                                         | Development       | List of DeFi protocols and organizations        |
 | --- --- **Organization**                                                                                            |                   | Organization page                               |
 | --- [**Chains**](https://stability.farm/chains)                                                                     | Development       | List of EVM-networks known for the Platform     |
