@@ -34,8 +34,11 @@ interface IStrategyInfo {
 
 interface IChainData extends Chain {
   chainId: number;
+  protocolsCount: number;
   tvl: number;
+  protocols: TTableProtocol[];
 }
+
 type TAssetData = {
   symbol: string;
   website: string;
@@ -343,6 +346,8 @@ type TInputItem = {
 
 type TYearnProtocol = { title: string; link: string };
 
+type TTableProtocol = { name: string; img: string; website: string };
+
 type TChain = {
   name: string;
   id: string;
@@ -638,4 +643,5 @@ export type {
   TLeaderboard,
   TContests,
   IExtendedYieldContest,
+  TTableProtocol,
 };

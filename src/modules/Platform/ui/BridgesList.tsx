@@ -21,7 +21,7 @@ const BridgesList: React.FC<TProps> = ({ chainId, chainName }) => {
   let more;
   if (total > 6) {
     bridges = bridges.slice(0, 5);
-    more = <span className="text-[12px] ml-1">... {total - 5}</span>;
+    more = `+${total - 5}`;
   }
 
   return (
@@ -41,7 +41,11 @@ const BridgesList: React.FC<TProps> = ({ chainId, chainName }) => {
           />
         </a>
       ))}
-      {more}
+      {!!more && (
+        <p className="text-accent-400 text-[12px] flex items-center justify-center font-semibold w-6 h-6 bg-accent-900 rounded-full">
+          {more}
+        </p>
+      )}
     </div>
   );
 };

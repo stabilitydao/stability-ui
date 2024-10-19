@@ -8,7 +8,7 @@ import { apiData } from "@store";
 
 import { Breadcrumbs, HeadingText, TableColumnSort } from "@ui";
 
-import { BridgesList, ChainStatus } from "../../ui";
+import { BridgesList, ChainStatus, ProtocolsList } from "../../ui";
 
 import { formatNumber, sortTable } from "@utils";
 
@@ -17,6 +17,8 @@ import { CHAINS_TABLE } from "@constants";
 import { CHAINS_INFO } from "../../constants";
 
 import type { TTableColumn, IChainData } from "@types";
+
+import { getChainProtocols, integrations } from "@stabilitydao/stability";
 
 import type { ApiMainReply } from "@stabilitydao/stability";
 
@@ -32,12 +34,29 @@ const Chains = (): JSX.Element => {
 
   const initTableData = async () => {
     if (chains) {
-      const chainsData = Object.entries(chains).map((chain) => ({
-        ...chain[1],
-        chainId: Number(chain[1].chainId),
-        bridgesCount: getChainBridges(chain[1].name).length,
-        tvl: $apiData?.total.chainTvl[chain[0]] || 0,
-      }));
+      const chainsData = Object.entries(chains).map((chain) => {
+        const allChainProtocols = getChainProtocols(chain[0]);
+
+        const protocols = allChainProtocols.map(({ organization }) => ({
+          name: integrations[organization as string].name,
+          img: integrations[organization as string].img,
+          website: integrations[organization as string].website,
+        }));
+
+        const uniqueProtocols = protocols.filter(
+          (protocol, index, self) =>
+            index === self.findIndex((p) => p.name === protocol.name)
+        );
+
+        return {
+          ...chain[1],
+          chainId: Number(chain[1].chainId),
+          bridgesCount: getChainBridges(chain[1].name).length,
+          protocols: uniqueProtocols,
+          protocolsCount: protocols.length,
+          tvl: $apiData?.total.chainTvl[chain[0]] || 0,
+        };
+      });
 
       setTableData(chainsData);
     }
@@ -66,8 +85,8 @@ const Chains = (): JSX.Element => {
         ))}
       </div>
 
-      <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
-        <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+      <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[1000px]">
+        <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[1000px] lg:min-w-full">
           <thead className="bg-accent-950 text-neutral-600 h-[36px]">
             <tr className="text-[12px] uppercase">
               {tableStates.map((value: TTableColumn, index: number) => (
@@ -95,14 +114,15 @@ const Chains = (): JSX.Element => {
                   // chainLibGithubId,
                   // multisig,
                   tvl,
+                  protocols,
                 }) => (
                   <tr
                     onClick={() => toChain(chainId)}
                     key={chainId}
                     className="h-[48px] hover:bg-accent-950 cursor-pointer"
                   >
-                    <td className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
-                      <div className="flex whitespace-nowrap items-center">
+                    <td className="px-4 py-3 text-center sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10">
+                      <div className="flex font-bold whitespace-nowrap items-center">
                         {img && (
                           <img
                             src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
@@ -149,8 +169,13 @@ const Chains = (): JSX.Element => {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <div className="flex md:justify-center items-center">
+                      <div className="flex lg:justify-center items-center">
                         <BridgesList chainId={chainId} chainName={name} />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex lg:justify-center items-center">
+                        <ProtocolsList protocols={protocols} />
                       </div>
                     </td>
                   </tr>
