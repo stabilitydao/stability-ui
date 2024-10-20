@@ -49,6 +49,10 @@ const Contests = (): JSX.Element => {
           ? contest[1].rewards.length
           : contest[1].rewards;
 
+        const questsLength = contest[1].integration
+          ? Object.keys(contest[1].integration).length
+          : 0;
+
         return {
           id: contest[0],
           name: contest[1].name,
@@ -58,6 +62,8 @@ const Contests = (): JSX.Element => {
           minEarn: contest[1].minEarn,
           rewards: contest[1].rewards,
           rewardsLength,
+          quests: contest[1].integration,
+          questsLength,
         };
       });
 
@@ -94,7 +100,16 @@ const Contests = (): JSX.Element => {
             <tbody className="text-[14px]">
               {!!tableData.length &&
                 tableData.map(
-                  ({ id, status, name, start, end, minEarn, rewards }) => {
+                  ({
+                    id,
+                    status,
+                    name,
+                    start,
+                    end,
+                    minEarn,
+                    rewards,
+                    quests,
+                  }) => {
                     const badgeState = !status
                       ? "default"
                       : status === 1
@@ -175,6 +190,16 @@ const Contests = (): JSX.Element => {
                             </div>
                           ) : (
                             <div>TBA</div>
+                          )}
+                        </td>
+                        <td className="text-left px-4 py-3">
+                          {!!quests?.intract && (
+                            <img
+                              className="w-6"
+                              src="/intract.png"
+                              alt="Intract"
+                              title="Intract"
+                            />
                           )}
                         </td>
                       </tr>

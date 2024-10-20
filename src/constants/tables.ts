@@ -238,6 +238,12 @@ const CONTESTS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
+  {
+    name: "Quest",
+    keyName: "questsLength",
+    sortType: "none",
+    dataType: "number",
+  },
 ];
 
 const LEADERBOARD_TABLE: TTableColumn[] = [

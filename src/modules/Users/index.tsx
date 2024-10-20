@@ -76,7 +76,6 @@ const Users = (): JSX.Element => {
   useEffect(() => {
     initTableData();
   }, [activeContest, allContests]);
-
   return (
     <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
