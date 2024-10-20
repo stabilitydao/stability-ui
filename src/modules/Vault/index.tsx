@@ -55,7 +55,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
   }
   return vault && localVault ? (
     <WagmiLayout>
-      <main className="w-full mx-auto font-manrope">
+      <main className="w-full xl:min-w-[1200px] mx-auto font-manrope">
         <Breadcrumbs links={["Vaults", localVault.symbol]} />
         <VaultBar vault={localVault} />
         <div className="flex items-center lg:items-start justify-between gap-3 mt-6 flex-col lg:flex-row">

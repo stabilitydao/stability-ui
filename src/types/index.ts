@@ -569,10 +569,16 @@ type TContests = {
   [contestId: string]: YieldContest;
 };
 
+interface Integration {
+  [key: string]: string;
+}
+
 interface IExtendedYieldContest extends YieldContest {
   id: string;
   status: number;
   rewardsLength: number;
+  quests: Integration;
+  questsLength: number;
 }
 
 export type {

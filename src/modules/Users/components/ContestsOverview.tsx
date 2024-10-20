@@ -29,11 +29,21 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                 className="cursor-pointer"
               >
                 <div className="bg-accent-950 h-full w-[300px] rounded-2xl p-5 flex flex-col gap-3 items-scenter justify-start text-[18px]">
-                  <span
-                    className={`text-[24px] font-bold ${contest.hidden ? "text-neutral-500" : ""}`}
-                  >
-                    {contest.name}
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-[24px] font-bold ${contest.hidden ? "text-neutral-500" : ""}`}
+                    >
+                      {contest.name}
+                    </span>
+                    {!!contest?.integration?.intract && (
+                      <img
+                        className="w-6"
+                        src="/intract.png"
+                        alt="Intract"
+                        title="Intract"
+                      />
+                    )}
+                  </div>
 
                   <div className="flex justify-between items-center flex-wrap gap-2">
                     <div className="flex items-center text-accent-300 mb-1">
