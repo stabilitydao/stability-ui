@@ -196,62 +196,68 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
           )}
         </div>
       )}
-
-      {isActiveContest && (
-        <div className="mt-5 w-full">
-          <HeadingText text="Leaderboard" scale={2} styles="mb-5" />
-          {tableData.length ? (
-            <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
-              <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
-                <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                  <tr className="text-[12px] uppercase">
-                    {tableStates.map((value: TTableColumn, index: number) => (
-                      <TableColumnSort
-                        key={value.name + index}
-                        index={index}
-                        value={value.name}
-                        sort={sortTable}
-                        table={tableStates}
-                        setTable={setTableStates}
-                        tableData={tableData}
-                        setTableData={setTableData}
-                      />
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="text-[14px]">
-                  {!!tableData.length &&
-                    tableData.map(({ address, deposit, earned }) => (
-                      <tr
-                        key={address}
-                        className="h-[48px] hover:bg-accent-950"
-                      >
-                        <td
-                          className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10"
-                          style={{ fontFamily: "monospace" }}
+      <div className="mt-5 w-full text-center">
+        <HeadingText text="Leaderboard" scale={2} styles="mb-5" />
+        {isActiveContest ? (
+          <div>
+            {tableData.length ? (
+              <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
+                <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+                  <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+                    <tr className="text-[12px] uppercase">
+                      {tableStates.map((value: TTableColumn, index: number) => (
+                        <TableColumnSort
+                          key={value.name + index}
+                          index={index}
+                          value={value.name}
+                          sort={sortTable}
+                          table={tableStates}
+                          setTable={setTableStates}
+                          tableData={tableData}
+                          setTableData={setTableData}
+                        />
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="text-[14px]">
+                    {!!tableData.length &&
+                      tableData.map(({ address, deposit, earned }) => (
+                        <tr
+                          key={address}
+                          className="h-[48px] hover:bg-accent-950"
                         >
-                          {getShortAddress(address, 6, 4)}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {earned <= 0.01
-                            ? earned.toFixed(4)
-                            : earned.toFixed(2)}
-                        </td>
-                        <td className="text-center px-4 py-3">
-                          {deposit <= 0.01
-                            ? deposit.toFixed(4)
-                            : deposit.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <FullPageLoader />
-          )}
-        </div>
-      )}
+                          <td
+                            className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10"
+                            style={{ fontFamily: "monospace" }}
+                          >
+                            {getShortAddress(address, 6, 4)}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {earned <= 0.01
+                              ? earned.toFixed(4)
+                              : earned.toFixed(2)}
+                          </td>
+                          <td className="text-center px-4 py-3">
+                            {deposit <= 0.01
+                              ? deposit.toFixed(4)
+                              : deposit.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <FullPageLoader />
+            )}
+          </div>
+        ) : (
+          <HeadingText
+            text="The leaderboard table will appear after the contest has started."
+            scale={3}
+          />
+        )}
+      </div>
     </div>
   );
 };
