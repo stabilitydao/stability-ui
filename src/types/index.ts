@@ -565,6 +565,8 @@ type TAPIData = {
   };
 };
 
+type TVLRange = { min: number; max: number };
+
 type TContests = {
   [contestId: string]: YieldContest;
 };
@@ -650,4 +652,5 @@ export type {
   TContests,
   IExtendedYieldContest,
   TTableProtocol,
+  TVLRange,
 };
