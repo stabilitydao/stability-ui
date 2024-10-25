@@ -59,8 +59,8 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
   }, [range]);
 
   return (
-    <div className="flex flex-col items-center w-full max-w-lg">
-      <div className="flex items-center justify-between w-full text-neutral-50 font-manrope mb-1">
+    <div className="flex flex-col items-center w-full max-w-[300px] md:max-w-lg">
+      <div className="flex items-center justify-between w-full text-neutral-50 font-manrope">
         <span>{formatNumber(minValue, "abbreviate")}</span>
         <span>{formatNumber(maxValue, "abbreviate")}</span>
       </div>

@@ -28,7 +28,6 @@ import {
 import {
   vaults,
   isVaultsLoaded,
-  error,
   aprFilter,
   connected,
   // platformVersions,
@@ -92,7 +91,6 @@ const Vaults = (): JSX.Element => {
 
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
-  const $error = useStore(error);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
   const $connected = useStore(connected);
   // const $publicClient = useStore(publicClient);
@@ -473,14 +471,6 @@ const Vaults = (): JSX.Element => {
   const isLoading = useMemo(() => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
   }, [$isVaultsLoaded, isLocalVaultsLoaded]);
-
-  if ($error.state && $error.type === "API") {
-    return (
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <ErrorMessage type="API" />
-      </div>
-    );
-  }
 
   return (
     <>

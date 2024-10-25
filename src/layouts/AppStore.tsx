@@ -38,6 +38,8 @@ import {
 
 import { wagmiConfig, platforms, PlatformABI, IVaultManagerABI } from "@web3";
 
+import { ErrorMessage } from "@ui";
+
 import {
   calculateAPY,
   getStrategyInfo,
@@ -93,6 +95,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
+  const $error = useStore(error);
 
   const localVaults: {
     [network: string]: TVaults;
@@ -103,18 +106,36 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   let stabilityAPIData: TAPIData = {};
 
   const getDataFromStabilityAPI = async () => {
-    try {
-      const response = await axios.get(seeds[0]);
-      stabilityAPIData = response.data;
+    const maxRetries = 3;
+    let currentRetry = 0;
 
-      if (stabilityAPIData?.assetPrices) {
-        assetsPrices.set(stabilityAPIData?.assetPrices);
-        prices = stabilityAPIData?.assetPrices;
+    while (currentRetry < maxRetries) {
+      try {
+        const response = await axios.get(seeds[0]);
+
+        stabilityAPIData = response.data;
+        console.log(stabilityAPIData);
+        if (stabilityAPIData?.assetPrices) {
+          assetsPrices.set(stabilityAPIData?.assetPrices);
+          prices = stabilityAPIData?.assetPrices;
+        }
+
+        apiData.set(stabilityAPIData);
+        return;
+      } catch (err) {
+        currentRetry++;
+        if (currentRetry < maxRetries) {
+          console.log(`Retrying (${currentRetry}/${maxRetries})...`, seeds[0]);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } else {
+          console.error("API error:", err);
+          error.set({
+            state: true,
+            type: "API",
+            description: err?.message,
+          });
+        }
       }
-
-      apiData.set(stabilityAPIData);
-    } catch (error) {
-      console.error("API ERROR:", error);
     }
   };
 
@@ -687,6 +708,14 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   useEffect(() => {
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
+
+  if ($error.state && $error.type === "API") {
+    return (
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <ErrorMessage type="API" />
+      </div>
+    );
+  }
 
   return (
     <WagmiLayout>

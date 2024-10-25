@@ -12,9 +12,9 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
 
   if ($error.state && type === "API") {
     return (
-      <div className="mt-5 text-[16px] font-manrope bg-accent-950 text-neutral-50 rounded-[32px]">
-        <div className="flex items-center justify-center flex-col gap-3">
-          <p> {$error.description.slice(0, 20)}...</p>
+      <div className="mt-5 text-[16px] font-manrope bg-accent-950 text-neutral-50 rounded-[32px] min-w-[350px]">
+        <div className="flex items-center justify-center flex-col gap-3 p-3">
+          <p> {$error.description.slice(0, 40)}...</p>
           <button
             onClick={() => reload.set(!$reload)}
             className="bg-accent-500 text-neutral-50 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"

@@ -181,11 +181,11 @@ const Chains = (): JSX.Element => {
       <HeadingText text="Chains" scale={1} styles="mt-3" />
 
       <div className="bg-accent-950 p-[26px] rounded-[44px] mb-6 flex flex-col select-none">
-        <div className="flex md:flex-nowrap flex-wrap relative justify-center">
+        <div className="flex flex-wrap relative justify-evenly gap-5">
           {activeChains.map(({ name, length, bgColor, active }) => (
             <div
               key={name}
-              className={`flex p-[12px] w-full ${active ? "opacity-100" : "opacity-50"} ${name === "Total" && active ? "" : "cursor-pointer"}`}
+              className={`flex p-[12px] ${active ? "opacity-100" : "opacity-50"} ${name === "Total" && active ? "" : "cursor-pointer"}`}
               onClick={() => activeChainsHandler(name)}
             >
               <Counter color={bgColor} value={length.toString()} name={name} />
