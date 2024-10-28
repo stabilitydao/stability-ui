@@ -82,21 +82,9 @@ const Chains = (): JSX.Element => {
   };
 
   const activeChainsHandler = (category: string) => {
-    if (
-      activeChains.filter((chain) => chain.active).length ===
-        activeChains.length &&
-      category === "Total"
-    ) {
-      return;
-    }
-
     let updatedChains = activeChains.map((chain) =>
       category === chain.name ? { ...chain, active: !chain.active } : chain
     );
-
-    if (updatedChains.some((chain) => chain.name === "Total" && chain.active)) {
-      updatedChains = activeChains.map((chain) => ({ ...chain, active: true }));
-    }
 
     const allActive = activeChains.every((chain) => chain.active);
     const allInactive = updatedChains.every((chain) => !chain.active);
@@ -117,26 +105,24 @@ const Chains = (): JSX.Element => {
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
-    const searchValue: string = String(search?.current?.value.toLowerCase());
+    const searchValue: string = String(
+      search?.current?.value.replace(/[^a-zA-Z0-9\s]/g, "").toLowerCase()
+    );
     const chainsToFilter = activeChains.filter((chain) => chain.active);
 
     let data: IChainData[] = [];
     //filter
-    if (chainsToFilter.some((chain) => chain.name === "Total")) {
-      data = tableData;
-    } else {
-      chainsToFilter.forEach((chain) => {
-        if (chain.active) {
-          data.push(
-            ...tableData.filter(
-              (row) =>
-                row.status ===
-                CHAIN_STATUSES[chain.name as keyof typeof CHAIN_STATUSES]
-            )
-          );
-        }
-      });
-    }
+    chainsToFilter.forEach((chain) => {
+      if (chain.active) {
+        data.push(
+          ...tableData.filter(
+            (row) =>
+              row.status ===
+              CHAIN_STATUSES[chain.name as keyof typeof CHAIN_STATUSES]
+          )
+        );
+      }
+    });
 
     data = data.filter(({ tvl }) => tvl <= TVLRange.max && tvl >= TVLRange.min);
 
@@ -147,11 +133,14 @@ const Chains = (): JSX.Element => {
       tableData: data,
       setTableData: setFiltredTableData,
     });
+
     //search
     data = data.filter(
       ({ name, chainId }) =>
-        name.toLowerCase().includes(searchValue) ||
-        String(chainId).includes(searchValue)
+        name
+          .replace(/[^a-zA-Z0-9\s]/g, "")
+          .toLowerCase()
+          .includes(searchValue) || String(chainId).includes(searchValue)
     );
 
     setFiltredTableData(data);
@@ -174,6 +163,7 @@ const Chains = (): JSX.Element => {
       return { min: 0, max: 1 };
     }
   }, [tableData]);
+
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
       <Breadcrumbs links={["Platform", "Chains"]} />
@@ -185,7 +175,7 @@ const Chains = (): JSX.Element => {
           {activeChains.map(({ name, length, bgColor, active }) => (
             <div
               key={name}
-              className={`flex p-[12px] ${active ? "opacity-100" : "opacity-50"} ${name === "Total" && active ? "" : "cursor-pointer"}`}
+              className={`flex p-[12px] ${active ? "opacity-100" : "opacity-50"} cursor-pointer`}
               onClick={() => activeChainsHandler(name)}
             >
               <Counter color={bgColor} value={length.toString()} name={name} />

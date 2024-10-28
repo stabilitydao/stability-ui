@@ -1,21 +1,10 @@
-import {
-  chains,
-  getChainsTotals,
-  getStrategiesTotals,
-} from "@stabilitydao/stability";
+import { getChainsTotals, getStrategiesTotals } from "@stabilitydao/stability";
 
 const TOTAL_CHAINS = getChainsTotals();
 
 const TOTAL_STRATEGIES = getStrategiesTotals();
 
 const CHAINS_INFO = [
-  {
-    name: "Total",
-    length: Object.keys(chains).length,
-    color: "text-gray-400",
-    bgColor: "#E8E8EC",
-    active: true,
-  },
   {
     name: "Supported",
     length: TOTAL_CHAINS.SUPPORTED,
@@ -49,6 +38,13 @@ const CHAINS_INFO = [
     length: TOTAL_CHAINS.AWAITING_ISSUE_CREATION,
     color: "text-orange-300",
     bgColor: "#FDA73A",
+    active: true,
+  },
+  {
+    name: "Not supported",
+    length: TOTAL_CHAINS.NOT_SUPPORTED,
+    color: "text-gray-400",
+    bgColor: "#E01A1A",
     active: true,
   },
 ];
@@ -93,6 +89,7 @@ const CHAIN_STATUSES = {
   Development: "CHAINLIB_DEVELOPMENT",
   "Awaiting developer": "AWAITING_DEVELOPER",
   "Awaiting issue": "AWAITING_ISSUE_CREATION",
+  "Not supported": "NOT_SUPPORTED",
 };
 
 export { CHAINS_INFO, STRATEGIES_INFO, STATE_COLORS, CHAIN_STATUSES };

@@ -114,7 +114,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const response = await axios.get(seeds[0]);
 
         stabilityAPIData = response.data;
-        console.log(stabilityAPIData);
+
         if (stabilityAPIData?.assetPrices) {
           assetsPrices.set(stabilityAPIData?.assetPrices);
           prices = stabilityAPIData?.assetPrices;

@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 
 import axios from "axios";
 
+import { useStore } from "@nanostores/react";
+
 import { Breadcrumbs, HeadingText, TableColumnSort, FullPageLoader } from "@ui";
 
 import {
@@ -20,6 +22,8 @@ import { contests, seeds } from "@stabilitydao/stability";
 
 import type { TTableColumn, TLeaderboard } from "@types";
 
+import { account } from "@store";
+
 interface IProps {
   contestId: string;
 }
@@ -27,6 +31,8 @@ interface IProps {
 const CURRENT_TIMESTAMP_IN_SECONDS = Math.floor(Date.now() / 1000);
 
 const Contest: React.FC<IProps> = ({ contestId }) => {
+  const $account = useStore(account);
+
   const [tableStates, setTableStates] = useState(LEADERBOARD_TABLE);
   const [tableData, setTableData] = useState<TLeaderboard[]>([]);
 
@@ -227,7 +233,7 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                           className="h-[48px] hover:bg-accent-950"
                         >
                           <td
-                            className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10"
+                            className={`px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10 ${$account?.toLowerCase() === address ? "underline" : ""}`}
                             style={{ fontFamily: "monospace" }}
                           >
                             {getShortAddress(address, 6, 4)}
