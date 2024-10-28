@@ -11,6 +11,9 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
   const [minValue, setMinValue] = useState(range.min);
   const [maxValue, setMaxValue] = useState(range.max);
 
+  const [minInputValue, setMinInputValue] = useState(String(range.min));
+  const [maxInputValue, setMaxInputValue] = useState(String(range.max));
+
   const handleMouseDown = (
     e: React.MouseEvent<HTMLDivElement>,
     type: "min" | "max"
@@ -27,11 +30,15 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
 
       if (type === "min") {
         const newMinValue = Math.min(newValue, maxValue - 10);
+
         setMinValue(newMinValue);
+        setMinInputValue(String(newMinValue));
         setRange({ min: newMinValue, max: maxValue });
       } else {
         const newMaxValue = Math.max(newValue, minValue + 10);
+
         setMaxValue(newMaxValue);
+        setMaxInputValue(String(newMaxValue));
         setRange({ min: minValue, max: newMaxValue });
       }
     };
@@ -45,81 +52,113 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
     window.addEventListener("mouseup", handleMouseUp);
   };
 
-  useEffect(() => {
-    setMinValue(range.min);
-    setMaxValue(range.max);
-  }, [range]);
-
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = 0;
     const input = e.target.value.trim();
     const lastChar = input.slice(-1).toLowerCase();
 
-    switch (lastChar) {
-      case "m":
-        value = Number(input.slice(0, -1)) * 1_000_000;
-        break;
-      case "k":
-        value = Number(input.slice(0, -1)) * 1_000;
-        break;
-      case "b":
-        value = Number(input.slice(0, -1)) * 1_000_000_000;
-        break;
-      default:
+    let value = 0;
+    let inputValue = String(input);
+
+    const correctInputSlice =
+      input.length === 1 ? Number(input) : Number(input.slice(0, -1));
+
+    if (!isNaN(correctInputSlice)) {
+      if (isNaN(Number(lastChar))) {
+        switch (lastChar) {
+          case "m":
+            value = Number(input.slice(0, -1)) * 1_000_000;
+            break;
+          case "k":
+            value = Number(input.slice(0, -1)) * 1_000;
+            break;
+          case "b":
+            value = Number(input.slice(0, -1)) * 1_000_000_000;
+            break;
+          default:
+            value = parseFloat(input);
+            inputValue = String(input.slice(0, -1));
+            break;
+        }
+      } else {
         value = parseFloat(input);
-        break;
-    }
+      }
 
-    if (isNaN(value) || value < 0) {
-      value = 0;
-    } else if (value > maxValue) {
-      value = maxValue;
-    }
+      if (isNaN(value)) {
+        value = 0;
+      }
+      if (value >= range.max) {
+        value = range.max;
+        inputValue = String(range.max);
+      }
 
-    setMinValue(value);
-    setRange({ min: value, max: maxValue });
+      setMinInputValue(inputValue.toUpperCase());
+      setMinValue(value);
+      setRange({ min: value, max: maxValue });
+    }
   };
 
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = 0;
     const input = e.target.value.trim();
     const lastChar = input.slice(-1).toLowerCase();
 
-    switch (lastChar) {
-      case "m":
-        value = Number(input.slice(0, -1)) * 1_000_000;
-        break;
-      case "k":
-        value = Number(input.slice(0, -1)) * 1_000;
-        break;
-      case "b":
-        value = Number(input.slice(0, -1)) * 1_000_000_000;
-        break;
-      default:
+    let value = 0;
+    let inputValue = String(input);
+
+    const correctInputSlice =
+      input.length === 1 ? Number(input) : Number(input.slice(0, -1));
+
+    if (!isNaN(correctInputSlice)) {
+      if (isNaN(Number(lastChar))) {
+        switch (lastChar) {
+          case "m":
+            value = Number(input.slice(0, -1)) * 1_000_000;
+            break;
+          case "k":
+            value = Number(input.slice(0, -1)) * 1_000;
+            break;
+          case "b":
+            value = Number(input.slice(0, -1)) * 1_000_000_000;
+            break;
+          default:
+            value = parseFloat(input);
+            inputValue = String(input.slice(0, -1));
+            break;
+        }
+      } else {
         value = parseFloat(input);
-        break;
-    }
+      }
 
-    if (isNaN(value)) {
-      value = 0;
-    } else if (value > range.max) {
-      value = range.max;
-    }
+      if (isNaN(value)) {
+        value = 0;
+      } else if (value >= range.max) {
+        value = range.max;
+        inputValue = String(range.max);
+      }
 
-    setMaxValue(value);
-    setRange({ min: minValue, max: value });
+      setMaxInputValue(inputValue.toUpperCase());
+      setMaxValue(value);
+      setRange({ min: minValue, max: value });
+    }
   };
+
+  useEffect(() => {
+    setMinValue(range.min);
+    setMinInputValue(String(range.min));
+
+    setMaxValue(range.max);
+    setMaxInputValue(String(range.max));
+  }, [range]);
   return (
     <div className="flex flex-col items-center w-full max-w-[300px] md:max-w-lg">
       <div className="flex items-center justify-between w-full text-neutral-50 font-manrope mb-2">
         <input
-          value={minValue}
+          value={minInputValue}
           onChange={handleMinInputChange}
           className="bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 pl-5"
         />
 
         <input
-          value={maxValue}
+          value={maxInputValue}
           onChange={handleMaxInputChange}
           className="bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 pl-5"
         />
