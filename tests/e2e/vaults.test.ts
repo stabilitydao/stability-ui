@@ -36,12 +36,12 @@ const STRATEGIES = [
   "Y",
   "IQMF",
   "GUMF",
-  "CF",
-  "GQMF",
-  "CCF",
   "QSMF",
+  "CF",
   "DQMF",
   "IRMF",
+  "CCF",
+  "GQMF",
   "GRMF",
 ];
 

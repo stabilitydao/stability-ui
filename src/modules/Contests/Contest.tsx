@@ -20,9 +20,9 @@ import { LEADERBOARD_TABLE } from "@constants";
 
 import { contests, seeds } from "@stabilitydao/stability";
 
-import type { TTableColumn, TLeaderboard } from "@types";
-
 import { account } from "@store";
+
+import type { TTableColumn, TLeaderboard } from "@types";
 
 interface IProps {
   contestId: string;
@@ -41,7 +41,14 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
       const response = await axios.get(`${seeds[0]}/contests/${contestId}`);
 
       if (response.data.leaderboard.length) {
-        setTableData(response.data.leaderboard);
+        const data = response.data.leaderboard.map(
+          (user: TLeaderboard, index: number) => ({
+            ...user,
+            rank: index + 1,
+          })
+        );
+
+        setTableData(data);
       }
     } catch (error) {
       console.log(error);
@@ -227,13 +234,19 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                   </thead>
                   <tbody className="text-[14px]">
                     {!!tableData.length &&
-                      tableData.map(({ address, deposit, earned }) => (
+                      tableData.map(({ rank, address, deposit, earned }) => (
                         <tr
                           key={address}
                           className="h-[48px] hover:bg-accent-950"
                         >
                           <td
                             className={`px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10 ${$account?.toLowerCase() === address ? "underline" : ""}`}
+                          >
+                            {rank}
+                          </td>
+
+                          <td
+                            className="px-4 py-3 text-center"
                             style={{ fontFamily: "monospace" }}
                           >
                             {getShortAddress(address, 6, 4)}

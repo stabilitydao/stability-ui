@@ -8,11 +8,13 @@ type TProps = {
 };
 
 const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
-  const [minValue, setMinValue] = useState(range.min);
-  const [maxValue, setMaxValue] = useState(range.max);
+  const [min, max] = [Number(range.min.toFixed()), Number(range.max.toFixed())];
 
-  const [minInputValue, setMinInputValue] = useState(String(range.min));
-  const [maxInputValue, setMaxInputValue] = useState(String(range.max));
+  const [minValue, setMinValue] = useState(min);
+  const [maxValue, setMaxValue] = useState(max);
+
+  const [minInputValue, setMinInputValue] = useState(min.toFixed());
+  const [maxInputValue, setMaxInputValue] = useState(max.toFixed());
 
   const handleMouseDown = (
     e: React.MouseEvent<HTMLDivElement>,
@@ -24,8 +26,8 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const newOffset = moveEvent.clientX - rect.left;
       const newValue = Math.min(
-        range.max,
-        Math.max(range.min, Math.round((newOffset / rect.width) * range.max))
+        max,
+        Math.max(min, Math.round((newOffset / rect.width) * max))
       );
 
       if (type === "min") {
@@ -53,8 +55,10 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
   };
 
   const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.trim();
+    let input = e.target.value.trim();
     const lastChar = input.slice(-1).toLowerCase();
+
+    input = input.replace(/^0+(?=\d)/, "");
 
     let value = 0;
     let inputValue = String(input);
@@ -86,9 +90,10 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
       if (isNaN(value)) {
         value = 0;
       }
-      if (value >= range.max) {
-        value = range.max;
-        inputValue = String(range.max);
+
+      if (value >= maxValue) {
+        value = maxValue;
+        inputValue = String(maxValue);
       }
 
       setMinInputValue(inputValue.toUpperCase());
@@ -98,8 +103,10 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
   };
 
   const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.trim();
+    let input = e.target.value.trim();
     const lastChar = input.slice(-1).toLowerCase();
+
+    input = input.replace(/^0+(?=\d)/, "");
 
     let value = 0;
     let inputValue = String(input);
@@ -130,9 +137,12 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
 
       if (isNaN(value)) {
         value = 0;
-      } else if (value >= range.max) {
-        value = range.max;
-        inputValue = String(range.max);
+      } else if (value >= max) {
+        value = max;
+        inputValue = String(max);
+      } else if (value <= minValue) {
+        value = minValue;
+        inputValue = String(minValue);
       }
 
       setMaxInputValue(inputValue.toUpperCase());
@@ -142,11 +152,11 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
   };
 
   useEffect(() => {
-    setMinValue(range.min);
-    setMinInputValue(String(range.min));
+    setMinValue(min);
+    setMinInputValue(String(min));
 
-    setMaxValue(range.max);
-    setMaxInputValue(String(range.max));
+    setMaxValue(max);
+    setMaxInputValue(String(max));
   }, [range]);
   return (
     <div className="flex flex-col items-center w-full max-w-[300px] md:max-w-lg">
@@ -168,8 +178,8 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
         <div
           className="absolute bg-accent-800 h-3 rounded-lg transition-all duration-300"
           style={{
-            left: `${(minValue / range.max) * 100}%`,
-            width: `${((maxValue - minValue) / range.max) * 100}%`,
+            left: `${(minValue / max) * 100}%`,
+            width: `${((maxValue - minValue) / max) * 100}%`,
             top: "50%",
             transform: "translateY(-50%)",
             borderRadius: "8px",
@@ -179,7 +189,7 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
         <div
           className="absolute bg-accent-500 rounded-full w-5 h-5 cursor-pointer shadow-lg transition-transform duration-200 hover:scale-110"
           style={{
-            left: `${(minValue / range.max) * 100}%`,
+            left: `${(minValue / max) * 100}%`,
             top: "50%",
             transform: "translate(-50%, -50%)",
           }}
@@ -189,7 +199,7 @@ const RangeSlider: React.FC<TProps> = ({ range, setRange }) => {
         <div
           className="absolute bg-accent-500 rounded-full w-5 h-5 cursor-pointer shadow-lg transition-transform duration-200 hover:scale-110"
           style={{
-            left: `${(maxValue / range.max) * 100}%`,
+            left: `${(maxValue / max) * 100}%`,
             top: "50%",
             transform: "translate(-50%, -50%)",
           }}
