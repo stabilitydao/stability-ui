@@ -9,7 +9,7 @@ import { getShortAddress, sortTable, formatTimestampToDate } from "@utils";
 
 import { findAllValidPeriods } from "./functions";
 
-import { apiData } from "@store";
+import { account, apiData } from "@store";
 
 import { contests } from "@stabilitydao/stability";
 
@@ -23,6 +23,7 @@ import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 
 const Users = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
+  const $account = useStore(account);
 
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
@@ -157,7 +158,7 @@ const Users = (): JSX.Element => {
                       {user.rank}
                     </td>
                     <td
-                      className="px-4 py-3 text-center"
+                      className={`px-4 py-3 text-center ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                       style={{ fontFamily: "monospace" }}
                     >
                       {getShortAddress(user.address, 6, 4)}

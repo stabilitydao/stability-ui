@@ -11,13 +11,13 @@ import { VaultType } from "./VaultType";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
-import { CountersBlock } from "./CountersBlock";
 import { CountersBlockCompact } from "./CountersBlockCompact";
 import { Checkbox } from "./Checkbox";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
 import { TableColumnSort } from "./TableColumnSort";
 import { Badge } from "./Badge";
+import { Counter } from "./Counter";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -42,11 +42,11 @@ export {
   Breadcrumbs,
   RiskIndicator,
   ColorIndicator,
-  CountersBlock,
   CountersBlockCompact,
   Checkbox,
   HeadingText,
   FieldValue,
   TableColumnSort,
   Badge,
+  Counter,
 };

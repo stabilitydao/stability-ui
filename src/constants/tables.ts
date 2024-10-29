@@ -247,6 +247,7 @@ const CONTESTS_TABLE: TTableColumn[] = [
 ];
 
 const LEADERBOARD_TABLE: TTableColumn[] = [
+  { name: "Rank", keyName: "rank", sortType: "none", dataType: "number" },
   {
     name: "Address",
     keyName: "",
