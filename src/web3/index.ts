@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http } from "viem";
 
-import { polygon, base } from "wagmi/chains";
+import { polygon, base, real } from "wagmi/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -24,15 +24,18 @@ import PriceReaderABI from "./abi/PriceReaderABI.ts";
 import type { TAddress } from "@types";
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
-// 137 || 8453
+
+// 137 || 8453 || 111188
 const platforms: { [key: string]: TAddress } = {
   "137": deployments[137].core?.platform,
   "8453": deployments[8453].core?.platform,
+  "111188": deployments[111188].core?.platform,
 };
 
 const priceReaders: { [key: string]: TAddress } = {
   "137": deployments[137].core.priceReader,
   "8453": deployments[8453].core.priceReader,
+  "111188": deployments[111188].core?.priceReader,
 };
 
 const defiedgeFactories: { [key: string]: TAddress } = {
@@ -52,7 +55,7 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [polygon, base],
+  chains: [polygon, base, real],
   projectId: walletConnectProjectId,
   metadata,
 });

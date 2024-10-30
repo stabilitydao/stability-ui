@@ -93,6 +93,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     config: wagmiConfig,
   });
 
+  const realClient = usePublicClient({
+    chainId: 111188,
+    config: wagmiConfig,
+  });
+
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $error = useStore(error);
@@ -597,6 +602,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           let localClient = maticClient;
           if (chain.id === "8453") {
             localClient = baseClient;
+          } else if (chain.id === "111188") {
+            localClient = realClient;
           }
 
           try {

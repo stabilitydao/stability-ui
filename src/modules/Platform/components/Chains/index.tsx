@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { chains, getChainBridges } from "@stabilitydao/stability";
 
@@ -14,7 +14,7 @@ import {
   FullPageLoader,
 } from "@ui";
 
-import { BridgesList, ChainStatus, ProtocolsList, RangeSlider } from "../../ui";
+import { BridgesList, ChainStatus, ProtocolsList } from "../../ui";
 
 import { formatNumber, sortTable } from "@utils";
 
@@ -155,14 +155,14 @@ const Chains = (): JSX.Element => {
     initTableData();
   }, [$apiData]);
 
-  const range = useMemo(() => {
-    if (!!tableData.length) {
-      const TVLs = tableData.map(({ tvl }) => tvl);
-      return { min: Math.min(...TVLs), max: Math.max(...TVLs) };
-    } else {
-      return { min: 0, max: 1 };
-    }
-  }, [tableData]);
+  // const range = useMemo(() => {
+  //   if (!!tableData.length) {
+  //     const TVLs = tableData.map(({ tvl }) => tvl);
+  //     return { min: Math.min(...TVLs), max: Math.max(...TVLs) };
+  //   } else {
+  //     return { min: 0, max: 1 };
+  //   }
+  // }, [tableData]);
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
@@ -201,7 +201,7 @@ const Chains = (): JSX.Element => {
             onChange={() => tableHandler()}
           />
         </label>
-        <RangeSlider range={range} setRange={setTVLRange} />
+        {/* <RangeSlider range={range} setRange={setTVLRange} /> */}
       </div>
       <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[1000px]">
         <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[1000px] lg:min-w-full">

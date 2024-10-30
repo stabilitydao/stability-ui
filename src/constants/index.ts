@@ -103,6 +103,14 @@ const CHAINS = [
     nativeCurrency: "ETH",
     active: true, // main page active networks
   },
+  {
+    name: chains["111188"].name,
+    id: "111188",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["111188"].img}`,
+    explorer: "https://explorer.re.al",
+    nativeCurrency: "reETH",
+    active: true, // main page active networks
+  },
 ];
 
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
