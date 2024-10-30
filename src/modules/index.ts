@@ -1,4 +1,4 @@
-import { CreateVault } from "./CreateVault";
+import { Factory } from "./Factory";
 import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
 import { AI } from "./AI";
@@ -16,7 +16,7 @@ import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 
 export {
-  CreateVault,
+  Factory,
   Vaults,
   Vault,
   AI,

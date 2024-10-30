@@ -1080,7 +1080,7 @@ const Vaults = (): JSX.Element => {
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
-      {/* <a href="/create-vault">
+      {/* <a href="/factory">
         <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
           Create vault
         </button>

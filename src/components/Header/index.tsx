@@ -16,7 +16,7 @@ const Header = (): JSX.Element => {
     "chains",
     "integrations",
     "assets",
-    "create-vault",
+    "factory",
   ];
 
   const [menu, setMenu] = useState(false);

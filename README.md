@@ -18,7 +18,7 @@
 | --- --- [**Contest**](https://stability.farm/contests/d1)                                                           |                   | Contest page                                    |
 | **DAO**                                                                                                             |                   | Self-developing DAO portal                      |
 | [**Platform**](https://stability.farm/platform)                                                                     | Development       | Platform portal                                 |
-| --- [**Factory**](https://stability.farm/create-vault)                                                              | Development       | Factory of vaults, farms.                       |
+| --- [**Factory**](https://stability.farm/factory)                                                                   | Development       | Factory of vaults, farms.                       |
 | --- [**Network**](https://stability.farm/network)                                                                   | Development       | Stability p2p network nodes                     |
 | --- --- [**Node**](https://stability.farm/network/6e9a70eb6628e1295772218defdf254ce3200890cb16cc588c4dab5000972edd) | Development       | Node page                                       |
 | --- [**Strategies**](https://stability.farm/strategies)                                                             | Development       | List of strategies                              |
