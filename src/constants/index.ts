@@ -192,6 +192,16 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
+  pearlV2: {
+    name: "Pearl V2",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+  },
+  trident: {
+    name: "Trident",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
+  },
 };
 
 const IL = {

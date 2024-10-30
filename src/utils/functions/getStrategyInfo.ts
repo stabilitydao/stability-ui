@@ -50,6 +50,8 @@ export const getStrategyInfo = (
     // aave,
     yearn,
     uniswapV3,
+    pearlV2,
+    trident,
   } = PROTOCOLS;
 
   if (!strategyInfo) {
@@ -160,6 +162,12 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [gamma, uniswapV3, merkl],
       il: IL.LOW,
+    };
+  } else if (vaultSymbol.match(/TPF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [trident, pearlV2],
+      il: IL.CCF,
     };
   }
 
