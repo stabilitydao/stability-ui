@@ -276,6 +276,12 @@ const IL = {
     desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
     color: "#D7F55B",
   },
+  TPF: {
+    rate: 1,
+    title: "UNKNOWN YET",
+    desc: "This is a new strategy with new protocols and pools. The impermanent losses will be indicated later, after data collection and analysis.",
+    color: "#C0BCC9",
+  },
 };
 
 const DEFAULT_ERROR = { state: false, type: "", description: "" };

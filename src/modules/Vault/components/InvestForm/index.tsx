@@ -177,10 +177,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const { shortId } = vault.strategyInfo;
 
-  const dexLogo =
+  const DEX =
     network === "111188"
-      ? "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png"
-      : "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg";
+      ? {
+          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+          title: "Pearl DeX",
+        }
+      : {
+          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
+          title: "1inch DeX",
+        };
 
   const checkButtonApproveDeposit = (apprDepo: string[]) => {
     if (shortId === "IQMF" || shortId === "IRMF") {
@@ -2338,9 +2344,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               {shortId !== "CCF" ? (
                                 <div className="h-[40px] flex items-center justify-center">
                                   <img
-                                    src={dexLogo}
-                                    alt="logo"
-                                    title="logo"
+                                    src={DEX.logo}
+                                    alt={DEX.title}
+                                    title={DEX.title}
                                     className="w-[26px] h-[26px]"
                                   />
                                   <div className="flex whitespace-nowrap gap-3 items-center">
@@ -2408,9 +2414,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 <div className="text-[14px]  flex items-center gap-1 ml-2">
                                   <div className="flex items-center gap-1 mt-2">
                                     <img
-                                      src={dexLogo}
-                                      alt="logo"
-                                      title="logo"
+                                      src={DEX.logo}
+                                      alt={DEX.title}
+                                      title={DEX.title}
                                     />
                                     {zapError ? (
                                       <img
@@ -2687,9 +2693,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   option[0].toLowerCase() && (
                                   <div className="flex items-center h-5">
                                     <img
-                                      src={dexLogo}
-                                      alt="logo"
-                                      title="logo"
+                                      src={DEX.logo}
+                                      alt={DEX.title}
+                                      title={DEX.title}
                                       className="w-[20px] h-[20px]"
                                     />
                                     {!!amountOut ? (

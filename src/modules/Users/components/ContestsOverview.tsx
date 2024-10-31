@@ -53,7 +53,7 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                         className="mr-2"
                       />
                       <span>
-                        {formatTimestampToDate(contest.start)} -
+                        {formatTimestampToDate(contest.start)} -{" "}
                         {formatTimestampToDate(contest.end)}
                       </span>
                     </div>

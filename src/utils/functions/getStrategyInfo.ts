@@ -167,7 +167,7 @@ export const getStrategyInfo = (
     strategyInfo = {
       ...strategyInfo,
       protocols: [trident, pearlV2],
-      il: IL.CCF,
+      il: IL.TPF,
     };
   }
 
