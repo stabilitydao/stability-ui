@@ -505,6 +505,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         /////
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
 
+        const shareprice =
+          !Number(vault.sharePrice) && !Number(vault.tvl)
+            ? "1"
+            : vault.sharePrice;
+
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
           {
             address: vault.address.toLowerCase(),
@@ -514,7 +519,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             assetsPricesOnCreation: vault.assetsPricesOnCreation,
             type: vault.vaultType,
             strategy: vault.strategyId,
-            shareprice: vault.sharePrice,
+            shareprice,
             tvl: vault.tvl,
             strategySpecific,
             balance: "",
