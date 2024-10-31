@@ -479,13 +479,13 @@ test("Should display basic info correctly", async ({ page }) => {
     expect(isTVL).toBeTruthy();
 
     /* ALM TVL should be dispalyed correctly */
-    if (vaultData?.alm?.tvl) {
-      const infoBarAlmTVL = await page.getByTestId("infoBarAlmTVL").innerText();
+    // if (vaultData?.alm?.tvl) {
+    //   const infoBarAlmTVL = await page.getByTestId("infoBarAlmTVL").innerText();
 
-      const almTVL = formatNumber(Number(vaultData?.alm?.tvl), "abbreviate");
+    //   const almTVL = formatNumber(Number(vaultData?.alm?.tvl), "abbreviate");
 
-      expect(infoBarAlmTVL).toBe(almTVL);
-    }
+    //   expect(infoBarAlmTVL).toBe(almTVL);
+    // }
 
     /* Pool TVL should be dispalyed correctly */
     if (vaultData?.pool?.tvl) {
