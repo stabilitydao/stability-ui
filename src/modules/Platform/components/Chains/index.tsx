@@ -249,7 +249,7 @@ const Chains = (): JSX.Element => {
                         key={chainId}
                         className="h-[48px] hover:bg-accent-950 cursor-pointer"
                       >
-                        <td className="px-4 text-[15px] py-3 text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
+                        <td className="px-4 py-3 text-[15px] text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
                           {chainId}
                         </td>
                         <td className="px-4 py-3 text-center w-[180px] xl:w-[230px]">
@@ -264,7 +264,7 @@ const Chains = (): JSX.Element => {
                             {name}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-left whitespace-nowrap w-[100px] xl:w-[120px]">
+                        <td className="px-4 py-3 text-[15px] text-left whitespace-nowrap w-[100px] xl:w-[120px]">
                           {formatNumber(tvl, "abbreviate")}
                         </td>
                         {/* <td className="px-4 py-3 text-[12px]">
