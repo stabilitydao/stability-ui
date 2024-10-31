@@ -249,7 +249,7 @@ const Chains = (): JSX.Element => {
                         key={chainId}
                         className="h-[48px] hover:bg-accent-950 cursor-pointer"
                       >
-                        <td className="px-4 py-3 text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
+                        <td className="px-4 text-[15px] py-3 text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
                           {chainId}
                         </td>
                         <td className="px-4 py-3 text-center w-[180px] xl:w-[230px]">
@@ -296,17 +296,17 @@ const Chains = (): JSX.Element => {
                             <ChainStatus status={status} />
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center font-bold w-[110px] xl:w-[130px]">
-                          {strategies}
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[110px] xl:w-[130px]">
+                          {!!strategies && strategies}
                         </td>
-                        <td className="px-4 py-3 text-center font-bold w-[90px] xl:w-[100px]">
-                          {bridges}
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
+                          {!!bridges && bridges}
                         </td>
-                        <td className="px-4 py-3 text-center font-bold w-[120px] xl:w-[130px]">
-                          {protocols}
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[120px] xl:w-[130px]">
+                          {!!protocols && protocols}
                         </td>
-                        <td className="px-4 py-3 text-center font-bold w-[90px] xl:w-[100px]">
-                          {assets}
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
+                          {!!assets && assets}
                         </td>
                       </tr>
                     )
