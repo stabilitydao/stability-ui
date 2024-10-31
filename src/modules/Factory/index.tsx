@@ -26,7 +26,7 @@ import {
   currentChainID,
 } from "@store";
 
-import { getTokenData } from "@utils";
+// import { getTokenData } from "@utils";
 
 import { CHAINS } from "@constants";
 
@@ -47,7 +47,7 @@ type TFreeVaults =
 
 type TBuildingPrices = { [vaultType: string]: bigint };
 
-const CreateVault = (): JSX.Element => {
+const Factory = (): JSX.Element => {
   const $publicClient = useStore(publicClient);
   const $platformsData = useStore(platformsData);
   const $balances = useStore(balances);
@@ -64,9 +64,9 @@ const CreateVault = (): JSX.Element => {
 
   const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
-  const [allowedBBTokenVaults, setAllowedBBTokenVaults] = useState<
-    TAllowedBBTokenVaults | undefined
-  >();
+  // const [allowedBBTokenVaults, setAllowedBBTokenVaults] = useState<
+  //   TAllowedBBTokenVaults | undefined
+  // >();
   const [minInitialBoostPerDay, setMinInitialBoostPerDay] = useState<
     bigint | undefined
   >();
@@ -171,7 +171,7 @@ const CreateVault = (): JSX.Element => {
             allowedBBTokenVaults[1][i]
           );
         }
-        setAllowedBBTokenVaults(allowedBBTokenVaults_);
+        // setAllowedBBTokenVaults(allowedBBTokenVaults_);
       }
 
       const minInitialBoostPerDayValue = await $publicClient.readContract({
@@ -333,7 +333,7 @@ const CreateVault = (): JSX.Element => {
               <p>New vaults can be created after developing new strategies.</p>
             </div>
           )}
-          <h2 className="text-[22px] my-5">Rewarding vault</h2>
+          {/* <h2 className="text-[22px] my-5">Rewarding vault</h2>
           <div className="bg-[#2c2f38] rounded-md mb-5 max-w-[800px] mx-auto">
             <div className="px-5 py-3">
               {allowedBBTokenVaults && (
@@ -509,7 +509,7 @@ const CreateVault = (): JSX.Element => {
           </div>
 
           <h2 className="text-[22px] mt-5">Rewarding managed vault</h2>
-          <div className="text-[22px] text-center">Coming soon</div>
+          <div className="text-[22px] text-center">Coming soon</div> */}
 
           {$platformsData?.[$currentChainID] && buildIndex !== undefined && (
             <div
@@ -567,4 +567,4 @@ const CreateVault = (): JSX.Element => {
     </WagmiLayout>
   );
 };
-export { CreateVault };
+export { Factory };

@@ -5,6 +5,7 @@ import { formatUnits } from "viem";
 import axios from "axios";
 
 import { getStrategyInfo } from "../../src/utils/functions/getStrategyInfo";
+
 import { determineAPR } from "../../src/utils/functions/determineAPR";
 
 import { seeds } from "@stabilitydao/stability";
@@ -22,7 +23,7 @@ const getDaysFromLastHardWork = (lastHardWork: number) => {
   return Math.floor(differenceInSeconds / (60 * 60 * 24));
 };
 
-const CURRENT_ACTIVE_VAULTS = 19;
+const CURRENT_ACTIVE_VAULTS = 20;
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
@@ -30,9 +31,9 @@ const SEARCH_VALUES = {
   invalidByLaguage: "вматик",
 };
 
-const NETWORKS = ["Polygon", "Base"];
+const NETWORKS: string[] = ["Polygon", "Base", "Re.al"];
 
-const STRATEGIES = [
+const STRATEGIES: string[] = [
   "Y",
   "IQMF",
   "GUMF",
@@ -43,6 +44,7 @@ const STRATEGIES = [
   "CCF",
   "GQMF",
   "GRMF",
+  "TPF",
 ];
 
 const SORT_CASES = [
@@ -54,7 +56,7 @@ const SORT_CASES = [
   { name: "TVL", queue: 7, dataType: "withFormat" },
 ];
 
-const LINKS = [
+const LINKS: string[] = [
   "https://github.com/stabilitydao",
   "https://twitter.com/stabilitydao",
   "https://t.me/stabilitydao",
@@ -62,7 +64,13 @@ const LINKS = [
   "https://stabilitydao.gitbook.io/",
 ];
 
-const PORTFOLIO_VALUES = ["Deposited", "Daily", "Monthly", "APR", "APY"];
+const PORTFOLIO_VALUES: string[] = [
+  "Deposited",
+  "Daily",
+  "Monthly",
+  "APR",
+  "APY",
+];
 
 let allVaults: any[] = [];
 
@@ -84,7 +92,14 @@ test.beforeEach(async ({ page }) => {
         }));
       })
     );
-    allVaults = allVaults.flat();
+
+    allVaults = allVaults.flat().map((vault) => ({
+      ...vault,
+      sharePrice:
+        !Number(vault.sharePrice) && !Number(vault.tvl)
+          ? "1"
+          : vault.sharePrice,
+    }));
   } catch (error) {
     throw new Error(`API Error: ${error}`);
   }
@@ -308,7 +323,7 @@ test.describe("Vaults page tests", () => {
 
     for (let i = 0; i < NETWORKS.length; i++) {
       await networks.nth(i).click();
-      if (i === 1) await networks.nth(i).click();
+      if (i) await networks.nth(i - 1).click();
 
       await page.waitForTimeout(3000);
 
@@ -326,6 +341,7 @@ test.describe("Vaults page tests", () => {
           .getByRole("img")
           .nth(0)
           .getAttribute("alt");
+
         if (name === NETWORKS[i]) {
           networkVaultsCount++;
         }

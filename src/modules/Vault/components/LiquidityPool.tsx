@@ -67,7 +67,12 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
     );
 
     const assetsWithPercents = assets.map((asset) => {
-      return { ...asset, percent: (asset.amountInUSD / vaultLiquidity) * 100 };
+      return {
+        ...asset,
+        percent: asset.amountInUSD
+          ? (asset.amountInUSD / vaultLiquidity) * 100
+          : 0,
+      };
     });
 
     setPoolAssets(assetsWithPercents);
@@ -104,7 +109,11 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex flex-col gap-5">
             <FieldValue
               name="TVL"
-              value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+              value={
+                vault.pool.tvl
+                  ? formatNumber(Number(vault.pool.tvl), "abbreviate")
+                  : 0
+              }
               testId="poolTVL"
             />
 
@@ -120,7 +129,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
             {!!poolAssets &&
               poolAssets.map((poolAsset, index: number) => (
                 <div
-                  key={poolAsset.amount}
+                  key={poolAsset.amount + index}
                   data-testid="poolAsset"
                   className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col"
                 >

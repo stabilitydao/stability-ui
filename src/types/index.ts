@@ -34,9 +34,11 @@ interface IStrategyInfo {
 
 interface IChainData extends Chain {
   chainId: number;
-  protocolsCount: number;
+  protocols: number;
+  assets: number;
+  strategies: number;
+  bridges: number;
   tvl: number;
-  protocols: TTableProtocol[];
 }
 
 type TAssetData = {

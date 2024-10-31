@@ -4,6 +4,8 @@ const USDC: TAddress[] = [
   "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
   "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359",
   "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xaec9e50e3397f9ddc635c6c429c8c7eca418a143",
+  "0xc518a88c67ceca8b3f24c4562cb71deeb2af86b7",
 ];
 const USDT: TAddress[] = [
   "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",

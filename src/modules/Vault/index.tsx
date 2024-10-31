@@ -93,7 +93,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            {localVault.assets.length > 1 && localVault?.pool && (
+            {localVault.assets.length > 1 && localVault?.pool?.tvl && (
               <LiquidityPool network={network} vault={localVault} />
             )}
           </div>

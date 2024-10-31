@@ -84,6 +84,11 @@ const DEXes = [
     algo: "Uniswap V3",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
+  {
+    name: "Pearl V2",
+    algo: "Pearl V2",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+  },
 ];
 
 const CHAINS = [
@@ -101,6 +106,14 @@ const CHAINS = [
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
     explorer: "https://basescan.org/address/",
     nativeCurrency: "ETH",
+    active: true, // main page active networks
+  },
+  {
+    name: chains["111188"].name,
+    id: "111188",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["111188"].img}`,
+    explorer: "https://explorer.re.al/address/",
+    nativeCurrency: "reETH",
     active: true, // main page active networks
   },
 ];
@@ -184,6 +197,16 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
+  pearlV2: {
+    name: "Pearl V2",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+  },
+  trident: {
+    name: "Trident",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
+  },
 };
 
 const IL = {
@@ -252,6 +275,12 @@ const IL = {
     title: "Low",
     desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
     color: "#D7F55B",
+  },
+  TPF: {
+    rate: 1,
+    title: "UNKNOWN YET",
+    desc: "This is a new strategy with new protocols and pools. The impermanent losses will be indicated later, after data collection and analysis.",
+    color: "#C0BCC9",
   },
 };
 

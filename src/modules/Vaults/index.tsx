@@ -90,6 +90,7 @@ const Vaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
 
   const $vaults = useStore(vaults);
+
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
   const $connected = useStore(connected);
@@ -766,7 +767,7 @@ const Vaults = (): JSX.Element => {
                                       (protocol, index) => (
                                         <img
                                           className="h-6 w-6 rounded-full mx-[2px]"
-                                          key={protocol.logoSrc + index}
+                                          key={protocol.logoSrc + String(index)}
                                           src={protocol.logoSrc}
                                           alt={protocol.name}
                                           title={protocol.name}
@@ -1080,7 +1081,7 @@ const Vaults = (): JSX.Element => {
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
-      {/* <a href="/create-vault">
+      {/* <a href="/factory">
         <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
           Create vault
         </button>

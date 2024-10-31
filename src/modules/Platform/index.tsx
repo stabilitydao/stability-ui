@@ -206,8 +206,8 @@ const Platform = (): JSX.Element => {
 
         <CountersBlockCompact
           title="Factory"
-          link="/create-vault"
-          linkTitle="Gp to Factory"
+          link="/factory"
+          linkTitle="Go to Factory"
           counters={factoryInfo}
         />
       </div>

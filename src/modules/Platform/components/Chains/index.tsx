@@ -1,6 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 
-import { chains, getChainBridges } from "@stabilitydao/stability";
+import {
+  chains,
+  assets,
+  getChainBridges,
+  getChainStrategies,
+} from "@stabilitydao/stability";
 
 import { useStore } from "@nanostores/react";
 
@@ -14,7 +19,7 @@ import {
   FullPageLoader,
 } from "@ui";
 
-import { BridgesList, ChainStatus, ProtocolsList, RangeSlider } from "../../ui";
+import { ChainStatus } from "../../ui";
 
 import { formatNumber, sortTable } from "@utils";
 
@@ -40,10 +45,10 @@ const Chains = (): JSX.Element => {
   const [filtredTableData, setFiltredTableData] = useState<IChainData[]>([]);
   const [activeChains, setActiveChains] = useState(CHAINS_INFO);
 
-  const [TVLRange, setTVLRange] = useState({
-    min: 0,
-    max: 1_000_000_000_000_000,
-  });
+  // const [TVLRange, setTVLRange] = useState({
+  //   min: 0,
+  //   max: 1_000_000_000_000_000,
+  // });
 
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -60,17 +65,17 @@ const Chains = (): JSX.Element => {
           website: integrations[organization as string].website,
         }));
 
-        const uniqueProtocols = protocols.filter(
-          (protocol, index, self) =>
-            index === self.findIndex((p) => p.name === protocol.name)
+        const chainAssets = assets.filter((asset) =>
+          Object.keys(asset.addresses).includes(chain[0].toString())
         );
 
         return {
           ...chain[1],
           chainId: Number(chain[1].chainId),
-          bridgesCount: getChainBridges(chain[1].name).length,
-          protocols: uniqueProtocols,
-          protocolsCount: protocols.length,
+          bridges: getChainBridges(chain[1].name).length,
+          protocols: protocols.length,
+          assets: chainAssets.length,
+          strategies: getChainStrategies(chain[1].name).length,
           tvl: $apiData?.total.chainTvl[chain[0]] || 0,
         };
       });
@@ -124,7 +129,7 @@ const Chains = (): JSX.Element => {
       }
     });
 
-    data = data.filter(({ tvl }) => tvl <= TVLRange.max && tvl >= TVLRange.min);
+    // data = data.filter(({ tvl }) => tvl <= TVLRange.max && tvl >= TVLRange.min);
 
     //sort
     sortTable({
@@ -149,20 +154,20 @@ const Chains = (): JSX.Element => {
 
   useEffect(() => {
     tableHandler();
-  }, [activeChains, TVLRange]);
-
+  }, [activeChains]);
+  // TVLRange
   useEffect(() => {
     initTableData();
   }, [$apiData]);
 
-  const range = useMemo(() => {
-    if (!!tableData.length) {
-      const TVLs = tableData.map(({ tvl }) => tvl);
-      return { min: Math.min(...TVLs), max: Math.max(...TVLs) };
-    } else {
-      return { min: 0, max: 1 };
-    }
-  }, [tableData]);
+  // const range = useMemo(() => {
+  //   if (!!tableData.length) {
+  //     const TVLs = tableData.map(({ tvl }) => tvl);
+  //     return { min: Math.min(...TVLs), max: Math.max(...TVLs) };
+  //   } else {
+  //     return { min: 0, max: 1 };
+  //   }
+  // }, [tableData]);
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
@@ -201,7 +206,7 @@ const Chains = (): JSX.Element => {
             onChange={() => tableHandler()}
           />
         </label>
-        <RangeSlider range={range} setRange={setTVLRange} />
+        {/* <RangeSlider range={range} setRange={setTVLRange} /> */}
       </div>
       <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[1000px]">
         <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[1000px] lg:min-w-full">
@@ -235,13 +240,19 @@ const Chains = (): JSX.Element => {
                       // multisig,
                       tvl,
                       protocols,
+                      bridges,
+                      assets,
+                      strategies,
                     }) => (
                       <tr
                         onClick={() => toChain(chainId)}
                         key={chainId}
                         className="h-[48px] hover:bg-accent-950 cursor-pointer"
                       >
-                        <td className="px-4 py-3 text-center sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10">
+                        <td className="px-4 py-3 text-[15px] text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
+                          {chainId}
+                        </td>
+                        <td className="px-4 py-3 text-center w-[180px] xl:w-[230px]">
                           <div className="flex font-bold whitespace-nowrap items-center">
                             {img && (
                               <img
@@ -253,10 +264,7 @@ const Chains = (): JSX.Element => {
                             {name}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center font-bold">
-                          {chainId}
-                        </td>
-                        <td className="px-4 py-3 text-left whitespace-nowrap">
+                        <td className="px-4 py-3 text-[15px] text-left whitespace-nowrap w-[100px] xl:w-[120px]">
                           {formatNumber(tvl, "abbreviate")}
                         </td>
                         {/* <td className="px-4 py-3 text-[12px]">
@@ -283,20 +291,22 @@ const Chains = (): JSX.Element => {
                       )}
                     </div>
                   </td> */}
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 w-[200px] xl:w-[240px]">
                           <div className="flex items-center justify-center">
                             <ChainStatus status={status} />
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex lg:justify-center items-center">
-                            <BridgesList chainId={chainId} chainName={name} />
-                          </div>
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[110px] xl:w-[130px]">
+                          {!!strategies && strategies}
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex lg:justify-center items-center">
-                            <ProtocolsList protocols={protocols} />
-                          </div>
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
+                          {!!bridges && bridges}
+                        </td>
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[120px] xl:w-[130px]">
+                          {!!protocols && protocols}
+                        </td>
+                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
+                          {!!assets && assets}
                         </td>
                       </tr>
                     )

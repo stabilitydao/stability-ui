@@ -177,6 +177,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const { shortId } = vault.strategyInfo;
 
+  const DEX =
+    network === "111188"
+      ? {
+          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+          title: "Pearl DeX",
+        }
+      : {
+          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
+          title: "1inch DeX",
+        };
+
   const checkButtonApproveDeposit = (apprDepo: string[]) => {
     if (shortId === "IQMF" || shortId === "IRMF") {
       if (apprDepo.includes("deposit")) return true;
@@ -1878,7 +1889,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       const reload = async () => {
         if (transactionInProgress) return;
         if (inputs[option[0]]) {
-          if (tab === "Deposit") {
+          if (tab === "Deposit" && zapTokens.length) {
             await getZapDepositSwapAmounts(inputs[option[0]]);
           }
           if (tab === "Withdraw") {
@@ -2331,11 +2342,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           {!!zapTokens.length && (
                             <>
                               {shortId !== "CCF" ? (
-                                <div className="h-[40px] flex items-center">
+                                <div className="h-[40px] flex items-center justify-center">
                                   <img
-                                    src="/oneInch.svg"
-                                    alt="1inch logo"
-                                    title="1inch"
+                                    src={DEX.logo}
+                                    alt={DEX.title}
+                                    title={DEX.title}
                                     className="w-[26px] h-[26px]"
                                   />
                                   <div className="flex whitespace-nowrap gap-3 items-center">
@@ -2346,7 +2357,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       >
                                         {token.address.toLowerCase() !==
                                           option[0].toLowerCase() && (
-                                          <div className="flex items-center gap-1 mt-2">
+                                          <div className="flex items-center gap-1">
                                             {zapError ? (
                                               <img
                                                 src="/error.svg"
@@ -2403,9 +2414,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 <div className="text-[14px]  flex items-center gap-1 ml-2">
                                   <div className="flex items-center gap-1 mt-2">
                                     <img
-                                      src="/oneInch.svg"
-                                      alt="1inch logo"
-                                      title="1inch"
+                                      src={DEX.logo}
+                                      alt={DEX.title}
+                                      title={DEX.title}
                                     />
                                     {zapError ? (
                                       <img
@@ -2682,9 +2693,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   option[0].toLowerCase() && (
                                   <div className="flex items-center h-5">
                                     <img
-                                      src="/oneInch.svg"
-                                      alt="1inch logo"
-                                      title="1inch"
+                                      src={DEX.logo}
+                                      alt={DEX.title}
+                                      title={DEX.title}
                                       className="w-[20px] h-[20px]"
                                     />
                                     {!!amountOut ? (

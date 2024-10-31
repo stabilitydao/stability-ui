@@ -105,6 +105,7 @@ const Assets: React.FC<IProps> = memo(
     );
 
     const [investedData, setInvestedData] = useState<TPieChartData[]>([]);
+    const [isPieChart, setIsPieChart] = useState(false);
 
     const getInvestedData = async () => {
       const assetsAmounts = await publicClient?.readContract({
@@ -114,6 +115,8 @@ const Assets: React.FC<IProps> = memo(
       });
 
       if (!assetsAmounts?.length || !$assetsPrices[network]) return;
+
+      let isChart = false;
 
       const tokens = assetsAmounts[0].map((token: TAddress) =>
         getTokenData(token)
@@ -157,6 +160,10 @@ const Assets: React.FC<IProps> = memo(
           const color: string =
             assets.find((asset) => asset.symbol === symbol)?.color || "";
 
+          if (!!amount) {
+            isChart = true;
+          }
+
           return {
             address,
             symbol,
@@ -175,6 +182,7 @@ const Assets: React.FC<IProps> = memo(
       );
 
       setInvestedData(investedAssets);
+      setIsPieChart(isChart);
     };
 
     useEffect(() => {
@@ -197,34 +205,36 @@ const Assets: React.FC<IProps> = memo(
           scale={2}
           styles="text-left md:ml-4 md:mb-0 mb-2"
         />
-        <div className="flex justify-center items-center gap-5 mb-5">
-          {investedData && <Chart data={investedData} />}
+        {isPieChart && (
+          <div className="flex justify-center items-center gap-5 mb-5">
+            {investedData && <Chart data={investedData} />}
 
-          <div className="flex flex-col items-center gap-5">
-            {investedData &&
-              investedData.map((data: TPieChartData, index: number) => {
-                return (
-                  <div
-                    className="flex items-center gap-2"
-                    key={data?.color + index}
-                  >
+            <div className="flex flex-col items-center gap-5">
+              {investedData &&
+                investedData.map((data: TPieChartData, index: number) => {
+                  return (
                     <div
-                      style={{ background: data.color }}
-                      className="w-2 h-8 rounded-md"
-                    ></div>
-                    <img
-                      className="w-[30px] rounded-full"
-                      src={data.logo}
-                      alt={data.symbol}
-                    />
-                    <p className="text-[18px] text-[#8D8E96]">
-                      {data?.percent.toFixed(2)}%
-                    </p>
-                  </div>
-                );
-              })}
+                      className="flex items-center gap-2"
+                      key={data?.color + index}
+                    >
+                      <div
+                        style={{ background: data.color }}
+                        className="w-2 h-8 rounded-md"
+                      ></div>
+                      <img
+                        className="w-[30px] rounded-full"
+                        src={data.logo}
+                        alt={data.symbol}
+                      />
+                      <p className="text-[18px] text-[#8D8E96]">
+                        {data?.percent.toFixed(2)}%
+                      </p>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
           {investedData &&

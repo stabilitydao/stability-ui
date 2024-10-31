@@ -1,4 +1,8 @@
-import { getChainsTotals, getStrategiesTotals } from "@stabilitydao/stability";
+import {
+  chainStatusInfo,
+  getChainsTotals,
+  getStrategiesTotals,
+} from "@stabilitydao/stability";
 
 const TOTAL_CHAINS = getChainsTotals();
 
@@ -9,42 +13,43 @@ const CHAINS_INFO = [
     name: "Supported",
     length: TOTAL_CHAINS.SUPPORTED,
     color: "text-green-400",
-    bgColor: "#4FAE2D",
+    bgColor: chainStatusInfo.SUPPORTED.color,
     active: true,
   },
   {
     name: "Awaiting deployment",
     length: TOTAL_CHAINS.AWAITING_DEPLOYMENT,
     color: "text-violet-400",
-    bgColor: "#FDA73A",
+    bgColor: chainStatusInfo.AWAITING_DEPLOYMENT.color,
     active: true,
   },
   {
     name: "Development",
     length: TOTAL_CHAINS.CHAINLIB_DEVELOPMENT,
     color: "text-blue-400",
-    bgColor: "#4FAE2D",
+    bgColor: chainStatusInfo.CHAINLIB_DEVELOPMENT.color,
+
     active: true,
   },
   {
     name: "Awaiting developer",
     length: TOTAL_CHAINS.AWAITING_DEVELOPER,
     color: "text-yellow-200",
-    bgColor: "#FDA73A",
+    bgColor: chainStatusInfo.AWAITING_DEVELOPER.color,
     active: true,
   },
   {
     name: "Awaiting issue",
     length: TOTAL_CHAINS.AWAITING_ISSUE_CREATION,
     color: "text-orange-300",
-    bgColor: "#FDA73A",
+    bgColor: chainStatusInfo.AWAITING_ISSUE_CREATION.color,
     active: true,
   },
   {
     name: "Not supported",
     length: TOTAL_CHAINS.NOT_SUPPORTED,
     color: "text-gray-400",
-    bgColor: "#E01A1A",
+    bgColor: chainStatusInfo.NOT_SUPPORTED.color,
     active: true,
   },
 ];
