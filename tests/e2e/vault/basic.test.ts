@@ -15,11 +15,11 @@ const tokenlist = {
   name: "Stability Token List",
   logoURI: "https://stability.farm/logo.svg",
   keywords: [],
-  timestamp: "2024-06-28T00:00:00+00:00",
+  timestamp: "2024-10-22T00:00:00+00:00",
   version: {
     major: 1,
-    minor: 3,
-    patch: 0,
+    minor: 4,
+    patch: 2,
   },
   tags: {
     stablecoin: {
@@ -213,6 +213,110 @@ const tokenlist = {
       decimals: 18,
       logoURI:
         "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/dai.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 111188,
+      address: "0x25ea98ac87A38142561eA70143fd44c4772A16b6",
+      symbol: "MORE",
+      name: "MORE",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/MORE.png",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 111188,
+      address: "0x83feDBc0B85c6e29B589aA6BdefB1Cc581935ECD",
+      symbol: "USTB",
+      name: "US T-Bill",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/USTB.png",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 111188,
+      address: "0xAEC9e50e3397f9ddC635C6c429C8C7eca418a143",
+      symbol: "arcUSD",
+      name: "arcUSD",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/arcUSD.png",
+      tags: ["stablecoin"],
+    },
+    {
+      chainId: 111188,
+      address: "0x90c6E93849E06EC7478ba24522329d14A5954Df4",
+      symbol: "WREETH",
+      name: "Wrapped Real Ether",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/WREETH.png",
+      tags: ["wNative"],
+    },
+    {
+      chainId: 111188,
+      address: "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A",
+      symbol: "PEARL",
+      name: "Pearl",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/PEARL.png",
+    },
+    {
+      chainId: 111188,
+      address: "0x4644066f535Ead0cde82D209dF78d94572fCbf14",
+      symbol: "RWA",
+      name: "re.al",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/RWA.png",
+    },
+    {
+      chainId: 111188,
+      address: "0xB08F026f8a096E6d92eb5BcbE102c273A7a2d51C",
+      symbol: "CVR",
+      name: "CAVIAR",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/CVR.png",
+    },
+    {
+      chainId: 111188,
+      address: "0x835d3E1C0aA079C6164AAd21DCb23E60eb71AF48",
+      symbol: "UKRE",
+      name: "UK Real Estate",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/UKRE.svg",
+    },
+    {
+      chainId: 111188,
+      address: "0x75d0cBF342060b14c2fC756fd6E717dFeb5B1B70",
+      symbol: "DAI",
+      name: "Dai Stablecoin",
+      decimals: 18,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/dai.jpg",
+      tags: ["stablecoin", "bridged"],
+    },
+    {
+      chainId: 111188,
+      address: "0x6B2e0fACD2F2A8f407aC591067Ac06b5d29247E4",
+      symbol: "SACRA",
+      name: "Sacra token",
+      decimals: 18,
+      logoURI: "https://www.pearl.exchange/tokens/SACRA.png",
+    },
+    {
+      chainId: 111188,
+      address: "0xc518A88c67CECA8B3f24c4562CB71deeB2AF86B7",
+      symbol: "USDC",
+      name: "USD Coin",
+      decimals: 6,
+      logoURI:
+        "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg",
       tags: ["stablecoin", "bridged"],
     },
   ],

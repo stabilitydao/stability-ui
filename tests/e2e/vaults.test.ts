@@ -7,7 +7,7 @@ import axios from "axios";
 import { getStrategyInfo } from "../../src/utils/functions/getStrategyInfo";
 import { determineAPR } from "../../src/utils/functions/determineAPR";
 
-import { seeds } from "@stabilitydao/stability";
+import { seeds, chains } from "@stabilitydao/stability";
 
 import { CHAINS, ZERO_BigInt } from "@constants";
 
@@ -22,7 +22,7 @@ const getDaysFromLastHardWork = (lastHardWork: number) => {
   return Math.floor(differenceInSeconds / (60 * 60 * 24));
 };
 
-const CURRENT_ACTIVE_VAULTS = 19;
+const CURRENT_ACTIVE_VAULTS = 20;
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
@@ -30,9 +30,12 @@ const SEARCH_VALUES = {
   invalidByLaguage: "вматик",
 };
 
-const NETWORKS = ["Polygon", "Base"];
+const NETWORKS = Object.values(chains).reduce((acc, chain) => {
+  if (chain.status === "SUPPORTED") acc.push(chain?.name);
+  return acc;
+}, []);
 
-const STRATEGIES = [
+const STRATEGIES: string[] = [
   "Y",
   "IQMF",
   "GUMF",
@@ -43,6 +46,7 @@ const STRATEGIES = [
   "CCF",
   "GQMF",
   "GRMF",
+  "TPF",
 ];
 
 const SORT_CASES = [
@@ -308,7 +312,7 @@ test.describe("Vaults page tests", () => {
 
     for (let i = 0; i < NETWORKS.length; i++) {
       await networks.nth(i).click();
-      if (i === 1) await networks.nth(i).click();
+      if (i) await networks.nth(i - 1).click();
 
       await page.waitForTimeout(3000);
 
@@ -326,6 +330,7 @@ test.describe("Vaults page tests", () => {
           .getByRole("img")
           .nth(0)
           .getAttribute("alt");
+
         if (name === NETWORKS[i]) {
           networkVaultsCount++;
         }

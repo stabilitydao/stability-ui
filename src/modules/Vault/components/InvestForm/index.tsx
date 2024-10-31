@@ -1878,7 +1878,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       const reload = async () => {
         if (transactionInProgress) return;
         if (inputs[option[0]]) {
-          if (tab === "Deposit") {
+          if (tab === "Deposit" && zapTokens.length) {
             await getZapDepositSwapAmounts(inputs[option[0]]);
           }
           if (tab === "Withdraw") {

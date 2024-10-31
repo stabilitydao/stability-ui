@@ -84,6 +84,11 @@ const DEXes = [
     algo: "Uniswap V3",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
+  {
+    name: "Pearl V2",
+    algo: "Pearl V2",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+  },
 ];
 
 const CHAINS = [

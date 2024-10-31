@@ -129,7 +129,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
             {!!poolAssets &&
               poolAssets.map((poolAsset, index: number) => (
                 <div
-                  key={poolAsset.amount}
+                  key={poolAsset.amount + index}
                   data-testid="poolAsset"
                   className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col"
                 >
