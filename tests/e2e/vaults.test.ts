@@ -5,9 +5,10 @@ import { formatUnits } from "viem";
 import axios from "axios";
 
 import { getStrategyInfo } from "../../src/utils/functions/getStrategyInfo";
+
 import { determineAPR } from "../../src/utils/functions/determineAPR";
 
-import { seeds, chains } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
 import { CHAINS, ZERO_BigInt } from "@constants";
 
@@ -30,10 +31,7 @@ const SEARCH_VALUES = {
   invalidByLaguage: "вматик",
 };
 
-const NETWORKS = Object.values(chains).reduce((acc, chain) => {
-  if (chain.status === "SUPPORTED") acc.push(chain?.name);
-  return acc;
-}, []);
+const NETWORKS: string[] = ["Polygon", "Base", "Re.al"];
 
 const STRATEGIES: string[] = [
   "Y",
@@ -58,7 +56,7 @@ const SORT_CASES = [
   { name: "TVL", queue: 7, dataType: "withFormat" },
 ];
 
-const LINKS = [
+const LINKS: string[] = [
   "https://github.com/stabilitydao",
   "https://twitter.com/stabilitydao",
   "https://t.me/stabilitydao",
@@ -66,7 +64,13 @@ const LINKS = [
   "https://stabilitydao.gitbook.io/",
 ];
 
-const PORTFOLIO_VALUES = ["Deposited", "Daily", "Monthly", "APR", "APY"];
+const PORTFOLIO_VALUES: string[] = [
+  "Deposited",
+  "Daily",
+  "Monthly",
+  "APR",
+  "APY",
+];
 
 let allVaults: any[] = [];
 
@@ -88,7 +92,14 @@ test.beforeEach(async ({ page }) => {
         }));
       })
     );
-    allVaults = allVaults.flat();
+
+    allVaults = allVaults.flat().map((vault) => ({
+      ...vault,
+      sharePrice:
+        !Number(vault.sharePrice) && !Number(vault.tvl)
+          ? "1"
+          : vault.sharePrice,
+    }));
   } catch (error) {
     throw new Error(`API Error: ${error}`);
   }

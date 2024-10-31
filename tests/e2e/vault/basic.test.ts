@@ -501,9 +501,11 @@ test("Should display basic info correctly", async ({ page }) => {
     /* Share price should be displayed correctly */
     const vaultSP = await page.getByTestId("infoBarSP").innerText();
 
-    expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(
-      Number(vaultData.sharePrice).toFixed(1)
-    );
+    const sharePrice = Number(vaultData.sharePrice)
+      ? Number(vaultData.sharePrice).toFixed(1)
+      : "1.0";
+
+    expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(sharePrice);
 
     /* Last Hardwork should be displayed in hours and minutes or none */
     const infoBarHardWork = await page

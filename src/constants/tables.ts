@@ -63,16 +63,16 @@ const TABLE: TTableColumn[] = [
 
 const CHAINS_TABLE: TTableColumn[] = [
   {
-    name: "Chain",
-    keyName: "name",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
     name: "ID",
     keyName: "chainId",
     sortType: "ascendentic",
     dataType: "number",
+  },
+  {
+    name: "Chain",
+    keyName: "name",
+    sortType: "none",
+    dataType: "string",
   },
   {
     name: "TVL",
@@ -94,14 +94,26 @@ const CHAINS_TABLE: TTableColumn[] = [
   // },
   { name: "Status", keyName: "status", sortType: "none", dataType: "string" },
   {
+    name: "Strategies",
+    keyName: "strategies",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
     name: "Bridges",
-    keyName: "bridgesCount",
+    keyName: "bridges",
     sortType: "none",
     dataType: "number",
   },
   {
     name: "Protocols",
-    keyName: "protocolsCount",
+    keyName: "protocols",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Assets",
+    keyName: "assets",
     sortType: "none",
     dataType: "number",
   },
