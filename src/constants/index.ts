@@ -107,7 +107,7 @@ const CHAINS = [
     name: chains["111188"].name,
     id: "111188",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["111188"].img}`,
-    explorer: "https://explorer.re.al",
+    explorer: "https://explorer.re.al/address/",
     nativeCurrency: "reETH",
     active: true, // main page active networks
   },
