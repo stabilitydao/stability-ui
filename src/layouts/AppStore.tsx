@@ -572,6 +572,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       },
       Promise.resolve({})
     );
+
     localVaults[chainID] = APIVaults;
   };
 
@@ -676,12 +677,14 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 const vaultsPromise = await Promise.all(
                   contractVaults[0].map(
                     async (vault: string, index: number) => {
-                      return {
-                        [vault.toLowerCase()]: {
-                          ...localVaults[chain.id][vault.toLowerCase()],
-                          balance: contractBalance[5][index],
-                        },
-                      };
+                      if (localVaults[chain.id][vault.toLowerCase()]) {
+                        return {
+                          [vault.toLowerCase()]: {
+                            ...localVaults[chain.id][vault.toLowerCase()],
+                            balance: contractBalance[5][index],
+                          },
+                        };
+                      }
                     }
                   )
                 );
