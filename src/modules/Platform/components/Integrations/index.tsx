@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { integrations } from "@stabilitydao/stability";
 
-import { ProtocolBadge } from "../ui";
+import { ProtocolBadge } from "../../ui";
 
 import { Breadcrumbs, TableColumnSort, HeadingText } from "@ui";
 
@@ -13,6 +13,10 @@ import { INTEGRATIONS_TABLE } from "@constants";
 import type { TTableColumn } from "@types";
 
 import type { DeFiOrganization } from "@stabilitydao/stability";
+
+const toIntegration = (name: string): void => {
+  window.location.href = `/integrations/${name.toLowerCase()}`;
+};
 
 const Integrations = (): JSX.Element => {
   const [tableStates, setTableStates] = useState(INTEGRATIONS_TABLE);
@@ -60,7 +64,11 @@ const Integrations = (): JSX.Element => {
           <tbody className="text-[14px]">
             {tableData.map(
               ({ name, img, website, github, defiLlama, protocols }) => (
-                <tr className="h-[48px] hover:bg-accent-950" key={name}>
+                <tr
+                  onClick={() => toIntegration(name)}
+                  className="h-[48px] hover:bg-accent-950 cursor-pointer"
+                  key={name}
+                >
                   <td className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
                     <div className="flex items-center py-2">
                       <img

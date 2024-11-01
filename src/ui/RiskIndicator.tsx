@@ -6,10 +6,13 @@ interface IProps {
 
 const RiskIndicator: React.FC<IProps> = ({ riskSymbol }) => {
   const symbol: string = riskSymbol.toLowerCase();
+
   let color: string = "#4FAE2D";
 
   if (symbol.includes("rekt")) {
     color = "#E01A1A";
+  } else if (symbol.includes("unknown")) {
+    color = "#7F768B";
   } else if (symbol === "high" || symbol === "medium" || symbol === "low") {
     color = "#FB8B13";
   }

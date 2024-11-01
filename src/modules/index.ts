@@ -7,6 +7,7 @@ import { Assets } from "./Platform/components/Assets";
 import { Chains } from "./Platform/components/Chains";
 import { Chain } from "./Platform/components/Chains/Chain";
 import { Integrations } from "./Platform/components/Integrations";
+import { Integration } from "./Platform/components/Integrations/Integration";
 import { Network } from "./Platform/components/Network";
 import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
@@ -25,6 +26,7 @@ export {
   Chains,
   Chain,
   Integrations,
+  Integration,
   Network,
   Strategies,
   Node,

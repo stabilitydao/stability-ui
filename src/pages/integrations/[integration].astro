@@ -1,0 +1,11 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Integration} from "@modules"
+const { integration } = Astro.params;
+---
+
+<Layout title="Integration">
+    <div class="my-vault max-w-[1200px]">
+        <Integration integrationName={integration} client:only="react" />
+    </div>
+</Layout>
