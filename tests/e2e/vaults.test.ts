@@ -43,8 +43,8 @@ const STRATEGIES: string[] = [
   "IRMF",
   "CCF",
   "GQMF",
-  "GRMF",
   "TPF",
+  "GRMF",
 ];
 
 const SORT_CASES = [
