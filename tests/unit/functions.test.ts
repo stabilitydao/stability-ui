@@ -20,6 +20,7 @@ import {
   dataSorter,
   getShortAddress,
   formatTimestampToDate,
+  extractDomain,
 } from "@utils";
 
 import { transactionSettings, aprFilter } from "@store";
@@ -911,5 +912,44 @@ describe("formatTimestampToDate", () => {
   it("should format timestamp correctly for 23rd January with year", () => {
     const timestamp = 1674476300;
     expect(formatTimestampToDate(timestamp, true)).toBe("23rd Jan 2023");
+  });
+});
+
+describe("extractDomain", () => {
+  it("should return the domain without 'https://'", () => {
+    const url = "https://example.com";
+    expect(extractDomain(url)).toBe("example.com");
+  });
+
+  it("should return the domain without 'http://'", () => {
+    const url = "http://example.com";
+    expect(extractDomain(url)).toBe("example.com");
+  });
+
+  it("should return the domain without 'www'", () => {
+    const url = "https://www.example.com";
+    expect(extractDomain(url)).toBe("example.com");
+  });
+
+  it("should handle subdomains correctly", () => {
+    const url = "https://subdomain.example.com";
+    expect(extractDomain(url)).toBe("subdomain.example.com");
+  });
+
+  it("should handle URLs with paths after the domain", () => {
+    const url = "https://example.com/path/to/page";
+    expect(extractDomain(url)).toBe("example.com");
+  });
+
+  it("should handle URLs with 'www' and paths", () => {
+    const url = "https://www.example.com/path/to/page";
+    expect(extractDomain(url)).toBe("example.com");
+  });
+
+  it("should handle undefined or empty input gracefully", () => {
+    const url = "";
+
+    expect(extractDomain(url)).toBe("");
+    expect(extractDomain(undefined)).toBe("");
   });
 });

@@ -14,6 +14,7 @@ const USDT: TAddress[] = [
 const DAI: TAddress[] = [
   "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
   "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",
+  "0x75d0cbf342060b14c2fc756fd6e717dfeb5b1b70",
 ];
 const WMATIC: TAddress[] = ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"];
 const WETH: TAddress[] = [
@@ -30,7 +31,11 @@ const CRV: TAddress[] = [
   "0xc4ce1d6f5d98d65ee25cf85e9f2e9dcfee6cb5d6",
   "0x417Ac0e078398C154EdFadD9Ef675d30Be60Af93",
 ];
+
 const cbETH: TAddress[] = ["0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22"];
+
+const MORE: TAddress[] = ["0x25ea98ac87a38142561ea70143fd44c4772a16b6"];
+const USTB: TAddress[] = ["0x83fedbc0b85c6e29b589aa6bdefb1cc581935ecd"];
 
 export {
   USDC,
@@ -46,4 +51,6 @@ export {
   MULTISIG,
   CRV,
   cbETH,
+  MORE,
+  USTB,
 };

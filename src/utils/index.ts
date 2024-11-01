@@ -20,6 +20,7 @@ import { getShortAddress } from "./functions/getShortAddress";
 import { sortTable } from "./functions/sortTable";
 import { formatTimestampToDate } from "./functions/formatTimestampToDate";
 import { getNFTSymbol } from "./functions/getNFTSymbol";
+import { extractDomain } from "./functions/extractDomain";
 
 export {
   getTokenData,
@@ -44,4 +45,5 @@ export {
   sortTable,
   formatTimestampToDate,
   getNFTSymbol,
+  extractDomain,
 };

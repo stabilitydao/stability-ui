@@ -596,20 +596,20 @@ test.describe("Vaults page tests", () => {
   });
 });
 
-// test("should be tvl", async ({ page }) => {
-//   try {
-//     const TVLs = allVaults.map((vault) => vault.tvl);
+test("should be tvl", async ({ page }) => {
+  try {
+    const TVLs = allVaults.map((vault) => vault.tvl);
 
-//     const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
+    const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
 
-//     const formattedTVL = formatNumber(totalTVL, "abbreviate");
+    const formattedTVL = formatNumber(totalTVL, "abbreviate");
 
-//     await page.waitForSelector("[data-testid='tvl']");
+    await page.waitForSelector("[data-testid='tvl']");
 
-//     const pageTVL = await page.getByTestId("tvl").textContent();
+    const pageTVL = await page.getByTestId("tvl").textContent();
 
-//     expect(pageTVL).toBe(formattedTVL);
-//   } catch (error) {
-//     console.error("Error fetching or processing data:", error);
-//   }
-// });
+    expect(pageTVL).toBe(formattedTVL);
+  } catch (error) {
+    console.error("Error fetching or processing data:", error);
+  }
+});

@@ -17,15 +17,14 @@ const Header = (): JSX.Element => {
     "integrations",
     "assets",
     "factory",
+    "network",
   ];
 
   const [menu, setMenu] = useState(false);
 
   const isPlatform =
     platformPaths.some((path) => path === currentPath) ||
-    currentPath.includes("network/") ||
-    currentPath.includes("chains/") ||
-    currentPath.includes("strategies/");
+    platformPaths.some((path) => currentPath.includes(path));
 
   const isVaults = currentPath === "" || currentPath.includes("vault/");
   return (

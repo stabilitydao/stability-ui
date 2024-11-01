@@ -120,6 +120,15 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         stabilityAPIData = response.data;
 
+        if (stabilityAPIData?.error) {
+          error.set({
+            state: true,
+            type: "API",
+            description: stabilityAPIData?.error,
+          });
+          return;
+        }
+
         if (stabilityAPIData?.assetPrices) {
           assetsPrices.set(stabilityAPIData?.assetPrices);
           prices = stabilityAPIData?.assetPrices;
@@ -455,7 +464,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let yearnProtocols: TYearnProtocol[] = [];
         let strategySpecific: string = "";
 
-        if (vault.strategySpecific && strategyInfo.shortId === "Y") {
+        if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
             if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
               switch (protocol) {

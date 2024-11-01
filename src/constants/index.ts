@@ -26,11 +26,13 @@ import {
   TREASURY,
   // cbETH,
   CRV,
+  MORE,
+  USTB,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
 
-const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV];
+const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV, ...MORE, ...USTB];
 
 const PAGINATION_VAULTS = 20;
 
