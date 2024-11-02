@@ -72,7 +72,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
     },
     {
       name: "TVL",
-      content: `\$${formatNumber($apiData?.total.chainTvl[chain.toString()] ? $apiData?.total.chainTvl[chain.toString()].toFixed(0) : "-", "withSpaces")}`,
+      content: `${formatNumber($apiData?.total.chainTvl[chain.toString()] ? $apiData?.total.chainTvl[chain.toString()].toFixed(0) : "-", "abbreviate")}`,
     },
   ];
 
@@ -101,7 +101,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
         content: chainVaults.length,
       },
       {
-        name: "Vaults APR",
+        name: "APR",
         content: `${weightedAverageAPR.toFixed(2)}%`,
       },
       {

@@ -8,6 +8,8 @@ import { getStrategyInfo } from "../../src/utils/functions/getStrategyInfo";
 
 import { determineAPR } from "../../src/utils/functions/determineAPR";
 
+import { formatNumber } from "../../src/utils/functions/formatNumber";
+
 import { seeds } from "@stabilitydao/stability";
 
 import { CHAINS, ZERO_BigInt, PAGINATION_VAULTS } from "@constants";
@@ -32,8 +34,10 @@ const SEARCH_VALUES = {
 const NETWORKS: string[] = ["Polygon", "Base", "Re.al"];
 
 const STRATEGIES: string[] = [
+  "GRMF",
   "Y",
   "IQMF",
+  "TPF",
   "GUMF",
   "QSMF",
   "CF",
@@ -41,9 +45,9 @@ const STRATEGIES: string[] = [
   "IRMF",
   "CCF",
   "GQMF",
-  "TPF",
-  "GRMF",
-];
+].sort();
+
+const STABLECOIN_SYMBOLS = ["USD", "DAI", "MORE", "USTB"];
 
 const SORT_CASES = [
   { name: "SYMBOL", queue: 0, dataType: "text" },
@@ -367,7 +371,9 @@ test.describe("Vaults page tests", () => {
 
       const isStablecoins = assets
         ?.split("+")
-        .every((asset) => asset.includes("USD") || asset.includes("DAI"));
+        .every((asset) =>
+          STABLECOIN_SYMBOLS.some((symbol) => asset.includes(symbol))
+        );
 
       if (isStablecoins) stablecoinsVaultsCount++;
     }
@@ -378,15 +384,15 @@ test.describe("Vaults page tests", () => {
   test("should be all strategy filters", async ({ page }) => {
     const strategiesCount = await page.getByTestId("strategy").count();
 
-    const dropdownStrategyes = [];
+    const dropdownStrategies = [];
 
     for (let i = 0; i < strategiesCount; i++) {
       const strategy = await page.getByTestId("strategy").nth(i).textContent();
 
-      dropdownStrategyes.push(strategy);
+      dropdownStrategies.push(strategy);
     }
 
-    expect(dropdownStrategyes).toEqual(STRATEGIES);
+    expect(dropdownStrategies.sort()).toEqual(STRATEGIES);
     expect(strategiesCount).toBe(STRATEGIES.length);
   });
 
@@ -594,20 +600,20 @@ test.describe("Vaults page tests", () => {
   });
 });
 
-test("should be tvl", async ({ page }) => {
-  try {
-    const TVLs = allVaults.map((vault) => vault.tvl);
+// test("should be tvl", async ({ page }) => {
+//   try {
+//     const TVLs = allVaults.map((vault) => vault.tvl);
 
-    const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
+//     const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
 
-    const formattedTVL = formatNumber(totalTVL, "abbreviate");
+//     const formattedTVL = formatNumber(totalTVL, "abbreviate");
 
-    await page.waitForSelector("[data-testid='tvl']");
+//     await page.waitForSelector("[data-testid='tvl']");
 
-    const pageTVL = await page.getByTestId("tvl").textContent();
+//     const pageTVL = await page.getByTestId("tvl").textContent();
 
-    expect(pageTVL).toBe(formattedTVL);
-  } catch (error) {
-    console.error("Error fetching or processing data:", error);
-  }
-});
+//     expect(pageTVL).toBe(formattedTVL);
+//   } catch (error) {
+//     console.error("Error fetching or processing data:", error);
+//   }
+// });

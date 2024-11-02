@@ -10,22 +10,7 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
 
-  if ($error.state && type === "API") {
-    return (
-      <div className="mt-5 text-[16px] font-manrope bg-accent-950 text-neutral-50 rounded-[32px] min-w-[350px]">
-        <div className="flex items-center justify-center flex-col gap-3 p-3">
-          <p> {$error.description.slice(0, 40)}...</p>
-          <button
-            onClick={() => reload.set(!$reload)}
-            className="bg-accent-500 text-neutral-50 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"
-          >
-            Reload
-          </button>
-        </div>
-      </div>
-    );
-  }
-  if ($error.state && type === "WEB3") {
+  if ($error.state) {
     return (
       <div className="fixed top-0 left-1/2 transform -translate-x-1/2 font-manrope text-[16px] max-w-[700px] w-full bg-accent-950 rounded-[32px] flex flex-col items-center justify-center mt-3 z-[200] text-neutral-50">
         <svg
@@ -88,7 +73,9 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
             </filter>
           </defs>
         </svg>
-        <p className="py-8 px-3">{$error.description.slice(0, 25)}...</p>
+        <p className="py-8 px-3">
+          {$error.description.slice(0, type === "WEB3" ? 25 : 40)}...
+        </p>
         <button
           onClick={() => reload.set(!$reload)}
           className="bg-accent-500 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"

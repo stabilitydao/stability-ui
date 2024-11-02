@@ -565,6 +565,7 @@ type TAPIData = {
       };
     };
   };
+  error?: string;
 };
 
 type TVLRange = { min: number; max: number };

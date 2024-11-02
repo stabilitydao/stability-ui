@@ -46,13 +46,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
     }
   }, [$vaults, $vaultData]);
 
-  if ($error.state && $error.type === "API") {
-    return (
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <ErrorMessage type="API" />
-      </div>
-    );
-  }
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full xl:min-w-[1200px] mx-auto font-manrope">
@@ -70,6 +63,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
         <HistoricalRate
           network={network}
           address={vault.toLowerCase() as TAddress}
+          created={Number(localVault.created)}
           vaultStrategy={localVault.strategy}
           lastHardWork={Number(localVault.lastHardWork)}
         />
@@ -109,11 +103,13 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           strategy={localVault?.strategyAddress}
         />
       </main>
-      <ErrorMessage type="WEB3" />
     </WagmiLayout>
   ) : (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <FullPageLoader />
+    <div>
+      <ErrorMessage type={$error.type} />{" "}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <FullPageLoader />
+      </div>
     </div>
   );
 };
