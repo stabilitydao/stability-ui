@@ -10,7 +10,7 @@ import { determineAPR } from "../../src/utils/functions/determineAPR";
 
 import { seeds } from "@stabilitydao/stability";
 
-import { CHAINS, ZERO_BigInt } from "@constants";
+import { CHAINS, ZERO_BigInt, PAGINATION_VAULTS } from "@constants";
 
 const calculateAPR = (almEntity: number, fee: number) => {
   return almEntity - (almEntity / 100) * fee;
@@ -22,8 +22,6 @@ const getDaysFromLastHardWork = (lastHardWork: number) => {
   const differenceInSeconds = currentTime - targetTime;
   return Math.floor(differenceInSeconds / (60 * 60 * 24));
 };
-
-const CURRENT_ACTIVE_VAULTS = 20;
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
@@ -131,7 +129,7 @@ test.describe("Vaults page tests", () => {
 
     const activeVaults = await page.getByTestId("vault").count();
 
-    await expect(activeVaults).toBe(CURRENT_ACTIVE_VAULTS);
+    await expect(activeVaults).toBe(PAGINATION_VAULTS);
   });
 
   test("should be hide portfolio data", async ({ page }) => {

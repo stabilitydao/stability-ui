@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import {
   type ApiMainReply,
   assets,
@@ -11,7 +13,7 @@ import {
 
 import { useStore } from "@nanostores/react";
 
-import { apiData } from "@store";
+import { apiData, vaults } from "@store";
 
 import { formatNumber } from "@utils";
 
@@ -21,7 +23,7 @@ import { ChainStatus, StrategyStatus } from "../../ui";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
-import type { TStrategyState } from "@types";
+import type { TStrategyState, TVault } from "@types";
 
 interface IProps {
   chain: number;
@@ -29,6 +31,7 @@ interface IProps {
 
 const Chain: React.FC<IProps> = ({ chain }) => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
+  const $vaults = useStore(vaults);
 
   const chainData = {
     ...chains[chain],
@@ -73,6 +76,41 @@ const Chain: React.FC<IProps> = ({ chain }) => {
     },
   ];
 
+  const vaultsInfo = useMemo(() => {
+    if (!$apiData) return [];
+
+    const chainVaults: TVault[] = Object.entries($vaults[chain] || {}).map(
+      (vault) => vault[1] as TVault
+    );
+
+    const vaultsTVL: number = chainVaults.reduce(
+      (acc: number, cur) => (acc += Number(cur?.tvl)),
+      0
+    );
+
+    const weightedAverageAPR: number = chainVaults.reduce(
+      (acc: number, cur) =>
+        acc +
+        (Number(cur?.earningData?.apr?.daily) * Number(cur?.tvl)) / vaultsTVL,
+      0
+    );
+
+    return [
+      {
+        name: "Vaults",
+        content: chainVaults.length,
+      },
+      {
+        name: "Vaults APR",
+        content: `${weightedAverageAPR.toFixed(2)}%`,
+      },
+      {
+        name: "Vaults TVL",
+        content: formatNumber(vaultsTVL, "abbreviate"),
+      },
+    ];
+  }, [$vaults, chain]);
+
   const chainAssets = assets.filter((asset) =>
     Object.keys(asset.addresses).includes(chain.toString())
   );
@@ -109,6 +147,36 @@ const Chain: React.FC<IProps> = ({ chain }) => {
               </div>
             ))}
           </div>
+          {chainData.status === "SUPPORTED" && vaultsInfo.length ? (
+            <div className="flex items-center justify-center flex-wrap p-[16px] ">
+              {vaultsInfo.map(({ name, content }, index) => (
+                <div
+                  key={name}
+                  className="flex w-full sm:w-6/12 md:w-4/12 lg:w-4/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col it"
+                >
+                  {!index ? (
+                    <a
+                      className="h-[50px] text-[30px] whitespace-nowrap items-center self-center flex"
+                      target="_blank"
+                      href={`/?chain=${chain}&status=all`}
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div className="h-[50px] text-[30px] whitespace-nowrap items-center self-center flex">
+                      {content}
+                    </div>
+                  )}
+
+                  <div className="flex self-center justify-center text-[16px]">
+                    {name}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
 
         {strategies.length > 0 && (
