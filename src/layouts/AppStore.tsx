@@ -38,8 +38,6 @@ import {
 
 import { wagmiConfig, platforms, PlatformABI, IVaultManagerABI } from "@web3";
 
-import { ErrorMessage } from "@ui";
-
 import {
   calculateAPY,
   getStrategyInfo,
@@ -100,7 +98,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
-  const $error = useStore(error);
+
+  let isError = false;
 
   const localVaults: {
     [network: string]: TVaults;
@@ -109,6 +108,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   let prices: TMultichainPrices = {};
 
   let stabilityAPIData: TAPIData = {};
+
+  const handleError = (errType: string, description: string) => {
+    error.set({ state: true, type: errType, description });
+    isError = true;
+  };
 
   const getDataFromStabilityAPI = async () => {
     const maxRetries = 3;
@@ -121,11 +125,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         stabilityAPIData = response.data;
 
         if (stabilityAPIData?.error) {
-          error.set({
-            state: true,
-            type: "API",
-            description: stabilityAPIData?.error,
-          });
+          handleError("API", stabilityAPIData?.error);
           return;
         }
 
@@ -143,11 +143,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         } else {
           console.error("API error:", err);
-          error.set({
-            state: true,
-            type: "API",
-            description: err?.message,
-          });
+          handleError("API", err);
         }
       }
     }
@@ -697,6 +693,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               isVaultsLoaded.set(true);
             } catch (txError: any) {
               console.log("BLOCKCHAIN ERROR:", txError);
+
               error.set({
                 state: true,
                 type: "WEB3",
@@ -724,7 +721,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     await getDataFromStabilityAPI();
 
-    getData();
+    if (!isError) {
+      getData();
+    }
 
     if (chain?.id) {
       currentChainID.set(String(chain?.id));
@@ -738,14 +737,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   useEffect(() => {
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
-
-  if ($error.state && $error.type === "API") {
-    return (
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <ErrorMessage type="API" />
-      </div>
-    );
-  }
 
   return (
     <WagmiLayout>

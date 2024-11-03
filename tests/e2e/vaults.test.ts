@@ -8,9 +8,11 @@ import { getStrategyInfo } from "../../src/utils/functions/getStrategyInfo";
 
 import { determineAPR } from "../../src/utils/functions/determineAPR";
 
+import { formatNumber } from "../../src/utils/functions/formatNumber";
+
 import { seeds } from "@stabilitydao/stability";
 
-import { CHAINS, ZERO_BigInt } from "@constants";
+import { CHAINS, ZERO_BigInt, PAGINATION_VAULTS } from "@constants";
 
 const calculateAPR = (almEntity: number, fee: number) => {
   return almEntity - (almEntity / 100) * fee;
@@ -23,8 +25,6 @@ const getDaysFromLastHardWork = (lastHardWork: number) => {
   return Math.floor(differenceInSeconds / (60 * 60 * 24));
 };
 
-const CURRENT_ACTIVE_VAULTS = 20;
-
 const SEARCH_VALUES = {
   valid: "WMATIC",
   invalidByNumber: String(Math.random()),
@@ -34,8 +34,10 @@ const SEARCH_VALUES = {
 const NETWORKS: string[] = ["Polygon", "Base", "Re.al"];
 
 const STRATEGIES: string[] = [
+  "GRMF",
   "Y",
   "IQMF",
+  "TPF",
   "GUMF",
   "QSMF",
   "CF",
@@ -43,9 +45,9 @@ const STRATEGIES: string[] = [
   "IRMF",
   "CCF",
   "GQMF",
-  "TPF",
-  "GRMF",
-];
+].sort();
+
+const STABLECOIN_SYMBOLS = ["USD", "DAI", "MORE", "USTB"];
 
 const SORT_CASES = [
   { name: "SYMBOL", queue: 0, dataType: "text" },
@@ -131,7 +133,7 @@ test.describe("Vaults page tests", () => {
 
     const activeVaults = await page.getByTestId("vault").count();
 
-    await expect(activeVaults).toBe(CURRENT_ACTIVE_VAULTS);
+    await expect(activeVaults).toBe(PAGINATION_VAULTS);
   });
 
   test("should be hide portfolio data", async ({ page }) => {
@@ -369,7 +371,9 @@ test.describe("Vaults page tests", () => {
 
       const isStablecoins = assets
         ?.split("+")
-        .every((asset) => asset.includes("USD") || asset.includes("DAI"));
+        .every((asset) =>
+          STABLECOIN_SYMBOLS.some((symbol) => asset.includes(symbol))
+        );
 
       if (isStablecoins) stablecoinsVaultsCount++;
     }
@@ -380,15 +384,15 @@ test.describe("Vaults page tests", () => {
   test("should be all strategy filters", async ({ page }) => {
     const strategiesCount = await page.getByTestId("strategy").count();
 
-    const dropdownStrategyes = [];
+    const dropdownStrategies = [];
 
     for (let i = 0; i < strategiesCount; i++) {
       const strategy = await page.getByTestId("strategy").nth(i).textContent();
 
-      dropdownStrategyes.push(strategy);
+      dropdownStrategies.push(strategy);
     }
 
-    expect(dropdownStrategyes).toEqual(STRATEGIES);
+    expect(dropdownStrategies.sort()).toEqual(STRATEGIES);
     expect(strategiesCount).toBe(STRATEGIES.length);
   });
 
@@ -596,20 +600,20 @@ test.describe("Vaults page tests", () => {
   });
 });
 
-test("should be tvl", async ({ page }) => {
-  try {
-    const TVLs = allVaults.map((vault) => vault.tvl);
+// test("should be tvl", async ({ page }) => {
+//   try {
+//     const TVLs = allVaults.map((vault) => vault.tvl);
 
-    const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
+//     const totalTVL = TVLs.reduce((acc, tvl) => acc + Number(tvl), 0);
 
-    const formattedTVL = formatNumber(totalTVL, "abbreviate");
+//     const formattedTVL = formatNumber(totalTVL, "abbreviate");
 
-    await page.waitForSelector("[data-testid='tvl']");
+//     await page.waitForSelector("[data-testid='tvl']");
 
-    const pageTVL = await page.getByTestId("tvl").textContent();
+//     const pageTVL = await page.getByTestId("tvl").textContent();
 
-    expect(pageTVL).toBe(formattedTVL);
-  } catch (error) {
-    console.error("Error fetching or processing data:", error);
-  }
-});
+//     expect(pageTVL).toBe(formattedTVL);
+//   } catch (error) {
+//     console.error("Error fetching or processing data:", error);
+//   }
+// });

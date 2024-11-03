@@ -30,6 +30,7 @@ import {
   isVaultsLoaded,
   aprFilter,
   connected,
+  error,
   // platformVersions,
   // currentChainID,
   // assetsPrices,
@@ -94,6 +95,8 @@ const Vaults = (): JSX.Element => {
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
   const $connected = useStore(connected);
+
+  const $error = useStore(error);
   // const $publicClient = useStore(publicClient);
   // const $platformVersions = useStore(platformVersions);
   // const $currentChainID = useStore(currentChainID);
@@ -506,7 +509,7 @@ const Vaults = (): JSX.Element => {
         </div>
       </div>
 
-      <ErrorMessage type="WEB3" />
+      <ErrorMessage type={$error.type} />
       {/* {!!platformUpdates?.newVersion &&
         platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
         !!upgradesTable?.length && (

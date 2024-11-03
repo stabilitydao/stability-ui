@@ -479,7 +479,7 @@ test("Should display assets info correctly", async ({ page }) => {
       const tokenDescriptionText = await page
         .getByTestId(`tokenDescription${assetIndex}`)
         .innerText();
-      expect(tokenDescriptionText).toBe(asset?.description);
+      expect(tokenDescriptionText?.trim()).toBe(asset?.description?.trim());
 
       /* If price feed provided by oracle - oracle label should be displayed */
 
@@ -492,7 +492,7 @@ test("Should display assets info correctly", async ({ page }) => {
         const trustedOracleLink = await page
           .getByTestId(`trustedToken${assetIndex}`)
           .getAttribute("href");
-        expect(trustedOracleLink).toBe(oracleLink);
+        expect(trustedOracleLink?.trim()).toBe(oracleLink?.trim());
       }
     }
 
