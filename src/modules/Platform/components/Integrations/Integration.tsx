@@ -20,13 +20,12 @@ const Integration: React.FC<IProps> = ({ integrationName }) => {
 
   const integration = integrations[integrationName] || integrations.chainlink;
 
-  const flatChains = Object.entries(chains).map((chain) => chain[1]);
+  const flatChains = Object.values(chains);
 
   const website = extractDomain(integration.website);
 
-  const protocols = Object.entries(integration.protocols).map(
-    (entry) => entry[1]
-  );
+  const protocols = Object.values(integration.protocols);
+
   return (
     <div className="flex flex-col lg:w-[960px] xl:min-w-[1200px]">
       <Breadcrumbs links={["Platform", "Integrations", integration.name]} />

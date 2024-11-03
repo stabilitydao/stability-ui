@@ -24,10 +24,10 @@ const Integrations = (): JSX.Element => {
 
   const initTableData = async () => {
     if (integrations) {
-      const integrationsData = Object.entries(integrations).map(
+      const integrationsData = Object.values(integrations).map(
         (integration) => ({
-          ...integration[1],
-          protocolsLength: Object.keys(integration[1].protocols).length,
+          ...integration,
+          protocolsLength: Object.keys(integration.protocols).length,
         })
       );
       setTableData(integrationsData);

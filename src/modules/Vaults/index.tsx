@@ -181,12 +181,11 @@ const Vaults = (): JSX.Element => {
     if (activeNetworksLength === updatedNetworks.length) {
       params.delete("chain");
     } else {
+      params.delete("chain");
+
       updatedNetworks.forEach((network) => {
         if (network.active) {
-          params.set("chain", network.id);
-
-          newUrl.search = `?${params.toString()}`;
-          window.history.pushState({}, "", newUrl.toString());
+          params.append("chain", network.id);
         }
       });
     }

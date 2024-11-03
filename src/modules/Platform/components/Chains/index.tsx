@@ -55,6 +55,14 @@ const Chains = (): JSX.Element => {
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const initTableData = async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const chainStatuses = searchParams
+      .getAll("status")
+      .map((status) =>
+        status === "awaiting_issue" ? "awaiting_issue_creation" : status
+      );
+
     if (chains) {
       const chainsData = Object.entries(chains).map((chain) => {
         const allChainProtocols = getChainProtocols(chain[0]);
@@ -80,8 +88,27 @@ const Chains = (): JSX.Element => {
         };
       });
 
+      const filtredChainsData = chainStatuses.length
+        ? chainsData.filter((chain) =>
+            chainStatuses.includes(chain.status.toLowerCase())
+          )
+        : chainsData;
+
+      const filteredChains = chainStatuses.length
+        ? activeChains.map((chain) =>
+            chainStatuses.includes(
+              chain.name === "Awaiting issue"
+                ? "awaiting_issue_creation"
+                : chain.name.toLowerCase().split(" ").join("_")
+            )
+              ? { ...chain, active: !chain.active }
+              : chain
+          )
+        : activeChains.map((chain) => ({ ...chain, active: true }));
+
       setTableData(chainsData);
-      setFiltredTableData(chainsData);
+      setActiveChains(filteredChains);
+      setFiltredTableData(filtredChainsData);
       setIsLoaded(true);
     }
   };
@@ -90,6 +117,11 @@ const Chains = (): JSX.Element => {
     let updatedChains = activeChains.map((chain) =>
       category === chain.name ? { ...chain, active: !chain.active } : chain
     );
+
+    ///// For chains URL filters
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+    /////
 
     const allActive = activeChains.every((chain) => chain.active);
     const allInactive = updatedChains.every((chain) => !chain.active);
@@ -105,6 +137,28 @@ const Chains = (): JSX.Element => {
         active: chain.name === category,
       }));
     }
+
+    /// URL set
+    const activeChainsLength = updatedChains.filter(
+      (chain) => chain.active
+    )?.length;
+
+    if (activeChainsLength === updatedChains.length) {
+      params.delete("status");
+    } else {
+      params.delete("status");
+
+      updatedChains.forEach((chain) => {
+        const type = chain.name.toLowerCase().split(" ").join("_");
+
+        if (chain.active) {
+          params.append("status", type);
+        }
+      });
+    }
+
+    newUrl.search = `?${params.toString()}`;
+    window.history.pushState({}, "", newUrl.toString());
 
     setActiveChains(updatedChains);
   };
@@ -155,7 +209,7 @@ const Chains = (): JSX.Element => {
   useEffect(() => {
     tableHandler();
   }, [activeChains]);
-  // TVLRange
+
   useEffect(() => {
     initTableData();
   }, [$apiData]);

@@ -14,14 +14,14 @@ const CHAINS_INFO = [
     length: TOTAL_CHAINS.SUPPORTED,
     color: "text-green-400",
     bgColor: chainStatusInfo.SUPPORTED.color,
-    active: true,
+    active: false,
   },
   {
     name: "Awaiting deployment",
     length: TOTAL_CHAINS.AWAITING_DEPLOYMENT,
     color: "text-violet-400",
     bgColor: chainStatusInfo.AWAITING_DEPLOYMENT.color,
-    active: true,
+    active: false,
   },
   {
     name: "Development",
@@ -29,28 +29,28 @@ const CHAINS_INFO = [
     color: "text-blue-400",
     bgColor: chainStatusInfo.CHAINLIB_DEVELOPMENT.color,
 
-    active: true,
+    active: false,
   },
   {
     name: "Awaiting developer",
     length: TOTAL_CHAINS.AWAITING_DEVELOPER,
     color: "text-yellow-200",
     bgColor: chainStatusInfo.AWAITING_DEVELOPER.color,
-    active: true,
+    active: false,
   },
   {
     name: "Awaiting issue",
     length: TOTAL_CHAINS.AWAITING_ISSUE_CREATION,
     color: "text-orange-300",
     bgColor: chainStatusInfo.AWAITING_ISSUE_CREATION.color,
-    active: true,
+    active: false,
   },
   {
     name: "Not supported",
     length: TOTAL_CHAINS.NOT_SUPPORTED,
     color: "text-gray-400",
     bgColor: chainStatusInfo.NOT_SUPPORTED.color,
-    active: true,
+    active: false,
   },
 ];
 

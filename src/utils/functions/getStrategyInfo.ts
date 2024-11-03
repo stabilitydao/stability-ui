@@ -31,9 +31,9 @@ export const getStrategyInfo = (
   vaultSymbol: string,
   strategyId: string
 ): IStrategyInfo => {
-  let strategyInfo = Object.entries(strategies)
-    .map((entry) => entry[1])
-    .find((strategy) => strategy.id === strategyId);
+  let strategyInfo = Object.values(strategies).find(
+    (strategy) => strategy.id === strategyId
+  );
 
   const {
     quickSwap,

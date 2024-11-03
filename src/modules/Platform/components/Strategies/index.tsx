@@ -24,14 +24,17 @@ const Strategies = (): JSX.Element => {
 
   const initTableData = async () => {
     if (strategies) {
-      const strategiesData = Object.entries(strategies).map((strategy) => ({
-        id: strategy[1].id,
-        shortId: strategy[1].shortId,
-        state: strategy[1].state,
-        contractGithubId: strategy[1].contractGithubId,
-        color: strategy[1].color,
-        bgColor: strategy[1].bgColor,
-      }));
+      const strategiesData = Object.values(strategies).map(
+        ({ id, shortId, state, contractGithubId, color, bgColor }) => ({
+          id,
+          shortId,
+          state,
+          contractGithubId,
+          color,
+          bgColor,
+        })
+      );
+
       setTableData(strategiesData);
     }
   };
