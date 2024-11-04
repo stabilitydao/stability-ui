@@ -79,9 +79,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
   const vaultsInfo = useMemo(() => {
     if (!$apiData) return [];
 
-    const chainVaults: TVault[] = Object.entries($vaults[chain] || {}).map(
-      (vault) => vault[1] as TVault
-    );
+    const chainVaults: TVault[] = Object.values($vaults[chain] || {});
 
     const vaultsTVL: number = chainVaults.reduce(
       (acc: number, cur) => (acc += Number(cur?.tvl)),
@@ -101,7 +99,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
         content: chainVaults.length,
       },
       {
-        name: "APR",
+        name: "Income APR 24h",
         content: `${weightedAverageAPR.toFixed(2)}%`,
       },
       {
@@ -157,7 +155,6 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                   {!index ? (
                     <a
                       className="h-[50px] text-[30px] whitespace-nowrap items-center self-center flex"
-                      target="_blank"
                       href={`/?chain=${chain}&status=all`}
                     >
                       {content}

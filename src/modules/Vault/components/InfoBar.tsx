@@ -97,7 +97,10 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             <HeadingText text={vault.symbol} scale={2} />
           </div>
 
-          <div className="flex items-center">
+          <a
+            href={`/chains/${vaultChain?.id}`}
+            className="flex items-center cursor-pointer"
+          >
             <img
               className="w-6 h-6 rounded-full hidden lg:flex mr-1"
               src={vaultChain?.logoURI}
@@ -105,7 +108,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               title={vaultChain?.name}
             />
             {vaultChain?.name}
-          </div>
+          </a>
         </div>
       </div>
 

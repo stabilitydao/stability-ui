@@ -314,7 +314,10 @@ describe("formatNumber", () => {
   });
 
   it("should format small numbers correctly", () => {
-    expect(formatNumber(0.05, "smallNumbers")).toBe("0.05");
+    expect(formatNumber(0.05567468565431123456, "smallNumbers")).toBe(
+      "0.05567"
+    );
+
     expect(formatNumber(1000.123, "smallNumbers")).toBe("1 000.12");
   });
 

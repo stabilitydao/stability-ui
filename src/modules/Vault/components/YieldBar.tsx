@@ -93,7 +93,6 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   useEffect(() => {
     getShareData();
   }, [$connected]);
-
   return (
     <div>
       <HeadingText
@@ -213,7 +212,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
           </table>
         )}
 
-        {!!vault.lifetimeTokensHold && (
+        {!!vault.lifetimeTokensHold && vault.symbol != "C-CVR-P-TPF" && (
           <table className="font-manrope w-full mt-5">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[14px] uppercase">

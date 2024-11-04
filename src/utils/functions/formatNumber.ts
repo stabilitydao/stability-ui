@@ -141,8 +141,12 @@ export const formatNumber = (
 
       break;
     case "smallNumbers":
-      if (Number(value) > 0.1) value = Number(value).toFixed(2);
-      value = String(value);
+      if (Number(value) > 0.1) {
+        value = Number(value).toFixed(2);
+      } else {
+        value = Number(value).toFixed(5);
+      }
+
       const [smallIntegerPart, smallDecimalPart] = value.split(".");
 
       const smallFormattedInteger = smallIntegerPart.replace(

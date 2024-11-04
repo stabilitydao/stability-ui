@@ -23,7 +23,7 @@ export const initFilters = (
   vaults: TVault[],
   tableFilters: TTableFilters[],
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
-  networksHandler: (chain: string) => void
+  networksHandler: (chains: string) => void
 ): void => {
   const shortNames: string[] = [
     ...new Set(
@@ -93,6 +93,7 @@ export const initFilters = (
       return f;
     });
   }
+
   if (chainParam) {
     networksHandler(chainParam);
   }

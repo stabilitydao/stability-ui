@@ -54,8 +54,7 @@ const SORT_CASES = [
   { name: "ASSETS", queue: 1, dataType: "text" },
   { name: "INCOME APR", queue: 3, dataType: "APR" },
   { name: "VS HOLD APR", queue: 4, dataType: "APR" },
-  { name: "PRICE", queue: 6, dataType: "withCurrency" },
-  { name: "TVL", queue: 7, dataType: "withFormat" },
+  { name: "TVL", queue: 6, dataType: "withFormat" },
 ];
 
 const LINKS: string[] = [

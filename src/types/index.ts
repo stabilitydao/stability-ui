@@ -44,6 +44,7 @@ interface IChainData extends Chain {
 type TAssetData = {
   symbol: string;
   website: string;
+  price: number;
   addresses: number;
 };
 type TTableStrategy = {
@@ -246,6 +247,7 @@ type TVault = {
   tvl: string;
   strategySpecific: string;
   balance: string | bigint;
+  balanceInUSD: number;
   lastHardWork: string;
   hardWorkOnDeposit: boolean;
   daily: number;

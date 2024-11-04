@@ -27,13 +27,23 @@ import type { IStrategyInfo } from "@types";
  * @returns {string} sourceCode - URL to the source code for the strategy's smart contracts
  */
 
+// temporary
+const TPF_STABLECOINS_VAULTS = [
+  "C-aU-U-TPF",
+  "C-UB-aU-TPF",
+  "C-MO-UB-TPF",
+  "C-D-UB-TPF",
+  "C-D-U-TPF",
+  "C-MO-U-TPF",
+];
+
 export const getStrategyInfo = (
   vaultSymbol: string,
   strategyId: string
 ): IStrategyInfo => {
-  let strategyInfo = Object.entries(strategies)
-    .map((entry) => entry[1])
-    .find((strategy) => strategy.id === strategyId);
+  let strategyInfo = Object.values(strategies).find(
+    (strategy) => strategy.id === strategyId
+  );
 
   const {
     quickSwap,
@@ -167,7 +177,7 @@ export const getStrategyInfo = (
     strategyInfo = {
       ...strategyInfo,
       protocols: [trident, pearlV2],
-      il: IL.TPF,
+      il: TPF_STABLECOINS_VAULTS.includes(vaultSymbol) ? IL.TPF_STABLE : IL.TPF,
     };
   }
 

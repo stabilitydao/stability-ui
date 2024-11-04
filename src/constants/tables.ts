@@ -46,16 +46,10 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "Price",
-    keyName: "shareprice",
-    sortType: "none",
-    dataType: "number",
-  },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
   {
     name: "Balance",
-    keyName: "balance",
+    keyName: "balanceInUSD",
     sortType: "none",
     dataType: "number",
   },
@@ -132,6 +126,12 @@ const ASSETS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "",
     unsortable: true,
+  },
+  {
+    name: "Price",
+    keyName: "price",
+    sortType: "none",
+    dataType: "number",
   },
   {
     name: "Addresses",
