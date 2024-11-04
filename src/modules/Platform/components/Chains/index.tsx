@@ -42,7 +42,7 @@ const Chains = (): JSX.Element => {
 
   const [tableStates, setTableStates] = useState(CHAINS_TABLE);
   const [tableData, setTableData] = useState<IChainData[]>([]);
-  const [filtredTableData, setFiltredTableData] = useState<IChainData[]>([]);
+  const [filteredTableData, setFilteredTableData] = useState<IChainData[]>([]);
   const [activeChains, setActiveChains] = useState(CHAINS_INFO);
 
   // const [TVLRange, setTVLRange] = useState({
@@ -88,7 +88,7 @@ const Chains = (): JSX.Element => {
         };
       });
 
-      const filtredChainsData = chainStatuses.length
+      const filteredChainsData = chainStatuses.length
         ? chainsData.filter((chain) =>
             chainStatuses.includes(chain.status.toLowerCase())
           )
@@ -108,7 +108,7 @@ const Chains = (): JSX.Element => {
 
       setTableData(chainsData);
       setActiveChains(filteredChains);
-      setFiltredTableData(filtredChainsData);
+      setFilteredTableData(filteredChainsData);
       setIsLoaded(true);
     }
   };
@@ -190,7 +190,7 @@ const Chains = (): JSX.Element => {
       table,
       setTable: setTableStates,
       tableData: data,
-      setTableData: setFiltredTableData,
+      setTableData: setFilteredTableData,
     });
 
     //search
@@ -202,7 +202,7 @@ const Chains = (): JSX.Element => {
           .includes(searchValue) || String(chainId).includes(searchValue)
     );
 
-    setFiltredTableData(data);
+    setFilteredTableData(data);
     setTableStates(table);
   };
 
@@ -274,8 +274,8 @@ const Chains = (): JSX.Element => {
                   sort={sortTable}
                   table={tableStates}
                   setTable={setTableStates}
-                  tableData={filtredTableData}
-                  setTableData={setFiltredTableData}
+                  tableData={filteredTableData}
+                  setTableData={setFilteredTableData}
                 />
               ))}
             </tr>
@@ -283,8 +283,8 @@ const Chains = (): JSX.Element => {
           <tbody className="text-[14px]">
             {isLoaded ? (
               <>
-                {!!filtredTableData.length ? (
-                  filtredTableData.map(
+                {!!filteredTableData.length ? (
+                  filteredTableData.map(
                     ({
                       chainId,
                       name,

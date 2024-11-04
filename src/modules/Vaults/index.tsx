@@ -308,9 +308,17 @@ const Vaults = (): JSX.Element => {
       return acc;
     }, {});
 
-    let sortedVaults = Object.values(mixedVaults).sort(
-      (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
-    );
+    let sortedVaults = Object.values(mixedVaults)
+      .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
+      .map((vault) => {
+        const balance = formatFromBigInt(vault.balance, 18);
+
+        return {
+          ...vault,
+          balanceInUSD: balance * Number(vault.shareprice),
+        };
+      });
+
     //filter
     tableFilters.forEach((f) => {
       if (!f.state) return;
@@ -419,9 +427,16 @@ const Vaults = (): JSX.Element => {
         {}
       );
 
-      const vaults: TVault[] = Object.values(mixedVaults).sort(
-        (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
-      );
+      const vaults: TVault[] = Object.values(mixedVaults)
+        .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
+        .map((vault) => {
+          const balance = formatFromBigInt(vault.balance, 18);
+
+          return {
+            ...vault,
+            balanceInUSD: balance * Number(vault.shareprice),
+          };
+        });
 
       initFilters(vaults, tableFilters, setTableFilters, activeNetworksHandler);
       setLocalVaults(vaults);
@@ -1018,20 +1033,11 @@ const Vaults = (): JSX.Element => {
                             )}
                           </div>
                         </td>
-                        <td
-                          data-testid="sharePrice"
-                          className="px-2 min-[1130px]:px-4 py-2"
-                        >
-                          ${Number(vault.shareprice).toFixed(3)}
-                        </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 text-right">
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
                         <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right">
-                          {formatNumber(
-                            formatFromBigInt(vault.balance, 18),
-                            "format"
-                          )}
+                          ${formatNumber(vault.balanceInUSD, "format")}
                         </td>
                       </tr>
                     );

@@ -528,6 +528,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             tvl: vault.tvl,
             strategySpecific,
             balance: "",
+            balanceInUSD: 0,
             lastHardWork: vault.lastHardWork,
             hardWorkOnDeposit: vault.hardWorkOnDeposit,
             daily: (Number(APR) / 365).toFixed(2),
