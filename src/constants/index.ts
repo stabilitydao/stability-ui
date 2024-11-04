@@ -284,6 +284,12 @@ const IL = {
     desc: "This is a new strategy with new protocols and pools. The impermanent losses will be indicated later, after data collection and analysis.",
     color: "#C0BCC9",
   },
+  TPF_STABLE: {
+    rate: 0,
+    title: "Low ",
+    desc: "So far no significant IL has been observed in stablecoin pairs with this strategy.",
+    color: "#4aff71",
+  },
 };
 
 const DEFAULT_ERROR = { state: false, type: "", description: "" };

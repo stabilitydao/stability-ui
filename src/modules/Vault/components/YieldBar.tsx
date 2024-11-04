@@ -93,7 +93,6 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   useEffect(() => {
     getShareData();
   }, [$connected]);
-
   return (
     <div>
       <HeadingText
