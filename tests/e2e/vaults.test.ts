@@ -53,7 +53,7 @@ const SORT_CASES = [
   { name: "SYMBOL", queue: 0, dataType: "text" },
   { name: "ASSETS", queue: 1, dataType: "text" },
   { name: "INCOME APR", queue: 3, dataType: "APR" },
-  { name: "VS HOLD APR", queue: 4, dataType: "APR" },
+  // { name: "VS HOLD APR", queue: 4, dataType: "APR" },
   { name: "TVL", queue: 6, dataType: "withFormat" },
 ];
 
