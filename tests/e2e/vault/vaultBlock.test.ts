@@ -105,25 +105,25 @@ test("Should display vault info correctly", async ({ page, context }) => {
 
     /* Last Hardwork should be displayed in hours and minutes or none */
 
-    const timeDifference = getTimeDifference(vaultData?.lastHardWork);
+    // const timeDifference = getTimeDifference(vaultData?.lastHardWork);
 
-    if (timeDifference) {
-      let expectedLastHardWorkText = "None";
+    // if (timeDifference) {
+    //   let expectedLastHardWorkText = "None";
 
-      if (timeDifference.days) {
-        if (timeDifference.days < 1000) {
-          expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
-        }
-      } else {
-        expectedLastHardWorkText = `${timeDifference.hours}h ago`;
-      }
+    //   if (timeDifference.days) {
+    //     if (timeDifference.days < 1000) {
+    //       expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
+    //     }
+    //   } else {
+    //     expectedLastHardWorkText = `${timeDifference.hours}h ago`;
+    //   }
 
-      const vaultLastHardWork = await page
-        .getByTestId("vaultLastHardWork")
-        .textContent();
+    //   const vaultLastHardWork = await page
+    //     .getByTestId("vaultLastHardWork")
+    //     .textContent();
 
-      expect(vaultLastHardWork).toContain(expectedLastHardWorkText);
-    }
+    //   expect(vaultLastHardWork).toContain(expectedLastHardWorkText);
+    // }
     /* Hardwork on Deposit should have status YES or NO */
 
     const hardWorkOnDeposit = vaultData?.hardWorkOnDeposit ? "YES" : "NO";

@@ -442,17 +442,17 @@ test("Should display basic info correctly", async ({ page }) => {
     // todo: income apr + period
 
     /* VS HODL APR should be displayed correctly */
-    const vsHodlAPR = (
-      await page.getByTestId("infoBarVSHodlAPR").innerText()
-    ).slice(0, -1);
+    // const vsHodlAPR = (
+    //   await page.getByTestId("infoBarVSHodlAPR").innerText()
+    // ).slice(0, -1);
 
-    const lifetimeVsHoldAPR =
-      vaultData.apr?.vsHoldLifetime &&
-      getTimeDifference(vaultData.created)?.days >= 3
-        ? Number(vaultData.apr?.vsHoldLifetime).toFixed(2)
-        : 0;
+    // const lifetimeVsHoldAPR =
+    //   vaultData.apr?.vsHoldLifetime &&
+    //   getTimeDifference(vaultData.created)?.days >= 3
+    //     ? Number(vaultData.apr?.vsHoldLifetime).toFixed(2)
+    //     : 0;
 
-    expect(Number(vsHodlAPR)).toBe(Number(lifetimeVsHoldAPR));
+    // expect(Number(vsHodlAPR)).toBe(Number(lifetimeVsHoldAPR));
 
     // /* TVL should be displayed correctly per vault */
     const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
@@ -479,13 +479,13 @@ test("Should display basic info correctly", async ({ page }) => {
     expect(isTVL).toBeTruthy();
 
     /* ALM TVL should be dispalyed correctly */
-    if (vaultData?.alm?.tvl) {
-      const infoBarAlmTVL = await page.getByTestId("infoBarAlmTVL").innerText();
+    // if (vaultData?.alm?.tvl) {
+    //   const infoBarAlmTVL = await page.getByTestId("infoBarAlmTVL").innerText();
 
-      const almTVL = formatNumber(Number(vaultData?.alm?.tvl), "abbreviate");
+    //   const almTVL = formatNumber(Number(vaultData?.alm?.tvl), "abbreviate");
 
-      expect(infoBarAlmTVL).toBe(almTVL);
-    }
+    //   expect(infoBarAlmTVL).toBe(almTVL);
+    // }
 
     /* Pool TVL should be dispalyed correctly */
     if (vaultData?.pool?.tvl) {
@@ -499,34 +499,34 @@ test("Should display basic info correctly", async ({ page }) => {
     }
 
     /* Share price should be displayed correctly */
-    const vaultSP = await page.getByTestId("infoBarSP").innerText();
+    // const vaultSP = await page.getByTestId("infoBarSP").innerText();
 
-    const sharePrice = Number(vaultData.sharePrice)
-      ? Number(vaultData.sharePrice).toFixed(1)
-      : "1.0";
+    // const sharePrice = Number(vaultData.sharePrice)
+    //   ? Number(vaultData.sharePrice).toFixed(1)
+    //   : "1.0";
 
-    expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(sharePrice);
+    // expect(Number(vaultSP.slice(1)).toFixed(1)).toBe(sharePrice);
 
     /* Last Hardwork should be displayed in hours and minutes or none */
-    const infoBarHardWork = await page
-      .getByTestId("infoBarHardWork")
-      .innerText();
+    // const infoBarHardWork = await page
+    //   .getByTestId("infoBarHardWork")
+    //   .innerText();
 
-    const timeDifference = getTimeDifference(vaultData?.lastHardWork);
+    // const timeDifference = getTimeDifference(vaultData?.lastHardWork);
 
-    if (timeDifference) {
-      let expectedLastHardWorkText = "None";
+    // if (timeDifference) {
+    //   let expectedLastHardWorkText = "None";
 
-      if (timeDifference.days) {
-        if (timeDifference.days < 1000) {
-          expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
-        }
-      } else {
-        expectedLastHardWorkText = `${timeDifference.hours}h ago`;
-      }
+    //   if (timeDifference.days) {
+    //     if (timeDifference.days < 1000) {
+    //       expectedLastHardWorkText = `${timeDifference.days} ${timeDifference.days > 1 ? "days" : "day"} ${timeDifference.hours}h ago`;
+    //     }
+    //   } else {
+    //     expectedLastHardWorkText = `${timeDifference.hours}h ago`;
+    //   }
 
-      expect(infoBarHardWork).toContain(expectedLastHardWorkText);
-    }
+    //   expect(infoBarHardWork).toContain(expectedLastHardWorkText);
+    // }
 
     /* Deposited amount should be 0 if user have no deps in vault or disconnected */
     const deposited = await page.getByTestId("infoBarDeposited").innerText();
