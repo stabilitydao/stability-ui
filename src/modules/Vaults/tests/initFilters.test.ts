@@ -65,7 +65,7 @@ describe("initFilters", () => {
       { name: "Active", type: "single", state: true },
     ]);
 
-    expect(networksHandler).toHaveBeenCalledWith("eth");
+    expect(networksHandler).toHaveBeenCalledWith(["eth"]);
   });
 
   it("should not call networksHandler if chainParam is absent", () => {
