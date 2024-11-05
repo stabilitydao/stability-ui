@@ -1,3 +1,4 @@
+/* FUNCTIONS */
 import { getTokenData } from "./functions/getTokenData";
 import { formatNumber } from "./functions/formatNumber";
 import { formatFromBigInt } from "./functions/formatFromBigInt";

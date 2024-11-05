@@ -148,14 +148,16 @@ const Vaults = (): JSX.Element => {
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
 
-  const activeNetworksHandler = async (chainID: string) => {
+  const activeNetworksHandler = async (chainIDs: string[]) => {
     ///// For vaults URL filters
     const newUrl = new URL(window.location.href);
     const params = new URLSearchParams(newUrl.search);
     /////
 
     let updatedNetworks = activeNetworks.map((network) =>
-      network.id === chainID ? { ...network, active: !network.active } : network
+      chainIDs.includes(network.id)
+        ? { ...network, active: !network.active }
+        : network
     );
 
     const allActive = activeNetworks.every((network) => network.active);
@@ -169,7 +171,7 @@ const Vaults = (): JSX.Element => {
     } else if (allActive) {
       updatedNetworks = activeNetworks.map((network) => ({
         ...network,
-        active: network.id === chainID,
+        active: chainIDs.includes(network.id),
       }));
     }
 

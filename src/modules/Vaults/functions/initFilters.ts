@@ -23,7 +23,7 @@ export const initFilters = (
   vaults: TVault[],
   tableFilters: TTableFilters[],
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
-  networksHandler: (chains: string) => void
+  networksHandler: (chains: string[]) => void
 ): void => {
   const shortNames: string[] = [
     ...new Set(
@@ -49,7 +49,7 @@ export const initFilters = (
   const strategyParam = searchParams.get("strategy");
   const vaultsParam = searchParams.get("vaults");
   const statusParam = searchParams.get("status");
-  const chainParam = searchParams.get("chain");
+  const chainsParam = searchParams.getAll("chain");
 
   if (tagsParam) {
     newFilters = newFilters.map((f) =>
@@ -94,8 +94,8 @@ export const initFilters = (
     });
   }
 
-  if (chainParam) {
-    networksHandler(chainParam);
+  if (chainsParam.length) {
+    networksHandler(chainsParam);
   }
   setTableFilters(newFilters);
 };
