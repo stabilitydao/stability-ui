@@ -4,7 +4,7 @@ import type { TChain } from "@types";
 
 interface IProps {
   activeNetworks: TChain[];
-  activeNetworksHandler: (chain: string) => void;
+  activeNetworksHandler: (chains: string[]) => void;
 }
 
 const NetworkFilters: React.FC<IProps> = memo(
@@ -20,7 +20,7 @@ const NetworkFilters: React.FC<IProps> = memo(
             }`}
             key={chain.name + chain.id}
             title={chain.name}
-            onClick={() => activeNetworksHandler(chain.id)}
+            onClick={() => activeNetworksHandler([chain.id])}
             data-testid="network"
           >
             <img
