@@ -319,7 +319,7 @@ const Chains = (): JSX.Element => {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-[15px] text-left whitespace-nowrap w-[100px] xl:w-[120px]">
-                          {formatNumber(tvl, "abbreviate")}
+                          {tvl ? formatNumber(tvl, "abbreviate") : ""}
                         </td>
                         {/* <td className="px-4 py-3 text-[12px]">
                     <div className="flex">
