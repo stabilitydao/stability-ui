@@ -59,20 +59,40 @@ const Users = (): JSX.Element => {
         ...data,
         rank: index + 1,
       }));
-
-      setTableStates(USERS_TABLE);
       setTableData(contestData);
     }
   };
 
-  const allContests = useMemo(
-    () => ({
-      PAST: $apiData?.leaderboards?.[previousPeriod as keyof YieldContest],
-      ACTIVE: $apiData?.leaderboards?.[currentPeriod as keyof YieldContest],
-      ABSOLUTE: $apiData?.leaderboards.absolute,
-    }),
-    [$apiData?.leaderboards]
-  );
+  const allContests = useMemo(() => {
+    const absoluteLeaderboard = $apiData?.leaderboards.absolute.map((user) =>
+      user?.points ? user : { ...user, points: 0 }
+    );
+
+    const absoluteLeaderboardMap = absoluteLeaderboard
+      ? Object.fromEntries(
+          absoluteLeaderboard?.map((user) => [user.address, user.points])
+        )
+      : {};
+
+    const fillPoints = (leaderboard?: { address: string; points?: number }[]) =>
+      leaderboard?.map((user) => ({
+        ...user,
+        points: absoluteLeaderboardMap[user?.address] ?? 0,
+      }));
+
+    const pastLeaderboard = fillPoints(
+      $apiData?.leaderboards?.[previousPeriod as keyof YieldContest]
+    );
+    const activeLeaderboard = fillPoints(
+      $apiData?.leaderboards?.[currentPeriod as keyof YieldContest]
+    );
+
+    return {
+      PAST: pastLeaderboard,
+      ACTIVE: activeLeaderboard,
+      ABSOLUTE: absoluteLeaderboard,
+    };
+  }, [$apiData?.leaderboards]);
 
   useEffect(() => {
     initTableData();
@@ -172,6 +192,9 @@ const Users = (): JSX.Element => {
                       {user.deposit
                         ? (Math.round(user.deposit * 100) / 100).toFixed(2)
                         : ""}
+                    </td>
+                    <td className="text-center px-4 py-3">
+                      {user.points ? user.points : ""}
                     </td>
                   </tr>
                 ))}
