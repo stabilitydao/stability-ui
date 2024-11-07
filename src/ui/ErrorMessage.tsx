@@ -74,7 +74,10 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
           </defs>
         </svg>
         <p className="py-8 px-3">
-          {$error.description.slice(0, type === "WEB3" ? 25 : 40)}...
+          {$error?.description?.message
+            ? $error?.description?.message?.slice(0, type === "WEB3" ? 25 : 40)
+            : $error?.description?.slice(0, type === "WEB3" ? 25 : 40)}
+          ...
         </p>
         <button
           onClick={() => reload.set(!$reload)}
