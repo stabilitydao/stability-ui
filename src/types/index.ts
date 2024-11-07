@@ -302,6 +302,7 @@ type TLeaderboard = {
   address: TAddress;
   deposit: number;
   earned: number;
+  points?: number;
 };
 
 type TTAbleFiltersVariant = {

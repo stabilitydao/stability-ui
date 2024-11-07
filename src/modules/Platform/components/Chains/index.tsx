@@ -105,7 +105,6 @@ const Chains = (): JSX.Element => {
               : chain
           )
         : activeChains.map((chain) => ({ ...chain, active: true }));
-
       setTableData(chainsData);
       setActiveChains(filteredChains);
       setFilteredTableData(filteredChainsData);
@@ -182,8 +181,18 @@ const Chains = (): JSX.Element => {
         );
       }
     });
-
     // data = data.filter(({ tvl }) => tvl <= TVLRange.max && tvl >= TVLRange.min);
+
+    //search
+    if (!!searchValue) {
+      data = data.filter(
+        ({ name, chainId }) =>
+          name
+            .replace(/[^a-zA-Z0-9\s]/g, "")
+            .toLowerCase()
+            .includes(searchValue) || String(chainId).includes(searchValue)
+      );
+    }
 
     //sort
     sortTable({
@@ -192,18 +201,6 @@ const Chains = (): JSX.Element => {
       tableData: data,
       setTableData: setFilteredTableData,
     });
-
-    //search
-    data = data.filter(
-      ({ name, chainId }) =>
-        name
-          .replace(/[^a-zA-Z0-9\s]/g, "")
-          .toLowerCase()
-          .includes(searchValue) || String(chainId).includes(searchValue)
-    );
-
-    setFilteredTableData(data);
-    setTableStates(table);
   };
 
   useEffect(() => {
@@ -211,7 +208,9 @@ const Chains = (): JSX.Element => {
   }, [activeChains]);
 
   useEffect(() => {
-    initTableData();
+    if ($apiData) {
+      initTableData();
+    }
   }, [$apiData]);
 
   // const range = useMemo(() => {

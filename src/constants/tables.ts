@@ -215,6 +215,12 @@ const USERS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
+  {
+    name: "Points",
+    keyName: "points",
+    sortType: "none",
+    dataType: "number",
+  },
 ];
 
 const CONTESTS_TABLE: TTableColumn[] = [

@@ -7,8 +7,8 @@ import {
   getChainBridges,
   getChainProtocols,
   getChainStrategies,
-  getStrategyProtocols,
   integrations,
+  type StrategyShortId,
 } from "@stabilitydao/stability";
 
 import { useStore } from "@nanostores/react";
@@ -19,7 +19,7 @@ import { formatNumber } from "@utils";
 
 import { Breadcrumbs, HeadingText } from "@ui";
 
-import { ChainStatus, StrategyStatus } from "../../ui";
+import { ChainStatus, StrategyStatus, ProtocolsChip } from "../../ui";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
@@ -112,7 +112,6 @@ const Chain: React.FC<IProps> = ({ chain }) => {
   const chainAssets = assets.filter((asset) =>
     Object.keys(asset.addresses).includes(chain.toString())
   );
-
   const strategies = getChainStrategies(chainData.name);
 
   return (
@@ -201,29 +200,11 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                     className="h-[48px] hover:bg-accent-950"
                   >
                     <td className="px-4 py-2">
-                      <div
-                        className="inline-flex whitespace-nowrap items-center rounded-xl"
-                        style={{
-                          backgroundColor: strategy.bgColor,
-                          color: strategy.color,
-                        }}
-                      >
-                        <span className="inline-flex w-[100px] gap-1 justify-end text-right">
-                          {getStrategyProtocols(strategy.shortId).map(
-                            (protocol) => (
-                              <img
-                                key={protocol.name}
-                                className="w-[24pxx] h-[24px]"
-                                src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${protocol.img || integrations[protocol.organization as string].img}`}
-                                alt=""
-                              />
-                            )
-                          )}
-                        </span>
-                        <span className="inline-flex justify-start px-3 rounded-xl w-[300px] text-[16px] font-bold">
-                          {strategy.id}
-                        </span>
-                      </div>
+                      <ProtocolsChip
+                        id={strategy.shortId as StrategyShortId}
+                        bgColor={strategy.bgColor}
+                        color={strategy.color}
+                      />
                     </td>
                     <td className="px-4 py-3">
                       <StrategyStatus
@@ -334,7 +315,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                         (token) =>
                           token.symbol.toLowerCase() ===
                           asset.symbol.toLowerCase()
-                      )[0].logoURI
+                      )[0]?.logoURI
                     }
                     alt={asset.symbol}
                   />

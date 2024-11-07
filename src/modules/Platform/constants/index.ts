@@ -12,21 +12,18 @@ const CHAINS_INFO = [
   {
     name: "Supported",
     length: TOTAL_CHAINS.SUPPORTED,
-    color: "text-green-400",
     bgColor: chainStatusInfo.SUPPORTED.color,
     active: false,
   },
   {
     name: "Awaiting deployment",
     length: TOTAL_CHAINS.AWAITING_DEPLOYMENT,
-    color: "text-violet-400",
     bgColor: chainStatusInfo.AWAITING_DEPLOYMENT.color,
     active: false,
   },
   {
     name: "Development",
     length: TOTAL_CHAINS.CHAINLIB_DEVELOPMENT,
-    color: "text-blue-400",
     bgColor: chainStatusInfo.CHAINLIB_DEVELOPMENT.color,
 
     active: false,
@@ -34,48 +31,59 @@ const CHAINS_INFO = [
   {
     name: "Awaiting developer",
     length: TOTAL_CHAINS.AWAITING_DEVELOPER,
-    color: "text-yellow-200",
     bgColor: chainStatusInfo.AWAITING_DEVELOPER.color,
     active: false,
   },
   {
     name: "Awaiting issue",
     length: TOTAL_CHAINS.AWAITING_ISSUE_CREATION,
-    color: "text-orange-300",
     bgColor: chainStatusInfo.AWAITING_ISSUE_CREATION.color,
     active: false,
   },
   {
     name: "Not supported",
     length: TOTAL_CHAINS.NOT_SUPPORTED,
-    color: "text-gray-400",
     bgColor: chainStatusInfo.NOT_SUPPORTED.color,
     active: false,
   },
 ];
 
 const STRATEGIES_INFO = [
-  { name: "Live", state: TOTAL_STRATEGIES.LIVE, color: "text-green-400" },
+  {
+    name: "Live",
+    length: TOTAL_STRATEGIES.LIVE,
+    bgColor: "#4FAE2D",
+    active: false,
+  },
   {
     name: "Awaiting deployment",
-    state: TOTAL_STRATEGIES.DEPLOYMENT,
-    color: "text-violet-400",
+    length: TOTAL_STRATEGIES.DEPLOYMENT,
+    bgColor: "#612FFB",
+    active: false,
   },
   {
     name: "Development",
-    state: TOTAL_STRATEGIES.DEVELOPMENT,
-    color: "text-blue-400",
+    length: TOTAL_STRATEGIES.DEVELOPMENT,
+    bgColor: "#2D67FB",
+    active: false,
   },
   {
     name: "Awaiting developer",
-    state: TOTAL_STRATEGIES.AWAITING,
-    color: "text-yellow-200",
+    length: TOTAL_STRATEGIES.AWAITING,
+    bgColor: "#E1E114",
+    active: false,
   },
-  { name: "Blocked", state: TOTAL_STRATEGIES.BLOCKED, color: "text-red-200" },
+  {
+    name: "Blocked",
+    length: TOTAL_STRATEGIES.BLOCKED,
+    bgColor: "#E01A1A",
+    active: false,
+  },
   {
     name: "Proposal",
-    state: TOTAL_STRATEGIES.PROPOSAL,
-    color: "text-orange-300",
+    length: TOTAL_STRATEGIES.PROPOSAL,
+    bgColor: "#FB8B13",
+    active: false,
   },
 ];
 
@@ -97,4 +105,19 @@ const CHAIN_STATUSES = {
   "Not supported": "NOT_SUPPORTED",
 };
 
-export { CHAINS_INFO, STRATEGIES_INFO, STATE_COLORS, CHAIN_STATUSES };
+const STRATEGY_STATUSES = {
+  Live: "LIVE",
+  "Awaiting deployment": "DEPLOYMENT",
+  Development: "DEVELOPMENT",
+  "Awaiting developer": "AWAITING",
+  Blocked: "BLOCKED",
+  Proposal: "PROPOSAL",
+};
+
+export {
+  CHAINS_INFO,
+  STRATEGIES_INFO,
+  STATE_COLORS,
+  CHAIN_STATUSES,
+  STRATEGY_STATUSES,
+};
