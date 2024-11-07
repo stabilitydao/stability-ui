@@ -2,29 +2,41 @@ import {
   integrations,
   chains,
   getIntegrationStatus,
+  strategies,
+  type StrategyShortId,
 } from "@stabilitydao/stability";
 
 import { protocolStatusInfo } from "@stabilitydao/stability/out/integrations";
 
+import { StrategyStatus, ProtocolsChip } from "../../ui";
+
 import { Breadcrumbs, HeadingText } from "@ui";
 
 import { extractDomain } from "@utils";
+
+import type { TStrategyState } from "@types";
 
 interface IProps {
   integrationName: string;
 }
 
 const Integration: React.FC<IProps> = ({ integrationName }) => {
-  integrationName =
-    integrationName === "1inch" ? "oneInch" : integrationName.toLowerCase();
-
-  const integration = integrations[integrationName] || integrations.chainlink;
+  integrationName = integrationName.toLowerCase().replace(/\s+/g, "");
+  const integration =
+    Object.values(integrations).find(
+      (protocol) =>
+        protocol.name.toLowerCase().replace(/\s+/g, "") === integrationName
+    ) || integrations.chainlink;
 
   const flatChains = Object.values(chains);
 
   const website = extractDomain(integration.website);
 
   const protocols = Object.values(integration.protocols);
+
+  const strategiesData = Object.values(strategies).filter((strategy) =>
+    strategy.protocols.some((protocol) => protocol.includes(integrationName))
+  );
 
   return (
     <div className="flex flex-col lg:w-[960px] xl:min-w-[1200px]">
@@ -77,6 +89,70 @@ const Integration: React.FC<IProps> = ({ integrationName }) => {
           )}
         </div>
       </div>
+
+      {!!strategiesData.length && (
+        <div className="mt-5">
+          <HeadingText text="Strategies" scale={2} styles="text-center mb-5" />
+          <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
+            <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+                <tr className="text-[12px] uppercase">
+                  <td className="text-[12px] px-3 font-manrope font-semibold">
+                    Strategy
+                  </td>
+                  <td className="text-[12px] px-3 font-manrope font-semibold">
+                    Name
+                  </td>
+                  <td className="text-[12px] px-3 font-manrope font-semibold">
+                    State
+                  </td>
+                  <td className="text-[12px] px-3 font-manrope font-semibold">
+                    Issue
+                  </td>
+                </tr>
+              </thead>
+              <tbody className="text-[14px]">
+                {strategiesData.map((strategy) => (
+                  <tr
+                    key={strategy.id}
+                    className="h-[48px] hover:bg-accent-950"
+                  >
+                    <td className="px-4 py-2">
+                      <ProtocolsChip
+                        id={strategy.shortId as StrategyShortId}
+                        bgColor={strategy.bgColor}
+                        color={strategy.color}
+                      />
+                    </td>
+                    <td className="px-4 py-2 text-[16px] font-semibold">
+                      {strategy.id}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StrategyStatus
+                        state={strategy.state as TStrategyState}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <a
+                        className="inline-flex"
+                        href={`https://github.com/stabilitydao/stability-contracts/issues/${strategy.contractGithubId}`}
+                        target="_blank"
+                        title="Go to strategy issue page on Github"
+                      >
+                        <img
+                          src="/icons/github.svg"
+                          alt="Github"
+                          className="w-[20px]"
+                        />
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       <HeadingText text="Protocols" scale={2} styles="text-center mt-5" />
 

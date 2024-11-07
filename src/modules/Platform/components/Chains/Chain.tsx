@@ -175,60 +175,67 @@ const Chain: React.FC<IProps> = ({ chain }) => {
           )}
         </div>
 
-        {strategies.length > 0 && (
+        {!!strategies.length && (
           <div className="mb-5">
             <HeadingText text="Strategies" scale={2} styles="mb-3" />
-
-            <table className="font-manrope w-full">
-              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                <tr className="text-[12px] uppercase">
-                  <td className="text-[12px] px-3 font-manrope font-semibold">
-                    Strategy
-                  </td>
-                  <td className="text-[12px] px-3 font-manrope font-semibold">
-                    State
-                  </td>
-                  <td className="text-[12px] px-3 font-manrope font-semibold">
-                    Issue
-                  </td>
-                </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                {strategies.map((strategy) => (
-                  <tr
-                    key={strategy.id}
-                    className="h-[48px] hover:bg-accent-950"
-                  >
-                    <td className="px-4 py-2">
-                      <ProtocolsChip
-                        id={strategy.shortId as StrategyShortId}
-                        bgColor={strategy.bgColor}
-                        color={strategy.color}
-                      />
+            <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
+              <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
+                <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+                  <tr className="text-[12px] uppercase">
+                    <td className="text-[12px] px-3 font-manrope font-semibold">
+                      Strategy
                     </td>
-                    <td className="px-4 py-3">
-                      <StrategyStatus
-                        state={strategy.state as TStrategyState}
-                      />
+                    <td className="text-[12px] px-3 font-manrope font-semibold">
+                      Name
                     </td>
-                    <td className="px-4 py-3">
-                      <a
-                        className="inline-flex"
-                        href={`https://github.com/stabilitydao/stability-contracts/issues/${strategy.contractGithubId}`}
-                        target="_blank"
-                        title="Go to strategy issue page on Github"
-                      >
-                        <img
-                          src="/icons/github.svg"
-                          alt="Github"
-                          className="w-[20px]"
-                        />
-                      </a>
+                    <td className="text-[12px] px-3 font-manrope font-semibold">
+                      State
+                    </td>
+                    <td className="text-[12px] px-3 font-manrope font-semibold">
+                      Issue
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-[14px]">
+                  {strategies.map((strategy) => (
+                    <tr
+                      key={strategy.id}
+                      className="h-[48px] hover:bg-accent-950"
+                    >
+                      <td className="px-4 py-2">
+                        <ProtocolsChip
+                          id={strategy.shortId as StrategyShortId}
+                          bgColor={strategy.bgColor}
+                          color={strategy.color}
+                        />
+                      </td>
+                      <td className="px-4 py-2 text-[16px] font-semibold">
+                        {strategy.id}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StrategyStatus
+                          state={strategy.state as TStrategyState}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <a
+                          className="inline-flex"
+                          href={`https://github.com/stabilitydao/stability-contracts/issues/${strategy.contractGithubId}`}
+                          target="_blank"
+                          title="Go to strategy issue page on Github"
+                        >
+                          <img
+                            src="/icons/github.svg"
+                            alt="Github"
+                            className="w-[20px]"
+                          />
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
