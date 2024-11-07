@@ -1,11 +1,23 @@
 ---
 import Layout from '@layouts/Layout.astro';
+
+import { integrations } from '@stabilitydao/stability';
+
 import {Integration} from "@modules"
-const { integration } = Astro.params;
+
+const { integration  } = Astro.params;
+
+const integrationData =
+    Object.values(integrations).find(
+      (protocol) =>
+        protocol.name.toLowerCase().replace(/\s+/g, "") ===
+        integration?.toLowerCase().replace(/\s+/g, "")
+    ) || integrations.chainlink;
 ---
 
-<Layout title="Integration">
+<Layout title={integrationData.name} metaTitle={integrationData.name} metaDescription={`Integration of the ${integrationData.name} protocols into the Stability platform.`} img={`/integration-covers/${integrationData.name}.png`}>
     <div class="my-vault max-w-[1200px]">
+        {console.log(integration)}
         <Integration integrationName={integration} client:only="react" />
     </div>
 </Layout>

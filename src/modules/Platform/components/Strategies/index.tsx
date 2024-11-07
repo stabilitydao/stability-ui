@@ -206,7 +206,9 @@ const Strategies = (): JSX.Element => {
                           color={color}
                         />
                       </td>
-                      <td className="px-4 py-3">{id}</td>
+                      <td className="px-4 py-3 text-[16px] font-semibold">
+                        {id}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex justify-center">
                           <StrategyStatus state={state as TStrategyState} />
