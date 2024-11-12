@@ -74,6 +74,19 @@ import type {
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
 
+const getVsHoldAPY = (lifetime: number, period: number) => {
+  if (lifetime >= 0) {
+    return ((lifetime / period) * 365).toFixed(2);
+  }
+
+  const periodsPerYear = 365 / period;
+
+  const periodFactor = 1 + lifetime / 100;
+  const compoundedAPR = Math.pow(periodFactor, periodsPerYear) - 1;
+
+  return (compoundedAPR * 100).toFixed(2);
+};
+
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
 
@@ -264,12 +277,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const fee = vault?.almFee?.income || 0;
 
         if (daysFromLastHardWork < 3) {
-          dailyFarmApr = vault.apr?.income24h
-            ? Number(vault.apr?.income24h)
+          dailyFarmApr = vault.income?.apr24h
+            ? Number(vault.income?.apr24h)
             : 0;
 
-          weeklyFarmApr = vault.apr?.incomeWeek
-            ? Number(vault.apr?.incomeWeek)
+          weeklyFarmApr = vault.income?.aprWeek
+            ? Number(vault.income?.aprWeek)
             : 0;
 
           if (underlying) {
@@ -302,13 +315,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             if (!dailyAPR) dailyAPR = 0;
           }
 
-          APR = (Number(vault?.apr?.incomeLatest) + Number(dailyAPR)).toFixed(
+          APR = (Number(vault?.income?.aprLatest) + Number(dailyAPR)).toFixed(
             2
           );
 
           APY = calculateAPY(APR).toFixed(2);
 
-          APRWithoutFees = Number(vault?.apr?.incomeLatest).toFixed(2) || "0";
+          APRWithoutFees = Number(vault?.income?.aprLatest).toFixed(2) || "0";
 
           ///////
           const dailyTotalAPRWithFees =
@@ -319,12 +332,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APRArray = {
             latest: String(APR),
             daily: determineAPR(
-              vault.apr?.income24h,
+              vault?.income.apr24h,
               dailyTotalAPRWithFees,
               APR
             ),
             weekly: determineAPR(
-              vault.apr?.incomeWeek,
+              vault?.income.aprWeek,
               weeklyTotalAPRWithFees,
               APR
             ),
@@ -332,12 +345,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APYArray = {
             latest: APY,
             daily: determineAPR(
-              vault.apr?.income24h,
+              vault?.income.apr24h,
               calculateAPY(dailyTotalAPRWithFees).toFixed(2),
               APY
             ),
             weekly: determineAPR(
-              vault.apr?.incomeWeek,
+              vault?.income.aprWeek,
               calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
               APY
             ),
@@ -355,12 +368,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           farmAPR = {
             latest: APRWithoutFees,
             daily: determineAPR(
-              vault.apr?.income24h,
+              vault?.income.apr24h,
               dailyFarmApr,
               APRWithoutFees
             ),
             weekly: determineAPR(
-              vault.apr?.incomeWeek,
+              vault?.income.aprWeek,
               weeklyFarmApr,
               APRWithoutFees
             ),
@@ -396,12 +409,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const vaultCreated = vault.created as number;
 
-        const lifetimeVsHoldAPR =
-          vault.apr?.vsHoldLifetime &&
-          getTimeDifference(vaultCreated)?.days >= 3
-            ? Number(vault.apr?.vsHoldLifetime).toFixed(2)
-            : 0;
-
         const currentTime = Math.floor(Date.now() / 1000);
 
         const differenceInSecondsFromCreation = currentTime - vaultCreated;
@@ -412,13 +419,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           differenceInSecondsFromCreation / secondsInADay
         );
 
-        const vsHoldAPR = (
-          (Number(lifetimeVsHoldAPR) / 365) *
-          Number(daysFromCreation)
-        ).toFixed(2);
+        const vsHoldAPR =
+          vault.vsHold?.lifetime && getTimeDifference(vaultCreated)?.days >= 3
+            ? Number(vault.vsHold?.lifetime).toFixed(2)
+            : 0;
+
+        const lifetimeVsHoldAPR = getVsHoldAPY(
+          Number(vsHoldAPR),
+          daysFromCreation
+        );
 
         let lifetimeTokensHold: THoldData[] = [];
-        if (vault.apr?.vsHoldAssetsLifetime && prices) {
+        if (vault.vsHold?.lifetimeAssets && prices) {
           lifetimeTokensHold = strategyAssets.map(
             (asset: string, index: number) => {
               const price = vault?.assetsPricesLast?.[index]
@@ -435,10 +447,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               const priceDifference =
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
-              const yearPercentDiff =
-                Number(vault.apr?.vsHoldAssetsLifetime[index]) || 0;
+              const percentDiff =
+                Number(vault.vsHold?.lifetimeAssets[index]) || 0;
 
-              const percentDiff = (yearPercentDiff / 365) * daysFromCreation;
+              const yearPercentDiff = getVsHoldAPY(
+                Number(percentDiff),
+                daysFromCreation
+              );
 
               return {
                 symbol: getTokenData(asset)?.symbol || "",
@@ -446,7 +461,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 price: price.toFixed(2),
                 priceDifference: priceDifference.toFixed(2),
                 latestAPR: percentDiff.toFixed(2),
-                APR: yearPercentDiff.toFixed(2),
+                APR: yearPercentDiff,
               };
             }
           );

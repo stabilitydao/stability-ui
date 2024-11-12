@@ -931,104 +931,97 @@ const Vaults = (): JSX.Element => {
                             className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault.lifetimeVsHoldAPR < 0 &&
                               getTimeDifference(vault.created).days >= 3 &&
-                              vault.symbol != "C-CVR-P-TPF" &&
                               "text-[#eb7979]"
                             }`}
                           >
-                            {getTimeDifference(vault.created).days >= 3 &&
-                            vault.symbol != "C-CVR-P-TPF"
+                            {getTimeDifference(vault.created).days >= 3
                               ? `${vault.lifetimeVsHoldAPR}%`
                               : "-"}
                           </p>
-                          {vault.symbol != "C-CVR-P-TPF" ? (
-                            <div className="visible__tooltip !w-[450px]">
-                              <table className="table table-auto w-full rounded-lg">
-                                <thead className="bg-[#0b0e11]">
-                                  <tr className="text-[16px] text-[#8f8f8f] uppercase">
-                                    <th></th>
-                                    <th>
-                                      {getTimeDifference(vault.created).days}{" "}
-                                      days
-                                    </th>
-                                    <th className="text-right">est Annual</th>
-                                  </tr>
-                                </thead>
-                                <tbody data-testid="vsHoldAPRTable">
-                                  <tr className="hover:bg-[#2B3139]">
-                                    <td className="text-left">VAULT VS HODL</td>
 
-                                    {vault.isVsActive ? (
-                                      <td
-                                        className={`text-right ${
-                                          vault.vsHoldAPR < 0 &&
-                                          "text-[#eb7979]"
-                                        }`}
-                                      >
-                                        {vault.vsHoldAPR}%
-                                      </td>
-                                    ) : (
-                                      <td className="text-right">-</td>
-                                    )}
+                          <div className="visible__tooltip !w-[450px]">
+                            <table className="table table-auto w-full rounded-lg">
+                              <thead className="bg-[#0b0e11]">
+                                <tr className="text-[16px] text-[#8f8f8f] uppercase">
+                                  <th></th>
+                                  <th>
+                                    {getTimeDifference(vault.created).days} days
+                                  </th>
+                                  <th className="text-right">est Annual</th>
+                                </tr>
+                              </thead>
+                              <tbody data-testid="vsHoldAPRTable">
+                                <tr className="hover:bg-[#2B3139]">
+                                  <td className="text-left">VAULT VS HODL</td>
 
-                                    {vault.isVsActive ? (
-                                      <td
-                                        className={`text-right ${
-                                          vault.lifetimeVsHoldAPR < 0 &&
-                                          "text-[#eb7979]"
-                                        }`}
-                                      >
-                                        {vault.lifetimeVsHoldAPR}%
-                                      </td>
-                                    ) : (
-                                      <td className="text-right">-</td>
-                                    )}
-                                  </tr>
-
-                                  {vault.lifetimeTokensHold.map(
-                                    (aprsData: THoldData, index: number) => (
-                                      <tr
-                                        key={aprsData?.symbol + index}
-                                        className="hover:bg-[#2B3139]"
-                                      >
-                                        <td className="text-left">
-                                          VAULT VS {aprsData?.symbol} HODL
-                                        </td>
-
-                                        {vault.isVsActive ? (
-                                          <td
-                                            className={`text-right ${
-                                              Number(aprsData.latestAPR) < 0 &&
-                                              "text-[#eb7979]"
-                                            }`}
-                                          >
-                                            {aprsData.latestAPR}%
-                                          </td>
-                                        ) : (
-                                          <td className="text-right">-</td>
-                                        )}
-
-                                        {vault.isVsActive ? (
-                                          <td
-                                            className={`text-right ${
-                                              Number(aprsData.latestAPR) < 0 &&
-                                              "text-[#eb7979]"
-                                            }`}
-                                          >
-                                            {aprsData.APR}%
-                                          </td>
-                                        ) : (
-                                          <td className="text-right">-</td>
-                                        )}
-                                      </tr>
-                                    )
+                                  {vault.isVsActive ? (
+                                    <td
+                                      className={`text-right ${
+                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
+                                      }`}
+                                    >
+                                      {vault.vsHoldAPR}%
+                                    </td>
+                                  ) : (
+                                    <td className="text-right">-</td>
                                   )}
-                                </tbody>
-                              </table>
-                              <i></i>
-                            </div>
-                          ) : (
-                            ""
-                          )}
+
+                                  {vault.isVsActive ? (
+                                    <td
+                                      className={`text-right ${
+                                        vault.lifetimeVsHoldAPR < 0 &&
+                                        "text-[#eb7979]"
+                                      }`}
+                                    >
+                                      {vault.lifetimeVsHoldAPR}%
+                                    </td>
+                                  ) : (
+                                    <td className="text-right">-</td>
+                                  )}
+                                </tr>
+
+                                {vault.lifetimeTokensHold.map(
+                                  (aprsData: THoldData, index: number) => (
+                                    <tr
+                                      key={aprsData?.symbol + index}
+                                      className="hover:bg-[#2B3139]"
+                                    >
+                                      <td className="text-left">
+                                        VAULT VS {aprsData?.symbol} HODL
+                                      </td>
+
+                                      {vault.isVsActive ? (
+                                        <td
+                                          className={`text-right ${
+                                            Number(aprsData.latestAPR) < 0 &&
+                                            "text-[#eb7979]"
+                                          }`}
+                                        >
+                                          {aprsData.latestAPR}%
+                                        </td>
+                                      ) : (
+                                        <td className="text-right">-</td>
+                                      )}
+
+                                      {vault.isVsActive ? (
+                                        <td
+                                          className={`text-right ${
+                                            Number(aprsData.latestAPR) < 0 &&
+                                            "text-[#eb7979]"
+                                          }`}
+                                        >
+                                          {aprsData.APR}%
+                                        </td>
+                                      ) : (
+                                        <td className="text-right">-</td>
+                                      )}
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                            <i></i>
+                          </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center">

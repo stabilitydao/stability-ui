@@ -280,9 +280,9 @@ const IL = {
   },
   TPF: {
     rate: 1,
-    title: "UNKNOWN YET",
-    desc: "This is a new strategy with new protocols and pools. The impermanent losses will be indicated later, after data collection and analysis.",
-    color: "#C0BCC9",
+    title: "MEDIUM",
+    desc: "Significant impermanent loss was noted during rebalancing with this ALM in volatile pools.",
+    color: "#F5DA5B",
   },
   TPF_STABLE: {
     rate: 0,
