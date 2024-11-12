@@ -271,7 +271,7 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
-  vsHoldAPR: number;
+  lifetimeVsHold: number;
   lifetimeVsHoldAPR: number;
   lifetimeTokensHold: THoldData[];
   isVsActive: boolean;

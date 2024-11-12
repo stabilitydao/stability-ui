@@ -1998,14 +1998,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
                     {Array.isArray(activeOptionToken?.logoURI) &&
-                      activeOptionToken?.logoURI?.map((logo: string) => (
-                        <img
-                          key={Math.random()}
-                          className="w-6 h-6 rounded-full"
-                          src={logo}
-                          alt="logo"
-                        />
-                      ))}
+                      activeOptionToken?.logoURI?.map(
+                        (logo: string, index: number) => (
+                          <img
+                            key={`activeOption-${index}-${logo}`}
+                            className="w-6 h-6 rounded-full"
+                            src={logo}
+                            alt="logo"
+                          />
+                        )
+                      )}
                   </div>
                   <p className="whitespace-nowrap">
                     {activeOptionToken?.symbol}

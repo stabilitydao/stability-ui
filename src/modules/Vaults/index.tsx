@@ -917,7 +917,7 @@ const Vaults = (): JSX.Element => {
                               setVsHoldModal({
                                 lifetimeTokensHold:
                                   vault.lifetimeTokensHold as THoldData[],
-                                vsHoldAPR: vault.vsHoldAPR,
+                                vsHoldAPR: vault.lifetimeVsHold,
                                 lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
                                 created: getTimeDifference(vault.created)?.days,
                                 state: true,
@@ -957,10 +957,11 @@ const Vaults = (): JSX.Element => {
                                   {vault.isVsActive ? (
                                     <td
                                       className={`text-right ${
-                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
+                                        vault.lifetimeVsHold < 0 &&
+                                        "text-[#eb7979]"
                                       }`}
                                     >
-                                      {vault.vsHoldAPR}%
+                                      {vault.lifetimeVsHold}%
                                     </td>
                                   ) : (
                                     <td className="text-right">-</td>

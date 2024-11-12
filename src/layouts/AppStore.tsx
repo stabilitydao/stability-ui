@@ -397,7 +397,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const daysFromCreation = getTimeDifference(vaultCreated)?.days;
 
-        const vsHoldAPR =
+        const lifetimeVsHold =
           vault.vsHold?.lifetime && daysFromCreation >= 3
             ? Number(vault.vsHold?.lifetime).toFixed(2)
             : 0;
@@ -543,7 +543,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             pool: vault.pool,
             alm: vault.alm,
             risk: vault?.risk,
-            vsHoldAPR: Number(vsHoldAPR),
+            lifetimeVsHold: Number(lifetimeVsHold),
             lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
             lifetimeTokensHold,
             isVsActive,
