@@ -74,19 +74,6 @@ import type {
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
 
-const getVsHoldAPY = (lifetime: number, period: number) => {
-  if (lifetime >= 0) {
-    return ((lifetime / period) * 365).toFixed(2);
-  }
-
-  const periodsPerYear = 365 / period;
-
-  const periodFactor = 1 + lifetime / 100;
-  const compoundedAPR = Math.pow(periodFactor, periodsPerYear) - 1;
-
-  return (compoundedAPR * 100).toFixed(2);
-};
-
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
 
@@ -406,28 +393,19 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
 
         ///// VS HODL
-
         const vaultCreated = vault.created as number;
 
-        const currentTime = Math.floor(Date.now() / 1000);
-
-        const differenceInSecondsFromCreation = currentTime - vaultCreated;
-
-        const secondsInADay = 60 * 60 * 24;
-
-        const daysFromCreation = Math.round(
-          differenceInSecondsFromCreation / secondsInADay
-        );
+        const daysFromCreation = getTimeDifference(vaultCreated)?.days;
 
         const vsHoldAPR =
-          vault.vsHold?.lifetime && getTimeDifference(vaultCreated)?.days >= 3
+          vault.vsHold?.lifetime && daysFromCreation >= 3
             ? Number(vault.vsHold?.lifetime).toFixed(2)
             : 0;
 
-        const lifetimeVsHoldAPR = getVsHoldAPY(
-          Number(vsHoldAPR),
-          daysFromCreation
-        );
+        const lifetimeVsHoldAPR =
+          vault.vsHold?.aprLifetime && daysFromCreation >= 3
+            ? Number(vault.vsHold?.aprLifetime).toFixed(2)
+            : 0;
 
         let lifetimeTokensHold: THoldData[] = [];
         if (vault.vsHold?.lifetimeAssets && prices) {
@@ -447,29 +425,22 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               const priceDifference =
                 ((price - priceOnCreation) / priceOnCreation) * 100;
 
-              const percentDiff =
-                Number(vault.vsHold?.lifetimeAssets[index]) || 0;
-
-              const yearPercentDiff = getVsHoldAPY(
-                Number(percentDiff),
-                daysFromCreation
-              );
-
               return {
                 symbol: getTokenData(asset)?.symbol || "",
                 initPrice: priceOnCreation.toFixed(2),
                 price: price.toFixed(2),
                 priceDifference: priceDifference.toFixed(2),
-                latestAPR: percentDiff.toFixed(2),
-                APR: yearPercentDiff,
+                latestAPR:
+                  Number(vault.vsHold?.lifetimeAssets[index]).toFixed(2) || "0",
+                APR:
+                  Number(vault.vsHold?.aprAssetsLifetime[index]).toFixed(2) ||
+                  "0",
               };
             }
           );
         }
 
-        const isVsActive =
-          getTimeDifference(vaultCreated).days > 2 &&
-          !!Number(vault.sharePrice);
+        const isVsActive = daysFromCreation > 2 && !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
