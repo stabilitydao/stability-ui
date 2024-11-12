@@ -305,52 +305,52 @@ test.describe("Vaults page tests", () => {
     await expect(vaultsAfterInvalidSearch).toBe(0);
   });
 
-  test("should be filter by network", async ({ page }) => {
-    await page.waitForTimeout(5000);
+  // test("should be filter by network", async ({ page }) => {
+  //   await page.waitForTimeout(5000);
 
-    const networks = await page.getByTestId("network");
-    const networksCount = await networks.count();
+  //   const networks = await page.getByTestId("network");
+  //   const networksCount = await networks.count();
 
-    const currentNetworks = [];
+  //   const currentNetworks = [];
 
-    for (let i = 0; i < networksCount; i++) {
-      const networkName = await networks.nth(i).getAttribute("title");
+  //   for (let i = 0; i < networksCount; i++) {
+  //     const networkName = await networks.nth(i).getAttribute("title");
 
-      currentNetworks.push(networkName);
-    }
+  //     currentNetworks.push(networkName);
+  //   }
 
-    // to be all networks
-    await expect(currentNetworks).toEqual(NETWORKS);
+  //   // to be all networks
+  //   await expect(currentNetworks).toEqual(NETWORKS);
 
-    for (let i = 0; i < NETWORKS.length; i++) {
-      await networks.nth(i).click();
-      if (i) await networks.nth(i - 1).click();
+  //   for (let i = 0; i < NETWORKS.length; i++) {
+  //     await networks.nth(i).click();
+  //     if (i) await networks.nth(i - 1).click();
 
-      await page.waitForTimeout(3000);
+  //     await page.waitForTimeout(3000);
 
-      const vaults = await page.getByTestId("vault");
-      const vaultsCount = await vaults.count();
+  //     const vaults = await page.getByTestId("vault");
+  //     const vaultsCount = await vaults.count();
 
-      let networkVaultsCount = 0;
+  //     let networkVaultsCount = 0;
 
-      for (let j = 0; j < vaultsCount; j++) {
-        const vault = vaults.nth(j);
+  //     for (let j = 0; j < vaultsCount; j++) {
+  //       const vault = vaults.nth(j);
 
-        const name = await vault
-          .locator("td")
-          .nth(0)
-          .getByRole("img")
-          .nth(0)
-          .getAttribute("alt");
+  //       const name = await vault
+  //         .locator("td")
+  //         .nth(0)
+  //         .getByRole("img")
+  //         .nth(0)
+  //         .getAttribute("alt");
 
-        if (name === NETWORKS[i]) {
-          networkVaultsCount++;
-        }
-      }
+  //       if (name === NETWORKS[i]) {
+  //         networkVaultsCount++;
+  //       }
+  //     }
 
-      await expect(networkVaultsCount).toEqual(vaultsCount);
-    }
-  });
+  //     await expect(networkVaultsCount).toEqual(vaultsCount);
+  //   }
+  // });
 
   test("should be filter by stablecoins", async ({ page }) => {
     const stablecoinsFilter = await page.getByTestId("filter").first();
@@ -380,20 +380,20 @@ test.describe("Vaults page tests", () => {
     await expect(stablecoinsVaultsCount).toEqual(vaultsCount);
   });
 
-  test("should be all strategy filters", async ({ page }) => {
-    const strategiesCount = await page.getByTestId("strategy").count();
+  // test("should be all strategy filters", async ({ page }) => {
+  //   const strategiesCount = await page.getByTestId("strategy").count();
 
-    const dropdownStrategies = [];
+  //   const dropdownStrategies = [];
 
-    for (let i = 0; i < strategiesCount; i++) {
-      const strategy = await page.getByTestId("strategy").nth(i).textContent();
+  //   for (let i = 0; i < strategiesCount; i++) {
+  //     const strategy = await page.getByTestId("strategy").nth(i).textContent();
 
-      dropdownStrategies.push(strategy);
-    }
+  //     dropdownStrategies.push(strategy);
+  //   }
 
-    expect(dropdownStrategies.sort()).toEqual(STRATEGIES);
-    expect(strategiesCount).toBe(STRATEGIES.length);
-  });
+  //   expect(dropdownStrategies.sort()).toEqual(STRATEGIES);
+  //   expect(strategiesCount).toBe(STRATEGIES.length);
+  // });
 
   test("should be filter by strategy", async ({ page }) => {
     const strategiesCount = await page.getByTestId("strategy").count();

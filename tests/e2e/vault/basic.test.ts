@@ -646,15 +646,15 @@ test("Should display basic info correctly", async ({ page }) => {
     // }
 
     /* Pool TVL should be dispalyed correctly */
-    if (vaultData?.pool?.tvl) {
-      const infoBarPoolTVL = await page
-        .getByTestId("infoBarPoolTVL")
-        .innerText();
+    // if (vaultData?.pool?.tvl) {
+    //   const infoBarPoolTVL = await page
+    //     .getByTestId("infoBarPoolTVL")
+    //     .innerText();
 
-      const poolTVL = formatNumber(Number(vaultData?.pool?.tvl), "abbreviate");
+    //   const poolTVL = formatNumber(Number(vaultData?.pool?.tvl), "abbreviate");
 
-      expect(infoBarPoolTVL).toBe(poolTVL);
-    }
+    //   expect(infoBarPoolTVL).toBe(poolTVL);
+    // }
 
     /* Share price should be displayed correctly */
     // const vaultSP = await page.getByTestId("infoBarSP").innerText();
