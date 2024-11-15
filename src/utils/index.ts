@@ -22,6 +22,7 @@ import { sortTable } from "./functions/sortTable";
 import { formatTimestampToDate } from "./functions/formatTimestampToDate";
 import { getNFTSymbol } from "./functions/getNFTSymbol";
 import { extractDomain } from "./functions/extractDomain";
+import { setVisibleBalances } from "./functions/setVisibleBalances";
 
 export {
   getTokenData,
@@ -47,4 +48,5 @@ export {
   formatTimestampToDate,
   getNFTSymbol,
   extractDomain,
+  setVisibleBalances,
 };

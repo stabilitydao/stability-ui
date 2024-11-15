@@ -12,6 +12,7 @@ import {
   TimeDifferenceIndicator,
   VaultType,
   FieldValue,
+  BalanceVisibilityToggler,
 } from "@ui";
 
 import { aprFilter, visible } from "@store";
@@ -282,9 +283,12 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
       <div className="flex w-full flex-col md:flex-row px-6 pb-6 md:pb-2 pt-6 bg-accent-900 rounded-b-2xl gap-0 md:gap-3">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <FieldValue
-            name="DEPOSITED"
-            value={
+          <div className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col">
+            <div className="h-[12px] flex items-center gap-1 uppercase text-[12px] leading-3 text-neutral-500">
+              <span>DEPOSITED</span>
+              <BalanceVisibilityToggler />
+            </div>
+            <div className="h-[40px] flex items-center text-[18px] font-semibold whitespace-nowrap">
               <div className="flex h-[28px] items-center">
                 <div
                   className={`${!$visible && "blur select-none"} text-[18px] font-semibold flex whitespace-nowrap`}
@@ -297,15 +301,29 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
+          <FieldValue
+            name="DAILY"
+            value={
+              <p className={`${!$visible && "blur select-none"}`}>
+                {earnData.dailyEarn}$
+              </p>
             }
           />
         </div>
-        <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <FieldValue name="DAILY" value={`${earnData.dailyEarn}$`} />
-        </div>
 
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <FieldValue name="MONTHLY" value={`${earnData.monthlyEarn}$`} />
+          <FieldValue
+            name="MONTHLY"
+            value={
+              <p className={`${!$visible && "blur select-none"}`}>
+                {earnData.monthlyEarn}$
+              </p>
+            }
+          />
         </div>
       </div>
 

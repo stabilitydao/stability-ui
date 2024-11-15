@@ -60,7 +60,7 @@ const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false }) => {
   if ($error.state) {
     return (
       <div
-        className={`${isAlert ? "relative font-manrope text-[16px] w-full bg-accent-950 rounded-[32px] flex items-center justify-center text-neutral-50" : "fixed top-0 left-1/2 transform -translate-x-1/2 font-manrope text-[16px] max-w-[700px] w-full bg-accent-950 rounded-[32px] flex flex-col items-center justify-center mt-3 z-[200] text-neutral-50"}`}
+        className={`flex items-center justify-center bg-accent-950 text-neutral-50 font-manrope text-[16px] w-full rounded-[32px] ${isAlert ? "relative" : "fixed top-0 left-1/2 transform -translate-x-1/2 max-w-[700px] flex-col mt-3 z-[200]"}`}
       >
         <svg
           onClick={() => error.set({ state: false, type: "", description: "" })}
