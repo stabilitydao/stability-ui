@@ -1,6 +1,10 @@
+import { useState, useEffect } from "react";
+
 import { useStore } from "@nanostores/react";
 
 import { error, reload } from "@store";
+
+import { deployments } from "@stabilitydao/stability";
 
 interface IProps {
   type: string;
@@ -9,6 +13,32 @@ interface IProps {
 const ErrorMessage: React.FC<IProps> = ({ type }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if ($error.state) {
+      const message = $error?.description?.message
+        ? $error?.description?.message
+        : $error?.description;
+
+      const slicedMessage = `${message?.slice(0, 40)}...`;
+
+      if (type === "WEB3") {
+        const contractName = Object.values(deployments)
+          .flatMap((deployment) => Object.entries(deployment.core))
+          .find(([_, value]) => message.includes(value))?.[0];
+
+        const contractErrorMessage = contractName
+          ? `${contractName}: ${slicedMessage}`
+          : slicedMessage;
+
+        setErrorMessage(contractErrorMessage);
+      } else {
+        setErrorMessage(slicedMessage);
+      }
+    }
+  }, [$error]);
 
   if ($error.state) {
     return (
@@ -73,12 +103,7 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
             </filter>
           </defs>
         </svg>
-        <p className="py-8 px-3">
-          {$error?.description?.message
-            ? $error?.description?.message?.slice(0, type === "WEB3" ? 25 : 40)
-            : $error?.description?.slice(0, type === "WEB3" ? 25 : 40)}
-          ...
-        </p>
+        <p className="py-8 px-3">{errorMessage}</p>
         <button
           onClick={() => reload.set(!$reload)}
           className="bg-accent-500 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"
