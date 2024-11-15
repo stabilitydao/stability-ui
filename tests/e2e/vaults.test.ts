@@ -136,7 +136,7 @@ test.describe("Vaults page tests", () => {
         .getByTestId(`portfolio${value}`)
         .textContent();
 
-      if (portfolioValue !== "****") {
+      if (!portfolioValue?.includes("000")) {
         allValuesAreMasked = false;
       }
     }

@@ -248,13 +248,9 @@ const Wallet = (): JSX.Element => {
             alt="walletImage"
           />
         )}
-        <span className="md:block hidden">
+        <span className={`${!$visible && "blur select-none"} md:block hidden`}>
           {$account
-            ? `${
-                $visible
-                  ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
-                  : "*************"
-              }`
+            ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
             : "Connect Wallet"}
         </span>
       </button>
