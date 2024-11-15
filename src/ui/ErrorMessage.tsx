@@ -1,18 +1,67 @@
+import { useState, useEffect } from "react";
+
 import { useStore } from "@nanostores/react";
 
 import { error, reload } from "@store";
 
+import { CHAINS } from "@constants";
+
+import { deployments } from "@stabilitydao/stability";
+
 interface IProps {
   type: string;
+  isAlert?: boolean;
 }
 
-const ErrorMessage: React.FC<IProps> = ({ type }) => {
+const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
 
+  const [chainLogo, setChainLogo] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if ($error.state) {
+      const message = $error.description?.message ?? $error.description;
+
+      const slicedMessage = `${message?.slice(0, 40)}...`;
+
+      if (type === "WEB3") {
+        const errorChain = Object.entries(deployments).find(([_, deployment]) =>
+          Object.entries(deployment.core).some(([_, value]) =>
+            message.includes(value)
+          )
+        );
+        if (errorChain) {
+          const [chainID, deployment] = errorChain;
+
+          const contractName = Object.entries(deployment.core).find(
+            ([_, value]) => message.includes(value)
+          )?.[0];
+
+          const chainImg =
+            CHAINS.find((chain) => chain.id === chainID)?.logoURI || "";
+
+          const contractErrorMessage = contractName
+            ? `${contractName}: ${slicedMessage}`
+            : slicedMessage;
+
+          setChainLogo(chainImg);
+          setErrorMessage(contractErrorMessage);
+        } else {
+          setErrorMessage(slicedMessage);
+        }
+      } else {
+        setErrorMessage(slicedMessage);
+      }
+    }
+  }, [$error, type]);
+
   if ($error.state) {
     return (
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 font-manrope text-[16px] max-w-[700px] w-full bg-accent-950 rounded-[32px] flex flex-col items-center justify-center mt-3 z-[200] text-neutral-50">
+      <div
+        className={`${isAlert ? "relative font-manrope text-[16px] w-full bg-accent-950 rounded-[32px] flex items-center justify-center text-neutral-50" : "fixed top-0 left-1/2 transform -translate-x-1/2 font-manrope text-[16px] max-w-[700px] w-full bg-accent-950 rounded-[32px] flex flex-col items-center justify-center mt-3 z-[200] text-neutral-50"}`}
+      >
         <svg
           onClick={() => error.set({ state: false, type: "", description: "" })}
           className="absolute right-5 top-5 cursor-pointer"
@@ -73,15 +122,22 @@ const ErrorMessage: React.FC<IProps> = ({ type }) => {
             </filter>
           </defs>
         </svg>
-        <p className="py-8 px-3">
-          {$error?.description?.message
-            ? $error?.description?.message?.slice(0, type === "WEB3" ? 25 : 40)
-            : $error?.description?.slice(0, type === "WEB3" ? 25 : 40)}
-          ...
-        </p>
+        <img
+          className="absolute left-5 top-5"
+          src="/triangle-alert.png"
+          alt="alert-img"
+        />
+        <div
+          className={`${isAlert ? "py-4" : "py-8"} px-3 flex items-center gap-1 mt-5 md:mt-0`}
+        >
+          {!!chainLogo && (
+            <img src={chainLogo} alt="chain-img" className="w-6 h-6" />
+          )}
+          <span>{errorMessage}</span>
+        </div>
         <button
           onClick={() => reload.set(!$reload)}
-          className="bg-accent-500 font-semibold py-2 min-w-[100px] rounded-2xl mb-2"
+          className={`bg-accent-500 font-semibold py-2 min-w-[100px] rounded-2xl ${isAlert ? "" : "mb-2"}`}
         >
           Reload
         </button>

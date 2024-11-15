@@ -31,6 +31,7 @@ import {
   aprFilter,
   connected,
   error,
+  visible,
   // platformVersions,
   // currentChainID,
   // assetsPrices,
@@ -97,6 +98,7 @@ const Vaults = (): JSX.Element => {
   const $connected = useStore(connected);
 
   const $error = useStore(error);
+  const $visible = useStore(visible);
   // const $publicClient = useStore(publicClient);
   // const $platformVersions = useStore(platformVersions);
   // const $currentChainID = useStore(currentChainID);
@@ -499,6 +501,7 @@ const Vaults = (): JSX.Element => {
           isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
+        <ErrorMessage type={$error.type} isAlert={true} />
         <Portfolio vaults={localVaults} />
         <NetworkFilters
           activeNetworks={activeNetworks}
@@ -525,7 +528,6 @@ const Vaults = (): JSX.Element => {
         </div>
       </div>
 
-      <ErrorMessage type={$error.type} />
       {/* {!!platformUpdates?.newVersion &&
         platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
         !!upgradesTable?.length && (
@@ -917,7 +919,7 @@ const Vaults = (): JSX.Element => {
                               setVsHoldModal({
                                 lifetimeTokensHold:
                                   vault.lifetimeTokensHold as THoldData[],
-                                vsHoldAPR: vault.vsHoldAPR,
+                                vsHoldAPR: vault.lifetimeVsHold,
                                 lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
                                 created: getTimeDifference(vault.created)?.days,
                                 state: true,
@@ -957,10 +959,11 @@ const Vaults = (): JSX.Element => {
                                   {vault.isVsActive ? (
                                     <td
                                       className={`text-right ${
-                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
+                                        vault.lifetimeVsHold < 0 &&
+                                        "text-[#eb7979]"
                                       }`}
                                     >
-                                      {vault.vsHoldAPR}%
+                                      {vault.lifetimeVsHold}%
                                     </td>
                                   ) : (
                                     <td className="text-right">-</td>
@@ -1040,7 +1043,11 @@ const Vaults = (): JSX.Element => {
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
                         <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right">
-                          ${formatNumber(vault.balanceInUSD, "format")}
+                          <p className={`${!$visible && "blur select-none"}`}>
+                            {$visible
+                              ? `$${formatNumber(vault.balanceInUSD, "format")}`
+                              : "$000"}
+                          </p>
                         </td>
                       </tr>
                     );

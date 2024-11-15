@@ -258,13 +258,13 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                   <td
                     data-testid="vaultVsHold"
                     className={`text-right text-[18px] ${
-                      vault.vsHoldAPR > 0
+                      vault.lifetimeVsHold > 0
                         ? "text-success-400"
                         : "text-error-400"
                     }`}
                   >
-                    {vault.vsHoldAPR > 0 ? "+" : ""}
-                    {vault.vsHoldAPR}%
+                    {vault.lifetimeVsHold > 0 ? "+" : ""}
+                    {vault.lifetimeVsHold}%
                   </td>
                 ) : (
                   <td className="text-right">-</td>

@@ -14,7 +14,7 @@ import {
   FieldValue,
 } from "@ui";
 
-import { aprFilter } from "@store";
+import { aprFilter, visible } from "@store";
 
 import { formatFromBigInt, formatNumber } from "@utils";
 
@@ -29,6 +29,7 @@ interface IProps {
 
 const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
+  const $visible = useStore(visible);
 
   const [feeAPRModal, setFeeAPRModal] = useState(false);
   const [userBalances, setUserBalances] = useState({
@@ -285,7 +286,9 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             name="DEPOSITED"
             value={
               <div className="flex h-[28px] items-center">
-                <div className="text-[18px] font-semibold flex whitespace-nowrap">
+                <div
+                  className={`${!$visible && "blur select-none"} text-[18px] font-semibold flex whitespace-nowrap`}
+                >
                   <p data-testid="infoBarDeposited" className="mr-1">
                     {formatNumber(userBalances.shareBalance, "format")}
                   </p>

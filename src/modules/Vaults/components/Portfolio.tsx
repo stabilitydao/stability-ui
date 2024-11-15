@@ -182,11 +182,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                     <Skeleton height={21} width={100} />
                   </div>
                 ) : (
-                  <>
+                  <p className={`${!$visible && "blur select-none"}`}>
                     {$visible
                       ? `$${formatNumber(portfolio.deposited, "format")}`
-                      : "****"}
-                  </>
+                      : "000$"}
+                  </p>
                 )}
               </div>
             </div>
@@ -203,7 +203,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                     <Skeleton height={21} width={100} />
                   </div>
                 ) : (
-                  <>{$visible ? dailyYield : "****"}</>
+                  <p className={`${!$visible && "blur select-none"}`}>
+                    {$visible ? dailyYield : "000$"}
+                  </p>
                 )}
               </div>
             </div>
@@ -220,7 +222,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                     <Skeleton height={21} width={100} />
                   </div>
                 ) : (
-                  <>{$visible ? monthlyYield : "****"}</>
+                  <p className={`${!$visible && "blur select-none"}`}>
+                    {$visible ? monthlyYield : "000$"}
+                  </p>
                 )}
               </div>
             </div>
@@ -237,7 +241,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                     <Skeleton height={21} width={100} />
                   </div>
                 ) : (
-                  <>{$visible ? avgApr : "****"}</>
+                  <p className={`${!$visible && "blur select-none"}`}>
+                    {$visible ? avgApr : "000$"}
+                  </p>
                 )}
               </div>
             </div>
@@ -254,7 +260,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                     <Skeleton height={21} width={100} />
                   </div>
                 ) : (
-                  <>{$visible ? avgApy : "****"}</>
+                  <p className={`${!$visible && "blur select-none"}`}>
+                    {$visible ? avgApy : "0000"}
+                  </p>
                 )}
               </div>
             </div>
@@ -271,11 +279,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       <Skeleton height={21} width={100} />
                     </div>
                   ) : (
-                    <>
+                    <p className={`${!$visible && "blur select-none"}`}>
                       {$visible
                         ? `$${formatNumber(portfolio.deposited, "format")}`
-                        : "****"}
-                    </>
+                        : "0000"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -289,7 +297,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       <Skeleton height={21} width={100} />
                     </div>
                   ) : (
-                    <>{$visible ? monthlyYield : "****"}</>
+                    <p className={`${!$visible && "blur select-none"}`}>
+                      {$visible ? monthlyYield : "0000"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -303,7 +313,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       <Skeleton height={21} width={100} />
                     </div>
                   ) : (
-                    <>{$visible ? avgApy : "****"}</>
+                    <p className={`${!$visible && "blur select-none"}`}>
+                      {$visible ? avgApy : "0000"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -319,7 +331,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       <Skeleton height={21} width={100} />
                     </div>
                   ) : (
-                    <>{$visible ? dailyYield : "****"}</>
+                    <p className={`${!$visible && "blur select-none"}`}>
+                      {$visible ? dailyYield : "0000"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -333,7 +347,9 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
                       <Skeleton height={21} width={100} />
                     </div>
                   ) : (
-                    <>{$visible ? avgApr : "****"}</>
+                    <p className={`${!$visible && "blur select-none"}`}>
+                      {$visible ? avgApr : "0000"}
+                    </p>
                   )}
                 </div>
               </div>
