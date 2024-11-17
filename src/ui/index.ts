@@ -18,6 +18,7 @@ import { FieldValue } from "./FieldValue";
 import { TableColumnSort } from "./TableColumnSort";
 import { Badge } from "./Badge";
 import { Counter } from "./Counter";
+import { BalanceVisibilityToggler } from "./BalanceVisibilityToggler";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -49,4 +50,5 @@ export {
   TableColumnSort,
   Badge,
   Counter,
+  BalanceVisibilityToggler,
 };

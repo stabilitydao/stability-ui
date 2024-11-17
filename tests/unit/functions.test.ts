@@ -31,6 +31,8 @@ vi.mock("@store", () => ({
   transactionSettings: { set: vi.fn() },
   hideFeeApr: { set: vi.fn() },
   aprFilter: { set: vi.fn() },
+  isVisibleBalance: { set: vi.fn() },
+  visible: { set: vi.fn() },
 }));
 
 describe("addAssetsBalance", () => {

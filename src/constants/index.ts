@@ -120,6 +120,12 @@ const CHAINS = [
   },
 ];
 
+const CHAINS_CONFIRMATIONS = {
+  "137": 3,
+  "8453": 3,
+  "111188": 1,
+};
+
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const DEFAULT_TRANSACTION_SETTINGS = {
@@ -335,4 +341,5 @@ export {
   USERS_TABLE,
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
+  CHAINS_CONFIRMATIONS,
 };
