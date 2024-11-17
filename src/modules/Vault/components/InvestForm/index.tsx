@@ -52,7 +52,7 @@ import {
   isEmptyObject,
 } from "../../functions";
 
-import { DEFAULT_ERROR, ZERO_BigInt } from "@constants";
+import { CHAINS_CONFIRMATIONS, DEFAULT_ERROR, ZERO_BigInt } from "@constants";
 
 import type {
   TAddress,
@@ -172,6 +172,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [loader, setLoader] = useState<boolean>(false);
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
+
+  const confirmations: number =
+    CHAINS_CONFIRMATIONS[network as keyof typeof CHAINS_CONFIRMATIONS] ?? 3;
 
   let isAnyCCFOptionVisible = false;
 
@@ -438,7 +441,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             address: vault.underlying,
             symbol: underlyingSymbol,
             decimals: Number(underlyingDecimals),
-            balance: Number(formatUnits(underlyingBalance, underlyingDecimals)),
+            balance: formatUnits(underlyingBalance, underlyingDecimals),
             allowance: Number(
               formatUnits(underlyingAllowance, underlyingDecimals)
             ),
@@ -523,6 +526,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             functionName: "allowance",
             args: [$account as TAddress, vault.address],
           })) as bigint;
+
           if (
             Number(formatUnits(allowanceData, 18)) < Number(amount) &&
             Number(amount) <= Number(balances[asset])
@@ -662,7 +666,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setLoader(true);
 
       const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 3,
+        confirmations,
         hash: assetApprove,
       });
 
@@ -759,7 +763,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(true);
 
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: depositAssets,
         });
         setLocalStoreHash({
@@ -842,7 +846,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: zapDeposit,
         });
 
@@ -913,6 +917,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       let promises;
       let outData: TZAPData[] = [];
+
       if (shortId === "CCF") {
         promises = (await get1InchRoutes(
           network,
@@ -925,19 +930,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         )) as TZAPData;
         outData = [promises, promises];
       } else {
-        promises = zapAmounts[0].map(
-          async (toAddress, index) =>
-            vault.assetsProportions[index] &&
-            (await get1InchRoutes(
-              network,
-              option[0] as TAddress,
-              toAddress,
-              decimals,
-              String(zapAmounts[1][index]),
-              setZapError,
-              "deposit"
-            ))
-        );
+        promises = zapAmounts[0]
+          .filter((_, index) => vault.assetsProportions[index])
+          .map(
+            async (toAddress, index) =>
+              await get1InchRoutes(
+                network,
+                option[0] as TAddress,
+                toAddress,
+                decimals,
+                String(zapAmounts[1][index]),
+                setZapError,
+                "deposit"
+              )
+          );
         outData = (await Promise.all(promises)) as TZAPData[];
       }
 
@@ -1042,7 +1048,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(settings.gasLimit))
       );
+
       setNeedConfirm(true);
+
       const assetApprove = await writeContract(wagmiConfig, {
         address: vault.address,
         abi: ERC20ABI,
@@ -1053,21 +1061,21 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setNeedConfirm(false);
       setLoader(true);
       const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 3,
+        confirmations,
         hash: assetApprove,
       });
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
-        const newAllowance = await _publicClient?.readContract({
-          address: option[0] as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [
-            $account as TAddress,
-            $platformsData[network]?.zap as TAddress,
-          ],
-        });
+
+        const newAllowance = await getAssetAllowance(
+          _publicClient,
+          option[0] as TAddress,
+          tab,
+          vault?.address,
+          underlyingToken?.address,
+          $platformsData?.[network]?.zap
+        );
 
         let _newAllowance =
           typeof newAllowance === "bigint" ? newAllowance : ZERO_BigInt;
@@ -1144,7 +1152,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: assetApprove,
         });
 
@@ -1301,7 +1309,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
       setLoader(true);
       transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 3,
+        confirmations,
         hash: depositAssets,
       });
       if (transaction.status === "success") {
@@ -1335,6 +1343,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     ///// 2ASSETS -> UNDERLYING -> ZAP
     //before rewrite
     let withdrawAssets: any, transaction, zapWithdraw: any;
+
     let localAssets = defaultOption?.assetsArray;
     if (shortId === "IQMF" || shortId === "IRMF") {
       localAssets = vault.assets.map((asset) => asset.address);
@@ -1380,7 +1389,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: withdrawAssets,
         });
         setLocalStoreHash({
@@ -1391,6 +1400,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           vault: vault.address,
           tokens: txTokens,
         });
+
         if (transaction.status === "success") {
           resetFormAfterTx();
         }
@@ -1451,7 +1461,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: withdrawAssets,
         });
         setLocalStoreHash({
@@ -1462,6 +1472,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           vault: vault.address,
           tokens: txTokens,
         });
+
         if (transaction.status === "success") {
           resetFormAfterTx();
         }
@@ -1528,7 +1539,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setNeedConfirm(false);
         setLoader(true);
         transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: 3,
+          confirmations,
           hash: zapWithdraw,
         });
         setLocalStoreHash({
@@ -1597,7 +1608,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           assetsLength = [ZERO_BigInt, ZERO_BigInt];
           localAssets = vault.assets.map((asset) => asset.address);
         }
-
         const { result } = await _publicClient?.simulateContract({
           address: vault.address,
           abi: VaultABI,
