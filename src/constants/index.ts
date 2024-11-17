@@ -285,16 +285,16 @@ const IL = {
     color: "#D7F55B",
   },
   TPF: {
-    rate: 1,
+    rate: 5,
     title: "MEDIUM",
     desc: "Significant impermanent loss was noted during rebalancing with this ALM in volatile pools.",
     color: "#F5DA5B",
   },
   TPF_STABLE: {
-    rate: 0,
-    title: "Low ",
-    desc: "So far no significant IL has been observed in stablecoin pairs with this strategy.",
-    color: "#4aff71",
+    rate: 5,
+    title: "Medium",
+    desc: "We catch significant IL in stablecoin pairs with this strategy when depeg become..",
+    color: "#F5DA5B",
   },
 };
 
