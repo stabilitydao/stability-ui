@@ -14,7 +14,7 @@ import { getDaysFromLastHardWork, calculateAPR } from "../helpers";
 
 import { seeds } from "@stabilitydao/stability";
 
-import { CHAINS, ZERO_BigInt, PAGINATION_VAULTS } from "@constants";
+import { CHAINS, BIG_INT_VALUES, PAGINATION_VAULTS } from "@constants";
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
@@ -179,13 +179,13 @@ test.describe("Vaults page tests", () => {
 
         if (["IQMF", "IRMF"].includes(strategyName)) {
           const alm0 = Number(
-            formatUnits(almRebalanceEntity?.[0] || ZERO_BigInt, 8)
+            formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
           );
           const alm1 = Number(
-            formatUnits(almRebalanceEntity?.[1] || ZERO_BigInt, 8)
+            formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
           );
           const alm2 = Number(
-            formatUnits(almRebalanceEntity?.[2] || ZERO_BigInt, 8)
+            formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
           );
 
           poolSwapFeesAPRDaily = calculateAPR(alm0, fee);

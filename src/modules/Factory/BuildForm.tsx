@@ -14,7 +14,7 @@ import { FactoryABI, ERC20ABI, wagmiConfig } from "@web3";
 
 import { getTokenData } from "@utils";
 
-import { ZERO_BigInt } from "@constants";
+import { BIG_INT_VALUES } from "@constants";
 
 import {
   account,
@@ -77,7 +77,7 @@ const BuildForm = ({
     symbol: tokenlist.tokens.find((token) => token.address === addr)?.symbol,
     address: addr,
     balance: formatUnits(
-      $assetsBalances[$currentChainID]?.[addr] || ZERO_BigInt,
+      $assetsBalances[$currentChainID]?.[addr] || BIG_INT_VALUES.ZERO,
       tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18
     ),
     price: $assetsPrices[$currentChainID][addr]?.price,
