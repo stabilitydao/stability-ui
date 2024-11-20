@@ -52,7 +52,11 @@ import {
   isEmptyObject,
 } from "../../functions";
 
-import { CHAINS_CONFIRMATIONS, DEFAULT_ERROR, ZERO_BigInt } from "@constants";
+import {
+  CHAINS_CONFIRMATIONS,
+  DEFAULT_ERROR,
+  BIG_INT_VALUES,
+} from "@constants";
 
 import type {
   TAddress,
@@ -391,6 +395,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     filtredTokens = filtredTokens.filter(
       (token) => token.address != defaultOption?.assets
     );
+
     if (defaultOption?.assetsArray?.length < 2) {
       filtredTokens = filtredTokens.filter(
         (token) => token.address != defaultOption?.assetsArray[0]
@@ -504,7 +509,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(false);
         return;
       }
-
       if (asset === underlyingToken?.address) {
         try {
           const previewDepositAssets = await _publicClient?.readContract({
@@ -875,7 +879,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const depositCCF = async (amount: string) => {
     const decimals = getTokenData(option[0])?.decimals || 18;
     if (option) {
-      let amounts: bigint[] = [ZERO_BigInt, parseUnits(amount, decimals)];
+      let amounts: bigint[] = [
+        BIG_INT_VALUES.ZERO,
+        parseUnits(amount, decimals),
+      ];
 
       try {
         let previewDepositAssets: any;
@@ -964,7 +971,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 getTokenData(outData[0]?.address as TAddress)
                   ?.decimals as number
               )
-            : ZERO_BigInt
+            : BIG_INT_VALUES.ZERO
         );
       } else {
         amounts = outData.map((tokenOut) =>
@@ -988,7 +995,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         args: [defaultOption?.assetsArray as TAddress[], amounts],
       });
 
-      let _previewDepositAssets: bigint = ZERO_BigInt;
+      let _previewDepositAssets: bigint = BIG_INT_VALUES.ZERO;
 
       if (
         Array.isArray(previewDepositAssets) &&
@@ -1078,7 +1085,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
 
         let _newAllowance =
-          typeof newAllowance === "bigint" ? newAllowance : ZERO_BigInt;
+          typeof newAllowance === "bigint" ? newAllowance : BIG_INT_VALUES.ZERO;
 
         if (
           Number(formatUnits(_newAllowance, 18)) >= Number(inputs[option[0]])
@@ -1224,7 +1231,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       : (parseUnits(_strShares, 18) * BigInt(1)) / BigInt(100);
 
     if (shortId === "CCF" && option.length < 2) {
-      input.push(ZERO_BigInt);
+      input.push(BIG_INT_VALUES.ZERO);
     }
 
     for (let i = 0; i < option.length; i++) {
@@ -1265,29 +1272,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
     }
     try {
-      if (shortId !== "IQMF" && shortId !== "IRMF") {
-        gas = await _publicClient?.estimateContractGas({
-          address: vault.address,
-          abi: VaultABI,
-          functionName: "depositAssets",
-          args: [assets as TAddress[], input, out, $account as TAddress],
-          account: $account as TAddress,
-        });
-        gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
-        setNeedConfirm(true);
-        depositAssets = await writeContract(wagmiConfig, {
-          address: vault.address,
-          abi: VaultABI,
-          functionName: "depositAssets",
-          args: [assets as TAddress[], input, out, $account as TAddress],
-          gas: gasLimit,
-        });
-        setNeedConfirm(false);
-      } else {
-        // IQMF strategy only
+      if (shortId === "IQMF" || shortId === "IRMF") {
+        // IQMF & IRMF strategies only
         let assets: TAddress[] = vault.assets.map((asset) => asset.address);
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
-          proportion ? amounts[0] : ZERO_BigInt
+          proportion ? amounts[0] : BIG_INT_VALUES.ZERO
         );
         gas = await _publicClient?.estimateContractGas({
           address: vault.address,
@@ -1303,6 +1292,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           abi: VaultABI,
           functionName: "depositAssets",
           args: [assets, IQMFAmounts, out, $account as TAddress],
+          gas: gasLimit,
+        });
+        setNeedConfirm(false);
+      } else {
+        gas = await _publicClient?.estimateContractGas({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [assets as TAddress[], input, out, $account as TAddress],
+          account: $account as TAddress,
+        });
+        gasLimit = BigInt(Math.trunc(Number(gas) * Number(settings.gasLimit)));
+        setNeedConfirm(true);
+        depositAssets = await writeContract(wagmiConfig, {
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "depositAssets",
+          args: [assets as TAddress[], input, out, $account as TAddress],
           gas: gasLimit,
         });
         setNeedConfirm(false);
@@ -1588,7 +1595,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           address: vault.address,
           abi: VaultABI,
           functionName: "withdrawAssets",
-          args: [option as TAddress[], currentValue, [ZERO_BigInt]],
+          args: [option as TAddress[], currentValue, [BIG_INT_VALUES.ZERO]],
           account: $account as TAddress,
         });
         setWithdrawAmount([
@@ -1601,11 +1608,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setButton("withdraw");
       } else {
         let assetsLength = defaultOption?.assetsArray.map(
-          (_: string) => ZERO_BigInt
+          (_: string) => BIG_INT_VALUES.ZERO
         );
         let localAssets = defaultOption?.assetsArray;
         if (shortId === "IQMF" || shortId === "IRMF") {
-          assetsLength = [ZERO_BigInt, ZERO_BigInt];
+          assetsLength = [BIG_INT_VALUES.ZERO, BIG_INT_VALUES.ZERO];
           localAssets = vault.assets.map((asset) => asset.address);
         }
         const { result } = await _publicClient?.simulateContract({
@@ -1707,7 +1714,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       });
 
       if (!allowanceResult[option[i]]) {
-        allowanceResult[option[i]] = ZERO_BigInt;
+        allowanceResult[option[i]] = BIG_INT_VALUES.ZERO;
       }
       allowanceResult[option[i]] = allowanceData;
     }
@@ -1779,12 +1786,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         try {
           let previewDepositAssets: any;
           if (shortId === "IQMF" || shortId === "IRMF") {
-            // IQMF & IRMF strategy only
+            // IQMF & IRMF strategies only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
-              (proportion) => (proportion ? amounts[0] : ZERO_BigInt)
+              (proportion) => (proportion ? amounts[0] : BIG_INT_VALUES.ZERO)
             );
-
             previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
               abi: VaultABI,
@@ -2098,29 +2104,31 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {/* CRV Strategy don't have zap withdraw */}
                 {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
-                    return (
-                      <div
-                        className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
-                        key={address as string}
-                        onClick={() => {
-                          optionHandler(
-                            [address as string],
-                            symbol as string,
-                            address as string,
-                            [logoURI as string]
-                          );
-                        }}
-                      >
-                        {logoURI && (
-                          <img
-                            className="w-6 h-6 rounded-full"
-                            src={logoURI as string}
-                            alt="logo"
-                          />
-                        )}
-                        <p className="ml-2">{symbol}</p>
-                      </div>
-                    );
+                    if (symbol !== defaultOption?.symbols) {
+                      return (
+                        <div
+                          className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
+                          key={address as string}
+                          onClick={() => {
+                            optionHandler(
+                              [address as string],
+                              symbol as string,
+                              address as string,
+                              [logoURI as string]
+                            );
+                          }}
+                        >
+                          {logoURI && (
+                            <img
+                              className="w-6 h-6 rounded-full"
+                              src={logoURI as string}
+                              alt="logo"
+                            />
+                          )}
+                          <p className="ml-2">{symbol}</p>
+                        </div>
+                      );
+                    }
                   })}
               </div>
             </div>

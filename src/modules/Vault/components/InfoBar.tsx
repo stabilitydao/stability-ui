@@ -272,7 +272,13 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 name="Risk"
                 value={
                   <div className="flex h-[28px] items-center">
-                    <RiskIndicator riskSymbol={vault?.risk?.symbol} />
+                    <RiskIndicator
+                      riskSymbol={
+                        vault?.risk?.isRektStrategy
+                          ? vault?.risk?.symbol
+                          : (vault.strategyInfo.il?.title as string)
+                      }
+                    />
                   </div>
                 }
               />

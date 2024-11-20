@@ -1028,15 +1028,13 @@ const Vaults = (): JSX.Element => {
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center">
-                            {vault?.risk?.isRektStrategy ? (
-                              <RiskIndicator riskSymbol={vault?.risk?.symbol} />
-                            ) : (
-                              <RiskIndicator
-                                riskSymbol={
-                                  vault.strategyInfo.il?.title as string
-                                }
-                              />
-                            )}
+                            <RiskIndicator
+                              riskSymbol={
+                                vault?.risk?.isRektStrategy
+                                  ? vault?.risk?.symbol
+                                  : (vault.strategyInfo.il?.title as string)
+                              }
+                            />
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 text-right">

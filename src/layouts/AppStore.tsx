@@ -53,7 +53,7 @@ import {
   YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
-  ZERO_BigInt,
+  BIG_INT_VALUES,
 } from "@constants";
 
 import type {
@@ -280,20 +280,32 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           if (strategyName === "IQMF" || strategyName === "IRMF") {
             //////
             poolSwapFeesAPRDaily =
-              Number(formatUnits(almRebalanceEntity?.[0] || ZERO_BigInt, 8)) -
-              (Number(formatUnits(almRebalanceEntity?.[0] || ZERO_BigInt, 8)) /
+              Number(
+                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+              ) -
+              (Number(
+                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+              ) /
                 100) *
                 fee;
 
             poolSwapFeesAPRWeekly =
-              Number(formatUnits(almRebalanceEntity?.[2] || ZERO_BigInt, 8)) -
-              (Number(formatUnits(almRebalanceEntity?.[2] || ZERO_BigInt, 8)) /
+              Number(
+                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+              ) -
+              (Number(
+                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+              ) /
                 100) *
                 fee;
 
             dailyAPR =
-              Number(formatUnits(almRebalanceEntity?.[1] || ZERO_BigInt, 8)) -
-              (Number(formatUnits(almRebalanceEntity?.[1] || ZERO_BigInt, 8)) /
+              Number(
+                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+              ) -
+              (Number(
+                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+              ) /
                 100) *
                 fee;
 
