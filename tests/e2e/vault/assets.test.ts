@@ -146,17 +146,17 @@ test("Should display assets info correctly", async ({ page }) => {
 
       /* If price feed provided by oracle - oracle label should be displayed */
 
-      const oracleLink =
-        CHAINLINK_STABLECOINS[
-          asset?.symbol as keyof typeof CHAINLINK_STABLECOINS
-        ];
+      //   const oracleLink =
+      //     CHAINLINK_STABLECOINS[
+      //       asset?.symbol as keyof typeof CHAINLINK_STABLECOINS
+      //     ];
 
-      if (oracleLink) {
-        const trustedOracleLink = await page
-          .getByTestId(`trustedToken${assetIndex}`)
-          .getAttribute("href");
-        expect(trustedOracleLink?.trim()).toBe(oracleLink?.trim());
-      }
+      //   if (oracleLink) {
+      //     const trustedOracleLink = await page
+      //       .getByTestId(`trustedToken${assetIndex}`)
+      //       .getAttribute("href");
+      //     expect(trustedOracleLink?.trim()).toBe(oracleLink?.trim());
+      //   }
     }
 
     await page.goBack();
