@@ -86,6 +86,14 @@ type TOptionInfo = {
   logoURI: string | string[];
 };
 
+const ZAP_ROUTERS = {
+  "1inch": {
+    logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
+    title: "1inch DeX",
+  },
+  swapper: { logo: "/logo.svg", title: "Swapper" },
+};
+
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const _publicClient = usePublicClient({
     chainId: Number(network),
@@ -174,6 +182,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
   const [loader, setLoader] = useState<boolean>(false);
+  const [agg, setAgg] = useState("");
 
   const tokenSelectorRef = useRef<HTMLDivElement>(null);
 
@@ -190,10 +199,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
           title: "Pearl DeX",
         }
-      : {
-          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
-          title: "1inch DeX",
-        };
+      : (ZAP_ROUTERS[agg] ?? ZAP_ROUTERS.swapper);
 
   const checkButtonApproveDeposit = (apprDepo: string[]) => {
     if (shortId === "IQMF" || shortId === "IRMF") {
@@ -959,7 +965,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
       }
-
+      const isAgg = outData.find((data) => !!data.agg);
+      setAgg(isAgg?.agg ?? "");
       setZapTokens(outData);
       let amounts;
 
@@ -1675,6 +1682,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             );
 
             const outData = await Promise.all(promises);
+            const isAgg = outData.find((data) => !!data.agg);
+            setAgg(isAgg?.agg ?? "");
 
             setZapPreviewWithdraw(outData);
 
@@ -2346,206 +2355,208 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     : 0}
                 </p>
 
-                <div className="mt-[10px] flex flex-col">
-                  {isNotUnderlying && (
-                    <>
-                      <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
-                        {isEmptyObject(inputs) ? "" : " Swaps"}
-                      </p>
+                {$connected && (
+                  <div className="mt-[10px] flex flex-col">
+                    {isNotUnderlying && (
+                      <>
+                        <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
+                          {isEmptyObject(inputs) ? "" : " Swaps"}
+                        </p>
 
-                      {loader && !transactionInProgress ? (
-                        <div className="flex items-start justify-start">
-                          <AssetsSkeleton />
-                        </div>
-                      ) : (
-                        <div className="flex h-[52px] mb-[10px]">
-                          {!!zapTokens.length && (
-                            <>
-                              {shortId !== "CCF" ? (
-                                <div className="h-[40px] flex items-center justify-center">
-                                  <img
-                                    src={DEX.logo}
-                                    alt={DEX.title}
-                                    title={DEX.title}
-                                    className="w-[26px] h-[26px]"
-                                  />
-                                  <div className="flex whitespace-nowrap gap-3 items-center">
-                                    {zapTokens?.map((token: any) => (
-                                      <div
-                                        className="text-[14px] flex items-center gap-3"
-                                        key={token.address}
-                                      >
-                                        {token.address.toLowerCase() !==
-                                          option[0].toLowerCase() && (
-                                          <div className="flex items-center gap-1">
-                                            {zapError ? (
-                                              <img
-                                                src="/error.svg"
-                                                alt="error img"
-                                                title="error"
-                                              />
-                                            ) : (
-                                              <>
-                                                <div className="flex items-center gap-1">
-                                                  {/* <p>
-                                                  {Number(
-                                                    token.amountIn
-                                                  ).toFixed(6)}
-                                                </p>*/}
-                                                  <img
-                                                    src={
-                                                      getTokenData(option[0])
-                                                        ?.logoURI
-                                                    }
-                                                    title={
-                                                      getTokenData(option[0])
-                                                        ?.symbol
-                                                    }
-                                                    alt={
-                                                      getTokenData(option[0])
-                                                        ?.symbol
-                                                    }
-                                                    className="w-6 h-6 rounded-full"
-                                                  />
-                                                </div>
-                                                -&gt;
-                                                <div className="flex items-center gap-1">
-                                                  {/*<p>
-                                                  {Number(
-                                                    token.amountOut
-                                                  ).toFixed(6)}
-                                                </p>*/}
-                                                  <img
-                                                    src={token.img}
-                                                    title={token.symbol}
-                                                    alt={token.symbol}
-                                                    className="w-6 h-6 rounded-full"
-                                                  />
-                                                </div>
-                                              </>
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="text-[14px]  flex items-center gap-1 ml-2">
-                                  <div className="flex items-center gap-1 mt-2">
+                        {loader && !transactionInProgress ? (
+                          <div className="flex items-start justify-start">
+                            <AssetsSkeleton />
+                          </div>
+                        ) : (
+                          <div className="flex h-[52px] mb-[10px]">
+                            {!!zapTokens.length && (
+                              <>
+                                {shortId !== "CCF" ? (
+                                  <div className="h-[40px] flex items-center justify-center">
                                     <img
                                       src={DEX.logo}
                                       alt={DEX.title}
                                       title={DEX.title}
+                                      className="w-[26px] h-[26px]"
                                     />
-                                    {zapError ? (
-                                      <img
-                                        src="/error.svg"
-                                        alt="error img"
-                                        title="error"
-                                      />
-                                    ) : (
-                                      <>
-                                        <div className="flex items-center gap-1">
-                                          <p>
-                                            {Number(
-                                              zapTokens[0].amountIn
-                                            ).toFixed(6)}
-                                          </p>
-                                          <img
-                                            src={
-                                              getTokenData(option[0])?.logoURI
-                                            }
-                                            title={
-                                              getTokenData(option[0])?.symbol
-                                            }
-                                            alt={
-                                              getTokenData(option[0])?.symbol
-                                            }
-                                            className="w-6 h-6 rounded-full"
-                                          />
+                                    <div className="flex whitespace-nowrap gap-3 items-center">
+                                      {zapTokens?.map((token: any) => (
+                                        <div
+                                          className="text-[14px] flex items-center gap-3"
+                                          key={token.address}
+                                        >
+                                          {token.address.toLowerCase() !==
+                                            option[0].toLowerCase() && (
+                                            <div className="flex items-center gap-1">
+                                              {zapError ? (
+                                                <img
+                                                  src="/error.svg"
+                                                  alt="error img"
+                                                  title="error"
+                                                />
+                                              ) : (
+                                                <>
+                                                  <div className="flex items-center gap-1">
+                                                    {/* <p>
+                                                  {Number(
+                                                    token.amountIn
+                                                  ).toFixed(6)}
+                                                </p>*/}
+                                                    <img
+                                                      src={
+                                                        getTokenData(option[0])
+                                                          ?.logoURI
+                                                      }
+                                                      title={
+                                                        getTokenData(option[0])
+                                                          ?.symbol
+                                                      }
+                                                      alt={
+                                                        getTokenData(option[0])
+                                                          ?.symbol
+                                                      }
+                                                      className="w-6 h-6 rounded-full"
+                                                    />
+                                                  </div>
+                                                  -&gt;
+                                                  <div className="flex items-center gap-1">
+                                                    {/*<p>
+                                                  {Number(
+                                                    token.amountOut
+                                                  ).toFixed(6)}
+                                                </p>*/}
+                                                    <img
+                                                      src={token.img}
+                                                      title={token.symbol}
+                                                      alt={token.symbol}
+                                                      className="w-6 h-6 rounded-full"
+                                                    />
+                                                  </div>
+                                                </>
+                                              )}
+                                            </div>
+                                          )}
                                         </div>
-                                        -&gt;
-                                        <div className="flex items-center gap-1">
-                                          <p>
-                                            {Number(
-                                              zapTokens[0].amountOut
-                                            ).toFixed(6)}
-                                          </p>
-                                          <img
-                                            src={zapTokens[0].img}
-                                            title={zapTokens[0].symbol}
-                                            alt={zapTokens[0].symbol}
-                                            className="w-6 h-6 rounded-full"
-                                          />
-                                        </div>
-                                      </>
-                                    )}
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  <div className="flex mt-[-3px]">
-                    <div
-                      className={`${isNotUnderlying ? "h-[66px]" : "h-[122px] flex flex-col justify-end"}`}
-                    >
-                      {!isEmptyObject(inputs) && (
-                        <>
-                          <p className="text-[12px] text-neutral-500 uppercase">
-                            You Receive
-                          </p>
-                          <div
-                            className={`${isNotUnderlying ? "h-[63px]" : "h-[30px]"}`}
-                          >
-                            <div className="text-left text-neutral-50 text-[14px]">
-                              <div className="flex items-center">
-                                <img
-                                  src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                                  alt="logo"
-                                  className="w-7 h-7 rounded-full mr-4"
-                                />
-
-                                {loader && !transactionInProgress ? (
-                                  <ShareSkeleton height={24} width={300} />
                                 ) : (
-                                  <div>
-                                    {(underlyingShares &&
-                                      Number(inputs[option[0]]) > 0) ||
-                                    (zapShares &&
-                                      Number(inputs[option[0]]) > 0) ? (
-                                      <p className="h-6">
-                                        {underlyingShares &&
-                                        Number(inputs[option[0]]) > 0
-                                          ? `${underlyingShares} ($${(
-                                              Number(underlyingShares) *
-                                              Number(vault.shareprice)
-                                            ).toFixed(2)})`
-                                          : zapShares &&
-                                            Number(inputs[option[0]]) > 0 &&
-                                            `${zapShares} ($${(
-                                              Number(zapShares) *
-                                              Number(vault.shareprice)
-                                            ).toFixed(2)})`}
-                                      </p>
-                                    ) : (
-                                      <p className="h-6">0 ($0.0)</p>
-                                    )}
+                                  <div className="text-[14px]  flex items-center gap-1 ml-2">
+                                    <div className="flex items-center gap-1 mt-2">
+                                      <img
+                                        src={DEX.logo}
+                                        alt={DEX.title}
+                                        title={DEX.title}
+                                      />
+                                      {zapError ? (
+                                        <img
+                                          src="/error.svg"
+                                          alt="error img"
+                                          title="error"
+                                        />
+                                      ) : (
+                                        <>
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(
+                                                zapTokens[0].amountIn
+                                              ).toFixed(6)}
+                                            </p>
+                                            <img
+                                              src={
+                                                getTokenData(option[0])?.logoURI
+                                              }
+                                              title={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              alt={
+                                                getTokenData(option[0])?.symbol
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                          -&gt;
+                                          <div className="flex items-center gap-1">
+                                            <p>
+                                              {Number(
+                                                zapTokens[0].amountOut
+                                              ).toFixed(6)}
+                                            </p>
+                                            <img
+                                              src={zapTokens[0].img}
+                                              title={zapTokens[0].symbol}
+                                              alt={zapTokens[0].symbol}
+                                              className="w-6 h-6 rounded-full"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                 )}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <div className="flex mt-[-3px]">
+                      <div
+                        className={`${isNotUnderlying ? "h-[66px]" : "h-[122px] flex flex-col justify-end"}`}
+                      >
+                        {!isEmptyObject(inputs) && (
+                          <>
+                            <p className="text-[12px] text-neutral-500 uppercase">
+                              You Receive
+                            </p>
+                            <div
+                              className={`${isNotUnderlying ? "h-[63px]" : "h-[30px]"}`}
+                            >
+                              <div className="text-left text-neutral-50 text-[14px]">
+                                <div className="flex items-center">
+                                  <img
+                                    src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                                    alt="logo"
+                                    className="w-7 h-7 rounded-full mr-4"
+                                  />
+
+                                  {loader && !transactionInProgress ? (
+                                    <ShareSkeleton height={24} width={300} />
+                                  ) : (
+                                    <div>
+                                      {(underlyingShares &&
+                                        Number(inputs[option[0]]) > 0) ||
+                                      (zapShares &&
+                                        Number(inputs[option[0]]) > 0) ? (
+                                        <p className="h-6">
+                                          {underlyingShares &&
+                                          Number(inputs[option[0]]) > 0
+                                            ? `${underlyingShares} ($${(
+                                                Number(underlyingShares) *
+                                                Number(vault.shareprice)
+                                              ).toFixed(2)})`
+                                            : zapShares &&
+                                              Number(inputs[option[0]]) > 0 &&
+                                              `${zapShares} ($${(
+                                                Number(zapShares) *
+                                                Number(vault.shareprice)
+                                              ).toFixed(2)})`}
+                                        </p>
+                                      ) : (
+                                        <p className="h-6">0 ($0.0)</p>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </>
-                      )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </>
@@ -2690,7 +2701,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </div>
                   ))}
 
-                {!isSingleTokenStrategy && isNotUnderlying && (
+                {!isSingleTokenStrategy && isNotUnderlying && $connected && (
                   <div>
                     {option.length < 2 && (
                       <p
