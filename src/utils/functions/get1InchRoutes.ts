@@ -9,6 +9,7 @@ import type { TAddress } from "@types";
 type ReturnData = {
   symbol: string;
   address: string;
+  agg: string;
   amountIn: string;
   amountOut: string;
   router: string;
@@ -69,6 +70,7 @@ export const get1InchRoutes = async (
     return {
       symbol: symbol as string,
       address: address,
+      agg: "",
       amountIn: formatUnits(BigInt(amount), decimals),
       amountOut: "0",
       router: "",
@@ -88,20 +90,22 @@ export const get1InchRoutes = async (
     try {
       const response = await axios.get(url);
 
-      if (!response?.data[0]?.amountOut) {
-        throw new Error(
-          `1inch status: ${response?.data?.[0]?.aggApiReply.status}`
-        );
+      const firstCorrectResponse = response?.data.find((res) => res?.amountOut);
+
+      if (!firstCorrectResponse) {
+        throw new Error("ZAP error");
       }
 
       setError(false);
+
       return {
         symbol: symbol as string,
         address: address,
+        agg: firstCorrectResponse.agg.toLowerCase(),
         amountIn: formatUnits(BigInt(amount), decimals),
-        amountOut: formatUnits(response?.data[0].amountOut, tokenDecimals),
-        router: response?.data[0].router,
-        txData: response?.data[0].txData,
+        amountOut: formatUnits(firstCorrectResponse.amountOut, tokenDecimals),
+        router: firstCorrectResponse.router,
+        txData: firstCorrectResponse.txData,
         img: tokenData?.logoURI as string,
       };
     } catch (error) {
@@ -116,6 +120,7 @@ export const get1InchRoutes = async (
         return {
           symbol: symbol as string,
           address: address,
+          agg: "",
           amountIn: formatUnits(BigInt(amount), decimals),
           amountOut: "0",
           router: "",

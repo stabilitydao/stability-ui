@@ -3,7 +3,13 @@ import {Users} from '@modules';
 import Layout from '@layouts/Layout.astro';
 ---
 
-<Layout title="Users">
+
+<Layout title="Users" 
+  img="/ogs/users.png"
+  metaTitle="On-chain asset management, liquidity mining and yield farming platform."
+  metaUrl="https://stability.farm/users"
+  metaDescription="On-chain asset management, liquidity mining and yield farming platform."
+>
     <div class="platform">
         <Users client:only="react" />
     </div>

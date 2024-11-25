@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { useStore } from "@nanostores/react";
 
 import {
@@ -13,7 +15,7 @@ import {
 
 import { formatNumber } from "@utils";
 
-import { CountersBlockCompact } from "@ui";
+import { CountersBlockCompact, Skeleton } from "@ui";
 
 import { apiData, currentChainID, platformVersions } from "@store";
 
@@ -29,22 +31,22 @@ const Platform = (): JSX.Element => {
   const chainsTotals = getChainsTotals();
   const strategiesTotals = getStrategiesTotals();
 
+  const [platformData, setPlatformData] = useState([
+    {
+      name: "AUM",
+      content: "",
+    },
+    {
+      name: "Users earned",
+      content: "",
+    },
+    { name: "Vaults", content: "" },
+  ]);
+
   let protocolsTotal = 0;
   for (const defiOrgCode of Object.keys(integrations)) {
     protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length;
   }
-
-  const platformInfo = [
-    {
-      name: "AUM",
-      content: `\$${formatNumber($apiData?.total.tvl || 0, "withSpaces")}`,
-    },
-    {
-      name: "Users earned",
-      content: `\$${formatNumber($apiData?.total.usersEarned.toFixed(0) || 0, "withSpaces")}`,
-    },
-    { name: "Vaults", content: $apiData?.total.activeVaults },
-  ];
 
   const strategiesInfo = [
     { name: "Live", value: strategiesTotals.LIVE.toString(), color: "#4FAE2D" },
@@ -121,6 +123,26 @@ const Platform = (): JSX.Element => {
     },
   ];
 
+  useEffect(() => {
+    if (
+      $apiData?.total?.tvl &&
+      $apiData?.total.usersEarned &&
+      $apiData?.total.activeVaults
+    ) {
+      setPlatformData([
+        {
+          name: "AUM",
+          content: `\$${formatNumber($apiData?.total.tvl || 0, "withSpaces")}`,
+        },
+        {
+          name: "Users earned",
+          content: `\$${formatNumber($apiData?.total.usersEarned.toFixed(0) || 0, "withSpaces")}`,
+        },
+        { name: "Vaults", content: String($apiData?.total.activeVaults) },
+      ]);
+    }
+  }, [$apiData]);
+
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
@@ -154,13 +176,17 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-center p-[36px] ">
-        {platformInfo.map(({ name, content }) => (
+      <div className="flex flex-wrap justify-center p-[36px]">
+        {platformData.map(({ name, content }) => (
           <div
             key={name}
             className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col"
           >
-            <div className="text-[36px]">{content}</div>
+            {content ? (
+              <div className="text-[36px]">{content}</div>
+            ) : (
+              <Skeleton />
+            )}
             <div className="flex self-center justify-center text-[16px]">
               {name}
             </div>
