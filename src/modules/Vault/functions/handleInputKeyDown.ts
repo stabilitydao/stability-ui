@@ -15,28 +15,37 @@
  * @returns {void} Function does not return anything, but it prevents invalid keys from being entered into the input field
  */
 
+const keys = [
+  "Backspace",
+  "ArrowLeft",
+  "ArrowRight",
+  "Home",
+  "End",
+  "Delete",
+  "Del",
+];
+
 export const handleInputKeyDown = (
   evt: React.KeyboardEvent<HTMLInputElement>,
   currentValue: string
 ): void => {
-  if (
-    !/[\d.]/.test(evt.key) &&
-    evt.key !== "Backspace" &&
-    evt.key !== "ArrowLeft" &&
-    evt.key !== "ArrowRight"
-  ) {
+  if (!/[\d.]/.test(evt.key) && !keys.includes(evt.key)) {
     evt.preventDefault();
+    return;
   }
 
   if (evt.key === "0" && currentValue === "0") {
     evt.preventDefault();
+    return;
   }
 
   if (/^\d/.test(evt.key) && currentValue === "0" && evt.key !== ".") {
     evt.preventDefault();
+    return;
   }
 
   if (evt.key === "." && currentValue && currentValue.includes(".")) {
     evt.preventDefault();
+    return;
   }
 };

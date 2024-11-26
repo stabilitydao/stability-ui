@@ -1682,7 +1682,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             );
 
             const outData = await Promise.all(promises);
-            const isAgg = outData.find((data) => !!data.agg);
+            const isAgg = outData.find((data: any) => !!data.agg);
             setAgg(isAgg?.agg ?? "");
 
             setZapPreviewWithdraw(outData);
@@ -2584,10 +2584,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <label className="relative block w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
-                    src={activeOptionToken.logoURI[0]}
-                    alt={activeOptionToken.symbol as string}
-                    title={activeOptionToken.symbol as string}
-                    className="w-4 h-4 text-neutral-500 rounded-full"
+                    src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                    alt="logo"
+                    className="w-4 h-4 rounded-full "
                   />
                 </span>
                 <input

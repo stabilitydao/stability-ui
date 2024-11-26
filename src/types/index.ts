@@ -365,7 +365,7 @@ type TUnderlyingToken = {
   address: TAddress;
   symbol: string;
   decimals: number;
-  balance: number;
+  balance: number | string;
   allowance: number;
   logoURI: string;
 };

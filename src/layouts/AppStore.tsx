@@ -143,7 +143,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         } else {
           console.error("API error:", err);
-          handleError("API", err);
+          handleError("API", err as string);
         }
       }
     }
@@ -687,7 +687,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 localVaults[chain.id] = vaultsPromise.reduce(
                   (acc, curr) => ({ ...acc, ...curr }),
                   {}
-                );
+                ) as TVaults;
               }
               isVaultsLoaded.set(true);
             } catch (txError: any) {
