@@ -409,47 +409,59 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         const daysFromCreation = getTimeDifference(vaultCreated)?.days;
 
+        const vsHold24H =
+          vault.vsHold?.apr24h && daysFromCreation >= 3
+            ? Number(vault.vsHold?.apr24h).toFixed(2)
+            : 0;
+
+        const vsHoldWeekly =
+          vault.vsHold?.aprWeek && daysFromCreation >= 3
+            ? Number(vault.vsHold?.aprWeek).toFixed(2)
+            : 0;
+
         const lifetimeVsHold =
           vault.vsHold?.lifetime && daysFromCreation >= 3
             ? Number(vault.vsHold?.lifetime).toFixed(2)
             : 0;
 
-        const lifetimeVsHoldAPR =
+        const vsHoldAPR =
           vault.vsHold?.aprLifetime && daysFromCreation >= 3
             ? Number(vault.vsHold?.aprLifetime).toFixed(2)
             : 0;
 
-        let lifetimeTokensHold: THoldData[] = [];
+        let assetsVsHold: THoldData[] = [];
         if (vault.vsHold?.lifetimeAssets && prices) {
-          lifetimeTokensHold = strategyAssets.map(
-            (asset: string, index: number) => {
-              const price = vault?.assetsPricesLast?.[index]
-                ? Number(vault?.assetsPricesLast?.[index])
-                : Number(prices[asset?.toLowerCase()]?.price);
+          assetsVsHold = strategyAssets.map((asset: string, index: number) => {
+            const price = vault?.assetsPricesLast?.[index]
+              ? Number(vault?.assetsPricesLast?.[index])
+              : Number(prices[asset?.toLowerCase()]?.price);
 
-              const priceOnCreation = Number(
-                formatUnits(
-                  BigInt(vault?.assetsPricesOnCreation?.[index] || 0),
-                  18
-                )
-              );
+            const priceOnCreation = Number(
+              formatUnits(
+                BigInt(vault?.assetsPricesOnCreation?.[index] || 0),
+                18
+              )
+            );
 
-              const priceDifference =
-                ((price - priceOnCreation) / priceOnCreation) * 100;
+            const priceDifference =
+              ((price - priceOnCreation) / priceOnCreation) * 100;
 
-              return {
-                symbol: getTokenData(asset)?.symbol || "",
-                initPrice: priceOnCreation.toFixed(2),
-                price: price.toFixed(2),
-                priceDifference: priceDifference.toFixed(2),
-                latestAPR:
-                  Number(vault.vsHold?.lifetimeAssets[index]).toFixed(2) || "0",
-                APR:
-                  Number(vault.vsHold?.aprAssetsLifetime[index]).toFixed(2) ||
-                  "0",
-              };
-            }
-          );
+            return {
+              symbol: getTokenData(asset)?.symbol || "",
+              initPrice: priceOnCreation.toFixed(2),
+              price: price.toFixed(2),
+              priceDifference: priceDifference.toFixed(2),
+              dailyAPR:
+                Number(vault.vsHold?.aprAssets24h[index]).toFixed(2) || "0",
+              weeklyAPR:
+                Number(vault.vsHold?.aprAssetsWeek[index]).toFixed(2) || "0",
+              latestAPR:
+                Number(vault.vsHold?.lifetimeAssets[index]).toFixed(2) || "0",
+              APR:
+                Number(vault.vsHold?.aprAssetsLifetime[index]).toFixed(2) ||
+                "0",
+            };
+          });
         }
 
         const isVsActive = daysFromCreation > 2 && !!Number(vault.sharePrice);
@@ -556,8 +568,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             alm: vault.alm,
             risk: vault?.risk,
             lifetimeVsHold: Number(lifetimeVsHold),
-            lifetimeVsHoldAPR: Number(lifetimeVsHoldAPR),
-            lifetimeTokensHold,
+            vsHold24H: Number(vsHold24H),
+            vsHoldWeekly: Number(vsHoldWeekly),
+            vsHoldAPR: Number(vsHoldAPR),
+            assetsVsHold,
             isVsActive,
             yearnProtocols,
             network: chainID,

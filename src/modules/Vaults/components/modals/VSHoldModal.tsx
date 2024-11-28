@@ -13,9 +13,9 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       setModalState({
-        lifetimeTokensHold: [],
+        assetsVsHold: [],
+        lifetimeVsHold: 0,
         vsHoldAPR: 0,
-        lifetimeVsHoldAPR: 0,
         created: 0,
         state: false,
         isVsActive: false,
@@ -43,9 +43,9 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
         <svg
           onClick={() => {
             setModalState({
-              lifetimeTokensHold: [],
+              assetsVsHold: [],
+              lifetimeVsHold: 0,
               vsHoldAPR: 0,
-              lifetimeVsHoldAPR: 0,
               created: 0,
               state: false,
               isVsActive: false,
@@ -125,6 +125,21 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
                 {state.isVsActive ? (
                   <td
                     className={`text-right ${
+                      state.lifetimeVsHold > 0
+                        ? "text-[#b0ddb8]"
+                        : "text-[#eb7979]"
+                    }`}
+                  >
+                    {state.lifetimeVsHold > 0 ? "+" : ""}
+                    {state.lifetimeVsHold}%
+                  </td>
+                ) : (
+                  <td className="text-right">-</td>
+                )}
+
+                {state.isVsActive ? (
+                  <td
+                    className={`text-right ${
                       state.vsHoldAPR > 0 ? "text-[#b0ddb8]" : "text-[#eb7979]"
                     }`}
                   >
@@ -134,62 +149,45 @@ const VSHoldModal: React.FC<IProps> = ({ state, setModalState }) => {
                 ) : (
                   <td className="text-right">-</td>
                 )}
-
-                {state.isVsActive ? (
-                  <td
-                    className={`text-right ${
-                      state.lifetimeVsHoldAPR > 0
-                        ? "text-[#b0ddb8]"
-                        : "text-[#eb7979]"
-                    }`}
-                  >
-                    {state.lifetimeVsHoldAPR > 0 ? "+" : ""}
-                    {state.lifetimeVsHoldAPR}%
-                  </td>
-                ) : (
-                  <td className="text-right">-</td>
-                )}
               </tr>
 
-              {state.lifetimeTokensHold.map(
-                (aprsData: THoldData, index: number) => (
-                  <tr key={index} className="hover:bg-[#2B3139]">
-                    <td className="text-left">
-                      VAULT VS {aprsData?.symbol} HODL
+              {state.assetsVsHold.map((aprsData: THoldData, index: number) => (
+                <tr key={index} className="hover:bg-[#2B3139]">
+                  <td className="text-left">
+                    VAULT VS {aprsData?.symbol} HODL
+                  </td>
+
+                  {state.isVsActive ? (
+                    <td
+                      className={`text-right ${
+                        Number(aprsData.latestAPR) > 0
+                          ? "text-[#b0ddb8]"
+                          : "text-[#eb7979]"
+                      }`}
+                    >
+                      {Number(aprsData.latestAPR) > 0 ? "+" : ""}
+                      {aprsData.latestAPR}%
                     </td>
+                  ) : (
+                    <td className="text-right">-</td>
+                  )}
 
-                    {state.isVsActive ? (
-                      <td
-                        className={`text-right ${
-                          Number(aprsData.latestAPR) > 0
-                            ? "text-[#b0ddb8]"
-                            : "text-[#eb7979]"
-                        }`}
-                      >
-                        {Number(aprsData.latestAPR) > 0 ? "+" : ""}
-                        {aprsData.latestAPR}%
-                      </td>
-                    ) : (
-                      <td className="text-right">-</td>
-                    )}
-
-                    {state.isVsActive ? (
-                      <td
-                        className={`text-right ${
-                          Number(aprsData.latestAPR) > 0
-                            ? "text-[#b0ddb8]"
-                            : "text-[#eb7979]"
-                        }`}
-                      >
-                        {Number(aprsData.APR) > 0 ? "+" : ""}
-                        {aprsData.APR}%
-                      </td>
-                    ) : (
-                      <td className="text-right">-</td>
-                    )}
-                  </tr>
-                )
-              )}
+                  {state.isVsActive ? (
+                    <td
+                      className={`text-right ${
+                        Number(aprsData.latestAPR) > 0
+                          ? "text-[#b0ddb8]"
+                          : "text-[#eb7979]"
+                      }`}
+                    >
+                      {Number(aprsData.APR) > 0 ? "+" : ""}
+                      {aprsData.APR}%
+                    </td>
+                  ) : (
+                    <td className="text-right">-</td>
+                  )}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

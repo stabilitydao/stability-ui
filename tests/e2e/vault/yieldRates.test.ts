@@ -358,13 +358,13 @@ test("Should display yield rates info correctly", async ({ page }) => {
     // }
     // /* VAULT VS Vault token HODL percentage amount should be displayed */
     // /* from deployed date and Est Annual correctly                     */
-    // let lifetimeTokensHold: any = [];
+    // let assetsVsHold: any = [];
 
     // const strategyAssets: string[] =
     //   vaultData?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
     // if (vaultData.apr?.vsHoldAssetsLifetime) {
-    //   lifetimeTokensHold = strategyAssets.map((_: string, index: number) => {
+    //   assetsVsHold = strategyAssets.map((_: string, index: number) => {
     //     const yearPercentDiff =
     //       Number(vaultData.apr?.vsHoldAssetsLifetime[index]) || 0;
 
@@ -378,17 +378,17 @@ test("Should display yield rates info correctly", async ({ page }) => {
     // }
 
     // if (isVsActive) {
-    //   for (const [index, token] of lifetimeTokensHold.entries()) {
+    //   for (const [index, token] of assetsVsHold.entries()) {
     //     await page.waitForSelector(`[data-testid='tokensHold${index}']`);
     //     await page.waitForSelector(
-    //       `[data-testid='lifetimeTokensHold${index}']`
+    //       `[data-testid='assetsVsHold${index}']`
     //     );
 
     //     const tokenHold = await page
     //       .getByTestId(`tokensHold${index}`)
     //       .innerText();
     //     const lifetimeTokenHold = await page
-    //       .getByTestId(`lifetimeTokensHold${index}`)
+    //       .getByTestId(`assetsVsHold${index}`)
     //       .innerText();
 
     //     let tokenHoldNumber = tokenHold.includes("+")

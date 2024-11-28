@@ -36,7 +36,7 @@ const TABLE: TTableColumn[] = [
   },
   {
     name: "VS HODL APR",
-    keyName: "lifetimeVsHoldAPR",
+    keyName: "vsHoldAPR",
     sortType: "none",
     dataType: "number",
   },

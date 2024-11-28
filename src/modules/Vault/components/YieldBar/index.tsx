@@ -1,71 +1,20 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
+import { HoldTable } from "./HoldTable";
+import { VSHoldTableCell } from "./VSHoldTableCell";
+
 import { HoldModal, HeadingText } from "@ui";
 
 import { connected } from "@store";
 
 import { getTimeDifference } from "@utils";
 
-import type { TVault, THoldData } from "@types";
+import type { TVault, THoldData, TShareData } from "@types";
 
 interface IProps {
   vault: TVault;
 }
-
-type TShareData = {
-  sharePriceOnCreation?: string;
-  sharePrice?: string;
-  yieldPercent?: string;
-};
-
-const HoldTable = ({
-  shareData,
-  holdData,
-}: {
-  shareData: TShareData;
-  holdData: THoldData[];
-}) => {
-  return (
-    <table className="table table-auto w-full rounded-lg">
-      <thead className="bg-[#0b0e11]">
-        <tr className="text-[16px] text-[#8f8f8f] uppercase">
-          <th></th>
-          <th>INIT PRICE</th>
-          <th>PRICE</th>
-          <th>CHANGE</th>
-        </tr>
-      </thead>
-      <tbody className="text-[16px]">
-        {!!shareData && (
-          <tr className="hover:bg-[#2B3139]">
-            <td>Vault</td>
-            <td className="text-right py-1">
-              {shareData.sharePriceOnCreation}
-            </td>
-            <td className="text-right py-1">{shareData.sharePrice}</td>
-            <td className="text-right py-1">
-              {Number(shareData.yieldPercent) > 0 && "+"}
-              {shareData.yieldPercent}%
-            </td>
-          </tr>
-        )}
-        {!!holdData &&
-          holdData.map((aprsData) => (
-            <tr key={aprsData.symbol} className="hover:bg-[#2B3139]">
-              <td>{aprsData.symbol}</td>
-              <td className="text-right py-1">{aprsData.initPrice}</td>
-              <td className="text-right py-1">{aprsData.price}</td>
-              <td className="text-right py-1">
-                {Number(aprsData.priceDifference) > 0 && "+"}
-                {aprsData.priceDifference}%
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
-  );
-};
 
 const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
@@ -212,7 +161,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
           </table>
         )}
 
-        {!!vault.lifetimeTokensHold && (
+        {!!vault.assetsVsHold && (
           <table className="font-manrope w-full mt-5">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[14px] uppercase">
@@ -239,11 +188,13 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                     <div className="visible__tooltip toCenter">
                       <HoldTable
                         shareData={shareData}
-                        holdData={vault.lifetimeTokensHold}
+                        holdData={vault.assetsVsHold}
                       />
                     </div>
                   </div>
                 </th>
+                <th className="text-right">24h</th>
+                <th className="text-right">week</th>
                 <th className="text-right">
                   {getTimeDifference(vault.created).days} days
                 </th>
@@ -253,77 +204,55 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[14px]">
               <tr className="h-[48px] hover:bg-accent-950">
                 <td>VAULT VS HODL</td>
+                <VSHoldTableCell
+                  isVsActive={vault.isVsActive}
+                  vsHold={vault.vsHold24H}
+                />
+                <VSHoldTableCell
+                  isVsActive={vault.isVsActive}
+                  vsHold={vault.vsHoldWeekly}
+                />
 
-                {vault.isVsActive ? (
-                  <td
-                    data-testid="vaultVsHold"
-                    className={`text-right text-[18px] ${
-                      vault.lifetimeVsHold > 0
-                        ? "text-success-400"
-                        : "text-error-400"
-                    }`}
-                  >
-                    {vault.lifetimeVsHold > 0 ? "+" : ""}
-                    {vault.lifetimeVsHold}%
-                  </td>
-                ) : (
-                  <td className="text-right">-</td>
-                )}
-                {vault.isVsActive ? (
-                  <td
-                    data-testid="vaultVsHoldLifetime"
-                    className={`text-right text-[18px] ${
-                      vault.lifetimeVsHoldAPR > 0
-                        ? "text-success-400"
-                        : "text-error-400"
-                    }`}
-                  >
-                    {vault.lifetimeVsHoldAPR > 0 ? "+" : ""}
-                    {vault.lifetimeVsHoldAPR}%
-                  </td>
-                ) : (
-                  <td className="text-right">-</td>
-                )}
+                <VSHoldTableCell
+                  isVsActive={vault.isVsActive}
+                  vsHold={vault.lifetimeVsHold}
+                  testID="vaultVsHold"
+                />
+
+                <VSHoldTableCell
+                  isVsActive={vault.isVsActive}
+                  vsHold={vault.vsHoldAPR}
+                  testID="vaultVsHoldLifetime"
+                />
               </tr>
-              {vault.lifetimeTokensHold.map(
-                (aprsData: THoldData, index: number) => (
+              {vault.assetsVsHold.map((aprsData: THoldData, index: number) => {
+                const data = [
+                  { vsHold: Number(aprsData.dailyAPR) },
+                  { vsHold: Number(aprsData.weeklyAPR) },
+                  {
+                    vsHold: Number(aprsData.latestAPR),
+                    testID: `tokensHold${index}`,
+                  },
+                  {
+                    vsHold: Number(aprsData.APR),
+                    testID: `assetsVsHold${index}`,
+                  },
+                ];
+
+                return (
                   <tr key={index} className="h-[48px] hover:bg-accent-950">
                     <td>VAULT VS {aprsData?.symbol} HODL</td>
-
-                    {vault.isVsActive ? (
-                      <td
-                        data-testid={`tokensHold${index}`}
-                        className={`text-right text-[18px] ${
-                          Number(aprsData.latestAPR) > 0
-                            ? "text-success-400"
-                            : "text-error-400"
-                        }`}
-                      >
-                        {Number(aprsData.latestAPR) > 0 ? "+" : ""}
-                        {aprsData.latestAPR}%
-                      </td>
-                    ) : (
-                      <td className="text-right">-</td>
-                    )}
-
-                    {vault.isVsActive ? (
-                      <td
-                        data-testid={`lifetimeTokensHold${index}`}
-                        className={`text-right text-[18px] ${
-                          Number(aprsData.latestAPR) > 0
-                            ? "text-success-400"
-                            : "text-error-400"
-                        }`}
-                      >
-                        {Number(aprsData.APR) > 0 ? "+" : ""}
-                        {aprsData.APR}%
-                      </td>
-                    ) : (
-                      <td className="text-right">-</td>
-                    )}
+                    {data.map((cell) => (
+                      <VSHoldTableCell
+                        key={cell.vsHold}
+                        isVsActive={vault.isVsActive}
+                        vsHold={cell.vsHold}
+                        testID={cell.testID ?? ""}
+                      />
+                    ))}
                   </tr>
-                )
-              )}
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -332,10 +261,7 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
         <HoldModal
           setModalState={setModal}
           table={
-            <HoldTable
-              shareData={shareData}
-              holdData={vault.lifetimeTokensHold}
-            />
+            <HoldTable shareData={shareData} holdData={vault.assetsVsHold} />
           }
         />
       )}
