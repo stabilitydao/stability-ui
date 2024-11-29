@@ -1,8 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import { HoldTable } from "./HoldTable";
-import { VSHoldTableCell } from "./VSHoldTableCell";
+import { HoldTable, VSHoldTableCell, YieldTableCell } from "./table";
 
 import { HoldModal, HeadingText } from "@ui";
 
@@ -16,12 +15,48 @@ interface IProps {
   vault: TVault;
 }
 
-const YieldBar: React.FC<IProps> = memo(({ vault }) => {
+const YieldRates: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
 
   const [shareData, setShareData] = useState<TShareData>({});
 
   const [modal, setModal] = useState<boolean>(false);
+
+  const totalAPY = [
+    { data: vault?.earningData?.apy?.latest, testID: "yieldLatestAPY" },
+    { data: vault?.earningData?.apy?.daily, testID: "yieldDailyAPY" },
+    { data: vault?.earningData?.apy?.weekly, testID: "yieldWeeklyAPY" },
+  ];
+  const totalAPR = [
+    { data: vault?.earningData?.apr?.latest, testID: "yieldLatestAPR" },
+    { data: vault?.earningData?.apr?.daily, testID: "yieldDailyAPR" },
+    { data: vault?.earningData?.apr?.weekly, testID: "yieldWeeklyAPR" },
+  ];
+  const poolSwapFeeAPR = [
+    {
+      data: vault?.earningData?.poolSwapFeesAPR?.latest,
+      testID: "yieldLatestPoolAPR",
+    },
+    {
+      data: vault?.earningData?.poolSwapFeesAPR?.daily,
+      testID: "yieldDailyPoolAPR",
+    },
+    {
+      data: vault?.earningData?.poolSwapFeesAPR?.weekly,
+      testID: "yieldWeeklyPoolAPR",
+    },
+  ];
+  const farmAPR = [
+    { data: vault?.earningData?.farmAPR?.latest, testID: "yieldLatestFarmAPR" },
+    { data: vault?.earningData?.farmAPR?.daily, testID: "yieldDailyFarmAPR" },
+    { data: vault?.earningData?.farmAPR?.weekly, testID: "yieldWeeklyFarmAPR" },
+  ];
+  const vsHold = [
+    { data: vault.vsHold24H },
+    { data: vault.vsHoldWeekly },
+    { data: vault.lifetimeVsHold, testID: "vaultVsHold" },
+    { data: vault.vsHoldAPR, testID: "vaultVsHoldLifetime" },
+  ];
 
   const getShareData = async () => {
     if (!Number(vault.shareprice)) {
@@ -64,68 +99,37 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[14px]">
               <tr className="h-[48px] hover:bg-accent-950">
                 <td>Total APY</td>
-                <td data-testid="yieldLatestAPY" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.latest}%`
-                    : "-"}
-                </td>
-                <td data-testid="yieldDailyAPY" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.daily}%`
-                    : "-"}
-                </td>
-                <td data-testid="yieldWeeklyAPY" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apy?.weekly}%`
-                    : "-"}
-                </td>
+                {totalAPY.map(({ data, testID }) => (
+                  <YieldTableCell
+                    key={testID}
+                    isSharePrice={!!Number(vault.shareprice)}
+                    data={data}
+                    testID={testID}
+                  />
+                ))}
               </tr>
               <tr className="h-[48px] hover:bg-accent-950">
                 <td>Total APR</td>
-                <td data-testid="yieldLatestAPR" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.latest}%`
-                    : "-"}
-                </td>
-                <td data-testid="yieldDailyAPR" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.daily}%`
-                    : "-"}
-                </td>
-                <td data-testid="yieldWeeklyAPR" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.apr?.weekly}%`
-                    : "-"}
-                </td>
+                {totalAPR.map(({ data, testID }) => (
+                  <YieldTableCell
+                    key={testID}
+                    isSharePrice={!!Number(vault.shareprice)}
+                    data={data}
+                    testID={testID}
+                  />
+                ))}
               </tr>
               {vault.strategyInfo.shortId != "CF" && vault.pool && (
                 <tr className="h-[48px] hover:bg-accent-950">
                   <td>Pool swap fees APR</td>
-
-                  <td
-                    data-testid="yieldLatestPoolAPR"
-                    className="text-right py-1"
-                  >
-                    {!!Number(vault.shareprice)
-                      ? `${vault?.earningData?.poolSwapFeesAPR?.latest}%`
-                      : "-"}
-                  </td>
-                  <td
-                    data-testid="yieldDailyPoolAPR"
-                    className="text-right py-1"
-                  >
-                    {!!Number(vault.shareprice)
-                      ? `${vault?.earningData?.poolSwapFeesAPR?.daily}%`
-                      : "-"}
-                  </td>
-                  <td
-                    data-testid="yieldWeeklyPoolAPR"
-                    className="text-right py-1"
-                  >
-                    {!!Number(vault.shareprice)
-                      ? `${vault?.earningData?.poolSwapFeesAPR?.weekly}%`
-                      : "-"}
-                  </td>
+                  {poolSwapFeeAPR.map(({ data, testID }) => (
+                    <YieldTableCell
+                      key={testID}
+                      isSharePrice={!!Number(vault.shareprice)}
+                      data={data}
+                      testID={testID}
+                    />
+                  ))}
                 </tr>
               )}
               <tr className="h-[48px] hover:bg-accent-950">
@@ -134,28 +138,14 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 ) : (
                   <td>Farm APR</td>
                 )}
-                <td
-                  data-testid="yieldLatestFarmAPR"
-                  className="text-right py-1"
-                >
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.farmAPR?.latest}%`
-                    : "-"}
-                </td>
-
-                <td data-testid="yieldDailyFarmAPR" className="text-right py-1">
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.farmAPR?.daily}%`
-                    : "-"}
-                </td>
-                <td
-                  data-testid="yieldWeeklyFarmAPR"
-                  className="text-right py-1"
-                >
-                  {!!Number(vault.shareprice)
-                    ? `${vault?.earningData?.farmAPR?.weekly}%`
-                    : "-"}
-                </td>
+                {farmAPR.map(({ data, testID }) => (
+                  <YieldTableCell
+                    key={testID}
+                    isSharePrice={!!Number(vault.shareprice)}
+                    data={data}
+                    testID={testID}
+                  />
+                ))}
               </tr>
             </tbody>
           </table>
@@ -204,37 +194,26 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
             <tbody className="text-[14px]">
               <tr className="h-[48px] hover:bg-accent-950">
                 <td>VAULT VS HODL</td>
-                <VSHoldTableCell
-                  isVsActive={vault.isVsActive}
-                  vsHold={vault.vsHold24H}
-                />
-                <VSHoldTableCell
-                  isVsActive={vault.isVsActive}
-                  vsHold={vault.vsHoldWeekly}
-                />
 
-                <VSHoldTableCell
-                  isVsActive={vault.isVsActive}
-                  vsHold={vault.lifetimeVsHold}
-                  testID="vaultVsHold"
-                />
-
-                <VSHoldTableCell
-                  isVsActive={vault.isVsActive}
-                  vsHold={vault.vsHoldAPR}
-                  testID="vaultVsHoldLifetime"
-                />
+                {vsHold.map((cell) => (
+                  <VSHoldTableCell
+                    key={cell.data}
+                    isVsActive={vault.isVsActive}
+                    vsHold={cell.data}
+                    testID={cell.testID ?? ""}
+                  />
+                ))}
               </tr>
               {vault.assetsVsHold.map((aprsData: THoldData, index: number) => {
-                const data = [
-                  { vsHold: Number(aprsData.dailyAPR) },
-                  { vsHold: Number(aprsData.weeklyAPR) },
+                const assetData = [
+                  { data: Number(aprsData.dailyAPR) },
+                  { data: Number(aprsData.weeklyAPR) },
                   {
-                    vsHold: Number(aprsData.latestAPR),
+                    data: Number(aprsData.latestAPR),
                     testID: `tokensHold${index}`,
                   },
                   {
-                    vsHold: Number(aprsData.APR),
+                    data: Number(aprsData.APR),
                     testID: `assetsVsHold${index}`,
                   },
                 ];
@@ -242,11 +221,11 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
                 return (
                   <tr key={index} className="h-[48px] hover:bg-accent-950">
                     <td>VAULT VS {aprsData?.symbol} HODL</td>
-                    {data.map((cell) => (
+                    {assetData.map((cell) => (
                       <VSHoldTableCell
-                        key={cell.vsHold}
+                        key={cell.data}
                         isVsActive={vault.isVsActive}
-                        vsHold={cell.vsHold}
+                        vsHold={cell.data}
                         testID={cell.testID ?? ""}
                       />
                     ))}
@@ -269,4 +248,4 @@ const YieldBar: React.FC<IProps> = memo(({ vault }) => {
   );
 });
 
-export { YieldBar };
+export { YieldRates };

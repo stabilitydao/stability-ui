@@ -9,7 +9,7 @@ import { InfoBar } from "./components/InfoBar";
 import { HistoricalRate } from "./components/HistoricalRate";
 import { VaultInfo } from "./components/VaultInfo";
 import { Contracts } from "./components/Contracts";
-import { YieldBar } from "./components/YieldBar";
+import { YieldRates } from "./components/YieldRates";
 import { LiquidityPool } from "./components/LiquidityPool";
 import { UnderlyingALM } from "./components/UnderlyingALM";
 
@@ -70,7 +70,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
         <div className="my-8 flex flex-col lg:flex-row items-start justify-start gap-5 w-full">
           <div className="w-full lg:w-1/2">
-            <YieldBar vault={localVault} />
+            <YieldRates vault={localVault} />
           </div>
           <div className="w-full lg:w-1/2">
             <Contracts vault={localVault} network={network} />
