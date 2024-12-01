@@ -1,0 +1,24 @@
+name: ESLint Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: |
+          yarn add eslint eslint-plugin-astro @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier astro-eslint-parser --dev
+      - name: Run ESLint
+        run: |
+          export NODE_OPTIONS=--max-old-space-size=8192
+          yarn lint

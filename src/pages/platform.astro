@@ -1,0 +1,23 @@
+---
+import {Platform} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout
+  title="Platform"
+  img="/ogs/platform.png"
+  metaTitle="Stability Platform"
+  metaUrl="https://stability.farm/platform"
+  metaDescription="If you are interested in what is under the hood of an on-chain asset management platform, then this page is for you."
+>
+    <div class="platform">
+        <Platform client:only="react" />
+    </div>
+</Layout>
+
+<style is:global>
+    .what-to-build table td {
+        padding: 0 20px;
+    }
+    
+</style>

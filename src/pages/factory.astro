@@ -1,0 +1,17 @@
+---
+import {Factory} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Create vault">
+    <div class="what-to-build max-w-[1200px]">
+        <Factory client:only="react" />
+    </div>
+</Layout>
+
+<style is:global>
+    .what-to-build table td {
+        padding: 0 20px;
+    }
+    
+</style>

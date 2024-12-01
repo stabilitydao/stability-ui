@@ -1,0 +1,31 @@
+---
+import {Strategies} from '@modules';
+
+import Layout from '@layouts/Layout.astro';
+
+import {getStrategiesTotals} from "@stabilitydao/stability";
+
+const strategiesTotals = getStrategiesTotals()
+
+const totalText = [
+    ['Live', strategiesTotals.LIVE,],
+    ['Awaiting deployment', strategiesTotals.DEPLOYMENT,],
+    ['Development', strategiesTotals.DEVELOPMENT,],
+    ['Awaiting developer', strategiesTotals.AWAITING,],
+    ['Blocked', strategiesTotals.BLOCKED,],
+    ['Proposal', strategiesTotals.PROPOSAL,],
+].map(text => `${text[0]}: ${text[1]}.`).join(' ')
+
+---
+
+<Layout
+  title="Strategies"
+  img="/ogs/strategies.png"
+  metaTitle="DeFi Asset Management strategies supported by Stability platform"
+  metaUrl="https://stability.farm/strategies"
+  metaDescription={totalText}
+>
+    <div class="platform max-w-[1200px]">
+        <Strategies client:only="react" />
+    </div>
+</Layout>

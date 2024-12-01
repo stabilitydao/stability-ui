@@ -1,5 +1,31 @@
-export const formatNumber = (value: string | number, type: string) => {
-  let changedValue;
+/**
+ * Formats a number or string based on the specified format type
+ *
+ * @example
+ * ```
+ * const abbreviated = formatNumber(1234567, "abbreviate"); // "$1.23M"
+ * const formatted = formatNumber(1234567.891, "format"); // "1 234 567.89"
+ * const smallFormatted = formatNumber(0.1234, "smallNumbers"); // "0.12"
+ * ```
+ *
+ * @param {string | number} value - Number or numeric string to be formatted
+ * @param {string} type - The type of formatting to be applied. Options include:
+ *   - "abbreviate": Formats number using abbreviations like K, M, B, etc. with two decimal places
+ *   - "abbreviateInteger": Formats number using abbreviations with no decimal places
+ *   - "chartAbbreviate": Formats number with variable decimal places based on size, using abbreviations for large values
+ *   - "formatWithoutDecimalPart": Formats number with space-separated thousands and no decimal part
+ *   - "format": Formats number with space-separated thousands and two decimal places
+ *   - "formatWithLongDecimalPart": Formats number with space-separated thousands and four decimal places
+ *   - "smallNumbers": Formats small numbers with space-separated thousands and up to two decimal places
+ *
+ * @returns {string | number} Formatted number as a string. For "smallNumbers" type, it can return a number if the value is greater than 0.1
+ */
+
+export const formatNumber = (
+  value: string | number,
+  type: string
+): string | number => {
+  let changedValue = "";
 
   const suffixes = ["", "K", "M", "B", "T"];
   let suffixNum = 0;
@@ -35,6 +61,42 @@ export const formatNumber = (value: string | number, type: string) => {
         rounded += suffixes[suffixNum];
       }
       changedValue = "$" + rounded;
+      break;
+    case "chartAbbreviate":
+      value = Number(value);
+      if (value <= 0) return 0;
+
+      let newValue;
+
+      if (value >= 1000) {
+        while (value >= 1000) {
+          value /= 1000;
+          suffixNum++;
+        }
+        newValue = value.toFixed();
+      } else {
+        if (value < 10) {
+          newValue = value.toFixed(2);
+        } else if (value < 50) {
+          newValue = value.toFixed(1);
+        } else if (value > 100) {
+          newValue = Math.floor(value / 10) * 10;
+        } else {
+          newValue = value.toFixed();
+        }
+      }
+
+      if (suffixNum > 0) {
+        newValue += suffixes[suffixNum];
+      }
+
+      changedValue = "$" + newValue;
+      break;
+    case "formatWithoutDecimalPart":
+      value = String(value);
+
+      changedValue = value.split(".")[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
       break;
     case "format":
       value = String(value);
@@ -79,8 +141,12 @@ export const formatNumber = (value: string | number, type: string) => {
 
       break;
     case "smallNumbers":
-      if (Number(value) > 0.1) value = Number(value).toFixed(2);
-      value = String(value);
+      if (Number(value) > 0.1) {
+        value = Number(value).toFixed(2);
+      } else {
+        value = Number(value).toFixed(5);
+      }
+
       const [smallIntegerPart, smallDecimalPart] = value.split(".");
 
       const smallFormattedInteger = smallIntegerPart.replace(
@@ -93,6 +159,11 @@ export const formatNumber = (value: string | number, type: string) => {
         : smallFormattedInteger;
 
       changedValue = smallFormattedValue;
+      break;
+    case "withSpaces":
+      value = String(value);
+
+      changedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       break;
     default:
       break;

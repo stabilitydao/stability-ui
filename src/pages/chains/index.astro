@@ -1,0 +1,28 @@
+---
+import {Chains} from '@modules';
+import Layout from '@layouts/Layout.astro';
+import {chains,  getChainsTotals} from "@stabilitydao/stability";
+
+
+const totalChains = getChainsTotals();
+const totalText = [
+    ['Total', Object.keys(chains).length,],
+    ['Supported', totalChains.SUPPORTED,],
+    ['Awaiting deployment', totalChains.AWAITING_DEPLOYMENT,],
+    ['Development', totalChains.CHAINLIB_DEVELOPMENT,],
+    ['Awaiting developer', totalChains.AWAITING_DEVELOPER,],
+    ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION,],
+].map(text => `${text[0]}: ${text[1]}.`).join(' ')
+---
+
+<Layout
+  title="Chains"
+  img="/ogs/chains.png"
+  metaTitle="Blockchains known to Stability platform"
+  metaUrl="https://stability.farm/chains"
+  metaDescription={totalText}
+>
+    <div class="platform max-w-[1200px]">
+        <Chains client:only="react" />
+    </div>
+</Layout>

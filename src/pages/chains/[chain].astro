@@ -1,0 +1,18 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { Chain } from "@modules";
+import {chains} from "@stabilitydao/stability";
+const { chain } = Astro.params;
+const chainData:Chain|undefined = chains[chain]
+---
+
+<Layout
+  title={chainData ? `${chainData.name}` : `Unknown chain`}
+  metaTitle={`${chainData.name}`}
+  metaDescription={chainData ? `Support of the ${chainData.name} blockchain by the Stability platform. Strategies, bridges, protocols, assets and other related information.` : 'Chain with such chain ID was not found'}
+  img={chainData ? `/chain-covers/${chain}.png` : ''}
+>
+    <div class="my-vault max-w-[1200px]">
+        <Chain chain={chain} client:only="react" />
+    </div>
+</Layout>

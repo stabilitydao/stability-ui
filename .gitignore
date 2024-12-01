@@ -1,3 +1,6 @@
+.vercel
+.idea
+
 # build output
 dist/
 
@@ -19,3 +22,13 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# synpress cache
+.cache-synpress
+
+# coverage
+coverage

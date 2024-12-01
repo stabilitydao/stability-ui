@@ -1,0 +1,16 @@
+---
+import {Contests} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout
+  title="Contests"
+  img="/ogs/contests.png"
+  metaTitle="Yield Contests"
+  metaUrl="https://stability.farm/contests"
+  metaDescription="All yield contests taking place in the Stability ecosystem."
+>
+    <div class="max-w-[1200px]">
+        <Contests client:only="react" />
+    </div>
+</Layout>

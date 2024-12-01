@@ -1,36 +1,79 @@
 ---
 import App from "./App";
-import {Header} from "@components/Header"
+// import { ViewTransitions } from 'astro:transitions';
+
+import { Header} from "@components/Header"
 import { Footer } from "@components/Footer";
 
 interface IProps {
-	title: string;
+  title: string;
+  img: string;
+  metaTitle: string;
+  metaUrl: string;
+  metaDescription: string;
 }
 
-const { title } = Astro.props as IProps;
+const {
+  title,
+  img = '/ogs/stability.png',
+  metaTitle = "On-chain asset management, liquidity mining and yield farming platform.",
+  metaUrl = "https://stability.farm/",
+  metaDescription = "On-chain asset management, liquidity mining and yield farming platform.",
+} = Astro.props as IProps;
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Asset Management Platform" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.png" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title} - Stability</title>
-	</head>
-	<body>
-		<App client:only>
-			<Header client:only/>
-			<main>
-				<slot />
-			</main>
-			<Footer client:only/>
-		</App>
-	</body>
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="description" content={metaDescription} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="twitter:image:src" content={img} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={metaTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta property="og:image" content={img} />
+    <meta property="twitter:image:height" content="100" />
+    <meta property="twitter:image:width" content="100" />
+    <meta property="og:image:alt" content={metaTitle} />
+    <meta property="og:type" content="object" />
+    <meta property="og:title" content={metaTitle} />
+    <meta property="og:url" content={metaUrl} />
+    <meta property="og:description" content={metaDescription} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.png" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} - Stability</title>
+    <!-- <ViewTransitions /> -->
+  </head>
+  <body>
+    <App client:only="react">
+      <Header client:only="react"/>
+      <main>
+        <slot />
+      </main>
+      <Footer client:only="react"/>
+    </App>
+  </body>
 </html>
 <style is:global>
+
+	html {
+		width:100vw;
+		overflow-x: hidden;
+	}
+
 	html, body {
 		height: 100%;
 		margin: 0;
@@ -38,6 +81,23 @@ const { title } = Astro.props as IProps;
 	body {
 		display: flex;
   		flex-direction: column;
+	}
+
+	::-webkit-scrollbar {
+	    width: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+	    background-color: #0C0C1C;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background-color: #272451;
+		border-radius: 12px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background-color: #30127f;
 	}
 	:root {
 		--accent: 136, 58, 234;
@@ -58,7 +118,7 @@ const { title } = Astro.props as IProps;
 	}
 	html {
 		font-family: system-ui, sans-serif;
-		background: #0C0C1C;
+		background: #0C0620;
 		background-size: 224px;
 	}
 	body {
@@ -75,7 +135,6 @@ const { title } = Astro.props as IProps;
 	.title {
 		display: flex;
 		align-items: center;
-		padding-bottom: 4px;
 	}
 	.title > a {
 		color: #a995ff;
@@ -96,11 +155,12 @@ const { title } = Astro.props as IProps;
 	.menu {
 		display: flex;
 		justify-content: center;
+		gap:12px;
 	}
 	.menu-nav a {
 		width: 100%;
 	}
-	@media screen and (max-width: 600px) {
+	@media screen and (max-width: 767px) {
 		.menu {
 			display: none;
 		}
@@ -108,28 +168,29 @@ const { title } = Astro.props as IProps;
 	.menu > a {
 		margin: 0;
 		min-width: 90px;
-		height: 60px;
+		height: 40px;
 		color: #fcf3f6;
 		display: flex;
 		align-self: center;
 		align-items: center;
 		justify-content: center;
-		text-decoration: none;
-		font-size: 17px;
-		border-bottom: 3px solid transparent;
-		padding-top: 3px;
+		font-weight: 600;
+		padding: 10px 16px;
+		border-radius: 16px;
 	}
 	.menu > a.active {
-		border-bottom: 3px solid #9b7ff7;
+		background:  #3D1E9F;
+	}
+	.menu > a.active:hover {
+		background:  #3D1E9F;
 	}
 	.menu > a:hover {
-		background-color: #3e294c;
+		background-color: #2B1570;
 	}
 
 	main {
 		margin: 0 auto auto auto;
 		padding: 1rem 0.5rem;
-		width: 1200px;
 		max-width: calc(100% - 2rem);
 		color: white;
 		font-size: 20px;
@@ -300,14 +361,21 @@ const { title } = Astro.props as IProps;
 		box-sizing:border-box;
 		box-shadow:0 1px 8px rgba(0,0,0,0.5);
 		display:none;
+		pointer-events: none;
 	}
-	 .toLeft {
+	.toLeft {
 		top:230px !important;
 		left:-140px !important;
 	}
+	.toCenter {
+		top:180px !important;
+		left:100px !important;
+		width:350px !important;
+	}
 	.toLeftPlatform {
-		top:70px !important;
-		left:-140px !important;
+		top:140px !important;
+		left:-240px !important;
+		width:370px !important;
 	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
@@ -347,4 +415,40 @@ const { title } = Astro.props as IProps;
 			display:none !important;
 		}
 	}
+
+	.truncated-text {
+  		white-space: nowrap;        
+  		overflow: hidden;           
+  		text-overflow: ellipsis;    
+  		width: 100px;                
+	}
+
+	/* Checkbox */
+	input[type="checkbox"]::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 6px;
+        height: 10px;
+        border-right: 2px solid white;
+        border-bottom: 2px solid white;
+        transform: translate(-50%, -60%) rotate(45deg);
+        opacity: 0;
+        transition: opacity 0.1s ease;
+	}
+   input[type="checkbox"]:checked::before {
+        opacity: 1;
+    }
+
+	/* Loader fade */
+	@keyframes fade {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+    }
 </style>

@@ -1,0 +1,15 @@
+---
+import {Integrations} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Integrations" 
+  img="/ogs/integrations.png"
+  metaTitle="On-chain asset management, liquidity mining and yield farming platform."
+  metaUrl="https://stability.farm/integrations"
+  metaDescription="On-chain asset management, liquidity mining and yield farming platform."
+>
+    <div class="platform max-w-[1200px]">
+        <Integrations client:only="react" />
+    </div>
+</Layout>

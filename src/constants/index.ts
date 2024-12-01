@@ -1,4 +1,17 @@
-import type { TVaultStatuses, TTableFilters, TTableColumn } from "@types";
+import { chains } from "@stabilitydao/stability";
+
+import {
+  TABLE_FILTERS,
+  TABLE,
+  CHAINS_TABLE,
+  ASSETS_TABLE,
+  INTEGRATIONS_TABLE,
+  STRATEGIES_TABLE,
+  USERS_TABLE,
+  CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
+} from "./tables";
+
 import {
   USDC,
   USDT,
@@ -11,59 +24,15 @@ import {
   PM,
   MULTISIG,
   TREASURY,
+  // cbETH,
+  CRV,
+  MORE,
+  USTB,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
 
-const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "name", sortType: "none", dataType: "string" },
-  { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
-  {
-    name: "Type",
-    keyName: "type",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Strategy",
-    keyName: "strategy",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "APR / APY",
-    keyName: "apy",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "IL",
-    keyName: "il",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "Price",
-    keyName: "shareprice",
-    sortType: "none",
-    dataType: "number",
-  },
-  { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  {
-    name: "Balance",
-    keyName: "balance",
-    sortType: "none",
-    dataType: "number",
-  },
-];
-const TABLE_FILTERS: TTableFilters[] = [
-  { name: "Stablecoins", type: "single", state: false },
-  { name: "Strategy", type: "dropdown", state: true },
-  { name: "My vaults", type: "sample", state: false },
-  { name: "Active", type: "sample", state: true },
-];
-
-const STABLECOINS = [...USDC, ...USDT, ...DAI];
+const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV, ...MORE, ...USTB];
 
 const PAGINATION_VAULTS = 20;
 
@@ -90,94 +59,74 @@ const TIMESTAMPS_IN_SECONDS = {
   YEAR: 31536000,
 };
 
-const TOKENS_ASSETS = [
+const CHAINLINK_STABLECOINS = {
+  USDT: "https://data.chain.link/feeds/polygon/mainnet/usdt-usd",
+  "USDC.e": "https://data.chain.link/feeds/polygon/mainnet/usdc-usd",
+  DAI: "https://data.chain.link/feeds/polygon/mainnet/dai-usd",
+};
+
+const DEXes = [
   {
-    symbol: "USDC",
-    addresses: USDC,
-    description:
-      "USDC is a fully-reserved stablecoin, which is a type of cryptocurrency, or digital asset. Unlike other cryptocurrencies that fluctuate in price, USDC is designed to maintain price equivalence to the US dollar.",
-    website: "https://www.circle.com/en/usdc",
-    docs: "https://developers.circle.com/stablecoins/docs",
-    color: "#3b87df",
+    name: "QuickSwap",
+    algo: "AlgebraV1",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/QuickSwap.svg",
   },
   {
-    symbol: "USDT",
-    addresses: USDT,
-    description:
-      "Tether (USDT) is a cryptocurrency with a value meant to mirror the value of the U.S. dollar. The idea was to create stable digital cash. Tether converts cash into digital currency, to anchor or “tether” the value of the coin to the price of national currencies like the US dollar, the Euro, and the Yen.",
-    website: "https://tether.to/en/",
-    docs: "https://tether.to/en/knowledge-base/",
-    color: "#5bc7af",
+    name: "Retro",
+    algo: "Uniswap V3",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Retro.svg",
   },
   {
-    symbol: "DAI",
-    addresses: DAI,
-    description:
-      "DAI is an algorithmic stablecoin issued by MakerDAO, an Ethereum-based protocol, that seeks to maintain an exact ratio of one-to-one with the U.S. dollar.",
-    website: "https://makerdao.com/",
-    docs: "https://docs.makerdao.com/smart-contract-modules/dai-module/dai-detailed-documentation",
-    color: "#f3ba42",
+    name: "Curve",
+    algo: "StableSwapNG",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Curve.svg",
   },
   {
-    symbol: "WMATIC",
-    addresses: WMATIC,
-    description:
-      "WMATIC is a wrapped version of MATIC that enables it to be easily used within DeFi.",
-    website: "https://polygon.technology/",
-    docs: "https://wiki.polygon.technology/",
-    color: "#9663ee",
+    name: "UniswapV3",
+    algo: "Uniswap V3",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
   {
-    symbol: "WETH",
-    addresses: WETH,
-    description:
-      "WETH is an ERC-20 token on Ethereum that represents 1 Ether (ETH)",
-    website: "https://ethereum.org/en/",
-    docs: "https://ethereum.org/en/developers/docs/",
-    color: "#6372a2",
-  },
-  {
-    symbol: "WBTC",
-    addresses: WBTC,
-    description:
-      "WBTC is an ERC-20 token on the Ethereum blockchain that is pegged to Bitcoin (BTC). WBTC is backed one-to-one with Bitcoin. Before WBTC, the only way to use Bitcoin in a financial transaction was through centralized entities, like centralized exchanges (CEXs).",
-    website: "https://wbtc.network/",
-    docs: "",
-    color: "#f0a051",
-  },
-  {
-    symbol: "PROFIT",
-    addresses: PROFIT,
-    description:
-      "The native token PROFIT's primary purpose is to represent ownership shares of the Stability protocol. Given PROFIT holders are effectively owners of Stability. Holding the token also allows investors to manage the Stability protocol collectively.",
-    website: "https://stabilitydao.org/tokens",
-    docs: "https://book.stabilitydao.org/tokens.html#profit",
-    color: "#886ac3",
-  },
-  {
-    symbol: "SDIV",
-    addresses: SDIV,
-    description:
-      "The SDIV token is intended to distribute the externally generated profit of the organization in the form of dividends.",
-    website: "https://stabilitydao.org/tokens",
-    docs: "https://book.stabilitydao.org/tokens.html#sdiv",
-    color: "#232323",
+    name: "Pearl V2",
+    algo: "Pearl V2",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
   },
 ];
 
 const CHAINS = [
   {
-    name: "Polygon",
-    logoURI:
-      "https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/polygon.jpg",
+    name: chains["137"].name,
+    id: "137",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["137"].img}`,
+    explorer: "https://polygonscan.com/address/",
+    nativeCurrency: "POL",
+    active: true, // main page active networks
+  },
+  {
+    name: chains["8453"].name,
+    id: "8453",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
+    explorer: "https://basescan.org/address/",
+    nativeCurrency: "ETH",
+    active: true, // main page active networks
+  },
+  {
+    name: chains["111188"].name,
+    id: "111188",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["111188"].img}`,
+    explorer: "https://explorer.re.al/address/",
+    nativeCurrency: "reETH",
+    active: true, // main page active networks
   },
 ];
 
-const TRANSACTION_SETTINGS = {
-  slippage: ["0.5", "1", "2"],
-  approves: ["limited", "unlimited"],
-  gasLimits: ["1", "1.1"],
+const CHAINS_CONFIRMATIONS = {
+  "137": 3,
+  "8453": 3,
+  "111188": 1,
 };
+
+const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "1",
@@ -185,143 +134,215 @@ const DEFAULT_TRANSACTION_SETTINGS = {
   gasLimit: "1.1",
 };
 
-const VAULT_STATUSES: TVaultStatuses = {
-  0: "NOT_EXIST",
-  1: "ACTIVE",
-  2: "DEPRECATED",
-  3: "EMERGENCY_EXIT",
-  4: "DISABLED",
-  5: "DEPOSITS_UNAVAILABLE",
-};
-
 const PROTOCOLS = {
   quickSwap: {
     name: "QuickSwap",
-    logoSrc: "/protocols/QuickSwap.svg",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/QuickSwap.svg",
   },
   gamma: {
     name: "Gamma",
-    logoSrc: "/protocols/Gamma.png",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Gamma.svg",
   },
   compound: {
     name: "Compound",
-    logoSrc: "/protocols/Compound.png",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.svg",
   },
   defiedge: {
     name: "DefiEdge",
-    logoSrc: "/protocols/DefiEdge.svg",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/DefiEdge.svg",
   },
   merkl: {
     name: "Merkl",
-    logoSrc: "/protocols/Merkl.svg",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg",
   },
   ichi: {
     name: "Ichi",
-    logoSrc: "/protocols/Ichi.png",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Ichi.svg",
   },
   retro: {
     name: "Retro",
-    logoSrc: "/protocols/Retro.svg",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Retro.svg",
+  },
+  curve: {
+    name: "Curve",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Curve.svg",
+  },
+  convex: {
+    name: "Convex",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Convex.svg",
+  },
+  lido: {
+    name: "Lido",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
+  },
+  aave: {
+    name: "Aave",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.svg",
+  },
+  stargate: {
+    name: "Stargate",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
+  },
+  yearn: {
+    name: "Yearn",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Yearn.svg",
+  },
+  uniswapV3: {
+    name: "UniswapV3",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
+  },
+  pearlV2: {
+    name: "Pearl V2",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
+  },
+  trident: {
+    name: "Trident",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
   },
 };
 
-const GRAPH_ENDPOINT =
-  "https://api.thegraph.com/subgraphs/name/jodsmigel/stability";
+const IL = {
+  GQFS: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.",
+    color: "#7af996",
+  },
+  GQFN: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider (Gamma Narrow LP) provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#f55e11",
+  },
+  GQFW: {
+    rate: 5,
+    title: "Medium",
+    desc: "The strategy of the underlying liquidity provider (Gamma Wide LP) provides liquidity in the wide range, rebalancing the position infrequently (when the price deviates from the average by approximately +-10%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#F5DA5B",
+  },
+  QSF: {
+    rate: 0,
+    title: "None",
+    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+    color: "#4aff71",
+  },
+  CF: {
+    rate: 0,
+    title: "None",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
+  DQMFN: {
+    rate: 8,
+    title: "High",
+    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
+    color: "#f55e11",
+  },
+  IQMF: {
+    rate: 4,
+    title: "Medium",
+    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the wide range, not often rebalancing the position.",
+    color: "#F5DA5B",
+  },
+  CCF: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
+    color: "#7af996",
+  },
+  Y: {
+    rate: 0,
+    title: "None",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
+  QSMF: {
+    rate: 0,
+    title: "None",
+    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
+    color: "#4aff71",
+  },
+  LOW: {
+    rate: 3,
+    title: "Low",
+    desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
+    color: "#D7F55B",
+  },
+  TPF: {
+    rate: 5,
+    title: "MEDIUM",
+    desc: "Significant impermanent loss was noted during rebalancing with this ALM in volatile pools.",
+    color: "#F5DA5B",
+  },
+  TPF_STABLE: {
+    rate: 5,
+    title: "Medium",
+    desc: "We catch significant IL in stablecoin pairs with this strategy when depeg become..",
+    color: "#F5DA5B",
+  },
+};
 
-const GRAPH_QUERY = `
-      {
-        vaultEntities {
-          id
-          apr
-          tvl
-          sharePrice
-          assetsProportions
-          strategy
-          strategyId
-          totalSupply
-          created
-          color
-          upgradeAllowed
-          vaultType
-          version
-          colorBackground
-          deployAllowed
-          vaultBuildingPrice
-          underlying
-          symbol
-          strategySpecific
-          strategyDescription
-          name
-          strategyAssets
-          lastHardWork
-          assetsWithApr
-          assetsAprs
-          vaultStatus
-          AssetsPricesOnCreation
-          vaultHistoryEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null },first: 1) {
-            APR24H
-            APRWeekly
-          }
-          almRebalanceEntity(orderBy: timestamp, orderDirection: desc, where: { APR24H_not: null, APRWeekly_not: null }) {
-            timestamp
-            APRFromLastEvent
-            APR24H
-            APRWeekly
-          }
-        }
-        platformEntities {
-          version
-          bcAssets
-        }
-        vaultTypeEntities {
-          version
-          id
-        }
-        strategyEntities {
-          strategyId
-          version
-          id
-        }
-        strategyConfigEntities {
-          version
-          id
-        }
-        assetHistoryEntities {
-          id
-          price
-          timestamp
-          address
-        }
-        lastFeeAMLEntities {
-          id
-          timestamps
-          APRS
-        }
-      }
-      `;
+const DEFAULT_ERROR = { state: false, type: "", description: "" };
 
-const STABILITY_API = "https://api.stabilitydao.org/";
+const STRATEGY_SPECIFIC_SUBSTITUTE: {
+  [key: string]: string;
+} = {
+  "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
+};
+
+const BIG_INT_VALUES = {
+  ZERO: BigInt(0),
+  LARGE: BigInt(10 ** 30),
+};
 
 export {
   APRsType,
   TABLE,
   TABLE_FILTERS,
+  CHAINS_TABLE,
   PAGINATION_VAULTS,
-  TOKENS_ASSETS,
   STABLECOINS,
   CHAINS,
-  TRANSACTION_SETTINGS,
-  DEFAULT_TRANSACTION_SETTINGS,
-  GRAPH_ENDPOINT,
   PROTOCOLS,
-  GRAPH_QUERY,
-  STABILITY_API,
   PROFIT,
   PM,
   SDIV,
-  VAULT_STATUSES,
+  WBTC,
+  WETH,
+  WMATIC,
   MULTISIG,
   TREASURY,
   MONTHS,
   TIMESTAMPS_IN_SECONDS,
+  DEXes,
+  CHAINLINK_STABLECOINS,
+  YEARN_PROTOCOLS,
+  STRATEGY_SPECIFIC_SUBSTITUTE,
+  DEFAULT_TRANSACTION_SETTINGS,
+  DEFAULT_ERROR,
+  IL,
+  BIG_INT_VALUES,
+  ASSETS_TABLE,
+  INTEGRATIONS_TABLE,
+  STRATEGIES_TABLE,
+  USERS_TABLE,
+  CONTESTS_TABLE,
+  LEADERBOARD_TABLE,
+  CHAINS_CONFIRMATIONS,
 };

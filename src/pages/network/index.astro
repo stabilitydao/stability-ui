@@ -1,0 +1,10 @@
+---
+import {Network} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Network">
+    <div class="platform max-w-[1200px]">
+        <Network client:only="react" />
+    </div>
+</Layout>

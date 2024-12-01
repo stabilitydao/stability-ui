@@ -1,7 +1,10 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "moduleResolution": "node",
     "jsx": "react-jsx",
+    "strict": true,
+    "verbatimModuleSyntax": false,
     "jsxImportSource": "react",
     "baseUrl": "./",
     "paths": {
@@ -14,7 +17,11 @@
       "@store": ["src/store"],
       "@utils": ["src/utils"],
       "@constants": ["src/constants"],
-      "@types": ["src/types"]
-    }
+      "@types": ["src/types"],
+      "@modules": ["src/modules"],
+      "@ui": ["src/ui"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }

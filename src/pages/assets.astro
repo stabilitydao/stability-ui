@@ -1,0 +1,14 @@
+---
+import {Assets} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Assets"
+img="/ogs/assets.png"
+metaTitle="Yield Contests"
+metaUrl="https://stability.farm/assets"
+metaDescription="All yield contests taking place in the Stability ecosystem.">
+    <div class="platform max-w-[1200px]">
+        <Assets client:only="react" />
+    </div>
+</Layout>

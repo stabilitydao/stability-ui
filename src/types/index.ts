@@ -1,3 +1,10 @@
+import { Dispatch, SetStateAction } from "react";
+import type {
+  Chain,
+  DeFiOrganization,
+  YieldContest,
+} from "@stabilitydao/stability";
+
 // interfaces
 interface IL {
   rate: number;
@@ -11,35 +18,82 @@ interface IProtocol {
   logoSrc: string;
 }
 
-interface IFeature {
-  name: string;
-  logoSrc?: string;
-  svg?: any;
-}
-
 interface IStrategyInfo {
-  name: string;
-  shortName: string;
-  specific?: string;
-  protocols: IProtocol[];
-  features: IFeature[];
+  id: string;
+  shortId: string;
+  state?: string;
+  contractGithubId?: number;
   color: string;
   bgColor: string;
+  protocols: IProtocol[];
   baseStrategies: string[];
   ammAdapter: string;
   sourceCode: string;
   il?: IL;
 }
 
+interface IChainData extends Chain {
+  chainId: number;
+  protocols: number;
+  assets: number;
+  strategies: number;
+  bridges: number;
+  tvl: number;
+}
+
+type TAssetData = {
+  symbol: string;
+  website: string;
+  price: number;
+  addresses: number;
+};
+type TTableStrategy = {
+  id: string;
+  shortId: string;
+  state: string;
+  contractGithubId: number | "is-being-created";
+  color: string;
+  bgColor: string;
+};
+
 // types
 type TPlatformData = {
-  platform: TAddress;
-  factory: TAddress;
-  buildingPermitToken: TAddress;
-  buildingPayPerVaultToken: TAddress;
-  zap: TAddress;
-  buildingPrices: { [vaultType: string]: bigint };
+  [key: string]: {
+    platform: TAddress;
+    factory: TAddress;
+    buildingPermitToken: TAddress;
+    buildingPayPerVaultToken: TAddress;
+    zap: TAddress;
+  };
 };
+
+type TTokens = {
+  [chainId: string]: TAddress[];
+};
+
+type TPlatformGetData = [
+  string[],
+  string[],
+  string[],
+  string[],
+  string[],
+  bigint[],
+  string[],
+  boolean[],
+  string[],
+  string[],
+];
+type TPlatformGetBalance = [
+  string[],
+  bigint[],
+  bigint[],
+  string[],
+  bigint[],
+  bigint[],
+  string[],
+  bigint[],
+  bigint,
+];
 
 type TUserBalance = {
   buildingPayPerVaultTokenBalance: bigint;
@@ -60,7 +114,7 @@ type TAllowedBBTokenVaults = {
 };
 
 type TTokenData = {
-  address: string;
+  address: TAddress;
   name: string;
   symbol: string;
   chainId: number;
@@ -78,25 +132,25 @@ type TAPRData = {
 };
 
 type TEarningData = {
-  apr: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
-  apy: {
-    withFees: TAPRData;
-    withoutFees: TAPRData;
-  };
+  apr: TAPRData;
+  apy: TAPRData;
   poolSwapFeesAPR: TAPRData;
   farmAPR: TAPRData;
 };
 
 type TVaults = {
-  [vaultAddress: string]: TVaultData;
+  [vaultAddress: string]: TVault;
 };
 
 type TVaultData = {
-  vaultSharePrice: bigint;
-  vaultUserBalance: bigint;
+  [address: TAddress]: {
+    vaultSharePrice: bigint;
+    vaultUserBalance: bigint;
+  };
+};
+
+type TVaultDataKey = {
+  [chainId: string]: TVaultData;
 };
 
 type TToken = {
@@ -106,11 +160,19 @@ type TToken = {
   name: string;
   decimals: number;
   logoURI: string;
+  logo?: string;
+  color?: string;
   tags?: string[];
 };
 
-type TAssetPrices = {
-  [address: string]: bigint;
+type TPriceInfo = {
+  price: string;
+  trusted: boolean;
+};
+type TMultichainPrices = {
+  [network: string]: {
+    [key: string]: TPriceInfo;
+  };
 };
 
 type TBalances = {
@@ -125,6 +187,54 @@ type TAsset = {
   symbol: string;
 };
 
+type TPool = {
+  address?: TAddress;
+  ammAlgoName?: string;
+  ammName?: string;
+  amountToken0?: number;
+  amountToken1?: number;
+  fee?: number;
+  tick?: number;
+  tvl?: number;
+};
+
+type TAPRPeriod = "latest" | "daily" | "weekly";
+
+type TAlmPosition = {
+  amountToken0: number;
+  amountToken1: number;
+  inRange: boolean;
+  lowerTick: number;
+  tvl: number;
+  upperTick: number;
+};
+
+type TAlm = {
+  protocol: string;
+  amountToken0: number;
+  amountToken1: number;
+  tvl: number;
+  positions: TAlmPosition[];
+};
+type TRisk = {
+  factors: string[];
+  isRektStrategy: boolean | string;
+  symbol: string;
+};
+type TRebalances = {
+  daily: number;
+  weekly: number;
+};
+
+type THoldData = {
+  symbol: string;
+  initPrice: string;
+  price: string;
+  priceDifference: string;
+  latestAPR: string;
+  APR: string;
+};
+
 type TVault = {
   address: TAddress;
   name: string;
@@ -136,22 +246,47 @@ type TVault = {
   shareprice: string;
   tvl: string;
   strategySpecific: string;
-  balance: string;
-  lastHardWork: bigint;
-  apy: number;
+  balance: string | bigint;
+  balanceInUSD: number;
+  lastHardWork: string;
+  hardWorkOnDeposit: boolean;
   daily: number;
   assets: TAsset[];
+  assetsSymbol: string;
   assetsProportions: number[];
   strategyInfo: IStrategyInfo;
   il: number;
   underlying: TAddress;
   strategyAddress: TAddress;
   strategyDescription: string;
-  status: number;
+  status: string;
   version: string;
   strategyVersion: string;
-  rebalances: any;
-  earningData: TEarningData | any;
+  underlyingSymbol: string;
+  NFTtokenID: string;
+  gasReserve: string;
+  rebalances: TRebalances;
+  earningData: TEarningData;
+  sortAPR: string;
+  pool: TPool;
+  alm: TAlm;
+  risk: TRisk;
+  lifetimeVsHold: number;
+  lifetimeVsHoldAPR: number;
+  lifetimeTokensHold: THoldData[];
+  isVsActive: boolean;
+  yearnProtocols: TYearnProtocol[];
+  network: string;
+};
+
+type TZAPData = {
+  address: string;
+  amountIn: string;
+  amountOut: string;
+  img: string;
+  router: string;
+  symbol: string;
+  txData: string;
 };
 
 type TTableColumn = {
@@ -159,6 +294,15 @@ type TTableColumn = {
   keyName: string;
   sortType: string;
   dataType: string;
+  unsortable?: boolean;
+};
+
+type TLeaderboard = {
+  rank?: number;
+  address: TAddress;
+  deposit: number;
+  earned: number;
+  points?: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -173,11 +317,22 @@ type TTableFilters = {
   state: boolean;
 };
 
-type TAPRModal = {
-  earningData: TEarningData | any;
-  daily: number;
-  lastHardWork: any;
+type TVsHoldModal = {
+  lifetimeTokensHold: THoldData[];
+  vsHoldAPR: number;
+  lifetimeVsHoldAPR: number;
+  created: number;
   state: boolean;
+  isVsActive: boolean;
+};
+
+type TAPRModal = {
+  earningData: TEarningData;
+  daily: number;
+  lastHardWork: string;
+  symbol: string;
+  state: boolean;
+  pool: TPool;
 };
 
 type TBuildVariant = {
@@ -194,6 +349,27 @@ type TInputItem = {
   valuePerDay: string;
 };
 
+type TYearnProtocol = { title: string; link: string };
+
+type TTableProtocol = { name: string; img: string; website: string };
+
+type TChain = {
+  name: string;
+  id: string;
+  logoURI: string;
+  explorer: string;
+  active: boolean;
+};
+
+type TUnderlyingToken = {
+  address: TAddress;
+  symbol: string;
+  decimals: number;
+  balance: number;
+  allowance: number;
+  logoURI: string;
+};
+
 ////          VAULT
 
 type TVaultBalance = {
@@ -204,16 +380,14 @@ type TVaultInput = {
   [assetAdress: string]: string;
 };
 
+type TLocalStorageToken = { amount: string; symbol?: string; logo?: string };
+
 type TVaultAllowance = {
-  [asset: string]: bigint[];
+  [asset: string]: bigint;
 };
 
 type TVaultsAddress = {
-  [vaultAddress: string]: string | any;
-};
-
-type TVaultStatuses = {
-  [key: number]: string;
+  [vaultAddress: string]: string;
 };
 
 type TSettings = {
@@ -231,29 +405,58 @@ type TToast = {
   vault: string;
 };
 
-//// CHART
-type TChartData = {
-  APR?: number;
-  TVL?: number;
-  address?: TAddress;
-  sharePrice?: number;
-  timestamp: string;
-  unixTimestamp?: string;
-  date: string;
+type TContractInfo = {
+  address: TAddress;
+  logo: string;
+  symbol: string;
+  type: string;
+  isCopy: boolean;
+};
+type TUpgradesTable = {
+  contract: string;
+  oldVersion: string;
+  newVersion: string;
+  proxy: TAddress;
+  oldImplementation: TAddress;
+  newImplementation: TAddress;
 };
 
-//// DAO
-type TDAOData = {
-  platformVersion: string;
-  platformGovernance: string;
-  multisigAddress: string;
-  strategieNames: string[];
-  platformFee: string;
-  vaultManagerFee: string;
-  typesOfVaults: string;
-  strategyLogicFee: string;
-  ecosystemFee: string;
-  farmsLength: number;
+//// CHART
+type TChartData = {
+  APR: number;
+  APR24H: string;
+  date: string;
+  timestamp: number | string;
+  unixTimestamp: number;
+  vsHoldAPR: string;
+  periodVsHoldAPR?: number;
+  TVL?: string;
+  address?: string;
+  sharePrice?: string;
+};
+type TChartPayload = {
+  chartType?: string;
+  color?: string;
+  dataKey: string;
+  formatter?: undefined;
+  hide?: boolean;
+  name: string;
+  payload: TChartData;
+  type?: string;
+  unit?: string;
+  value: number;
+};
+
+type TPieChartData = {
+  address: TAddress;
+  amount: string;
+  amountInUSD: number;
+  color: string;
+  formatedAmountInUSD?: string;
+  logo: string;
+  percent: number;
+  symbol: string;
+  decimals: number;
 };
 
 type TPendingPlatformUpgrade = {
@@ -303,6 +506,14 @@ type TIQMFAlm = {
   totalUSD: string;
 };
 
+type TStrategyState =
+  | "LIVE"
+  | "DEPLOYMENT"
+  | "DEVELOPMENT"
+  | "AWAITING"
+  | "BLOCKED"
+  | "PROPOSAL";
+
 //// EVENTS
 
 type TError = {
@@ -310,6 +521,73 @@ type TError = {
   type: string;
   description: string;
 };
+
+type TTableData =
+  | IChainData[]
+  | TAssetData[]
+  | DeFiOrganization[]
+  | TTableStrategy[]
+  | TLeaderboard[]
+  | IExtendedYieldContest[];
+
+type TDispatchedTableData =
+  | Dispatch<SetStateAction<IChainData[]>>
+  | Dispatch<SetStateAction<TAssetData[]>>
+  | Dispatch<SetStateAction<DeFiOrganization[]>>
+  | Dispatch<SetStateAction<TTableStrategy[]>>
+  | Dispatch<SetStateAction<TLeaderboard[]>>
+  | Dispatch<SetStateAction<IExtendedYieldContest[]>>;
+
+type TSort = {
+  table: TTableColumn[];
+  setTable: Dispatch<SetStateAction<TTableColumn[]>>;
+  tableData: TTableData | any;
+  setTableData: TDispatchedTableData;
+};
+
+//// API
+
+type TAPIData = {
+  title?: string;
+  // about?: string;
+  status?: string;
+  // services?: string[];
+  assetPrices?: TMultichainPrices;
+  vaults?: TVaults;
+  underlyings?: TVaults;
+  platforms?: {
+    [chainID: string]: {
+      buildingPermitToken: TAddress;
+      buildingPayPerVaultToken: TAddress;
+      bcAssets: TAddress[];
+      versions: {
+        platform: string;
+        strategy: {
+          [strategyId: string]: string;
+        };
+      };
+    };
+  };
+  error?: string;
+};
+
+type TVLRange = { min: number; max: number };
+
+type TContests = {
+  [contestId: string]: YieldContest;
+};
+
+interface Integration {
+  [key: string]: string;
+}
+
+interface IExtendedYieldContest extends YieldContest {
+  id: string;
+  status: number;
+  rewardsLength: number;
+  quests: Integration;
+  questsLength: number;
+}
 
 export type {
   TPlatformData,
@@ -320,7 +598,6 @@ export type {
   TVaults,
   TVaultData,
   TToken,
-  TAssetPrices,
   TBalances,
   TVault,
   TAsset,
@@ -329,14 +606,13 @@ export type {
   TBuildVariant,
   TAddress,
   IProtocol,
-  IFeature,
+  TMultichainPrices,
   IStrategyInfo,
   TInputItem,
   TVaultsAddress,
   TVaultAllowance,
   TVaultInput,
   TVaultBalance,
-  TDAOData,
   TGitHubUser,
   TMultisigBalance,
   TMultiTokenData,
@@ -344,12 +620,43 @@ export type {
   TSettings,
   TProfitTokenWallet,
   TSdivTokenWallet,
-  TVaultStatuses,
   TTableFilters,
   TTAbleFiltersVariant,
   TPendingPlatformUpgrade,
   TToast,
+  TVsHoldModal,
   TIQMFAlm,
   TChartData,
   TError,
+  TContractInfo,
+  TPieChartData,
+  TRisk,
+  TZAPData,
+  THoldData,
+  TUpgradesTable,
+  TYearnProtocol,
+  TPriceInfo,
+  TAPIData,
+  TEarningData,
+  TPlatformGetData,
+  TChartPayload,
+  TVaultDataKey,
+  TPlatformGetBalance,
+  TChain,
+  TUnderlyingToken,
+  TTokens,
+  TAPRPeriod,
+  TLocalStorageToken,
+  IChainData,
+  TSort,
+  TAssetData,
+  TTableData,
+  TDispatchedTableData,
+  TStrategyState,
+  TTableStrategy,
+  TLeaderboard,
+  TContests,
+  IExtendedYieldContest,
+  TTableProtocol,
+  TVLRange,
 };

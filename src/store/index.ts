@@ -5,56 +5,56 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { deserialize, serialize } from "wagmi";
 
-import { DEFAULT_TRANSACTION_SETTINGS, APRsType } from "@constants";
+import { DEFAULT_ERROR, DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import type {
   TPlatformData,
   TUserBalance,
-  TVaults,
-  TAssetPrices,
   TBalances,
   TAddress,
   TSettings,
   TError,
+  TMultichainPrices,
+  TTokens,
+  TVaultDataKey,
+  TAPRPeriod,
 } from "@types";
 
 // atoms
-const account = atom<string | undefined>();
-const network = atom<string | undefined>();
+const account = atom<TAddress | undefined>();
 const publicClient = atom<any>();
-const platformData = atom<TPlatformData | undefined>();
-const platformVersion = atom<string>("24.01.1-alpha");
+const platformsData = atom<TPlatformData>({});
+
+const platformVersions = atom<Record<string, string>>({});
 const userBalance = atom<TUserBalance | undefined>();
 const lastTx = atom<string | undefined>();
-const assets = atom<string[] | undefined>();
-const assetsPrices = atom<TAssetPrices | undefined>();
-const assetsBalances = atom<TBalances | undefined>();
-const vaultData = atom<TVaults>({});
+const assetsPrices = atom<TMultichainPrices>({});
+const assetsBalances = atom<{ [key: string]: TBalances }>({});
+const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
 const balances = atom<any>();
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
 
-const tokens = atom<TAddress[] | undefined>();
+const tokens = atom<TTokens>({});
 
 const connected = atom<boolean | undefined>();
 
 const reload = atom<boolean>(false);
-const error = atom<TError>({ state: false, type: "", description: "" });
-const isWeb3Load = atom<boolean>(false);
+const error = atom<TError>(DEFAULT_ERROR);
+const isWeb3Load = atom<boolean>(true);
 
 const apiData = atom<any>();
-const vaultTypes = atom();
-const strategyTypes = atom();
+
+const currentChainID = atom("137");
 
 // deepMaps
 
-const vaults = deepMap<any>();
+const vaults = deepMap<any>(false);
 
 // portfolio
-const hideFeeApr = atom(false);
-const aprFilter = atom(APRsType[1]);
+const aprFilter = atom<TAPRPeriod>("daily");
 
 //// tanstack query
 
@@ -73,12 +73,10 @@ const persister = createSyncStoragePersister({
 
 export {
   account,
-  network,
   publicClient,
-  platformData,
+  platformsData,
   userBalance,
   lastTx,
-  assets,
   assetsPrices,
   assetsBalances,
   vaultData,
@@ -89,15 +87,13 @@ export {
   tokens,
   connected,
   apiData,
-  vaultTypes,
-  strategyTypes,
   transactionSettings,
-  platformVersion,
-  hideFeeApr,
+  platformVersions,
   reload,
   error,
   isWeb3Load,
   queryClient,
   persister,
   aprFilter,
+  currentChainID,
 };

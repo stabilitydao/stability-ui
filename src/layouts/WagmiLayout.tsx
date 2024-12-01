@@ -6,7 +6,7 @@ import { wagmiConfig } from "@web3";
 
 import { queryClient, persister } from "@store";
 
-const WagmiLayout = (props: React.PropsWithChildren) => {
+const WagmiLayout = (props: React.PropsWithChildren): JSX.Element => {
   return (
     <WagmiProvider config={wagmiConfig}>
       <PersistQueryClientProvider

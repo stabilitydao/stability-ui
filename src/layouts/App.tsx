@@ -10,7 +10,7 @@ import { walletConnectProjectId, wagmiConfig } from "@web3";
 
 createWeb3Modal({ wagmiConfig, projectId: walletConnectProjectId });
 
-const App = (props: React.PropsWithChildren) => {
+const App = (props: React.PropsWithChildren): JSX.Element => {
   return (
     <WagmiLayout>
       <AppStore>{props.children}</AppStore>
