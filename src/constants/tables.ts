@@ -8,9 +8,9 @@ const TABLE_FILTERS: TTableFilters[] = [
 ];
 
 const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
+  // { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
   {
-    name: "Assets",
+    name: "Vault",
     keyName: "assetsSymbol",
     sortType: "none",
     dataType: "string",
@@ -22,12 +22,12 @@ const TABLE: TTableColumn[] = [
   //   sortType: "none",
   //   dataType: "string",
   // },
-  {
-    name: "Strategy",
-    keyName: "strategy",
-    sortType: "none",
-    dataType: "string",
-  },
+  // {
+  //   name: "Strategy",
+  //   keyName: "strategy",
+  //   sortType: "none",
+  //   dataType: "string",
+  // },
   {
     name: "Income APR",
     keyName: "earningData",

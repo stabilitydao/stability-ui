@@ -689,146 +689,99 @@ const Vaults = (): JSX.Element => {
                         data-testid="vault"
                       >
                         <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-accent-950 min-[1020px]:bg-transparent z-10">
-                          <div className="flex items-center min-[1020px]:ml-0 ml-[18px]">
-                            {/* {vault?.risk?.isRektStrategy ? (
-                                <div
-                                  className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
-                                  title={vault?.risk?.isRektStrategy as string}
-                                ></div>
-                              ) : (
-                                <VaultState status={vault.status} />
-                              )} */}
-                            <div className="relative mr-[6px] hidden min-[1020px]:block">
-                              <img
-                                src={network?.logoURI}
-                                alt={network?.name}
-                                className="h-4 w-4 rounded-full absolute left-[-15%] top-[-15%]"
-                              />
-                              <img
-                                src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                                alt="logo"
-                                className="w-6 h-6 rounded-full"
-                              />
+                          <div className="min-[1020px]:ml-0 ml-[18px] relative">
+                            <img
+                              src={network?.logoURI}
+                              alt={network?.name}
+                              className="h-4 w-4 rounded-full absolute z-10"
+                            />
+                            <div className="flex items-center">
+                              <div className="flex items-center w-[52px] justify-center">
+                                {vault.assets.map((asset, index) => (
+                                  <img
+                                    src={asset.logo}
+                                    alt={asset.symbol}
+                                    className={`w-6 h-6 rounded-full ${
+                                      !index &&
+                                      vault.assets.length > 1 &&
+                                      "mr-[-10px] z-[5]"
+                                    }`}
+                                    key={asset.logo + index}
+                                  />
+                                ))}
+                              </div>
+                              <span>{vault.assetsSymbol}</span>
                             </div>
-
-                            <div className="max-w-[150px] min-[1020px]:max-w-[250px] flex items-start flex-col text-[#eaecef]">
-                              <p
-                                title={vault.name}
-                                className={`whitespace-nowrap text-[12px] md:text-[14px] ${
-                                  vault?.risk?.isRektStrategy
-                                    ? "text-[#818181]"
-                                    : "text-[#fff]"
-                                }`}
-                                style={{ color: vault.strategyInfo.color }}
-                              >
-                                {vault.symbol}
-                              </p>
-                              <p className="min-[1130px]:hidden text-[#848e9c]">
-                                {vault.strategyInfo.shortId}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
-                          <div className="flex items-center">
-                            <div className="flex items-center w-[52px] justify-center">
-                              {vault.assets.map((asset, index) => (
-                                <img
-                                  src={asset.logo}
-                                  alt={asset.symbol}
-                                  className={`w-6 h-6 rounded-full ${
-                                    !index &&
-                                    vault.assets.length > 1 &&
-                                    "mr-[-10px] z-[5]"
-                                  }`}
-                                  key={asset.logo + index}
-                                />
-                              ))}
-                            </div>
-                            <span>{vault.assetsSymbol}</span>
-                          </div>
-                        </td>
-                        {/* <td className="px-2 min-[1130px]:px-1 py-2 table-cell w-[50px]">
-                          <div className="flex items-center justify-center">
-                            {vault?.risk?.isRektStrategy ? (
-                              <div
-                                className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
-                                title={vault?.risk?.isRektStrategy as string}
-                              ></div>
-                            ) : (
-                              <VaultState status={vault.status} />
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
-                          <VaultType type={vault.type} />
-                        </td> */}
-                        <td className="pl-2 py-2 hidden min-[1340px]:table-cell whitespace-nowrap">
-                          <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
-                            {vault.strategyInfo && (
-                              <>
-                                <span
-                                  className={`px-2 rounded-[10px] hidden min-[1020px]:flex h-8 items-center ${
-                                    (vault.strategySpecific &&
-                                      vault.strategyInfo.shortId != "Y") ||
-                                    vault.strategyInfo.protocols.length > 2
-                                      ? "min-w-[100px] w-[170px]"
-                                      : ""
-                                  }`}
-                                >
+                            <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
+                              {vault.strategyInfo && (
+                                <>
                                   <span
-                                    className={`flex ${
-                                      vault.yearnProtocols.length ||
-                                      vault.strategyInfo.shortId === "CF"
-                                        ? ""
-                                        : "min-w-[50px]"
+                                    className={`px-2 rounded-[10px] flex h-8 items-center ${
+                                      (vault.strategySpecific &&
+                                        vault.strategyInfo.shortId != "Y") ||
+                                      vault.strategyInfo.protocols.length > 2
+                                        ? "min-w-[100px] w-[170px]"
+                                        : ""
                                     }`}
                                   >
-                                    {vault.strategyInfo.protocols.map(
-                                      (protocol, index) => (
-                                        <img
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                          key={protocol.logoSrc + String(index)}
-                                          src={protocol.logoSrc}
-                                          alt={protocol.name}
-                                          title={protocol.name}
-                                          style={{
-                                            zIndex:
-                                              vault.strategyInfo.protocols
-                                                .length - index,
-                                          }}
-                                        />
-                                      )
-                                    )}
-                                  </span>
-                                  {vault.yearnProtocols.length ? (
-                                    <div className="flex">
-                                      {vault.yearnProtocols.map((protocol) => (
-                                        <img
-                                          key={protocol.link}
-                                          src={protocol.link}
-                                          alt={protocol.title}
-                                          title={protocol.title}
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                        />
-                                      ))}
-                                    </div>
-                                  ) : vault.strategySpecific ? (
                                     <span
-                                      className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
-                                        vault.strategySpecific.length > 10
-                                          ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
-                                          : "uppercase  text-[9px] px-[6px]"
+                                      className={`flex ${
+                                        vault.yearnProtocols.length ||
+                                        vault.strategyInfo.shortId === "CF"
+                                          ? ""
+                                          : "min-w-[50px]"
                                       }`}
                                     >
-                                      {vault.strategySpecific}
+                                      {vault.strategyInfo.protocols.map(
+                                        (protocol, index) => (
+                                          <img
+                                            className="h-4 w-4 rounded-full mx-[2px]"
+                                            key={
+                                              protocol.logoSrc + String(index)
+                                            }
+                                            src={protocol.logoSrc}
+                                            alt={protocol.name}
+                                            title={protocol.name}
+                                            style={{
+                                              zIndex:
+                                                vault.strategyInfo.protocols
+                                                  .length - index,
+                                            }}
+                                          />
+                                        )
+                                      )}
                                     </span>
-                                  ) : (
-                                    ""
-                                  )}
-                                </span>
-                              </>
-                            )}
+                                    {vault.yearnProtocols.length ? (
+                                      <div className="flex">
+                                        {vault.yearnProtocols.map(
+                                          (protocol) => (
+                                            <img
+                                              key={protocol.link}
+                                              src={protocol.link}
+                                              alt={protocol.title}
+                                              title={protocol.title}
+                                              className="h-4 w-4 rounded-full mx-[2px]"
+                                            />
+                                          )
+                                        )}
+                                      </div>
+                                    ) : vault.strategySpecific ? (
+                                      <span
+                                        className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
+                                          vault.strategySpecific.length > 10
+                                            ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
+                                            : "uppercase  text-[9px] px-[6px]"
+                                        }`}
+                                      >
+                                        {vault.strategySpecific}
+                                      </span>
+                                    ) : (
+                                      ""
+                                    )}
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td
