@@ -226,11 +226,19 @@ type TRebalances = {
   weekly: number;
 };
 
+type TShareData = {
+  sharePriceOnCreation?: string;
+  sharePrice?: string;
+  yieldPercent?: string;
+};
+
 type THoldData = {
   symbol: string;
   initPrice: string;
   price: string;
   priceDifference: string;
+  dailyAPR: string;
+  weeklyAPR: string;
   latestAPR: string;
   APR: string;
 };
@@ -271,9 +279,11 @@ type TVault = {
   pool: TPool;
   alm: TAlm;
   risk: TRisk;
+  vsHold24H: number;
+  vsHoldWeekly: number;
   lifetimeVsHold: number;
-  lifetimeVsHoldAPR: number;
-  lifetimeTokensHold: THoldData[];
+  vsHoldAPR: number;
+  assetsVsHold: THoldData[];
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
   network: string;
@@ -318,9 +328,9 @@ type TTableFilters = {
 };
 
 type TVsHoldModal = {
-  lifetimeTokensHold: THoldData[];
+  assetsVsHold: THoldData[];
+  lifetimeVsHold: number;
   vsHoldAPR: number;
-  lifetimeVsHoldAPR: number;
   created: number;
   state: boolean;
   isVsActive: boolean;
@@ -365,7 +375,7 @@ type TUnderlyingToken = {
   address: TAddress;
   symbol: string;
   decimals: number;
-  balance: number;
+  balance: number | string;
   allowance: number;
   logoURI: string;
 };
@@ -659,4 +669,5 @@ export type {
   IExtendedYieldContest,
   TTableProtocol,
   TVLRange,
+  TShareData,
 };

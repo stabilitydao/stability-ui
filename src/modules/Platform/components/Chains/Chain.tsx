@@ -72,7 +72,7 @@ const Chain: React.FC<IProps> = ({ chain }) => {
     },
     {
       name: "TVL",
-      content: `${formatNumber($apiData?.total.chainTvl[chain.toString()] ? $apiData?.total.chainTvl[chain.toString()].toFixed(0) : "-", "abbreviate")}`,
+      content: `${formatNumber($apiData?.total.chainTvl[chain.toString()] ? $apiData?.total.chainTvl[chain.toString()].toFixed(0) : "0", "abbreviate")}`,
     },
   ];
 

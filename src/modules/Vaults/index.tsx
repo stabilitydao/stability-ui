@@ -80,9 +80,9 @@ import type {
 // };
 
 type TVSHoldModalState = {
-  lifetimeTokensHold: THoldData[];
+  assetsVsHold: THoldData[];
+  lifetimeVsHold: number;
   vsHoldAPR: number;
-  lifetimeVsHoldAPR: number;
   created: number;
   state: boolean;
   isVsActive: boolean;
@@ -120,9 +120,9 @@ const Vaults = (): JSX.Element => {
   });
 
   const [vsHoldModal, setVsHoldModal] = useState<TVSHoldModalState>({
-    lifetimeTokensHold: [],
+    assetsVsHold: [],
+    lifetimeVsHold: 0,
     vsHoldAPR: 0,
-    lifetimeVsHoldAPR: 0,
     created: 0,
     state: false,
     isVsActive: false,
@@ -917,10 +917,9 @@ const Vaults = (): JSX.Element => {
                             if (isMobile) {
                               e.stopPropagation();
                               setVsHoldModal({
-                                lifetimeTokensHold:
-                                  vault.lifetimeTokensHold as THoldData[],
-                                vsHoldAPR: vault.lifetimeVsHold,
-                                lifetimeVsHoldAPR: vault.lifetimeVsHoldAPR,
+                                assetsVsHold: vault.assetsVsHold as THoldData[],
+                                lifetimeVsHold: vault.lifetimeVsHold,
+                                vsHoldAPR: vault.vsHoldAPR,
                                 created: getTimeDifference(vault.created)?.days,
                                 state: true,
                                 isVsActive: vault.isVsActive,
@@ -931,13 +930,13 @@ const Vaults = (): JSX.Element => {
                         >
                           <p
                             className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault.lifetimeVsHoldAPR < 0 &&
+                              vault.vsHoldAPR < 0 &&
                               getTimeDifference(vault.created).days >= 3 &&
                               "text-[#eb7979]"
                             }`}
                           >
                             {getTimeDifference(vault.created).days >= 3
-                              ? `${vault.lifetimeVsHoldAPR}%`
+                              ? `${vault.vsHoldAPR}%`
                               : "-"}
                           </p>
 
@@ -972,18 +971,17 @@ const Vaults = (): JSX.Element => {
                                   {vault.isVsActive ? (
                                     <td
                                       className={`text-right ${
-                                        vault.lifetimeVsHoldAPR < 0 &&
-                                        "text-[#eb7979]"
+                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
                                       }`}
                                     >
-                                      {vault.lifetimeVsHoldAPR}%
+                                      {vault.vsHoldAPR}%
                                     </td>
                                   ) : (
                                     <td className="text-right">-</td>
                                   )}
                                 </tr>
 
-                                {vault.lifetimeTokensHold.map(
+                                {vault.assetsVsHold.map(
                                   (aprsData: THoldData, index: number) => (
                                     <tr
                                       key={aprsData?.symbol + index}

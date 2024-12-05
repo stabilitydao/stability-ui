@@ -204,7 +204,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="VS HODL APR"
-                value={vault.lifetimeVsHoldAPR + "%"}
+                value={vault.vsHoldAPR + "%"}
                 testId="infoBarVSHodlAPR"
               />
             </div>
