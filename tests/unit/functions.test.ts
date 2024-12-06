@@ -10,7 +10,6 @@ import {
   formatFromBigInt,
   formatNumber,
   getDate,
-  getProtocolLogo,
   getStrategyInfo,
   getTimeDifference,
   get1InchRoutes,
@@ -361,44 +360,6 @@ describe("getDate", () => {
     const formattedDate = getDate(unixTime);
 
     expect(formattedDate).toBe("7/1/2021");
-  });
-});
-
-describe("getProtocolLogo", () => {
-  it("should return correct logo for Curve (CCF)", () => {
-    const logo = getProtocolLogo("CCF");
-
-    expect(logo).toBe(PROTOCOLS.curve.logoSrc);
-  });
-
-  it("should return correct logo for DefiEdge (DQMF)", () => {
-    const logo = getProtocolLogo("DQMF");
-
-    expect(logo).toBe(PROTOCOLS.defiedge.logoSrc);
-  });
-
-  it("should return correct logo for Ichi (IQMF)", () => {
-    const logo = getProtocolLogo("IQMF");
-
-    expect(logo).toBe(PROTOCOLS.ichi.logoSrc);
-  });
-
-  it("should return correct logo for Ichi (IRMF)", () => {
-    const logo = getProtocolLogo("IRMF");
-
-    expect(logo).toBe(PROTOCOLS.ichi.logoSrc);
-  });
-
-  it("should return correct logo for Yearn (Y)", () => {
-    const logo = getProtocolLogo("Y");
-
-    expect(logo).toBe(PROTOCOLS.yearn.logoSrc);
-  });
-
-  it("should return default logo for unknown strategy (example)", () => {
-    const logo = getProtocolLogo("example");
-
-    expect(logo).toBe(PROTOCOLS.gamma.logoSrc);
   });
 });
 

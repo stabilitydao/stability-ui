@@ -2,9 +2,12 @@ import { test, expect } from "@playwright/test";
 
 import axios from "axios";
 
-import { seeds } from "@stabilitydao/stability";
+import {
+  seeds,
+  getStrategyProtocols,
+  StrategyShortId,
+} from "@stabilitydao/stability";
 
-import { getProtocolLogo } from "../../../src/utils/functions/getProtocolLogo";
 import { getStrategyInfo } from "../../../src/utils/functions/getStrategyInfo";
 
 import { getTokenData } from "../../helpers";
@@ -82,8 +85,14 @@ test("Should display contracts info correctly", async ({ page }) => {
 
     let underlyingToken = {};
 
-    if (isALM || isUnderlying) {
-      const logo = getProtocolLogo(vaultData.strategyShortId);
+    if (isALM || isUnderlying || true) {
+      const strategyProtocols = getStrategyProtocols(
+        strategyInfo?.shortId as StrategyShortId
+      );
+
+      const logo = strategyProtocols.length
+        ? `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategyProtocols[0].img}`
+        : "";
 
       underlyingToken = { symbol: vaultData.underlyingSymbol, logo: logo };
     }

@@ -27,7 +27,6 @@ import {
 
 import {
   VaultABI,
-  ERC20DQMFABI,
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
@@ -39,9 +38,7 @@ import {
   getTokenData,
   get1InchRoutes,
   debounce,
-  decodeHex,
   setLocalStoreHash,
-  getProtocolLogo,
 } from "@utils";
 
 import {
@@ -149,12 +146,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<TZAPData[]>([]);
   const [underlyingToken, setUnderlyingToken] = useState<TUnderlyingToken>({
-    address: "0x0",
-    symbol: "",
-    decimals: 0,
+    address: vault.underlying.address,
+    symbol: vault.underlying.symbol,
+    decimals: vault.underlying.decimals,
     balance: 0,
     allowance: 0,
-    logoURI: "",
+    logoURI: vault.underlying.logo,
   });
 
   const [underlyingShares, setUnderlyingShares] = useState<string | boolean>();
@@ -409,66 +406,27 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
     ///// GET UNDERLYING TOKEN
     try {
-      if (vault.underlying != zeroAddress) {
-        const logo = getProtocolLogo(shortId);
-        if ($connected) {
-          let underlyingSymbol = "";
+      if (vault.underlying.address != zeroAddress && $connected) {
+        const underlyingAllowance = (await _publicClient?.readContract({
+          address: vault.underlying.address,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault.address],
+        })) as bigint;
 
-          if (shortId === "DQMF") {
-            underlyingSymbol = (await _publicClient?.readContract({
-              address: vault.underlying,
-              abi: ERC20DQMFABI,
-              functionName: "symbol",
-            })) as string;
-
-            underlyingSymbol = decodeHex(underlyingSymbol);
-          } else {
-            underlyingSymbol = (await _publicClient?.readContract({
-              address: vault.underlying,
-              abi: ERC20MetadataUpgradeableABI,
-              functionName: "symbol",
-            })) as string;
-          }
-
-          const underlyingDecimals = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "decimals",
-          })) as number;
-          const underlyingAllowance = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "allowance",
-            args: [$account as TAddress, vault.address],
-          })) as bigint;
-          const underlyingBalance = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "balanceOf",
-            args: [$account as TAddress],
-          })) as bigint;
-
-          setUnderlyingToken({
-            address: vault.underlying,
-            symbol: underlyingSymbol,
-            decimals: Number(underlyingDecimals),
-            balance: formatUnits(underlyingBalance, underlyingDecimals),
-            allowance: Number(
-              formatUnits(underlyingAllowance, underlyingDecimals)
-            ),
-            logoURI: logo,
-          });
-        } else {
-          const defaultTokens = defaultOption?.symbols?.split(" + ");
-          setUnderlyingToken({
-            address: vault.underlying,
-            symbol: `aw${defaultTokens[0]}-${defaultTokens[1]}`,
-            decimals: 18,
-            balance: 0,
-            allowance: 0,
-            logoURI: logo,
-          });
-        }
+        const underlyingBalance = (await _publicClient?.readContract({
+          address: vault.underlying.address,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        })) as bigint;
+        setUnderlyingToken((prevState) => ({
+          ...prevState,
+          balance: formatUnits(underlyingBalance, vault.underlying.decimals),
+          allowance: Number(
+            formatUnits(underlyingAllowance, vault.underlying.decimals)
+          ),
+        }));
       }
     } catch (err) {
       console.error("UNDERLYING TOKEN ERROR:", err);
@@ -1734,12 +1692,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const getIchiAllow = async () => {
     try {
       const allowToken0 = (await _publicClient?.readContract({
-        address: vault.underlying,
+        address: vault.underlying.address,
         abi: ICHIABI,
         functionName: "allowToken0",
       })) as boolean;
       const allowToken1 = (await _publicClient?.readContract({
-        address: vault.underlying,
+        address: vault.underlying.address,
         abi: ICHIABI,
         functionName: "allowToken1",
       })) as boolean;
@@ -2093,10 +2051,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                     onClick={() => {
                       optionHandler(
-                        [underlyingToken?.address],
-                        underlyingToken?.symbol,
-                        underlyingToken?.address,
-                        [getProtocolLogo(shortId)]
+                        [underlyingToken.address],
+                        underlyingToken.symbol,
+                        underlyingToken.address,
+                        [underlyingToken.logoURI]
                       );
                     }}
                   >

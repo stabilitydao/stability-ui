@@ -12,7 +12,13 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import { deployments, getAsset, seeds } from "@stabilitydao/stability";
+import {
+  deployments,
+  getAsset,
+  getStrategyProtocols,
+  seeds,
+  StrategyShortId,
+} from "@stabilitydao/stability";
 
 import {
   account,
@@ -331,12 +337,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APRArray = {
             latest: String(APR),
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               dailyTotalAPRWithFees,
               APR
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               weeklyTotalAPRWithFees,
               APR
             ),
@@ -344,12 +350,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APYArray = {
             latest: APY,
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               calculateAPY(dailyTotalAPRWithFees).toFixed(2),
               APY
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
               APY
             ),
@@ -367,12 +373,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           farmAPR = {
             latest: APRWithoutFees,
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               dailyFarmApr,
               APRWithoutFees
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               weeklyFarmApr,
               APRWithoutFees
             ),
@@ -525,6 +531,21 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             ? "1"
             : vault.sharePrice;
 
+        const strategyProtocols = getStrategyProtocols(
+          strategyInfo.shortId as StrategyShortId
+        );
+
+        const underlyingLogo = strategyProtocols.length
+          ? `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategyProtocols[0].img}`
+          : "";
+
+        const underlyingData = {
+          address: vault.underlying,
+          symbol: vault.underlyingSymbol,
+          decimals: vault.underlyingDecimals,
+          logo: underlyingLogo,
+        };
+
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
           {
             address: vault.address.toLowerCase(),
@@ -547,13 +568,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             assetsProportions,
             strategyInfo,
             il: IL,
-            underlying: vault.underlying,
+            underlying: underlyingData,
             strategyAddress: vault?.strategy?.toLowerCase(),
             strategyDescription: vault.strategyDescription,
             status: vault.status,
             version: vault.version,
             strategyVersion: vault.strategyVersion,
-            underlyingSymbol: vault?.underlyingSymbol || "",
             NFTtokenID: vault.vaultManagerId,
             gasReserve: vault.gasReserve,
             rebalances,

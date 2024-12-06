@@ -264,13 +264,12 @@ type TVault = {
   assetsProportions: number[];
   strategyInfo: IStrategyInfo;
   il: number;
-  underlying: TAddress;
+  underlying: TUnderlyingData;
   strategyAddress: TAddress;
   strategyDescription: string;
   status: string;
   version: string;
   strategyVersion: string;
-  underlyingSymbol: string;
   NFTtokenID: string;
   gasReserve: string;
   rebalances: TRebalances;
@@ -378,6 +377,13 @@ type TUnderlyingToken = {
   balance: number | string;
   allowance: number;
   logoURI: string;
+};
+
+type TUnderlyingData = {
+  address: TAddress;
+  symbol: string;
+  decimals: number;
+  logo: string;
 };
 
 ////          VAULT
