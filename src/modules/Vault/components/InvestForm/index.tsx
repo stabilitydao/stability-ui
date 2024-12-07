@@ -210,17 +210,32 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     return apprDepo.every((element) => element === apprDepo[0]);
   };
 
-  const checkInputsAllowance = (input: bigint[]) => {
+  const checkInputsAllowance = (input: bigint[], type: string = "assets") => {
     const apprDepo: string[] = [];
     let change = false;
 
     const assetsBalances = $assetsBalances[network];
-    const assetsArray = defaultOption?.assetsArray;
+
+    if (type === "underlying") {
+      assetsBalances[underlyingToken.address] = input[0];
+    }
+
+    const assetsArray =
+      type === "underlying"
+        ? [underlyingToken.address]
+        : defaultOption?.assetsArray;
 
     const isIRMF = shortId === "IRMF";
     const isIQMFOrIRMF = shortId === "IQMF" || isIRMF;
 
     for (let i = 0; i < input.length; i++) {
+      console.log("--------------------------------------------------");
+      console.log(vault.underlying.address);
+      console.log(input);
+      console.log(assetsBalances);
+      console.log(assetsArray);
+      console.log(assetsArray[i]);
+      console.log(assetsBalances?.[assetsArray[i]]);
       if (assetsBalances && input[i] > assetsBalances?.[assetsArray[i]]) {
         setButton("insufficientBalance");
         change = true;
@@ -420,6 +435,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "balanceOf",
           args: [$account as TAddress],
         })) as bigint;
+        console.log(underlyingBalance);
         setUnderlyingToken((prevState) => ({
           ...prevState,
           balance: formatUnits(underlyingBalance, vault.underlying.decimals),
@@ -481,8 +497,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             functionName: "previewDepositAssets",
             args: [[asset as TAddress], [parseUnits(amount, 18)]],
           });
+          console.log("here", [parseUnits(amount, 18)]);
 
           if (previewDepositAssets) {
+            console.log(formatUnits(previewDepositAssets[1] as bigint, 18));
             setUnderlyingShares(
               formatUnits(previewDepositAssets[1] as bigint, 18)
             );
@@ -506,11 +524,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             Number(amount) <= Number(balances[asset]) &&
             Number(formatUnits(allowanceData, 18)) >= Number(amount)
           ) {
+            console.log(tab);
             setButton(tab.toLowerCase());
           }
-
+          console.log(previewDepositAssets);
           if (previewDepositAssets) {
-            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+            checkInputsAllowance(
+              [parseUnits(amount, 18)] as bigint[],
+              "underlying"
+            );
             setSharesOut(
               ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
             );

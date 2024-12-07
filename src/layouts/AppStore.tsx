@@ -122,36 +122,43 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const getDataFromStabilityAPI = async () => {
     const maxRetries = 3;
-    let currentRetry = 0;
+    let isResponse = false;
 
-    while (currentRetry < maxRetries) {
-      try {
-        const response = await axios.get(seeds[0]);
+    for (const seed of seeds) {
+      let currentRetry = 0;
 
-        stabilityAPIData = response.data;
+      while (currentRetry < maxRetries) {
+        try {
+          const response = await axios.get(seed);
 
-        if (stabilityAPIData?.error) {
-          handleError("API", stabilityAPIData?.error);
-          return;
-        }
+          stabilityAPIData = response.data;
 
-        if (stabilityAPIData?.assetPrices) {
-          assetsPrices.set(stabilityAPIData?.assetPrices);
-          prices = stabilityAPIData?.assetPrices;
-        }
+          if (stabilityAPIData?.error) {
+            handleError("API", stabilityAPIData?.error);
+            return;
+          }
 
-        apiData.set(stabilityAPIData);
-        return;
-      } catch (err) {
-        currentRetry++;
-        if (currentRetry < maxRetries) {
-          console.log(`Retrying (${currentRetry}/${maxRetries})...`, seeds[0]);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        } else {
-          console.error("API error:", err);
-          handleError("API", err as string);
+          if (stabilityAPIData?.assetPrices) {
+            assetsPrices.set(stabilityAPIData?.assetPrices);
+            prices = stabilityAPIData?.assetPrices;
+          }
+
+          apiData.set(stabilityAPIData);
+          isResponse = true;
+          break;
+        } catch (err) {
+          currentRetry++;
+          if (currentRetry < maxRetries) {
+            console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          } else {
+            console.error("API error:", err);
+            handleError("API", err as string);
+          }
         }
       }
+
+      if (isResponse) break;
     }
   };
 
@@ -615,6 +622,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     await Promise.all(
       CHAINS.map(async (chain) => {
         /////***** SET VAULTS DATA *****/////
+
         const APIVaultsData = Object.values(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
         );
