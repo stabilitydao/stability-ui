@@ -68,6 +68,7 @@ import type {
   TUnderlyingToken,
   TZAPData,
   TLocalStorageToken,
+  TxTokens,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -229,13 +230,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const isIQMFOrIRMF = shortId === "IQMF" || isIRMF;
 
     for (let i = 0; i < input.length; i++) {
-      console.log("--------------------------------------------------");
-      console.log(vault.underlying.address);
-      console.log(input);
-      console.log(assetsBalances);
-      console.log(assetsArray);
-      console.log(assetsArray[i]);
-      console.log(assetsBalances?.[assetsArray[i]]);
       if (assetsBalances && input[i] > assetsBalances?.[assetsArray[i]]) {
         setButton("insufficientBalance");
         change = true;
@@ -435,7 +429,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           functionName: "balanceOf",
           args: [$account as TAddress],
         })) as bigint;
-        console.log(underlyingBalance);
+
         setUnderlyingToken((prevState) => ({
           ...prevState,
           balance: formatUnits(underlyingBalance, vault.underlying.decimals),
@@ -497,10 +491,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             functionName: "previewDepositAssets",
             args: [[asset as TAddress], [parseUnits(amount, 18)]],
           });
-          console.log("here", [parseUnits(amount, 18)]);
 
           if (previewDepositAssets) {
-            console.log(formatUnits(previewDepositAssets[1] as bigint, 18));
             setUnderlyingShares(
               formatUnits(previewDepositAssets[1] as bigint, 18)
             );
@@ -524,10 +516,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             Number(amount) <= Number(balances[asset]) &&
             Number(formatUnits(allowanceData, 18)) >= Number(amount)
           ) {
-            console.log(tab);
             setButton(tab.toLowerCase());
           }
-          console.log(previewDepositAssets);
+
           if (previewDepositAssets) {
             checkInputsAllowance(
               [parseUnits(amount, 18)] as bigint[],
@@ -713,7 +704,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         const out = shares - (shares * decimalPercent) / BigInt(100);
 
-        const txToken: any = {
+        const txTokens: TxTokens = {
           [underlyingToken?.address]: {
             amount: amount,
             symbol: underlyingToken?.symbol,
@@ -762,7 +753,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
-          tokens: txToken,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -840,13 +831,25 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           hash: zapDeposit,
         });
 
+        const txTokens: TxTokens = Object.entries(inputs).reduce(
+          (acc, [address, amount]) => {
+            acc[address] = {
+              amount: Number(amount).toFixed(4),
+              symbol: getTokenData(address)?.symbol as string,
+              logo: getTokenData(address)?.logoURI,
+            };
+            return acc;
+          },
+          {} as TxTokens
+        );
+
         setLocalStoreHash({
           timestamp: new Date().getTime(),
           hash: zapDeposit,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
-          tokens: inputs,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -1309,13 +1312,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       if (transaction.status === "success") {
         resetFormAfterTx();
       }
+
+      const txTokens: TxTokens = Object.entries(inputs).reduce(
+        (acc, [address, amount]) => {
+          acc[address] = {
+            amount: Number(amount).toFixed(4),
+            symbol: getTokenData(address)?.symbol as string,
+            logo: getTokenData(address)?.logoURI,
+          };
+          return acc;
+        },
+        {} as TxTokens
+      );
+
       setLocalStoreHash({
         timestamp: new Date().getTime(),
         hash: depositAssets,
         status: transaction?.status || "reverted",
         type: "deposit",
         vault: vault.address,
-        tokens: inputs,
+        tokens: txTokens,
       });
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
@@ -1415,8 +1431,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           const JSONToken = tokenlist.tokens.find(
             (t) => t.symbol === token.symbol
           );
-
           result[JSONToken?.address as TAddress] = {
+            symbol: JSONToken?.symbol,
+            logo: JSONToken?.logoURI,
             amount: token.amount,
           };
 
@@ -1536,13 +1553,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           confirmations,
           hash: zapWithdraw,
         });
+
+        const txTokens: TxTokens = Object.entries(inputs).reduce(
+          (acc, [address, amount]) => {
+            acc[address] = {
+              amount: Number(amount).toFixed(4),
+              symbol: getTokenData(address)?.symbol as string,
+              logo: getTokenData(address)?.logoURI,
+            };
+            return acc;
+          },
+          {} as TxTokens
+        );
+
         setLocalStoreHash({
           timestamp: new Date().getTime(),
           hash: zapWithdraw,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
-          tokens: inputs,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();

@@ -4,8 +4,6 @@ import { useStore } from "@nanostores/react";
 
 import { vaults, lastTx } from "@store";
 
-import { getTokenData } from "@utils";
-
 import type { TLocalStorageToken, TToast } from "@types";
 
 import "./Toast.css";
@@ -56,6 +54,7 @@ const Toast: React.FC<IProps> = memo(
         const currentTime = new Date().getTime();
         const lastUpdateTime = initialTx.timestamp || 0;
         const timeDifference = currentTime - lastUpdateTime;
+
         if (timeDifference < 10000) {
           setStoreTx(initialTx);
           initialTx.status === "success"
@@ -63,12 +62,12 @@ const Toast: React.FC<IProps> = memo(
             : setColor("#B34D61");
 
           const array = Object.entries(
-            initialTx.tokens as Record<string, string>
-          ).map(([address, amount]) => ({
+            initialTx.tokens as Record<string, TLocalStorageToken>
+          ).map(([address, { amount, symbol, logo }]) => ({
             address,
             amount: Number(amount).toFixed(4),
-            symbol: getTokenData(address)?.symbol,
-            logo: getTokenData(address)?.logoURI,
+            symbol,
+            logo,
           }));
 
           setTokens(array);
@@ -185,7 +184,7 @@ const Toast: React.FC<IProps> = memo(
               <a
                 target="_blank"
                 href={`${explorer}${storeTx?.vault}`}
-                className="underline "
+                className="underline"
               >
                 {$vaults[network][storeTx?.vault].symbol}
               </a>

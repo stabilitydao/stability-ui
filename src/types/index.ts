@@ -298,6 +298,10 @@ type TZAPData = {
   txData: string;
 };
 
+type TxTokens = {
+  [tokenAddress: string]: TLocalStorageToken;
+};
+
 type TTableColumn = {
   name: string;
   keyName: string;
@@ -676,4 +680,5 @@ export type {
   TTableProtocol,
   TVLRange,
   TShareData,
+  TxTokens,
 };
