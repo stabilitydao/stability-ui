@@ -63,7 +63,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
     switch (vault.alm.protocol) {
       case "Gamma":
         const contractFee = await readContract(wagmiConfig, {
-          address: vault.underlying,
+          address: vault.underlying.address,
           abi: [
             {
               inputs: [],
@@ -269,7 +269,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex flex-col">
             <span className="text-[16px]">{vault.alm.protocol}</span>
             <span className="text-[14px] text-[#8d8e96]">
-              {vault.underlyingSymbol}
+              {vault.underlying.symbol}
             </span>
           </div>
         </div>

@@ -12,7 +12,13 @@ import { useAccount, usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
 
-import { deployments, getAsset, seeds } from "@stabilitydao/stability";
+import {
+  deployments,
+  getAsset,
+  getStrategyProtocols,
+  seeds,
+  StrategyShortId,
+} from "@stabilitydao/stability";
 
 import {
   account,
@@ -116,36 +122,43 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const getDataFromStabilityAPI = async () => {
     const maxRetries = 3;
-    let currentRetry = 0;
+    let isResponse = false;
 
-    while (currentRetry < maxRetries) {
-      try {
-        const response = await axios.get(seeds[0]);
+    for (const seed of seeds) {
+      let currentRetry = 0;
 
-        stabilityAPIData = response.data;
+      while (currentRetry < maxRetries) {
+        try {
+          const response = await axios.get(seed);
 
-        if (stabilityAPIData?.error) {
-          handleError("API", stabilityAPIData?.error);
-          return;
-        }
+          stabilityAPIData = response.data;
 
-        if (stabilityAPIData?.assetPrices) {
-          assetsPrices.set(stabilityAPIData?.assetPrices);
-          prices = stabilityAPIData?.assetPrices;
-        }
+          if (stabilityAPIData?.error) {
+            handleError("API", stabilityAPIData?.error);
+            return;
+          }
 
-        apiData.set(stabilityAPIData);
-        return;
-      } catch (err) {
-        currentRetry++;
-        if (currentRetry < maxRetries) {
-          console.log(`Retrying (${currentRetry}/${maxRetries})...`, seeds[0]);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        } else {
-          console.error("API error:", err);
-          handleError("API", err as string);
+          if (stabilityAPIData?.assetPrices) {
+            assetsPrices.set(stabilityAPIData?.assetPrices);
+            prices = stabilityAPIData?.assetPrices;
+          }
+
+          apiData.set(stabilityAPIData);
+          isResponse = true;
+          break;
+        } catch (err) {
+          currentRetry++;
+          if (currentRetry < maxRetries) {
+            console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          } else {
+            console.error("API error:", err);
+            handleError("API", err as string);
+          }
         }
       }
+
+      if (isResponse) break;
     }
   };
 
@@ -331,12 +344,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APRArray = {
             latest: String(APR),
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               dailyTotalAPRWithFees,
               APR
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               weeklyTotalAPRWithFees,
               APR
             ),
@@ -344,12 +357,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           APYArray = {
             latest: APY,
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               calculateAPY(dailyTotalAPRWithFees).toFixed(2),
               APY
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
               APY
             ),
@@ -367,12 +380,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           farmAPR = {
             latest: APRWithoutFees,
             daily: determineAPR(
-              vault?.income.apr24h,
+              vault?.income?.apr24h,
               dailyFarmApr,
               APRWithoutFees
             ),
             weekly: determineAPR(
-              vault?.income.aprWeek,
+              vault?.income?.aprWeek,
               weeklyFarmApr,
               APRWithoutFees
             ),
@@ -525,6 +538,21 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             ? "1"
             : vault.sharePrice;
 
+        const strategyProtocols = getStrategyProtocols(
+          strategyInfo.shortId as StrategyShortId
+        );
+
+        const underlyingLogo = strategyProtocols.length
+          ? `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategyProtocols[0].img}`
+          : "";
+
+        const underlyingData = {
+          address: vault.underlying,
+          symbol: vault.underlyingSymbol,
+          decimals: vault.underlyingDecimals,
+          logo: underlyingLogo,
+        };
+
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
           {
             address: vault.address.toLowerCase(),
@@ -547,13 +575,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             assetsProportions,
             strategyInfo,
             il: IL,
-            underlying: vault.underlying,
+            underlying: underlyingData,
             strategyAddress: vault?.strategy?.toLowerCase(),
             strategyDescription: vault.strategyDescription,
             status: vault.status,
             version: vault.version,
             strategyVersion: vault.strategyVersion,
-            underlyingSymbol: vault?.underlyingSymbol || "",
             NFTtokenID: vault.vaultManagerId,
             gasReserve: vault.gasReserve,
             rebalances,
@@ -595,6 +622,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     await Promise.all(
       CHAINS.map(async (chain) => {
         /////***** SET VAULTS DATA *****/////
+
         const APIVaultsData = Object.values(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
         );

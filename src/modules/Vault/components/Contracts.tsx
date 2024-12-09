@@ -1,10 +1,8 @@
 import { memo, useMemo, useState, useEffect } from "react";
 
-import { zeroAddress, getAddress } from "viem";
+import { getAddress } from "viem";
 
 import { HeadingText } from "@ui";
-
-import { getProtocolLogo } from "@utils";
 
 import { DEXes, CHAINS } from "@constants";
 
@@ -18,19 +16,7 @@ interface IProps {
 const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>>();
 
-  const [underlyingToken, setUnderlyingToken] = useState({
-    symbol: "",
-    logo: "",
-  });
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
-
-  const initUnderlying = async () => {
-    if (isALM || isUnderlying) {
-      const logo = getProtocolLogo(vault.strategyInfo.shortId);
-
-      setUnderlyingToken({ symbol: vault.underlyingSymbol, logo: logo });
-    }
-  };
 
   const copyHandler = async (address: TAddress) => {
     try {
@@ -60,11 +46,6 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
 
     setTimeoutId(newTimeoutId);
   };
-  useEffect(() => {
-    if (vault.underlying != zeroAddress) {
-      initUnderlying();
-    }
-  }, [vault]);
 
   useEffect(() => {
     if (vault?.address) {
@@ -85,12 +66,12 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         },
       ];
 
-      if (underlyingToken?.symbol) {
+      if (vault.underlying.symbol) {
         contractsInfo.push({
-          logo: underlyingToken.logo,
-          symbol: underlyingToken.symbol,
+          logo: vault.underlying.logo,
+          symbol: vault.underlying.symbol,
           type: isALM ? "ALM" : "Underlying",
-          address: vault?.underlying,
+          address: vault?.underlying.address,
           isCopy: false,
         });
       }
@@ -127,18 +108,12 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
       }
       setContracts(contractsInfo);
     }
-  }, [vault, underlyingToken]);
+  }, [vault]);
 
   const isALM = useMemo(
     () =>
       vault?.alm && ["Ichi", "DefiEdge", "Gamma"].includes(vault.alm.protocol),
     [vault?.alm]
-  );
-
-  // only for Yearn strategies
-  const isUnderlying = useMemo(
-    () => vault.strategy === "Yearn",
-    [vault.strategy]
   );
 
   const explorer = useMemo(

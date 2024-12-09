@@ -9,7 +9,8 @@ const GRAPH_ENDPOINTS: { [key: string]: string } = {
     "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY
   ),
-  111188: deployments[111188].subgraph,
+  111188:
+    "https://api.goldsky.com/api/public/project_cm2v16o5ct0ql01vr3m5o0vt2/subgraphs/stability-subgraph/0.0.13/gn", //deployments[111188].subgraph,
 };
 
 export { GRAPH_ENDPOINTS };

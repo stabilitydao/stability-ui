@@ -27,7 +27,6 @@ import {
 
 import {
   VaultABI,
-  ERC20DQMFABI,
   ERC20ABI,
   ZapABI,
   ERC20MetadataUpgradeableABI,
@@ -39,9 +38,7 @@ import {
   getTokenData,
   get1InchRoutes,
   debounce,
-  decodeHex,
   setLocalStoreHash,
-  getProtocolLogo,
 } from "@utils";
 
 import {
@@ -71,6 +68,7 @@ import type {
   TUnderlyingToken,
   TZAPData,
   TLocalStorageToken,
+  TxTokens,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -149,12 +147,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const [zapPreviewWithdraw, setZapPreviewWithdraw] = useState<TZAPData[]>([]);
   const [underlyingToken, setUnderlyingToken] = useState<TUnderlyingToken>({
-    address: "0x0",
-    symbol: "",
-    decimals: 0,
+    address: vault.underlying.address,
+    symbol: vault.underlying.symbol,
+    decimals: vault.underlying.decimals,
     balance: 0,
     allowance: 0,
-    logoURI: "",
+    logoURI: vault.underlying.logo,
   });
 
   const [underlyingShares, setUnderlyingShares] = useState<string | boolean>();
@@ -213,12 +211,20 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     return apprDepo.every((element) => element === apprDepo[0]);
   };
 
-  const checkInputsAllowance = (input: bigint[]) => {
+  const checkInputsAllowance = (input: bigint[], type: string = "assets") => {
     const apprDepo: string[] = [];
     let change = false;
 
     const assetsBalances = $assetsBalances[network];
-    const assetsArray = defaultOption?.assetsArray;
+
+    if (type === "underlying") {
+      assetsBalances[underlyingToken.address] = input[0];
+    }
+
+    const assetsArray =
+      type === "underlying"
+        ? [underlyingToken.address]
+        : defaultOption?.assetsArray;
 
     const isIRMF = shortId === "IRMF";
     const isIQMFOrIRMF = shortId === "IQMF" || isIRMF;
@@ -409,66 +415,28 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
     ///// GET UNDERLYING TOKEN
     try {
-      if (vault.underlying != zeroAddress) {
-        const logo = getProtocolLogo(shortId);
-        if ($connected) {
-          let underlyingSymbol = "";
+      if (vault.underlying.address != zeroAddress && $connected) {
+        const underlyingAllowance = (await _publicClient?.readContract({
+          address: vault.underlying.address,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "allowance",
+          args: [$account as TAddress, vault.address],
+        })) as bigint;
 
-          if (shortId === "DQMF") {
-            underlyingSymbol = (await _publicClient?.readContract({
-              address: vault.underlying,
-              abi: ERC20DQMFABI,
-              functionName: "symbol",
-            })) as string;
+        const underlyingBalance = (await _publicClient?.readContract({
+          address: vault.underlying.address,
+          abi: ERC20MetadataUpgradeableABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        })) as bigint;
 
-            underlyingSymbol = decodeHex(underlyingSymbol);
-          } else {
-            underlyingSymbol = (await _publicClient?.readContract({
-              address: vault.underlying,
-              abi: ERC20MetadataUpgradeableABI,
-              functionName: "symbol",
-            })) as string;
-          }
-
-          const underlyingDecimals = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "decimals",
-          })) as number;
-          const underlyingAllowance = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "allowance",
-            args: [$account as TAddress, vault.address],
-          })) as bigint;
-          const underlyingBalance = (await _publicClient?.readContract({
-            address: vault.underlying,
-            abi: ERC20MetadataUpgradeableABI,
-            functionName: "balanceOf",
-            args: [$account as TAddress],
-          })) as bigint;
-
-          setUnderlyingToken({
-            address: vault.underlying,
-            symbol: underlyingSymbol,
-            decimals: Number(underlyingDecimals),
-            balance: formatUnits(underlyingBalance, underlyingDecimals),
-            allowance: Number(
-              formatUnits(underlyingAllowance, underlyingDecimals)
-            ),
-            logoURI: logo,
-          });
-        } else {
-          const defaultTokens = defaultOption?.symbols?.split(" + ");
-          setUnderlyingToken({
-            address: vault.underlying,
-            symbol: `aw${defaultTokens[0]}-${defaultTokens[1]}`,
-            decimals: 18,
-            balance: 0,
-            allowance: 0,
-            logoURI: logo,
-          });
-        }
+        setUnderlyingToken((prevState) => ({
+          ...prevState,
+          balance: formatUnits(underlyingBalance, vault.underlying.decimals),
+          allowance: Number(
+            formatUnits(underlyingAllowance, vault.underlying.decimals)
+          ),
+        }));
       }
     } catch (err) {
       console.error("UNDERLYING TOKEN ERROR:", err);
@@ -552,7 +520,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           }
 
           if (previewDepositAssets) {
-            checkInputsAllowance(previewDepositAssets[0] as bigint[]);
+            checkInputsAllowance(
+              [parseUnits(amount, 18)] as bigint[],
+              "underlying"
+            );
             setSharesOut(
               ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
             );
@@ -733,7 +704,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         const out = shares - (shares * decimalPercent) / BigInt(100);
 
-        const txToken: any = {
+        const txTokens: TxTokens = {
           [underlyingToken?.address]: {
             amount: amount,
             symbol: underlyingToken?.symbol,
@@ -782,7 +753,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
-          tokens: txToken,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -860,13 +831,25 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           hash: zapDeposit,
         });
 
+        const txTokens: TxTokens = Object.entries(inputs).reduce(
+          (acc, [address, amount]) => {
+            acc[address] = {
+              amount: Number(amount).toFixed(4),
+              symbol: getTokenData(address)?.symbol as string,
+              logo: getTokenData(address)?.logoURI,
+            };
+            return acc;
+          },
+          {} as TxTokens
+        );
+
         setLocalStoreHash({
           timestamp: new Date().getTime(),
           hash: zapDeposit,
           status: transaction?.status || "reverted",
           type: "deposit",
           vault: vault.address,
-          tokens: inputs,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -1329,13 +1312,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       if (transaction.status === "success") {
         resetFormAfterTx();
       }
+
+      const txTokens: TxTokens = Object.entries(inputs).reduce(
+        (acc, [address, amount]) => {
+          acc[address] = {
+            amount: Number(amount).toFixed(4),
+            symbol: getTokenData(address)?.symbol as string,
+            logo: getTokenData(address)?.logoURI,
+          };
+          return acc;
+        },
+        {} as TxTokens
+      );
+
       setLocalStoreHash({
         timestamp: new Date().getTime(),
         hash: depositAssets,
         status: transaction?.status || "reverted",
         type: "deposit",
         vault: vault.address,
-        tokens: inputs,
+        tokens: txTokens,
       });
       lastTx.set(transaction?.transactionHash);
       setLoader(false);
@@ -1435,8 +1431,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           const JSONToken = tokenlist.tokens.find(
             (t) => t.symbol === token.symbol
           );
-
           result[JSONToken?.address as TAddress] = {
+            symbol: JSONToken?.symbol,
+            logo: JSONToken?.logoURI,
             amount: token.amount,
           };
 
@@ -1556,13 +1553,26 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           confirmations,
           hash: zapWithdraw,
         });
+
+        const txTokens: TxTokens = Object.entries(inputs).reduce(
+          (acc, [address, amount]) => {
+            acc[address] = {
+              amount: Number(amount).toFixed(4),
+              symbol: getTokenData(address)?.symbol as string,
+              logo: getTokenData(address)?.logoURI,
+            };
+            return acc;
+          },
+          {} as TxTokens
+        );
+
         setLocalStoreHash({
           timestamp: new Date().getTime(),
           hash: zapWithdraw,
           status: transaction?.status || "reverted",
           type: "withdraw",
           vault: vault.address,
-          tokens: inputs,
+          tokens: txTokens,
         });
         if (transaction.status === "success") {
           resetFormAfterTx();
@@ -1734,12 +1744,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const getIchiAllow = async () => {
     try {
       const allowToken0 = (await _publicClient?.readContract({
-        address: vault.underlying,
+        address: vault.underlying.address,
         abi: ICHIABI,
         functionName: "allowToken0",
       })) as boolean;
       const allowToken1 = (await _publicClient?.readContract({
-        address: vault.underlying,
+        address: vault.underlying.address,
         abi: ICHIABI,
         functionName: "allowToken1",
       })) as boolean;
@@ -2093,10 +2103,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
                     onClick={() => {
                       optionHandler(
-                        [underlyingToken?.address],
-                        underlyingToken?.symbol,
-                        underlyingToken?.address,
-                        [getProtocolLogo(shortId)]
+                        [underlyingToken.address],
+                        underlyingToken.symbol,
+                        underlyingToken.address,
+                        [underlyingToken.logoURI]
                       );
                     }}
                   >
