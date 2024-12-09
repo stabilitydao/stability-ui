@@ -277,15 +277,14 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                 <a
                   key={protocol.name}
                   className="w-[144px] h-[100px] m-2 text-[14px] pt-3 pb-1 inline-flex flex-col justify-center bg-accent-900 hover:bg-accent-800 rounded-xl items-center relative"
-                  href={integrations[protocol.organization as string].website}
-                  title={`Go to ${integrations[protocol.organization as string].name} website`}
-                  target="_blank"
+                  href={`/integrations/${protocol.organization}`}
+                  // title={`Go to ${integrations[protocol.organization as string].name} website`}
                 >
-                  <img
+                  {/* <img
                     src="/link.svg"
                     alt="ExternalLink"
                     className="w-4 h-4 absolute right-2 top-2"
-                  />
+                  /> */}
                   <img
                     className="w-[36px] h-[36px] rounded-full mb-2"
                     src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${protocol.img || integrations[protocol.organization as string].img}`}

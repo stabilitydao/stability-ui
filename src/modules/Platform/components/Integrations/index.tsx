@@ -30,6 +30,7 @@ const Integrations = (): JSX.Element => {
           protocolsLength: Object.keys(integration.protocols).length,
         })
       );
+
       setTableData(integrationsData);
     }
   };

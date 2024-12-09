@@ -156,14 +156,14 @@ const Integration: React.FC<IProps> = ({ integrationName }) => {
 
       <HeadingText text="Protocols" scale={2} styles="text-center mt-5" />
 
-      <div className="flex flex-col items-center justify-center w-full gap-5 mt-5">
+      <div className="flex items-stretch justify-center flex-wrap w-full gap-5 mt-5">
         {!!protocols.length &&
           protocols.map(({ name, category, chains, img }, index) => {
             const status = getIntegrationStatus(protocols[index]);
 
             const statusInfo = protocolStatusInfo[status];
             return (
-              <div className="px-6 w-full" key={name}>
+              <div className="px-6 max-w-[450px]" key={name}>
                 <div className="flex flex-col items-center justify-center p-[16px] gap-[8px] bg-accent-950 rounded-[24px]">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     {img && (
