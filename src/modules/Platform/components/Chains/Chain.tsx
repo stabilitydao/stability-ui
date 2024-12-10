@@ -203,11 +203,13 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                       className="h-[48px] hover:bg-accent-950"
                     >
                       <td className="px-4 py-2">
-                        <ProtocolsChip
-                          id={strategy.shortId as StrategyShortId}
-                          bgColor={strategy.bgColor}
-                          color={strategy.color}
-                        />
+                        <a href={`/strategies/${strategy.shortId.toLowerCase()}`} title="Go to strategy page">
+                          <ProtocolsChip
+                            id={strategy.shortId as StrategyShortId}
+                            bgColor={strategy.bgColor}
+                            color={strategy.color}
+                          />
+                        </a>
                       </td>
                       <td className="px-4 py-2 text-[16px] font-semibold">
                         {strategy.id}
