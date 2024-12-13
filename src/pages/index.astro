@@ -1,13 +1,45 @@
 ---
-import Layout from '@layouts/Layout.astro';
-import {Vaults} from "@modules"
+import App from "@layouts/App"
+import {Home} from "@modules"
 ---
 
-<Layout title="Vaults"
-  img="/ogs/vaults.png"
-  metaTitle="On-chain asset management, liquidity mining and yield farming platform."
-  metaUrl="https://stability.farm/vaults"
-  metaDescription="Deploy assets in Stability vaults, optimize your yield strategies and maximize profit."
->
-  <Vaults client:only="react"/>
-</Layout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
+    </script>
+    <meta charset="UTF-8" />
+    <!-- <meta name="description" content={metaDescription} /> -->
+    <meta name="viewport" content="width=device-width" />
+    <!-- <meta name="twitter:image:src" content={img} /> -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- <meta name="twitter:title" content={metaTitle} /> -->
+    <!-- <meta name="twitter:description" content={metaDescription} /> -->
+    <!-- <meta property="og:image" content={img} /> -->
+    <meta property="twitter:image:height" content="100" />
+    <meta property="twitter:image:width" content="100" />
+    <!-- <meta property="og:image:alt" content={metaTitle} /> -->
+    <meta property="og:type" content="object" />
+    <!-- <meta property="og:title" content={metaTitle} /> -->
+    <!-- <meta property="og:url" content={metaUrl} /> -->
+    <!-- <meta property="og:description" content={metaDescription} /> -->
+	<link rel="icon" type="image/svg+xml" href="/favicon.ico">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+  <meta name="generator" content={Astro.generator} />
+  <title>Stability</title>
+  </head>
+  <body>
+    <App client:only="react">
+      <Home client:only="react"/>
+    </App>
+  </body>
+</html>

@@ -26,7 +26,7 @@ const Header = (): JSX.Element => {
     platformPaths.some((path) => path === currentPath) ||
     platformPaths.some((path) => currentPath.includes(path));
 
-  const isVaults = currentPath === "" || currentPath.includes("vault/");
+  const isVaults = currentPath.includes("vault");
   return (
     <WagmiLayout>
       <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
@@ -42,7 +42,7 @@ const Header = (): JSX.Element => {
           <a
             data-testid="vaults-link"
             className={isVaults ? "active" : ""}
-            href="/"
+            href="/vaults"
           >
             Vaults
           </a>

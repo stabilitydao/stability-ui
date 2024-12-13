@@ -1,3 +1,4 @@
+import { Home } from "./Home";
 import { Factory } from "./Factory";
 import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
@@ -34,4 +35,5 @@ export {
   Strategy,
   Contests,
   Contest,
+  Home,
 };

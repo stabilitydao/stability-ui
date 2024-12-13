@@ -1,0 +1,16 @@
+.home-bg {
+  background: linear-gradient(132deg, #000 37.8%, rgba(0, 0, 0, 0.55) 80.55%),
+    #612ffb;
+}
+.responsive-font__h1 {
+  font-size: calc(30px + 42 * ((100vw - 320px) / (1920 - 320)));
+}
+.responsive-font__h3 {
+  font-size: calc(20px + 13 * ((100vw - 320px) / (1920 - 320)));
+}
+.responsive-font__nav {
+  font-size: calc(16px + 7 * ((100vw - 320px) / (1920 - 320)));
+}
+.responsive-font__footer {
+  font-size: calc(18px + 9 * ((100vw - 320px) / (1920 - 320)));
+}
