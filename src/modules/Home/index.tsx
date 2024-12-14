@@ -12,16 +12,32 @@ const Home = (): JSX.Element => {
             </span>
           </div>
           <div className="flex items-center gap-5 md:gap-[60px] font-medium">
-            <a className="responsive-font__nav" href="">
+            <a
+              className="responsive-font__nav"
+              href="https://github.com/stabilitydao"
+              target="_blank"
+            >
               GitHub
             </a>
-            <a className="responsive-font__nav" href="">
+            <a
+              className="responsive-font__nav"
+              href="https://x.com/stabilitydao"
+              target="_blank"
+            >
               X
             </a>
-            <a className="responsive-font__nav" href="">
+            <a
+              className="responsive-font__nav"
+              href="https://stabilitydao.gitbook.io/"
+              target="_blank"
+            >
               Docs
             </a>
-            <a className="responsive-font__nav" href="">
+            <a
+              className="responsive-font__nav"
+              href="https://defillama.com/protocol/stability"
+              target="_blank"
+            >
               DefiLlama
             </a>
           </div>
@@ -42,14 +58,22 @@ const Home = (): JSX.Element => {
           </a>
         </main>
         <footer className="flex items-center justify-between flex-col lg:flex-row responsive-font__footer">
-          <p className="flex items-center">
+          <a
+            className="flex items-center"
+            href="https://www.soniclabs.com/"
+            target="_blank"
+          >
             <span>Powered by</span>
             <img src="/sonic.svg" alt="Sonic" />
-          </p>
+          </a>
           <p className="text-right opacity-60 font-medium">
             Stability is live and already growing.
             <br /> Join our{" "}
-            <a className="text-[#C2AEFF] font-semibold opacity-60" href="">
+            <a
+              className="text-[#C2AEFF] font-semibold opacity-60"
+              href="https://discord.com/invite/R3nnetWzC9"
+              target="_blank"
+            >
               community
             </a>{" "}
             to find out more.
