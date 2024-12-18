@@ -1,6 +1,7 @@
 ---
 import App from "@layouts/App"
 import {Home} from "@modules"
+import Layout from '@layouts/Layout.astro';
 ---
 
 <!doctype html>
@@ -39,7 +40,7 @@ import {Home} from "@modules"
   </head>
   <body>
     <App client:only="react">
-      <Home client:only="react"/>
+     <Home client:only="react"/>
     </App>
   </body>
 </html>

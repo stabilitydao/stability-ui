@@ -50,7 +50,7 @@ const SORT_CASES = [
 
 const LINKS: string[] = [
   "https://github.com/stabilitydao",
-  "https://twitter.com/stabilitydao",
+  "https://x.com/stabilitydao",
   "https://t.me/stabilitydao",
   "https://discord.com/invite/R3nnetWzC9",
   "https://stabilitydao.gitbook.io/",

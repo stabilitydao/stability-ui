@@ -1,10 +1,12 @@
+import { useState } from "react";
 import "./home.css";
 
 const Home = (): JSX.Element => {
+  const [menu, setMenu] = useState(false);
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
       <div className="mx-5 md:mx-[100px] lg:mx-[150px] my-5 md:my-10 flex flex-col justify-between flex-1 z-[2]">
-        <header className="flex items-center justify-between flex-wrap gap-5 md:gap-0">
+        {/* <header className="flex items-center justify-between flex-wrap gap-5 md:gap-0">
           <img
             className="w-[105px] h-[48px] md:w-[175px] md:h-[80px]"
             src="/full_logo_dark.png"
@@ -40,6 +42,42 @@ const Home = (): JSX.Element => {
               DefiLlama
             </a>
           </div>
+        </header> */}
+        <header className="relative flex items-center justify-between">
+          <img
+            className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
+            src="/full_logo_dark.png"
+            alt="Stability logo"
+          />
+
+          <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
+            <a href="/vaults">Vaults</a>
+            <a href="/users">Users</a>
+            <a href="/platform">Platform</a>
+          </div>
+          <div className="flex justify-end mr-[15px] gap-3">
+            <div
+              className="burger-menu"
+              onClick={() => setMenu((prev) => !prev)}
+            >
+              {menu ? (
+                <img className="w-4 h-4" src="/close.svg" alt="close" />
+              ) : (
+                <img className="w-4 h-4" src="/menu.svg" alt="menu" />
+              )}
+            </div>
+          </div>
+          <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
+            <a className="px-4 py-[10px] font-semibold" href="/">
+              Vaults
+            </a>
+            <a className="px-4 py-[10px] font-semibold" href="/users">
+              Users
+            </a>
+            <a className="px-4 py-[10px] font-semibold" href="/platform">
+              Platform
+            </a>
+          </nav>
         </header>
         <main>
           <a

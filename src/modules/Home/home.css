@@ -17,3 +17,72 @@
 .responsive-font__sonic {
   font-size: calc(13px + 14 * ((100vw - 320px) / (1920 - 320)));
 }
+
+/* Header */
+body.no-scroll {
+  overflow: hidden;
+}
+.menu {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.menu > a {
+  margin: 0;
+  min-width: 90px;
+  height: 40px;
+  color: #fcf3f6;
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 16px;
+}
+
+.burger-menu {
+  display: none;
+  cursor: pointer;
+  background: #1f0f50;
+  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+}
+.menu-nav {
+  display: none;
+}
+
+@media screen and (max-width: 767px) {
+  .burger-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .menu-nav {
+    flex-direction: column;
+    align-items: center;
+    /* background-color: #1f0f50; */
+    padding: 10px;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    border-radius: 0 0 24px 24px;
+  }
+  .menu-nav.active {
+    display: flex;
+  }
+
+  .menu-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+    margin: 5px 0;
+  }
+  .menu {
+    display: none;
+  }
+}
