@@ -50,7 +50,7 @@ const SORT_CASES = [
 
 const LINKS: string[] = [
   "https://github.com/stabilitydao",
-  "https://twitter.com/stabilitydao",
+  "https://x.com/stabilitydao",
   "https://t.me/stabilitydao",
   "https://discord.com/invite/R3nnetWzC9",
   "https://stabilitydao.gitbook.io/",
@@ -96,27 +96,21 @@ test.beforeEach(async ({ page }) => {
     throw new Error(`API Error: ${error}`);
   }
 
-  await page.goto("/", { waitUntil: "load", timeout: 60000 });
+  await page.goto("/vaults", { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(5000);
 });
 
 test.describe("Vaults page tests", () => {
-  test("logo and vaults tab is clickable and refers to main page", async ({
-    page,
-  }) => {
-    const ids = ["stability-logo", "vaults-link"];
+  test("vaults tab is clickable and refers to main page", async ({ page }) => {
+    await page.getByTestId("vaults-link").click();
 
-    for (const id of ids) {
-      await page.getByTestId(id).click();
+    await page.waitForLoadState("load");
 
-      await page.waitForLoadState("load");
+    const isCorrectPageURL =
+      page.url() === "https://stability.farm/vaults" ||
+      page.url() === "http://localhost:4321/vaults";
 
-      const isCorrectPageURL =
-        page.url() === "https://stability.farm/" ||
-        page.url() === "http://localhost:4321/";
-
-      expect(isCorrectPageURL).toBeTruthy();
-    }
+    expect(isCorrectPageURL).toBeTruthy();
   });
   test("should be active vaults", async ({ page }) => {
     await page.waitForSelector("[data-testid='vault']");

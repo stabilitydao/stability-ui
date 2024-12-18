@@ -7,18 +7,18 @@ interface IProps {
 
 const HoldTable: React.FC<IProps> = ({ shareData, holdData }) => {
   return (
-    <table className="table table-auto w-full rounded-lg">
-      <thead className="bg-[#0b0e11]">
-        <tr className="text-[16px] text-[#8f8f8f] uppercase">
+    <table className="font-manrope w-full">
+      <thead className="bg-accent-950 text-neutral-600 h-[36px]">
+        <tr className="text-[14px] uppercase">
           <th></th>
-          <th>INIT PRICE</th>
-          <th>PRICE</th>
-          <th>CHANGE</th>
+          <th className="text-right">INIT PRICE</th>
+          <th className="text-right">PRICE</th>
+          <th className="text-right">CHANGE</th>
         </tr>
       </thead>
-      <tbody className="text-[16px]">
+      <tbody className="text-[14px]">
         {!!shareData && (
-          <tr className="hover:bg-[#2B3139]">
+          <tr className="h-[48px] hover:bg-accent-950">
             <td>Vault</td>
             <td className="text-right py-1">
               {shareData.sharePriceOnCreation}
@@ -32,7 +32,7 @@ const HoldTable: React.FC<IProps> = ({ shareData, holdData }) => {
         )}
         {!!holdData &&
           holdData.map((aprsData) => (
-            <tr key={aprsData.symbol} className="hover:bg-[#2B3139]">
+            <tr key={aprsData.symbol} className="h-[48px] hover:bg-accent-950">
               <td>{aprsData.symbol}</td>
               <td className="text-right py-1">{aprsData.initPrice}</td>
               <td className="text-right py-1">{aprsData.price}</td>

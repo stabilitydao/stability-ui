@@ -85,7 +85,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
         styles="text-left md:ml-4 md:mb-0 mb-2"
       />
 
-      <div className="md:p-4">
+      <div className="md:p-4 flex flex-col gap-5">
         {!!vault?.earningData && (
           <table className="font-manrope w-full">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
@@ -152,7 +152,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
         )}
 
         {!!vault.assetsVsHold && (
-          <table className="font-manrope w-full mt-5">
+          <table className="font-manrope w-full">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[14px] uppercase">
                 <th>
@@ -175,11 +175,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                         fill="white"
                       />
                     </svg>
-                    <div className="visible__tooltip toCenter">
-                      <HoldTable
-                        shareData={shareData}
-                        holdData={vault.assetsVsHold}
-                      />
+                    <div className="visible__tooltip toCenter flex items-start justify-start normal-case">
+                      VS HODL APR compares depositing tokens into a vault vs
+                      holding them in a wallet with it's ratio and timeline.
                     </div>
                   </div>
                 </th>
@@ -234,6 +232,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
               })}
             </tbody>
           </table>
+        )}
+        {!!vault.assetsVsHold && (
+          <HoldTable shareData={shareData} holdData={vault.assetsVsHold} />
         )}
       </div>
       {modal && (

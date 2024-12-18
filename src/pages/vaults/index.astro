@@ -1,0 +1,13 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Vaults} from "@modules"
+---
+
+<Layout title="Vaults"
+  img="/ogs/vaults.png"
+  metaTitle="On-chain asset management, liquidity mining and yield farming platform."
+  metaUrl="https://stability.farm/vaults"
+  metaDescription="Deploy assets in Stability vaults, optimize your yield strategies and maximize profit."
+>
+  <Vaults client:only="react"/>
+</Layout>
