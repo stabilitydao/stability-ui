@@ -42,6 +42,20 @@ const Home = (): JSX.Element => {
           </div>
         </header>
         <main>
+          <a
+            className="flex items-center justify-start"
+            href="https://www.soniclabs.com/"
+            target="_blank"
+          >
+            <span className="mr-[7px] responsive-font__sonic text-nowrap">
+              Powered by
+            </span>
+            <img
+              src="/sonic.svg"
+              alt="Sonic"
+              className="w-[70px] h-[27px] md:w-[109px] md:h-10"
+            />
+          </a>
           <h1 className="responsive-font__h1 mb-3 leading-[100%]">
             DeFi Infrastructure Layer
           </h1>
@@ -57,22 +71,16 @@ const Home = (): JSX.Element => {
             Vaults
           </a>
         </main>
-        <footer className="flex items-center lg:items-end justify-between flex-col-reverse lg:flex-row md:responsive-font__footer!">
+        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5">
           <a
             className="flex items-center justify-center"
-            href="https://www.soniclabs.com/"
+            href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"
             target="_blank"
           >
-            <span className="mr-[7px] responsive-font__sonic text-nowrap">
-              Powered by
-            </span>
-            <img
-              src="/sonic.svg"
-              alt="Sonic"
-              className="w-[70px] h-[27px] md:w-full md:h-full"
-            />
+            <img src="/sonic_boom.png" alt="Sonic" className="" />
           </a>
-          <div className="min-[450px]:hidden w-[50%] flex items-center justify-between my-5">
+
+          <div className="min-[450px]:hidden w-[50%] flex items-center justify-between">
             <a
               href="https://github.com/stabilitydao"
               target="_blank"
@@ -106,7 +114,7 @@ const Home = (): JSX.Element => {
               />
             </a>
           </div>
-          <div className="text-center lg:text-right text-[45px] mb-0 lg:mb-[10px]">
+          <div className="text-center lg:text-right text-[45px]">
             <p className="hidden lg:block">Join Stability</p>{" "}
             <p className="text-neutral-400 responsive-font__footer">
               Stability is live and already growing.
