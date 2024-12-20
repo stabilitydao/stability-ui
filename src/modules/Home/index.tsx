@@ -1,59 +1,26 @@
-import { useState } from "react";
 import "./home.css";
 
 const Home = (): JSX.Element => {
-  const [menu, setMenu] = useState(false);
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
       <div className="flex flex-col justify-between flex-1 z-[2]">
-        <header className="relative flex items-center justify-between h-[60px] lg:h-auto">
+        <header className="flex items-center justify-between h-[60px] w-full py-[20px] px-[8px] md:py-[48px] md:px-[60px]">
           <img
             className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
             src="/full_logo_dark.png"
             alt="Stability logo"
           />
-
-          <div className="home-menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
-            <a href="/vaults">Vaults</a>
-            <a href="/users">Users</a>
-            <a href="/platform">Platform</a>
-          </div>
-          <div className="flex justify-end mr-[15px] gap-3">
-            <a
-              href="/vaults"
-              className="bg-accent-500 h-10 px-3 md:min-w-[150px] py-1 rounded-xl md:flex items-center justify-center gap-1 w-[120px] md:w-full font-semibold hidden"
-            >
-              Launch App
-            </a>
-            <div
-              className="home-burger-menu"
-              onClick={() => setMenu((prev) => !prev)}
-            >
-              {menu ? (
-                <img className="w-4 h-4" src="/close.svg" alt="close" />
-              ) : (
-                <img className="w-4 h-4" src="/menu.svg" alt="menu" />
-              )}
-            </div>
-          </div>
-          <nav
-            className={`home-menu-nav text-center gap-3 ${menu && "active"}`}
+          <a
+            href="/vaults"
+            className="bg-accent-500 h-10 px-3 w-[150px] py-1 rounded-[5px] md:flex items-center justify-center gap-1 font-semibold hidden"
           >
-            <a className="px-4 py-[10px] font-semibold" href="/">
-              Vaults
-            </a>
-            <a className="px-4 py-[10px] font-semibold" href="/users">
-              Users
-            </a>
-            <a className="px-4 py-[10px] font-semibold" href="/platform">
-              Platform
-            </a>
-          </nav>
+            Launch App
+          </a>
         </header>
-        <main>
-          <div className="min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <main className="mt-[20px] md:mt-0">
+          <div className="min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px] md:px-0 px-2">
             <a
-              className="flex items-center justify-start"
+              className="flex items-center justify-start mb-[5px] md:mb-1 ml-[3px]"
               href="https://www.soniclabs.com/"
               target="_blank"
             >
@@ -63,35 +30,41 @@ const Home = (): JSX.Element => {
               <img
                 src="/sonic.svg"
                 alt="Sonic"
-                className="w-[70px] h-[27px] md:w-[109px] md:h-10"
+                className="w-[60px] h-[27px] md:w-[80px] md:h-10"
               />
             </a>
             <h1 className="responsive-font__h1 mb-3 leading-[100%]">
               DeFi Infrastructure Layer
             </h1>
-            <p className="responsive-font__p opacity-60 leading-[120%] mb-5 md:mb-[60px]">
+            <p className="responsive-font__p opacity-60 leading-[120%] mb-[30px] md:mb-[50px] md:ml-[2px]">
               Stability acts as permissionless, non-custodial and{" "}
-              <br className="" /> automatic asset management solution <br />{" "}
-              based on AI.
+              <br className="hidden md:block" /> automatic asset management{" "}
+              <br className="block md:hidden" />
+              solution
+              <br className="hidden md:block" /> based on AI.
             </p>
             <a
-              className="text-white responsive-font__nav leading-[100%] py-[9px] md:py-[18px] px-6 md:px-[48px] bg-[#612FFB] rounded-lg"
+              className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
               href="/vaults"
             >
               Vaults
             </a>
           </div>
         </main>
-        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <footer className="py-6 md:py-[3rem] px-1 flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
           <a
-            className="flex items-center justify-center lg:mb-9"
+            className="flex items-center justify-center mb-3 md:mb-0"
             href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"
             target="_blank"
           >
-            <img src="/sonic_boom.png" alt="Sonic" />
+            <img
+              src="/sonic_boom.png"
+              alt="Sonic"
+              className="w-[125px] md:w-auto"
+            />
           </a>
 
-          <div className="lg:hidden w-[50%] flex items-center justify-center gap-5">
+          <div className="lg:hidden flex items-center justify-center gap-5">
             <a
               href="https://github.com/stabilitydao"
               target="_blank"
@@ -125,9 +98,10 @@ const Home = (): JSX.Element => {
               />
             </a>
           </div>
-          <div className="text-center lg:text-right text-[45px]">
+
+          <div className="text-center lg:text-right text-[35px]">
             <p className="hidden lg:block">Join Stability</p>{" "}
-            <p className="text-neutral-400 responsive-font__footer">
+            <p className="text-neutral-400 responsive-font__footer mt-5 md:mt-0">
               Stability is live and already growing.
               <br /> Join our{" "}
               <a
@@ -139,12 +113,12 @@ const Home = (): JSX.Element => {
               </a>{" "}
               to find out more.
             </p>
-            <div className="items-center justify-end lg:flex hidden">
+            <div className="items-center justify-end lg:flex hidden mt-6">
               <a
                 href="https://github.com/stabilitydao"
                 target="_blank"
                 title="GitHub"
-                className="px-3 py-2"
+                className="px-3"
               >
                 <img
                   src="socials/github.svg"
@@ -156,7 +130,7 @@ const Home = (): JSX.Element => {
                 href="https://x.com/stabilitydao"
                 target="_blank"
                 title="X"
-                className="px-3 py-2"
+                className="px-3"
               >
                 <img src="socials/x.svg" alt="X" className="w-4 h-4" />
               </a>
@@ -164,7 +138,7 @@ const Home = (): JSX.Element => {
                 href="https://stabilitydao.gitbook.io/"
                 target="_blank"
                 title="GitBook"
-                className="px-3 py-2"
+                className="px-3"
               >
                 <img
                   src="socials/gitbook.svg"
@@ -176,7 +150,7 @@ const Home = (): JSX.Element => {
                 href="https://defillama.com/protocol/stability"
                 target="_blank"
                 title="DefiLlama"
-                className="px-3 py-2"
+                className="px-3"
               >
                 <img
                   src="socials/defillama.svg"
