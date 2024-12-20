@@ -6,14 +6,14 @@ const Home = (): JSX.Element => {
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
       <div className="flex flex-col justify-between flex-1 z-[2]">
-        <header className="relative flex items-center justify-between">
+        <header className="relative flex items-center justify-between h-[60px] lg:h-auto">
           <img
             className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
             src="/full_logo_dark.png"
             alt="Stability logo"
           />
 
-          <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
+          <div className="home-menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
             <a href="/vaults">Vaults</a>
             <a href="/users">Users</a>
             <a href="/platform">Platform</a>
@@ -21,12 +21,12 @@ const Home = (): JSX.Element => {
           <div className="flex justify-end mr-[15px] gap-3">
             <a
               href="/vaults"
-              className="bg-accent-500 h-10 px-3 md:min-w-[150px] py-1 rounded-xl flex items-center justify-center gap-1 w-[120px] md:w-full font-semibold"
+              className="bg-accent-500 h-10 px-3 md:min-w-[150px] py-1 rounded-xl md:flex items-center justify-center gap-1 w-[120px] md:w-full font-semibold hidden"
             >
               Launch App
             </a>
             <div
-              className="burger-menu"
+              className="home-burger-menu"
               onClick={() => setMenu((prev) => !prev)}
             >
               {menu ? (
@@ -36,7 +36,9 @@ const Home = (): JSX.Element => {
               )}
             </div>
           </div>
-          <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
+          <nav
+            className={`home-menu-nav text-center gap-3 ${menu && "active"}`}
+          >
             <a className="px-4 py-[10px] font-semibold" href="/">
               Vaults
             </a>
@@ -82,35 +84,28 @@ const Home = (): JSX.Element => {
         </main>
         <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
           <a
-            className="flex items-center justify-center"
+            className="flex items-center justify-center lg:mb-9"
             href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"
             target="_blank"
           >
-            <img src="/sonic_boom.png" alt="Sonic" className="" />
+            <img src="/sonic_boom.png" alt="Sonic" />
           </a>
 
-          <div className="lg:hidden w-[50%] flex items-center justify-center">
+          <div className="lg:hidden w-[50%] flex items-center justify-center gap-5">
             <a
               href="https://github.com/stabilitydao"
               target="_blank"
               title="GitHub"
-              className="px-3 py-2"
             >
               <img src="socials/github.svg" alt="GitHub" className="w-5 h-5" />
             </a>
-            <a
-              href="https://x.com/stabilitydao"
-              target="_blank"
-              title="X"
-              className="px-3 py-2"
-            >
+            <a href="https://x.com/stabilitydao" target="_blank" title="X">
               <img src="socials/x.svg" alt="X" className="w-5 h-5" />
             </a>
             <a
               href="https://stabilitydao.gitbook.io/"
               target="_blank"
               title="GitBook"
-              className="px-3 py-2"
             >
               <img
                 src="socials/gitbook.svg"
@@ -122,7 +117,6 @@ const Home = (): JSX.Element => {
               href="https://defillama.com/protocol/stability"
               target="_blank"
               title="DefiLlama"
-              className="px-3 py-2"
             >
               <img
                 src="socials/defillama.svg"

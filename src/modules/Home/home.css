@@ -17,6 +17,9 @@
 .responsive-font__sonic {
   font-size: calc(13px + 14 * ((100vw - 320px) / (1920 - 320)));
 }
+body {
+  margin: 0;
+}
 
 main {
   margin: 0 auto;
@@ -41,12 +44,12 @@ footer {
 body.no-scroll {
   overflow: hidden;
 }
-.menu {
+.home-menu {
   display: flex;
   justify-content: center;
   gap: 12px;
 }
-.menu > a {
+.home-menu > a {
   margin: 0;
   min-width: 90px;
   height: 40px;
@@ -60,7 +63,7 @@ body.no-scroll {
   border-radius: 16px;
 }
 
-.burger-menu {
+.home-burger-menu {
   display: none;
   cursor: pointer;
   background: #1f0f50;
@@ -68,18 +71,18 @@ body.no-scroll {
   width: 32px;
   height: 32px;
 }
-.menu-nav {
+.home-menu-nav {
   display: none;
 }
 
 @media screen and (max-width: 767px) {
-  .burger-menu {
+  .home-burger-menu {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
   }
-  .menu-nav {
+  .home-menu-nav {
     flex-direction: column;
     align-items: center;
     background-color: #1f0f50;
@@ -91,17 +94,17 @@ body.no-scroll {
     z-index: 100;
     border-radius: 24px;
   }
-  .menu-nav.active {
+  .home-menu-nav.active {
     display: flex;
   }
 
-  .menu-nav a {
+  .home-menu-nav a {
     color: white;
     text-decoration: none;
     font-size: 17px;
     /* margin: 5px 0; */
   }
-  .menu {
+  .home-menu {
     display: none;
   }
 }
