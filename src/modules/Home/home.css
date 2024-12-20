@@ -3,19 +3,19 @@
     #612ffb;
 }
 .responsive-font__h1 {
-  font-size: calc(45px + 27 * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(45px + 27 * ((100vw - 360px) / (1920 - 320)));
 }
 .responsive-font__p {
-  font-size: calc(16px + 17 * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(15px + 9 * ((100vw - 360px) / (1920 - 320)));
 }
 .responsive-font__nav {
-  font-size: calc(16px + 9 * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(16px + 9 * ((100vw - 360px) / (1920 - 320)));
 }
 .responsive-font__footer {
-  font-size: calc(16px + 11 * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(13px + 5 * ((100vw - 360px) / (1920 - 320)));
 }
 .responsive-font__sonic {
-  font-size: calc(13px + 14 * ((100vw - 320px) / (1920 - 320)));
+  font-size: calc(10px + 5 * ((100vw - 360px) / (1920 - 320)));
 }
 body {
   margin: 0;
@@ -28,7 +28,7 @@ main {
 }
 footer {
   margin: 0 auto;
-  padding: 1rem 0.5rem;
+  padding: 3rem 0.5rem;
   max-width: calc(100% - 2rem);
 }
 @media (max-width: 500px) {

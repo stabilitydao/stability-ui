@@ -1,7 +1,13 @@
 ---
-import App from "@layouts/App"
 import {Home} from "@modules"
-import Layout from '@layouts/Layout.astro';
+
+
+const metaData = {
+  img :'/ogs/stability.png',
+ title : "Stability",
+  url :"https://stability.farm/",
+  description:"On-chain asset management, liquidity mining and yield farming platform.",
+}
 ---
 
 <!doctype html>
@@ -17,20 +23,20 @@ import Layout from '@layouts/Layout.astro';
       gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
     </script>
     <meta charset="UTF-8" />
-    <!-- <meta name="description" content={metaDescription} /> -->
+    <meta name="description" content={metaData.description} />
     <meta name="viewport" content="width=device-width" />
-    <!-- <meta name="twitter:image:src" content={img} /> -->
+    <meta name="twitter:image:src" content={metaData.img} />
     <meta name="twitter:card" content="summary_large_image" />
-    <!-- <meta name="twitter:title" content={metaTitle} /> -->
-    <!-- <meta name="twitter:description" content={metaDescription} /> -->
-    <!-- <meta property="og:image" content={img} /> -->
+    <meta name="twitter:title" content={metaData.title} />
+    <meta name="twitter:description" content={metaData.description} />
+    <meta property="og:image" content={metaData.img} />
     <meta property="twitter:image:height" content="100" />
     <meta property="twitter:image:width" content="100" />
-    <!-- <meta property="og:image:alt" content={metaTitle} /> -->
+    <meta property="og:image:alt"  content={metaData.title} />
     <meta property="og:type" content="object" />
-    <!-- <meta property="og:title" content={metaTitle} /> -->
-    <!-- <meta property="og:url" content={metaUrl} /> -->
-    <!-- <meta property="og:description" content={metaDescription} /> -->
+    <meta property="og:title" content={metaData.title} />
+    <meta property="og:url" content={metaData.url} />
+    <meta property="og:description" content={metaData.description} />
 	<link rel="icon" type="image/svg+xml" href="/favicon.ico">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,8 +45,6 @@ import Layout from '@layouts/Layout.astro';
   <title>Stability</title>
   </head>
   <body>
-    <App client:only="react">
      <Home client:only="react"/>
-    </App>
   </body>
 </html>
