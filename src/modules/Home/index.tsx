@@ -80,7 +80,7 @@ const Home = (): JSX.Element => {
             </a>
           </div>
         </main>
-        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 py-5 px-3">
+        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
           <a
             className="flex items-center justify-center"
             href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"

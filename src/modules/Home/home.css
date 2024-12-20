@@ -23,8 +23,16 @@ main {
   padding: 1rem 0.5rem;
   max-width: calc(100% - 2rem);
 }
+footer {
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
+  max-width: calc(100% - 2rem);
+}
 @media (max-width: 500px) {
   main {
+    max-width: 100%;
+  }
+  footer {
     max-width: 100%;
   }
 }
