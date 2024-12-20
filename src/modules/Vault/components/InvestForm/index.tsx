@@ -2123,7 +2123,22 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {/* CRV Strategy don't have zap withdraw */}
                 {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
-                    if (symbol !== defaultOption?.symbols) {
+                    const isIchiProtocol = vault?.alm?.protocol === "Ichi";
+
+                    const symbolIndex = isIchiProtocol
+                      ? defaultOption?.symbols
+                          .split(" + ")
+                          .indexOf(symbol as string)
+                      : -1;
+
+                    const isSymbolValid =
+                      !isIchiProtocol ||
+                      symbolIndex === -1 ||
+                      !ichiAllow[symbolIndex];
+
+                    const isValid = tab === "Deposit" ? isSymbolValid : true;
+
+                    if (symbol !== defaultOption?.symbols && isValid) {
                       return (
                         <div
                           className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"

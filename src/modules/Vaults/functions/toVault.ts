@@ -6,5 +6,5 @@
  */
 
 export const toVault = (network: string, address: string): void => {
-  window.location.href = `/vault/${network}/${address}`;
+  window.location.href = `/vaults/vault/${network}/${address}`;
 };

@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
     throw new Error(`API Error: ${error}`);
   }
 
-  await page.goto("/", { waitUntil: "load", timeout: 60000 });
+  await page.goto("/vaults", { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(5000);
 });
 

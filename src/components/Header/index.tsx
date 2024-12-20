@@ -26,23 +26,23 @@ const Header = (): JSX.Element => {
     platformPaths.some((path) => path === currentPath) ||
     platformPaths.some((path) => currentPath.includes(path));
 
-  const isVaults = currentPath === "" || currentPath.includes("vault/");
+  const isVaults = currentPath.includes("vault");
   return (
     <WagmiLayout>
       <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
-        <span className="title">
-          <a data-testid="stability-logo" href="/" title="Stability">
-            <img src="/logo.svg" alt="Stability logo" />
-            <span className="block text-[20px] font-semibold text-[#A995FF]">
-              Stability
-            </span>
-          </a>
-        </span>
+        <a data-testid="stability-logo" href="/" title="Stability">
+          <img
+            className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
+            src="/full_logo_dark.png"
+            alt="Stability logo"
+          />
+        </a>
+
         <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
           <a
             data-testid="vaults-link"
             className={isVaults ? "active" : ""}
-            href="/"
+            href="/vaults"
           >
             Vaults
           </a>
