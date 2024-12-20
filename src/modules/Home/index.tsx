@@ -5,7 +5,7 @@ const Home = (): JSX.Element => {
   const [menu, setMenu] = useState(false);
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
-      <div className="mx-5 md:mx-[100px] lg:mx-[150px] my-5 md:my-10 flex flex-col justify-between flex-1 z-[2]">
+      <div className="flex flex-col justify-between flex-1 z-[2]">
         {/* <header className="flex items-center justify-between flex-wrap gap-5 md:gap-0">
           <img
             className="w-[105px] h-[48px] md:w-[175px] md:h-[80px]"
@@ -43,7 +43,7 @@ const Home = (): JSX.Element => {
             </a>
           </div>
         </header> */}
-        <header className="relative flex items-center justify-between">
+        <header className="relative flex items-center justify-between ">
           <img
             className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
             src="/full_logo_dark.png"
@@ -56,6 +56,12 @@ const Home = (): JSX.Element => {
             <a href="/platform">Platform</a>
           </div>
           <div className="flex justify-end mr-[15px] gap-3">
+            <a
+              href="/vaults"
+              className="bg-accent-500 h-10 px-3 md:min-w-[150px] py-1 rounded-xl flex items-center justify-center gap-1 w-[120px] md:w-full font-semibold"
+            >
+              Launch App
+            </a>
             <div
               className="burger-menu"
               onClick={() => setMenu((prev) => !prev)}
@@ -79,7 +85,7 @@ const Home = (): JSX.Element => {
             </a>
           </nav>
         </header>
-        <main>
+        <main className="mx-5 md:mx-[100px] lg:mx-[150px] my-5 md:my-10">
           <a
             className="flex items-center justify-start"
             href="https://www.soniclabs.com/"
@@ -109,7 +115,7 @@ const Home = (): JSX.Element => {
             Vaults
           </a>
         </main>
-        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5">
+        <footer className="flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 mx-5 md:mx-[100px] lg:mx-[150px] my-5 md:my-10">
           <a
             className="flex items-center justify-center"
             href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"

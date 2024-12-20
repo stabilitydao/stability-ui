@@ -233,8 +233,13 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
             </tbody>
           </table>
         )}
+
         {!!vault.assetsVsHold && (
-          <HoldTable shareData={shareData} holdData={vault.assetsVsHold} />
+          <HoldTable
+            shareData={shareData}
+            holdData={vault.assetsVsHold}
+            daysFromCreation={getTimeDifference(vault?.created)?.days}
+          />
         )}
       </div>
       {modal && (
