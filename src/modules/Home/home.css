@@ -18,6 +18,17 @@
   font-size: calc(13px + 14 * ((100vw - 320px) / (1920 - 320)));
 }
 
+main {
+  margin: 0 auto;
+  padding: 1rem 0.5rem;
+  max-width: calc(100% - 2rem);
+}
+@media (max-width: 500px) {
+  main {
+    max-width: 100%;
+  }
+}
+
 /* Header */
 body.no-scroll {
   overflow: hidden;
