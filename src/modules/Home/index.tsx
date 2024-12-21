@@ -51,7 +51,7 @@ const Home = (): JSX.Element => {
             </a>
           </div>
         </main>
-        <footer className="py-6 md:py-[3rem] px-1 flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <footer className="py-6 md:py-[3rem] px-1 flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px] home-footer">
           <a
             className="flex items-center justify-center mb-3 md:mb-0"
             href="https://docs.soniclabs.com/funding/airdrop/sonic-boom/winners"

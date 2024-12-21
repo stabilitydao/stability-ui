@@ -8,7 +8,7 @@ const Footer = (): JSX.Element => {
           href="https://github.com/stabilitydao"
           title="GitHub"
         >
-          <img src="socials/github.svg" alt="GitHub" className="w-4 h-4" />
+          <img src="/socials/github.svg" alt="GitHub" className="w-4 h-4" />
         </a>
         <a
           className="px-3 py-2"
@@ -16,7 +16,7 @@ const Footer = (): JSX.Element => {
           href="https://x.com/stabilitydao"
           title="X"
         >
-          <img src="socials/x.svg" alt="X" className="w-4 h-4" />
+          <img src="/socials/x.svg" alt="X" className="w-4 h-4" />
         </a>
         <a
           className="px-3 py-2"
@@ -24,7 +24,7 @@ const Footer = (): JSX.Element => {
           href="https://t.me/stabilitydao"
           title="Telegram"
         >
-          <img src="socials/telegram.svg" alt="Telegram" className="w-4 h-4" />
+          <img src="/socials/telegram.svg" alt="Telegram" className="w-4 h-4" />
         </a>
         <a
           className="px-3 py-2"
@@ -32,7 +32,7 @@ const Footer = (): JSX.Element => {
           href="https://discord.com/invite/R3nnetWzC9"
           title="Discord"
         >
-          <img src="socials/discord.svg" alt="Discord" className="w-4 h-4" />
+          <img src="/socials/discord.svg" alt="Discord" className="w-4 h-4" />
         </a>
         <a
           className="px-3 py-2"
@@ -40,7 +40,7 @@ const Footer = (): JSX.Element => {
           href="https://stabilitydao.gitbook.io/"
           title="Stability Book"
         >
-          <img src="socials/gitbook.svg" alt="GitBook" className="w-4 h-4" />
+          <img src="/socials/gitbook.svg" alt="GitBook" className="w-4 h-4" />
         </a>
       </div>
     </footer>
