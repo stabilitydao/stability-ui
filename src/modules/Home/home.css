@@ -26,7 +26,7 @@ main {
   padding: 1rem 0.5rem;
   max-width: calc(100% - 2rem);
 }
-footer {
+.home-footer {
   margin: 0 auto;
   padding: 3rem 0.5rem;
   max-width: calc(100% - 2rem);
@@ -35,7 +35,7 @@ footer {
   main {
     max-width: 100%;
   }
-  footer {
+  .home-footer {
     max-width: 100%;
   }
 }
