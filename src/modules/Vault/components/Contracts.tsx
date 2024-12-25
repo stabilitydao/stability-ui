@@ -66,35 +66,59 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         },
       ];
 
-      if (vault.underlying.symbol) {
-        contractsInfo.push({
-          logo: vault.underlying.logo,
-          symbol: vault.underlying.symbol,
-          type: isALM ? "ALM" : "Underlying",
-          address: vault?.underlying.address,
-          isCopy: false,
-        });
-      }
-      if (vault?.pool?.address) {
-        const poolSymbol =
-          vault?.assets.length > 1
-            ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
-            : vault?.assets[0]?.symbol;
+      if (vault.strategyInfo.shortId !== "BSF") {
+        if (vault.underlying.symbol) {
+          contractsInfo.push({
+            logo: vault.underlying.logo,
+            symbol: vault.underlying.symbol,
+            type: isALM ? "ALM" : "Underlying",
+            address: vault?.underlying.address,
+            isCopy: false,
+          });
+        }
+        if (vault?.pool?.address) {
+          const poolSymbol =
+            vault?.assets.length > 1
+              ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
+              : vault?.assets[0]?.symbol;
 
-        const dexPool = DEXes.find((dex) =>
-          vault.strategyInfo.protocols.some(
-            (protocol) => protocol.name === dex.name
-          )
-        );
+          const dexPool = DEXes.find((dex) =>
+            vault.strategyInfo.protocols.some(
+              (protocol) => protocol.name === dex.name
+            )
+          );
 
-        contractsInfo.push({
-          logo: dexPool?.img as string,
-          symbol: poolSymbol,
-          type: "Pool",
-          address: vault?.pool?.address,
-          isCopy: false,
-        });
+          contractsInfo.push({
+            logo: dexPool?.img as string,
+            symbol: poolSymbol,
+            type: "Pool",
+            address: vault?.pool?.address,
+            isCopy: false,
+          });
+        }
+      } else {
+        if (vault?.pool?.address) {
+          const poolSymbol =
+            vault?.assets.length > 1
+              ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
+              : vault?.assets[0]?.symbol;
+
+          const dexPool = DEXes.find((dex) =>
+            vault.strategyInfo.protocols.some(
+              (protocol) => protocol.name === dex.name
+            )
+          );
+
+          contractsInfo.push({
+            logo: vault.underlying.logo,
+            symbol: poolSymbol,
+            type: "Pool",
+            address: vault?.pool?.address,
+            isCopy: false,
+          });
+        }
       }
+
       if (vault?.assets) {
         vault.assets.map((asset) => {
           contractsInfo.push({

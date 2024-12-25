@@ -16,6 +16,7 @@ import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
+import { SonicVaults } from "./SonicVaults";
 
 export {
   Factory,
@@ -36,4 +37,5 @@ export {
   Contests,
   Contest,
   Home,
+  SonicVaults,
 };

@@ -199,10 +199,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
               <tbody className="text-[14px]">
                 <tr className="h-[48px] hover:bg-accent-950">
                   <td>VAULT VS HODL</td>
-
-                  {vsHold.map((cell) => (
+                  {vsHold.map((cell, index) => (
                     <VSHoldTableCell
-                      key={cell.data}
+                      key={`${cell.data}-${index}`}
                       isVsActive={vault.isVsActive}
                       vsHold={cell.data}
                       testID={cell.testID ?? ""}
@@ -227,9 +226,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     return (
                       <tr key={index} className="h-[48px] hover:bg-accent-950">
                         <td>VAULT VS {aprsData?.symbol} HODL</td>
-                        {assetData.map((cell) => (
+                        {assetData.map((cell, index) => (
                           <VSHoldTableCell
-                            key={cell.data}
+                            key={`${cell.data}+${index}`}
                             isVsActive={vault.isVsActive}
                             vsHold={cell.data}
                             testID={cell.testID ?? ""}

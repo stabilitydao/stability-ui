@@ -224,6 +224,11 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
   },
+  beethovenx: {
+    name: "Beethoven X",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/beethovenx.png",
+  },
 };
 
 const IL = {
@@ -304,6 +309,12 @@ const IL = {
     title: "Medium",
     desc: "We catch significant IL in stablecoin pairs with this strategy when depeg become..",
     color: "#F5DA5B",
+  },
+  BSF: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "There are no impermanent loss in Balancer Stable pools while pool balanced and assets pegged.",
+    color: "#7af996",
   },
 };
 

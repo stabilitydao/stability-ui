@@ -5,7 +5,7 @@ interface IProps {
 }
 
 const RiskIndicator: React.FC<IProps> = ({ riskSymbol }) => {
-  const symbol: string = riskSymbol.toLowerCase();
+  const symbol: string = riskSymbol ? riskSymbol.toLowerCase() : "low";
 
   let color: string = "#4FAE2D";
 
