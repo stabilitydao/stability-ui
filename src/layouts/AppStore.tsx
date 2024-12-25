@@ -101,6 +101,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     chainId: 111188,
     config: wagmiConfig,
   });
+  const sonicClient = usePublicClient({
+    chainId: 146,
+    config: wagmiConfig,
+  });
 
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
@@ -622,34 +626,30 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     await Promise.all(
       CHAINS.map(async (chain) => {
         /////***** SET VAULTS DATA *****/////
-
         const APIVaultsData = Object.values(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
         );
 
+        /////***** SET PLATFORM DATA *****/////
+
+        vaultsTokens[chain.id] =
+          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
+
+        versions[chain.id] =
+          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
+
+        platformData[chain.id] = {
+          platform: platforms[chain.id],
+          factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
+          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+            ?.buildingPermitToken as TAddress,
+          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+            ?.buildingPayPerVaultToken as TAddress,
+          zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
+        };
+
         if (APIVaultsData.length) {
           await setVaultsData(APIVaultsData, prices?.[chain.id], chain.id);
-
-          /////***** SET PLATFORM DATA *****/////
-
-          vaultsTokens[chain.id] =
-            stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
-
-          versions[chain.id] =
-            stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
-
-          platformData[chain.id] = {
-            platform: platforms[chain.id],
-            factory: deployments[
-              chain.id
-            ].core.factory.toLowerCase() as TAddress,
-            buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
-              ?.buildingPermitToken as TAddress,
-            buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
-              ?.buildingPayPerVaultToken as TAddress,
-            zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
-          };
-
           /////***** SET USER BALANCES *****/////
           if (isConnected) {
             isWeb3Load.set(true);
@@ -659,6 +659,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               localClient = baseClient;
             } else if (chain.id === "111188") {
               localClient = realClient;
+            } else if (chain.id === "146") {
+              localClient = sonicClient;
             }
 
             try {

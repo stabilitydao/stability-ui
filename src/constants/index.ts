@@ -118,10 +118,19 @@ const CHAINS = [
     nativeCurrency: "reETH",
     active: true, // main page active networks
   },
+  {
+    name: chains["146"].name,
+    id: "146",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
+    explorer: "https://sonicscan.org/address/",
+    nativeCurrency: "S",
+    active: true, // main page active networks
+  },
 ];
 
 const CHAINS_CONFIRMATIONS = {
   "137": 3,
+  "146": 3,
   "8453": 3,
   "111188": 1,
 };
