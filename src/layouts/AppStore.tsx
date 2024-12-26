@@ -151,6 +151,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             isResponse = true;
             break;
           } catch (err) {
+            console.log("API error:", err);
             currentRetry++;
             if (currentRetry < maxRetries) {
               console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
