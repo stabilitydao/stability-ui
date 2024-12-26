@@ -21,7 +21,7 @@ body {
   margin: 0;
 }
 
-main {
+.home-main {
   margin: 0 auto;
   padding: 1rem 0.5rem;
   max-width: calc(100% - 2rem);
@@ -32,7 +32,7 @@ main {
   max-width: calc(100% - 2rem);
 }
 @media (max-width: 500px) {
-  main {
+  .home-main {
     max-width: 100%;
   }
   .home-footer {
