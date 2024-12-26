@@ -303,11 +303,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const handleInputChange = async (amount: string, asset: string) => {
-    if (!amount && shortId !== "BSF") {
-      setSharesOut(false);
-      resetInputs();
-      return;
-    }
+    // if (!amount) {
+    //   setSharesOut(false);
+    //   resetInputs();
+    //   return;
+    // }
+    // commented for BSF
+
     if (tab === "Deposit") {
       setInputs(
         (prevInputs: any) =>
@@ -1783,7 +1785,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const previewDeposit = async (asset: string, amount: string) => {
-    if (!Number(amount)) return;
+    // if (!Number(amount)) return;  // commented for BSF
     if (!$connected) return;
 
     setLoader(true);

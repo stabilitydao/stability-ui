@@ -29,6 +29,10 @@ export const handleInputKeyDown = (
   evt: React.KeyboardEvent<HTMLInputElement>,
   currentValue: string
 ): void => {
+  if (evt.key === "Tab") {
+    return;
+  }
+
   if (!/[\d.]/.test(evt.key) && !keys.includes(evt.key)) {
     evt.preventDefault();
     return;
