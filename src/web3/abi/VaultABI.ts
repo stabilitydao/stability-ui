@@ -1,598 +1,743 @@
 export default [
   {
+    type: "function",
+    name: "depositAssets",
     inputs: [
       {
-        internalType: "uint256",
-        name: "maxSupply",
-        type: "uint256",
-      },
-    ],
-    name: "ExceedMaxSupply",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "mintToUser",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "minToMint",
-        type: "uint256",
-      },
-    ],
-    name: "ExceedSlippage",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "asset",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "mintToUser",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "minToMint",
-        type: "uint256",
-      },
-    ],
-    name: "ExceedSlippageExactAsset",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "FuseTrigger",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "mintAmount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "initialShares",
-        type: "uint256",
-      },
-    ],
-    name: "NotEnoughAmountToInitSupply",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotEnoughBalanceToPay",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "WaitAFewBlocks",
-    type: "error",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "assets",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "amounts",
-        type: "uint256[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "mintAmount",
-        type: "uint256",
-      },
-    ],
-    name: "DepositAssets",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "oldValue",
-        type: "bool",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "newValue",
-        type: "bool",
-      },
-    ],
-    name: "DoHardWorkOnDepositChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "gasUsed",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "gasCost",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "compensated",
-        type: "bool",
-      },
-    ],
-    name: "HardWorkGas",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "maxShares",
-        type: "uint256",
-      },
-    ],
-    name: "MaxSupply",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "assets",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "sharesAmount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "amountsOut",
-        type: "uint256[]",
-      },
-    ],
-    name: "WithdrawAssets",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address[]",
         name: "assets_",
         type: "address[]",
+        internalType: "address[]",
       },
       {
-        internalType: "uint256[]",
         name: "amountsMax",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
       {
-        internalType: "uint256",
         name: "minSharesOut",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "address",
         name: "receiver",
         type: "address",
+        internalType: "address",
       },
     ],
-    name: "depositAssets",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "doHardWork",
+    inputs: [],
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "doHardWorkOnDeposit",
+    inputs: [],
     outputs: [
       {
-        internalType: "bool",
         name: "",
         type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "extra",
+    inputs: [],
     outputs: [
       {
-        internalType: "bytes32",
         name: "",
         type: "bytes32",
+        internalType: "bytes32",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "getApr",
+    inputs: [],
     outputs: [
       {
-        internalType: "uint256",
         name: "totalApr",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "uint256",
         name: "strategyApr",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "address[]",
         name: "assetsWithApr",
         type: "address[]",
+        internalType: "address[]",
       },
       {
-        internalType: "uint256[]",
         name: "assetsAprs",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "getUniqueInitParamLength",
+    inputs: [],
     outputs: [
       {
-        internalType: "uint256",
         name: "uniqueInitAddresses",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "uint256",
         name: "uniqueInitNums",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "hardWorkMintFeeCallback",
     inputs: [
       {
-        components: [
-          {
-            internalType: "address",
-            name: "platform",
-            type: "address",
-          },
-          {
-            internalType: "address",
-            name: "strategy",
-            type: "address",
-          },
-          {
-            internalType: "string",
-            name: "name",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "symbol",
-            type: "string",
-          },
-          {
-            internalType: "uint256",
-            name: "tokenId",
-            type: "uint256",
-          },
-          {
-            internalType: "address[]",
-            name: "vaultInitAddresses",
-            type: "address[]",
-          },
-          {
-            internalType: "uint256[]",
-            name: "vaultInitNums",
-            type: "uint256[]",
-          },
-        ],
-        internalType: "struct IVault.VaultInitializationData",
+        name: "revenueAssets",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "revenueAmounts",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "initialize",
+    inputs: [
+      {
         name: "vaultInitializationData",
         type: "tuple",
+        internalType: "struct IVault.VaultInitializationData",
+        components: [
+          {
+            name: "platform",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "strategy",
+            type: "address",
+            internalType: "address",
+          },
+          {
+            name: "name",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "symbol",
+            type: "string",
+            internalType: "string",
+          },
+          {
+            name: "tokenId",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "vaultInitAddresses",
+            type: "address[]",
+            internalType: "address[]",
+          },
+          {
+            name: "vaultInitNums",
+            type: "uint256[]",
+            internalType: "uint256[]",
+          },
+        ],
       },
     ],
-    name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "maxSupply",
+    inputs: [],
     outputs: [
       {
-        internalType: "uint256",
         name: "",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "previewDepositAssets",
     inputs: [
       {
-        internalType: "address[]",
         name: "assets_",
         type: "address[]",
+        internalType: "address[]",
       },
       {
-        internalType: "uint256[]",
         name: "amountsMax",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "previewDepositAssets",
     outputs: [
       {
-        internalType: "uint256[]",
         name: "amountsConsumed",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
       {
-        internalType: "uint256",
         name: "sharesOut",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "uint256",
         name: "valueOut",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
-    name: "price",
+    type: "function",
+    name: "previewDepositAssetsWrite",
+    inputs: [
+      {
+        name: "assets_",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "amountsMax",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
     outputs: [
       {
+        name: "amountsConsumed",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+      {
+        name: "sharesOut",
+        type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "valueOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "price",
+    inputs: [],
+    outputs: [
+      {
         name: "price_",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "bool",
         name: "trusted",
         type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "setDoHardWorkOnDeposit",
     inputs: [
       {
-        internalType: "bool",
         name: "value",
         type: "bool",
+        internalType: "bool",
       },
     ],
-    name: "setDoHardWorkOnDeposit",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
+    type: "function",
+    name: "setMaxSupply",
     inputs: [
       {
-        internalType: "uint256",
         name: "maxShares",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
-    name: "setMaxSupply",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
+    name: "setName",
+    inputs: [
+      {
+        name: "newName",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setSymbol",
+    inputs: [
+      {
+        name: "newSymbol",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "strategy",
+    inputs: [],
     outputs: [
       {
-        internalType: "contract IStrategy",
         name: "",
         type: "address",
+        internalType: "contract IStrategy",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "supportsInterface",
     inputs: [
       {
-        internalType: "bytes4",
         name: "interfaceId",
         type: "bytes4",
+        internalType: "bytes4",
       },
     ],
-    name: "supportsInterface",
     outputs: [
       {
-        internalType: "bool",
         name: "",
         type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "tokenId",
+    inputs: [],
     outputs: [
       {
-        internalType: "uint256",
         name: "",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "tvl",
+    inputs: [],
     outputs: [
       {
-        internalType: "uint256",
         name: "tvl_",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "bool",
         name: "trusted",
         type: "bool",
+        internalType: "bool",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "vaultType",
+    inputs: [],
     outputs: [
       {
-        internalType: "string",
         name: "",
         type: "string",
+        internalType: "string",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "withdrawAssets",
     inputs: [
       {
-        internalType: "address[]",
         name: "assets_",
         type: "address[]",
+        internalType: "address[]",
       },
       {
-        internalType: "uint256",
         name: "amountShares",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "uint256[]",
         name: "minAssetAmountsOut",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "withdrawAssets",
     outputs: [
       {
-        internalType: "uint256[]",
         name: "",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
+    type: "function",
+    name: "withdrawAssets",
     inputs: [
       {
-        internalType: "address[]",
         name: "assets_",
         type: "address[]",
+        internalType: "address[]",
       },
       {
-        internalType: "uint256",
         name: "amountShares",
         type: "uint256",
+        internalType: "uint256",
       },
       {
-        internalType: "uint256[]",
         name: "minAssetAmountsOut",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
       {
-        internalType: "address",
         name: "receiver",
         type: "address",
+        internalType: "address",
       },
       {
-        internalType: "address",
         name: "owner",
         type: "address",
+        internalType: "address",
       },
     ],
-    name: "withdrawAssets",
     outputs: [
       {
-        internalType: "uint256[]",
         name: "",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
+  },
+  {
+    type: "event",
+    name: "DepositAssets",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "assets",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+      {
+        name: "amounts",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+      {
+        name: "mintAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DoHardWorkOnDepositChanged",
+    inputs: [
+      {
+        name: "oldValue",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+      {
+        name: "newValue",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "HardWorkGas",
+    inputs: [
+      {
+        name: "gasUsed",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "gasCost",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "compensated",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "MaxSupply",
+    inputs: [
+      {
+        name: "maxShares",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "MintFees",
+    inputs: [
+      {
+        name: "vaultManagerReceiverFee",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "strategyLogicReceiverFee",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "ecosystemRevenueReceiverFee",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "multisigReceiverFee",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "VaultName",
+    inputs: [
+      {
+        name: "newName",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "VaultSymbol",
+    inputs: [
+      {
+        name: "newSymbol",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "WithdrawAssets",
+    inputs: [
+      {
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "owner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "assets",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+      {
+        name: "sharesAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "amountsOut",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "error",
+    name: "ExceedMaxSupply",
+    inputs: [
+      {
+        name: "maxSupply",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "ExceedSlippage",
+    inputs: [
+      {
+        name: "mintToUser",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minToMint",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "ExceedSlippageExactAsset",
+    inputs: [
+      {
+        name: "asset",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "mintToUser",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minToMint",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "FuseTrigger",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "NotEnoughAmountToInitSupply",
+    inputs: [
+      {
+        name: "mintAmount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "initialShares",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "NotEnoughBalanceToPay",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "NotSupported",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "StrategyZeroDeposit",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "WaitAFewBlocks",
+    inputs: [],
   },
 ] as const;
