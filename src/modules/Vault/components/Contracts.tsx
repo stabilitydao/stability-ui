@@ -103,12 +103,6 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
               ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
               : vault?.assets[0]?.symbol;
 
-          const dexPool = DEXes.find((dex) =>
-            vault.strategyInfo.protocols.some(
-              (protocol) => protocol.name === dex.name
-            )
-          );
-
           contractsInfo.push({
             logo: vault.underlying.logo,
             symbol: poolSymbol,

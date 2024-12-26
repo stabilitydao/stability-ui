@@ -4,7 +4,7 @@ const Home = (): JSX.Element => {
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
       <div className="flex flex-col justify-between flex-1 z-[2]">
-        <header className="flex items-center justify-between h-[60px] w-full py-[20px] px-[8px] md:py-[48px] md:px-[60px]">
+        <header className="flex items-center justify-between h-[60px] w-full">
           <img
             className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
             src="/full_logo_dark.png"
@@ -12,12 +12,12 @@ const Home = (): JSX.Element => {
           />
           <a
             href="/vaults"
-            className="bg-accent-500 h-10 px-3 w-[150px] py-1 rounded-[5px] md:flex items-center justify-center gap-1 font-semibold hidden"
+            className="bg-accent-500 h-10 px-3 w-[150px] py-1 rounded-[5px] md:flex items-center justify-center gap-1 font-semibold hidden mr-[15px]"
           >
             Launch App
           </a>
         </header>
-        <main className="mt-[20px] md:mt-0">
+        <main className="mt-[20px] md:mt-0 home-main">
           <div className="min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px] md:px-0 px-2">
             <a
               className="flex items-center justify-start mb-[5px] md:mb-1 ml-[3px]"

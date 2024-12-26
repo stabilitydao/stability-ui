@@ -303,7 +303,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const handleInputChange = async (amount: string, asset: string) => {
-    if (!amount) {
+    if (!amount && shortId !== "BSF") {
       setSharesOut(false);
       resetInputs();
       return;
@@ -2268,6 +2268,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   className="w-4 h-4 text-neutral-500 rounded-full"
                                 />
                               </span>
+
                               <input
                                 list="amount"
                                 id={asset}

@@ -54,7 +54,7 @@ import {
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
-  CHAINS,
+  // CHAINS,
   // WBTC,
   // WETH,
   // WMATIC,
@@ -434,13 +434,6 @@ const SonicVaults = (): JSX.Element => {
 
   const initVaults = async () => {
     if ($vaults) {
-      const mixedVaults: TVaults = Object.values($vaults).reduce<TVaults>(
-        (acc, value) => {
-          return { ...acc, ...(value as TVaults) };
-        },
-        {}
-      );
-
       const vaults: TVault[] = Object.values($vaults[146])
         .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
         .map((vault) => {
