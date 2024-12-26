@@ -118,10 +118,19 @@ const CHAINS = [
     nativeCurrency: "reETH",
     active: true, // main page active networks
   },
+  {
+    name: chains["146"].name,
+    id: "146",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
+    explorer: "https://sonicscan.org/address/",
+    nativeCurrency: "S",
+    active: true, // main page active networks
+  },
 ];
 
 const CHAINS_CONFIRMATIONS = {
   "137": 3,
+  "146": 3,
   "8453": 3,
   "111188": 1,
 };
@@ -215,6 +224,11 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
   },
+  beethovenx: {
+    name: "Beethoven X",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/beethovenx.png",
+  },
 };
 
 const IL = {
@@ -295,6 +309,12 @@ const IL = {
     title: "Medium",
     desc: "We catch significant IL in stablecoin pairs with this strategy when depeg become..",
     color: "#F5DA5B",
+  },
+  BSF: {
+    rate: 1,
+    title: "Zero exp",
+    desc: "There are no impermanent loss in Balancer Stable pools while pool balanced and assets pegged.",
+    color: "#7af996",
   },
 };
 

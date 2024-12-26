@@ -6,6 +6,7 @@ const USDC: TAddress[] = [
   "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
   "0xaec9e50e3397f9ddc635c6c429c8c7eca418a143",
   "0xc518a88c67ceca8b3f24c4562cb71deeb2af86b7",
+  "0x29219dd400f2bf60e5a23d13be72b486d4038894",
 ];
 const USDT: TAddress[] = [
   "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
@@ -20,6 +21,7 @@ const WMATIC: TAddress[] = ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"];
 const WETH: TAddress[] = [
   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
   "0x4200000000000000000000000000000000000006",
+  "0x309c92261178fa0cf748a855e90ae73fdb79ebc7",
 ];
 const WBTC: TAddress[] = ["0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6"];
 const PROFIT: TAddress[] = ["0x48469a0481254d5945e7e56c1eb9861429c02f44"];

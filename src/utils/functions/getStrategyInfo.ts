@@ -62,6 +62,7 @@ export const getStrategyInfo = (
     uniswapV3,
     pearlV2,
     trident,
+    beethovenx,
   } = PROTOCOLS;
 
   if (!strategyInfo) {
@@ -178,6 +179,12 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [trident, pearlV2],
       il: TPF_STABLECOINS_VAULTS.includes(vaultSymbol) ? IL.TPF_STABLE : IL.TPF,
+    };
+  } else if (vaultSymbol.match(/BSF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [beethovenx],
+      il: IL.BSF,
     };
   }
 

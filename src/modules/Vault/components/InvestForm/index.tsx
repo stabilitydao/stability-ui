@@ -485,12 +485,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
       if (asset === underlyingToken?.address) {
         try {
-          const previewDepositAssets = await _publicClient?.readContract({
-            address: vault.address,
-            abi: VaultABI,
-            functionName: "previewDepositAssets",
-            args: [[asset as TAddress], [parseUnits(amount, 18)]],
-          });
+          let previewDepositAssets;
+          if (shortId === "BSF") {
+            previewDepositAssets = await _publicClient?.simulateContract({
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssetsWrite",
+              args: [[asset as TAddress], [parseUnits(amount, 18)]],
+              account: $account as TAddress,
+            });
+            previewDepositAssets = previewDepositAssets.result;
+          } else {
+            previewDepositAssets = await _publicClient?.readContract({
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [[asset as TAddress], [parseUnits(amount, 18)]],
+            });
+          }
 
           if (previewDepositAssets) {
             setUnderlyingShares(
@@ -977,13 +989,24 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           ? parseUnits(amount, decimals) - zapAmounts[1][index ^ 1]
           : thisAmount;
       });
-
-      const previewDepositAssets = await _publicClient?.readContract({
-        address: vault.address,
-        abi: VaultABI,
-        functionName: "previewDepositAssets",
-        args: [defaultOption?.assetsArray as TAddress[], amounts],
-      });
+      let previewDepositAssets;
+      if (shortId === "BSF") {
+        previewDepositAssets = await _publicClient?.simulateContract({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "previewDepositAssetsWrite",
+          args: [defaultOption?.assetsArray as TAddress[], amounts],
+          account: $account as TAddress,
+        });
+        previewDepositAssets = previewDepositAssets.result;
+      } else {
+        previewDepositAssets = await _publicClient?.readContract({
+          address: vault.address,
+          abi: VaultABI,
+          functionName: "previewDepositAssets",
+          args: [defaultOption?.assetsArray as TAddress[], amounts],
+        });
+      }
 
       let _previewDepositAssets: bigint = BIG_INT_VALUES.ZERO;
 
@@ -1775,7 +1798,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (shortId === "CCF") {
+            if (shortId === "CCF" || shortId === "BSF") {
               let value;
               let decimals = 18;
               for (const key in inputs) {
@@ -1810,6 +1833,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : BIG_INT_VALUES.ZERO)
             );
+
             previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
               abi: VaultABI,
@@ -1817,13 +1841,25 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               args: [assets, IQMFAmounts],
             });
           } else {
-            previewDepositAssets = await _publicClient?.readContract({
-              address: vault.address,
-              abi: VaultABI,
-              functionName: "previewDepositAssets",
-              args: [defaultOption?.assetsArray as TAddress[], amounts],
-            });
+            if (shortId === "BSF") {
+              previewDepositAssets = await _publicClient?.simulateContract({
+                address: vault.address,
+                abi: VaultABI,
+                functionName: "previewDepositAssetsWrite",
+                args: [defaultOption?.assetsArray as TAddress[], amounts],
+                account: $account as TAddress,
+              });
+              previewDepositAssets = previewDepositAssets.result;
+            } else {
+              previewDepositAssets = await _publicClient?.readContract({
+                address: vault.address,
+                abi: VaultABI,
+                functionName: "previewDepositAssets",
+                args: [defaultOption?.assetsArray as TAddress[], amounts],
+              });
+            }
           }
+
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)
