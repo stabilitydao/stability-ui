@@ -494,6 +494,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               args: [[asset as TAddress], [parseUnits(amount, 18)]],
               account: $account as TAddress,
             });
+            previewDepositAssets = previewDepositAssets.result;
           } else {
             previewDepositAssets = await _publicClient?.readContract({
               address: vault.address,
@@ -997,6 +998,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           args: [defaultOption?.assetsArray as TAddress[], amounts],
           account: $account as TAddress,
         });
+        previewDepositAssets = previewDepositAssets.result;
       } else {
         previewDepositAssets = await _publicClient?.readContract({
           address: vault.address,
@@ -1796,7 +1798,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (shortId === "CCF") {
+            if (shortId === "CCF" || shortId === "BSF") {
               let value;
               let decimals = 18;
               for (const key in inputs) {
@@ -1847,6 +1849,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 args: [defaultOption?.assetsArray as TAddress[], amounts],
                 account: $account as TAddress,
               });
+              previewDepositAssets = previewDepositAssets.result;
             } else {
               previewDepositAssets = await _publicClient?.readContract({
                 address: vault.address,
@@ -1856,6 +1859,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               });
             }
           }
+
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
             ((previewDepositAssets[1] as bigint) * BigInt(1)) / BigInt(100)

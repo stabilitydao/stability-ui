@@ -127,42 +127,46 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const getDataFromStabilityAPI = async () => {
     const maxRetries = 3;
     let isResponse = false;
+    try {
+      for (const seed of seeds) {
+        let currentRetry = 0;
 
-    for (const seed of seeds) {
-      let currentRetry = 0;
+        while (currentRetry < maxRetries) {
+          try {
+            const response = await axios.get(seed);
 
-      while (currentRetry < maxRetries) {
-        try {
-          const response = await axios.get(seed);
+            stabilityAPIData = response.data;
 
-          stabilityAPIData = response.data;
+            if (stabilityAPIData?.error) {
+              handleError("API", stabilityAPIData?.error);
+              return;
+            }
 
-          if (stabilityAPIData?.error) {
-            handleError("API", stabilityAPIData?.error);
-            return;
-          }
+            if (stabilityAPIData?.assetPrices) {
+              assetsPrices.set(stabilityAPIData?.assetPrices);
+              prices = stabilityAPIData?.assetPrices;
+            }
 
-          if (stabilityAPIData?.assetPrices) {
-            assetsPrices.set(stabilityAPIData?.assetPrices);
-            prices = stabilityAPIData?.assetPrices;
-          }
-
-          apiData.set(stabilityAPIData);
-          isResponse = true;
-          break;
-        } catch (err) {
-          currentRetry++;
-          if (currentRetry < maxRetries) {
-            console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          } else {
-            console.error("API error:", err);
-            handleError("API", err as string);
+            apiData.set(stabilityAPIData);
+            isResponse = true;
+            break;
+          } catch (err) {
+            currentRetry++;
+            if (currentRetry < maxRetries) {
+              console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
           }
         }
-      }
 
-      if (isResponse) break;
+        if (isResponse) break;
+      }
+      if (!isResponse) {
+        throw new Error("API error");
+      }
+    } catch (err) {
+      console.error("API error:", err);
+      handleError("API", err as string);
     }
   };
 
