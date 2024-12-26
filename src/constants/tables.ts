@@ -8,7 +8,7 @@ const TABLE_FILTERS: TTableFilters[] = [
 ];
 
 const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
+  // { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
   {
     name: "Assets",
     keyName: "assetsSymbol",
