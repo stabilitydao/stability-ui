@@ -39,10 +39,10 @@ export const handleInputKeyDown = (
     return;
   }
 
-  if (/^\d/.test(evt.key) && currentValue === "0" && evt.key !== ".") {
-    evt.preventDefault();
-    return;
-  }
+  // if (/^\d/.test(evt.key) && currentValue === "0" && evt.key !== ".") {
+  //   evt.preventDefault();
+  //   return;
+  // }
 
   if (evt.key === "." && currentValue && currentValue.includes(".")) {
     evt.preventDefault();
