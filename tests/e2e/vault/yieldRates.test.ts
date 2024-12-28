@@ -311,7 +311,7 @@ test("Should display yield rates info correctly", async ({ page }) => {
 
     // const lifetimeVsHoldAPR =
     //   vaultData.apr?.vsHoldLifetime &&
-    //   getTimeDifference(vaultData.created)?.days >= 3
+    //   getTimeDifference(vaultData.created)?.days >= 7
     //     ? Number(vaultData.apr?.vsHoldLifetime).toFixed(2)
     //     : 0;
 
