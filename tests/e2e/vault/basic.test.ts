@@ -112,7 +112,7 @@ test("Should display basic info correctly", async ({ page }) => {
 
     const lifetimeVsHoldAPR =
       vaultData.vsHold?.aprLifetime &&
-      getTimeDifference(vaultData.created)?.days >= 3
+      getTimeDifference(vaultData.created)?.days >= 7
         ? Number(vaultData.vsHold?.aprLifetime).toFixed(2)
         : 0;
 

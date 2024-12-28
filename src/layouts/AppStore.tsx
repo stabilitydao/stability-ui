@@ -151,7 +151,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             isResponse = true;
             break;
           } catch (err) {
-            console.log("API error:", err);
+            console.log("API Error:", err);
             currentRetry++;
             if (currentRetry < maxRetries) {
               console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
@@ -432,22 +432,22 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const daysFromCreation = getTimeDifference(vaultCreated)?.days;
 
         const vsHold24H =
-          vault.vsHold?.apr24h && daysFromCreation >= 3
+          vault.vsHold?.apr24h && daysFromCreation >= 7
             ? Number(vault.vsHold?.apr24h).toFixed(2)
             : 0;
 
         const vsHoldWeekly =
-          vault.vsHold?.aprWeek && daysFromCreation >= 3
+          vault.vsHold?.aprWeek && daysFromCreation >= 7
             ? Number(vault.vsHold?.aprWeek).toFixed(2)
             : 0;
 
         const lifetimeVsHold =
-          vault.vsHold?.lifetime && daysFromCreation >= 3
+          vault.vsHold?.lifetime && daysFromCreation >= 7
             ? Number(vault.vsHold?.lifetime).toFixed(2)
             : 0;
 
         const vsHoldAPR =
-          vault.vsHold?.aprLifetime && daysFromCreation >= 3
+          vault.vsHold?.aprLifetime && daysFromCreation >= 7
             ? Number(vault.vsHold?.aprLifetime).toFixed(2)
             : 0;
 
@@ -486,7 +486,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           });
         }
 
-        const isVsActive = daysFromCreation > 2 && !!Number(vault.sharePrice);
+        const isVsActive = daysFromCreation > 7 && !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
