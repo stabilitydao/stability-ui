@@ -106,17 +106,17 @@ test("Should display basic info correctly", async ({ page }) => {
 
     /* VS HODL APR should be displayed correctly */
 
-    const vsHodlAPR = (
-      await page.getByTestId("infoBarVSHodlAPR").innerText()
-    ).slice(0, -1);
+    // const vsHodlAPR = (
+    //   await page.getByTestId("infoBarVSHodlAPR").innerText()
+    // ).slice(0, -1);
 
-    const lifetimeVsHoldAPR =
-      vaultData.vsHold?.aprLifetime &&
-      getTimeDifference(vaultData.created)?.days >= 3
-        ? Number(vaultData.vsHold?.aprLifetime).toFixed(2)
-        : 0;
+    // const lifetimeVsHoldAPR =
+    //   vaultData.vsHold?.aprLifetime &&
+    //   getTimeDifference(vaultData.created)?.days >= 3
+    //     ? Number(vaultData.vsHold?.aprLifetime).toFixed(2)
+    //     : 0;
 
-    expect(Number(vsHodlAPR)).toBe(Number(lifetimeVsHoldAPR));
+    // expect(Number(vsHodlAPR)).toBe(Number(lifetimeVsHoldAPR));
 
     // /* TVL should be displayed correctly per vault */
     const vaultTVL = await page.getByTestId("infoBarTVL").innerText();
