@@ -104,7 +104,6 @@ const HistoricalRate: React.FC<IProps> = memo(
                   TVL
                   timestamp
               }}`;
-          console.log(GRAPH_ENDPOINTS);
 
           const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
             query: HISTORY_QUERY,
