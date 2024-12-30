@@ -104,6 +104,7 @@ const HistoricalRate: React.FC<IProps> = memo(
                   TVL
                   timestamp
               }}`;
+          console.log(GRAPH_ENDPOINTS);
 
           const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
             query: HISTORY_QUERY,
@@ -168,7 +169,7 @@ const HistoricalRate: React.FC<IProps> = memo(
 
           newData = [];
 
-          if (segment === "WEEK" && createdDaysDifference >= 7) {
+          if (segment === "WEEK" && createdDaysDifference >= 3) {
             do {
               let sortedAPRs = APRArr.filter(
                 (obj) => obj.unixTimestamp >= time
@@ -266,7 +267,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           );
 
           newData = [];
-          if (segment === "WEEK" && createdDaysDifference >= 7) {
+          if (segment === "WEEK" && createdDaysDifference >= 3) {
             do {
               let sortedAPRs = vsHoldArr.filter(
                 (obj) => obj.unixTimestamp >= time
