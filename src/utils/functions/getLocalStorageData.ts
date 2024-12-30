@@ -36,7 +36,7 @@ export const getLocalStorageData = (): void => {
     transactionSettings.set(savedData);
   }
 
-  let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "weekly";
+  let localAPRfilter = APRsFiler ? JSON.parse(APRsFiler) : "latest";
 
   if (localAPRfilter === "week") {
     localAPRfilter = "weekly";

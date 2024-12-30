@@ -692,10 +692,10 @@ describe("getLocalStorageData", () => {
     expect(aprFilter.set).toHaveBeenCalledWith("daily");
   });
 
-  it("should set aprFilter to default value 'weekly' if nothing is in localStorage", () => {
+  it("should set aprFilter to default value 'latest' if nothing is in localStorage", () => {
     getLocalStorageData();
 
-    expect(aprFilter.set).toHaveBeenCalledWith("weekly");
+    expect(aprFilter.set).toHaveBeenCalledWith("latest");
   });
 
   it("should not set transactionSettings if there is no data in localStorage", () => {

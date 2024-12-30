@@ -6,7 +6,11 @@ import { aprFilter } from "@store";
 
 import { APRsType } from "@constants";
 
-const APRtimeSwitcher = (): JSX.Element => {
+interface IProps {
+  withText?: boolean;
+}
+
+const APRtimeSwitcher: React.FC<IProps> = ({ withText = false }) => {
   const $aprFilter = useStore(aprFilter);
 
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -114,7 +118,7 @@ const APRtimeSwitcher = (): JSX.Element => {
         className="flex items-center justify-between gap-3 px-3 py-1 bg-accent-900 text-neutral-50 rounded-2xl h-[36px] cursor-pointer"
       >
         <p>
-          {" "}
+          {withText ? "Period:" : ""}{" "}
           {activeAPRType === "weekly"
             ? "week"
             : activeAPRType === "daily"

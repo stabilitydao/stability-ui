@@ -129,8 +129,8 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             <h3 className="text-[1.4rem] font-medium">Portfolio</h3>
             <BalanceVisibilityToggler />
           </div>
-          <div className="hidden items-center justify-center gap-2 md:flex">
-            <APRtimeSwitcher />
+          <div className="hidden items-start justify-center flex-col md:flex">
+            <APRtimeSwitcher withText={true} />
           </div>
         </div>
         <div className="flex items-start justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
@@ -322,7 +322,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2 md:hidden">
+          <div className="flex items-start justify-between flex-col md:hidden">
             <APRtimeSwitcher />
           </div>
         </div>
