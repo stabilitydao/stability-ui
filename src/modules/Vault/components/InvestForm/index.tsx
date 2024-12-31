@@ -1786,7 +1786,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     // if (!Number(amount)) return;  // commented for BSF
-    if (!Number(amount)) {
+
+    if (!amount) {
       const secondAsset = defaultOption.assetsArray.find(
         (address) => address != asset
       );
@@ -2295,6 +2296,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 onKeyDown={(evt) =>
                                   handleInputKeyDown(evt, inputs[asset])
                                 }
+                                type="text"
                                 pattern="^[0-9]*[.,]?[0-9]*$"
                                 inputMode="decimal"
                                 className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"

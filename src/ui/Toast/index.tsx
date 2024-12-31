@@ -55,17 +55,6 @@ const Toast: React.FC<IProps> = memo(
         const lastUpdateTime = initialTx.timestamp || 0;
         const timeDifference = currentTime - lastUpdateTime;
 
-        const array = Object.entries(
-          initialTx.tokens as Record<string, TLocalStorageToken>
-        ).map(([address, { amount, symbol, logo }]) => ({
-          address,
-          amount: Number(amount).toFixed(4),
-          symbol,
-          logo,
-        }));
-
-        console.log("Toast tokens:", array);
-
         if (timeDifference < 10000) {
           setStoreTx(initialTx);
           initialTx.status === "success"
@@ -91,7 +80,7 @@ const Toast: React.FC<IProps> = memo(
     }, [network]);
     return (
       isVisible && (
-        <div key={storeTx.hash} className="toast z-[20]">
+        <div key={storeTx.hash} className="toast z-[30]">
           <div className="flex flex-col gap-3 px-3 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

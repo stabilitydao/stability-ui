@@ -8,8 +8,8 @@
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  /* opacity: 0; */
-  /* animation: fadeInOut 10s linear forwards; */
+  opacity: 0;
+  animation: fadeInOut 10s linear forwards;
 }
 .capitalize-first::first-letter {
   text-transform: uppercase;
@@ -28,7 +28,7 @@
 
 .toast .progress {
   height: 5px;
-  /* animation: progressBar 10s linear infinite; */
+  animation: progressBar 10s linear infinite;
 }
 
 @keyframes progressBar {

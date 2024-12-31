@@ -75,7 +75,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           Number(vault.shareprice) * Number(formatUnits(vaultBalance, 18))
         ).toFixed(2)
       );
-      console.log("Balances:", { shareBalance, USDBalance });
+
       setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
