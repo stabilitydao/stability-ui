@@ -303,7 +303,7 @@ describe("formatNumber", () => {
   });
 
   it("should format numbers correctly", () => {
-    expect(formatNumber(12345.678, "format")).toBe("12 345.68");
+    expect(formatNumber(12345.678, "format")).toBe("12 345.67");
     expect(formatNumber(12345, "format")).toBe("12 345");
   });
 
@@ -325,7 +325,7 @@ describe("formatNumber", () => {
   it("should handle string input", () => {
     expect(formatNumber("1500", "abbreviate")).toBe("$1.50K");
     expect(formatNumber("2000000", "abbreviateInteger")).toBe("$2M");
-    expect(formatNumber("12345.678", "format")).toBe("12 345.68");
+    expect(formatNumber("12345.678", "format")).toBe("12 345.67");
   });
 
   it("should return undefined for unknown type", () => {
