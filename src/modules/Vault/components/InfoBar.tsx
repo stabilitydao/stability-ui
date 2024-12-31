@@ -75,7 +75,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           Number(vault.shareprice) * Number(formatUnits(vaultBalance, 18))
         ).toFixed(2)
       );
-
+      console.log("Balances:", { shareBalance, USDBalance });
       setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
@@ -83,6 +83,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     () => CHAINS.find((item) => item.id === network),
     [network]
   );
+
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
       <div className="bg-accent-900 rounded-t-2xl lg:flex hidden justify-between items-center h-[56px] px-6">

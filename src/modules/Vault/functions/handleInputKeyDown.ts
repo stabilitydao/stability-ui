@@ -29,7 +29,7 @@ export const handleInputKeyDown = (
   evt: React.KeyboardEvent<HTMLInputElement>,
   currentValue: string
 ): void => {
-  if (evt.key === "Tab") {
+  if (evt.ctrlKey || evt.altKey || evt.metaKey) {
     return;
   }
 

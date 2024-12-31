@@ -55,6 +55,17 @@ const Toast: React.FC<IProps> = memo(
         const lastUpdateTime = initialTx.timestamp || 0;
         const timeDifference = currentTime - lastUpdateTime;
 
+        const array = Object.entries(
+          initialTx.tokens as Record<string, TLocalStorageToken>
+        ).map(([address, { amount, symbol, logo }]) => ({
+          address,
+          amount: Number(amount).toFixed(4),
+          symbol,
+          logo,
+        }));
+
+        console.log("Toast tokens:", array);
+
         if (timeDifference < 10000) {
           setStoreTx(initialTx);
           initialTx.status === "success"
@@ -71,7 +82,6 @@ const Toast: React.FC<IProps> = memo(
           }));
 
           setTokens(array);
-
           setIsVisible(true);
         }
       }
