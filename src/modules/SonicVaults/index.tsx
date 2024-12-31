@@ -889,11 +889,11 @@ const SonicVaults = (): JSX.Element => {
                           <p
                             className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
                               vault.vsHoldAPR < 0 &&
-                              getTimeDifference(vault.created).days >= 7 &&
+                              getTimeDifference(vault.created).days >= 10 &&
                               "text-[#eb7979]"
                             }`}
                           >
-                            {getTimeDifference(vault.created).days >= 7
+                            {getTimeDifference(vault.created).days >= 10
                               ? `${vault.vsHoldAPR}%`
                               : "-"}
                           </p>

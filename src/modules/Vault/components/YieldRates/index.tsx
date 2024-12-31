@@ -154,7 +154,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
           </div>
         )}
 
-        {null&&!!vault.assetsVsHold && (
+        {false && !!vault.assetsVsHold && (
           <div>
             <div className="mb-2 flex items-center gap-2">
               <p>VS HOLD</p>
