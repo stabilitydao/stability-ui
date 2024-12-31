@@ -8,6 +8,9 @@ const USDC: TAddress[] = [
   "0xc518a88c67ceca8b3f24c4562cb71deeb2af86b7",
   "0x29219dd400f2bf60e5a23d13be72b486d4038894",
 ];
+
+const scUSD: TAddress[] = ["0xd3dce716f3ef535c5ff8d041c1a41c3bd89b97ae"];
+
 const USDT: TAddress[] = [
   "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
   "0xfde4c96c8593536e31f229ea8f37b2ada2699bb2",
@@ -55,4 +58,5 @@ export {
   cbETH,
   MORE,
   USTB,
+  scUSD,
 };

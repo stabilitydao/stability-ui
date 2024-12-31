@@ -109,7 +109,7 @@ export const formatNumber = (
       );
 
       const roundedDecimalPart = decimalPart
-        ? parseFloat(`0.${decimalPart}`).toFixed(2).slice(2)
+        ? decimalPart.slice(0, 2).padEnd(2, "0")
         : "";
 
       const formattedValue = roundedDecimalPart

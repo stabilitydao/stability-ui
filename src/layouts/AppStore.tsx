@@ -486,7 +486,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           });
         }
 
-        const isVsActive = daysFromCreation >= 7 && !!Number(vault.sharePrice);
+        const isVsActive = daysFromCreation >= 10 && !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];

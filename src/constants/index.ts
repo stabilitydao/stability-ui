@@ -28,11 +28,20 @@ import {
   CRV,
   MORE,
   USTB,
+  scUSD,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
 
-const STABLECOINS = [...USDC, ...USDT, ...DAI, ...CRV, ...MORE, ...USTB];
+const STABLECOINS = [
+  ...USDC,
+  ...USDT,
+  ...DAI,
+  ...CRV,
+  ...MORE,
+  ...USTB,
+  ...scUSD,
+];
 
 const PAGINATION_VAULTS = 20;
 

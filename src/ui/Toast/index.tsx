@@ -71,7 +71,6 @@ const Toast: React.FC<IProps> = memo(
           }));
 
           setTokens(array);
-
           setIsVisible(true);
         }
       }
@@ -81,7 +80,7 @@ const Toast: React.FC<IProps> = memo(
     }, [network]);
     return (
       isVisible && (
-        <div key={storeTx.hash} className="toast z-[20]">
+        <div key={storeTx.hash} className="toast z-[30]">
           <div className="flex flex-col gap-3 px-3 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
