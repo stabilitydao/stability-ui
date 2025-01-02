@@ -435,13 +435,14 @@ const SonicVaults = (): JSX.Element => {
   const initVaults = async () => {
     if ($vaults) {
       const vaults: TVault[] = Object.values($vaults[146])
-        .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
+        .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
-          const balance = formatFromBigInt(vault.balance, 18);
+          const tVault = vault as TVault
+          const balance = formatFromBigInt(tVault.balance, 18);
 
           return {
-            ...vault,
-            balanceInUSD: balance * Number(vault.shareprice),
+            ...tVault,
+            balanceInUSD: balance * Number(tVault.shareprice),
           };
         });
 

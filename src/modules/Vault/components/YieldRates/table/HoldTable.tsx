@@ -3,13 +3,13 @@ import type { TShareData, THoldData } from "@types";
 interface IProps {
   shareData: TShareData;
   holdData: THoldData[];
-  daysFromCreation: number;
+  daysFromCreation?: number;
 }
 
 const HoldTable: React.FC<IProps> = ({
   shareData,
   holdData,
-  daysFromCreation,
+  daysFromCreation= 0,
 }) => {
   return (
     <table className="font-manrope w-full">
@@ -18,7 +18,7 @@ const HoldTable: React.FC<IProps> = ({
           <th></th>
           <th className="text-right">INIT PRICE</th>
           <th className="text-right">PRICE</th>
-          <th className="text-right">CHANGE {daysFromCreation ?? 0} DAYS</th>
+          <th className="text-right">CHANGE {daysFromCreation} DAYS</th>
         </tr>
       </thead>
       <tbody className="text-[14px]">
