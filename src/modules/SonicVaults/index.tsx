@@ -726,66 +726,46 @@ const SonicVaults = (): JSX.Element => {
                           <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                             {vault.strategyInfo && (
                               <>
-                                <span
-                                  className={`px-2 rounded-[10px] flex h-8 items-center ${
-                                    (vault.strategySpecific &&
-                                      vault.strategyInfo.shortId != "Y") ||
-                                    vault.strategyInfo.protocols.length > 2
-                                      ? "min-w-[100px] w-[170px]"
-                                      : ""
-                                  }`}
+                                <div
+                                  style={{
+                                    backgroundColor: vault.strategyInfo.bgColor,
+                                    color: vault.strategyInfo.color,
+                                  }}
+                                  className="px-3 rounded-[10px] flex items-center  justify-start"
                                 >
+                                  <span className="text-[14px] w-[30px] flex justify-center" title={vault.strategyInfo.id}>{vault.strategyInfo.shortId}</span>
                                   <span
-                                    className={`flex ${
-                                      vault.yearnProtocols.length ||
-                                      vault.strategyInfo.shortId === "CF"
-                                        ? ""
-                                        : "min-w-[50px]"
-                                    }`}
+                                    className={`pl-2 flex h-8 items-center`}
                                   >
-                                    {vault.strategyInfo.protocols.map(
-                                      (protocol, index) => (
-                                        <img
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                          key={protocol.logoSrc + String(index)}
-                                          src={protocol.logoSrc}
-                                          alt={protocol.name}
-                                          title={protocol.name}
-                                          style={{
-                                            zIndex:
-                                              vault.strategyInfo.protocols
-                                                .length - index,
-                                          }}
-                                        />
-                                      )
+                                     <span
+                                       className="min-w-[10px]"
+                                     >
+                                       {vault.strategyInfo.protocols.map((protocol, index) => (
+                                         <img
+                                           className="h-6 w-6 rounded-full mx-[2px]"
+                                           key={protocol.logoSrc + String(index)}
+                                           src={protocol.logoSrc}
+                                           alt={protocol.name}
+                                           title={protocol.name}
+                                           style={{
+                                             zIndex: vault.strategyInfo.protocols.length - index,
+                                           }}
+                                         />
+                                       ))}
+                                    </span>
+                                    {vault.strategySpecific && (
+                                      <span
+                                        className={`font-bold text-[#b6bdd7] inline ${
+                                          vault.strategySpecific.length > 10
+                                            ? "lowercase text-[10px] pl-[12px] whitespace-pre-wrap max-w-[70px] text-left"
+                                            : "uppercase text-[10px] pl-[12px]"
+                                        }`}
+                                      >
+                                        {vault.strategySpecific}
+                                      </span>
                                     )}
                                   </span>
-                                  {vault.yearnProtocols.length ? (
-                                    <div className="flex">
-                                      {vault.yearnProtocols.map((protocol) => (
-                                        <img
-                                          key={protocol.link}
-                                          src={protocol.link}
-                                          alt={protocol.title}
-                                          title={protocol.title}
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                        />
-                                      ))}
-                                    </div>
-                                  ) : vault.strategySpecific ? (
-                                    <span
-                                      className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
-                                        vault.strategySpecific.length > 10
-                                          ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
-                                          : "uppercase  text-[9px] px-[6px]"
-                                      }`}
-                                    >
-                                      {vault.strategySpecific}
-                                    </span>
-                                  ) : (
-                                    ""
-                                  )}
-                                </span>
+                                </div>
                               </>
                             )}
                           </div>

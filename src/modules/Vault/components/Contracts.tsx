@@ -66,7 +66,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         },
       ];
 
-      if (vault.strategyInfo.shortId !== "BSF") {
+      if (!["BSF", "BWF", "EF"].includes(vault.strategyInfo.shortId)) {
         if (vault.underlying.symbol) {
           contractsInfo.push({
             logo: vault.underlying.logo,

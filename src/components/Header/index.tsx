@@ -73,7 +73,7 @@ const Header = (): JSX.Element => {
         <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
           <a
             className={`px-4 py-[10px] font-semibold ${isVaults ? "bg-accent-800 rounded-[16px]" : ""}`}
-            href="/"
+            href="/vaults"
           >
             Vaults
           </a>

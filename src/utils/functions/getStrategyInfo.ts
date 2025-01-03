@@ -63,6 +63,7 @@ export const getStrategyInfo = (
     pearlV2,
     trident,
     beethovenx,
+    equalizer,
   } = PROTOCOLS;
 
   if (!strategyInfo) {
@@ -185,6 +186,18 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [beethovenx],
       il: IL.BSF,
+    };
+  } else if (vaultSymbol.match(/BWF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [beethovenx],
+      il: IL.EF_vAMM,
+    };
+  } else if (vaultSymbol.match(/EF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [equalizer],
+      il: IL.EF_vAMM,
     };
   }
 
