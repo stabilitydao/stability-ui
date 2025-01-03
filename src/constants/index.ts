@@ -234,9 +234,14 @@ const PROTOCOLS = {
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
   },
   beethovenx: {
-    name: "Beethoven X",
+    name: "Beets",
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/beethovenx.png",
+  },
+  equalizer: {
+    name: "Equalizer",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/equalizer.png",
   },
 };
 
@@ -304,7 +309,7 @@ const IL = {
   LOW: {
     rate: 3,
     title: "Low",
-    desc: "We expect low impermant loss for pegged Gamma preset. Will be updated.",
+    desc: "We expect low impermanent loss for pegged Gamma preset. Will be updated.",
     color: "#D7F55B",
   },
   TPF: {
@@ -324,6 +329,12 @@ const IL = {
     title: "Zero exp",
     desc: "There are no impermanent loss in Balancer Stable pools while pool balanced and assets pegged.",
     color: "#7af996",
+  },
+  EF_vAMM: {
+    rate: 3,
+    title: "Low",
+    desc: "Low impermanent loss is expected for UniswapV2-like and similar not CL AMMs.",
+    color: "#D7F55B",
   },
 };
 
