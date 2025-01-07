@@ -108,7 +108,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
               <span className="flex min-w-[42px] justify-center">
                 {vault.strategyInfo.protocols.map((protocol, index) => (
                   <img
-                    className={`h-7 w-7 rounded-full ${
+                    className={`h-6 w-6 ${
                       vault.strategyInfo.protocols.length > 1 &&
                       index &&
                       "ml-[-4px]"

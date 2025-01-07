@@ -738,11 +738,11 @@ const SonicVaults = (): JSX.Element => {
                                     className={`pl-2 flex h-8 items-center`}
                                   >
                                      <span
-                                       className="min-w-[10px]"
+                                       className="min-w-[24px]"
                                      >
                                        {vault.strategyInfo.protocols.map((protocol, index) => (
                                          <img
-                                           className="h-6 w-6 rounded-full mx-[2px]"
+                                           className="h-6 w-6 mx-[2px]"
                                            key={protocol.logoSrc + String(index)}
                                            src={protocol.logoSrc}
                                            alt={protocol.name}
