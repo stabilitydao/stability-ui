@@ -2056,6 +2056,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
   }, []);
 
+  //// !! tmp
+  const zapSoon = vault?.strategyInfo?.shortId === 'ISF'
+
   return (
     <div className="bg-accent-950 relative rounded-2xl min-w-[320px] h-[462px] md:w-[420px] font-manrope">
       <TabSwitcher
@@ -2439,17 +2442,23 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   <div className="mt-[10px] flex flex-col">
                     {isNotUnderlying && (
                       <>
-                        <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
-                          {isEmptyObject(inputs) ? "" : " Swaps"}
-                        </p>
+                        {zapSoon ?
+                          <p className="h-8 text-[12px] text-neutral-500 mb-0">
+                            <span className="text-[18px] font-bold text-orange-400">ZAP feature for this strategy will be available soon</span>
+                          </p>
+                          :
+                          <p className="h-3 text-[12px] leading-3 text-neutral-500 uppercase mb-0">
+                            {isEmptyObject(inputs) ? "" : " Swaps"}
+                          </p>
+                        }
 
-                        {loader && !transactionInProgress ? (
+                        {!zapSoon && loader && !transactionInProgress ? (
                           <div className="flex items-start justify-start">
                             <AssetsSkeleton />
                           </div>
                         ) : (
                           <div className="flex h-[52px] mb-[10px]">
-                            {!!zapTokens.length && (
+                            {!zapSoon && !!zapTokens.length && (
                               <>
                                 {shortId !== "CCF" ? (
                                   <div className="h-[40px] flex items-center justify-center">
