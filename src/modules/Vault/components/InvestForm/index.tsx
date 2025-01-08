@@ -798,7 +798,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         let txData = zapTokens?.map((tokens: any) => tokens.txData);
 
-        if (shortId === "IQMF" || shortId === "IRMF") txData.push("");
+        if (shortId === "IQMF" || shortId === "IRMF" || shortId === "ISF") txData.push("");
 
         if (shortId === "IRMF") {
           txData.reverse();
@@ -957,7 +957,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         outData = (await Promise.all(promises)) as TZAPData[];
       }
 
-      if (shortId === "IQMF" || shortId === "IRMF") {
+      if (shortId === "IQMF" || shortId === "IRMF" || shortId === "ISF") {
         outData = outData.filter(
           (obj: any) => Number(obj?.amountIn) > 0 || Number(obj?.amountOut) > 0
         );
@@ -967,7 +967,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setZapTokens(outData);
       let amounts;
 
-      if (shortId === "IQMF" || shortId === "IRMF") {
+      if (shortId === "IQMF" || shortId === "IRMF" || shortId === "ISF") {
         amounts = vault.assetsProportions.map((proportion) =>
           proportion
             ? parseUnits(
@@ -1963,7 +1963,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [vault, $tokens, defaultOption, defaultOption]);
 
   useEffect(() => {
-    if (vault?.alm?.protocol === "Ichi") {
+    if (vault?.alm?.protocol === "Ichi" || vault?.strategyInfo?.shortId === 'ISF') {
       getIchiAllow();
     }
   }, []);

@@ -243,6 +243,10 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/equalizer.png",
   },
+  swapx: {
+    name: "SwapX",
+    logoSrc: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png?1",
+  },
 };
 
 const IL = {
