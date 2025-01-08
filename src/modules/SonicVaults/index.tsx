@@ -738,7 +738,7 @@ const SonicVaults = (): JSX.Element => {
                                     className={`pl-2 flex h-8 items-center`}
                                   >
                                      <span
-                                       className="min-w-[24px]"
+                                       className="min-w-[24px] flex items-center"
                                      >
                                        {vault.strategyInfo.protocols.map((protocol, index) => (
                                          <img

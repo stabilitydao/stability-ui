@@ -64,6 +64,7 @@ export const getStrategyInfo = (
     trident,
     beethovenx,
     equalizer,
+    swapx,
   } = PROTOCOLS;
 
   if (!strategyInfo) {
@@ -198,6 +199,12 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [equalizer],
       il: IL.EF_vAMM,
+    };
+  } else if (vaultSymbol.match(/ISF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [ichi, swapx],
+      il: IL.IQMF,
     };
   }
 
