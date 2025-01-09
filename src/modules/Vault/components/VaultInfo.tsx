@@ -19,6 +19,7 @@ import { CHAINS } from "@constants";
 import { connected, currentChainID } from "@store";
 
 import type { TVault } from "@types";
+import {seeds} from "@stabilitydao/stability";
 
 interface IProps {
   network: string;
@@ -160,7 +161,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
                 vault?.address,
                 18,
                 vault?.symbol,
-                `https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`
+                `${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`
               )
             }
             className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"

@@ -72,6 +72,7 @@ import type {
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
+import {seeds} from "@stabilitydao/stability";
 
 interface IProps {
   network: string;
@@ -2358,7 +2359,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           </p>
                           <div className="h-[40px] flex items-center text-neutral-50 text-[14px]">
                             <img
-                              src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                              src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                               alt="logo"
                               className="w-7 h-7 rounded-full mr-4"
                             />
@@ -2607,7 +2608,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               <div className="text-left text-neutral-50 text-[14px]">
                                 <div className="flex items-center">
                                   <img
-                                    src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                                    src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                                     alt="logo"
                                     className="w-7 h-7 rounded-full mr-4"
                                   />
@@ -2675,7 +2676,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <label className="relative block w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
-                    src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                    src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                     alt="logo"
                     className="w-4 h-4 rounded-full "
                   />

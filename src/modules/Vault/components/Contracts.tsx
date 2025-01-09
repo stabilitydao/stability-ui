@@ -7,6 +7,7 @@ import { HeadingText } from "@ui";
 import { DEXes, CHAINS } from "@constants";
 
 import type { TAddress, TVault, TContractInfo } from "@types";
+import {seeds} from "@stabilitydao/stability";
 
 interface IProps {
   vault: TVault;
@@ -158,7 +159,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                   >
                     {logo === "proportions" ? (
                       <img
-                        src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+                        src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                         alt="logo"
                         className="w-[26px] h-[26px] rounded-full"
                       />

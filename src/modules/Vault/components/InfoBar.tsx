@@ -22,6 +22,7 @@ import { formatFromBigInt, formatNumber } from "@utils";
 import { CHAINS } from "@constants";
 
 import type { TAPRPeriod, TVault } from "@types";
+import {seeds} from "@stabilitydao/stability";
 
 interface IProps {
   network: string;
@@ -93,7 +94,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         >
           <div className="flex items-center">
             <img
-              src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
+              src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
               alt="logo"
               className="w-[28px] h-[28px] rounded-full mr-1.5"
             />
