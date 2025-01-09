@@ -2060,7 +2060,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, []);
 
   //// !! tmp
-  const zapSoon = vault?.strategyInfo?.shortId === 'ISF'
+  const zapSoon = false //vault?.strategyInfo?.shortId === 'ISF'
 
   return (
     <div className="bg-accent-950 relative rounded-2xl min-w-[320px] h-[462px] md:w-[420px] font-manrope">
