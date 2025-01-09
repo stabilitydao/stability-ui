@@ -44,9 +44,8 @@ import {
   formatNumber,
   formatFromBigInt,
   getTimeDifference,
-  dataSorter, getDate, getShortAddress, formatTimestampToDate,
-  // getDate,
-  // getTokenData,
+  dataSorter,
+  getShortAddress,
 } from "@utils";
 
 import {
