@@ -17,7 +17,7 @@ import { Pagination } from "./components/Pagination";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
 
-import {chains, deployments} from "@stabilitydao/stability";
+import { chains, deployments } from "@stabilitydao/stability";
 
 import {
   TimeDifferenceIndicator,
@@ -32,7 +32,9 @@ import {
   aprFilter,
   connected,
   error,
-  visible, publicClient, platformVersions,
+  visible,
+  publicClient,
+  platformVersions,
   // platformVersions,
   // currentChainID,
   // assetsPrices,
@@ -52,7 +54,8 @@ import {
   TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,
-  STABLECOINS, CHAINS,
+  STABLECOINS,
+  CHAINS,
   // CHAINS,
   // WBTC,
   // WETH,
@@ -71,10 +74,13 @@ import type {
   // TUpgradesTable,
   TEarningData,
   TVaults,
-  TAPRPeriod, TPendingPlatformUpgrade, TUpgradesTable, TAddress,
+  TAPRPeriod,
+  TPendingPlatformUpgrade,
+  TUpgradesTable,
+  TAddress,
 } from "@types";
 import PlatformABI from "../../web3/abi/PlatformABI.ts";
-import {ExplorerLink} from "../../ui/ExplorerLink.tsx";
+import { ExplorerLink } from "../../ui/ExplorerLink.tsx";
 
 // type TToken = {
 //   logo: string;
@@ -210,7 +216,7 @@ const SonicVaults = (): JSX.Element => {
     setActiveNetworks(updatedNetworks);
   };
 
-  const $currentChainID = "146"
+  const $currentChainID = "146";
 
   const fetchPlatformUpdates = async () => {
     try {
@@ -223,12 +229,15 @@ const SonicVaults = (): JSX.Element => {
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
           async (proxy: TAddress, index: number) => {
-            const moduleContracts = Object.keys(deployments[$currentChainID].core);
+            const moduleContracts = Object.keys(
+              deployments[$currentChainID].core
+            );
             const upgratedData = await Promise.all(
               moduleContracts.map(async (moduleContract: string) => {
                 //Can't use CoreContracts type
                 //@ts-ignore
-                const address = deployments[$currentChainID].core[moduleContract];
+                const address =
+                  deployments[$currentChainID].core[moduleContract];
                 if (proxy.toLowerCase() === address.toLowerCase()) {
                   const oldImplementation = await $publicClient?.readContract({
                     address: address,
@@ -273,7 +282,7 @@ const SonicVaults = (): JSX.Element => {
                 }
               })
             );
-            console.log(upgratedData)
+
             return upgratedData.filter((data) => data !== undefined);
           }
         );
@@ -440,7 +449,7 @@ const SonicVaults = (): JSX.Element => {
       const vaults: TVault[] = Object.values($vaults[146])
         .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
-          const tVault = vault as TVault
+          const tVault = vault as TVault;
           const balance = formatFromBigInt(tVault.balance, 18);
 
           return {
@@ -501,7 +510,7 @@ const SonicVaults = (): JSX.Element => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
   }, [$isVaultsLoaded, isLocalVaultsLoaded]);
 
-  const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer
+  const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
 
   return (
     <>
@@ -514,60 +523,74 @@ const SonicVaults = (): JSX.Element => {
             </h3>
             <div className="flex gap-3 text-[14px]">
               <span className="w-[100px]">Version:</span>
-              <span>{$platformVersions[$currentChainID]} -{">"} {platformUpdates.newVersion}</span>
+              <span>
+                {$platformVersions[$currentChainID]} -{">"}{" "}
+                {platformUpdates.newVersion}
+              </span>
             </div>
             <div className="flex gap-3 text-[14px]">
               <span className="w-[100px]">Timelock:</span>
-              <span>{lockTime.start} -{">"} {lockTime.end}</span>
+              <span>
+                {lockTime.start} -{">"} {lockTime.end}
+              </span>
             </div>
 
             <div className="overflow-x-auto mt-2">
               <table className="table table-auto w-full rounded-lg">
                 <thead className="">
-                <tr className="text-[12px] text-neutral-600 uppercase whitespace-nowrap">
-                  <th className="text-left">Contract</th>
-                  <th className="text-left">Version</th>
-                  <th className="text-left">Proxy</th>
-                  <th className="text-left">Old Implementation</th>
-                  <th className="text-left">New Implementation</th>
-                </tr>
+                  <tr className="text-[12px] text-neutral-600 uppercase whitespace-nowrap">
+                    <th className="text-left">Contract</th>
+                    <th className="text-left">Version</th>
+                    <th className="text-left">Proxy</th>
+                    <th className="text-left">Old Implementation</th>
+                    <th className="text-left">New Implementation</th>
+                  </tr>
                 </thead>
                 <tbody className="text-[14px]">
-                {!!upgradesTable.length &&
-                  upgradesTable.map((upgrade) => (
-                    <tr key={upgrade.contract} className="">
-                      <td className="text-left min-w-[100px] capitalize">
-                        <p>{upgrade.contract}</p>
-                      </td>
-                      <td className="text-left min-w-[100px]">
-                        {upgrade.oldVersion} {"->"} {upgrade.newVersion}
-                      </td>
-                      {upgrade?.proxy && (
-                        <td className="text-left min-w-[150px]">
-                          <span className="flex items-center">
-                            {getShortAddress(upgrade.proxy, 6, 4)}
-                            <ExplorerLink explorer={explorer || ''} address={upgrade.proxy}/>
-                          </span>
+                  {!!upgradesTable.length &&
+                    upgradesTable.map((upgrade) => (
+                      <tr key={upgrade.contract} className="">
+                        <td className="text-left min-w-[100px] capitalize">
+                          <p>{upgrade.contract}</p>
                         </td>
-                      )}
-                      {upgrade.oldImplementation && (
-                        <td className="text-left min-w-[150px]">
-                          <span className="flex items-center">
-                            {getShortAddress(upgrade.oldImplementation, 6, 4)}
-                            <ExplorerLink explorer={explorer || ''} address={upgrade.oldImplementation}/>
-                          </span>
+                        <td className="text-left min-w-[100px]">
+                          {upgrade.oldVersion} {"->"} {upgrade.newVersion}
                         </td>
-                      )}
-                      {upgrade?.newImplementation && (
-                        <td className="text-left min-w-[150px]">
-                          <span className="flex items-center">
-                            {getShortAddress(upgrade.newImplementation, 6, 4)}
-                            <ExplorerLink explorer={explorer || ''} address={upgrade.newImplementation} />
-                          </span>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
+                        {upgrade?.proxy && (
+                          <td className="text-left min-w-[150px]">
+                            <span className="flex items-center">
+                              {getShortAddress(upgrade.proxy, 6, 4)}
+                              <ExplorerLink
+                                explorer={explorer || ""}
+                                address={upgrade.proxy}
+                              />
+                            </span>
+                          </td>
+                        )}
+                        {upgrade.oldImplementation && (
+                          <td className="text-left min-w-[150px]">
+                            <span className="flex items-center">
+                              {getShortAddress(upgrade.oldImplementation, 6, 4)}
+                              <ExplorerLink
+                                explorer={explorer || ""}
+                                address={upgrade.oldImplementation}
+                              />
+                            </span>
+                          </td>
+                        )}
+                        {upgrade?.newImplementation && (
+                          <td className="text-left min-w-[150px]">
+                            <span className="flex items-center">
+                              {getShortAddress(upgrade.newImplementation, 6, 4)}
+                              <ExplorerLink
+                                explorer={explorer || ""}
+                                address={upgrade.newImplementation}
+                              />
+                            </span>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -579,7 +602,7 @@ const SonicVaults = (): JSX.Element => {
           isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
-        <ErrorMessage type={$error.type} isAlert={true}/>
+        <ErrorMessage type={$error.type} isAlert={true} />
         <Portfolio vaults={localVaults} />
         {/* <NetworkFilters
           activeNetworks={activeNetworks}
@@ -712,25 +735,34 @@ const SonicVaults = (): JSX.Element => {
                                   }}
                                   className="px-3 rounded-[10px] flex items-center  justify-start"
                                 >
-                                  <span className="text-[14px] w-[30px] flex justify-center" title={vault.strategyInfo.id}>{vault.strategyInfo.shortId}</span>
+                                  <span
+                                    className="text-[14px] w-[30px] flex justify-center"
+                                    title={vault.strategyInfo.id}
+                                  >
+                                    {vault.strategyInfo.shortId}
+                                  </span>
                                   <span
                                     className={`pl-2 flex h-8 items-center`}
                                   >
-                                     <span
-                                       className="min-w-[24px] flex items-center"
-                                     >
-                                       {vault.strategyInfo.protocols.map((protocol, index) => (
-                                         <img
-                                           className="h-6 w-6 mx-[2px]"
-                                           key={protocol.logoSrc + String(index)}
-                                           src={protocol.logoSrc}
-                                           alt={protocol.name}
-                                           title={protocol.name}
-                                           style={{
-                                             zIndex: vault.strategyInfo.protocols.length - index,
-                                           }}
-                                         />
-                                       ))}
+                                    <span className="min-w-[24px] flex items-center">
+                                      {vault.strategyInfo.protocols.map(
+                                        (protocol, index) => (
+                                          <img
+                                            className="h-6 w-6 mx-[2px]"
+                                            key={
+                                              protocol.logoSrc + String(index)
+                                            }
+                                            src={protocol.logoSrc}
+                                            alt={protocol.name}
+                                            title={protocol.name}
+                                            style={{
+                                              zIndex:
+                                                vault.strategyInfo.protocols
+                                                  .length - index,
+                                            }}
+                                          />
+                                        )
+                                      )}
                                     </span>
                                     {vault.strategySpecific && (
                                       <span
@@ -772,7 +804,9 @@ const SonicVaults = (): JSX.Element => {
                                 : "text-[#eaecef]"
                             }`}
                           >
-                            <p className="text-end">{aprValue}%</p>
+                            <p className="text-end">
+                              {formatNumber(aprValue, "formatAPR")}%
+                            </p>
                           </div>
                           <div className="visible__tooltip">
                             <div className="flex items-start flex-col gap-4">
@@ -792,11 +826,15 @@ const SonicVaults = (): JSX.Element => {
                                 )}
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Total APY</p>
-                                  <p className="text-end">{apyValue}%</p>
+                                  <p className="text-end">
+                                    {formatNumber(apyValue, "formatAPR")}%
+                                  </p>
                                 </div>
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Total APR</p>
-                                  <p className="text-end">{aprValue}%</p>
+                                  <p className="text-end">
+                                    {formatNumber(aprValue, "formatAPR")}%
+                                  </p>
                                 </div>
 
                                 {vault?.earningData?.poolSwapFeesAPR.daily !=
@@ -805,19 +843,29 @@ const SonicVaults = (): JSX.Element => {
                                     <div className="font-bold flex items-center justify-between">
                                       <p>Pool swap fees APR</p>
                                       <p className="text-end">
-                                        {swapFeesAPRValue}%
+                                        {formatNumber(
+                                          swapFeesAPRValue,
+                                          "formatAPR"
+                                        )}
+                                        %
                                       </p>
                                     </div>
                                   )}
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Strategy APR</p>
                                   <p className="text-end">
-                                    {strategyAPRValue}%
+                                    {formatNumber(
+                                      strategyAPRValue,
+                                      "formatAPR"
+                                    )}
+                                    %
                                   </p>
                                 </div>
                                 <div className="font-bold flex items-center justify-between">
                                   <p>Daily</p>
-                                  <p className="text-end">{dailyAPRValue}%</p>
+                                  <p className="text-end">
+                                    {formatNumber(dailyAPRValue, "formatAPR")}%
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-center justify-between w-full">

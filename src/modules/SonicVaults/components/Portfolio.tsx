@@ -111,8 +111,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         "format"
       )}%`
     : "-";
-  const avgApr = $connected ? `${formatNumber(portfolio.apr, "format")}%` : "-";
-  const avgApy = $connected ? `${formatNumber(portfolio.apy, "format")}%` : "-";
+  const avgApr = $connected
+    ? `${formatNumber(portfolio.apr, "formatAPR")}%`
+    : "-";
+  const avgApy = $connected
+    ? `${formatNumber(portfolio.apy, "formatAPR")}%`
+    : "-";
 
   useEffect(() => {
     localStorage.setItem("APRsFiler", JSON.stringify($aprFilter));

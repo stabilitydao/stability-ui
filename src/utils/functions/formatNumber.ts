@@ -165,6 +165,19 @@ export const formatNumber = (
 
       changedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       break;
+
+    case "formatAPR":
+      value = Number(value);
+
+      if (value >= 1000000) {
+        changedValue = (value / 1000000).toFixed(1) + "M";
+      } else if (value >= 10000) {
+        changedValue = (value / 1000).toFixed(1) + "K";
+      } else {
+        changedValue = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      }
+
+      break;
     default:
       break;
   }
