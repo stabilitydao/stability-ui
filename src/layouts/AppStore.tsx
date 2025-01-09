@@ -460,7 +460,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
             const priceOnCreation = Number(
               formatUnits(
-                BigInt(vault?.assetsPricesOnCreation?.[index] || 0),
+                BigInt(vault?.assetsPricesOnCreation?.[index] ?? 1),
                 18
               )
             );

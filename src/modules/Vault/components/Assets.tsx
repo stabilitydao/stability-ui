@@ -24,13 +24,14 @@ import type {
   TToken,
   TPieChartData,
   TTokenData,
+  THoldData,
 } from "@types";
 
 interface IProps {
   network: string;
+  holdData: THoldData[];
   assets: TAsset[];
   created: string;
-  pricesOnCreation: string[];
   strategy: TAddress;
 }
 
@@ -87,7 +88,7 @@ const Chart = ({ data }: { data: TPieChartData[] }) => {
 };
 
 const Assets: React.FC<IProps> = memo(
-  ({ network, assets, created, pricesOnCreation, strategy }) => {
+  ({ network, holdData, assets, created, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
     const $currentChainID = useStore(currentChainID);
@@ -99,10 +100,6 @@ const Assets: React.FC<IProps> = memo(
       chainId: Number(network),
       config: wagmiConfig,
     });
-
-    const onCreationPrice: bigint[] = pricesOnCreation.map((price: string) =>
-      BigInt(price)
-    );
 
     const [investedData, setInvestedData] = useState<TPieChartData[]>([]);
     const [isPieChart, setIsPieChart] = useState(false);
@@ -248,11 +245,9 @@ const Assets: React.FC<IProps> = memo(
                 assetData?.address as TAddress
               );
 
-              const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+              const priceOnCreation = holdData[index].initPrice;
 
-              const price: number = $assetsPrices[network][asset.address]
-                ? Number($assetsPrices[network][asset.address].price)
-                : 0;
+              const price: number = holdData[index].price;
 
               const creationDate = getDate(Number(created));
 
@@ -335,7 +330,7 @@ const Assets: React.FC<IProps> = memo(
                               data-testid={`assetPrice${index}`}
                               className="text-[16px] mt-1"
                             >
-                              ${formatNumber(price, "smallNumbers")}
+                              ${price}
                             </p>
                           </div>
                         )}
@@ -348,8 +343,7 @@ const Assets: React.FC<IProps> = memo(
                               data-testid={`assetPriceOnCreation${index}`}
                               className="text-[16px] mt-1"
                             >
-                              ${formatNumber(priceOnCreation, "smallNumbers")} (
-                              {creationDate})
+                              ${priceOnCreation} ({creationDate})
                             </p>
                           </div>
                         )}

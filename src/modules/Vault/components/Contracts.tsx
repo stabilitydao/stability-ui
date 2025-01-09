@@ -7,7 +7,7 @@ import { HeadingText } from "@ui";
 import { DEXes, CHAINS } from "@constants";
 
 import type { TAddress, TVault, TContractInfo } from "@types";
-import {seeds} from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
 interface IProps {
   vault: TVault;
@@ -143,7 +143,6 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   return (
     <div className="rounded-md h-full">
       <HeadingText text="Contracts" scale={2} styles="text-left md:mb-0 mb-2" />
-
       <table className="w-full lg:max-w-[500px] text-[16px]">
         <tbody>
           {contracts.map(

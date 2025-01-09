@@ -100,6 +100,11 @@ const DEXes = [
     algo: "Pearl V2",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
   },
+  {
+    name: "SwapX",
+    algo: "",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png",
+  },
 ];
 
 const CHAINS = [
@@ -245,7 +250,8 @@ const PROTOCOLS = {
   },
   swapx: {
     name: "SwapX",
-    logoSrc: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png?1",
+    logoSrc:
+      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png?1",
   },
 };
 

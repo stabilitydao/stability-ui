@@ -208,6 +208,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               let sortedAPRs = APRArr.filter(
                 (obj) => obj.unixTimestamp >= time
               );
+
               let firstEl = sortedAPRs[0] || APRArr[APRArr.length - 1];
 
               newData.push({ ...firstEl, timestamp: time });

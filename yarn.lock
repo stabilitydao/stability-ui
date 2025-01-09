@@ -1611,10 +1611,10 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@stabilitydao/stability@=0.24.13":
-  version "0.24.13"
-  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.24.13.tgz#e8b3ecbb50a351d401cad8d6e8e886b567c5320d"
-  integrity sha512-Y5n4rHHPFwX3mWhApSB+am1KRunXN42fvqCzIaoYx5MMEMBGgh1WZ2oNBEmzl9N43QnejninUUNil43aqWUZUg==
+"@stabilitydao/stability@=0.24.14":
+  version "0.24.14"
+  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.24.14.tgz#d475350e32d53da3dbb3f4630cd9349546ba71a9"
+  integrity sha512-NRahpI4p6Krodf1v6SafcKYpRVbAQQ6eOFg6ZPAoRmOoZ019aPUMk/xo/cNywR3OnEft3ngz5Nfghdnm5Nc7dA==
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"
