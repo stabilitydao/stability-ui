@@ -2046,9 +2046,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   useEffect(() => {
     if (vault) {
+      // !!!! big bug was with filtering
+      // but need think and maybe fix it
       const assetsData = vault.assets
         .map((asset: TAsset) => asset.address.toLowerCase())
-        .filter((_, index) => vault.assetsProportions[index]);
+        /*.filter((_, index) => vault.assetsProportions[index])*/
       if (assetsData?.length) {
         setOption(assetsData);
         defaultAssetsOption(assetsData);
