@@ -11,12 +11,14 @@ import { deployments } from "@stabilitydao/stability";
 interface IProps {
   type: string;
   isAlert?: boolean;
+  onlyForChainId?: number;
 }
 
-const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false }) => {
+const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false, onlyForChainId = 0 }) => {
   const $error = useStore(error);
   const $reload = useStore(reload);
 
+  const [chainId, setChainId] = useState("");
   const [chainLogo, setChainLogo] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -46,6 +48,7 @@ const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false }) => {
             ? `${contractName}: ${slicedMessage}`
             : slicedMessage;
 
+          setChainId(chainID)
           setChainLogo(chainImg);
           setErrorMessage(contractErrorMessage);
         } else {
@@ -57,7 +60,7 @@ const ErrorMessage: React.FC<IProps> = ({ type, isAlert = false }) => {
     }
   }, [$error, type]);
 
-  if ($error.state) {
+  if ($error.state && (!onlyForChainId || onlyForChainId.toString() === chainId.toString())) {
     return (
       <div
         className={`flex items-center justify-center bg-accent-950 text-neutral-50 font-manrope text-[16px] w-full rounded-[32px] ${isAlert ? "relative" : "fixed top-0 left-1/2 transform -translate-x-1/2 max-w-[700px] flex-col mt-3 z-[200]"}`}

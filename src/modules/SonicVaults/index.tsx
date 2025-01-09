@@ -579,7 +579,7 @@ const SonicVaults = (): JSX.Element => {
           isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
-        <ErrorMessage type={$error.type} isAlert={true}/>
+        <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
         <Portfolio vaults={localVaults} />
         {/* <NetworkFilters
           activeNetworks={activeNetworks}
