@@ -52,8 +52,8 @@ const retroIchiFactory = "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7";
 const metadata = {
   name: "Stability",
   description: "Stability Asset Management Platform",
-  url: "https://stabilitydao.org",
-  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  url: "https://stability.farm",
+  icons: ["https://stability.farm/logo.svg"],
 };
 
 const wagmiConfig = defaultWagmiConfig({
