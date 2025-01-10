@@ -108,7 +108,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   });*/
   const sonicClient = createPublicClient({
     chain: sonic,
-    transport: http("https://sonic.drpc.org"),
+    transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
   });
 
   const $lastTx = useStore(lastTx);
