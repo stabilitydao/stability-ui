@@ -206,6 +206,12 @@ export const getStrategyInfo = (
       protocols: [ichi, swapx],
       il: IL.IQMF,
     };
+  } else if (vaultSymbol.match(/SF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [swapx],
+      il: IL.EF_vAMM,
+    };
   }
 
   return strategyInfo;
