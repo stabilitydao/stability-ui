@@ -2,7 +2,7 @@ import type React from "react";
 
 import { useEffect } from "react";
 
-import { formatUnits } from "viem";
+import {createPublicClient, formatUnits, http} from "viem";
 
 import axios from "axios";
 
@@ -79,6 +79,7 @@ import type {
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+import {sonic} from "viem/chains";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -101,9 +102,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     chainId: 111188,
     config: wagmiConfig,
   });
-  const sonicClient = usePublicClient({
+  /*const sonicClient = usePublicClient({
     chainId: 146,
     config: wagmiConfig,
+  });*/
+  const sonicClient = createPublicClient({
+    chain: sonic,
+    transport: http("https://sonic.drpc.org"),
   });
 
   const $lastTx = useStore(lastTx);
@@ -680,6 +685,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 address: contractBalance[6][1] as TAddress,
                 abi: IVaultManagerABI,
                 functionName: "vaults",
+
               })) as string[];
 
               if (contractBalance) {
