@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import {createPublicClient, formatUnits, http} from "viem";
+import { createPublicClient, formatUnits, http } from "viem";
 //import { usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
@@ -13,7 +13,7 @@ import {
   PlatformABI,
   FactoryABI,
   IERC721Enumerable,
-  wagmiConfig,
+  // wagmiConfig,
 } from "@web3";
 
 import {
@@ -37,7 +37,7 @@ import type {
   TAddress,
   TPlatformGetData,
 } from "@types";
-import {sonic} from "viem/chains";
+import { sonic } from "viem/chains";
 
 type TFreeVaults =
   | {
@@ -62,7 +62,9 @@ const Factory = (): JSX.Element => {
   });*/
   const _publicClient = createPublicClient({
     chain: sonic,
-    transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
+    transport: http(
+      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+    ),
   });
 
   const { open } = useWeb3Modal();

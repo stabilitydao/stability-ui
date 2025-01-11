@@ -799,12 +799,16 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
         let txData = zapTokens?.map((tokens: any) => tokens.txData);
 
-        if (shortId === "IQMF" || shortId === "IRMF" || shortId === "ISF") {
+        if (shortId === "IQMF" || shortId === "IRMF") {
           txData.push("");
         }
 
-        if (shortId === "IRMF" || shortId === "ISF") {
+        if (shortId === "IRMF") {
           txData.reverse();
+        }
+
+        if (shortId === "ISF") {
+          txData = ichiAllow.map((isAllow) => (isAllow ? txData[0] : ""));
         }
 
         if (shortId === "CCF") txData[1] = "";
@@ -2185,7 +2189,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {/* CRV Strategy don't have zap withdraw */}
                 {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
-                    const isIchiProtocol = vault?.alm?.protocol === "Ichi";
+                    const isIchiProtocol =
+                      vault?.alm?.protocol === "Ichi" || shortId === "ISF";
 
                     const symbolIndex = isIchiProtocol
                       ? defaultOption?.symbols
