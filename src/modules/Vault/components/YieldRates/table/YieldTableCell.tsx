@@ -2,7 +2,7 @@ import { memo } from "react";
 
 interface IProps {
   isSharePrice: boolean;
-  data: string;
+  data: string | number;
   testID?: string;
 }
 
