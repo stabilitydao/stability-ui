@@ -2317,6 +2317,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 inputMode="decimal"
                                 className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                               />
+
                               {!!$connected && !!balances[option[0]] && (
                                 <button
                                   type="button"
@@ -2354,7 +2355,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 >
                   {loader && !transactionInProgress ? (
                     <div
-                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] w-[372px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
                     >
                       <ShareSkeleton />
                     </div>
