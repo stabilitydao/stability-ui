@@ -7,7 +7,7 @@ import { HoldModal, HeadingText } from "@ui";
 
 import { connected } from "@store";
 
-import { getTimeDifference } from "@utils";
+import { getTimeDifference, formatNumber } from "@utils";
 
 import type { TVault, THoldData, TShareData } from "@types";
 
@@ -105,7 +105,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     <YieldTableCell
                       key={testID}
                       isSharePrice={!!Number(vault.shareprice)}
-                      data={data}
+                      data={formatNumber(data, "formatAPR")}
                       testID={testID}
                     />
                   ))}
@@ -116,7 +116,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     <YieldTableCell
                       key={testID}
                       isSharePrice={!!Number(vault.shareprice)}
-                      data={data}
+                      data={formatNumber(data, "formatAPR")}
                       testID={testID}
                     />
                   ))}
@@ -128,7 +128,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                       <YieldTableCell
                         key={testID}
                         isSharePrice={!!Number(vault.shareprice)}
-                        data={data}
+                        data={formatNumber(data, "formatAPR")}
                         testID={testID}
                       />
                     ))}
@@ -144,7 +144,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     <YieldTableCell
                       key={testID}
                       isSharePrice={!!Number(vault.shareprice)}
-                      data={data}
+                      data={formatNumber(data, "formatAPR")}
                       testID={testID}
                     />
                   ))}

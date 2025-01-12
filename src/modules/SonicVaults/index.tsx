@@ -643,7 +643,7 @@ const SonicVaults = (): JSX.Element => {
           ))}
       </div> */}
 
-      <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+      <div className="overflow-x-auto min-[870px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
         <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
           <thead className="bg-accent-950">
             <tr className="text-[12px] uppercase">

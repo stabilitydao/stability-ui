@@ -17,7 +17,7 @@ const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
   }
 
   const VISIBLE_VAULTS = {
-    first: tab === 1 ? tab : PAGINATION_VAULTS * (tab - 1),
+    first: tab === 1 ? tab : PAGINATION_VAULTS * (tab - 1) + 1,
     latest:
       PAGINATION_VAULTS * tab >= vaults.length
         ? vaults.length
