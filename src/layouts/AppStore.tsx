@@ -42,7 +42,7 @@ import {
   vaultData,
 } from "@store";
 
-import { wagmiConfig, platforms, PlatformABI, IVaultManagerABI } from "@web3";
+import { wagmiConfig, platforms, PlatformABI } from "@web3";
 
 import {
   calculateAPY,

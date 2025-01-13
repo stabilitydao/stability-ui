@@ -1,4 +1,4 @@
-import { useEffect, memo } from "react";
+import { memo } from "react";
 import { PAGINATION_VAULTS } from "@constants";
 
 import type { TVault } from "@types";
