@@ -109,6 +109,7 @@ const SonicVaults = (): JSX.Element => {
   const $visible = useStore(visible);
   const $publicClient = useStore(publicClient);
   const $platformVersions = useStore(platformVersions);
+  const $currentChainID = "146";
   // const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
 
@@ -215,8 +216,6 @@ const SonicVaults = (): JSX.Element => {
 
     setActiveNetworks(updatedNetworks);
   };
-
-  const $currentChainID = "146";
 
   const fetchPlatformUpdates = async () => {
     try {

@@ -610,7 +610,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     } else {
       setLoader(false);
     }
-
+    if (tab === "Withdraw" && option[0] === underlyingToken?.address) {
+      return;
+    }
     //@ts-ignore
     debouncedZap(amount, asset);
   };
@@ -920,6 +922,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       depositCCF(amount);
       return;
     }
+
     try {
       const decimals = Number(getTokenData(option[0])?.decimals);
 
@@ -1656,6 +1659,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             amount: formatUnits(result[0], 18),
           },
         ]);
+        setLoader(false);
         setButton("withdraw");
       } else {
         let assetsLength = defaultOption?.assetsArray.map(
@@ -2028,10 +2032,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setUnderlyingShares(false);
     setZapShares(false);
-    if (option[0] === underlyingToken?.address) {
-      setIsRefresh(false);
-      return;
-    }
+    // if (option[0] === underlyingToken?.address) {
+    //   setIsRefresh(false);
+    //   return;
+    // }
     setIsRefresh(true);
   }, [option, inputs]);
 
@@ -2355,7 +2359,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 >
                   {loader && !transactionInProgress ? (
                     <div
-                      className={`text-[18px] w-[372px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] w-[320px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
                     >
                       <ShareSkeleton />
                     </div>

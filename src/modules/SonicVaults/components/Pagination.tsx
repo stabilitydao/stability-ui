@@ -23,6 +23,22 @@ const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
         ? vaults.length
         : PAGINATION_VAULTS * tab,
   };
+
+  // useEffect(() => {
+  //   ///// For vaults URL filters
+  //   const newUrl = new URL(window.location.href);
+  //   const params = new URLSearchParams(newUrl.search);
+  //   /////
+
+  //   if (tab === 1) {
+  //     params.delete("page");
+  //   } else {
+  //     params.set("page", String(tab));
+  //   }
+
+  //   newUrl.search = `?${params.toString()}`;
+  //   window.history.pushState({}, "", newUrl.toString());
+  // }, [tab]);
   return (
     paginationNumbers.length > 1 && (
       <div className="flex items-center gap-5 mt-3 font-manrope">

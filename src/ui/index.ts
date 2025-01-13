@@ -1,5 +1,5 @@
 import { Toast } from "./Toast";
-import { HoldModal } from "./Toast/HoldModal";
+import { TextModal } from "./Modals/TextModal";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
 import { ErrorMessage } from "./ErrorMessage";
 import { FeeAPRModal } from "./FeeAPRModal";
@@ -27,7 +27,7 @@ import { Skeleton } from "./Skeletons/Skeleton";
 
 export {
   Toast,
-  HoldModal,
+  TextModal,
   APRtimeSwitcher,
   AssetsSkeleton,
   ChartSkeleton,

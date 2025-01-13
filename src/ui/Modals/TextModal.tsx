@@ -2,10 +2,10 @@ import { useEffect, useRef } from "react";
 
 interface IProps {
   setModalState: React.Dispatch<React.SetStateAction<boolean>>;
-  table: JSX.Element;
+  text: String;
 }
 
-const HoldModal: React.FC<IProps> = ({ setModalState, table }) => {
+const TextModal: React.FC<IProps> = ({ setModalState, text }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
@@ -15,7 +15,7 @@ const HoldModal: React.FC<IProps> = ({ setModalState, table }) => {
   };
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
+    document.body.style.overflowY = "hidden";
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
@@ -23,6 +23,7 @@ const HoldModal: React.FC<IProps> = ({ setModalState, table }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <div>
       <div className="bg-[#13141f] w-full h-full fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[50] opacity-80"></div>
@@ -94,10 +95,10 @@ const HoldModal: React.FC<IProps> = ({ setModalState, table }) => {
         </svg>
 
         <div className="p-10 flex items-start justify-center flex-col gap-4">
-          {table}
+          {text}
         </div>
       </div>
     </div>
   );
 };
-export { HoldModal };
+export { TextModal };
