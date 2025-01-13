@@ -2,7 +2,7 @@ import type React from "react";
 
 import { useEffect } from "react";
 
-import {createPublicClient, formatUnits, http} from "viem";
+import { createPublicClient, formatUnits, http } from "viem";
 
 import axios from "axios";
 
@@ -79,7 +79,7 @@ import type {
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
-import {sonic} from "viem/chains";
+import { sonic } from "viem/chains";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -108,7 +108,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   });*/
   const sonicClient = createPublicClient({
     chain: sonic,
-    transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
+    transport: http(
+      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+    ),
   });
 
   const $lastTx = useStore(lastTx);
@@ -681,12 +683,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 args: [address as TAddress],
               })) as TPlatformGetBalance;
 
-              const contractVaults = (await localClient?.readContract({
-                address: contractBalance[6][1] as TAddress,
-                abi: IVaultManagerABI,
-                functionName: "vaults",
-
-              })) as string[];
+              const vaultsAddresses = contractBalance[3];
+              const vaultsBalances = contractBalance[5];
 
               if (contractBalance) {
                 const buildingPayPerVaultTokenBalance: bigint =
@@ -723,20 +721,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 balances.set(contractBalance);
               }
 
-              if (Array.isArray(contractVaults[0])) {
+              if (Array.isArray(vaultsAddresses)) {
                 const vaultsPromise = await Promise.all(
-                  contractVaults[0].map(
-                    async (vault: string, index: number) => {
-                      if (localVaults[chain.id][vault.toLowerCase()]) {
-                        return {
-                          [vault.toLowerCase()]: {
-                            ...localVaults[chain.id][vault.toLowerCase()],
-                            balance: contractBalance[5][index],
-                          },
-                        };
-                      }
+                  vaultsAddresses.map(async (vault: string, index: number) => {
+                    if (localVaults[chain.id][vault.toLowerCase()]) {
+                      return {
+                        [vault.toLowerCase()]: {
+                          ...localVaults[chain.id][vault.toLowerCase()],
+                          balance: vaultsBalances[index],
+                        },
+                      };
                     }
-                  )
+                  })
                 );
 
                 localVaults[chain.id] = vaultsPromise.reduce(

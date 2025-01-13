@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react";
 
 import { HoldTable, VSHoldTableCell, YieldTableCell } from "./table";
 
-import { HoldModal, HeadingText } from "@ui";
+import { TextModal, HeadingText } from "@ui";
 
 import { connected } from "@store";
 
@@ -255,11 +255,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
         )}
       </div>
       {modal && (
-        <HoldModal
+        <TextModal
           setModalState={setModal}
-          table={
-            <HoldTable shareData={shareData} holdData={vault.assetsVsHold} />
-          }
+          text="VS HODL APR compares depositing tokens into a vault vs holding them in a wallet with it's ratio and timeline."
         />
       )}
     </div>
