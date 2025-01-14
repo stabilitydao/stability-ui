@@ -62,6 +62,21 @@ export const formatNumber = (
       }
       changedValue = "$" + rounded;
       break;
+    case "abbreviateIntegerNotUsd":
+      value = Number(value);
+
+      while (value >= 1000) {
+        value /= 1000;
+        suffixNum++;
+      }
+
+      let rounded1 = value.toFixed(0);
+
+      if (suffixNum > 0) {
+        rounded1 += suffixes[suffixNum];
+      }
+      changedValue = rounded1;
+      break;
     case "chartAbbreviate":
       value = Number(value);
       if (value <= 0) return 0;
