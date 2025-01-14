@@ -2152,7 +2152,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       (logo: string, index: number) => (
                         <img
                           key={logo + index}
-                          className="max-w-6 max-h-6 rounded-full"
+                          className="w-6 h-6 rounded-full"
                           src={logo}
                           alt="logo"
                         />
