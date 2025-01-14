@@ -157,6 +157,13 @@ const Contests = (): JSX.Element => {
                                         alt="pSTBL"
                                       />
                                     )}
+                                    {reward.type === "Gems1" && (
+                                      <img
+                                        src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
+                                        className="w-[24px] h-[24px]"
+                                        alt="sGEM1"
+                                      />
+                                    )}
 
                                     {reward.type === "ERC20 Token" && (
                                       <img
@@ -178,12 +185,13 @@ const Contests = (): JSX.Element => {
                                       )}
                                   </div>
                                   <div className="flex items-center">
-                                    {String(
+                                    {reward.winnerReward && reward.winners ? String(
                                       formatNumber(
                                         reward.winnerReward * reward.winners,
                                         "abbreviateInteger"
                                       )
-                                    ).slice(1)}
+                                    ).slice(1) : ''}
+                                    {reward.totalReward && formatNumber(reward.totalReward, 'abbreviateIntegerNotUsd')}
                                   </div>
                                 </div>
                               ))}
