@@ -106,6 +106,27 @@ const Vaults = (): JSX.Element => {
 
   // const [tokens, setTokens] = useState<TToken[]>([]);
 
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
+  let urlTab = 1;
+
+  let urlTableStates = TABLE;
+
+  if (!!Number(params.get("page"))) {
+    urlTab = Number(params.get("page"));
+  }
+
+  if (params.get("sort")) {
+    const [paramName, paramType] = params.get("sort")?.split("-") as string[];
+
+    const indexOfState = urlTableStates.findIndex(
+      ({ name }) => name.toUpperCase() === paramName.toUpperCase()
+    );
+
+    urlTableStates[indexOfState].sortType = paramType;
+  }
+
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
@@ -136,7 +157,7 @@ const Vaults = (): JSX.Element => {
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState(urlTab);
 
   const [tableStates, setTableStates] = useState(TABLE);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
@@ -151,11 +172,6 @@ const Vaults = (): JSX.Element => {
     !$connected;
 
   const activeNetworksHandler = async (chainIDs: string[]) => {
-    ///// For vaults URL filters
-    const newUrl = new URL(window.location.href);
-    const params = new URLSearchParams(newUrl.search);
-    /////
-
     let updatedNetworks = activeNetworks.map((network) =>
       chainIDs.includes(network.id)
         ? { ...network, active: !network.active }
@@ -415,7 +431,12 @@ const Vaults = (): JSX.Element => {
     );
     // pagination upd
     if (currentTab != 1) {
-      setCurrentTab(1);
+      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_VAULTS);
+
+      if (disponibleTabs < currentTab) {
+        setCurrentTab(1);
+        params.delete("page");
+      }
     }
 
     setFilteredVaults(sortedVaults);

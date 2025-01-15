@@ -8,6 +8,9 @@ type TProps = {
 };
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
   const styles: Record<string, string> = {
     // Type: "hidden xl:table-cell",
     Assets: "min-w-[180px]",
@@ -40,6 +43,9 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     const updatedTable: TTableColumn[] = table.map(
       (column: TTableColumn, i: number) => {
         if (index === i) {
+          params.set("sort", `${column.name.toLowerCase()}-${nextCase}`);
+          newUrl.search = `?${params.toString()}`;
+          window.history.pushState({}, "", newUrl.toString());
           return { ...column, sortType: nextCase };
         } else {
           return { ...column, sortType: "none" };

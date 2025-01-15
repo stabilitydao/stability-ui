@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { useEffect, memo } from "react";
 import { PAGINATION_VAULTS } from "@constants";
 
 import type { TVault } from "@types";
@@ -10,6 +10,9 @@ interface IProps {
 }
 
 const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
   const paginationNumbers = [];
 
   for (let i = 1; i <= Math.ceil(vaults.length / PAGINATION_VAULTS); i++) {
@@ -24,21 +27,17 @@ const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
         : PAGINATION_VAULTS * tab,
   };
 
-  // useEffect(() => {
-  //   ///// For vaults URL filters
-  //   const newUrl = new URL(window.location.href);
-  //   const params = new URLSearchParams(newUrl.search);
-  //   /////
+  useEffect(() => {
+    if (tab === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(tab));
+    }
 
-  //   if (tab === 1) {
-  //     params.delete("page");
-  //   } else {
-  //     params.set("page", String(tab));
-  //   }
+    newUrl.search = `?${params.toString()}`;
+    window.history.pushState({}, "", newUrl.toString());
+  }, [tab]);
 
-  //   newUrl.search = `?${params.toString()}`;
-  //   window.history.pushState({}, "", newUrl.toString());
-  // }, [tab]);
   return (
     paginationNumbers.length > 1 && (
       <div className="flex items-center gap-5 mt-3 font-manrope">

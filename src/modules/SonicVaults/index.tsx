@@ -115,6 +115,27 @@ const SonicVaults = (): JSX.Element => {
 
   // const [tokens, setTokens] = useState<TToken[]>([]);
 
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
+  let urlTab = 1;
+
+  let urlTableStates = TABLE;
+
+  if (!!Number(params.get("page"))) {
+    urlTab = Number(params.get("page"));
+  }
+
+  if (params.get("sort")) {
+    const [paramName, paramType] = params.get("sort")?.split("-") as string[];
+
+    const indexOfState = urlTableStates.findIndex(
+      ({ name }) => name.toUpperCase() === paramName.toUpperCase()
+    );
+
+    urlTableStates[indexOfState].sortType = paramType;
+  }
+
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
@@ -144,9 +165,9 @@ const SonicVaults = (): JSX.Element => {
   const [upgradesTable, setUpgradesTable] = useState<TUpgradesTable[]>([]);
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
-  const [currentTab, setCurrentTab] = useState(1);
+  const [currentTab, setCurrentTab] = useState(urlTab);
 
-  const [tableStates, setTableStates] = useState(TABLE);
+  const [tableStates, setTableStates] = useState(urlTableStates);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
   const [activeNetworks, setActiveNetworks] = useState([
     {
@@ -168,11 +189,6 @@ const SonicVaults = (): JSX.Element => {
     !$connected;
 
   const activeNetworksHandler = async (chainIDs: string[]) => {
-    ///// For vaults URL filters
-    const newUrl = new URL(window.location.href);
-    const params = new URLSearchParams(newUrl.search);
-    /////
-
     let updatedNetworks = activeNetworks.map((network) =>
       chainIDs.includes(network.id)
         ? { ...network, active: !network.active }
@@ -436,7 +452,12 @@ const SonicVaults = (): JSX.Element => {
     );
     // pagination upd
     if (currentTab != 1) {
-      setCurrentTab(1);
+      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_VAULTS);
+
+      if (disponibleTabs < currentTab) {
+        setCurrentTab(1);
+        params.delete("page");
+      }
     }
 
     setFilteredVaults(sortedVaults);
@@ -468,34 +489,6 @@ const SonicVaults = (): JSX.Element => {
       }
     }
   };
-  // useEffect(() => {
-  //   if ($assetsPrices) {
-  //     const BTC_LOGO = getTokenData(WBTC[0])?.logoURI as string;
-  //     const ETH_LOGO = getTokenData(WETH[0])?.logoURI as string;
-  //     const MATIC_LOGO = getTokenData(WMATIC[0])?.logoURI as string;
-
-  //     const BTC_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WBTC[0]], 18),
-  //       "formatWithoutDecimalPart"
-  //     ) as string;
-
-  //     const ETH_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WETH[0]], 18),
-  //       "formatWithoutDecimalPart"
-  //     ) as string;
-
-  //     const MATIC_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WMATIC[0]], 18),
-  //       "format"
-  //     ) as string;
-
-  //     setTokens([
-  //       { logo: BTC_LOGO, price: BTC_PRICE },
-  //       { logo: ETH_LOGO, price: ETH_PRICE },
-  //       { logo: MATIC_LOGO, price: MATIC_PRICE },
-  //     ]);
-  //   }
-  // }, [$assetsPrices]);
 
   useEffect(() => {
     tableHandler();
@@ -627,20 +620,6 @@ const SonicVaults = (): JSX.Element => {
           <Filters filters={tableFilters} setFilters={setTableFilters} />
         </div>
       </div>
-
-      {/* <div className="flex items-center gap-5 p-2 flex-wrap">
-        {!!tokens &&
-          tokens.map((token) => (
-            <div key={token.logo} className="flex items-center gap-2">
-              <img
-                src={token.logo}
-                alt="logo"
-                className="w-6 h-6 rounded-full"
-              />
-              <p className="text-[#848e9c] text-[18px]">${token.price}</p>
-            </div>
-          ))}
-      </div> */}
 
       <div className="overflow-x-auto min-[870px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
         <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
