@@ -12,12 +12,7 @@ import { formatNumber } from "@utils";
 
 import { assetsPrices } from "@store";
 
-import {
-  wagmiConfig,
-  defiedgeFactories,
-  quickSwapIchiFactory,
-  retroIchiFactory,
-} from "@web3";
+import { wagmiConfig, defiedgeFactories, ichiFactories } from "@web3";
 
 import type { TAddress, TVault } from "@types";
 
@@ -127,7 +122,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
       case "Ichi":
         if (vault.strategy.includes("Retro")) {
           const baseFee = await readContract(wagmiConfig, {
-            address: retroIchiFactory,
+            address: ichiFactories.retro,
             abi: [
               {
                 inputs: [],
@@ -145,7 +140,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
         }
         if (vault.strategy.includes("QuickSwap")) {
           const ammFee = await readContract(wagmiConfig, {
-            address: quickSwapIchiFactory,
+            address: ichiFactories.quickSwap,
             abi: [
               {
                 inputs: [],
@@ -160,7 +155,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
             functionName: "ammFee",
           });
           const baseFee = await readContract(wagmiConfig, {
-            address: quickSwapIchiFactory,
+            address: ichiFactories.quickSwap,
             abi: [
               {
                 inputs: [],

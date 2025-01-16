@@ -83,23 +83,8 @@ type TPlatformGetData = [
   string[],
   string[],
 ];
-type TPlatformGetBalance = [
-  string[],
-  bigint[],
-  bigint[],
-  string[],
-  bigint[],
-  bigint[],
-  string[],
-  bigint[],
-  bigint,
-];
 
-type TUserBalance = {
-  buildingPayPerVaultTokenBalance: bigint;
-  erc20Balance: { [token: string]: bigint };
-  erc721Balance: { [token: string]: bigint };
-};
+type TFrontendBalances = [bigint, string[], bigint[], bigint[]];
 
 type TInitParams = {
   initVaultAddresses: string[];
@@ -611,7 +596,6 @@ interface IExtendedYieldContest extends YieldContest {
 
 export type {
   TPlatformData,
-  TUserBalance,
   TInitParams,
   TAllowedBBTokenVaults,
   TTokenData,
@@ -661,7 +645,7 @@ export type {
   TPlatformGetData,
   TChartPayload,
   TVaultDataKey,
-  TPlatformGetBalance,
+  TFrontendBalances,
   TChain,
   TUnderlyingToken,
   TTokens,

@@ -1,4 +1,4 @@
-import type { TVaultData, TPlatformGetBalance, TAddress } from "@types";
+import type { TVaultData, TFrontendBalances, TAddress } from "@types";
 
 /**
  * Converts platform balance data into a vault data object
@@ -6,14 +6,16 @@ import type { TVaultData, TPlatformGetBalance, TAddress } from "@types";
  * @example
  * ```
  * const data = [
- *   ['0xVault1', '0xVault2'],
- *   [100, 200],
- *   [50, 150]
+ *   10n,
+ *   ["0xaddress","0xaddress"],
+ *   [1000n, 2000n]
+ *   [1000n, 2000n]
  * ];
+ *
  * const vaultData = addVaultData(data);
  * ```
  *
- * @param {TPlatformGetBalance} data - The platform balance data, consisting of:
+ * @param {TFrontendBalances} data - The platform balance data, consisting of:
  *   - `vaultAddress`: Array of vault addresses
  *   - `vaultSharePrice`: Array of share prices for each vault
  *   - `vaultUserBalance`: Array of user balances for each vault
@@ -25,10 +27,10 @@ import type { TVaultData, TPlatformGetBalance, TAddress } from "@types";
  * @remarks This function assumes that all input arrays (`vaultAddress`, `vaultSharePrice`, and `vaultUserBalance`) have the same length
  */
 
-const addVaultData = (data: TPlatformGetBalance): TVaultData => {
-  const vaultAddress = data[3];
-  const vaultSharePrice = data[4];
-  const vaultUserBalance = data[5];
+const addVaultData = (data: TFrontendBalances): TVaultData => {
+  const vaultAddress = data[1];
+  const vaultSharePrice = data[2];
+  const vaultUserBalance = data[3];
   const vault: TVaultData = {};
 
   for (let i = 0; i < vaultAddress.length; i++) {

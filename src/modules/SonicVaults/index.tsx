@@ -24,6 +24,7 @@ import {
   FullPageLoader,
   ErrorMessage,
   RiskIndicator,
+  ExplorerLink,
 } from "@ui";
 
 import {
@@ -62,7 +63,7 @@ import {
   // WMATIC,
 } from "@constants";
 
-// import { platforms, PlatformABI } from "@web3";
+import { PlatformABI } from "@web3";
 
 import type {
   TVault,
@@ -79,8 +80,6 @@ import type {
   TUpgradesTable,
   TAddress,
 } from "@types";
-import PlatformABI from "../../web3/abi/PlatformABI.ts";
-import { ExplorerLink } from "../../ui/ExplorerLink.tsx";
 
 // type TToken = {
 //   logo: string;
@@ -330,6 +329,8 @@ const SonicVaults = (): JSX.Element => {
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
+    if (!$vaults) return;
+
     const searchValue: string = String(search?.current?.value.toLowerCase());
 
     let activeNetworksVaults: { [key: string]: TVault[] } = {};
@@ -444,6 +445,7 @@ const SonicVaults = (): JSX.Element => {
         }
       }
     });
+
     //search
     sortedVaults = sortedVaults.filter(
       (vault: TVault) =>

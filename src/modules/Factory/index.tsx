@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { createPublicClient, formatUnits, http } from "viem";
+import { sonic } from "viem/chains";
 //import { usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
@@ -11,8 +12,9 @@ import { BuildForm } from "./BuildForm";
 import {
   platforms,
   PlatformABI,
-  FactoryABI,
-  IERC721Enumerable,
+  IFrontendABI,
+  frontendContracts,
+  CONTRACT_PAGINATION,
   // wagmiConfig,
 } from "@web3";
 
@@ -20,7 +22,6 @@ import {
   platformsData,
   publicClient,
   lastTx,
-  balances,
   account,
   connected,
   currentChainID,
@@ -34,24 +35,21 @@ import type {
   TInitParams,
   TAllowedBBTokenVaults,
   TBuildVariant,
-  TAddress,
   TPlatformGetData,
 } from "@types";
-import { sonic } from "viem/chains";
 
-type TFreeVaults =
-  | {
-      freeVaults: number;
-      nextUpdate: string;
-    }
-  | undefined;
+// type TFreeVaults =
+//   | {
+//       freeVaults: number;
+//       nextUpdate: string;
+//     }
+//   | undefined;
 
 type TBuildingPrices = { [vaultType: string]: bigint };
 
 const Factory = (): JSX.Element => {
   const $publicClient = useStore(publicClient);
   const $platformsData = useStore(platformsData);
-  const $balances = useStore(balances);
   const $account = useStore(account);
   const $connected = useStore(connected);
   const $currentChainID = useStore(currentChainID);
@@ -82,7 +80,7 @@ const Factory = (): JSX.Element => {
   // >();
 
   const [defaultBoostTokens, setDefaultBoostTokens] = useState<string[]>([]);
-  const [freeVaults, setFreeVaults] = useState<TFreeVaults>();
+  // const [freeVaults, setFreeVaults] = useState<TFreeVaults>();
 
   const [buildingPrices, setBuildingPrices] = useState<TBuildingPrices>({});
 
@@ -115,13 +113,14 @@ const Factory = (): JSX.Element => {
       const variants: TBuildVariant[] = [];
 
       const whatToBuild = await $publicClient.readContract({
-        address: $platformsData[$currentChainID].factory,
+        address: frontendContracts[$currentChainID],
         functionName: "whatToBuild",
-        abi: FactoryABI,
+        abi: IFrontendABI,
+        args: [BigInt(1), BigInt(CONTRACT_PAGINATION)],
       });
 
       if (whatToBuild?.length) {
-        for (let i = 0; i < whatToBuild[1].length; i++) {
+        for (let i = 0; i < whatToBuild[2].length; i++) {
           const initParams: TInitParams = {
             initVaultAddresses: [],
             initVaultNums: [],
@@ -129,37 +128,37 @@ const Factory = (): JSX.Element => {
             initStrategyNums: [],
             initStrategyTicks: [],
           };
-          let paramsLength = whatToBuild[3][i][1] - whatToBuild[3][i][0];
+          let paramsLength = whatToBuild[4][i][1] - whatToBuild[4][i][0];
           for (let j = 0; j < paramsLength; ++j) {
             initParams.initVaultAddresses[j] =
-              whatToBuild[4][Number(whatToBuild[3][i][0]) + j];
+              whatToBuild[5][Number(whatToBuild[4][i][0]) + j];
           }
-          paramsLength = whatToBuild[3][i][3] - whatToBuild[3][i][2];
+          paramsLength = whatToBuild[4][i][3] - whatToBuild[4][i][2];
           for (let j = 0; j < paramsLength; ++j) {
             initParams.initVaultNums[j] =
-              whatToBuild[5][Number(whatToBuild[3][i][2]) + j];
+              whatToBuild[6][Number(whatToBuild[4][i][2]) + j];
           }
-          paramsLength = whatToBuild[3][i][5] - whatToBuild[3][i][4];
+          paramsLength = whatToBuild[4][i][5] - whatToBuild[4][i][4];
           for (let j = 0; j < paramsLength; ++j) {
             initParams.initStrategyAddresses[j] =
-              whatToBuild[6][Number(whatToBuild[3][i][4]) + j];
+              whatToBuild[7][Number(whatToBuild[4][i][4]) + j];
           }
-          paramsLength = whatToBuild[3][i][7] - whatToBuild[3][i][6];
+          paramsLength = whatToBuild[4][i][7] - whatToBuild[4][i][6];
           for (let j = 0; j < paramsLength; ++j) {
             initParams.initStrategyNums[j] = BigInt(
-              whatToBuild[7][Number(whatToBuild[3][i][6]) + j]
+              whatToBuild[8][Number(whatToBuild[4][i][6]) + j]
             );
           }
-          paramsLength = whatToBuild[3][i][9] - whatToBuild[3][i][8];
+          paramsLength = whatToBuild[4][i][9] - whatToBuild[4][i][8];
           for (let j = 0; j < paramsLength; ++j) {
             initParams.initStrategyTicks[j] =
-              whatToBuild[8][Number(whatToBuild[3][i][8]) + j];
+              whatToBuild[9][Number(whatToBuild[4][i][8]) + j];
           }
 
           variants.push({
-            vaultType: whatToBuild[1][i],
-            strategyId: whatToBuild[2][i],
-            strategyDesc: whatToBuild[0][i],
+            vaultType: whatToBuild[2][i],
+            strategyId: whatToBuild[3][i],
+            strategyDesc: whatToBuild[1][i],
             canBuild: true,
             initParams,
           });
@@ -209,78 +208,78 @@ const Factory = (): JSX.Element => {
       }
     }
   };
+  // platform getBalance
+  // const freeVaultsHandler = async () => {
+  //   if ($publicClient && $balances && $balances[7][0] && isCorrectNetwork) {
+  //     const epoch = Math.floor(new Date().getTime() / 1000);
+  //     const nextEpoch = epoch + 7 * 24 * 60 * 60;
 
-  const freeVaultsHandler = async () => {
-    if ($publicClient && $balances && $balances[7][0] && isCorrectNetwork) {
-      const epoch = Math.floor(new Date().getTime() / 1000);
-      const nextEpoch = epoch + 7 * 24 * 60 * 60;
+  //     const week = Math.floor(epoch / (86400 * 7));
+  //     const nextWeek = Math.floor(nextEpoch / (86400 * 7)) * 604800;
 
-      const week = Math.floor(epoch / (86400 * 7));
-      const nextWeek = Math.floor(nextEpoch / (86400 * 7)) * 604800;
+  //     const date = new Date(nextWeek * 1000);
 
-      const date = new Date(nextWeek * 1000);
+  //     const [day, month, hours, minutes] = [
+  //       date.getDate(),
+  //       date.toLocaleString("en-US", { month: "long" }),
+  //       date.getHours(),
+  //       date.getMinutes(),
+  //     ];
 
-      const [day, month, hours, minutes] = [
-        date.getDate(),
-        date.toLocaleString("en-US", { month: "long" }),
-        date.getHours(),
-        date.getMinutes(),
-      ];
+  //     const formattedDate = `${day} ${month} ${hours}:${
+  //       minutes < 10 ? "0" : ""
+  //     }${minutes}`;
 
-      const formattedDate = `${day} ${month} ${hours}:${
-        minutes < 10 ? "0" : ""
-      }${minutes}`;
+  //     const tokensOfOwner: bigint[] = [];
+  //     for (let i = 0; i < $balances[7][0]; i++) {
+  //       const tokenOfOwnerByIndex = await $publicClient.readContract({
+  //         address: $balances[6][0],
+  //         functionName: "tokenOfOwnerByIndex",
+  //         abi: IERC721Enumerable,
+  //         args: [$account as TAddress, BigInt(i)],
+  //       });
+  //       tokensOfOwner.push(tokenOfOwnerByIndex);
+  //     }
 
-      const tokensOfOwner: bigint[] = [];
-      for (let i = 0; i < $balances[7][0]; i++) {
-        const tokenOfOwnerByIndex = await $publicClient.readContract({
-          address: $balances[6][0],
-          functionName: "tokenOfOwnerByIndex",
-          abi: IERC721Enumerable,
-          args: [$account as TAddress, BigInt(i)],
-        });
-        tokensOfOwner.push(tokenOfOwnerByIndex);
-      }
+  //     if (tokensOfOwner && $platformsData[$currentChainID]) {
+  //       const vaultsBuiltByPermitTokenIdPromises: Promise<bigint[]>[] =
+  //         tokensOfOwner.map(async (tokenID: bigint) => {
+  //           const vaultsBuiltByPermitTokenId = await $publicClient.readContract(
+  //             {
+  //               address: $platformsData[$currentChainID].factory,
+  //               functionName: "vaultsBuiltByPermitTokenId",
+  //               abi: FactoryABI,
+  //               args: [BigInt(week), tokenID],
+  //             }
+  //           );
 
-      if (tokensOfOwner && $platformsData[$currentChainID]) {
-        const vaultsBuiltByPermitTokenIdPromises: Promise<bigint[]>[] =
-          tokensOfOwner.map(async (tokenID: bigint) => {
-            const vaultsBuiltByPermitTokenId = await $publicClient.readContract(
-              {
-                address: $platformsData[$currentChainID].factory,
-                functionName: "vaultsBuiltByPermitTokenId",
-                abi: FactoryABI,
-                args: [BigInt(week), tokenID],
-              }
-            );
+  //           return vaultsBuiltByPermitTokenId;
+  //         });
 
-            return vaultsBuiltByPermitTokenId;
-          });
-
-        try {
-          const vaultsPermitTokenId = await Promise.all(
-            vaultsBuiltByPermitTokenIdPromises
-          );
-          // todo for multiple nft
-          setFreeVaults({
-            freeVaults: Number(vaultsPermitTokenId[0]),
-            nextUpdate: formattedDate,
-          });
-        } catch (error) {
-          console.error("Error fetching NFT data:", error);
-        }
-      }
-    }
-  };
+  //       try {
+  //         const vaultsPermitTokenId = await Promise.all(
+  //           vaultsBuiltByPermitTokenIdPromises
+  //         );
+  //         // todo for multiple nft
+  //         setFreeVaults({
+  //           freeVaults: Number(vaultsPermitTokenId[0]),
+  //           nextUpdate: formattedDate,
+  //         });
+  //       } catch (error) {
+  //         console.error("Error fetching NFT data:", error);
+  //       }
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     getBuildingPrices();
     getData();
   }, [$publicClient, $platformsData?.[$currentChainID]?.factory, lastTx.get()]);
 
-  useEffect(() => {
-    freeVaultsHandler();
-  }, [$balances]);
+  // useEffect(() => {
+  //   freeVaultsHandler();
+  // }, [$balances]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
     (variant) => variant.vaultType === "Compounding"
@@ -549,7 +548,7 @@ const Factory = (): JSX.Element => {
                     minInitialBoostPerDay as bigint,
                     18
                   )}
-                  nftData={freeVaults}
+                  // nftData={freeVaults}
                 />
               </div>
             </div>

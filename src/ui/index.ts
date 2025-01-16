@@ -19,6 +19,7 @@ import { TableColumnSort } from "./TableColumnSort";
 import { Badge } from "./Badge";
 import { Counter } from "./Counter";
 import { BalanceVisibilityToggler } from "./BalanceVisibilityToggler";
+import { ExplorerLink } from "./ExplorerLink";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -51,4 +52,5 @@ export {
   Badge,
   Counter,
   BalanceVisibilityToggler,
+  ExplorerLink,
 };

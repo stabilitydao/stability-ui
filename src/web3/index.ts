@@ -20,24 +20,44 @@ import DividendMinterABI from "./abi/DividendMinterABI.ts";
 import DividendTokenABI from "./abi/DividendTokenABI.ts";
 import ICHIABI from "./abi/ICHIABI.ts";
 import PriceReaderABI from "./abi/PriceReaderABI.ts";
+import IFrontendABI from "./abi/IFrontendABI.ts";
 
 import type { TAddress } from "@types";
+
+const CONTRACT_PAGINATION = 50;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
 // 137 || 8453 || 111188 || 146
-const platforms: { [key: string]: TAddress } = {
-  "137": deployments[137].core?.platform,
-  "8453": deployments[8453].core?.platform,
-  "111188": deployments[111188].core?.platform,
-  "146": deployments[146].core?.platform,
-};
+const platforms: { [key: string]: TAddress } = Object.entries(
+  deployments
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.core?.platform) {
+      acc[key] = value.core.platform;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
 
-const priceReaders: { [key: string]: TAddress } = {
-  "137": deployments[137].core.priceReader,
-  "8453": deployments[8453].core.priceReader,
-  "111188": deployments[111188].core?.priceReader,
-  "146": deployments[146].core?.priceReader,
+const priceReaders: { [key: string]: TAddress } = Object.entries(
+  deployments
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.core?.priceReader) {
+      acc[key] = value.core.priceReader;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
+
+const frontendContracts: { [key: string]: TAddress } = {
+  "137": "0xa9f5593e6a809a24fb41d1d854a577a8bf507e28",
+  "8453": "0x995c3bdee2830c7f96d4caa0c36f7b7b8ec60127",
+  "111188": "0xfd1361E0565b01B85d3c1511FEf7545D6A84d93a",
+  "146": "0x15487495cce9210795f9C2E0e1A7238E336dFc32",
 };
 
 const defiedgeFactories: { [key: string]: TAddress } = {
@@ -45,9 +65,10 @@ const defiedgeFactories: { [key: string]: TAddress } = {
   "8453": "0xa631c80f5F4739565d8793cAB6fD08812cE3337D",
 };
 
-const quickSwapIchiFactory = "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a";
-
-const retroIchiFactory = "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7";
+const ichiFactories: { [key: string]: TAddress } = {
+  quickSwap: "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a",
+  retro: "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7",
+};
 
 const metadata = {
   name: "Stability",
@@ -68,10 +89,11 @@ const walletClient = createWalletClient({
 });
 
 export {
+  CONTRACT_PAGINATION,
   platforms,
+  frontendContracts,
   defiedgeFactories,
-  quickSwapIchiFactory,
-  retroIchiFactory,
+  ichiFactories,
   walletConnectProjectId,
   walletClient,
   priceReaders,
@@ -91,4 +113,5 @@ export {
   DividendTokenABI,
   ICHIABI,
   PriceReaderABI,
+  IFrontendABI,
 };

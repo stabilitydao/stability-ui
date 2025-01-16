@@ -1,8 +1,8 @@
-import { addAssetsBalance } from "@utils";
-
 import { assetsBalances } from "@store";
 
-import { platforms, PlatformABI } from "@web3";
+import { addAssetsBalance } from "@utils";
+
+import { frontendContracts, IFrontendABI, CONTRACT_PAGINATION } from "@web3";
 
 import type { TAddress, TBalances } from "@types";
 
@@ -11,7 +11,7 @@ import type { TAddress, TBalances } from "@types";
  *
  * @example
  * ```
- * const balances = await getPlatformBalance(publicClient, "mainnet", "0xUserAddress");
+ * const balances = await getPlatformBalance(publicClient, 137, "0xUserAddress");
  * ```
  *
  * @param {any} publicClient - Public client instance used to interact with the blockchain
@@ -26,14 +26,14 @@ export const getPlatformBalance = async (
   network: string,
   address: TAddress
 ): Promise<TBalances> => {
-  const contractBalance = await publicClient?.readContract({
-    address: platforms[network],
-    abi: PlatformABI,
-    functionName: "getBalance",
-    args: [address],
+  const contractAssetsBalances = await publicClient?.readContract({
+    address: frontendContracts[network],
+    abi: IFrontendABI,
+    functionName: "getBalanceAssets",
+    args: [address as TAddress, BigInt(0), BigInt(CONTRACT_PAGINATION)],
   });
 
-  const currentChainBalances = addAssetsBalance(contractBalance);
+  const currentChainBalances = addAssetsBalance(contractAssetsBalances);
 
   const oldBalances = assetsBalances.get();
 

@@ -13,7 +13,9 @@ const mockPublicClient = {
 };
 
 const mockNetwork = "137";
+
 const mockAddress = "0x1234567890abcdef1234567890abcdef12345678";
+
 const mockContractBalance = {
   "0xabcdefabcdefabcdefabcdefabcdefabcdef": BigInt(1000),
 };

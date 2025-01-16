@@ -2,7 +2,15 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
+import {
+  formatUnits,
+  parseUnits,
+  zeroAddress,
+  maxUint256,
+  http,
+  createPublicClient,
+} from "viem";
+import { sonic } from "viem/chains";
 
 import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
@@ -94,10 +102,21 @@ const ZAP_ROUTERS = {
 };
 
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
-  const _publicClient = usePublicClient({
-    chainId: Number(network),
-    config: wagmiConfig,
-  });
+  let _publicClient;
+
+  if (network == "146") {
+    _publicClient = createPublicClient({
+      chain: sonic,
+      transport: http(
+        import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+      ),
+    });
+  } else {
+    _publicClient = usePublicClient({
+      chainId: Number(network),
+      config: wagmiConfig,
+    });
+  }
 
   const { open } = useWeb3Modal();
 
