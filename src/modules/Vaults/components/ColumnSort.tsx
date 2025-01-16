@@ -8,9 +8,6 @@ type TProps = {
 };
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
-  const newUrl = new URL(window.location.href);
-  const params = new URLSearchParams(newUrl.search);
-
   const styles: Record<string, string> = {
     // Type: "hidden xl:table-cell",
     Assets: "min-w-[180px]",
@@ -25,6 +22,11 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   };
 
   const tabController = () => {
+    if (table[index].unsortable) return;
+
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+
     let nextCase: string = "";
     switch (table[index].sortType) {
       case "none":

@@ -8,23 +8,26 @@ type TProps = {
 };
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
-  const newUrl = new URL(window.location.href);
-  const params = new URLSearchParams(newUrl.search);
-
   const styles: Record<string, string> = {
     // Type: "hidden xl:table-cell",
     Assets: "min-w-[180px]",
     Strategy: "w-[190px]",
     "Income APR": "min-w-[130px]",
-    "VS HODL APR": "min-w-[130px]",
+    // "VS HODL APR": "min-w-[130px]",
+    Rewards: "min-w-[130px]",
     // Status: "table-cell",
-    RISK: "text-center pl-2",
+    // RISK: "text-center pl-2",
     Price: "min-w-[80px]",
     TVL: "min-w-[95px]",
     Balance: "min-w-[100px]",
   };
 
   const tabController = () => {
+    if (table[index].unsortable) return;
+
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+
     let nextCase: string = "";
     switch (table[index].sortType) {
       case "none":
@@ -57,48 +60,38 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <th
       onClick={tabController}
-      className={`text-[12px] font-manrope font-semibold ${
+      className={`text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} ${
         index < 5
-          ? `px-2 min-[1130px]:px-4 ${
-              value === "Symbol" &&
-              "sticky left-0 md:relative z-10 min-w-[150px] w-[200px] bg-accent-950"
-            }`
+          ? "px-2 min-[1130px]:px-4"
           : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
-      } py-2 text-center cursor-pointer whitespace-nowrap ${
-        styles[value] || ""
-      }`}
+      } py-2 text-center whitespace-nowrap ${styles[value] || ""}`}
       data-testid="sort"
     >
-      {value !== "APR / APY" ? (
-        <p
-          className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
-        >
-          {value}
-        </p>
-      ) : (
-        <p
-          className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
-        >
-          {window.innerWidth > 915 || window.innerWidth < 767 ? value : "APR"}
-        </p>
-      )}
-      <svg
-        width="15"
-        height="14"
-        viewBox="0 0 15 14"
-        xmlns="http://www.w3.org/2000/svg"
-        className={`inline-block ml-1 transition duration-300 ease-in-out ${
-          table[index].sortType === "ascendentic" && "rotate-[180deg]"
-        }`}
+      <p
+        className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
       >
-        <path
-          d="M7.50008 2.91669V11.0834M7.50008 11.0834L11.5834 7.00002M7.50008 11.0834L3.41675 7.00002"
-          stroke={table[index].sortType !== "none" ? "#F9F8FA" : "#958CA1"}
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+        {value}
+      </p>
+
+      {!table[index].unsortable && (
+        <svg
+          width="15"
+          height="14"
+          viewBox="0 0 15 14"
+          xmlns="http://www.w3.org/2000/svg"
+          className={`inline-block ml-1 transition duration-300 ease-in-out ${
+            table[index].sortType === "ascendentic" && "rotate-[180deg]"
+          }`}
+        >
+          <path
+            d="M7.50008 2.91669V11.0834M7.50008 11.0834L11.5834 7.00002M7.50008 11.0834L3.41675 7.00002"
+            stroke={table[index].sortType !== "none" ? "#F9F8FA" : "#958CA1"}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
     </th>
   );
 };

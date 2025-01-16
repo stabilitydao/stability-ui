@@ -1151,6 +1151,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
+    // !tmp
+    if (
+      option[0] === underlyingToken.address ||
+      option.join(", ") === defaultOption.assets
+    ) {
+      return;
+    }
+
     const currentBalances: TBalances = await getPlatformBalance(
       _publicClient,
       network,
@@ -2051,10 +2059,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setUnderlyingShares(false);
     setZapShares(false);
-    // if (option[0] === underlyingToken?.address) {
-    //   setIsRefresh(false);
-    //   return;
-    // }
+    // !tmp
+    if (
+      option[0] === underlyingToken?.address ||
+      option.join(", ") === defaultOption.assets
+    ) {
+      setIsRefresh(false);
+      return;
+    }
     setIsRefresh(true);
   }, [option, inputs]);
 
@@ -2262,7 +2274,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             <div className="flex items-center gap-5 pt-[12px]">
               <img
                 className={`${
-                  isRefresh ? "cursor-pointer" : "cursor-default"
+                  isRefresh
+                    ? "cursor-pointer opacity-100"
+                    : "cursor-default opacity-30"
                 } transition-transform duration-500`}
                 style={{ transform: `rotate(${rotation}deg)` }}
                 onClick={refreshData}

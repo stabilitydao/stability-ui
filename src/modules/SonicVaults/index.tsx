@@ -23,7 +23,6 @@ import {
   TimeDifferenceIndicator,
   FullPageLoader,
   ErrorMessage,
-  RiskIndicator,
   ExplorerLink,
 } from "@ui";
 
@@ -858,7 +857,7 @@ const SonicVaults = (): JSX.Element => {
                             <i></i>
                           </div>
                         </td>
-                        <td
+                        {/* <td
                           onClick={(e) => {
                             if (isMobile) {
                               e.stopPropagation();
@@ -969,8 +968,18 @@ const SonicVaults = (): JSX.Element => {
                             </table>
                             <i></i>
                           </div>
-                        </td>
+                        </td> */}
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            <img
+                              src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
+                              className="w-[24px] h-[24px]"
+                              title="sGEM1"
+                              alt="sGEM1"
+                            />
+                          </div>
+                        </td>
+                        {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             <RiskIndicator
                               riskSymbol={
@@ -980,7 +989,7 @@ const SonicVaults = (): JSX.Element => {
                               }
                             />
                           </div>
-                        </td>
+                        </td> */}
                         <td className="px-2 min-[1130px]:px-4 py-2 text-right">
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
