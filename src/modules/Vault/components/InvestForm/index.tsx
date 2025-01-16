@@ -327,12 +327,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const handleInputChange = async (amount: string, asset: string) => {
-    // if (!amount) {
+    // if (!Number(amount) && shortId !== "BSF") {
     //   setSharesOut(false);
     //   resetInputs();
     //   return;
     // }
-    // commented for BSF
 
     if (tab === "Deposit") {
       setInputs(
@@ -342,6 +341,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             [asset]: amount,
           }) as TVaultInput
       );
+
       if (
         option.length > 1 ||
         (defaultOption?.assets === option[0] && option.length < 2)
@@ -1155,6 +1155,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
+
+    const isEmpty = !Object.values(inputs).filter((value) => value).length;
+
     // // !tmp
     // if (option[0] === underlyingToken.address) {
     //   return;
@@ -1165,6 +1168,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       network,
       $account as TAddress
     );
+
+    if (isEmpty) {
+      setRotation(rotation + 360);
+      getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
+      return;
+    }
 
     setRotation(rotation + 360);
     setLoader(true);
