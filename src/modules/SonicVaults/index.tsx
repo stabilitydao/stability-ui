@@ -130,7 +130,9 @@ const SonicVaults = (): JSX.Element => {
       ({ name }) => name.toUpperCase() === paramName.toUpperCase()
     );
 
-    urlTableStates[indexOfState].sortType = paramType;
+    const URLParamType = paramType === "desc" ? "descendentic" : "ascendentic";
+
+    urlTableStates[indexOfState].sortType = URLParamType;
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
@@ -594,7 +596,7 @@ const SonicVaults = (): JSX.Element => {
           isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
-        <ErrorMessage type={$error.type} isAlert={true} />
+        <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
         <Portfolio vaults={localVaults} />
         {/* <NetworkFilters
           activeNetworks={activeNetworks}

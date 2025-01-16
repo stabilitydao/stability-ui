@@ -10,7 +10,7 @@ type TProps = {
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
     // Type: "hidden xl:table-cell",
-    Assets: "min-w-[180px]",
+    Assets: "min-w-[180px] text-left",
     Strategy: "w-[190px]",
     "Income APR": "min-w-[130px] text-right",
     // "VS HODL APR": "min-w-[130px]",
@@ -46,9 +46,19 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     const updatedTable: TTableColumn[] = table.map(
       (column: TTableColumn, i: number) => {
         if (index === i) {
-          params.set("sort", `${column.name.toLowerCase()}-${nextCase}`);
+          const URLSortCase = nextCase === "descendentic" ? "desc" : "asc";
+
+          const sortParam = `${column.name.toLowerCase()}-${URLSortCase}`;
+
+          if (sortParam === "tvl-desc") {
+            params.delete("sort");
+          } else {
+            params.set("sort", sortParam);
+          }
+
           newUrl.search = `?${params.toString()}`;
           window.history.pushState({}, "", newUrl.toString());
+
           return { ...column, sortType: nextCase };
         } else {
           return { ...column, sortType: "none" };
@@ -64,7 +74,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
         index < 5
           ? "px-2 min-[1130px]:px-4"
           : "pl-0 md:px-2  min-[1130px]:px-3 text-right"
-      } py-2 text-center whitespace-nowrap ${styles[value] || ""}`}
+      } py-2 whitespace-nowrap ${styles[value] || "text-center"}`}
       data-testid="sort"
     >
       <p
