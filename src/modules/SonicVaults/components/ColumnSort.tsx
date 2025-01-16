@@ -12,13 +12,13 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     // Type: "hidden xl:table-cell",
     Assets: "min-w-[180px]",
     Strategy: "w-[190px]",
-    "Income APR": "min-w-[130px]",
+    "Income APR": "min-w-[130px] text-right",
     // "VS HODL APR": "min-w-[130px]",
     Rewards: "min-w-[130px]",
     // Status: "table-cell",
     // RISK: "text-center pl-2",
     Price: "min-w-[80px]",
-    TVL: "min-w-[95px]",
+    TVL: "min-w-[95px] text-right",
     Balance: "min-w-[100px]",
   };
 
