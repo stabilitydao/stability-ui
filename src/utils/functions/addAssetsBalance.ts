@@ -1,4 +1,4 @@
-import type { TBalances, TPlatformGetBalance } from "@types";
+import type { TBalances, TFrontendBalances } from "@types";
 
 /**
  * Converts platform balance data into a standardized balance object
@@ -6,22 +6,23 @@ import type { TBalances, TPlatformGetBalance } from "@types";
  * @example
  * ```
  * const data = [
- *   ['0x123...', '0xabc...'],
- *   [],
- *   [1000, 2000]
+ *   10n,
+ *   ["0xaddress","0xaddress"],
+ *   [1000n, 2000n]
+ *   [1000n, 2000n]
  * ];
  *
  * const balances = addAssetsBalance(data);
  * ```
  *
- * @param {TPlatformGetBalance} data - Data array containing platform balance information
+ * @param {TFrontendBalances} data - Data array containing platform balance information
  *
  * @returns {TBalances} An object where the keys are asset addresses (in lowercase) and the values are their corresponding balances
  */
 
-const addAssetsBalance = (data: TPlatformGetBalance): TBalances => {
-  const assets = data[0].map((address: string) => address.toLowerCase());
-  const assetsBalances = data[2];
+const addAssetsBalance = (data: TFrontendBalances): TBalances => {
+  const assets = data[1].map((address: string) => address.toLowerCase());
+  const assetsBalances = data[3];
   const balances: TBalances = {};
 
   for (let i = 0; i < assets.length; i++) {

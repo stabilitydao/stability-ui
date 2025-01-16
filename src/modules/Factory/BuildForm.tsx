@@ -19,7 +19,6 @@ import { BIG_INT_VALUES } from "@constants";
 import {
   account,
   platformsData,
-  userBalance,
   lastTx,
   assetsBalances,
   assetsPrices,
@@ -37,7 +36,7 @@ interface IProps {
   buildingPrice: bigint;
   defaultBoostTokens: string[];
   minInitialBoostPerDay: string | number;
-  nftData: { freeVaults: number; nextUpdate: string } | undefined;
+  // nftData: { freeVaults: number; nextUpdate: string } | undefined;
 }
 
 type TTokenData = {
@@ -58,11 +57,10 @@ const BuildForm = ({
   buildingPrice,
   defaultBoostTokens,
   minInitialBoostPerDay,
-  nftData,
+  // nftData,
 }: IProps): JSX.Element => {
   const $account = useStore(account);
   const $platformsData = useStore(platformsData);
-  const $balance = useStore(userBalance);
   const $assetsBalances = useStore(assetsBalances);
   const $assetsPrices = useStore(assetsPrices);
   const $currentChainID = useStore(currentChainID);
@@ -87,6 +85,8 @@ const BuildForm = ({
       tokenlist.tokens.find((token) => token.address === addr)?.decimals ?? 18,
   }));
 
+  const [vaultTokenBalance, setVaultTokenBalance] = useState<bigint>(BigInt(0));
+
   const [boostRewardsTokens, setBoostRewardsTokens] = useState(BRT);
   const [allowance, setAllowance] = useState<bigint | undefined>();
   const [buildResult, setBuildResult] = useState<boolean | undefined>();
@@ -103,6 +103,23 @@ const BuildForm = ({
   );
 
   const [loader, setLoader] = useState<boolean>(false);
+
+  const getVaultTokenBalance = async () => {
+    try {
+      const tokenBalance = await readContract(wagmiConfig, {
+        address: $platformsData[$currentChainID]?.buildingPayPerVaultToken,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      });
+
+      if (!!tokenBalance) {
+        setVaultTokenBalance(tokenBalance);
+      }
+    } catch (error) {
+      console.error("Get balance error:", error);
+    }
+  };
 
   //// rewarding
   const handleInput = (
@@ -130,6 +147,7 @@ const BuildForm = ({
     setBoostRewardsTokens(newBoostTokens);
     setInputValues(newInputValues);
   };
+
   const handleDeploy = () => {
     const tokensData: TTokenData[] = [];
 
@@ -186,6 +204,7 @@ const BuildForm = ({
       }
     }
   };
+
   const approveRewardingVaultTokens = async () => {
     if ($platformsData[$currentChainID] && rewardingVaultApprove?.length) {
       try {
@@ -216,6 +235,7 @@ const BuildForm = ({
       }
     }
   };
+
   const deployRewardingVault = async () => {
     const tokensToDeploy = boostRewardsTokens.map((item) =>
       parseUnits(item.sum, item.decimals)
@@ -352,6 +372,10 @@ const BuildForm = ({
   useEffect(() => {
     handleDeploy();
   }, [inputValues]);
+
+  useEffect(() => {
+    getVaultTokenBalance();
+  }, []);
   return (
     <div className="flex flex-col">
       {!buildResult && (
@@ -376,7 +400,7 @@ const BuildForm = ({
               {strategyDesc}
             </p>
           </div>
-          {nftData && (
+          {/* {nftData && (
             <div className="flex w-full justify-between">
               <span className="w-[40%] text-[18px]">
                 Free vaults by PM used until <br />
@@ -386,7 +410,7 @@ const BuildForm = ({
                 {nftData.freeVaults} of 1
               </span>
             </div>
-          )}
+          )} */}
           <div className="flex w-full justify-between">
             <span className="w-[30%] text-[16px] sm:text-[22px]">
               Build price
@@ -404,12 +428,12 @@ const BuildForm = ({
               Your balance
             </span>
             <span className="text-[14px] sm:text-[16px]">
-              {$balance?.buildingPayPerVaultTokenBalance && payPerVaultToken
+              {vaultTokenBalance && payPerVaultToken
                 ? `${formatUnits(
-                    $balance.buildingPayPerVaultTokenBalance,
+                    vaultTokenBalance,
                     payPerVaultToken.decimals
                   )} ${payPerVaultToken.symbol}`
-                : "-"}
+                : "0"}
             </span>
           </div>
 
@@ -463,11 +487,11 @@ const BuildForm = ({
       {!loader ? (
         <>
           {buildResult === undefined && vaultType === "Compounding" && (
+            // && (nftData === undefined || nftData?.freeVaults !== 0)
             <div className="mt-10 flex justify-center">
               {needCheckAllowance &&
               allowance !== undefined &&
-              allowance < buildingPrice &&
-              (nftData === undefined || nftData?.freeVaults !== 0) ? (
+              allowance < buildingPrice ? (
                 <button
                   className="bg-button px-5 py-1 rounded-md"
                   onClick={approve}
@@ -490,12 +514,12 @@ const BuildForm = ({
       )}
       {!loader && (
         <>
+          {/* && (nftData === undefined || nftData?.freeVaults !== 0) */}
           {buildResult === undefined &&
           vaultType === "Rewarding" &&
           needCheckAllowance &&
           allowance !== undefined &&
-          allowance < buildingPrice &&
-          (nftData === undefined || nftData?.freeVaults !== 0) ? (
+          allowance < buildingPrice ? (
             <button
               className="bg-button px-5 py-1 rounded-md"
               onClick={approve}

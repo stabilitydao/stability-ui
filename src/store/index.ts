@@ -9,7 +9,6 @@ import { DEFAULT_ERROR, DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import type {
   TPlatformData,
-  TUserBalance,
   TBalances,
   TAddress,
   TSettings,
@@ -26,14 +25,13 @@ const publicClient = atom<any>();
 const platformsData = atom<TPlatformData>({});
 
 const platformVersions = atom<Record<string, string>>({});
-const userBalance = atom<TUserBalance | undefined>();
+
 const lastTx = atom<string | undefined>();
 const assetsPrices = atom<TMultichainPrices>({});
 const assetsBalances = atom<{ [key: string]: TBalances }>({});
 const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
-const balances = atom<any>();
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
 
@@ -75,14 +73,12 @@ export {
   account,
   publicClient,
   platformsData,
-  userBalance,
   lastTx,
   assetsPrices,
   assetsBalances,
   vaultData,
   vaults,
   isVaultsLoaded,
-  balances,
   visible,
   tokens,
   connected,

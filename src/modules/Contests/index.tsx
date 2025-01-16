@@ -185,13 +185,20 @@ const Contests = (): JSX.Element => {
                                       )}
                                   </div>
                                   <div className="flex items-center">
-                                    {reward.winnerReward && reward.winners ? String(
+                                    {reward.winnerReward && reward.winners
+                                      ? String(
+                                          formatNumber(
+                                            reward.winnerReward *
+                                              reward.winners,
+                                            "abbreviateInteger"
+                                          )
+                                        ).slice(1)
+                                      : ""}
+                                    {reward.totalReward &&
                                       formatNumber(
-                                        reward.winnerReward * reward.winners,
-                                        "abbreviateInteger"
-                                      )
-                                    ).slice(1) : ''}
-                                    {reward.totalReward && formatNumber(reward.totalReward, 'abbreviateIntegerNotUsd')}
+                                        reward.totalReward,
+                                        "abbreviateIntegerNotUsd"
+                                      )}
                                   </div>
                                 </div>
                               ))}

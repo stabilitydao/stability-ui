@@ -22,6 +22,11 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   };
 
   const tabController = () => {
+    if (table[index].unsortable) return;
+
+    const newUrl = new URL(window.location.href);
+    const params = new URLSearchParams(newUrl.search);
+
     let nextCase: string = "";
     switch (table[index].sortType) {
       case "none":
@@ -40,6 +45,9 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     const updatedTable: TTableColumn[] = table.map(
       (column: TTableColumn, i: number) => {
         if (index === i) {
+          params.set("sort", `${column.name.toLowerCase()}-${nextCase}`);
+          newUrl.search = `?${params.toString()}`;
+          window.history.pushState({}, "", newUrl.toString());
           return { ...column, sortType: nextCase };
         } else {
           return { ...column, sortType: "none" };

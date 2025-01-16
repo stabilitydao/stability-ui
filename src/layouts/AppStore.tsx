@@ -3,6 +3,7 @@ import type React from "react";
 import { useEffect } from "react";
 
 import { createPublicClient, formatUnits, http } from "viem";
+import { sonic } from "viem/chains";
 
 import axios from "axios";
 
@@ -25,10 +26,8 @@ import {
   platformsData,
   platformVersions,
   publicClient,
-  userBalance,
   vaults,
   isVaultsLoaded,
-  balances,
   tokens,
   connected,
   apiData,
@@ -42,7 +41,13 @@ import {
   vaultData,
 } from "@store";
 
-import { wagmiConfig, platforms, PlatformABI } from "@web3";
+import {
+  wagmiConfig,
+  platforms,
+  frontendContracts,
+  IFrontendABI,
+  CONTRACT_PAGINATION,
+} from "@web3";
 
 import {
   calculateAPY,
@@ -71,7 +76,7 @@ import type {
   TAPIData,
   TPriceInfo,
   TVaultDataKey,
-  TPlatformGetBalance,
+  TFrontendBalances,
   TPlatformData,
   TBalances,
   TTokens,
@@ -79,7 +84,6 @@ import type {
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
-import { sonic } from "viem/chains";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -676,49 +680,47 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             }
 
             try {
-              const contractBalance = (await localClient?.readContract({
-                address: platforms[chain.id],
-                abi: PlatformABI,
-                functionName: "getBalance",
-                args: [address as TAddress],
-              })) as TPlatformGetBalance;
+              const contractAssetsBalances = await localClient?.readContract({
+                address: frontendContracts[chain.id],
+                abi: IFrontendABI,
+                functionName: "getBalanceAssets",
+                args: [
+                  address as TAddress,
+                  BigInt(0),
+                  BigInt(CONTRACT_PAGINATION),
+                ],
+              });
+              const contractVaultsBalances = await localClient?.readContract({
+                address: frontendContracts[chain.id],
+                abi: IFrontendABI,
+                functionName: "getBalanceVaults",
+                args: [
+                  address as TAddress,
+                  BigInt(0),
+                  BigInt(CONTRACT_PAGINATION),
+                ],
+              });
 
-              const vaultsAddresses = contractBalance[3];
-              const vaultsBalances = contractBalance[5];
+              const vaultsAddresses = contractVaultsBalances?.[1];
+              const vaultsBalances = contractVaultsBalances?.[3];
 
-              if (contractBalance) {
-                const buildingPayPerVaultTokenBalance: bigint =
-                  contractBalance[8];
+              if (contractAssetsBalances && contractVaultsBalances) {
                 const erc20Balance: { [token: string]: bigint } = {};
-                const erc721Balance: { [token: string]: bigint } = {};
                 //function -> .set vault/
 
                 vaultsData[chain.id] = addVaultData(
-                  contractBalance as TPlatformGetBalance
+                  contractVaultsBalances as TFrontendBalances
                 );
 
                 assetBalances[chain.id] = addAssetsBalance(
-                  contractBalance as TPlatformGetBalance
+                  contractAssetsBalances as TFrontendBalances
                 );
 
-                for (let i = 0; i < contractBalance[1].length; i++) {
-                  erc20Balance[String(contractBalance[0][i])] = BigInt(
-                    contractBalance[2][i]
+                for (let i = 0; i < contractAssetsBalances[1].length; i++) {
+                  erc20Balance[String(contractAssetsBalances[1][i])] = BigInt(
+                    contractAssetsBalances[3][i]
                   );
                 }
-
-                for (let i = 0; i < contractBalance[6].length; i++) {
-                  erc721Balance[contractBalance[6][i]] =
-                    contractBalance?.[7]?.[i];
-                }
-
-                userBalance.set({
-                  buildingPayPerVaultTokenBalance,
-                  erc20Balance,
-                  erc721Balance,
-                });
-
-                balances.set(contractBalance);
               }
 
               if (Array.isArray(vaultsAddresses)) {
@@ -728,7 +730,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                       return {
                         [vault.toLowerCase()]: {
                           ...localVaults[chain.id][vault.toLowerCase()],
-                          balance: vaultsBalances[index],
+                          balance: vaultsBalances?.[index],
                         },
                       };
                     }

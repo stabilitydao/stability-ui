@@ -2,7 +2,15 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
+import {
+  formatUnits,
+  parseUnits,
+  zeroAddress,
+  maxUint256,
+  http,
+  createPublicClient,
+} from "viem";
+import { sonic } from "viem/chains";
 
 import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
@@ -94,10 +102,21 @@ const ZAP_ROUTERS = {
 };
 
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
-  const _publicClient = usePublicClient({
-    chainId: Number(network),
-    config: wagmiConfig,
-  });
+  let _publicClient;
+
+  if (network == "146") {
+    _publicClient = createPublicClient({
+      chain: sonic,
+      transport: http(
+        import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+      ),
+    });
+  } else {
+    _publicClient = usePublicClient({
+      chainId: Number(network),
+      config: wagmiConfig,
+    });
+  }
 
   const { open } = useWeb3Modal();
 
@@ -191,6 +210,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   let isAnyCCFOptionVisible = false;
 
   const { shortId } = vault.strategyInfo;
+
+  const isIchiProtocol =
+    vault?.alm?.protocol === "Ichi" ||
+    vault.strategyInfo.protocols[0].name === "Ichi";
 
   const DEX =
     network === "111188"
@@ -304,12 +327,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const handleInputChange = async (amount: string, asset: string) => {
-    // if (!amount) {
+    // if (!Number(amount) && shortId !== "BSF") {
     //   setSharesOut(false);
     //   resetInputs();
     //   return;
     // }
-    // commented for BSF
 
     if (tab === "Deposit") {
       setInputs(
@@ -319,6 +341,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             [asset]: amount,
           }) as TVaultInput
       );
+
       if (
         option.length > 1 ||
         (defaultOption?.assets === option[0] && option.length < 2)
@@ -1132,16 +1155,45 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
+
+    const isEmpty = !Object.values(inputs).filter((value) => value).length;
+
+    // // !tmp
+    // if (option[0] === underlyingToken.address) {
+    //   return;
+    // }
+
     const currentBalances: TBalances = await getPlatformBalance(
       _publicClient,
       network,
       $account as TAddress
     );
 
+    if (isEmpty) {
+      setRotation(rotation + 360);
+      getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
+      return;
+    }
+
     setRotation(rotation + 360);
     setLoader(true);
     getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
-    zapInputHandler(inputs[option[0]], option[0]);
+
+    if (option.join(", ") === defaultOption.assets) {
+      let isAllowIndex = 0;
+
+      if (isIchiProtocol) {
+        isAllowIndex = ichiAllow.indexOf(true);
+
+        if (isAllowIndex === -1) {
+          isAllowIndex = 0;
+        }
+      }
+
+      handleInputChange(inputs[option[isAllowIndex]], option[isAllowIndex]);
+    } else {
+      zapInputHandler(inputs[option[0]], option[0]);
+    }
   };
   /////
 
@@ -1976,7 +2028,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [vault, $tokens, defaultOption, defaultOption]);
 
   useEffect(() => {
-    if (vault?.alm?.protocol === "Ichi" || shortId === "ISF") {
+    if (isIchiProtocol) {
       getIchiAllow();
     }
   }, []);
@@ -2032,6 +2084,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setUnderlyingShares(false);
     setZapShares(false);
+    // // !tmp
     // if (option[0] === underlyingToken?.address) {
     //   setIsRefresh(false);
     //   return;
@@ -2193,9 +2246,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {/* CRV Strategy don't have zap withdraw */}
                 {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
-                    const isIchiProtocol =
-                      vault?.alm?.protocol === "Ichi" || shortId === "ISF";
-
                     const symbolIndex = isIchiProtocol
                       ? defaultOption?.symbols
                           .split(" + ")
@@ -2243,7 +2293,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             <div className="flex items-center gap-5 pt-[12px]">
               <img
                 className={`${
-                  isRefresh ? "cursor-pointer" : "cursor-default"
+                  isRefresh
+                    ? "cursor-pointer opacity-100"
+                    : "cursor-default opacity-30"
                 } transition-transform duration-500`}
                 style={{ transform: `rotate(${rotation}deg)` }}
                 onClick={refreshData}
