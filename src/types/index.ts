@@ -589,8 +589,8 @@ interface Integration {
 interface IExtendedYieldContest extends YieldContest {
   id: string;
   status: number;
-  rewardsLength: number;
-  quests: Integration;
+  rewardsLength: number|"TBA";
+  quests: Integration|undefined;
   questsLength: number;
 }
 
