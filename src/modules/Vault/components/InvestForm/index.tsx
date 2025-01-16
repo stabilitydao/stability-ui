@@ -211,6 +211,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const { shortId } = vault.strategyInfo;
 
+  const isIchiProtocol =
+    vault?.alm?.protocol === "Ichi" ||
+    vault.strategyInfo.protocols[0].name === "Ichi";
+
   const DEX =
     network === "111188"
       ? {
@@ -1167,7 +1171,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
 
     if (option.join(", ") === defaultOption.assets) {
-      handleInputChange(inputs[option[0]], option[0]);
+      let isAllowIndex = 0;
+
+      if (isIchiProtocol) {
+        isAllowIndex = ichiAllow.indexOf(true);
+
+        if (isAllowIndex === -1) {
+          isAllowIndex = 0;
+        }
+      }
+
+      handleInputChange(inputs[option[isAllowIndex]], option[isAllowIndex]);
     } else {
       zapInputHandler(inputs[option[0]], option[0]);
     }
@@ -2005,7 +2019,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   }, [vault, $tokens, defaultOption, defaultOption]);
 
   useEffect(() => {
-    if (vault?.alm?.protocol === "Ichi" || shortId === "ISF") {
+    if (isIchiProtocol) {
       getIchiAllow();
     }
   }, []);
@@ -2223,9 +2237,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 {/* CRV Strategy don't have zap withdraw */}
                 {!(shortId === "CCF" && tab === "Withdraw") &&
                   optionTokens.map(({ address, symbol, logoURI }) => {
-                    const isIchiProtocol =
-                      vault?.alm?.protocol === "Ichi" || shortId === "ISF";
-
                     const symbolIndex = isIchiProtocol
                       ? defaultOption?.symbols
                           .split(" + ")
