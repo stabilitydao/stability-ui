@@ -1151,13 +1151,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   ///// 1INCH DATA REFRESH
   const refreshData = async () => {
     if (!isRefresh || loader) return;
-    // !tmp
-    if (
-      option[0] === underlyingToken.address ||
-      option.join(", ") === defaultOption.assets
-    ) {
-      return;
-    }
+    // // !tmp
+    // if (option[0] === underlyingToken.address) {
+    //   return;
+    // }
 
     const currentBalances: TBalances = await getPlatformBalance(
       _publicClient,
@@ -1168,7 +1165,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setRotation(rotation + 360);
     setLoader(true);
     getAssetsBalances(currentBalances, setBalances, option, underlyingToken);
-    zapInputHandler(inputs[option[0]], option[0]);
+
+    if (option.join(", ") === defaultOption.assets) {
+      handleInputChange(inputs[option[0]], option[0]);
+    } else {
+      zapInputHandler(inputs[option[0]], option[0]);
+    }
   };
   /////
 
@@ -2059,14 +2061,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   useEffect(() => {
     setUnderlyingShares(false);
     setZapShares(false);
-    // !tmp
-    if (
-      option[0] === underlyingToken?.address ||
-      option.join(", ") === defaultOption.assets
-    ) {
-      setIsRefresh(false);
-      return;
-    }
+    // // !tmp
+    // if (option[0] === underlyingToken?.address) {
+    //   setIsRefresh(false);
+    //   return;
+    // }
     setIsRefresh(true);
   }, [option, inputs]);
 
