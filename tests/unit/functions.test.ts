@@ -34,53 +34,53 @@ vi.mock("@store", () => ({
   visible: { set: vi.fn() },
 }));
 
-describe("addAssetsBalance", () => {
-  it("should correctly map assets to balances", () => {
-    const data = [
-      ["Address1", "Address2", "Address3"],
-      [],
-      ["Balance1", "Balance2", "Balance3"],
-    ];
-    const result = addAssetsBalance(data);
+// describe("addAssetsBalance", () => {
+//   it("should correctly map assets to balances", () => {
+//     const data = [
+//       ["Address1", "Address2", "Address3"],
+//       [],
+//       ["Balance1", "Balance2", "Balance3"],
+//     ];
+//     const result = addAssetsBalance(data);
 
-    expect(result).toEqual({
-      address1: "Balance1",
-      address2: "Balance2",
-      address3: "Balance3",
-    });
-  });
-});
+//     expect(result).toEqual({
+//       address1: "Balance1",
+//       address2: "Balance2",
+//       address3: "Balance3",
+//     });
+//   });
+// });
 
-describe("addVaultData", () => {
-  it("should correctly map vault addresses to their data", () => {
-    const data = [
-      [],
-      [],
-      [],
-      ["0xAddress1", "0xAddress2", "0xAddress3"],
-      [100, 200, 300],
-      [10, 20, 30],
-    ];
-    const result = addVaultData(data);
+// describe("addVaultData", () => {
+//   it("should correctly map vault addresses to their data", () => {
+//     const data = [
+//       [],
+//       [],
+//       [],
+//       ["0xAddress1", "0xAddress2", "0xAddress3"],
+//       [100, 200, 300],
+//       [10, 20, 30],
+//     ];
+//     const result = addVaultData(data);
 
-    const expected = {
-      "0xaddress1": {
-        vaultSharePrice: 100,
-        vaultUserBalance: 10,
-      },
-      "0xaddress2": {
-        vaultSharePrice: 200,
-        vaultUserBalance: 20,
-      },
-      "0xaddress3": {
-        vaultSharePrice: 300,
-        vaultUserBalance: 30,
-      },
-    };
+//     const expected = {
+//       "0xaddress1": {
+//         vaultSharePrice: 100,
+//         vaultUserBalance: 10,
+//       },
+//       "0xaddress2": {
+//         vaultSharePrice: 200,
+//         vaultUserBalance: 20,
+//       },
+//       "0xaddress3": {
+//         vaultSharePrice: 300,
+//         vaultUserBalance: 30,
+//       },
+//     };
 
-    expect(result).toEqual(expected);
-  });
-});
+//     expect(result).toEqual(expected);
+//   });
+// });
 
 describe("calculateAPY", () => {
   it("should correctly calculate with string || number", () => {

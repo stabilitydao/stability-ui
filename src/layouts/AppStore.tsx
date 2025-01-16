@@ -65,7 +65,6 @@ import {
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
   BIG_INT_VALUES,
-  PAGINATION_VAULTS,
 } from "@constants";
 
 import type {

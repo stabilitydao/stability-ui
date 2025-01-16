@@ -45,7 +45,6 @@ import { toVault, initFilters } from "./functions";
 import {
   formatNumber,
   formatFromBigInt,
-  getTimeDifference,
   dataSorter,
   getShortAddress,
 } from "@utils";
