@@ -41,13 +41,7 @@ import {
   vaultData,
 } from "@store";
 
-import {
-  wagmiConfig,
-  platforms,
-  frontendContracts,
-  IFrontendABI,
-  CONTRACT_PAGINATION,
-} from "@web3";
+import { wagmiConfig, platforms, frontendContracts } from "@web3";
 
 import {
   calculateAPY,
@@ -58,6 +52,7 @@ import {
   getTimeDifference,
   determineAPR,
   getLocalStorageData,
+  getContractDataWithPagination,
 } from "@utils";
 
 import {
@@ -680,31 +675,31 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             }
 
             try {
-              const contractAssetsBalances = await localClient?.readContract({
-                address: frontendContracts[chain.id],
-                abi: IFrontendABI,
-                functionName: "getBalanceAssets",
-                args: [
+              const contractAssetsBalances =
+                await getContractDataWithPagination(
+                  localClient,
+                  frontendContracts[chain.id],
+                  "getBalanceAssets",
                   address as TAddress,
-                  BigInt(0),
-                  BigInt(CONTRACT_PAGINATION),
-                ],
-              });
-              const contractVaultsBalances = await localClient?.readContract({
-                address: frontendContracts[chain.id],
-                abi: IFrontendABI,
-                functionName: "getBalanceVaults",
-                args: [
+                  0
+                );
+
+              const contractVaultsBalances =
+                await getContractDataWithPagination(
+                  localClient,
+                  frontendContracts[chain.id],
+                  "getBalanceVaults",
                   address as TAddress,
-                  BigInt(0),
-                  BigInt(CONTRACT_PAGINATION),
-                ],
-              });
+                  0
+                );
 
-              const vaultsAddresses = contractVaultsBalances?.[1];
-              const vaultsBalances = contractVaultsBalances?.[3];
+              if (
+                contractVaultsBalances.length === 4 &&
+                contractAssetsBalances.length === 4
+              ) {
+                const vaultsAddresses = contractVaultsBalances?.[1];
+                const vaultsBalances = contractVaultsBalances?.[3];
 
-              if (contractAssetsBalances && contractVaultsBalances) {
                 const erc20Balance: { [token: string]: bigint } = {};
                 //function -> .set vault/
 
@@ -721,28 +716,30 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     contractAssetsBalances[3][i]
                   );
                 }
-              }
 
-              if (Array.isArray(vaultsAddresses)) {
-                const vaultsPromise = await Promise.all(
-                  vaultsAddresses.map(async (vault: string, index: number) => {
-                    if (localVaults[chain.id][vault.toLowerCase()]) {
-                      return {
-                        [vault.toLowerCase()]: {
-                          ...localVaults[chain.id][vault.toLowerCase()],
-                          balance: vaultsBalances?.[index],
-                        },
-                      };
-                    }
-                  })
-                );
+                if (Array.isArray(vaultsAddresses)) {
+                  const vaultsPromise = await Promise.all(
+                    vaultsAddresses.map(
+                      async (vault: string, index: number) => {
+                        if (localVaults[chain.id][vault.toLowerCase()]) {
+                          return {
+                            [vault.toLowerCase()]: {
+                              ...localVaults[chain.id][vault.toLowerCase()],
+                              balance: vaultsBalances?.[index],
+                            },
+                          };
+                        }
+                      }
+                    )
+                  );
 
-                localVaults[chain.id] = vaultsPromise.reduce(
-                  (acc, curr) => ({ ...acc, ...curr }),
-                  {}
-                ) as TVaults;
+                  localVaults[chain.id] = vaultsPromise.reduce(
+                    (acc, curr) => ({ ...acc, ...curr }),
+                    {}
+                  ) as TVaults;
+                }
+                isVaultsLoaded.set(true);
               }
-              isVaultsLoaded.set(true);
             } catch (txError: any) {
               console.log("BLOCKCHAIN ERROR:", txError);
 

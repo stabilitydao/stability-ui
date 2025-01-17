@@ -519,6 +519,8 @@ type TStrategyState =
   | "BLOCKED"
   | "PROPOSAL";
 
+type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
+
 //// EVENTS
 
 type TError = {
@@ -589,8 +591,8 @@ interface Integration {
 interface IExtendedYieldContest extends YieldContest {
   id: string;
   status: number;
-  rewardsLength: number|"TBA";
-  quests: Integration|undefined;
+  rewardsLength: number | "TBA";
+  quests: Integration | undefined;
   questsLength: number;
 }
 
@@ -665,4 +667,5 @@ export type {
   TVLRange,
   TShareData,
   TxTokens,
+  TFrontendContractData,
 };
