@@ -976,7 +976,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         outData = [promises, promises];
       } else {
         promises = zapAmounts[0]
-          .filter((_, index) => vault.assetsProportions[index])
+          // bugfix 19.01.2025 by a17
+          // .filter((_, index) => vault.assetsProportions[index])
           .map(
             async (toAddress, index) =>
               await get1InchRoutes(
