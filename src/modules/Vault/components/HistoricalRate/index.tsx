@@ -97,7 +97,6 @@ const HistoricalRate: React.FC<IProps> = memo(
                 skip: ${entities}
               ) {
                   APR
-                  APR24H
                   periodVsHoldAPR
                   address
                   sharePrice

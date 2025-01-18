@@ -22,6 +22,7 @@ import { formatTimestampToDate } from "./functions/formatTimestampToDate";
 import { getNFTSymbol } from "./functions/getNFTSymbol";
 import { extractDomain } from "./functions/extractDomain";
 import { setVisibleBalances } from "./functions/setVisibleBalances";
+import { getContractDataWithPagination } from "./functions/getContractDataWithPagination";
 
 export {
   getTokenData,
@@ -47,4 +48,5 @@ export {
   getNFTSymbol,
   extractDomain,
   setVisibleBalances,
+  getContractDataWithPagination,
 };

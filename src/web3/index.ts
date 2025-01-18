@@ -24,7 +24,7 @@ import IFrontendABI from "./abi/IFrontendABI.ts";
 
 import type { TAddress } from "@types";
 
-const CONTRACT_PAGINATION = 50;
+const CONTRACT_PAGINATION = 20;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 

@@ -12,9 +12,8 @@ import { BuildForm } from "./BuildForm";
 import {
   platforms,
   PlatformABI,
-  IFrontendABI,
   frontendContracts,
-  CONTRACT_PAGINATION,
+  IFrontendABI,
   // wagmiConfig,
 } from "@web3";
 
@@ -116,7 +115,7 @@ const Factory = (): JSX.Element => {
         address: frontendContracts[$currentChainID],
         functionName: "whatToBuild",
         abi: IFrontendABI,
-        args: [BigInt(1), BigInt(CONTRACT_PAGINATION)],
+        args: [BigInt(1), BigInt(50)],
       });
 
       if (whatToBuild?.length) {

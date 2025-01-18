@@ -1,8 +1,8 @@
 import { assetsBalances } from "@store";
 
-import { addAssetsBalance } from "@utils";
+import { addAssetsBalance, getContractDataWithPagination } from "@utils";
 
-import { frontendContracts, IFrontendABI, CONTRACT_PAGINATION } from "@web3";
+import { frontendContracts } from "@web3";
 
 import type { TAddress, TBalances } from "@types";
 
@@ -26,12 +26,13 @@ export const getPlatformBalance = async (
   network: string,
   address: TAddress
 ): Promise<TBalances> => {
-  const contractAssetsBalances = await publicClient?.readContract({
-    address: frontendContracts[network],
-    abi: IFrontendABI,
-    functionName: "getBalanceAssets",
-    args: [address as TAddress, BigInt(0), BigInt(CONTRACT_PAGINATION)],
-  });
+  const contractAssetsBalances = await getContractDataWithPagination(
+    publicClient,
+    frontendContracts[network],
+    "getBalanceAssets",
+    address,
+    0
+  );
 
   const currentChainBalances = addAssetsBalance(contractAssetsBalances);
 
