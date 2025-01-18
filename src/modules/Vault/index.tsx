@@ -97,9 +97,9 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
         </div>
         <Assets
           network={network}
-          holdData={localVault?.assetsVsHold}
           assets={localVault?.assets}
           created={localVault.created}
+          pricesOnCreation={localVault.assetsPricesOnCreation}
           strategy={localVault?.strategyAddress}
         />
       </main>
