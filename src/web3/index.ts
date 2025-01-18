@@ -53,12 +53,17 @@ const priceReaders: { [key: string]: TAddress } = Object.entries(
   {} as { [key: string]: TAddress }
 );
 
-const frontendContracts: { [key: string]: TAddress } = {
-  "137": "0xa9f5593e6a809a24fb41d1d854a577a8bf507e28",
-  "8453": "0x995c3bdee2830c7f96d4caa0c36f7b7b8ec60127",
-  "111188": "0xfd1361E0565b01B85d3c1511FEf7545D6A84d93a",
-  "146": "0x15487495cce9210795f9C2E0e1A7238E336dFc32",
-};
+const frontendContracts: { [key: string]: TAddress } = Object.entries(
+  deployments
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.periphery?.frontend) {
+      acc[key] = value?.periphery?.frontend;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
 
 const defiedgeFactories: { [key: string]: TAddress } = {
   "137": "0x730d158D29165C55aBF368e9608Af160DD21Bd80",
