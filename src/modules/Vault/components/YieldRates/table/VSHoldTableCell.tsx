@@ -13,7 +13,7 @@ const VSHoldTableCell: React.FC<IProps> = memo(
         {...(!!testID && { "data-testid": testID })}
         className={`text-right ${
           isVsActive
-            ? `text-[18px] ${vsHold > 0 ? "text-success-400" : "text-error-400"}`
+            ? `text-[12px] md:text-[14px] ${vsHold > 0 ? "text-success-400" : "text-error-400"}`
             : ""
         }`}
       >
