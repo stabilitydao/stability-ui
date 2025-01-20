@@ -13,36 +13,36 @@ const metaData = {
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
-    </script>
-    <meta charset="UTF-8" />
-    <meta name="description" content={metaData.description} />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="twitter:image:src" content={metaData.img} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={metaData.title} />
-    <meta name="twitter:description" content={metaData.description} />
-    <meta property="og:image" content={metaData.img} />
-    <meta property="twitter:image:height" content="100" />
-    <meta property="twitter:image:width" content="100" />
-    <meta property="og:image:alt"  content={metaData.title} />
-    <meta property="og:type" content="object" />
-    <meta property="og:title" content={metaData.title} />
-    <meta property="og:url" content={metaData.url} />
-    <meta property="og:description" content={metaData.description} />
-	<link rel="icon" type="image/svg+xml" href="/favicon.ico">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
-  <meta name="generator" content={Astro.generator} />
-  <title>Stability</title>
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8NC1VWRMV"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', import.meta.env.PUBLIC_GOOGLE_ANALYTICS_KEY);
+      </script>
+      <meta charset="UTF-8" />
+      <meta name="description" content={metaData.description} />
+      <meta name="viewport" content="width=device-width" />
+      <meta name="twitter:image:src" content={metaData.img} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={metaData.title} />
+      <meta name="twitter:description" content={metaData.description} />
+      <meta property="og:image" content={metaData.img} />
+      <meta property="twitter:image:height" content="100" />
+      <meta property="twitter:image:width" content="100" />
+      <meta property="og:image:alt"  content={metaData.title} />
+      <meta property="og:type" content="object" />
+      <meta property="og:title" content={metaData.title} />
+      <meta property="og:url" content={metaData.url} />
+      <meta property="og:description" content={metaData.description} />
+      <meta name="debank-cloud-site-verification" content="a8009c84b0eef5ce070adbdeef48eca2" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+      <meta name="generator" content={Astro.generator} />
+      <title>Stability</title>
   </head>
   <body>
      <Home client:only="react"/>
