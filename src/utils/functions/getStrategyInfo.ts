@@ -200,7 +200,7 @@ export const getStrategyInfo = (
       protocols: [equalizer],
       il: IL.EF_vAMM,
     };
-  } else if (vaultSymbol.match(/ISF$/)) {
+  } else if (vaultSymbol.match(/ISF(\-\w)?$/)) {
     strategyInfo = {
       ...strategyInfo,
       protocols: [ichi, swapx],
