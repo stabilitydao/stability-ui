@@ -5,7 +5,12 @@ import { ContestsOverview } from "./components";
 
 import { FullPageLoader, HeadingText, TableColumnSort } from "@ui";
 
-import { getShortAddress, sortTable, formatTimestampToDate } from "@utils";
+import {
+  getShortAddress,
+  sortTable,
+  formatTimestampToDate,
+  formatNumber,
+} from "@utils";
 
 import { findAllValidPeriods } from "./functions";
 
@@ -27,6 +32,12 @@ const Users = (): JSX.Element => {
 
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
+
+  const [userRewards, setUserRewards] = useState({ points: "-", gems: "-" });
+  const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
+    points: "0",
+    gems: "0",
+  });
 
   const { currentPeriod, previousPeriod, nextPeriod } =
     findAllValidPeriods(contests);
@@ -63,6 +74,30 @@ const Users = (): JSX.Element => {
     }
   };
 
+  const getRewardsTotalSupply = async () => {
+    if ($apiData?.leaderboards?.absolute.length) {
+      const totalSupply = $apiData?.leaderboards?.absolute.reduce(
+        (acc, cur) => (acc += cur?.points ?? 0),
+        0
+      );
+
+      setRewardsTotalSupply({ points: String(totalSupply), gems: "0" });
+    }
+  };
+
+  const getUserBalance = async () => {
+    const user = $apiData?.leaderboards?.absolute.find(
+      ({ address }) => address === $account?.toLowerCase()
+    );
+
+    let userPoints = "0";
+    if (user?.points) {
+      userPoints = String(user?.points);
+    }
+
+    setUserRewards({ points: userPoints, gems: "0" });
+  };
+
   const allContests = useMemo(() => {
     const absoluteLeaderboard = $apiData?.leaderboards.absolute.map((user) =>
       user?.points ? user : { ...user, points: 0 }
@@ -97,9 +132,137 @@ const Users = (): JSX.Element => {
   useEffect(() => {
     initTableData();
   }, [activeContest, allContests]);
+
+  useEffect(() => {
+    if ($account) {
+      getUserBalance();
+    }
+  }, [$account]);
+
+  useEffect(() => {
+    getRewardsTotalSupply();
+  }, [$apiData?.leaderboards?.absolute]);
   return (
     <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[36px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
+      <div className="flex flex-col items-center gap-5">
+        <HeadingText text="Rewards" scale={2} styles="mb-0" />
+        <p className="flex items-center justify-center text-center">
+          Earning in our vaults you get additional rewards!
+        </p>{" "}
+        <div className="flex items-center justify-center gap-5 font-manrope flex-wrap">
+          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[250px] rounded-[10px]">
+            <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
+              <div className="flex flex-col items-start justify-between h-full">
+                <div className="font-light flex flex-col items-start">
+                  <span className="text-[25px] flex items-center gap-2">
+                    <img
+                      src="sGEM1.png"
+                      alt="sGEM1"
+                      title="sGEM1"
+                      className="w-[33px] h-[33px] block sm:hidden"
+                    />{" "}
+                    sGEM1
+                  </span>
+                  <p className="text-[12px]">
+                    Sonic Gems are app airdrop points that we give away entirely
+                    to our users.
+                    <br />
+                    <a
+                      href="https://stabilitydao.gitbook.io/stability/stability-dao/gems"
+                      target="_blank"
+                      className="underline"
+                    >
+                      Read Docs
+                    </a>
+                  </p>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[#EAD9B2] text-[15px] font-regular mb-[-10px]">
+                    Price: 0.01 USDc
+                  </span>
+                  <span className="font-medium text-[30px]">
+                    Balance:{" "}
+                    {userRewards.gems !== "-"
+                      ? String(
+                          formatNumber(Number(userRewards.gems), "abbreviate")
+                        ).slice(1)
+                      : "-"}
+                  </span>
+                  <p className="font-light text-[15px] text-[#c6afaf] mt-[-10px]">
+                    Total Supply: 0
+                  </p>
+                  {/* <p className="text-[#B0B0B0] text-[15px] flex items-end gap-1">
+                    Swap on{" "}
+                    <a target="_blank" href="https://swapx.fi/">
+                      <img src="swapX.png" alt="swapX" title="swapX" />
+                    </a>
+                  </p> */}
+                </div>
+              </div>
+              <img
+                src="sGEM1.png"
+                alt="sGEM1 reward"
+                className="w-[150px] h-[150px] sm:block hidden"
+              />
+            </div>
+          </div>
+          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[250px] rounded-[10px]">
+            <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
+              <div className="flex flex-col items-start justify-between h-full">
+                <div className="font-light flex flex-col items-start">
+                  <span className="text-[25px] flex items-center gap-2">
+                    <img
+                      src="pSTBL.png"
+                      alt="pSTBL"
+                      title="pSTBL"
+                      className="w-[33px] h-[33px] block sm:hidden"
+                    />{" "}
+                    pSTBL
+                  </span>
+                  <p className="text-[13px]">
+                    Stability Points will be exchanged for $STBL at TGE 2025.
+                  </p>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-medium text-[30px]">
+                    Balance:{" "}
+                    {userRewards.points !== "-"
+                      ? String(
+                          formatNumber(Number(userRewards.points), "abbreviate")
+                        ).slice(1)
+                      : "-"}
+                  </span>
+                  <p className="font-light text-[15px] text-[#B0AEFF] mt-[-10px]">
+                    Total Supply:{" "}
+                    {String(
+                      formatNumber(
+                        Number(rewardsTotalSupply.points),
+                        "abbreviate"
+                      )
+                    ).slice(1)}
+                  </p>
+                  {/* <p className="text-[#B0B0B0] text-[15px]">
+                    <a
+                      className="underline text-[#FFF]"
+                      target="_blank"
+                      href=""
+                    >
+                      Read Docs
+                    </a>{" "}
+                    for more information
+                  </p> */}
+                </div>
+              </div>
+              <img
+                className="w-[150px] h-[150px] sm:block hidden"
+                src="pSTBL.png"
+                alt="pSTBL reward"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <HeadingText text="Contests" scale={2} styles="mb-0" />
       <ContestsOverview periodsData={periodsData} />
