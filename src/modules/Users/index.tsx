@@ -143,15 +143,15 @@ const Users = (): JSX.Element => {
     getRewardsTotalSupply();
   }, [$apiData?.leaderboards?.absolute]);
   return (
-    <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[36px]">
+    <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[20px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
-      <div className="flex flex-col items-center gap-5">
+      <div className="flex flex-col items-center gap-5 mb-4">
         <HeadingText text="Rewards" scale={2} styles="mb-0" />
         <p className="flex items-center justify-center text-center">
           Earning in our vaults you get additional rewards!
         </p>{" "}
-        <div className="flex items-center justify-center gap-5 font-manrope flex-wrap">
-          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[250px] rounded-[10px]">
+        <div className="flex items-center justify-center gap-10 font-manrope flex-wrap mb-5">
+          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[230px] rounded-[10px]">
             <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
               <div className="flex flex-col items-start justify-between h-full">
                 <div className="font-light flex flex-col items-start">
@@ -207,7 +207,7 @@ const Users = (): JSX.Element => {
               />
             </div>
           </div>
-          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[250px] rounded-[10px]">
+          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[230px] rounded-[10px]">
             <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
               <div className="flex flex-col items-start justify-between h-full">
                 <div className="font-light flex flex-col items-start">
@@ -267,7 +267,7 @@ const Users = (): JSX.Element => {
       <HeadingText text="Contests" scale={2} styles="mb-0" />
       <ContestsOverview periodsData={periodsData} />
 
-      <div className="flex flex-col items-center ">
+      <div className="flex flex-col items-center mb-4 mt-2">
         <a
           className="bg-accent-900 max-w-[250px] min-w-[100px] text-[14px] font-semibold h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
           href="/contests"
