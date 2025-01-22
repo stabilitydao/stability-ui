@@ -641,6 +641,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const zapApprove = async () => {
+    console.log("zapApprove");
     ///// ZAP TOKENS & UNDERLYING TOKENS
     error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
@@ -686,10 +687,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setNeedConfirm(false);
       setLoader(true);
 
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations,
-        hash: assetApprove,
-      });
+      const transaction = await getTransactionReceipt(assetApprove);
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -1086,6 +1084,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const withdrawZapApprove = async () => {
+    console.log("withdrawZapApprove");
     error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
 
@@ -1118,10 +1117,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       });
       setNeedConfirm(false);
       setLoader(true);
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations,
-        hash: assetApprove,
-      });
+      const transaction = await getTransactionReceipt(assetApprove);
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -1199,6 +1195,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   /////
 
   const approve = async (asset: TAddress, index: number) => {
+    console.log("approve");
     setApproveIndex(index);
     const amount = inputs[asset];
     const decimals = getTokenData(asset)?.decimals || 18;
@@ -1238,10 +1235,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations,
-          hash: assetApprove,
-        });
+        const transaction = await getTransactionReceipt(assetApprove);
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -1293,6 +1287,39 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
     }
     setApproveIndex(false);
+  };
+
+  const getTransactionReceipt = async (hash: TAddress) => {
+    const interval = 2000;
+    const maxConfirmations = 30;
+
+    let transactionConfirmations = confirmations;
+
+    while (transactionConfirmations <= maxConfirmations) {
+      console.log(transactionConfirmations);
+
+      await new Promise((resolve) => setTimeout(resolve, interval));
+
+      try {
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          confirmations: transactionConfirmations,
+          hash: hash,
+        });
+
+        if (transaction.status === "success") {
+          console.log(transaction);
+          return transaction;
+        }
+      } catch (error) {
+        console.error("Error getting transaction status:", error);
+      }
+
+      transactionConfirmations += confirmations;
+    }
+
+    throw new Error(
+      "Transaction was not confirmed after the maximum number of attempts"
+    );
   };
 
   const deposit = async () => {
@@ -2331,11 +2358,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             {option?.length > 1 ||
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
-                <div className="flex flex-col items-center justify-center gap-[10px] min-w-[312px] w-[372px]">
+                <div
+                  className={`flex flex-col items-center justify-center min-w-[312px] w-[372px] ${ichiAllow.every((ichi) => ichi) ? "gap-[10px]" : ""}`}
+                >
                   {option.map((asset: string, index: number) => {
                     const currentAsset = getTokenData(asset) as TTokenData;
                     return (
-                      <div className="min-w-full gap-[10px]" key={asset}>
+                      <div className="min-w-full" key={asset}>
                         {ichiAllow[index] && (
                           <div className="min-w-full h-[64px]">
                             <div
