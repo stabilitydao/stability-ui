@@ -1855,7 +1855,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
       allowanceResult[option[i]] = allowanceData;
     }
-
+    console.log(allowanceResult);
     setAllowance(allowanceResult);
   };
 
@@ -1967,6 +1967,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               });
             }
           }
+
+          console.log(previewDepositAssets);
 
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);
           setSharesOut(
@@ -3100,10 +3102,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   {option.map(
                                     (asset: any, index: number) =>
                                       allowance &&
-                                      formatUnits(
-                                        allowance[asset],
-                                        Number(getTokenData(asset)?.decimals)
-                                      ) < inputs[asset] && (
+                                      Number(
+                                        formatUnits(
+                                          allowance[asset],
+                                          Number(getTokenData(asset)?.decimals)
+                                        )
+                                      ) < Number(inputs[asset]) && (
                                         <button
                                           disabled={approveIndex !== false}
                                           className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
@@ -3179,12 +3183,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                         (asset: any, index: number) => {
                                           if (
                                             allowance &&
-                                            formatUnits(
-                                              allowance[asset],
-                                              Number(
-                                                getTokenData(asset)?.decimals
+                                            Number(
+                                              formatUnits(
+                                                allowance[asset],
+                                                Number(
+                                                  getTokenData(asset)?.decimals
+                                                )
                                               )
-                                            ) < inputs[asset]
+                                            ) < Number(inputs[asset])
                                           ) {
                                             isAnyCCFOptionVisible = true;
                                             return (
