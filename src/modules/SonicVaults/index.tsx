@@ -34,7 +34,7 @@ import {
   error,
   visible,
   publicClient,
-  platformVersions,
+  platformVersions, apiData,
   // platformVersions,
   // currentChainID,
   // assetsPrices,
@@ -97,6 +97,7 @@ const SonicVaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
 
   const $vaults = useStore(vaults);
+  const $apiData = useStore(apiData);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
@@ -650,6 +651,7 @@ const SonicVaults = (): JSX.Element => {
                 {currentTabVaults?.length ? (
                   currentTabVaults.map((vault: TVault, index: number) => {
                     const aprValue = vault?.earningData?.apr[$aprFilter];
+                    const gemsAprValue = Number(aprValue) * $apiData.rewards?.gemsAprMultiplier
 
                     const apyValue = vault.earningData.apy[$aprFilter];
 
@@ -971,10 +973,11 @@ const SonicVaults = (): JSX.Element => {
                           </div>
                         </td> */}
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
+                          <div className="flex items-center justify-end">
+                            {formatNumber(gemsAprValue.toFixed(2), "formatAPR")}%
                             <img
                               src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
-                              className="w-[24px] h-[24px]"
+                              className="w-[24px] h-[24px] ml-1.5"
                               title="sGEM1"
                               alt="sGEM1"
                             />

@@ -28,7 +28,7 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                 key={contest.start}
                 className="cursor-pointer"
               >
-                <div className="bg-accent-950 h-full w-[300px] rounded-2xl p-5 flex flex-col gap-3 items-scenter justify-start text-[18px]">
+                <div className="bg-accent-950 h-full w-[354px] rounded-2xl p-5 flex flex-col gap-3 items-scenter justify-start text-[18px]">
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-[24px] font-bold ${contest.hidden ? "text-neutral-500" : ""}`}
