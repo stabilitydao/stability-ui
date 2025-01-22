@@ -41,7 +41,7 @@ const TABLE: TTableColumn[] = [
   //   dataType: "number",
   // },
   {
-    name: "Extra rewards",
+    name: "Extra rewards APR",
     keyName: "",
     sortType: "none",
     dataType: "",

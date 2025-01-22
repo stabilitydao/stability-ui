@@ -14,7 +14,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     Strategy: "w-[190px]",
     "Income APR": "min-w-[130px] text-right",
     // "VS HODL APR": "min-w-[130px]",
-    Rewards: "min-w-[130px]",
+    "Extra rewards APR": "min-w-[100px] text-right",
     // Status: "table-cell",
     // RISK: "text-center pl-2",
     Price: "min-w-[80px]",
