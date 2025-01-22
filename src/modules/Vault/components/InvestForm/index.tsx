@@ -634,6 +634,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setButton("none");
     setZapTokens([]);
     setZapPreviewWithdraw([]);
+
     if (!!amount) {
       setLoader(true);
     } else {
@@ -647,7 +648,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const zapApprove = async () => {
-    console.log("zapApprove");
     ///// ZAP TOKENS & UNDERLYING TOKENS
     error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
@@ -1087,7 +1087,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   };
 
   const withdrawZapApprove = async () => {
-    console.log("withdrawZapApprove");
     error.set(DEFAULT_ERROR);
     setTransactionInProgress(true);
 
@@ -1198,7 +1197,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   /////
 
   const approve = async (asset: TAddress, index: number) => {
-    console.log("approve");
     setApproveIndex(index);
     const amount = inputs[asset];
     const decimals = getTokenData(asset)?.decimals || 18;
@@ -1294,38 +1292,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
     }
     setApproveIndex(false);
-  };
-
-  const getTransactionReceipt = async (hash: TAddress) => {
-    const interval = 2000;
-    const maxConfirmations = 30;
-
-    let transactionConfirmations = confirmations;
-
-    while (transactionConfirmations <= maxConfirmations) {
-      console.log(transactionConfirmations);
-
-      await new Promise((resolve) => setTimeout(resolve, interval));
-
-      try {
-        const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations: transactionConfirmations,
-          hash: hash,
-        });
-
-        if (transaction.status === "success") {
-          return transaction;
-        }
-      } catch (error) {
-        console.error("Error getting transaction status:", error);
-      }
-
-      transactionConfirmations += confirmations;
-    }
-
-    throw new Error(
-      "Transaction was not confirmed after the maximum number of attempts"
-    );
   };
 
   const deposit = async () => {
@@ -1880,6 +1846,36 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     } catch (err) {
       console.error("get ichi allow error:", err);
     }
+  };
+
+  const getTransactionReceipt = async (hash: TAddress) => {
+    const interval = 2000;
+    const maxConfirmations = 30;
+
+    let transactionConfirmations = confirmations;
+
+    while (transactionConfirmations <= maxConfirmations) {
+      await new Promise((resolve) => setTimeout(resolve, interval));
+
+      try {
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          confirmations: transactionConfirmations,
+          hash: hash,
+        });
+
+        if (transaction.status === "success") {
+          return transaction;
+        }
+      } catch (error) {
+        console.error("Error getting transaction status:", error);
+      }
+
+      transactionConfirmations += confirmations;
+    }
+
+    throw new Error(
+      "Transaction was not confirmed after the maximum number of attempts"
+    );
   };
 
   const previewDeposit = async (asset: string, amount: string) => {
