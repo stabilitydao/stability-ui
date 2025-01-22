@@ -254,7 +254,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const isIQMFOrIRMF = shortId === "IQMF" || isIRMF;
 
     for (let i = 0; i < input.length; i++) {
-      if (assetsBalances && input[i] > assetsBalances?.[assetsArray[i]]) {
+      if (
+        assetsBalances &&
+        Number(input[i]) > Number(assetsBalances?.[assetsArray[i]])
+      ) {
         setButton("insufficientBalance");
         change = true;
         break;
@@ -267,7 +270,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         const balance = assetsBalances[asset];
         const allowanceForAsset = allowance[asset];
 
-        if (input[i] <= balance && allowanceForAsset >= input[i]) {
+        if (
+          Number(input[i]) <= Number(balance) &&
+          Number(allowanceForAsset) >= Number(input[i])
+        ) {
           apprDepo.push("deposit");
         } else {
           apprDepo.push("needApprove");
@@ -628,6 +634,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setButton("none");
     setZapTokens([]);
     setZapPreviewWithdraw([]);
+
     if (!!amount) {
       setLoader(true);
     } else {
@@ -686,10 +693,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       setNeedConfirm(false);
       setLoader(true);
 
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations,
-        hash: assetApprove,
-      });
+      const transaction = await getTransactionReceipt(assetApprove);
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -975,21 +979,18 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         )) as TZAPData;
         outData = [promises, promises];
       } else {
-        promises = zapAmounts[0]
-          // bugfix 19.01.2025 by a17
-          // .filter((_, index) => vault.assetsProportions[index])
-          .map(
-            async (toAddress, index) =>
-              await get1InchRoutes(
-                network,
-                option[0] as TAddress,
-                toAddress,
-                decimals,
-                String(zapAmounts[1][index]),
-                setZapError,
-                "deposit"
-              )
-          );
+        promises = zapAmounts[0].map(
+          async (toAddress, index) =>
+            await get1InchRoutes(
+              network,
+              option[0] as TAddress,
+              toAddress,
+              decimals,
+              String(zapAmounts[1][index]),
+              setZapError,
+              "deposit"
+            )
+        );
         outData = (await Promise.all(promises)) as TZAPData[];
       }
 
@@ -1118,10 +1119,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       });
       setNeedConfirm(false);
       setLoader(true);
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations,
-        hash: assetApprove,
-      });
+      const transaction = await getTransactionReceipt(assetApprove);
 
       if (transaction.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -1212,8 +1210,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
     const needApprove = option.filter(
       (asset) =>
-        formatUnits(allowance[asset], Number(getTokenData(asset)?.decimals)) <
-        inputs[asset]
+        Number(
+          formatUnits(allowance[asset], Number(getTokenData(asset)?.decimals))
+        ) < Number(inputs[asset])
     );
 
     if (vault.address) {
@@ -1238,10 +1237,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         });
         setNeedConfirm(false);
         setLoader(true);
-        const transaction = await waitForTransactionReceipt(wagmiConfig, {
-          confirmations,
-          hash: assetApprove,
-        });
+        const transaction = await getTransactionReceipt(assetApprove);
 
         if (transaction.status === "success") {
           lastTx.set(transaction?.transactionHash);
@@ -1260,8 +1256,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           // this is a temp condition before rewrite
           if (
             needApprove.length == 1 &&
-            formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
-              inputs[asset]
+            Number(
+              formatUnits(newAllowance, Number(getTokenData(asset)?.decimals))
+            ) >= Number(inputs[asset])
           ) {
             setButton("deposit");
           }
@@ -1279,11 +1276,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           ...prevAllowance,
           [asset]: newAllowance,
         }));
+
         // this is a temp condition before rewrite
         if (
           needApprove.length == 1 &&
-          formatUnits(newAllowance, Number(getTokenData(asset)?.decimals)) >=
-            inputs[asset]
+          Number(
+            formatUnits(newAllowance, Number(getTokenData(asset)?.decimals))
+          ) >= Number(inputs[asset])
         ) {
           setButton("deposit");
         }
@@ -1828,7 +1827,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       }
       allowanceResult[option[i]] = allowanceData;
     }
-
     setAllowance(allowanceResult);
   };
 
@@ -1848,6 +1846,36 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     } catch (err) {
       console.error("get ichi allow error:", err);
     }
+  };
+
+  const getTransactionReceipt = async (hash: TAddress) => {
+    const interval = 2000;
+    const maxConfirmations = 30;
+
+    let transactionConfirmations = confirmations;
+
+    while (transactionConfirmations <= maxConfirmations) {
+      await new Promise((resolve) => setTimeout(resolve, interval));
+
+      try {
+        const transaction = await waitForTransactionReceipt(wagmiConfig, {
+          confirmations: transactionConfirmations,
+          hash: hash,
+        });
+
+        if (transaction.status === "success") {
+          return transaction;
+        }
+      } catch (error) {
+        console.error("Error getting transaction status:", error);
+      }
+
+      transactionConfirmations += confirmations;
+    }
+
+    throw new Error(
+      "Transaction was not confirmed after the maximum number of attempts"
+    );
   };
 
   const previewDeposit = async (asset: string, amount: string) => {
@@ -2017,7 +2045,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setZapPreviewWithdraw([]);
     setLoader(false);
   }, [option, $connected, tab]);
-
   useEffect(() => {
     resetInputs();
   }, [$connected]);
@@ -2331,11 +2358,13 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             {option?.length > 1 ||
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
-                <div className="flex flex-col items-center justify-center gap-[10px] min-w-[312px] w-[372px]">
+                <div
+                  className={`flex flex-col items-center justify-center min-w-[312px] w-[372px] ${ichiAllow.every((ichi) => ichi) ? "gap-[10px]" : ""}`}
+                >
                   {option.map((asset: string, index: number) => {
                     const currentAsset = getTokenData(asset) as TTokenData;
                     return (
-                      <div className="min-w-full gap-[10px]" key={asset}>
+                      <div className="min-w-full" key={asset}>
                         {ichiAllow[index] && (
                           <div className="min-w-full h-[64px]">
                             <div
@@ -2408,17 +2437,17 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   })}
                 </div>
                 <div
-                  className={`${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-start justify-start"}`}
+                  className={`${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-start justify-start"}`}
                 >
                   {loader && !transactionInProgress ? (
                     <div
-                      className={`text-[18px] w-[320px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] w-[320px] ${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
                     >
                       <ShareSkeleton />
                     </div>
                   ) : (
                     <div
-                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi === true) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
                     >
                       {!!sharesOut && !isEmptyObject(inputs) && (
                         <div>
@@ -2688,20 +2717,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                     <ShareSkeleton height={24} width={300} />
                                   ) : (
                                     <div>
-                                      {(underlyingShares &&
-                                        Number(inputs[option[0]]) > 0) ||
-                                      (zapShares &&
-                                        Number(inputs[option[0]]) > 0) ? (
+                                      {(underlyingShares || zapShares) &&
+                                      Number(inputs[option[0]]) > 0 ? (
                                         <p className="h-6">
-                                          {underlyingShares &&
-                                          Number(inputs[option[0]]) > 0
+                                          {underlyingShares
                                             ? `${underlyingShares} ($${(
                                                 Number(underlyingShares) *
                                                 Number(vault.shareprice)
                                               ).toFixed(2)})`
-                                            : zapShares &&
-                                              Number(inputs[option[0]]) > 0 &&
-                                              `${zapShares} ($${(
+                                            : `${zapShares} ($${(
                                                 Number(zapShares) *
                                                 Number(vault.shareprice)
                                               ).toFixed(2)})`}
@@ -3071,10 +3095,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   {option.map(
                                     (asset: any, index: number) =>
                                       allowance &&
-                                      formatUnits(
-                                        allowance[asset],
-                                        Number(getTokenData(asset)?.decimals)
-                                      ) < inputs[asset] && (
+                                      Number(
+                                        formatUnits(
+                                          allowance[asset],
+                                          Number(getTokenData(asset)?.decimals)
+                                        )
+                                      ) < Number(inputs[asset]) && (
                                         <button
                                           disabled={approveIndex !== false}
                                           className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
@@ -3150,12 +3176,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                         (asset: any, index: number) => {
                                           if (
                                             allowance &&
-                                            formatUnits(
-                                              allowance[asset],
-                                              Number(
-                                                getTokenData(asset)?.decimals
+                                            Number(
+                                              formatUnits(
+                                                allowance[asset],
+                                                Number(
+                                                  getTokenData(asset)?.decimals
+                                                )
                                               )
-                                            ) < inputs[asset]
+                                            ) < Number(inputs[asset])
                                           ) {
                                             isAnyCCFOptionVisible = true;
                                             return (
