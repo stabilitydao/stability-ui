@@ -1908,6 +1908,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (isAllZero) {
         setSharesOut(false);
+        setButton("none");
         return;
       }
     } else {
@@ -1917,6 +1918,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       if (Number(amount) === 0) {
         setSharesOut(false);
+        setButton("none");
         return;
       }
     }
