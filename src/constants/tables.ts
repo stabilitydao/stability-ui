@@ -7,7 +7,7 @@ const TABLE_FILTERS: TTableFilters[] = [
   { name: "Active", type: "sample", state: true },
 ];
 
-const TABLE: TTableColumn[] = [
+const SONIC_TABLE: TTableColumn[] = [
   // { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
   {
     name: "Assets",
@@ -53,6 +53,54 @@ const TABLE: TTableColumn[] = [
   //   sortType: "none",
   //   dataType: "number",
   // },
+  { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
+  {
+    name: "Balance",
+    keyName: "balanceInUSD",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+const TABLE: TTableColumn[] = [
+  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
+  {
+    name: "Assets",
+    keyName: "assetsSymbol",
+    sortType: "none",
+    dataType: "string",
+  },
+  // { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
+  // {
+  //   name: "Type",
+  //   keyName: "type",
+  //   sortType: "none",
+  //   dataType: "string",
+  // },
+  {
+    name: "Strategy",
+    keyName: "strategy",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Income APR",
+    keyName: "earningData",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "VS HODL APR",
+    keyName: "vsHoldAPR",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "RISK",
+    keyName: "il",
+    sortType: "none",
+    dataType: "number",
+  },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
   {
     name: "Balance",
@@ -305,4 +353,5 @@ export {
   USERS_TABLE,
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
+  SONIC_TABLE,
 };

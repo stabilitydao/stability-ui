@@ -635,6 +635,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     setZapTokens([]);
     setZapPreviewWithdraw([]);
 
+    if (amount.startsWith(".")) {
+      amount = "0" + amount;
+    }
+
+    if (Number(amount) === 0) return;
+
     if (!!amount) {
       setLoader(true);
     } else {
@@ -1880,6 +1886,42 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     // if (!Number(amount)) return;  // commented for BSF
+
+    if (shortId === "BSF") {
+      const formattedInputs = Object.fromEntries(
+        Object.entries(
+          Object.entries(inputs).length ? inputs : { [asset]: amount }
+        ).map(([key, value]) => {
+          if (key === asset) value = amount;
+
+          if (value.startsWith(".")) {
+            value = "0" + value;
+          }
+
+          return [key, value];
+        })
+      );
+
+      const isAllZero = Object.values(formattedInputs).every(
+        (inputValue) => Number(inputValue) === 0
+      );
+
+      if (isAllZero) {
+        setSharesOut(false);
+        setButton("none");
+        return;
+      }
+    } else {
+      if (amount.startsWith(".")) {
+        amount = "0" + amount;
+      }
+
+      if (Number(amount) === 0) {
+        setSharesOut(false);
+        setButton("none");
+        return;
+      }
+    }
 
     if (!amount) {
       const secondAsset = defaultOption.assetsArray.find(

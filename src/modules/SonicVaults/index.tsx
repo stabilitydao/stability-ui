@@ -34,7 +34,8 @@ import {
   error,
   visible,
   publicClient,
-  platformVersions, apiData,
+  platformVersions,
+  apiData,
   // platformVersions,
   // currentChainID,
   // assetsPrices,
@@ -50,7 +51,7 @@ import {
 } from "@utils";
 
 import {
-  TABLE,
+  SONIC_TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
@@ -118,7 +119,7 @@ const SonicVaults = (): JSX.Element => {
 
   let urlTab = 1;
 
-  let urlTableStates = TABLE;
+  let urlTableStates = SONIC_TABLE;
 
   if (!!Number(params.get("page"))) {
     urlTab = Number(params.get("page"));
@@ -651,7 +652,8 @@ const SonicVaults = (): JSX.Element => {
                 {currentTabVaults?.length ? (
                   currentTabVaults.map((vault: TVault, index: number) => {
                     const aprValue = vault?.earningData?.apr[$aprFilter];
-                    const gemsAprValue = Number(aprValue) * $apiData.rewards?.gemsAprMultiplier
+                    const gemsAprValue =
+                      Number(aprValue) * $apiData.rewards?.gemsAprMultiplier;
 
                     const apyValue = vault.earningData.apy[$aprFilter];
 
@@ -974,7 +976,8 @@ const SonicVaults = (): JSX.Element => {
                         </td> */}
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-end">
-                            {formatNumber(gemsAprValue.toFixed(2), "formatAPR")}%
+                            {formatNumber(gemsAprValue.toFixed(2), "formatAPR")}
+                            %
                             <img
                               src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
                               className="w-[24px] h-[24px] ml-1.5"

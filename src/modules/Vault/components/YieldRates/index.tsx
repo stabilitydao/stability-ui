@@ -54,16 +54,17 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
   const vsHold = [
     { data: vault.vsHold24H },
     { data: vault.vsHoldWeekly },
-    { data: vault.lifetimeVsHold, testID: "vaultVsHold" },
     { data: vault.vsHoldAPR, testID: "vaultVsHoldLifetime" },
+    { data: vault.lifetimeVsHold, testID: "vaultVsHold" },
   ];
 
   const getShareData = async () => {
-    if (!Number(vault.shareprice)) {
+    if (!Number(vault.sharePriceLast)) {
       return;
     }
+
     const sharePriceOnCreation = 1;
-    const sharePrice = Number(vault.shareprice);
+    const sharePrice = Number(vault.sharePriceLast);
 
     const sharePriceDifference = (sharePrice - sharePriceOnCreation) * 100;
 
@@ -188,12 +189,12 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
               <thead className="bg-accent-950 text-neutral-600 h-[36px]">
                 <tr className="text-[14px] uppercase">
                   <th></th>
-                  <th className="text-right">24h</th>
-                  <th className="text-right">week</th>
+                  <th className="text-right">APR 24h</th>
+                  <th className="text-right">APR week</th>
+                  <th className="text-right">est APR</th>
                   <th className="text-right">
                     {getTimeDifference(vault.created).days} days
                   </th>
-                  <th className="text-right">est Annual</th>
                 </tr>
               </thead>
               <tbody className="text-[14px]">
@@ -214,12 +215,12 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                       { data: Number(aprsData.dailyAPR) },
                       { data: Number(aprsData.weeklyAPR) },
                       {
-                        data: Number(aprsData.latestAPR),
-                        testID: `tokensHold${index}`,
-                      },
-                      {
                         data: Number(aprsData.APR),
                         testID: `assetsVsHold${index}`,
+                      },
+                      {
+                        data: Number(aprsData.latestAPR),
+                        testID: `tokensHold${index}`,
                       },
                     ];
 

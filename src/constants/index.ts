@@ -10,6 +10,7 @@ import {
   USERS_TABLE,
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
+  SONIC_TABLE,
 } from "./tables";
 
 import {
@@ -395,4 +396,5 @@ export {
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
   CHAINS_CONFIRMATIONS,
+  SONIC_TABLE,
 };
