@@ -237,6 +237,7 @@ type TVault = {
   type: string;
   strategy: string;
   shareprice: string;
+  sharePriceLast: string;
   tvl: string;
   strategySpecific: string;
   balance: string | bigint;

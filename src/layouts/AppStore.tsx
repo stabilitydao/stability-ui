@@ -480,11 +480,23 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               price: price.toFixed(2),
               priceDifference: priceDifference.toFixed(2),
               dailyAPR:
-                Number(vault.vsHold?.aprAssets24h ? vault.vsHold?.aprAssets24h[index] : 0).toFixed(2) || "0",
+                Number(
+                  vault.vsHold?.aprAssets24h
+                    ? vault.vsHold?.aprAssets24h[index]
+                    : 0
+                ).toFixed(2) || "0",
               weeklyAPR:
-                Number(vault.vsHold?.aprAssetsWeek ? vault.vsHold?.aprAssetsWeek[index] : 0).toFixed(2) || "0",
+                Number(
+                  vault.vsHold?.aprAssetsWeek
+                    ? vault.vsHold?.aprAssetsWeek[index]
+                    : 0
+                ).toFixed(2) || "0",
               latestAPR:
-                Number(vault.vsHold?.lifetimeAssets ? vault.vsHold?.lifetimeAssets[index] : 0).toFixed(2) || "0",
+                Number(
+                  vault.vsHold?.lifetimeAssets
+                    ? vault.vsHold?.lifetimeAssets[index]
+                    : 0
+                ).toFixed(2) || "0",
               APR:
                 Number(vault.vsHold?.aprAssetsLifetime[index]).toFixed(2) ||
                 "0",
@@ -552,6 +564,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           !Number(vault.sharePrice) && !Number(vault.tvl)
             ? "1"
             : vault.sharePrice;
+        const sharePriceLast =
+          !Number(vault.sharePriceLast) && !Number(vault.tvl)
+            ? "1"
+            : vault.sharePriceLast;
 
         const strategyProtocols = getStrategyProtocols(
           strategyInfo.shortId as StrategyShortId
@@ -578,6 +594,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             type: vault.vaultType,
             strategy: vault.strategyId,
             shareprice,
+            sharePriceLast,
+
             tvl: vault.tvl,
             strategySpecific,
             balance: "",
