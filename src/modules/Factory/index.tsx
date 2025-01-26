@@ -111,11 +111,11 @@ const Factory = (): JSX.Element => {
     if ($publicClient && $platformsData[$currentChainID] && isCorrectNetwork) {
       const variants: TBuildVariant[] = [];
 
-      const whatToBuild = await $publicClient.readContract({
+      const whatToBuild = await _publicClient.readContract({
         address: frontendContracts[$currentChainID],
         functionName: "whatToBuild",
         abi: IFrontendABI,
-        args: [BigInt(1), BigInt(50)],
+        args: [BigInt(0), BigInt(50)],
       });
 
       if (whatToBuild?.length) {
