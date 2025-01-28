@@ -1,5 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import { useStore } from "@nanostores/react";
+
+import { readContract, writeContract } from "@wagmi/core";
+import { formatUnits } from "viem";
 
 import { ContestsOverview } from "./components";
 
@@ -18,13 +22,23 @@ import { account, apiData } from "@store";
 
 import { contests } from "@stabilitydao/stability";
 
+import {
+  wagmiConfig,
+  ERC20ABI,
+  sGEM1,
+  IMerkleDistributor,
+  merkleDistributor,
+} from "@web3";
+
 import { USERS_TABLE } from "@constants";
 
 import { TABLE_TYPES } from "./constants";
 
-import type { TTableColumn, TLeaderboard } from "@types";
+import type { TTableColumn, TLeaderboard, TAddress } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
+
+import type { UserRewards } from "@stabilitydao/stability/out/api.types";
 
 const Users = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
@@ -33,11 +47,15 @@ const Users = (): JSX.Element => {
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
 
-  const [userRewards, setUserRewards] = useState({ points: "-", gems: "-" });
+  const [userBalance, setUserBalance] = useState({ points: "-", gems: "-" });
+  const [userData, setUserData] = useState<any>([]); // todo: change type to user rewards
+  const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
     points: "0",
     gems: "0",
   });
+
+  const [contestsToClaim, setContestsToClaim] = useState([]);
 
   const { currentPeriod, previousPeriod, nextPeriod } =
     findAllValidPeriods(contests);
@@ -76,12 +94,65 @@ const Users = (): JSX.Element => {
 
   const getRewardsTotalSupply = async () => {
     if ($apiData?.leaderboards?.absolute.length) {
-      const totalSupply = $apiData?.leaderboards?.absolute.reduce(
+      const pointsTotalSupply = $apiData?.leaderboards?.absolute.reduce(
         (acc, cur) => (acc += cur?.points ?? 0),
         0
       );
 
-      setRewardsTotalSupply({ points: String(totalSupply), gems: "0" });
+      const _gems = String(formatNumber(0, "abbreviate")).slice(1);
+
+      const _points = String(
+        formatNumber(Number(pointsTotalSupply), "abbreviate")
+      ).slice(1);
+
+      setRewardsTotalSupply({ points: _points, gems: _gems });
+    }
+  };
+
+  const getUserData = async () => {
+    try {
+      // const response = await axios.get(
+      //   `https://api.stability.farm/rewards/user/${$account}`
+      // );
+
+      // const gemsEarnedData = response.data.gemsEarned;
+
+      const gemsEarnedData = [
+        {
+          contestId: "y6",
+          gems: 17547.462770085607,
+          gemsRaw: "17547462770085607000000",
+          proofs: [
+            "0x488b7bc0333772a3d3ba3ce6174255de3cce3cf7c32cd70f67524a47f3fd0e7d",
+            "0x96e918db2fb015c44badb49cbd6a7bb1e2eb2099149254541d1cead5d39e01b7",
+            "0x81a1bcb3d0eb091ac9476b49a16f00d12022fa9ac5aea91ee6e72efb2b82d2b5",
+            "0x02646a587bef7c6d9e112486c766ca1fd31a89ef980b91bee5c4cb17e4a63b2e",
+            "0x3d2c827a54666d51a77f5ce9eaa13badb68d6929fcf1dbd58e764101d725dd91",
+            "0x4cadf3cfb5498fe23e09d6ef22fb1b2bbadb1d794385d2db86f5a698810730bc",
+            "0xf990798404c36bb39c8751dac08d93fa47ef7d96a3123626d41985fd995c203e",
+          ],
+        },
+        {
+          contestId: "y7",
+          gems: 17547.462770085607,
+          gemsRaw: "17547462770085607000000",
+          proofs: [
+            "0x488b7bc0333772a3d3ba3ce6174255de3cce3cf7c32cd70f67524a47f3fd0e7d",
+            "0x96e918db2fb015c44badb49cbd6a7bb1e2eb2099149254541d1cead5d39e01b7",
+            "0x81a1bcb3d0eb091ac9476b49a16f00d12022fa9ac5aea91ee6e72efb2b82d2b5",
+            "0x02646a587bef7c6d9e112486c766ca1fd31a89ef980b91bee5c4cb17e4a63b2e",
+            "0x3d2c827a54666d51a77f5ce9eaa13badb68d6929fcf1dbd58e764101d725dd91",
+            "0x4cadf3cfb5498fe23e09d6ef22fb1b2bbadb1d794385d2db86f5a698810730bc",
+            "0xf990798404c36bb39c8751dac08d93fa47ef7d96a3123626d41985fd995c203e",
+          ],
+        },
+      ];
+
+      if (gemsEarnedData.length) {
+        setUserData(gemsEarnedData);
+      }
+    } catch (err) {
+      console.error("Error occurred at getUserData:", err);
     }
   };
 
@@ -91,11 +162,108 @@ const Users = (): JSX.Element => {
     );
 
     let userPoints = "0";
+    let user_sGEM1 = "0";
+
     if (user?.points) {
-      userPoints = String(user?.points);
+      userPoints = String(
+        formatNumber(Number(user?.points), "abbreviate")
+      ).slice(1);
     }
 
-    setUserRewards({ points: userPoints, gems: "0" });
+    try {
+      const sGEM1Balance = await readContract(wagmiConfig, {
+        address: sGEM1 as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      });
+
+      user_sGEM1 = formatUnits(sGEM1Balance, 18);
+
+      user_sGEM1 = String(formatNumber(Number(user_sGEM1), "abbreviate")).slice(
+        1
+      );
+    } catch (err) {
+      console.error("Error occurred at getUserBalance:", err);
+    }
+
+    setUserBalance({ points: userPoints, gems: user_sGEM1 });
+  };
+
+  const getUserEarnedGems = async () => {
+    if (!userData.length) return;
+    try {
+      const allGems = userData.reduce(
+        (acc: number, cur: UserRewards["gemsEarned"][number]) =>
+          (acc += cur.gems),
+        0
+      );
+
+      const abbreviateGems = String(
+        formatNumber(Number(allGems), "abbreviate")
+      ).slice(1);
+
+      setGemsEarned(abbreviateGems);
+    } catch (err) {
+      console.error("Error occurred at getUserEarnedGems:", err);
+    }
+  };
+
+  const getUserClaimedRewards = async () => {
+    if (!userData.length) return;
+    try {
+      const contestIds = userData.map(
+        ({ contestId }: { contestId: string }) => contestId
+      );
+
+      const claimedData = (await readContract(wagmiConfig, {
+        address: merkleDistributor as TAddress,
+        abi: IMerkleDistributor,
+        functionName: "claimed",
+        args: [$account as TAddress, contestIds],
+      })) as boolean[];
+
+      const claimContests = claimedData.reduce((acc, isClaimed, index) => {
+        if (!isClaimed) acc.push(contestIds[index] as string);
+        return acc;
+      }, []);
+
+      if (claimContests.length) {
+        setContestsToClaim(claimContests);
+      }
+    } catch (err) {
+      console.error("Error occurred at getUserClaimedRewards:", err);
+    }
+  };
+
+  const claim = async () => {
+    if (!$account) {
+      alert("Please connect your wallet!");
+    }
+
+    try {
+      const gemsAmounts: string[] = [];
+      const proofs: string[][] = [];
+
+      contestsToClaim.forEach((contest) => {
+        const contestData = userData.find(
+          ({ contestId }: { contestId: string }) => contest === contestId
+        );
+
+        gemsAmounts.push(contestData?.gemsRaw as string);
+        proofs.push(contestData?.proofs as string[]);
+      });
+
+      const claim = await writeContract(wagmiConfig, {
+        address: merkleDistributor as TAddress,
+        abi: IMerkleDistributor,
+        functionName: "claim",
+        args: [contestsToClaim, gemsAmounts, proofs, $account as TAddress],
+      });
+      console.log(claim);
+    } catch (err) {
+      console.error("Error occurred at claim:", err);
+    }
   };
 
   const allContests = useMemo(() => {
@@ -134,19 +302,37 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   useEffect(() => {
+    getRewardsTotalSupply();
+  }, [$apiData?.leaderboards?.absolute]);
+
+  useEffect(() => {
     if ($account) {
-      getUserBalance();
+      getUserData();
+    } else if (contestsToClaim.length) {
+      setContestsToClaim([]);
     }
   }, [$account]);
 
   useEffect(() => {
-    getRewardsTotalSupply();
-  }, [$apiData?.leaderboards?.absolute]);
+    if (userData.length) {
+      getUserBalance();
+      getUserEarnedGems();
+      getUserClaimedRewards();
+    }
+  }, [userData]);
   return (
     <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full gap-[20px]">
       <HeadingText text="Users" scale={1} styles="mb-0" />
       <div className="flex flex-col items-center gap-5 mb-4">
         <HeadingText text="Rewards" scale={2} styles="mb-0" />
+        {!!contestsToClaim.length && (
+          <button
+            className="bg-accent-500 h-10 md:px-3 min-w-[150px] py-1 rounded-xl w-8"
+            onClick={claim}
+          >
+            Claim Gems
+          </button>
+        )}
         <p className="flex items-center justify-center text-center">
           Earning in our vaults you get additional rewards!
         </p>{" "}
@@ -182,16 +368,13 @@ const Users = (): JSX.Element => {
                     Price: 0.01 USDc
                   </span>
                   <span className="font-medium text-[30px]">
-                    Balance:{" "}
-                    {userRewards.gems !== "-"
-                      ? String(
-                          formatNumber(Number(userRewards.gems), "abbreviate")
-                        ).slice(1)
-                      : "-"}
+                    Balance: {userBalance.gems}
                   </span>
-                  <p className="font-light text-[15px] text-[#c6afaf] mt-[-10px]">
-                    Total Supply: 0
-                  </p>
+                  <div className="font-light text-[15px] text-[#c6afaf] flex flex-col items-start">
+                    <p>Total Supply: {rewardsTotalSupply.gems}</p>
+                    <p>Earned: {gemsEarned}</p>
+                  </div>
+
                   {/* <p className="text-[#B0B0B0] text-[15px] flex items-end gap-1">
                     Swap on{" "}
                     <a target="_blank" href="https://swapx.fi/">
@@ -226,21 +409,10 @@ const Users = (): JSX.Element => {
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="font-medium text-[30px]">
-                    Balance:{" "}
-                    {userRewards.points !== "-"
-                      ? String(
-                          formatNumber(Number(userRewards.points), "abbreviate")
-                        ).slice(1)
-                      : "-"}
+                    Balance: {userBalance.points}
                   </span>
                   <p className="font-light text-[15px] text-[#B0AEFF] mt-[-10px]">
-                    Total Supply:{" "}
-                    {String(
-                      formatNumber(
-                        Number(rewardsTotalSupply.points),
-                        "abbreviate"
-                      )
-                    ).slice(1)}
+                    Total Supply: {rewardsTotalSupply.points}
                   </p>
                   {/* <p className="text-[#B0B0B0] text-[15px]">
                     <a
