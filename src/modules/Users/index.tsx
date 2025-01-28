@@ -111,42 +111,11 @@ const Users = (): JSX.Element => {
 
   const getUserData = async () => {
     try {
-      // const response = await axios.get(
-      //   `https://api.stability.farm/rewards/user/${$account}`
-      // );
+      const response = await axios.get(
+        `https://api.stability.farm/rewards/user/${$account}`
+      );
 
-      // const gemsEarnedData = response.data.gemsEarned;
-
-      const gemsEarnedData = [
-        {
-          contestId: "y6",
-          gems: 17547.462770085607,
-          gemsRaw: "17547462770085607000000",
-          proofs: [
-            "0x488b7bc0333772a3d3ba3ce6174255de3cce3cf7c32cd70f67524a47f3fd0e7d",
-            "0x96e918db2fb015c44badb49cbd6a7bb1e2eb2099149254541d1cead5d39e01b7",
-            "0x81a1bcb3d0eb091ac9476b49a16f00d12022fa9ac5aea91ee6e72efb2b82d2b5",
-            "0x02646a587bef7c6d9e112486c766ca1fd31a89ef980b91bee5c4cb17e4a63b2e",
-            "0x3d2c827a54666d51a77f5ce9eaa13badb68d6929fcf1dbd58e764101d725dd91",
-            "0x4cadf3cfb5498fe23e09d6ef22fb1b2bbadb1d794385d2db86f5a698810730bc",
-            "0xf990798404c36bb39c8751dac08d93fa47ef7d96a3123626d41985fd995c203e",
-          ],
-        },
-        {
-          contestId: "y7",
-          gems: 17547.462770085607,
-          gemsRaw: "17547462770085607000000",
-          proofs: [
-            "0x488b7bc0333772a3d3ba3ce6174255de3cce3cf7c32cd70f67524a47f3fd0e7d",
-            "0x96e918db2fb015c44badb49cbd6a7bb1e2eb2099149254541d1cead5d39e01b7",
-            "0x81a1bcb3d0eb091ac9476b49a16f00d12022fa9ac5aea91ee6e72efb2b82d2b5",
-            "0x02646a587bef7c6d9e112486c766ca1fd31a89ef980b91bee5c4cb17e4a63b2e",
-            "0x3d2c827a54666d51a77f5ce9eaa13badb68d6929fcf1dbd58e764101d725dd91",
-            "0x4cadf3cfb5498fe23e09d6ef22fb1b2bbadb1d794385d2db86f5a698810730bc",
-            "0xf990798404c36bb39c8751dac08d93fa47ef7d96a3123626d41985fd995c203e",
-          ],
-        },
-      ];
+      const gemsEarnedData = response.data.gemsEarned;
 
       if (gemsEarnedData.length) {
         setUserData(gemsEarnedData);
@@ -370,9 +339,9 @@ const Users = (): JSX.Element => {
                   <span className="font-medium text-[30px]">
                     Balance: {userBalance.gems}
                   </span>
-                  <div className="font-light text-[15px] text-[#c6afaf] flex flex-col items-start">
+                  <div className="font-light text-[15px] text-[#c6afaf] flex flex-col items-start mt-[-10px]">
                     <p>Total Supply: {rewardsTotalSupply.gems}</p>
-                    <p>Earned: {gemsEarned}</p>
+                    <p className="mt-[-5px]">Earned: {gemsEarned}</p>
                   </div>
 
                   {/* <p className="text-[#B0B0B0] text-[15px] flex items-end gap-1">
@@ -407,7 +376,7 @@ const Users = (): JSX.Element => {
                     Stability Points will be exchanged for $STBL at TGE 2025.
                   </p>
                 </div>
-                <div className="flex flex-col items-start">
+                <div className="flex flex-col items-start mb-[16px]">
                   <span className="font-medium text-[30px]">
                     Balance: {userBalance.points}
                   </span>
