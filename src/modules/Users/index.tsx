@@ -313,74 +313,128 @@ const Users = (): JSX.Element => {
       <HeadingText text="Users" scale={1} styles="mb-0" />
       <div className="flex flex-col items-center gap-5 mb-4">
         <HeadingText text="Rewards" scale={2} styles="mb-0" />
-        {!!contestsToClaim.length && (
-          <button
-            className="bg-accent-500 h-10 md:px-3 min-w-[150px] py-1 rounded-xl w-8"
-            onClick={claim}
-          >
-            Claim Gems
-          </button>
-        )}
         <p className="flex items-center justify-center text-center">
           Earning in our vaults you get additional rewards!
         </p>{" "}
         <div className="flex items-center justify-center gap-10 font-manrope flex-wrap mb-5">
-          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[230px] rounded-[10px]">
-            <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
-              <div className="flex flex-col items-start justify-between h-full">
+          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[270px] rounded-[10px]">
+            <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
+              <div className="flex flex-col items-start justify-between h-full md:w-2/3">
                 <div className="font-light flex flex-col items-start">
-                  <span className="text-[25px] flex items-center gap-2">
-                    <img
-                      src="sGEM1.png"
-                      alt="sGEM1"
-                      title="sGEM1"
-                      className="w-[33px] h-[33px] block sm:hidden"
-                    />{" "}
-                    sGEM1
-                  </span>
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-[25px] flex items-center gap-2">
+                      <img
+                        src="sGEM1.png"
+                        alt="sGEM1"
+                        title="sGEM1"
+                        className="w-[33px] h-[33px] block sm:hidden"
+                      />
+                      sGEM1
+                    </span>
+                    <a
+                      className="block sm:hidden"
+                      target="_blank"
+                      href="https://www.shadow.so/trade?inputCurrency=0x29219dd400f2Bf60E5a23d13Be72B486D4038894&outputCurrency=0x9A08cD5691E009cC72E2A4d8e7F2e6EE14E96d6d"
+                    >
+                      <img
+                        src="mobile_shadow.png"
+                        alt="Shadow"
+                        title="Shadow"
+                      />
+                    </a>
+                  </div>
                   <p className="text-[12px]">
-                    Sonic Gems are app airdrop points that we give away entirely
-                    to our users.
-                    <br />
+                    <span className="opacity-70">
+                      Sonic Gems are app airdrop points that we give away
+                      entirely to our users.
+                    </span>
+
                     <a
                       href="https://stabilitydao.gitbook.io/stability/stability-dao/gems"
                       target="_blank"
-                      className="underline"
+                      className="underline font-bold ml-1"
                     >
                       Read Docs
                     </a>
                   </p>
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-[#EAD9B2] text-[15px] font-regular mb-[-10px]">
-                    Price: ${gemPrice}
-                  </span>
-                  <span className="font-medium text-[30px]">
-                    Balance: {userBalance.gems}
-                  </span>
-                  <div className="font-light text-[15px] text-[#c6afaf] flex flex-col items-start mt-[-10px]">
-                    <p>Total Supply: {rewardsTotalSupply.gems}</p>
-                    <p className="mt-[-5px]">Earned: {gemsEarned}</p>
-                  </div>
+                <div>
+                  <p className="text-[28px]">
+                    <span className="font-extralight">Balance:</span>
+                    <span className="font-bold"> {userBalance.gems}</span>
+                  </p>
+                  <p className="flex items-center gap-[3px] text-[13px] mt-[-5px]">
+                    <span className="text-[#5C5C5E]">Total Earned:</span>
+                    <span className="font-light">{gemsEarned}</span>
+                    <span className="text-[#B52727]">sGEM1</span>
+                  </p>
+                </div>
+                <p className="text-[#B0B0B0] text-[15px] sm:flex items-center gap-1 hidden">
+                  Swap on{" "}
+                  <a
+                    target="_blank"
+                    href="https://www.shadow.so/trade?inputCurrency=0x29219dd400f2Bf60E5a23d13Be72B486D4038894&outputCurrency=0x9A08cD5691E009cC72E2A4d8e7F2e6EE14E96d6d"
+                  >
+                    <img src="shadow.png" alt="Shadow" title="Shadow" />
+                  </a>
+                </p>
+                <div className="w-full flex items-center justify-between sm:hidden">
+                  <div className="flex flex-col text-[12px]">
+                    <p className="text-[#EAD9B2]">
+                      Price:
+                      <span className="font-bold mx-[2px]">${gemPrice}</span>
+                      USD
+                    </p>
 
-                  {/* <p className="text-[#B0B0B0] text-[15px] flex items-end gap-1">
-                    Swap on{" "}
-                    <a target="_blank" href="https://swapx.fi/">
-                      <img src="swapX.png" alt="swapX" title="swapX" />
-                    </a>
-                  </p> */}
+                    <p className="font-light opacity-50">
+                      Total Supply:{" "}
+                      <span className="font-bold">
+                        {rewardsTotalSupply.gems}
+                      </span>
+                    </p>
+                  </div>
+                  {!!contestsToClaim.length && (
+                    <button
+                      className="bg-transparent border border-[#FEF08A] h-7 rounded-md w-[80px] font-light text-[13px]"
+                      onClick={claim}
+                    >
+                      Claim
+                    </button>
+                  )}
                 </div>
               </div>
-              <img
-                src="sGEM1.png"
-                alt="sGEM1 reward"
-                className="w-[150px] h-[150px] sm:block hidden"
-              />
+              <div className="flex flex-col sm:items-end justify-between sm:w-1/3 h-full whitespace-nowrap">
+                <img
+                  src="sGEM1.png"
+                  alt="sGEM1 reward"
+                  className="w-[88px] h-[88px] sm:block hidden"
+                />
+                {!!contestsToClaim.length && (
+                  <button
+                    className="bg-transparent border border-[#FEF08A] h-7 sm:w-[88px] rounded-md w-8 font-light text-[13px] sm:block hidden"
+                    onClick={claim}
+                  >
+                    Claim
+                  </button>
+                )}
+                <div className="hidden sm:flex flex-col items-end text-[12px]">
+                  <p className="text-[#EAD9B2]">
+                    Price:
+                    <span className="font-bold mx-[2px]">${gemPrice}</span>
+                    USD
+                  </p>
+
+                  <p className="font-light opacity-50">
+                    Total Supply:{" "}
+                    <span className="font-bold">{rewardsTotalSupply.gems}</span>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[230px] rounded-[10px]">
-            <div className="py-5 pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
-              <div className="flex flex-col items-start justify-between h-full">
+          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[270px] rounded-[10px]">
+            <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
+              <div className="flex flex-col items-start h-full sm:w-2/3">
                 <div className="font-light flex flex-col items-start">
                   <span className="text-[25px] flex items-center gap-2">
                     <img
@@ -391,34 +445,31 @@ const Users = (): JSX.Element => {
                     />{" "}
                     pSTBL
                   </span>
-                  <p className="text-[13px]">
+                  <p className="text-[13px] opacity-70">
                     Stability Points will be exchanged for $STBL at TGE 2025.
                   </p>
                 </div>
-                <div className="flex flex-col items-start mb-[16px]">
-                  <span className="font-medium text-[30px]">
-                    Balance: {userBalance.points}
-                  </span>
-                  <p className="font-light text-[15px] text-[#B0AEFF] mt-[-10px]">
-                    Total Supply: {rewardsTotalSupply.points}
-                  </p>
-                  {/* <p className="text-[#B0B0B0] text-[15px]">
-                    <a
-                      className="underline text-[#FFF]"
-                      target="_blank"
-                      href=""
-                    >
-                      Read Docs
-                    </a>{" "}
-                    for more information
-                  </p> */}
-                </div>
+
+                <p className="text-[28px] mt-[12px]">
+                  <span className="font-extralight">Balance:</span>
+                  <span className="font-bold"> {userBalance.points}</span>
+                </p>
+                <p className="font-light text-[#B0AEFF] text-[12px] mt-[-8px] block sm:hidden">
+                  Total Supply:{" "}
+                  <span className="font-bold">{rewardsTotalSupply.points}</span>
+                </p>
               </div>
-              <img
-                className="w-[150px] h-[150px] sm:block hidden"
-                src="pSTBL.png"
-                alt="pSTBL reward"
-              />
+              <div className="sm:flex hidden flex-col items-end justify-between text-[12px]  sm:w-1/3 h-full">
+                <img
+                  className="w-[93px] h-[93px] sm:block hidden"
+                  src="pSTBL.png"
+                  alt="pSTBL reward"
+                />
+                <p className="font-light text-[#B0AEFF]">
+                  Total Supply:{" "}
+                  <span className="font-bold">{rewardsTotalSupply.points}</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
