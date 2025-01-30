@@ -21,6 +21,7 @@ import DividendTokenABI from "./abi/DividendTokenABI.ts";
 import ICHIABI from "./abi/ICHIABI.ts";
 import PriceReaderABI from "./abi/PriceReaderABI.ts";
 import IFrontendABI from "./abi/IFrontendABI.ts";
+import IMerkleDistributor from "./abi/IMerkleDistributor.ts";
 
 import type { TAddress } from "@types";
 
@@ -75,6 +76,10 @@ const ichiFactories: { [key: string]: TAddress } = {
   retro: "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7",
 };
 
+const sGEM1 = deployments[146].tokenomics.gem1;
+
+const merkleDistributor = deployments[146].tokenomics.merkleDistributor;
+
 const metadata = {
   name: "Stability",
   description: "Stability Asset Management Platform",
@@ -119,4 +124,7 @@ export {
   ICHIABI,
   PriceReaderABI,
   IFrontendABI,
+  IMerkleDistributor,
+  sGEM1,
+  merkleDistributor,
 };
