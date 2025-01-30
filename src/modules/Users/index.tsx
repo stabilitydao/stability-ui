@@ -18,7 +18,7 @@ import {
 
 import { findAllValidPeriods } from "./functions";
 
-import { account, apiData } from "@store";
+import { account, apiData, assetsPrices } from "@store";
 
 import { contests } from "@stabilitydao/stability";
 
@@ -42,6 +42,7 @@ import type { UserRewards } from "@stabilitydao/stability/out/api.types";
 
 const Users = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
+  const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
 
   // const activeContestInfo = contests?.[currentPeriod];
@@ -54,6 +55,7 @@ const Users = (): JSX.Element => {
     points: "0",
     gems: "900k",
   });
+  const [gemPrice, setGemPrice] = useState("-");
 
   const [contestsToClaim, setContestsToClaim] = useState([]);
 
@@ -89,6 +91,19 @@ const Users = (): JSX.Element => {
         rank: index + 1,
       }));
       setTableData(contestData);
+    }
+  };
+
+  const getSGEMPrice = async () => {
+    const sonicPrices = $assetsPrices["146"];
+
+    if (sonicPrices) {
+      const _sGEM1Price =
+        Number(
+          sonicPrices[sGEM1?.toLowerCase() as keyof typeof sonicPrices]?.price
+        ).toFixed(3) ?? "0.010";
+
+      setGemPrice(_sGEM1Price);
     }
   };
 
@@ -271,8 +286,12 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   useEffect(() => {
+    getSGEMPrice();
+  }, [$assetsPrices]);
+
+  useEffect(() => {
     getRewardsTotalSupply();
-  }, [$apiData?.leaderboards?.absolute]);
+  }, [$apiData]);
 
   useEffect(() => {
     if ($account) {
@@ -334,7 +353,7 @@ const Users = (): JSX.Element => {
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[#EAD9B2] text-[15px] font-regular mb-[-10px]">
-                    Price: 0.01 USDc
+                    Price: ${gemPrice}
                   </span>
                   <span className="font-medium text-[30px]">
                     Balance: {userBalance.gems}
