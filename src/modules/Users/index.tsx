@@ -52,7 +52,7 @@ const Users = (): JSX.Element => {
   const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
     points: "0",
-    gems: "0",
+    gems: "900k",
   });
 
   const [contestsToClaim, setContestsToClaim] = useState([]);
@@ -99,7 +99,7 @@ const Users = (): JSX.Element => {
         0
       );
 
-      const _gems = String(formatNumber(0, "abbreviate")).slice(1);
+      const _gems = String(formatNumber(900000, "abbreviate")).slice(1);
 
       const _points = String(
         formatNumber(Number(pointsTotalSupply), "abbreviate")
