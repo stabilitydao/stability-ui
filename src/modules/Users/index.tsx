@@ -450,7 +450,7 @@ const Users = (): JSX.Element => {
                   </p>
                 </div>
 
-                <p className="text-[28px] mt-[12px]">
+                <p className="text-[28px] mt-[30px]">
                   <span className="font-extralight">Balance:</span>
                   <span className="font-bold"> {userBalance.points}</span>
                 </p>
