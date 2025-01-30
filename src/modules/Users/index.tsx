@@ -317,7 +317,7 @@ const Users = (): JSX.Element => {
           Earning in our vaults you get additional rewards!
         </p>{" "}
         <div className="flex items-center justify-center gap-10 font-manrope flex-wrap mb-5">
-          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[270px] rounded-[10px]">
+          <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[270px] sm:h-[220px] rounded-[10px]">
             <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
               <div className="flex flex-col items-start justify-between h-full md:w-2/3">
                 <div className="font-light flex flex-col items-start">
@@ -432,7 +432,7 @@ const Users = (): JSX.Element => {
               </div>
             </div>
           </div>
-          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[270px] rounded-[10px]">
+          <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[270px] sm:h-[220px] rounded-[10px]">
             <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
               <div className="flex flex-col items-start h-full sm:w-2/3">
                 <div className="font-light flex flex-col items-start">
@@ -450,7 +450,7 @@ const Users = (): JSX.Element => {
                   </p>
                 </div>
 
-                <p className="text-[28px] mt-[30px]">
+                <p className="text-[28px] mt-6 sm:mt-[6px]">
                   <span className="font-extralight">Balance:</span>
                   <span className="font-bold"> {userBalance.points}</span>
                 </p>
