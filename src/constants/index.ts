@@ -106,6 +106,11 @@ const DEXes = [
     algo: "",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png",
   },
+  {
+    name: "Shadow",
+    algo: "",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
+  },
 ];
 
 const CHAINS = [
@@ -254,9 +259,20 @@ const PROTOCOLS = {
     logoSrc:
       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png?1",
   },
+  shadow: {
+    name: 'Shadow',
+    logoSrc:
+       "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
+  },
 };
 
 const IL = {
+  ASFN: {
+    rate: 8,
+    title: "High",
+    desc: "The preset of the Stability ALM provides liquidity in the narrow range, often re-balancing the position (when the price deviates from the average by approximately +-3%). Every rebalancing results in a loss. The higher the volatility of the pair, the more re-balancing and the greater the loss.",
+    color: "#f55e11",
+  },
   GQFS: {
     rate: 1,
     title: "Zero exp",
