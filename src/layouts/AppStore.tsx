@@ -517,13 +517,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 case "aave":
                   yearnProtocols.push({
                     title: "Aave",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.svg",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
                   });
                   break;
                 case "compound":
                   yearnProtocols.push({
                     title: "Compound",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.svg",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
                   });
                   break;
                 case "stargate":

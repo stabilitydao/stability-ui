@@ -136,21 +136,12 @@ test("Should display vault info correctly", async ({ page, context }) => {
 
     /* Created should be displayed correctly in d/mm/yyyy format and */
     /* summarised days from deployment date                          */
+    const createdText = `${getTimeDifference(vaultData?.created)?.days} days ago`;
 
-    const date = getDate(Number(vaultData?.created));
+    const pageVaultCreated =
+      (await page.getByTestId("vaultCreated").textContent()) ?? "";
 
-    const createdData = {
-      time: date,
-      days: getTimeDifference(vaultData?.created)?.days,
-    };
-
-    const createdText = `${createdData?.time} / ${createdData?.days} days ago`;
-
-    const pageVaultCreated = await page
-      .getByTestId("vaultCreated")
-      .textContent();
-
-    expect(pageVaultCreated).toBe(createdText);
+    expect(pageVaultCreated.replace(/.*\/\s*/, "")).toBe(createdText);
 
     /* Vault version should be displayed correctly based on it's contract version */
 

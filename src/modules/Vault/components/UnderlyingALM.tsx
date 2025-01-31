@@ -140,7 +140,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
         }
         if (vault.strategy.includes("QuickSwap")) {
           const ammFee = await readContract(wagmiConfig, {
-            address: ichiFactories.quickSwap,
+            address: ichiFactories.quickswap,
             abi: [
               {
                 inputs: [],
@@ -155,7 +155,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
             functionName: "ammFee",
           });
           const baseFee = await readContract(wagmiConfig, {
-            address: ichiFactories.quickSwap,
+            address: ichiFactories.quickswap,
             abi: [
               {
                 inputs: [],
