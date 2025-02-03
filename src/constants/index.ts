@@ -257,7 +257,7 @@ const IL = {
   LOW: {
     rate: 3,
     title: "Low",
-    desc: "We expect low impermanent loss for pegged Gamma preset. Will be updated.",
+    desc: "We expect low impermanent loss for pegged Gamma preset.",
     color: "#D7F55B",
   },
   TPF: {

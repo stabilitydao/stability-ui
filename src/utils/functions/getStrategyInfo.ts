@@ -207,6 +207,12 @@ export const getStrategyInfo = (
       protocols: [ichi, swapx],
       il: IL.IQMF,
     };
+  } else if (vaultSymbol.match(/C-SACRAscUSD-ASF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [shadow],
+      il: IL.LOW,
+    };
   } else if (vaultSymbol.match(/ASF$/)) {
     strategyInfo = {
       ...strategyInfo,
