@@ -75,43 +75,43 @@ const CHAINLINK_STABLECOINS = {
   DAI: "https://data.chain.link/feeds/polygon/mainnet/dai-usd",
 };
 
-const DEXes = [
-  {
+const DEXes = {
+  quickswap: {
     name: "QuickSwap",
     algo: "AlgebraV1",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/QuickSwap.svg",
   },
-  {
+  retro: {
     name: "Retro",
     algo: "Uniswap V3",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Retro.svg",
   },
-  {
+  curve: {
     name: "Curve",
     algo: "StableSwapNG",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Curve.svg",
   },
-  {
+  uniswapV3: {
     name: "UniswapV3",
     algo: "Uniswap V3",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
   },
-  {
+  pearlV2: {
     name: "Pearl V2",
     algo: "Pearl V2",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
   },
-  {
+  swapx: {
     name: "SwapX",
     algo: "",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png",
   },
-  {
+  shadow: {
     name: "Shadow",
     algo: "",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
   },
-];
+};
 
 const CHAINS = [
   {
@@ -163,118 +163,29 @@ const DEFAULT_TRANSACTION_SETTINGS = {
   gasLimit: "1.1",
 };
 
-const PROTOCOLS = {
-  quickswap: {
-    name: "QuickSwap",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/QuickSwap.svg",
-  }, // 1
-  gamma: {
-    name: "Gamma",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Gamma.png",
-  }, // 1
-  compound: {
-    name: "Compound",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
-  }, // 1
-  defiEdge: {
-    name: "DefiEdge",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/DefiEdge.svg",
-  }, // 1
-  merkl: {
-    name: "Merkl",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg",
-  }, // 0
-  ichi: {
-    name: "Ichi",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Ichi.svg",
-  }, // 1
-  retro: {
-    name: "Retro",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Retro.svg",
-  }, // 1
-  curve: {
-    name: "Curve",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Curve.svg",
-  }, // 1
-  convex: {
-    name: "Convex",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Convex.png",
-  }, // 1
-  lido: {
-    name: "Lido",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
-  }, // 1
-  aave: {
-    name: "Aave",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
-  }, // 1
-  stargate: {
-    name: "Stargate",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
-  }, // 1
-  yearn: {
-    name: "Yearn",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Yearn.svg",
-  }, // 1
-  uniswapV3: {
-    name: "UniswapV3",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Uniswap.svg",
-  }, // 0
-  pearlV2: {
-    name: "Pearl V2",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
-  }, // 0
-  trident: {
-    name: "Trident",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Trident.png",
-  }, // 0
-  beethovenx: {
-    name: "Beets",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/beethovenx.png",
-  }, // 1
-  equalizer: {
-    name: "Equalizer",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/equalizer.png",
-  }, // 1
-  swapx: {
-    name: "SwapX",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/swapx.png",
-  }, // 1
-  shadow: {
-    name: "Shadow",
-    logoSrc:
-      "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
-  }, // 1
-};
+const PROTOCOLS = Object.entries(integrations).reduce<
+  Record<string, { name: string; logoSrc: string }>
+>((acc, [integrationKey, value]) => {
+  if (!acc[integrationKey]) {
+    acc[integrationKey] = {
+      name: value.name,
+      logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${value.img}`,
+    };
+  }
 
-// const _PROTOCOLS = Object.entries(integrations).reduce((acc, [key, value]) => {
-//   acc[key] = {
-//     name: value.name,
-//     logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${value.img}`,
-//   };
-//   return acc;
-// }, {});
-// console.log(PROTOCOLS);
-// console.log(_PROTOCOLS);
+  Object.entries(value.protocols).forEach(([key, val]) => {
+    const name = val.name;
+    let logoSrc = `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${val.img ?? value.img}`;
+
+    if (!acc[key])
+      acc[key] = {
+        name,
+        logoSrc,
+      };
+  });
+
+  return acc;
+}, {});
 
 const IL = {
   ASFN: {
