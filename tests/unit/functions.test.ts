@@ -20,6 +20,7 @@ import {
   getShortAddress,
   formatTimestampToDate,
   extractDomain,
+  getContractDataWithPagination,
 } from "@utils";
 
 import { transactionSettings, aprFilter } from "@store";
@@ -34,53 +35,54 @@ vi.mock("@store", () => ({
   visible: { set: vi.fn() },
 }));
 
-// describe("addAssetsBalance", () => {
-//   it("should correctly map assets to balances", () => {
-//     const data = [
-//       ["Address1", "Address2", "Address3"],
-//       [],
-//       ["Balance1", "Balance2", "Balance3"],
-//     ];
-//     const result = addAssetsBalance(data);
+describe("addAssetsBalance", () => {
+  it("should correctly map assets to balances", () => {
+    const data = [
+      10n,
+      ["Address1", "Address2", "Address3"],
+      [],
+      ["Balance1", "Balance2", "Balance3"],
+    ];
 
-//     expect(result).toEqual({
-//       address1: "Balance1",
-//       address2: "Balance2",
-//       address3: "Balance3",
-//     });
-//   });
-// });
+    const result = addAssetsBalance(data);
 
-// describe("addVaultData", () => {
-//   it("should correctly map vault addresses to their data", () => {
-//     const data = [
-//       [],
-//       [],
-//       [],
-//       ["0xAddress1", "0xAddress2", "0xAddress3"],
-//       [100, 200, 300],
-//       [10, 20, 30],
-//     ];
-//     const result = addVaultData(data);
+    expect(result).toEqual({
+      address1: "Balance1",
+      address2: "Balance2",
+      address3: "Balance3",
+    });
+  });
+});
 
-//     const expected = {
-//       "0xaddress1": {
-//         vaultSharePrice: 100,
-//         vaultUserBalance: 10,
-//       },
-//       "0xaddress2": {
-//         vaultSharePrice: 200,
-//         vaultUserBalance: 20,
-//       },
-//       "0xaddress3": {
-//         vaultSharePrice: 300,
-//         vaultUserBalance: 30,
-//       },
-//     };
+describe("addVaultData", () => {
+  it("should correctly map vault addresses to their data", () => {
+    const data = [
+      10n,
+      ["0xAddress1", "0xAddress2", "0xAddress3"],
+      [100, 200, 300],
+      [10, 20, 30],
+    ];
 
-//     expect(result).toEqual(expected);
-//   });
-// });
+    const result = addVaultData(data);
+
+    const expected = {
+      "0xaddress1": {
+        vaultSharePrice: 100,
+        vaultUserBalance: 10,
+      },
+      "0xaddress2": {
+        vaultSharePrice: 200,
+        vaultUserBalance: 20,
+      },
+      "0xaddress3": {
+        vaultSharePrice: 300,
+        vaultUserBalance: 30,
+      },
+    };
+
+    expect(result).toEqual(expected);
+  });
+});
 
 describe("calculateAPY", () => {
   it("should correctly calculate with string || number", () => {
@@ -385,7 +387,7 @@ describe("getStrategyInfo", () => {
 
     expect(strategyInfo.protocols).toEqual([
       PROTOCOLS.gamma,
-      PROTOCOLS.quickSwap,
+      PROTOCOLS.quickswap,
       PROTOCOLS.merkl,
     ]);
 
@@ -418,7 +420,7 @@ describe("getStrategyInfo", () => {
 
     expect(strategyInfo.id).toBe("QuickSwap Static Merkl Farm");
     expect(strategyInfo.shortId).toBe("QSMF");
-    expect(strategyInfo.protocols).toEqual([PROTOCOLS.quickSwap]);
+    expect(strategyInfo.protocols).toEqual([PROTOCOLS.quickswap]);
     expect(strategyInfo.il).toEqual(IL.QSF);
   });
 
@@ -431,8 +433,8 @@ describe("getStrategyInfo", () => {
     expect(strategyInfo.id).toBe("DefiEdge QuickSwap Merkl Farm");
     expect(strategyInfo.shortId).toBe("DQMF");
     expect(strategyInfo.protocols).toEqual([
-      PROTOCOLS.defiedge,
-      PROTOCOLS.quickSwap,
+      PROTOCOLS.defiEdge,
+      PROTOCOLS.quickswap,
       PROTOCOLS.merkl,
     ]);
     expect(strategyInfo.il).toEqual(IL.DQMFN);
@@ -500,7 +502,7 @@ describe("getStrategyInfo", () => {
     expect(strategyInfo.id).toBe("");
     expect(strategyInfo.shortId).toBe("");
     expect(strategyInfo.protocols).toEqual([
-      PROTOCOLS.quickSwap,
+      PROTOCOLS.quickswap,
       PROTOCOLS.gamma,
     ]);
     expect(strategyInfo.baseStrategies).toEqual([]);

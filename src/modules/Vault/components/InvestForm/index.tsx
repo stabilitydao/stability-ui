@@ -518,7 +518,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       if (asset === underlyingToken?.address) {
         try {
           let previewDepositAssets;
-          if (["BSF", "BWF"].includes(shortId)) {
+          if (["BSF", "BWF", "ASF"].includes(shortId)) {
             previewDepositAssets = await _publicClient?.simulateContract({
               address: vault.address,
               abi: VaultABI,
@@ -1035,7 +1035,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           : thisAmount;
       });
       let previewDepositAssets;
-      if (["BSF", "BWF"].includes(shortId)) {
+      if (["BSF", "BWF", "ASF"].includes(shortId)) {
         previewDepositAssets = await _publicClient?.simulateContract({
           address: vault.address,
           abi: VaultABI,
@@ -1886,8 +1886,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     // if (!Number(amount)) return;  // commented for BSF
-
-    if (shortId === "BSF") {
+    if (["BSF", "ASF"].includes(shortId)) {
       const formattedInputs = Object.fromEntries(
         Object.entries(
           Object.entries(inputs).length ? inputs : { [asset]: amount }
@@ -1949,7 +1948,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (["BSF", "BWF", "CCF"].includes(shortId)) {
+            if (["BSF", "BWF", "CCF", "ASF"].includes(shortId)) {
               let value;
               let decimals = 18;
               for (const key in inputs) {
@@ -1976,8 +1975,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             }
           }
         }
+
         try {
           let previewDepositAssets: any;
+
           if (shortId === "IQMF" || shortId === "IRMF") {
             // IQMF & IRMF strategies only
             let assets: TAddress[] = vault.assets.map((asset) => asset.address);
@@ -1992,7 +1993,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               args: [assets, IQMFAmounts],
             });
           } else {
-            if (["BSF", "BWF"].includes(shortId)) {
+            if (["BSF", "BWF", "ASF"].includes(shortId)) {
               previewDepositAssets = await _publicClient?.simulateContract({
                 address: vault.address,
                 abi: VaultABI,

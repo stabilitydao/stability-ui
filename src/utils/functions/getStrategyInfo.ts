@@ -46,10 +46,10 @@ export const getStrategyInfo = (
   );
 
   const {
-    quickSwap,
+    quickswap,
     gamma,
     compound,
-    defiedge,
+    defiEdge,
     merkl,
     ichi,
     retro,
@@ -72,7 +72,7 @@ export const getStrategyInfo = (
     return {
       id: "",
       shortId: "",
-      protocols: [quickSwap, gamma],
+      protocols: [quickswap, gamma],
       baseStrategies: [],
       color: "",
       bgColor: "",
@@ -93,13 +93,13 @@ export const getStrategyInfo = (
 
     strategyInfo = {
       ...strategyInfo,
-      protocols: [gamma, quickSwap],
+      protocols: [gamma, quickswap],
       il,
     };
   } else if (vaultSymbol.match(/QSF$/)) {
     strategyInfo = {
       ...strategyInfo,
-      protocols: [quickSwap],
+      protocols: [quickswap],
       il: IL.QSF,
     };
   } else if (vaultSymbol.match(/CCF$/)) {
@@ -117,13 +117,13 @@ export const getStrategyInfo = (
   } else if (vaultSymbol.match(/DQMFN?[A-Z0-9]?$/)) {
     strategyInfo = {
       ...strategyInfo,
-      protocols: [defiedge, quickSwap, merkl],
+      protocols: [defiEdge, quickswap, merkl],
       il: IL.DQMFN,
     };
   } else if (vaultSymbol.match(/IQMF[a-z0-9]{0,1}$/)) {
     strategyInfo = {
       ...strategyInfo,
-      protocols: [ichi, quickSwap, merkl],
+      protocols: [ichi, quickswap, merkl],
       il: IL.IQMF,
     };
   } else if (vaultSymbol.match(/GQMF(S|N|W)?$/)) {
@@ -137,7 +137,7 @@ export const getStrategyInfo = (
 
     strategyInfo = {
       ...strategyInfo,
-      protocols: [gamma, quickSwap, merkl],
+      protocols: [gamma, quickswap, merkl],
       il,
     };
   } else if (vaultSymbol.match(/\bIRMF\b/)) {
@@ -162,7 +162,7 @@ export const getStrategyInfo = (
   } else if (vaultSymbol.match(/QSMF$/)) {
     strategyInfo = {
       ...strategyInfo,
-      protocols: [quickSwap, merkl],
+      protocols: [quickswap, merkl],
       il: IL.QSMF,
     };
   } else if (vaultSymbol.match(/Y$/)) {
@@ -206,6 +206,12 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [ichi, swapx],
       il: IL.IQMF,
+    };
+  } else if (vaultSymbol.match(/C-SACRAscUSD-ASF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [shadow],
+      il: IL.LOW,
     };
   } else if (vaultSymbol.match(/ASF$/)) {
     strategyInfo = {

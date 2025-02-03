@@ -479,27 +479,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               initPrice: priceOnCreation.toFixed(2),
               price: price.toFixed(2),
               priceDifference: priceDifference.toFixed(2),
-              dailyAPR:
-                Number(
-                  vault.vsHold?.aprAssets24h
-                    ? vault.vsHold?.aprAssets24h[index]
-                    : 0
-                ).toFixed(2) || "0",
-              weeklyAPR:
-                Number(
-                  vault.vsHold?.aprAssetsWeek
-                    ? vault.vsHold?.aprAssetsWeek[index]
-                    : 0
-                ).toFixed(2) || "0",
-              latestAPR:
-                Number(
-                  vault.vsHold?.lifetimeAssets
-                    ? vault.vsHold?.lifetimeAssets[index]
-                    : 0
-                ).toFixed(2) || "0",
-              APR:
-                Number(vault.vsHold?.aprAssetsLifetime[index]).toFixed(2) ||
-                "0",
+              dailyAPR: Number(vault.vsHold?.aprAssets24h[index] ?? 0).toFixed(
+                2
+              ),
+              weeklyAPR: Number(
+                vault.vsHold?.aprAssetsWeek[index] ?? 0
+              ).toFixed(2),
+              latestAPR: Number(
+                vault.vsHold?.lifetimeAssets[index] ?? 0
+              ).toFixed(2),
+              APR: Number(vault.vsHold?.aprAssetsLifetime[index] ?? 0).toFixed(
+                2
+              ),
             };
           });
         }
@@ -517,13 +508,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 case "aave":
                   yearnProtocols.push({
                     title: "Aave",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.svg",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
                   });
                   break;
                 case "compound":
                   yearnProtocols.push({
                     title: "Compound",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.svg",
+                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
                   });
                   break;
                 case "stargate":
@@ -560,14 +551,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         /////
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
 
-        const shareprice =
-          !Number(vault.sharePrice) && !Number(vault.tvl)
-            ? "1"
-            : vault.sharePrice;
-        const sharePriceLast =
-          !Number(vault.sharePriceLast) && !Number(vault.tvl)
-            ? "1"
-            : vault.sharePriceLast;
+        const shareprice = !Number(vault.sharePrice) ? "1" : vault.sharePrice;
+
+        const sharePriceLast = !Number(vault.sharePriceLast)
+          ? "1"
+          : vault.sharePriceLast;
 
         const strategyProtocols = getStrategyProtocols(
           strategyInfo.shortId as StrategyShortId
@@ -595,7 +583,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             strategy: vault.strategyId,
             shareprice,
             sharePriceLast,
-
             tvl: vault.tvl,
             strategySpecific,
             balance: "",
