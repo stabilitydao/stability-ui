@@ -1,13 +1,17 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
+import Tippy from "@tippyjs/react";
+
 import { HoldTable, VSHoldTableCell, YieldTableCell } from "./table";
 
-import { TextModal, HeadingText } from "@ui";
+import { HeadingText } from "@ui";
 
 import { connected } from "@store";
 
 import { getTimeDifference, formatNumber } from "@utils";
+
+import "tippy.js/dist/tippy.css";
 
 import type { TVault, THoldData, TShareData } from "@types";
 
@@ -20,7 +24,8 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
 
   const [shareData, setShareData] = useState<TShareData>({});
 
-  const [modal, setModal] = useState<boolean>(false);
+  const vsHoldExplanation =
+    "VS HODL APR compares depositing tokens into a vault vs holding them in a wallet with its ratio and timeline.";
 
   const totalAPY = [
     { data: vault?.earningData?.apy?.latest, testID: "yieldLatestAPY" },
@@ -159,18 +164,14 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
           <div>
             <div className="mb-2 flex items-center gap-2">
               <p>VS HOLD</p>
-              <div className="tooltip">
+              <Tippy content={vsHoldExplanation} placement="top">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
                   height="18"
                   viewBox="0 0 18 18"
                   fill="none"
-                  className="ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms] tooltip"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setModal(true);
-                  }}
+                  className="ml-1 cursor-pointer opacity-40 hover:opacity-100 transition delay-[40ms]"
                 >
                   <circle cx="8" cy="8" r="7.5" stroke="white" />
                   <path
@@ -178,11 +179,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     fill="white"
                   />
                 </svg>
-                <div className="visible__tooltip toCenter flex items-start justify-start normal-case">
-                  VS HODL APR compares depositing tokens into a vault vs holding
-                  them in a wallet with it's ratio and timeline.
-                </div>
-              </div>
+              </Tippy>
             </div>
 
             <table className="font-manrope w-full">
@@ -255,12 +252,6 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
           </div>
         )}
       </div>
-      {modal && (
-        <TextModal
-          setModalState={setModal}
-          text="VS HODL APR compares depositing tokens into a vault vs holding them in a wallet with it's ratio and timeline."
-        />
-      )}
     </div>
   );
 });

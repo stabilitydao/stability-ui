@@ -22,6 +22,7 @@
     "@tanstack/query-sync-storage-persister": "^5.22.2",
     "@tanstack/react-query": "^5.22.2",
     "@tanstack/react-query-persist-client": "^5.22.2",
+    "@tippyjs/react": "^4.2.6",
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
