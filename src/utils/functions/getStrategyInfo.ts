@@ -66,6 +66,7 @@ export const getStrategyInfo = (
     equalizer,
     swapx,
     shadow,
+    silo,
   } = PROTOCOLS;
 
   if (!strategyInfo) {
@@ -225,7 +226,12 @@ export const getStrategyInfo = (
       protocols: [swapx],
       il: IL.EF_vAMM,
     };
+  } else if (vaultSymbol.match(/SiF$/)) {
+    strategyInfo = {
+      ...strategyInfo,
+      protocols: [silo],
+      il: IL.Y,
+    };
   }
-
   return strategyInfo;
 };
