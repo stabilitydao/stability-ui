@@ -1888,7 +1888,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     // if (!Number(amount)) return;  // commented for BSF
-    if (["BSF", "ASF"].includes(shortId)) {
+    if (["BSF"].includes(shortId)) {
       const formattedInputs = Object.fromEntries(
         Object.entries(
           Object.entries(inputs).length ? inputs : { [asset]: amount }
@@ -1950,7 +1950,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (["BSF", "BWF", "CCF", "ASF"].includes(shortId)) {
+            if (["BSF", "BWF", "CCF"].includes(shortId)) {
               let value;
               let decimals = 18;
               for (const key in inputs) {
