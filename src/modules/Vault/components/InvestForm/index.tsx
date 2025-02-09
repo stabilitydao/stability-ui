@@ -15,6 +15,8 @@ import { sonic } from "viem/chains";
 import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
+import { isMobile } from "react-device-detect";
+
 import { SettingsModal } from "./SettingsModal";
 import { TabSwitcher } from "./TabSwitcher";
 
@@ -1886,7 +1888,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const previewDeposit = async (asset: string, amount: string) => {
     // if (!Number(amount)) return;  // commented for BSF
-    if (["BSF", "ASF"].includes(shortId)) {
+    if (["BSF"].includes(shortId)) {
       const formattedInputs = Object.fromEntries(
         Object.entries(
           Object.entries(inputs).length ? inputs : { [asset]: amount }
@@ -1948,7 +1950,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               parseUnits(amount, Number(getTokenData(asset)?.decimals))
             );
           } else {
-            if (["BSF", "BWF", "CCF", "ASF"].includes(shortId)) {
+            if (["BSF", "BWF", "CCF"].includes(shortId)) {
               let value;
               let decimals = 18;
               for (const key in inputs) {
@@ -2200,7 +2202,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const zapSoon = false; //vault?.strategyInfo?.shortId === "ISF";
 
   return (
-    <div className="bg-accent-950 relative rounded-2xl min-w-[320px] h-[462px] md:w-[420px] font-manrope">
+    <div className="bg-accent-950 relative rounded-2xl w-[300px] h-[462px] md:w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -2212,7 +2214,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         <div className="flex items-center gap-4 relative pb-[12px]">
           {optionTokens && (
             <div
-              className="relative select-none min-w-[235px] w-[290px] text-neutral-50 text-[14px] "
+              className="relative select-none w-[250px] md:w-[290px] text-neutral-50 text-[14px]"
               ref={tokenSelectorRef}
             >
               <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
@@ -2222,7 +2224,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[16px] cursor-pointer"
+                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[12px] md:text-[16px] cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -2252,7 +2254,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </div>
 
               <div
-                className={`bg-accent-900 mt-2 rounded-2xl w-full z-30 ${
+                className={`bg-accent-900 mt-2 rounded-2xl w-full z-30 text-[12px] md:text-[14px] ${
                   tokenSelector ? "absolute transition delay-[50ms]" : "hidden"
                 } `}
               >
@@ -2402,7 +2404,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
                 <div
-                  className={`flex flex-col items-center justify-center min-w-[312px] w-[372px] ${ichiAllow.every((ichi) => ichi) ? "gap-[10px]" : ""}`}
+                  className={`flex flex-col items-center justify-center w-[250px] md:w-[372px] ${
+                    ichiAllow.every((ichi) => ichi) ? "gap-[10px]" : ""
+                  }`}
                 >
                   {option.map((asset: string, index: number) => {
                     const currentAsset = getTokenData(asset) as TTokenData;
@@ -2411,7 +2415,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         {ichiAllow[index] && (
                           <div className="min-w-full h-[64px]">
                             <div
-                              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[asset] ? "" : "opacity-0"}`}
+                              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
+                                !!balances[asset] ? "" : "opacity-0"
+                              }`}
                             >
                               <span>Balance: </span>
                               <span>
@@ -2419,7 +2425,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               </span>
                             </div>
 
-                            <label className="relative block h-[40px] w-[345px]">
+                            <label className="relative block h-[40px] w-[250px] md:w-[345px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                 <img
                                   src={currentAsset.logoURI}
@@ -2480,17 +2486,29 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   })}
                 </div>
                 <div
-                  className={`${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-start justify-start"}`}
+                  className={`${
+                    ichiAllow.every((ichi) => ichi)
+                      ? "h-[64px]"
+                      : "h-[116px] flex items-start justify-start"
+                  }`}
                 >
                   {loader && !transactionInProgress ? (
                     <div
-                      className={`text-[18px] w-[320px] ${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] w-[250px] md:w-[320px] ${
+                        ichiAllow.every((ichi) => ichi)
+                          ? "h-[64px]"
+                          : "h-[116px] flex items-end  justify-end"
+                      }`}
                     >
                       <ShareSkeleton />
                     </div>
                   ) : (
                     <div
-                      className={`text-[18px] ${ichiAllow.every((ichi) => ichi) ? "h-[64px]" : "h-[116px] flex items-end  justify-end"}`}
+                      className={`text-[18px] ${
+                        ichiAllow.every((ichi) => ichi)
+                          ? "h-[64px]"
+                          : "h-[116px] flex items-end  justify-end"
+                      }`}
                     >
                       {!!sharesOut && !isEmptyObject(inputs) && (
                         <div>
@@ -2523,7 +2541,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             ) : (
               <div className="flex flex-col text-[15px] w-full">
                 <div
-                  className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+                  className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
+                    !!balances[option[0]] ? "" : "opacity-0"
+                  }`}
                 >
                   <span>Balance: </span>
                   <span>
@@ -2531,7 +2551,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   </span>
                 </div>
 
-                <label className="relative block h-[40px] w-[345px]">
+                <label className="relative block h-[40px] w-[250px] md:w-[345px]">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <img
                       src={activeOptionToken.logoURI[0]}
@@ -2738,7 +2758,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
                     <div className="flex mt-[-3px]">
                       <div
-                        className={`${isNotUnderlying ? "h-[66px]" : "h-[122px] flex flex-col justify-end"}`}
+                        className={`${
+                          isNotUnderlying
+                            ? "h-[66px]"
+                            : "h-[122px] flex flex-col justify-end"
+                        }`}
                       >
                         {!isEmptyObject(inputs) && (
                           <>
@@ -2746,7 +2770,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               You Receive
                             </p>
                             <div
-                              className={`${isNotUnderlying ? "h-[63px]" : "h-[30px]"}`}
+                              className={`${
+                                isNotUnderlying ? "h-[63px]" : "h-[30px]"
+                              }`}
                             >
                               <div className="text-left text-neutral-50 text-[14px]">
                                 <div className="flex items-center">
@@ -2757,7 +2783,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   />
 
                                   {loader && !transactionInProgress ? (
-                                    <ShareSkeleton height={24} width={300} />
+                                    <ShareSkeleton
+                                      height={24}
+                                      width={isMobile ? 150 : 300}
+                                    />
                                   ) : (
                                     <div>
                                       {(underlyingShares || zapShares) &&
@@ -2794,7 +2823,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           <>
             <div className="grid text-[15px] w-full">
               <div
-                className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${!!balances[option[0]] ? "" : "opacity-0"}`}
+                className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
+                  !!balances[option[0]] ? "" : "opacity-0"
+                }`}
               >
                 <span>Balance:</span>
                 <span>
@@ -2811,7 +2842,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </span>
               </div>
 
-              <label className="relative block w-[345px]">
+              <label className="relative block w-[250px] md:w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
                     src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
@@ -2917,7 +2948,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         />
                       )}
                       {loader && !transactionInProgress ? (
-                        <ShareSkeleton height={24} width={300} />
+                        <ShareSkeleton
+                          height={24}
+                          width={isMobile ? 150 : 300}
+                        />
                       ) : (
                         <p className="text-[14px] text-neutral-50 h-6">
                           {!!withdrawAmount.length
@@ -2934,7 +2968,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   <div>
                     {option.length < 2 && (
                       <p
-                        className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                        className={`text-[12px] text-neutral-500 uppercase mt-[-3px] ${
+                          isEmptyObject(inputs) ? "opacity-0" : ""
+                        }`}
                       >
                         Swaps
                       </p>
@@ -2943,7 +2979,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       <AssetsSkeleton height={40} />
                     ) : (
                       <div
-                        className={`${option.length < 2 && "h-10 mb-[10px]"} ${isEmptyObject(inputs) ? "opacity-0" : ""}`}
+                        className={`${option.length < 2 && "h-10 mb-[10px]"} ${
+                          isEmptyObject(inputs) ? "opacity-0" : ""
+                        }`}
                       >
                         {!!zapPreviewWithdraw.length &&
                           zapPreviewWithdraw?.map(
@@ -3036,8 +3074,12 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             className="w-6 h-6 rounded-full"
                           />
                         )}
+
                         {loader && !transactionInProgress ? (
-                          <ShareSkeleton height={24} width={300} />
+                          <ShareSkeleton
+                            height={24}
+                            width={isMobile ? 150 : 300}
+                          />
                         ) : (
                           <div className="text-[14px] text-neutral-50">
                             {!!zapPreviewWithdraw.length ? (
@@ -3093,7 +3135,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         )}
 
-        <div className="flex w-full flex-col max-w-[350px] absolute bottom-[25px]">
+        <div className="flex w-full flex-col max-w-[250px] md:max-w-[350px] absolute bottom-[25px]">
           {$connected ? (
             <>
               {chain?.id === Number(network) ? (
@@ -3158,7 +3200,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                           }
                                         >
                                           <p>
-                                            {needConfirm
+                                            {approveIndex === index
                                               ? "Confirm in wallet"
                                               : `Approve ${
                                                   getTokenData(asset)?.symbol
@@ -3249,7 +3291,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                                 }
                                               >
                                                 <p>
-                                                  {needConfirm
+                                                  {approveIndex === index
                                                     ? "Confirm in wallet"
                                                     : `Approve ${
                                                         getTokenData(asset)
