@@ -3200,7 +3200,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                           }
                                         >
                                           <p>
-                                            {needConfirm
+                                            {approveIndex === index
                                               ? "Confirm in wallet"
                                               : `Approve ${
                                                   getTokenData(asset)?.symbol
@@ -3291,7 +3291,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                                 }
                                               >
                                                 <p>
-                                                  {needConfirm
+                                                  {approveIndex === index
                                                     ? "Confirm in wallet"
                                                     : `Approve ${
                                                         getTokenData(asset)
