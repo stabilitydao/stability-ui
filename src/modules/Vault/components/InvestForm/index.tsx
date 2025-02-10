@@ -2500,7 +2500,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           : "h-[116px] flex items-end justify-end"
                       }`}
                     >
-                      <ShareSkeleton />
+                      <ShareSkeleton width={isMobile ? 150 : 320} />
                     </div>
                   ) : (
                     <div
