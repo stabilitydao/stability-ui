@@ -22,7 +22,7 @@ import { formatFromBigInt, formatNumber } from "@utils";
 import { CHAINS } from "@constants";
 
 import type { TAPRPeriod, TVault } from "@types";
-import {seeds} from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
 interface IProps {
   network: string;
@@ -65,7 +65,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   }, [$aprFilter, userBalances]);
 
   useEffect(() => {
-    if (vault?.balance && vault?.shareprice) {
+    if (vault?.shareprice) {
       const vaultBalance = BigInt(vault?.balance);
       const shareBalance = Number(
         formatFromBigInt(vault?.balance, 18).toFixed(5)
@@ -80,6 +80,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
       setUserBalances({ shareBalance, USDBalance });
     }
   }, [vault]);
+
   const vaultChain = useMemo(
     () => CHAINS.find((item) => item.id === network),
     [network]

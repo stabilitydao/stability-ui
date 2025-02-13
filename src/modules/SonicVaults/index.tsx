@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
+import Tippy from "@tippyjs/react";
+
 // import { formatUnits} from "viem";
 
 import { useStore } from "@nanostores/react";
@@ -10,7 +12,6 @@ import { isMobile } from "react-device-detect";
 
 // import { deployments } from "@stabilitydao/stability";
 
-import { APRModal } from "./components/modals/APRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Pagination } from "./components/Pagination";
@@ -63,6 +64,8 @@ import {
 } from "@constants";
 
 import { PlatformABI } from "@web3";
+
+import "tippy.js/dist/tippy.css";
 
 import type {
   TVault,
@@ -141,14 +144,6 @@ const SonicVaults = (): JSX.Element => {
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
-  const [aprModal, setAprModal] = useState({
-    earningData: {} as TEarningData,
-    daily: 0,
-    lastHardWork: "0",
-    symbol: "",
-    state: false,
-    pool: {},
-  });
 
   const [vsHoldModal, setVsHoldModal] = useState<TVSHoldModalState>({
     assetsVsHold: [],
@@ -765,18 +760,11 @@ const SonicVaults = (): JSX.Element => {
                             )}
                           </div>
                         </td>
+
                         <td
                           onClick={(e) => {
                             if (isMobile) {
                               e.stopPropagation();
-                              setAprModal({
-                                earningData: vault.earningData,
-                                daily: vault.daily,
-                                lastHardWork: vault.lastHardWork,
-                                symbol: vault?.risk?.symbol as string,
-                                state: true,
-                                pool: vault?.pool,
-                              });
                             }
                           }}
                           className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
@@ -788,78 +776,85 @@ const SonicVaults = (): JSX.Element => {
                                 : "text-[#eaecef]"
                             }`}
                           >
-                            <p className="text-end">
-                              {formatNumber(aprValue, "formatAPR")}%
-                            </p>
-                          </div>
-                          <div className="visible__tooltip">
-                            <div className="flex items-start flex-col gap-4">
-                              <div className="flex flex-col gap-1 w-full">
-                                {!!vault?.risk?.isRektStrategy && (
-                                  <div className="flex flex-col items-center gap-2 mb-[10px]">
-                                    <h3 className="text-[#f52a11] font-bold">
-                                      {vault?.risk?.symbol} VAULT
-                                    </h3>
-                                    <p className="text-[12px] text-start">
-                                      Rekt vault regularly incurs losses,
-                                      potentially leading to rapid USD value
-                                      decline, with returns insufficient to
-                                      offset the losses.
-                                    </p>
-                                  </div>
-                                )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APY</p>
-                                  <p className="text-end">
-                                    {formatNumber(apyValue, "formatAPR")}%
-                                  </p>
-                                </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APR</p>
-                                  <p className="text-end">
-                                    {formatNumber(aprValue, "formatAPR")}%
-                                  </p>
-                                </div>
-
-                                {vault?.earningData?.poolSwapFeesAPR.daily !=
-                                  "-" &&
-                                  vault?.pool && (
+                            <Tippy
+                              content={
+                                <div className="flex items-start flex-col gap-4 min-w-[200px] md:min-w-[300px]">
+                                  <div className="flex flex-col gap-1 w-full">
+                                    {!!vault?.risk?.isRektStrategy && (
+                                      <div className="flex flex-col items-center gap-2 mb-[10px]">
+                                        <h3 className="text-[#f52a11] font-bold">
+                                          {vault?.risk?.symbol} VAULT
+                                        </h3>
+                                        <p className="text-[12px] text-start">
+                                          Rekt vault regularly incurs losses,
+                                          potentially leading to rapid USD value
+                                          decline, with returns insufficient to
+                                          offset the losses.
+                                        </p>
+                                      </div>
+                                    )}
                                     <div className="font-bold flex items-center justify-between">
-                                      <p>Pool swap fees APR</p>
+                                      <p>Total APY</p>
+                                      <p className="text-end">
+                                        {formatNumber(apyValue, "formatAPR")}%
+                                      </p>
+                                    </div>
+                                    <div className="font-bold flex items-center justify-between">
+                                      <p>Total APR</p>
+                                      <p className="text-end">
+                                        {formatNumber(aprValue, "formatAPR")}%
+                                      </p>
+                                    </div>
+
+                                    {vault?.earningData?.poolSwapFeesAPR
+                                      .daily != "-" &&
+                                      vault?.pool && (
+                                        <div className="font-bold flex items-center justify-between">
+                                          <p>Pool swap fees APR</p>
+                                          <p className="text-end">
+                                            {formatNumber(
+                                              swapFeesAPRValue,
+                                              "formatAPR"
+                                            )}
+                                            %
+                                          </p>
+                                        </div>
+                                      )}
+                                    <div className="font-bold flex items-center justify-between">
+                                      <p>Strategy APR</p>
                                       <p className="text-end">
                                         {formatNumber(
-                                          swapFeesAPRValue,
+                                          strategyAPRValue,
                                           "formatAPR"
                                         )}
                                         %
                                       </p>
                                     </div>
-                                  )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Strategy APR</p>
-                                  <p className="text-end">
-                                    {formatNumber(
-                                      strategyAPRValue,
-                                      "formatAPR"
-                                    )}
-                                    %
-                                  </p>
+                                    <div className="font-bold flex items-center justify-between">
+                                      <p>Daily</p>
+                                      <p className="text-end">
+                                        {formatNumber(
+                                          dailyAPRValue,
+                                          "formatAPR"
+                                        )}
+                                        %
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between w-full">
+                                    <p>Last Hard Work</p>
+                                    <TimeDifferenceIndicator
+                                      unix={vault.lastHardWork}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Daily</p>
-                                  <p className="text-end">
-                                    {formatNumber(dailyAPRValue, "formatAPR")}%
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-center justify-between w-full">
-                                <p>Last Hard Work</p>
-                                <TimeDifferenceIndicator
-                                  unix={vault.lastHardWork}
-                                />
-                              </div>
-                            </div>
-                            <i></i>
+                              }
+                              placement="top"
+                            >
+                              <p className="text-end">
+                                {formatNumber(aprValue, "formatAPR")}%
+                              </p>
+                            </Tippy>
                           </div>
                         </td>
                         {/* <td
@@ -1051,9 +1046,6 @@ const SonicVaults = (): JSX.Element => {
         tab={currentTab}
         setTab={setCurrentTab}
       />
-      {aprModal.state && (
-        <APRModal state={aprModal} setModalState={setAprModal} />
-      )}
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}

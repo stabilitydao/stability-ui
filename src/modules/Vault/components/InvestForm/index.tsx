@@ -1455,6 +1455,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     if (shortId === "IQMF" || shortId === "IRMF") {
       localAssets = vault.assets.map((asset) => asset.address);
     }
+
     if (underlyingToken?.address === option[0]) {
       const decimalPercent = BigInt(Math.floor(Number(settings.slippage)));
 
@@ -1511,6 +1512,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         if (transaction.status === "success") {
           resetFormAfterTx();
         }
+
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1584,6 +1586,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         if (transaction.status === "success") {
           resetFormAfterTx();
         }
+
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
@@ -1674,6 +1677,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         if (transaction.status === "success") {
           resetFormAfterTx();
         }
+
         lastTx.set(transaction?.transactionHash);
         setLoader(false);
       } catch (err) {
