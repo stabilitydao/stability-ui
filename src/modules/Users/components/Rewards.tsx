@@ -35,7 +35,7 @@ const Rewards = (): JSX.Element => {
   const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
     points: "0",
-    gems: "900k",
+    gems: "1.80M",
   });
 
   const [gemPrice, setGemPrice] = useState("-");
@@ -49,7 +49,7 @@ const Rewards = (): JSX.Element => {
       const _sGEM1Price =
         Number(
           sonicPrices[sGEM1?.toLowerCase() as keyof typeof sonicPrices]?.price
-        ).toFixed(3) ?? "0.010";
+        ).toFixed(5) ?? "0.01000";
 
       setGemPrice(_sGEM1Price);
     }
@@ -62,7 +62,7 @@ const Rewards = (): JSX.Element => {
         0
       );
 
-      const _gems = String(formatNumber(900000, "abbreviate")).slice(1);
+      const _gems = String(formatNumber(1800000, "abbreviate")).slice(1);
 
       const _points = String(
         formatNumber(Number(pointsTotalSupply), "abbreviate")
