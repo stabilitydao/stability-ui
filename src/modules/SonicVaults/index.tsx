@@ -75,7 +75,7 @@ import type {
   // TPendingPlatformUpgrade,
   // TAddress,
   // TUpgradesTable,
-  TEarningData,
+  // TEarningData,
   TVaults,
   TAPRPeriod,
   TPendingPlatformUpgrade,
