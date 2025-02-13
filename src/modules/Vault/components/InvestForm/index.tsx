@@ -2202,7 +2202,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const zapSoon = false; //vault?.strategyInfo?.shortId === "ISF";
 
   return (
-    <div className="bg-accent-950 relative rounded-2xl w-[300px] h-[462px] md:w-[420px] font-manrope">
+    <div className="bg-accent-950 relative rounded-2xl w-full h-[462px] md:w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -2211,10 +2211,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       />
 
       <form autoComplete="off" className="w-full p-6 flex flex-col gap-[10px]">
-        <div className="flex items-center gap-4 relative pb-[12px]">
+        <div className="flex items-center justify-between gap-2 md:justify-normal md:gap-4 relative pb-[12px] max-w-full">
           {optionTokens && (
             <div
-              className="relative select-none w-[250px] md:w-[290px] text-neutral-50 text-[14px]"
+              className="relative select-none w-full max-w-[320px] md:w-[290px] text-neutral-50 text-[14px]"
               ref={tokenSelectorRef}
             >
               <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
@@ -2224,7 +2224,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[12px] md:text-[16px] cursor-pointer"
+                className="flex items-center justify-between gap-2 rounded-2xl px-4 h-[36px] my-[2px] bg-accent-900 text-[14px] md:text-[16px] cursor-pointer max-w-[320px]"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -2404,7 +2404,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             (defaultOption?.assets === option[0] && option.length < 2) ? (
               <>
                 <div
-                  className={`flex flex-col items-center justify-center w-[250px] md:w-[372px] ${
+                  className={`flex flex-col items-center justify-center w-full md:w-[372px] ${
                     ichiAllow.every((ichi) => ichi) ? "gap-[10px]" : ""
                   }`}
                 >
@@ -2425,7 +2425,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               </span>
                             </div>
 
-                            <label className="relative block h-[40px] w-[250px] md:w-[345px]">
+                            <label className="relative block h-[40px] w-full md:w-[345px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                 <img
                                   src={currentAsset.logoURI}
@@ -2497,10 +2497,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                       className={`text-[18px] w-[250px] md:w-[320px] ${
                         ichiAllow.every((ichi) => ichi)
                           ? "h-[64px]"
-                          : "h-[116px] flex items-end  justify-end"
+                          : "h-[116px] flex items-end justify-end"
                       }`}
                     >
-                      <ShareSkeleton />
+                      <ShareSkeleton width={isMobile ? 150 : 320} />
                     </div>
                   ) : (
                     <div
@@ -2551,7 +2551,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   </span>
                 </div>
 
-                <label className="relative block h-[40px] w-[250px] md:w-[345px]">
+                <label className="relative block h-[40px] w-full md:w-[345px]">
                   <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                     <img
                       src={activeOptionToken.logoURI[0]}
@@ -2696,7 +2696,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="text-[14px]  flex items-center gap-1 ml-2">
+                                  <div className="text-[14px] flex items-center gap-1 ml-2">
                                     <div className="flex items-center gap-1 mt-2">
                                       <img
                                         src={DEX.logo}
@@ -2842,7 +2842,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 </span>
               </div>
 
-              <label className="relative block w-[250px] md:w-[345px]">
+              <label className="relative block w-full md:w-[345px]">
                 <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                   <img
                     src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
@@ -3135,7 +3135,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           </>
         )}
 
-        <div className="flex w-full flex-col max-w-[250px] md:max-w-[350px] absolute bottom-[25px]">
+        <div className="flex flex-col w-[90%] md:w-full max-w-[425px] md:max-w-[350px] absolute bottom-[25px]">
           {$connected ? (
             <>
               {chain?.id === Number(network) ? (
@@ -3143,7 +3143,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   {zapError ? (
                     <button
                       disabled
-                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                      className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                     >
                       Failed to get routes from aggregator
                     </button>
@@ -3158,7 +3158,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               {button === "deposit" ? (
                                 <button
                                   disabled={transactionInProgress}
-                                  className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                  className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                     transactionInProgress
                                       ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                       : ""
@@ -3188,7 +3188,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       ) < Number(inputs[asset]) && (
                                         <button
                                           disabled={approveIndex !== false}
-                                          className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                          className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                             approveIndex === index
                                               ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                               : ""
@@ -3216,14 +3216,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               ) : button === "insufficientBalance" ? (
                                 <button
                                   disabled
-                                  className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                  className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                 >
                                   Insufficient Balance
                                 </button>
                               ) : (
                                 <button
                                   disabled
-                                  className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                  className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                 >
                                   {loader ? "Loading..." : "Enter Amount"}
                                 </button>
@@ -3237,7 +3237,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   {button === "deposit" ? (
                                     <button
                                       disabled={transactionInProgress}
-                                      className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                      className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                         transactionInProgress
                                           ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                           : ""
@@ -3276,7 +3276,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                                 disabled={
                                                   approveIndex !== false
                                                 }
-                                                className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                                className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                                   approveIndex === index
                                                     ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                                     : ""
@@ -3311,7 +3311,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                       {!isAnyCCFOptionVisible && (
                                         <button
                                           disabled={transactionInProgress}
-                                          className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                          className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                             transactionInProgress
                                               ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                               : ""
@@ -3334,14 +3334,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   ) : button === "insufficientBalance" ? (
                                     <button
                                       disabled
-                                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                      className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                     >
                                       Insufficient Balance
                                     </button>
                                   ) : (
                                     <button
                                       disabled
-                                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                      className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                     >
                                       {loader ? "Loading..." : "Enter Amount"}
                                     </button>
@@ -3352,14 +3352,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   {button === "insufficientBalance" ? (
                                     <button
                                       disabled
-                                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                      className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                     >
                                       Insufficient Balance
                                     </button>
                                   ) : button === "needApprove" ? (
                                     <button
                                       disabled={transactionInProgress}
-                                      className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                      className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                         transactionInProgress
                                           ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                           : ""
@@ -3385,7 +3385,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   ) : button === "deposit" ? (
                                     <button
                                       disabled={transactionInProgress}
-                                      className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                                      className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                         transactionInProgress
                                           ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                           : ""
@@ -3405,7 +3405,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                   ) : (
                                     <button
                                       disabled
-                                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                                      className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                                     >
                                       {loader ? "Loading..." : "Enter Amount"}
                                     </button>
@@ -3420,14 +3420,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           {button === "insufficientBalance" ? (
                             <button
                               disabled
-                              className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                              className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                             >
                               Insufficient Balance
                             </button>
                           ) : button === "needApprove" ? (
                             <button
                               disabled={transactionInProgress}
-                              className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                              className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                 transactionInProgress
                                   ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                   : ""
@@ -3446,7 +3446,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             <button
                               disabled={transactionInProgress}
                               type="button"
-                              className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                              className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                                 transactionInProgress
                                   ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                                   : ""
@@ -3463,7 +3463,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           ) : (
                             <button
                               disabled
-                              className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                              className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                             >
                               {loader ? "Loading..." : "Enter Amount"}
                             </button>
@@ -3476,7 +3476,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               ) : (
                 <button
                   onClick={() => switchChain({ chainId: Number(network) })}
-                  className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+                  className="w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
                   type="button"
                 >
                   Switch Network
@@ -3486,7 +3486,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           ) : (
             <button
               type="button"
-              className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+              className="w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
               onClick={() => open()}
             >
               Connect Wallet
