@@ -54,6 +54,7 @@ import {
   determineAPR,
   getLocalStorageData,
   getContractDataWithPagination,
+  extractPointsMultiplier,
 } from "@utils";
 
 import {
@@ -577,7 +578,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let sonicActivePoints: undefined | number = undefined;
 
         if (chainID === "146") {
-          const points = strategyAssets.reduce((acc, asset, index) => {
+          let points = strategyAssets.reduce((acc, asset, index) => {
             let whitelistAssetPoints =
               (sonicWhitelistedAssets[
                 asset as keyof typeof sonicWhitelistedAssets
@@ -587,6 +588,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               ((assetsProportions?.[index] ?? 0) / 100) * whitelistAssetPoints
             );
           }, 0);
+
+          const pointsMultiplier = extractPointsMultiplier(strategySpecific);
+
+          if (pointsMultiplier) {
+            points *= pointsMultiplier;
+          }
 
           sonicActivePoints = Number(points.toFixed(1));
         }

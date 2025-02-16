@@ -21,6 +21,7 @@ import {
   formatTimestampToDate,
   extractDomain,
   getContractDataWithPagination,
+  extractPointsMultiplier,
 } from "@utils";
 
 import { transactionSettings, aprFilter } from "@store";
@@ -926,5 +927,30 @@ describe("extractDomain", () => {
 
     expect(extractDomain(url)).toBe("");
     expect(extractDomain(undefined)).toBe("");
+  });
+});
+
+describe("extractPointsMultiplier", () => {
+  it("should extract a valid multiplier from a string", () => {
+    expect(extractPointsMultiplier("3 stS x17.4")).toBe(17.4);
+    expect(extractPointsMultiplier("boost x5")).toBe(5);
+    expect(extractPointsMultiplier("rate x2.75")).toBe(2.75);
+  });
+
+  it("should return null if 'x' is separated by a space", () => {
+    expect(extractPointsMultiplier("invalid x 5.5")).toBeNull();
+    expect(extractPointsMultiplier("wrong x 10")).toBeNull();
+  });
+
+  it("should return null if there is no valid multiplier", () => {
+    expect(extractPointsMultiplier("no multiplier here")).toBeNull();
+    expect(extractPointsMultiplier("just some text")).toBeNull();
+    expect(extractPointsMultiplier("x alone")).toBeNull();
+  });
+
+  it("should handle edge cases", () => {
+    expect(extractPointsMultiplier("x0")).toBe(0);
+    expect(extractPointsMultiplier("value x100")).toBe(100);
+    expect(extractPointsMultiplier("negative x-3")).toBeNull();
   });
 });
