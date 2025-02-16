@@ -227,29 +227,30 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 }
               />
             </div>
-            <div className="w-full md:w-1/3 ">
-              {vault?.alm?.tvl ? (
-                <FieldValue
-                  name="ALM TVL"
-                  value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
-                  testId="infoBarAlmTVL"
-                />
-              ) : (
-                <div className="h-[46px]"></div>
-              )}
-            </div>
+            {vault?.alm?.tvl ? (
+                <div className="w-full md:w-1/3 ">
+                  <FieldValue
+                    name="ALM TVL"
+                    value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
+                    testId="infoBarAlmTVL"
+                  />
+                </div>
+            ) : (
+              <div className="hidden md:flex h-[46px]"></div>
+            )}
 
-            <div className="w-full md:w-1/3 ">
-              {vault?.pool?.tvl ? (
-                <FieldValue
-                  name="POOL TVL"
-                  value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
-                  testId="infoBarPoolTVL"
-                />
-              ) : (
-                <div className="w-1/2 lg:w-auto h-[46px]"></div>
-              )}
-            </div>
+            {vault?.pool?.tvl ? (
+                <div className="w-full md:w-1/3 ">
+                  <FieldValue
+                    name="POOL TVL"
+                    value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                    testId="infoBarPoolTVL"
+                  />
+                </div>
+            ) : (
+              <div className="hidden md:flex h-[46px]"></div>
+            )}
+
           </div>
           <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">
