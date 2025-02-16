@@ -19,6 +19,7 @@ import {
   getStrategyProtocols,
   seeds,
   StrategyShortId,
+  sonicWhitelistedAssets,
 } from "@stabilitydao/stability";
 
 import {
@@ -572,6 +573,24 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           logo: underlyingLogo,
         };
 
+        /***** SONIC ACTIVE POINTS *****/
+        let sonicActivePoints: undefined | number = undefined;
+
+        if (chainID === "146") {
+          const points = strategyAssets.reduce((acc, asset, index) => {
+            let whitelistAssetPoints =
+              (sonicWhitelistedAssets[
+                asset as keyof typeof sonicWhitelistedAssets
+              ] ?? 0) * 2;
+            return (
+              acc +
+              ((assetsProportions?.[index] ?? 0) / 100) * whitelistAssetPoints
+            );
+          }, 0);
+
+          sonicActivePoints = Number(points.toFixed(1));
+        }
+
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
           {
             address: vault.address.toLowerCase(),
@@ -622,6 +641,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             isVsActive,
             yearnProtocols,
             network: chainID,
+            sonicActivePoints,
           };
 
         return vaults;

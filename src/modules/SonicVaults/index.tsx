@@ -980,6 +980,11 @@ const SonicVaults = (): JSX.Element => {
                             />
                           </div>
                         </td>
+                        <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            x{vault.sonicActivePoints}
+                          </div>
+                        </td>
                         {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             <RiskIndicator
