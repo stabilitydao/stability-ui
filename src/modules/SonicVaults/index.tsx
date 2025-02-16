@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
+import Tippy from "@tippyjs/react";
+
 // import { formatUnits} from "viem";
 
 import { useStore } from "@nanostores/react";
@@ -10,7 +12,6 @@ import { isMobile } from "react-device-detect";
 
 // import { deployments } from "@stabilitydao/stability";
 
-import { APRModal } from "./components/modals/APRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Pagination } from "./components/Pagination";
@@ -64,6 +65,8 @@ import {
 
 import { PlatformABI } from "@web3";
 
+import "tippy.js/dist/tippy.css";
+
 import type {
   TVault,
   TTableColumn,
@@ -72,7 +75,7 @@ import type {
   // TPendingPlatformUpgrade,
   // TAddress,
   // TUpgradesTable,
-  TEarningData,
+  // TEarningData,
   TVaults,
   TAPRPeriod,
   TPendingPlatformUpgrade,
@@ -141,14 +144,6 @@ const SonicVaults = (): JSX.Element => {
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
-  const [aprModal, setAprModal] = useState({
-    earningData: {} as TEarningData,
-    daily: 0,
-    lastHardWork: "0",
-    symbol: "",
-    state: false,
-    pool: {},
-  });
 
   const [vsHoldModal, setVsHoldModal] = useState<TVSHoldModalState>({
     assetsVsHold: [],
@@ -765,35 +760,12 @@ const SonicVaults = (): JSX.Element => {
                             )}
                           </div>
                         </td>
-                        <td
-                          onClick={(e) => {
-                            if (isMobile) {
-                              e.stopPropagation();
-                              setAprModal({
-                                earningData: vault.earningData,
-                                daily: vault.daily,
-                                lastHardWork: vault.lastHardWork,
-                                symbol: vault?.risk?.symbol as string,
-                                state: true,
-                                pool: vault?.pool,
-                              });
-                            }
-                          }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                        >
-                          <div
-                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault?.risk?.isRektStrategy
-                                ? "text-[#818181]"
-                                : "text-[#eaecef]"
-                            }`}
-                          >
-                            <p className="text-end">
-                              {formatNumber(aprValue, "formatAPR")}%
-                            </p>
-                          </div>
-                          <div className="visible__tooltip">
-                            <div className="flex items-start flex-col gap-4">
+
+                        <Tippy
+                          theme="custom"
+                          delay={0}
+                          content={
+                            <div className="flex font-manrope items-start flex-col gap-4 w-[250px] bg-[#26282f] px-5 py-[10px]">
                               <div className="flex flex-col gap-1 w-full">
                                 {!!vault?.risk?.isRektStrategy && (
                                   <div className="flex flex-col items-center gap-2 mb-[10px]">
@@ -859,9 +831,31 @@ const SonicVaults = (): JSX.Element => {
                                 />
                               </div>
                             </div>
-                            <i></i>
-                          </div>
-                        </td>
+                          }
+                          placement="top"
+                        >
+                          <td
+                            onClick={(e) => {
+                              if (isMobile) {
+                                e.stopPropagation();
+                              }
+                            }}
+                            className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
+                          >
+                            <div
+                              className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                                vault?.risk?.isRektStrategy
+                                  ? "text-[#818181]"
+                                  : "text-[#eaecef]"
+                              }`}
+                            >
+                              <p className="text-end">
+                                {formatNumber(aprValue, "formatAPR")}%
+                              </p>
+                            </div>
+                          </td>
+                        </Tippy>
+
                         {/* <td
                           onClick={(e) => {
                             if (isMobile) {
@@ -986,6 +980,11 @@ const SonicVaults = (): JSX.Element => {
                             />
                           </div>
                         </td>
+                        <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
+                          <div className="flex items-center justify-center">
+                            x{vault.sonicActivePoints}
+                          </div>
+                        </td>
                         {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center">
                             <RiskIndicator
@@ -1051,9 +1050,6 @@ const SonicVaults = (): JSX.Element => {
         tab={currentTab}
         setTab={setCurrentTab}
       />
-      {aprModal.state && (
-        <APRModal state={aprModal} setModalState={setAprModal} />
-      )}
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}

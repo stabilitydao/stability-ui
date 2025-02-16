@@ -33,7 +33,11 @@ type TActiveChart =
 
 const HistoricalRate: React.FC<IProps> = memo(
   ({ network, address, created, vaultStrategy, lastHardWork }) => {
-    const APRType = vaultStrategy === "Compound Farm" ? "APR" : "Farm APR";
+    const APRType = ["Compound Farm", "Silo Leverage"].includes(vaultStrategy)
+      ? "APR"
+      : "Farm APR";
+
+    const isLaverageStrategy = vaultStrategy.toLowerCase().includes("silo");
 
     const timelineSegments = {
       DAY: "DAY",
@@ -82,7 +86,10 @@ const HistoricalRate: React.FC<IProps> = memo(
 
     const getData = async () => {
       const NOW = Math.floor(Date.now() / 1000);
-      const DATA = [];
+      let DATA = [];
+      const LAVERAGE_DATA: {
+        APR: string;
+      }[] = [];
 
       let entities = 0;
       let status = true;
@@ -116,6 +123,48 @@ const HistoricalRate: React.FC<IProps> = memo(
           entities += 100;
         }
 
+        if (isLaverageStrategy) {
+          status = true;
+          entities = 0;
+
+          while (status) {
+            const HISTORY_QUERY = `{
+              vaultLeverageLendingHistoryEntities(
+                orderBy: timestamp,
+                orderDirection: asc,
+                where: {address: "${address}"}
+                skip: ${entities}
+              ) {
+                APR
+              }}`;
+
+            const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
+              query: HISTORY_QUERY,
+            });
+
+            LAVERAGE_DATA.push(
+              ...graphResponse.data.data.vaultLeverageLendingHistoryEntities
+            );
+
+            if (
+              graphResponse.data.data.vaultLeverageLendingHistoryEntities
+                .length < 100
+            ) {
+              status = false;
+            }
+            entities += 100;
+          }
+
+          if (LAVERAGE_DATA.length === DATA.length) {
+            DATA = DATA.map((obj, index) => {
+              return {
+                ...obj,
+                APR: LAVERAGE_DATA[index].APR,
+              };
+            });
+          }
+        }
+
         const workedData = DATA.map(formatData);
 
         let _chartData = workedData.filter(
@@ -127,7 +176,6 @@ const HistoricalRate: React.FC<IProps> = memo(
           setIsData(false);
           return;
         }
-
         setChartData(workedData);
       } catch (error) {
         const err = error as AxiosError;

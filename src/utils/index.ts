@@ -23,6 +23,7 @@ import { getNFTSymbol } from "./functions/getNFTSymbol";
 import { extractDomain } from "./functions/extractDomain";
 import { setVisibleBalances } from "./functions/setVisibleBalances";
 import { getContractDataWithPagination } from "./functions/getContractDataWithPagination";
+import { extractPointsMultiplier } from "./functions/extractPointsMultiplier";
 
 export {
   getTokenData,
@@ -49,4 +50,5 @@ export {
   extractDomain,
   setVisibleBalances,
   getContractDataWithPagination,
+  extractPointsMultiplier,
 };

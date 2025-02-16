@@ -272,6 +272,7 @@ type TVault = {
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
   network: string;
+  sonicActivePoints: undefined | number;
 };
 
 type TZAPData = {
