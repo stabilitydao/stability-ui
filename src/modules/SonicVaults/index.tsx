@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import Tippy from "@tippyjs/react";
-
 // import { formatUnits} from "viem";
 
 import { useStore } from "@nanostores/react";
@@ -12,6 +10,7 @@ import { isMobile } from "react-device-detect";
 
 // import { deployments } from "@stabilitydao/stability";
 
+import { APRModal } from "./components/modals/APRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Pagination } from "./components/Pagination";
@@ -65,8 +64,6 @@ import {
 
 import { PlatformABI } from "@web3";
 
-import "tippy.js/dist/tippy.css";
-
 import type {
   TVault,
   TTableColumn,
@@ -75,7 +72,7 @@ import type {
   // TPendingPlatformUpgrade,
   // TAddress,
   // TUpgradesTable,
-  // TEarningData,
+  TEarningData,
   TVaults,
   TAPRPeriod,
   TPendingPlatformUpgrade,
@@ -137,13 +134,23 @@ const SonicVaults = (): JSX.Element => {
 
     const URLParamType = paramType === "desc" ? "descendentic" : "ascendentic";
 
-    urlTableStates[indexOfState].sortType = URLParamType;
+    if (indexOfState != -1) {
+      urlTableStates[indexOfState].sortType = URLParamType;
+    }
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
+  const [aprModal, setAprModal] = useState({
+    earningData: {} as TEarningData,
+    daily: 0,
+    lastHardWork: "0",
+    symbol: "",
+    state: false,
+    pool: {},
+  });
 
   const [vsHoldModal, setVsHoldModal] = useState<TVSHoldModalState>({
     assetsVsHold: [],
@@ -646,9 +653,16 @@ const SonicVaults = (): JSX.Element => {
               <>
                 {currentTabVaults?.length ? (
                   currentTabVaults.map((vault: TVault, index: number) => {
-                    const aprValue = vault?.earningData?.apr[$aprFilter];
-                    const gemsAprValue =
-                      Number(aprValue) * $apiData.rewards?.gemsAprMultiplier;
+                    const aprValue = Number(
+                      vault?.earningData?.apr[$aprFilter]
+                    );
+
+                    let gemsAprValue = 0;
+
+                    if (aprValue >= 0) {
+                      gemsAprValue =
+                        aprValue * $apiData.rewards?.gemsAprMultiplier;
+                    }
 
                     const apyValue = vault.earningData.apy[$aprFilter];
 
@@ -761,11 +775,35 @@ const SonicVaults = (): JSX.Element => {
                           </div>
                         </td>
 
-                        <Tippy
-                          theme="custom"
-                          delay={0}
-                          content={
-                            <div className="flex font-manrope items-start flex-col gap-4 w-[250px] bg-[#26282f] px-5 py-[10px]">
+                        <td
+                          onClick={(e) => {
+                            if (isMobile) {
+                              e.stopPropagation();
+                              setAprModal({
+                                earningData: vault.earningData,
+                                daily: vault.daily,
+                                lastHardWork: vault.lastHardWork,
+                                symbol: vault?.risk?.symbol as string,
+                                state: true,
+                                pool: vault?.pool,
+                              });
+                            }
+                          }}
+                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
+                        >
+                          <div
+                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
+                              vault?.risk?.isRektStrategy
+                                ? "text-[#818181]"
+                                : "text-[#eaecef]"
+                            }`}
+                          >
+                            <p className="text-end">
+                              {formatNumber(aprValue, "formatAPR")}%
+                            </p>
+                          </div>
+                          <div className="visible__tooltip">
+                            <div className="flex items-start flex-col gap-4">
                               <div className="flex flex-col gap-1 w-full">
                                 {!!vault?.risk?.isRektStrategy && (
                                   <div className="flex flex-col items-center gap-2 mb-[10px]">
@@ -831,143 +869,9 @@ const SonicVaults = (): JSX.Element => {
                                 />
                               </div>
                             </div>
-                          }
-                          placement="top"
-                        >
-                          <td
-                            onClick={(e) => {
-                              if (isMobile) {
-                                e.stopPropagation();
-                              }
-                            }}
-                            className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                          >
-                            <div
-                              className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                                vault?.risk?.isRektStrategy
-                                  ? "text-[#818181]"
-                                  : "text-[#eaecef]"
-                              }`}
-                            >
-                              <p className="text-end">
-                                {formatNumber(aprValue, "formatAPR")}%
-                              </p>
-                            </div>
-                          </td>
-                        </Tippy>
-
-                        {/* <td
-                          onClick={(e) => {
-                            if (isMobile) {
-                              e.stopPropagation();
-                              setVsHoldModal({
-                                assetsVsHold: vault.assetsVsHold as THoldData[],
-                                lifetimeVsHold: vault.lifetimeVsHold,
-                                vsHoldAPR: vault.vsHoldAPR,
-                                created: getTimeDifference(vault.created)?.days,
-                                state: true,
-                                isVsActive: vault.isVsActive,
-                              });
-                            }
-                          }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                        >
-                          <p
-                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault.vsHoldAPR < 0 &&
-                              getTimeDifference(vault.created).days >= 10 &&
-                              "text-[#eb7979]"
-                            }`}
-                          >
-                            {getTimeDifference(vault.created).days >= 10
-                              ? `${vault.vsHoldAPR}%`
-                              : "-"}
-                          </p>
-
-                          <div className="visible__tooltip !w-[450px]">
-                            <table className="table table-auto w-full rounded-lg">
-                              <thead className="bg-[#0b0e11]">
-                                <tr className="text-[16px] text-[#8f8f8f] uppercase">
-                                  <th></th>
-                                  <th>
-                                    {getTimeDifference(vault.created).days} days
-                                  </th>
-                                  <th className="text-right">est Annual</th>
-                                </tr>
-                              </thead>
-                              <tbody data-testid="vsHoldAPRTable">
-                                <tr className="hover:bg-[#2B3139]">
-                                  <td className="text-left">VAULT VS HODL</td>
-
-                                  {vault.isVsActive ? (
-                                    <td
-                                      className={`text-right ${
-                                        vault.lifetimeVsHold < 0 &&
-                                        "text-[#eb7979]"
-                                      }`}
-                                    >
-                                      {vault.lifetimeVsHold}%
-                                    </td>
-                                  ) : (
-                                    <td className="text-right">-</td>
-                                  )}
-
-                                  {vault.isVsActive ? (
-                                    <td
-                                      className={`text-right ${
-                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
-                                      }`}
-                                    >
-                                      {vault.vsHoldAPR}%
-                                    </td>
-                                  ) : (
-                                    <td className="text-right">-</td>
-                                  )}
-                                </tr>
-
-                                {vault.assetsVsHold.map(
-                                  (aprsData: THoldData, index: number) => (
-                                    <tr
-                                      key={aprsData?.symbol + index}
-                                      className="hover:bg-[#2B3139]"
-                                    >
-                                      <td className="text-left">
-                                        VAULT VS {aprsData?.symbol} HODL
-                                      </td>
-
-                                      {vault.isVsActive ? (
-                                        <td
-                                          className={`text-right ${
-                                            Number(aprsData.latestAPR) < 0 &&
-                                            "text-[#eb7979]"
-                                          }`}
-                                        >
-                                          {aprsData.latestAPR}%
-                                        </td>
-                                      ) : (
-                                        <td className="text-right">-</td>
-                                      )}
-
-                                      {vault.isVsActive ? (
-                                        <td
-                                          className={`text-right ${
-                                            Number(aprsData.latestAPR) < 0 &&
-                                            "text-[#eb7979]"
-                                          }`}
-                                        >
-                                          {aprsData.APR}%
-                                        </td>
-                                      ) : (
-                                        <td className="text-right">-</td>
-                                      )}
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
                             <i></i>
                           </div>
-                        </td> */}
+                        </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-end">
                             {formatNumber(gemsAprValue.toFixed(2), "formatAPR")}
@@ -1050,6 +954,9 @@ const SonicVaults = (): JSX.Element => {
         tab={currentTab}
         setTab={setCurrentTab}
       />
+      {aprModal.state && (
+        <APRModal state={aprModal} setModalState={setAprModal} />
+      )}
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
