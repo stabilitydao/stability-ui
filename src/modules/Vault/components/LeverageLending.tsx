@@ -22,7 +22,7 @@ const LeverageLending: React.FC<IProps> = memo(({ data }) => {
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               LEVERAGE
             </p>
-            <p className="text-[16px] mt-1">{data?.leverage?.toFixed(3)}%</p>
+            <p className="text-[16px] mt-1">x{data?.leverage?.toFixed(3)}</p>
           </div>
           <div className="w-1/2">
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
