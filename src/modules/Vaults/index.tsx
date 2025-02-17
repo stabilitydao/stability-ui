@@ -124,7 +124,9 @@ const Vaults = (): JSX.Element => {
       ({ name }) => name.toUpperCase() === paramName.toUpperCase()
     );
 
-    urlTableStates[indexOfState].sortType = paramType;
+    if (indexOfState != -1) {
+      urlTableStates[indexOfState].sortType = paramType;
+    }
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);

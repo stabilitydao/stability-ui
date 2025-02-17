@@ -44,11 +44,9 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   };
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.body.style.overflowY = "unset";
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
