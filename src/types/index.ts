@@ -273,6 +273,16 @@ type TVault = {
   yearnProtocols: TYearnProtocol[];
   network: string;
   sonicActivePoints: undefined | number;
+  leverageLending?: TLeverageLendingData;
+};
+
+type TLeverageLendingData = {
+  borrowApr: number;
+  leverage: number;
+  ltv: number;
+  maxLtv: number;
+  supplyApr: number;
+  targetLeveragePercent: number;
 };
 
 type TZAPData = {
@@ -670,4 +680,5 @@ export type {
   TShareData,
   TxTokens,
   TFrontendContractData,
+  TLeverageLendingData,
 };
