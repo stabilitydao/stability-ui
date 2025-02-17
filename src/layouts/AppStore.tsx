@@ -409,6 +409,23 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           };
         }
 
+        // dont show negative apr yet
+        if (Number(APRArray.latest) < 0) {
+          APRArray.latest = "0"
+          APYArray.latest = "0"
+          farmAPR.latest = "0"
+        }
+        if (Number(APRArray.daily) < 0) {
+          APRArray.daily = "0"
+          APYArray.daily = "0"
+          farmAPR.daily = "0"
+        }
+        if (Number(APRArray.weekly) < 0) {
+          APRArray.weekly = "0"
+          APYArray.weekly = "0"
+          farmAPR.weekly = "0"
+        }
+
         // rebalances
         const totalRebalances = vault.almRebalanceRawData || [];
 
