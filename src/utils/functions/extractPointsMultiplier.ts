@@ -14,6 +14,9 @@
  */
 
 export const extractPointsMultiplier = (text: string): number | null => {
-  const match = text.match(/x(\d+(\.\d+)?)/i);
-  return match ? parseFloat(match[1]) : null;
+  if(text) {
+    const match = text.match(/x(\d+(\.\d+)?)/i);
+    return match ? parseFloat(match[1]) : null;
+  }
+  return null
 };
