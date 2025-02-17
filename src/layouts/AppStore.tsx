@@ -649,6 +649,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             yearnProtocols,
             network: chainID,
             sonicActivePoints,
+            leverageLending: vault?.leverageLending,
           };
 
         return vaults;
