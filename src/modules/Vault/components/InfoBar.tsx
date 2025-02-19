@@ -228,29 +228,28 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               />
             </div>
             {vault?.alm?.tvl ? (
-                <div className="w-full md:w-1/3 ">
-                  <FieldValue
-                    name="ALM TVL"
-                    value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
-                    testId="infoBarAlmTVL"
-                  />
-                </div>
+              <div className="w-full md:w-1/3 ">
+                <FieldValue
+                  name="ALM TVL"
+                  value={formatNumber(Number(vault?.alm?.tvl), "abbreviate")}
+                  testId="infoBarAlmTVL"
+                />
+              </div>
             ) : (
               <div className="hidden md:flex h-[46px]"></div>
             )}
 
             {vault?.pool?.tvl ? (
-                <div className="w-full md:w-1/3 ">
-                  <FieldValue
-                    name="POOL TVL"
-                    value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
-                    testId="infoBarPoolTVL"
-                  />
-                </div>
+              <div className="w-full md:w-1/3 ">
+                <FieldValue
+                  name="POOL TVL"
+                  value={formatNumber(Number(vault.pool.tvl), "abbreviate")}
+                  testId="infoBarPoolTVL"
+                />
+              </div>
             ) : (
               <div className="hidden md:flex h-[46px]"></div>
             )}
-
           </div>
           <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">

@@ -193,11 +193,17 @@ test.describe("Vaults page tests", () => {
 
         APRArray = {
           latest: APR,
-          daily: determineAPR(vault.apr?.income24h, dailyTotalAPRWithFees, APR),
+          daily: determineAPR(
+            vault.apr?.income24h,
+            dailyTotalAPRWithFees,
+            APR,
+            vault.strategyShortId
+          ),
           weekly: determineAPR(
             vault.apr?.incomeWeek,
             weeklyTotalAPRWithFees,
-            APR
+            APR,
+            vault.strategyShortId
           ),
         };
       }

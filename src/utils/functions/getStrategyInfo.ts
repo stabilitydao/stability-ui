@@ -230,13 +230,13 @@ export const getStrategyInfo = (
     strategyInfo = {
       ...strategyInfo,
       protocols: [silo],
-      il: IL.Y,
+      il: IL.SIL,
     };
   } else if (vaultSymbol.match(/(SiL|SL)$/)) {
     strategyInfo = {
       ...strategyInfo,
       protocols: [silo],
-      il: IL.Y,
+      il: IL.SIL,
     };
   }
   return strategyInfo;
