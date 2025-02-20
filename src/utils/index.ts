@@ -24,6 +24,7 @@ import { extractDomain } from "./functions/extractDomain";
 import { setVisibleBalances } from "./functions/setVisibleBalances";
 import { getContractDataWithPagination } from "./functions/getContractDataWithPagination";
 import { extractPointsMultiplier } from "./functions/extractPointsMultiplier";
+import { playAudio } from "./functions/playAudio";
 
 export {
   getTokenData,
@@ -51,4 +52,5 @@ export {
   setVisibleBalances,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  playAudio,
 };

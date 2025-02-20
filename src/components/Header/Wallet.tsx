@@ -214,7 +214,7 @@ const Wallet = (): JSX.Element => {
     <div className="flex gap-3 flex-nowrap justify-end whitespace-nowrap text-neutral-50 text-[16px] font-semibold">
       {currentChain && $account && (
         <button
-          className="bg-accent-900  h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
+          className="bg-accent-900 h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >

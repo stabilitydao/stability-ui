@@ -1,14 +1,20 @@
 import { useState } from "react";
 
+import { useStore } from "@nanostores/react";
+
+import { account } from "@store";
+
 import { Wallet } from "./Wallet";
+import { SonicPointsButton } from "./SonicPointsButton";
 
 import { WagmiLayout } from "@layouts";
 
 import "./header.css";
-
 const Header = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1); // remove the first "/"
+
+  const $account = useStore(account);
 
   const platformPaths = [
     "platform",
@@ -37,7 +43,6 @@ const Header = (): JSX.Element => {
             alt="Stability logo"
           />
         </a>
-
         <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
           <a
             data-testid="vaults-link"
@@ -61,6 +66,8 @@ const Header = (): JSX.Element => {
           </a>
         </div>
         <div className="flex justify-end mr-[15px] gap-3">
+          {!!$account && <SonicPointsButton />}
+
           <Wallet />
           <div className="burger-menu" onClick={() => setMenu((prev) => !prev)}>
             {menu ? (
