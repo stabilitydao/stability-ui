@@ -248,6 +248,12 @@ const IL = {
     desc: "Providing assets to the landing protocol does not incur impermanent losses.",
     color: "#4aff71",
   },
+  SIL: {
+    rate: 0,
+    title: "Medium",
+    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
+    color: "#4aff71",
+  },
   QSMF: {
     rate: 0,
     title: "None",
