@@ -85,7 +85,7 @@ const SonicPointsButton = (): JSX.Element => {
     <div className="relative">
       <button
         ref={buttonRef}
-        className="bg-accent-900 h-8 md:h-10 sm:py-1 px-1 xl:px-3 rounded-xl sm:gap-3 flex items-center justify-center xl:justify-start w-10 xl:w-[180px]"
+        className="bg-accent-900 h-8 md:h-10 sm:py-1 px-1 xl:px-3 rounded-xl sm:gap-3 flex items-center justify-center xl:justify-start w-10 xl:w-[160px]"
         onClick={() => setSonicBtn((prev) => !prev)}
       >
         <img
@@ -110,7 +110,7 @@ const SonicPointsButton = (): JSX.Element => {
       {sonicBtn && (
         <div
           ref={menuRef}
-          className="bg-accent-900 absolute left-[-70px] md:left-0 top-[50px] w-[180px] rounded-xl py-1 px-3 z-[100]"
+          className="bg-accent-900 absolute left-[-70px] md:left-0 top-[50px] w-[160px] rounded-xl py-1 px-3 z-[100]"
         >
           <div className="flex items-center gap-[15px] xl:hidden">
             <img
