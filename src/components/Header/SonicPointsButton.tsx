@@ -26,7 +26,7 @@ const SonicPointsButton = (): JSX.Element => {
   const getUserData = async () => {
     try {
       const data = await axios.get(
-        `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${account}`
+        `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${$account}`
       );
 
       const totalPoints = String(
@@ -127,7 +127,6 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.totalPoints}</p>
             </div>
           </div>
-
           <div className="flex items-center gap-[8px]">
             <div
               className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#BD6EAC] text-white bg-[#BD6EAC]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
