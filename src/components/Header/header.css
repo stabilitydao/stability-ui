@@ -7,14 +7,14 @@ body.no-scroll {
   cursor: pointer;
   background: #1f0f50;
   border-radius: 12px;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 .menu-nav {
   display: none;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 900px) {
   .burger-menu {
     display: flex;
     align-items: center;
@@ -42,5 +42,11 @@ body.no-scroll {
     text-decoration: none;
     font-size: 17px;
     margin: 5px 0;
+  }
+}
+@media screen and (max-width: 767px) {
+  .burger-menu {
+    width: 32px;
+    height: 32px;
   }
 }

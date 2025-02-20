@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Wallet } from "./Wallet";
+import { SonicPointsButton } from "./SonicPointsButton";
 
 import { WagmiLayout } from "@layouts";
 
@@ -37,7 +38,6 @@ const Header = (): JSX.Element => {
             alt="Stability logo"
           />
         </a>
-
         <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
           <a
             data-testid="vaults-link"
@@ -61,6 +61,7 @@ const Header = (): JSX.Element => {
           </a>
         </div>
         <div className="flex justify-end mr-[15px] gap-3">
+          <SonicPointsButton />
           <Wallet />
           <div className="burger-menu" onClick={() => setMenu((prev) => !prev)}>
             {menu ? (
