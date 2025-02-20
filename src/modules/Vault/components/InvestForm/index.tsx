@@ -49,6 +49,7 @@ import {
   get1InchRoutes,
   debounce,
   setLocalStoreHash,
+  extractPointsMultiplier,
 } from "@utils";
 
 import {
@@ -2069,6 +2070,11 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     return option[0] != defaultOption.assets;
   }, [isSingleTokenStrategy, option, defaultOption]);
 
+  const pointsMultiplier = useMemo(
+    () => extractPointsMultiplier(vault.strategySpecific) ?? 0,
+    [vault]
+  );
+
   useEffect(() => {
     localStorage.setItem("transactionSettings", JSON.stringify(settings));
   }, [settings]);
@@ -2214,7 +2220,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         resetOptions={resetOptions}
       />
 
-      <form autoComplete="off" className="w-full p-6 flex flex-col gap-[10px]">
+      <form
+        autoComplete="off"
+        className="w-full p-6 flex flex-col gap-[10px] md:min-w-[420px]"
+      >
         <div className="flex items-center justify-between gap-2 md:justify-normal md:gap-4 relative pb-[12px] max-w-full">
           {optionTokens && (
             <div
@@ -3140,6 +3149,15 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         )}
 
         <div className="flex flex-col w-[90%] md:w-full max-w-[425px] md:max-w-[350px] absolute bottom-[25px]">
+          {vault?.strategyInfo?.shortId === "SiL" && (
+            <p className="text-[8px] mb-[9px] text-warning-300">
+              Deposit and withdrawal of funds in this vault has its own cost:
+              flashloan fee (0.03% * {pointsMultiplier}) on Beets, swap dynamic
+              fee on (0.01-0.3% * {pointsMultiplier}) on SwapX, price impact on
+              SwapX
+            </p>
+          )}
+
           {$connected ? (
             <>
               {chain?.id === Number(network) ? (
