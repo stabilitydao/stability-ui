@@ -95,9 +95,7 @@ const SonicPointsButton = (): JSX.Element => {
         />
         <div className="xl:flex flex-col items-start hidden">
           <div className="flex items-center gap-1">
-            <span className="text-neutral-500 text-[12px]">
-              Total Sonic Points
-            </span>
+            <span className="text-neutral-500 text-[12px]">Sonic Points</span>
             <img
               className={`transition delay-[50ms] w-2 h-2 ${
                 sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
@@ -121,9 +119,7 @@ const SonicPointsButton = (): JSX.Element => {
               alt="Sonic gem icon"
             />
             <div>
-              <span className="text-neutral-500 text-[12px]">
-                Total Sonic Points
-              </span>
+              <span className="text-neutral-500 text-[12px]">Sonic Points</span>
               <p className="text-[14px] leading-4">{user.totalPoints}</p>
             </div>
           </div>
