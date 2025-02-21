@@ -681,4 +681,5 @@ export type {
   TxTokens,
   TFrontendContractData,
   TLeverageLendingData,
+  IL,
 };

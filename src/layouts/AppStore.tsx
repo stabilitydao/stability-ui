@@ -197,7 +197,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const strategyAssets: string[] =
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
-        const strategyInfo = getStrategyInfo(vault?.symbol, vault.strategyId);
+        const strategyInfo = getStrategyInfo(
+          vault?.symbol,
+          vault.strategyId,
+          vault.strategyShortId as StrategyShortId,
+          vault.strategySpecific as string,
+          vault.assets as TAddress[]
+        );
 
         const strategyName = strategyInfo?.shortId;
 
