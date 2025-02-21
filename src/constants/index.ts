@@ -158,7 +158,7 @@ const CHAINS_CONFIRMATIONS = {
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 
 const DEFAULT_TRANSACTION_SETTINGS = {
-  slippage: "1",
+  slippage: "5",
   approves: "unlimited",
   gasLimit: "1.1",
 };
