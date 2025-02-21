@@ -3527,7 +3527,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
 
           {isError.state && (
-            <div className="bg-[#734950] absolute left-0 top-0 w-full h-full">
+            <div className="bg-[#734950] absolute left-0 top-[90px] w-full min-h-full z-[21]">
               <div className="px-2 py-2 flex items-center justify-center flex-col">
                 <div className="flex items-center justify-between w-full">
                   <svg
@@ -3605,7 +3605,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </defs>
                   </svg>
                 </div>
-                <p className="text-[14px] max-w-[400px] text-[#f2aeae] break-words">
+                <p className="text-[12px] max-w-[400px] text-[#f2aeae] break-words h-full">
                   {isError.description}
                 </p>
               </div>

@@ -16,16 +16,14 @@
  */
 
 export const getShortMessage = (message: string): string => {
-  let shortMessage = message.split(".")[0] + ".";
+  let shortMessage = message.split(".")[0];
 
-  const match = message.match(/Error:\s*(.*?)\s*\(/);
+  const match = message.match(/Error:\s*([\s\S]*?)\s*Contract Call:/);
   if (match) {
     const extractedMessage = match ? match[1] : message;
 
-    shortMessage = `${extractedMessage}: ${shortMessage}`;
+    shortMessage = `${shortMessage}: ${extractedMessage}`;
   }
 
-  return shortMessage.length > 100
-    ? shortMessage.slice(0, 100) + "..."
-    : shortMessage;
+  return shortMessage;
 };
