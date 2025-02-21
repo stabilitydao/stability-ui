@@ -79,7 +79,9 @@ export const getStrategyInfo = (
       sourceCode: "",
     };
   }
+
   const il = getIL(strategyShortId, strategySpecific, assets);
+
   if (il) {
     strategyInfo = {
       ...strategyInfo,
