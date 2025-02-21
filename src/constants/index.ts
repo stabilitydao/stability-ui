@@ -187,111 +187,6 @@ const PROTOCOLS = Object.entries(integrations).reduce<
   return acc;
 }, {});
 
-const IL = {
-  ASFN: {
-    rate: 8,
-    title: "High",
-    desc: "The preset of the Stability ALM provides liquidity in the narrow range, often re-balancing the position (when the price deviates from the average by approximately +-3%). Every rebalancing results in a loss. The higher the volatility of the pair, the more re-balancing and the greater the loss.",
-    color: "#f55e11",
-  },
-  GQFS: {
-    rate: 1,
-    title: "Zero exp",
-    desc: "The strategy of the underlying liquidity provider (Gamma Stable LP) can rebalance the position by expanding it, but this happens extremely rarely, only at times of high volatility of the assets in the pool.",
-    color: "#7af996",
-  },
-  GQFN: {
-    rate: 8,
-    title: "High",
-    desc: "The strategy of the underlying liquidity provider (Gamma Narrow LP) provides liquidity in the narrow range, often rebalancing the position (when the price deviates from the average by approximately +-3.7%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#f55e11",
-  },
-  GQFW: {
-    rate: 5,
-    title: "Medium",
-    desc: "The strategy of the underlying liquidity provider (Gamma Wide LP) provides liquidity in the wide range, rebalancing the position infrequently (when the price deviates from the average by approximately +-10%). Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#F5DA5B",
-  },
-  QSF: {
-    rate: 0,
-    title: "None",
-    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
-    color: "#4aff71",
-  },
-  CF: {
-    rate: 0,
-    title: "None",
-    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
-    color: "#4aff71",
-  },
-  DQMFN: {
-    rate: 8,
-    title: "High",
-    desc: "The strategy of the underlying liquidity provider DefiEdge provides liquidity in the narrow range, often rebalancing the position. Every rebalancing results in a loss. The higher the volatility of the pair, the more rebalancing and the greater the loss.",
-    color: "#f55e11",
-  },
-  IQMF: {
-    rate: 4,
-    title: "Medium",
-    desc: "The strategy of the underlying liquidity provider Ichi provides liquidity in the wide range, not often rebalancing the position.",
-    color: "#F5DA5B",
-  },
-  CCF: {
-    rate: 1,
-    title: "Zero exp",
-    desc: "If asset prices in StableSwap pool are kept pegged , there are no impermanent losses.",
-    color: "#7af996",
-  },
-  Y: {
-    rate: 0,
-    title: "None",
-    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
-    color: "#4aff71",
-  },
-  SIL: {
-    rate: 0,
-    title: "Medium",
-    desc: "Providing assets to the landing protocol does not incur impermanent losses.",
-    color: "#4aff71",
-  },
-  QSMF: {
-    rate: 0,
-    title: "None",
-    desc: "Liquidity in the form of stablecoins is provided in a fixed range, there are no rebalances, so there are no impermanent losses.",
-    color: "#4aff71",
-  },
-  LOW: {
-    rate: 3,
-    title: "Low",
-    desc: "We expect low impermanent loss for pegged Gamma preset.",
-    color: "#D7F55B",
-  },
-  TPF: {
-    rate: 5,
-    title: "MEDIUM",
-    desc: "Significant impermanent loss was noted during rebalancing with this ALM in volatile pools.",
-    color: "#F5DA5B",
-  },
-  TPF_STABLE: {
-    rate: 5,
-    title: "Medium",
-    desc: "We catch significant IL in stablecoin pairs with this strategy when depeg become..",
-    color: "#F5DA5B",
-  },
-  BSF: {
-    rate: 1,
-    title: "Zero exp",
-    desc: "There are no impermanent loss in Balancer Stable pools while pool balanced and assets pegged.",
-    color: "#7af996",
-  },
-  EF_vAMM: {
-    rate: 3,
-    title: "Low",
-    desc: "Low impermanent loss is expected for UniswapV2-like and similar not CL AMMs.",
-    color: "#D7F55B",
-  },
-};
-
 const DEFAULT_ERROR = { state: false, type: "", description: "" };
 
 const STRATEGY_SPECIFIC_SUBSTITUTE: {
@@ -330,7 +225,6 @@ export {
   STRATEGY_SPECIFIC_SUBSTITUTE,
   DEFAULT_TRANSACTION_SETTINGS,
   DEFAULT_ERROR,
-  IL,
   BIG_INT_VALUES,
   ASSETS_TABLE,
   INTEGRATIONS_TABLE,
