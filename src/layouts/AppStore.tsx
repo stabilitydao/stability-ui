@@ -3,6 +3,7 @@ import type React from "react";
 import { useEffect } from "react";
 
 import { createPublicClient, formatUnits, http } from "viem";
+
 import { sonic } from "viem/chains";
 
 import axios from "axios";
@@ -699,118 +700,122 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     await Promise.all(
       CHAINS.map(async (chain) => {
-        /////***** SET VAULTS DATA *****/////
-        const APIVaultsData = Object.values(
-          stabilityAPIData?.vaults?.[chain.id] as Vaults
-        );
+        if (chain.id === "146") {
+          /////***** SET VAULTS DATA *****/////
+          const APIVaultsData = Object.values(
+            stabilityAPIData?.vaults?.[chain.id] as Vaults
+          );
 
-        /////***** SET PLATFORM DATA *****/////
+          /////***** SET PLATFORM DATA *****/////
 
-        vaultsTokens[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
+          vaultsTokens[chain.id] =
+            stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
 
-        versions[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
+          versions[chain.id] =
+            stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
 
-        platformData[chain.id] = {
-          platform: platforms[chain.id],
-          factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
-          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
-            ?.buildingPermitToken as TAddress,
-          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
-            ?.buildingPayPerVaultToken as TAddress,
-          zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
-        };
+          platformData[chain.id] = {
+            platform: platforms[chain.id],
+            factory: deployments[
+              chain.id
+            ].core.factory.toLowerCase() as TAddress,
+            buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+              ?.buildingPermitToken as TAddress,
+            buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+              ?.buildingPayPerVaultToken as TAddress,
+            zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
+          };
 
-        if (APIVaultsData.length) {
-          await setVaultsData(APIVaultsData, prices?.[chain.id], chain.id);
-          /////***** SET USER BALANCES *****/////
-          if (isConnected) {
-            isWeb3Load.set(true);
+          if (APIVaultsData.length) {
+            await setVaultsData(APIVaultsData, prices?.[chain.id], chain.id);
+            /////***** SET USER BALANCES *****/////
+            if (isConnected) {
+              isWeb3Load.set(true);
 
-            let localClient = maticClient;
-            if (chain.id === "8453") {
-              localClient = baseClient;
-            } else if (chain.id === "111188") {
-              localClient = realClient;
-            } else if (chain.id === "146") {
-              localClient = sonicClient;
-            }
-
-            try {
-              const contractAssetsBalances =
-                await getContractDataWithPagination(
-                  localClient,
-                  frontendContracts[chain.id],
-                  "getBalanceAssets",
-                  address as TAddress,
-                  0
-                );
-
-              const contractVaultsBalances =
-                await getContractDataWithPagination(
-                  localClient,
-                  frontendContracts[chain.id],
-                  "getBalanceVaults",
-                  address as TAddress,
-                  0
-                );
-
-              if (
-                contractVaultsBalances.length === 4 &&
-                contractAssetsBalances.length === 4
-              ) {
-                const vaultsAddresses = contractVaultsBalances?.[1];
-                const vaultsBalances = contractVaultsBalances?.[3];
-
-                const erc20Balance: { [token: string]: bigint } = {};
-                //function -> .set vault/
-
-                vaultsData[chain.id] = addVaultData(
-                  contractVaultsBalances as TFrontendBalances
-                );
-
-                assetBalances[chain.id] = addAssetsBalance(
-                  contractAssetsBalances as TFrontendBalances
-                );
-
-                for (let i = 0; i < contractAssetsBalances[1].length; i++) {
-                  erc20Balance[String(contractAssetsBalances[1][i])] = BigInt(
-                    contractAssetsBalances[3][i]
-                  );
-                }
-
-                if (Array.isArray(vaultsAddresses)) {
-                  const vaultsPromise = await Promise.all(
-                    vaultsAddresses.map(
-                      async (vault: string, index: number) => {
-                        if (localVaults[chain.id][vault.toLowerCase()]) {
-                          return {
-                            [vault.toLowerCase()]: {
-                              ...localVaults[chain.id][vault.toLowerCase()],
-                              balance: vaultsBalances?.[index],
-                            },
-                          };
-                        }
-                      }
-                    )
-                  );
-
-                  localVaults[chain.id] = vaultsPromise.reduce(
-                    (acc, curr) => ({ ...acc, ...curr }),
-                    {}
-                  ) as TVaults;
-                }
-                isVaultsLoaded.set(true);
+              let localClient = maticClient;
+              if (chain.id === "8453") {
+                localClient = baseClient;
+              } else if (chain.id === "111188") {
+                localClient = realClient;
+              } else if (chain.id === "146") {
+                localClient = sonicClient;
               }
-            } catch (txError: any) {
-              console.log("BLOCKCHAIN ERROR:", txError);
 
-              error.set({
-                state: true,
-                type: "WEB3",
-                description: txError?.message,
-              });
+              try {
+                const contractAssetsBalances =
+                  await getContractDataWithPagination(
+                    localClient,
+                    frontendContracts[chain.id],
+                    "getBalanceAssets",
+                    address as TAddress,
+                    0
+                  );
+
+                const contractVaultsBalances =
+                  await getContractDataWithPagination(
+                    localClient,
+                    frontendContracts[chain.id],
+                    "getBalanceVaults",
+                    address as TAddress,
+                    0
+                  );
+
+                if (
+                  contractVaultsBalances.length === 4 &&
+                  contractAssetsBalances.length === 4
+                ) {
+                  const vaultsAddresses = contractVaultsBalances?.[1];
+                  const vaultsBalances = contractVaultsBalances?.[3];
+
+                  const erc20Balance: { [token: string]: bigint } = {};
+                  //function -> .set vault/
+
+                  vaultsData[chain.id] = addVaultData(
+                    contractVaultsBalances as TFrontendBalances
+                  );
+
+                  assetBalances[chain.id] = addAssetsBalance(
+                    contractAssetsBalances as TFrontendBalances
+                  );
+
+                  for (let i = 0; i < contractAssetsBalances[1].length; i++) {
+                    erc20Balance[String(contractAssetsBalances[1][i])] = BigInt(
+                      contractAssetsBalances[3][i]
+                    );
+                  }
+
+                  if (Array.isArray(vaultsAddresses)) {
+                    const vaultsPromise = await Promise.all(
+                      vaultsAddresses.map(
+                        async (vault: string, index: number) => {
+                          if (localVaults[chain.id][vault.toLowerCase()]) {
+                            return {
+                              [vault.toLowerCase()]: {
+                                ...localVaults[chain.id][vault.toLowerCase()],
+                                balance: vaultsBalances?.[index],
+                              },
+                            };
+                          }
+                        }
+                      )
+                    );
+
+                    localVaults[chain.id] = vaultsPromise.reduce(
+                      (acc, curr) => ({ ...acc, ...curr }),
+                      {}
+                    ) as TVaults;
+                  }
+                  isVaultsLoaded.set(true);
+                }
+              } catch (txError: any) {
+                console.log("BLOCKCHAIN ERROR:", txError);
+
+                error.set({
+                  state: true,
+                  type: "WEB3",
+                  description: txError?.message,
+                });
+              }
             }
           }
         }

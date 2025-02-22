@@ -86,6 +86,15 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     [network]
   );
 
+  const risk = useMemo(() => {
+    if (vault.strategyInfo.shortId === "SiL") {
+      return "medium";
+    } else if (vault?.risk?.isRektStrategy) {
+      return vault?.risk?.symbol;
+    }
+    return vault.strategyInfo.il?.title as string;
+  }, [vault]);
+
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
       <div className="bg-accent-900 rounded-t-2xl lg:flex hidden justify-between items-center h-[56px] px-6">
@@ -270,19 +279,12 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 testId="infoBarHardWork"
               />
             </div>
-
             <div className="w-full md:w-1/3 ">
               <FieldValue
                 name="Risk"
                 value={
                   <div className="flex h-[28px] items-center">
-                    <RiskIndicator
-                      riskSymbol={
-                        vault?.risk?.isRektStrategy
-                          ? vault?.risk?.symbol
-                          : (vault.strategyInfo.il?.title as string)
-                      }
-                    />
+                    <RiskIndicator riskSymbol={risk} />
                   </div>
                 }
               />
