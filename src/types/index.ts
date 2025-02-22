@@ -108,6 +108,12 @@ type TTokenData = {
   tags?: string[];
 };
 
+type TOptionInfo = {
+  address: string | string[];
+  symbol: string | string[];
+  logoURI: string | string[];
+};
+
 //New types
 
 type TAPRData = {
@@ -682,4 +688,5 @@ export type {
   TFrontendContractData,
   TLeverageLendingData,
   IL,
+  TOptionInfo,
 };

@@ -2,18 +2,9 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import {
-  formatUnits,
-  parseUnits,
-  zeroAddress,
-  maxUint256,
-  http,
-  createPublicClient,
-} from "viem";
+import { formatUnits, parseUnits, zeroAddress, maxUint256 } from "viem";
 
-import { sonic } from "viem/chains";
-
-import { usePublicClient, useAccount, useSwitchChain } from "wagmi";
+import { useAccount, useSwitchChain } from "wagmi";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 
 import { isMobile } from "react-device-detect";
@@ -44,6 +35,7 @@ import {
   ERC20MetadataUpgradeableABI,
   wagmiConfig,
   ICHIABI,
+  web3clients,
 } from "@web3";
 
 import {
@@ -69,6 +61,8 @@ import {
   BIG_INT_VALUES,
 } from "@constants";
 
+import { ZAP_ROUTERS } from "../../constants";
+
 import type {
   TAddress,
   TVaultAllowance,
@@ -84,6 +78,7 @@ import type {
   TLocalStorageToken,
   TxTokens,
   TError,
+  TOptionInfo,
 } from "@types";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
@@ -94,36 +89,8 @@ interface IProps {
   vault: TVault;
 }
 
-type TOptionInfo = {
-  address: string | string[];
-  symbol: string | string[];
-  logoURI: string | string[];
-};
-
-const ZAP_ROUTERS = {
-  "1inch": {
-    logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
-    title: "1inch DeX",
-  },
-  swapper: { logo: "/logo.svg", title: "Swapper" },
-};
-
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
-  let _publicClient;
-
-  if (network == "146") {
-    _publicClient = createPublicClient({
-      chain: sonic,
-      transport: http(
-        import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
-      ),
-    });
-  } else {
-    _publicClient = usePublicClient({
-      chainId: Number(network),
-      config: wagmiConfig,
-    });
-  }
+  let _publicClient = web3clients[network] ?? web3clients["146"];
 
   const { open } = useWeb3Modal();
 

@@ -18,7 +18,12 @@
 export const getShortMessage = (message: string): string => {
   let shortMessage = message.split(".")[0];
 
-  const match = message.match(/Error:\s*([\s\S]*?)\s*Contract Call:/);
+  const match =
+    message.match(/Error:\s*([\s\S]*?)\s*Contract Call:/) ??
+    message.match(
+      /ContractFunctionExecutionError:\s*([\s\S]*?)\s*Contract Call:/
+    );
+
   if (match) {
     const extractedMessage = match ? match[1] : message;
 
