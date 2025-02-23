@@ -59,6 +59,7 @@ const Users = (): JSX.Element => {
         ...data,
         rank: index + 1,
       }));
+
       setTableData(contestData);
     }
   };

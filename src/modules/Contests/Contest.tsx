@@ -11,7 +11,8 @@ import {
   sortTable,
   formatTimestampToDate,
   getNFTSymbol,
-  getTokenData, formatNumber,
+  getTokenData,
+  formatNumber,
 } from "@utils";
 
 import { Timer } from "./components";
@@ -128,8 +129,8 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                       </span>
                     )}
 
-                        {reward.type === "ERC20 Token" && (
-                          <span className="flex items-center">
+                    {reward.type === "ERC20 Token" && (
+                      <span className="flex items-center">
                         <img
                           className="w-[24px] h-[24px] rounded-full"
                           src={
@@ -143,12 +144,11 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                             ?.symbol as string) || "UNKNOWN"}
                         </span>
                       </span>
-                        )}
+                    )}
 
-                        {reward.type === "NFTs" && reward.contract && (
-                          <span className="flex items-center">
-                        <span
-                          className="inline-flex items-center justify-center text-[11px] font-bold w-[24px] border-[1px]">
+                    {reward.type === "NFTs" && reward.contract && (
+                      <span className="flex items-center">
+                        <span className="inline-flex items-center justify-center text-[11px] font-bold w-[24px] border-[1px]">
                           NFT
                         </span>
                         <span className="ml-2 font-bold">
@@ -158,9 +158,9 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                           )}
                         </span>
                       </span>
-                        )}
+                    )}
                   </div>
-                  {reward.winnerReward && reward.winners ?
+                  {reward.winnerReward && reward.winners ? (
                     <div className="flex items-center">
                       {reward.winnerReward} x
                       <svg
@@ -180,20 +180,27 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                         />
                       </svg>
                       {reward.winners}
-                    </div> : ''
-                  }
-                  {reward.totalReward ?
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {reward.totalReward ? (
                     <div className="flex items-center">
-                      {formatNumber(reward.totalReward, 'formatWithoutDecimalPart')}
-                    </div> : ''}
-
+                      {formatNumber(
+                        reward.totalReward,
+                        "formatWithoutDecimalPart"
+                      )}
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </div>
               ))}
             </div>
           </div>
           {!!contest?.integration?.intract && (
             <div className="flex flex-col items-center min-w-[200px]">
-              <HeadingText text="Quest" scale={2}/>
+              <HeadingText text="Quest" scale={2} />
               <a
                 className="flex items-center gap-1"
                 href={`https://intract.io/quest/${contest.integration.intract}`}
