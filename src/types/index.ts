@@ -615,6 +615,21 @@ interface IExtendedYieldContest extends YieldContest {
   questsLength: number;
 }
 
+type TVSHoldModalState = {
+  assetsVsHold: THoldData[];
+  lifetimeVsHold: number;
+  vsHoldAPR: number;
+  created: number;
+  state: boolean;
+  isVsActive: boolean;
+};
+
+type TTableActiveParams = {
+  search: number;
+  sort: number;
+  filters: number;
+};
+
 export type {
   TPlatformData,
   TInitParams,
@@ -690,4 +705,6 @@ export type {
   TLeverageLendingData,
   IL,
   TOptionInfo,
+  TVSHoldModalState,
+  TTableActiveParams,
 };

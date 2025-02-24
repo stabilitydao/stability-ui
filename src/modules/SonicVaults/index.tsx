@@ -56,6 +56,7 @@ import {
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,
+  DEFAULT_TABLE_PARAMS,
   // CHAINS,
   // WBTC,
   // WETH,
@@ -67,8 +68,6 @@ import { PlatformABI } from "@web3";
 import type {
   TVault,
   TTableColumn,
-  TTAbleFiltersVariant,
-  THoldData,
   // TPendingPlatformUpgrade,
   // TAddress,
   // TUpgradesTable,
@@ -78,21 +77,14 @@ import type {
   TPendingPlatformUpgrade,
   TUpgradesTable,
   TAddress,
+  TTableActiveParams,
+  TVSHoldModalState,
 } from "@types";
 
 // type TToken = {
 //   logo: string;
 //   price: string;
 // };
-
-type TVSHoldModalState = {
-  assetsVsHold: THoldData[];
-  lifetimeVsHold: number;
-  vsHoldAPR: number;
-  created: number;
-  state: boolean;
-  isVsActive: boolean;
-};
 
 const SonicVaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
@@ -117,6 +109,11 @@ const SonicVaults = (): JSX.Element => {
   const newUrl = new URL(window.location.href);
   const params = new URLSearchParams(newUrl.search);
 
+  const [activeTableParams, setActiveTableParams] =
+    useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
+
+  const [allParams, setAllParams] = useState<number>(0);
+
   let urlTab = 1;
 
   let urlTableStates = SONIC_TABLE;
@@ -136,6 +133,10 @@ const SonicVaults = (): JSX.Element => {
 
     if (indexOfState != -1) {
       urlTableStates[indexOfState].sortType = URLParamType;
+
+      if (!activeTableParams.sort) {
+        setActiveTableParams((prev) => ({ ...prev, sort: 1 }));
+      }
     }
   }
 
@@ -332,7 +333,53 @@ const SonicVaults = (): JSX.Element => {
     }
   };
 
-  const tableHandler = (table: TTableColumn[] = tableStates) => {
+  const resetTable = () => {
+    // search
+    if (search?.current) {
+      search.current.value = "";
+    }
+
+    // sort
+    const _tableStates = tableStates.map((state) => ({
+      ...state,
+      sortType: "none",
+    }));
+    setTableStates(_tableStates);
+
+    //filters
+    const _tableFilters = tableFilters.map((filter) => {
+      if (filter.variants) {
+        const variants = filter.variants.map((variant) => ({
+          ...variant,
+          state: false,
+        }));
+        return {
+          ...filter,
+          variants,
+        };
+      } else if (filter.name === "Active") {
+        return { ...filter, state: true };
+      } else {
+        return { ...filter, state: false };
+      }
+    });
+    setTableFilters(_tableFilters);
+
+    // ui
+    setActiveTableParams(DEFAULT_TABLE_PARAMS);
+    setAllParams(0);
+
+    // path
+    window.history.replaceState(null, "", window.location.pathname);
+
+    // table reset
+    tableHandler(_tableStates, DEFAULT_TABLE_PARAMS);
+  };
+
+  const tableHandler = (
+    table: TTableColumn[] = tableStates,
+    tableParams = activeTableParams
+  ) => {
     if (!$vaults) return;
 
     const searchValue: string = String(search?.current?.value.toLowerCase());
@@ -454,7 +501,6 @@ const SonicVaults = (): JSX.Element => {
         }
       }
     });
-
     //search
     sortedVaults = sortedVaults.filter(
       (vault: TVault) =>
@@ -471,6 +517,24 @@ const SonicVaults = (): JSX.Element => {
       }
     }
 
+    //active table params(search-sort-filter)
+    let _activeTableParams = tableParams;
+
+    if (!!searchValue && !_activeTableParams.search) {
+      _activeTableParams = { ..._activeTableParams, search: 1 };
+    } else if (!searchValue && !!_activeTableParams.search) {
+      _activeTableParams = { ..._activeTableParams, search: 0 };
+    }
+
+    const isSort = table.some((state) => state.sortType != "none");
+
+    if (isSort && !_activeTableParams.sort) {
+      _activeTableParams = { ..._activeTableParams, sort: 1 };
+    } else if (!isSort && !!_activeTableParams.sort) {
+      _activeTableParams = { ..._activeTableParams, sort: 0 };
+    }
+
+    setActiveTableParams(_activeTableParams);
     setFilteredVaults(sortedVaults);
     setTableStates(table);
   };
@@ -489,7 +553,13 @@ const SonicVaults = (): JSX.Element => {
           };
         });
 
-      initFilters(vaults, tableFilters, setTableFilters, activeNetworksHandler);
+      initFilters(
+        vaults,
+        tableFilters,
+        setTableFilters,
+        activeNetworksHandler,
+        setActiveTableParams
+      );
       setLocalVaults(vaults);
 
       setFilteredVaults(vaults);
@@ -508,6 +578,17 @@ const SonicVaults = (): JSX.Element => {
   useEffect(() => {
     initVaults();
   }, [$vaults, $isVaultsLoaded]);
+
+  useEffect(() => {
+    const _allParams = Object.values(activeTableParams).reduce(
+      (acc, cur) => (acc += cur),
+      0
+    );
+
+    if (allParams != _allParams) {
+      setAllParams(_allParams);
+    }
+  }, [activeTableParams]);
 
   const isLoading = useMemo(() => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
@@ -611,7 +692,7 @@ const SonicVaults = (): JSX.Element => {
           activeNetworks={activeNetworks}
           activeNetworksHandler={activeNetworksHandler}
         /> */}
-        <div className="flex items-center gap-2 flex-col lg:flex-row font-semibold text-[14px]">
+        <div className="flex items-center gap-2 flex-col min-[1440px]:flex-row font-semibold text-[14px]">
           <label className="relative block w-full">
             <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
               <img
@@ -628,7 +709,13 @@ const SonicVaults = (): JSX.Element => {
               onChange={() => tableHandler()}
             />
           </label>
-          <Filters filters={tableFilters} setFilters={setTableFilters} />
+          <Filters
+            filters={tableFilters}
+            setFilters={setTableFilters}
+            allParams={allParams}
+            setTableParams={setActiveTableParams}
+            resetTable={resetTable}
+          />
         </div>
       </div>
 
