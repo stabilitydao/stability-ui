@@ -385,13 +385,18 @@ const Vaults = (): JSX.Element => {
           break;
         case "dropdown":
           if (!f.variants) break;
-          if (f.name === "Strategy") {
-            const strategyName = f.variants.find(
-              (variant: TTAbleFiltersVariant) => variant.state
-            )?.name;
-            if (strategyName) {
-              sortedVaults = sortedVaults.filter(
-                (vault: TVault) => vault.strategyInfo.shortId === strategyName
+          if (f.name === "Strategies") {
+            const strategiesToFilter = f.variants.reduce<string[]>(
+              (acc, { state, name }) => {
+                if (state) acc.push(name);
+                return acc;
+              },
+              []
+            );
+
+            if (strategiesToFilter.length) {
+              sortedVaults = sortedVaults.filter((vault: TVault) =>
+                strategiesToFilter.includes(vault.strategyInfo.shortId)
               );
             }
           }
