@@ -25,16 +25,21 @@ export const initFilters = (
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
   networksHandler: (chains: string[]) => void
 ): void => {
-  const shortNames: string[] = [
-    ...new Set(
-      vaults
-        .map((vault) => vault.strategyInfo.shortId)
-        .filter((id) => id !== "")
-    ),
-  ];
+  const shortNames = Array.from(
+    new Map(
+      vaults.map((vault) => [
+        vault.strategyInfo.shortId,
+        {
+          name: vault.strategyInfo.shortId,
+          title: vault.strategy,
+        },
+      ])
+    ).values()
+  );
 
-  const convertedShortNames = shortNames.map((name: string) => ({
-    name: name,
+  const convertedShortNames = shortNames.map(({ name, title }) => ({
+    name,
+    title,
     state: false,
   }));
 

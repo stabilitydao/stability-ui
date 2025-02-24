@@ -206,7 +206,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 ))}
               </div>
             ) : filter.type === "dropdown" ? (
-              <div className="relative select-none w-[176px]">
+              <div className="relative select-none w-[220px]">
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
@@ -215,7 +215,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   data-testid="strategyFilterDropdown"
                   className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
                 >
-                  <p className="max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+                  <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
                     {filter.name}: {activeStrategies}
                   </p>
                   <img
@@ -246,6 +246,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                             variant.state ? "bg-accent-800" : ""
                           }`}
                           data-testid="strategy"
+                          title={variant.title}
                         >
                           <Checkbox
                             checked={variant.state}
@@ -253,7 +254,9 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                               activeFiltersHandler(filter, variant.name)
                             }
                           />
-                          <span>{variant.name}</span>
+                          <span className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap">
+                            {variant.title}
+                          </span>
                         </div>
                       )
                     )}

@@ -323,6 +323,7 @@ type TLeaderboard = {
 
 type TTAbleFiltersVariant = {
   name: string;
+  title: string;
   state: boolean;
 };
 
