@@ -64,7 +64,6 @@ import {
 import type {
   TVault,
   TTableColumn,
-  TTAbleFiltersVariant,
   THoldData,
   // TPendingPlatformUpgrade,
   // TAddress,
