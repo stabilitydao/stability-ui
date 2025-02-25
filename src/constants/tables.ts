@@ -2,7 +2,7 @@ import type { TTableColumn, TTableFilters } from "@types";
 
 const TABLE_FILTERS: TTableFilters[] = [
   { name: "Stablecoins", type: "single", state: false },
-  { name: "Strategy", type: "dropdown", state: true },
+  { name: "Strategies", type: "dropdown", state: true },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];
@@ -349,6 +349,12 @@ const LEADERBOARD_TABLE: TTableColumn[] = [
   },
 ];
 
+const DEFAULT_TABLE_PARAMS = {
+  search: 0,
+  sort: 0,
+  filters: 0,
+};
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -360,4 +366,5 @@ export {
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
   SONIC_TABLE,
+  DEFAULT_TABLE_PARAMS,
 };

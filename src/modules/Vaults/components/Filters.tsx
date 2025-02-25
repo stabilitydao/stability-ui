@@ -16,8 +16,8 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
 
   const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
 
-  const [activeStrategy, setActiveStrategy] = useState(
-    searchParams.get("strategy") ? searchParams.get("strategy") : "All"
+  const [activeStrategies, setActiveStrategies] = useState(
+    searchParams.get("strategies") ? searchParams.get("strategies") : "All"
   );
 
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -95,16 +95,28 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
         setFilters(updatedFiltersSample);
         break;
       case "dropdown":
-        const updatedFiltersDropDown = filters.map((f) =>
+        let updatedFiltersDropDown = filters.map((f) =>
           f.name === filterName.name
             ? {
                 ...f,
-                variants:
-                  f.variants?.map((variant: TTAbleFiltersVariant) =>
-                    variant.name === option
-                      ? { ...variant, state: !variant.state }
-                      : { ...variant, state: false }
-                  ) || [],
+                variants: f.variants?.map((variant: TTAbleFiltersVariant) =>
+                  variant.name === option
+                    ? { ...variant, state: !variant.state }
+                    : { ...variant }
+                ),
+              }
+            : f
+        );
+
+        updatedFiltersDropDown = updatedFiltersDropDown.map((f) =>
+          f.name === filterName.name &&
+          f.variants?.every((variant) => variant.state)
+            ? {
+                ...f,
+                variants: f.variants.map((variant) => ({
+                  ...variant,
+                  state: false,
+                })),
               }
             : f
         );
@@ -113,23 +125,27 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
           (f) => f.name === filterName.name
         );
 
-        if (dropDownFilter?.name.toLowerCase() === "strategy") {
-          const strategy =
-            dropDownFilter?.variants &&
-            dropDownFilter?.variants.find((variant) => variant.state);
+        if (dropDownFilter?.name.toLowerCase() === "strategies") {
+          const strategies =
+            dropDownFilter?.variants?.filter((variant) => variant.state) || [];
 
-          strategy
-            ? params.set("strategy", strategy.name)
-            : params.delete("strategy");
-
-          // UI representation
-          if (strategy) {
-            setActiveStrategy(strategy.name);
+          if (strategies.length) {
+            params.set(
+              "strategies",
+              strategies.map(({ name }) => name).join(",")
+            );
           } else {
-            setActiveStrategy("All");
+            params.delete("strategies");
+          }
+
+          // // UI representation
+          if (strategies.length) {
+            setActiveStrategies(strategies.map(({ name }) => name).join(","));
+          } else {
+            setActiveStrategies("All");
           }
         }
-        setDropDownSelector(false);
+        // setDropDownSelector(false);
         setFilters(updatedFiltersDropDown);
         break;
       default:
@@ -190,7 +206,7 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                 ))}
               </div>
             ) : filter.type === "dropdown" ? (
-              <div className="relative select-none w-[176px]">
+              <div className="relative select-none w-[220px]">
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
@@ -199,8 +215,8 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   data-testid="strategyFilterDropdown"
                   className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
                 >
-                  <p>
-                    {filter.name}: {activeStrategy}
+                  <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+                    {filter.name}: {activeStrategies}
                   </p>
                   <img
                     className={`transition delay-[50ms] ${
@@ -221,18 +237,27 @@ const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
                   <div className="flex flex-col items-start">
                     {filter.variants?.map(
                       (variant: TTAbleFiltersVariant, index: number) => (
-                        <p
+                        <div
                           key={variant.name}
                           onClick={() =>
                             activeFiltersHandler(filter, variant.name)
                           }
-                          className={`${!index && "rounded-t-2xl"} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
+                          className={`${!index ? "rounded-t-2xl" : ""} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center gap-2 ${
                             variant.state ? "bg-accent-800" : ""
                           }`}
                           data-testid="strategy"
+                          title={variant.title}
                         >
-                          {variant.name}
-                        </p>
+                          <Checkbox
+                            checked={variant.state}
+                            onChange={() =>
+                              activeFiltersHandler(filter, variant.name)
+                            }
+                          />
+                          <span className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap">
+                            {variant.title}
+                          </span>
+                        </div>
                       )
                     )}
                   </div>

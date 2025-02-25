@@ -1,6 +1,6 @@
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
-import { createWalletClient, http } from "viem";
+import { createWalletClient, http, createPublicClient } from "viem";
 
 import { base, polygon, real, sonic } from "viem/chains";
 
@@ -98,6 +98,33 @@ const walletClient = createWalletClient({
   transport: http(),
 });
 
+const maticClient = createPublicClient({
+  chain: polygon,
+  transport: http("https://polygon-rpc.com"),
+});
+
+const baseClient = createPublicClient({
+  chain: base,
+  transport: http("https://mainnet.base.org"),
+});
+
+const realClient = createPublicClient({
+  chain: real,
+  transport: http("https://real.drpc.org"),
+});
+
+const sonicClient = createPublicClient({
+  chain: sonic,
+  transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
+});
+
+const web3clients = {
+  "137": maticClient,
+  "146": sonicClient,
+  "8453": baseClient,
+  "111188": realClient,
+};
+
 export {
   CONTRACT_PAGINATION,
   platforms,
@@ -127,4 +154,9 @@ export {
   IMerkleDistributor,
   sGEM1,
   merkleDistributor,
+  maticClient,
+  sonicClient,
+  baseClient,
+  realClient,
+  web3clients,
 };

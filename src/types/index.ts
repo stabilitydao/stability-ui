@@ -108,6 +108,12 @@ type TTokenData = {
   tags?: string[];
 };
 
+type TOptionInfo = {
+  address: string | string[];
+  symbol: string | string[];
+  logoURI: string | string[];
+};
+
 //New types
 
 type TAPRData = {
@@ -317,6 +323,7 @@ type TLeaderboard = {
 
 type TTAbleFiltersVariant = {
   name: string;
+  title: string;
   state: boolean;
 };
 
@@ -608,6 +615,21 @@ interface IExtendedYieldContest extends YieldContest {
   questsLength: number;
 }
 
+type TVSHoldModalState = {
+  assetsVsHold: THoldData[];
+  lifetimeVsHold: number;
+  vsHoldAPR: number;
+  created: number;
+  state: boolean;
+  isVsActive: boolean;
+};
+
+type TTableActiveParams = {
+  search: number;
+  sort: number;
+  filters: number;
+};
+
 export type {
   TPlatformData,
   TInitParams,
@@ -682,4 +704,7 @@ export type {
   TFrontendContractData,
   TLeverageLendingData,
   IL,
+  TOptionInfo,
+  TVSHoldModalState,
+  TTableActiveParams,
 };

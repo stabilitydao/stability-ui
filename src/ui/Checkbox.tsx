@@ -8,6 +8,7 @@ const Checkbox: React.FC<IProps> = ({ checked, onChange }) => {
     <input
       checked={checked}
       onChange={onChange}
+      onClick={(event) => event.stopPropagation()}
       type="checkbox"
       className={`appearance-none h-5 w-5 border-[1.5px] border-accent-500 rounded-md ${!checked ? "hover:bg-accent-800" : ""} checked:bg-accent-500 checked:border-accent-500 focus:outline-none transition duration-300 relative cursor-pointer`}
     />

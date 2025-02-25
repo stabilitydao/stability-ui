@@ -18,7 +18,16 @@
 export const getShortMessage = (message: string): string => {
   let shortMessage = message.split(".")[0];
 
+  if (message.includes("IV")) {
+    shortMessage = message.match(
+      /(The contract function .*? reverted with the following reason:[\s\S]*?)\s*Contract Call:/
+    );
+
+    return shortMessage[1];
+  }
+
   const match = message.match(/Error:\s*([\s\S]*?)\s*Contract Call:/);
+
   if (match) {
     const extractedMessage = match ? match[1] : message;
 

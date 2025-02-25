@@ -6,4 +6,12 @@ const TRANSACTION_SETTINGS = {
   gasLimits: ["1", "1.1"],
 };
 
-export { TABS, TRANSACTION_SETTINGS };
+const ZAP_ROUTERS = {
+  "1inch": {
+    logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/1inch.svg",
+    title: "1inch DeX",
+  },
+  swapper: { logo: "/logo.svg", title: "Swapper" },
+};
+
+export { TABS, TRANSACTION_SETTINGS, ZAP_ROUTERS };

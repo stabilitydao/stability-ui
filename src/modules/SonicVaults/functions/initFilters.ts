@@ -1,4 +1,9 @@
-import type { TVault, TTAbleFiltersVariant, TTableFilters } from "@types";
+import type {
+  TVault,
+  TTAbleFiltersVariant,
+  TTableFilters,
+  TTableActiveParams,
+} from "@types";
 
 /**
  * Initializes the filters for a table based on the vault data, URL parameters, and network selection
@@ -23,30 +28,40 @@ export const initFilters = (
   vaults: TVault[],
   tableFilters: TTableFilters[],
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
-  networksHandler: (chains: string[]) => void
+  networksHandler: (chains: string[]) => void,
+  setTableParams: React.Dispatch<React.SetStateAction<TTableActiveParams>>
 ): void => {
-  const shortNames: string[] = [
-    ...new Set(
-      vaults
-        .map((vault) => vault.strategyInfo.shortId)
-        .filter((id) => id !== "")
-    ),
-  ];
+  const shortNames = Array.from(
+    new Map(
+      vaults.map((vault) => [
+        vault.strategyInfo.shortId,
+        {
+          name: vault.strategyInfo.shortId,
+          title: vault.strategy,
+        },
+      ])
+    ).values()
+  );
 
-  const convertedShortNames = shortNames.map((name: string) => ({
-    name: name,
+  const convertedShortNames = shortNames.map(({ name, title }) => ({
+    name,
+    title,
     state: false,
   }));
 
   let newFilters = tableFilters.map((f) =>
-    f.name === "Strategy" ? { ...f, variants: convertedShortNames } : f
+    f.name === "Strategies" ? { ...f, variants: convertedShortNames } : f
   );
 
   //set URL filters
   const searchParams = new URLSearchParams(window.location.search);
 
   const tagsParam = searchParams.get("tags");
-  const strategyParam = searchParams.get("strategy");
+  const strategiesParams = searchParams
+    .get("strategies")
+    ?.split(",")
+    ?.map((strategy) => strategy.toLowerCase());
+
   const vaultsParam = searchParams.get("vaults");
   const statusParam = searchParams.get("status");
   const chainsParam = searchParams.getAll("chain");
@@ -57,15 +72,14 @@ export const initFilters = (
     );
   }
 
-  if (strategyParam) {
+  if (strategiesParams?.length) {
     newFilters = newFilters.map((f) => {
-      return f.name.toLowerCase() === "strategy"
+      return f.name.toLowerCase() === "strategies"
         ? {
             ...f,
             variants:
               f.variants?.map((variant: TTAbleFiltersVariant) => {
-                return variant.name.toLowerCase() ===
-                  strategyParam.toLowerCase()
+                return strategiesParams.includes(variant.name.toLowerCase())
                   ? { ...variant, state: true }
                   : { ...variant, state: false };
               }) || [],
@@ -92,6 +106,26 @@ export const initFilters = (
       }
       return f;
     });
+  }
+
+  let activeFiltersCount = 0;
+
+  newFilters.forEach((filter) => {
+    if (filter.variants) {
+      filter.variants.forEach((variant) => {
+        if (variant.state) {
+          activeFiltersCount++;
+        }
+      });
+    } else if (!filter.state && filter.name === "Active") {
+      activeFiltersCount++;
+    } else if (filter.state && filter.name !== "Active") {
+      activeFiltersCount++;
+    }
+  });
+
+  if (activeFiltersCount) {
+    setTableParams((prev) => ({ ...prev, filters: activeFiltersCount }));
   }
 
   if (chainsParam.length) {
