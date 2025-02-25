@@ -17,6 +17,7 @@ import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { SonicVaults } from "./SonicVaults";
+import { STBL } from "./STBL";
 
 export {
   Factory,
@@ -38,4 +39,5 @@ export {
   Contest,
   Home,
   SonicVaults,
+  STBL,
 };
