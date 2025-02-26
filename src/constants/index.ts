@@ -215,6 +215,7 @@ export {
   SDIV,
   WBTC,
   WETH,
+  USDC,
   WMATIC,
   MULTISIG,
   TREASURY,
