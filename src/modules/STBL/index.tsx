@@ -455,6 +455,14 @@ const STBL = (): JSX.Element => {
               <span>USDC Balance: </span>
               <span>{!!balance ? balance : "0"}</span>
             </div>
+            <div
+              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
+                !!balance ? "" : "opacity-0"
+              }`}
+            >
+              <span>Amount in USDC: </span>
+              <span>{Number(inputValue) * Number(saleData.price)}</span>
+            </div>
           </div>
 
           <div>
