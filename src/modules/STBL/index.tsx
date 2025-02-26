@@ -309,8 +309,8 @@ const STBL = (): JSX.Element => {
   return (
     <div className="min-w-full lg:min-w-[1000px] xl:min-w-[1200px] max-w-[1400px] font-manrope">
       <div className="STBL mb-5">
-        <div className="flex justify-between items-center h-full md:h-[400px] py-10 px-[50px] xl:pl-[50px] xl:pr-[80px]">
-          <div className="flex flex-col items-start justify-between h-full gap-5  md:gap-0">
+        <div className="flex justify-between items-center gap-1 xl:gap-0 h-full md:h-[400px] py-10 px-[50px] xl:pl-[50px] xl:pr-[80px]">
+          <div className="flex flex-col items-start justify-between h-full gap-5 md:gap-0">
             <div>
               <span className="text-[40px] sm:text-[55px] leading-10">
                 PUBLIC SALE
