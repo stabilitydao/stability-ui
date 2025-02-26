@@ -12,7 +12,7 @@ import { connected, account } from "@store";
 
 import { Loader } from "@ui";
 
-import {formatNumber, getDate} from "@utils";
+import { getDate } from "@utils";
 
 import { Timer } from "./components";
 
@@ -299,112 +299,59 @@ const STBL = (): JSX.Element => {
   return (
     <div className="w-full xl:min-w-[1200px] max-w-[1400px] font-manrope">
       <div className="STBL">
-        <div className="flex justify-between items-center h-[400px] py-10 pl-[50px] pr-[80px]">
+        <div className="flex justify-between items-center h-[300px] py-10 pl-[50px] pr-[80px]">
           <div className="flex flex-col items-start justify-between h-full">
             <div>
               <span className="text-[55px] leading-10">PUBLIC SALE</span>
               <p className="text-[20px] text-[#949494]">
-                Stability Platform Native Token
+                Stability protocol official token
               </p>
             </div>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-end  gap-[50px]">
-                <div className="flex flex-col items-start  w-[120px]">
-                  <span className="text-[15px] font-light">Sale price</span>
-                  <div className="flex items-center justify-start gap-2">
-                    <img className="w-[24px] h-[24px] rounded-full"
-                         src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                         alt="USDC.e"/>
-                    <span className="text-[28px] font-bold">{saleData.price}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-[15px] font-light">Sold</span>
-                  <p className="text-[28px] font-bold">
-                    {formatNumber(+saleData.sold,"format")} / 4 000 000 <span className="text-[#A995FF]">STBL</span>
-                  </p>
-                </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-[15px] font-light">Total Raised</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img className="w-[24px] h-[24px] rounded-full"
-                         src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                         alt="USDC.e"/>
-                    <p className="text-[28px] font-bold">{saleData.raised}</p>
-                  </div>
+            <div className="flex items-end justify-center gap-[50px]">
+              <div className="flex flex-col items-start">
+                <span className="text-[15px] font-light">Price</span>
+                <div className="flex items-center justify-center gap-2">
+                  <img src="/sonic.png" alt="Sonic" />
+                  <span className="text-[28px] font-bold">0,070</span>
                 </div>
               </div>
-
-              <div className="flex items-end gap-[50px]">
-                <div className="flex flex-col items-start w-[120px]">
-                  <span className="text-[15px] font-light">TGE price</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img className="w-[24px] h-[24px] rounded-full"
-                         src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                         alt="USDC.e"/>
-                    <span className="text-[28px] font-bold">0.18</span>
-                  </div>
+              <div className="flex flex-col items-start">
+                <span className="text-[15px] font-light">Total Supply</span>
+                <p className="text-[28px] font-bold">
+                  1,000,000,000 <span className="text-[#A995FF]">STBL</span>
+                </p>
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-[15px] font-light">Total Raised</span>
+                <div className="flex items-center justify-center gap-2">
+                  <img src="/sonic.png" alt="Sonic" />
+                  <p className="text-[28px] font-bold">1,000,000</p>
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-[15px] font-light">Total Supply</span>
-                  <p className="text-[28px] font-bold">
-                    100 000 000 <span className="text-[#A995FF]">STBL</span>
-                  </p>
-                </div>
-                {/*<div className="flex flex-col items-start">
-                  <span className="text-[15px] font-light">Total Raised</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img src="/sonic.png" alt="Sonic"/>
-                    <p className="text-[28px] font-bold">1,000,000</p>
-                  </div>
-                </div>*/}
               </div>
             </div>
-
           </div>
-          <img className="rounded-full w-[200px] h-[200px]" src="/STBL_plain.png" alt="STBL"/>
+          <img src="/STBL.png" alt="STBL" />
         </div>
       </div>
 
-      <br/>
+      <div>
+        <p>Price: {saleData.price}</p>
+        <p>TGE: {getDate(saleData.tge)}</p>
+        <p>Start: {getDate(saleData.start)}</p>
+        <p>End: {getDate(saleData.end)}</p>
+        <p>Sold: {saleData.sold}</p>
+        <p>Allocation: {saleData.allocation}</p>
+        <p>Bought: {saleData.bought}</p>
+        <p>Raised: {saleData.raised}</p>
+        <p>Max raise: {saleData.maxRaise}</p>
 
-      <div className="flex w-full justify-between">
-        <div className="flex bg-accent-900 flex-col p-[20px]">
-          <div className="flex">
-            <span className="w-[200px]">Sale start</span>
-            <span>{new Date(saleData.start * 1000).toLocaleString()}</span>
-          </div>
-          <div className="flex">
-            <span className="w-[200px]">Sale end</span>
-            <span>{new Date(saleData.end * 1000).toLocaleString()}</span>
-          </div>
-          <div className="flex">
-            <span className="w-[200px]">TGE</span>
-            <span>{new Date(saleData.tge * 1000).toLocaleDateString()}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center">
-          <Timer start={saleData.start} end={saleData.end}/>
-        </div>
-
-        <div className="flex bg-accent-900 items-center p-[20px]">
-          <div className="flex">
-            <span className="w-[200px]">You Bought</span>
-            <span>{formatNumber(saleData.bought, "format")}</span>
-          </div>
-        </div>
-
+        <Timer start={saleData.start} end={saleData.end} />
       </div>
 
-      <br/>
-
-      <div className="flex flex-col">
-        <h2 className="flex text-[28px]">Buy</h2>
-        <div className="bg-accent-950 w-[400px] h-[300px] rounded-2xl">
-          <div className="px-5 py-3 flex flex-col justify-between h-full">
-            <div>
-              <label className="relative block h-[40px] w-full md:w-[345px]">
+      <div className="bg-accent-950 w-[400px] h-[300px] rounded-2xl">
+        <div className="px-5 py-3 flex flex-col justify-between h-full">
+          <div>
+            <label className="relative block h-[40px] w-full md:w-[345px]">
               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <img
                   src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
@@ -414,19 +361,19 @@ const STBL = (): JSX.Element => {
                 />
               </span>
 
-                <input
-                  list="amount"
-                  ref={input}
-                  name="amount"
-                  placeholder="0"
-                  value={inputValue}
-                  onChange={() => handleInputChange()}
-                  type="text"
-                  pattern="^[0-9]*[.,]?[0-9]*$"
-                  inputMode="decimal"
-                  autoComplete="off"
-                  className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10"
-                />
+              <input
+                list="amount"
+                ref={input}
+                name="amount"
+                placeholder="0"
+                value={inputValue}
+                onChange={() => handleInputChange()}
+                type="text"
+                pattern="^[0-9]*[.,]?[0-9]*$"
+                inputMode="decimal"
+                autoComplete="off"
+                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10"
+              />
 
               {!!$connected && !!balance && (
                 <button
@@ -439,7 +386,7 @@ const STBL = (): JSX.Element => {
               )}
             </label>
             <div
-              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
+              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
                 !!balance ? "" : "opacity-0"
               }`}
             >
@@ -448,21 +395,21 @@ const STBL = (): JSX.Element => {
             </div>
           </div>
 
-            <div>
-              {$connected ? (
-                <>
-                  {button === "buy" ? (
-                    <button
-                      disabled={transactionInProgress}
-                      className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                        transactionInProgress
-                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                          : ""
-                      }`}
-                      type="button"
-                      onClick={buy}
-                    >
-                      <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
+          <div>
+            {$connected ? (
+              <>
+                {button === "buy" ? (
+                  <button
+                    disabled={transactionInProgress}
+                    className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                      transactionInProgress
+                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                        : ""
+                    }`}
+                    type="button"
+                    onClick={buy}
+                  >
+                    <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
 
                     {transactionInProgress && <Loader color={"#a6a0b2"} />}
                   </button>
@@ -492,7 +439,7 @@ const STBL = (): JSX.Element => {
                     disabled
                     className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                   >
-                    {loader ? "Loading..." : "Enter Amount"}
+                    Enter Amount
                   </button>
                 )}
               </>
@@ -511,4 +458,4 @@ const STBL = (): JSX.Element => {
     </div>
   );
 };
-export {STBL};
+export { STBL };
