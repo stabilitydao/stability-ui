@@ -12,7 +12,7 @@ import { connected, account } from "@store";
 
 import { Loader } from "@ui";
 
-import { getDate } from "@utils";
+import { getDate, formatNumber } from "@utils";
 
 import { Timer } from "./components";
 
@@ -299,55 +299,115 @@ const STBL = (): JSX.Element => {
   return (
     <div className="w-full xl:min-w-[1200px] max-w-[1400px] font-manrope">
       <div className="STBL">
-        <div className="flex justify-between items-center h-[300px] py-10 pl-[50px] pr-[80px]">
+        <div className="flex justify-between items-center h-[400px] py-10 pl-[50px] pr-[80px]">
           <div className="flex flex-col items-start justify-between h-full">
             <div>
               <span className="text-[55px] leading-10">PUBLIC SALE</span>
               <p className="text-[20px] text-[#949494]">
-                Stability protocol official token
+                Stability Platform Native Token
               </p>
             </div>
-            <div className="flex items-end justify-center gap-[50px]">
-              <div className="flex flex-col items-start">
-                <span className="text-[15px] font-light">Price</span>
-                <div className="flex items-center justify-center gap-2">
-                  <img src="/sonic.png" alt="Sonic" />
-                  <span className="text-[28px] font-bold">0,070</span>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-end  gap-[50px]">
+                <div className="flex flex-col items-start  w-[120px]">
+                  <span className="text-[15px] font-light">Sale price</span>
+                  <div className="flex items-center justify-start gap-2">
+                    <img
+                      className="w-[24px] h-[24px] rounded-full"
+                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                      alt="USDC.e"
+                    />
+                    <span className="text-[28px] font-bold">
+                      {saleData.price}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[15px] font-light">Sold</span>
+                  <p className="text-[28px] font-bold">
+                    {formatNumber(+saleData.sold, "format")} / 4 000 000{" "}
+                    <span className="text-[#A995FF]">STBL</span>
+                  </p>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[15px] font-light">Total Raised</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <img
+                      className="w-[24px] h-[24px] rounded-full"
+                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                      alt="USDC.e"
+                    />
+                    <p className="text-[28px] font-bold">{saleData.raised}</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col items-start">
-                <span className="text-[15px] font-light">Total Supply</span>
-                <p className="text-[28px] font-bold">
-                  1,000,000,000 <span className="text-[#A995FF]">STBL</span>
-                </p>
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="text-[15px] font-light">Total Raised</span>
-                <div className="flex items-center justify-center gap-2">
-                  <img src="/sonic.png" alt="Sonic" />
-                  <p className="text-[28px] font-bold">1,000,000</p>
+
+              <div className="flex items-end gap-[50px]">
+                <div className="flex flex-col items-start w-[120px]">
+                  <span className="text-[15px] font-light">TGE price</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <img
+                      className="w-[24px] h-[24px] rounded-full"
+                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                      alt="USDC.e"
+                    />
+                    <span className="text-[28px] font-bold">0.18</span>
+                  </div>
                 </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-[15px] font-light">Total Supply</span>
+                  <p className="text-[28px] font-bold">
+                    100 000 000 <span className="text-[#A995FF]">STBL</span>
+                  </p>
+                </div>
+                {/*<div className="flex flex-col items-start">
+                  <span className="text-[15px] font-light">Total Raised</span>
+                  <div className="flex items-center justify-center gap-2">
+                    <img src="/sonic.png" alt="Sonic"/>
+                    <p className="text-[28px] font-bold">1,000,000</p>
+                  </div>
+                </div>*/}
               </div>
             </div>
           </div>
-          <img src="/STBL.png" alt="STBL" />
+          <img
+            className="rounded-full w-[200px] h-[200px]"
+            src="/STBL_plain.png"
+            alt="STBL"
+          />
         </div>
       </div>
 
-      <div>
-        <p>Price: {saleData.price}</p>
-        <p>TGE: {getDate(saleData.tge)}</p>
-        <p>Start: {getDate(saleData.start)}</p>
-        <p>End: {getDate(saleData.end)}</p>
-        <p>Sold: {saleData.sold}</p>
-        <p>Allocation: {saleData.allocation}</p>
-        <p>Bought: {saleData.bought}</p>
-        <p>Raised: {saleData.raised}</p>
-        <p>Max raise: {saleData.maxRaise}</p>
+      <br />
 
-        <Timer start={saleData.start} end={saleData.end} />
+      <div className="flex w-full justify-between">
+        <div className="flex bg-accent-900 flex-col p-[20px]">
+          <div className="flex">
+            <span className="w-[200px]">Sale start</span>
+            <span>{new Date(saleData.start * 1000).toLocaleString()}</span>
+          </div>
+          <div className="flex">
+            <span className="w-[200px]">Sale end</span>
+            <span>{new Date(saleData.end * 1000).toLocaleString()}</span>
+          </div>
+          <div className="flex">
+            <span className="w-[200px]">TGE</span>
+            <span>{new Date(saleData.tge * 1000).toLocaleDateString()}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center">
+          <Timer start={saleData.start} end={saleData.end} />
+        </div>
+
+        <div className="flex bg-accent-900 items-center p-[20px]">
+          <div className="flex">
+            <span className="w-[200px]">You Bought</span>
+            <span>{formatNumber(saleData.bought, "format")}</span>
+          </div>
+        </div>
       </div>
-
+      <br />
       <div className="bg-accent-950 w-[400px] h-[300px] rounded-2xl">
         <div className="px-5 py-3 flex flex-col justify-between h-full">
           <div>
