@@ -395,7 +395,7 @@ const STBL = (): JSX.Element => {
       </div>
 
       <div className="flex items-center justify-between gap-5 w-full flex-col md:flex-row md:h-[250px]">
-        <div className="flex bg-accent-950 flex-col rounded-2xl p-5 w-full md:w-1/2 h-[300px] md:h-full">
+        <div className="flex bg-accent-950 flex-col rounded-2xl p-5 w-full md:w-1/2 h-[220px] sm:h-[250px] md:h-full">
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">Sale start</span>
             <p className="text-[20] sm:text-[28px] font-bold">
