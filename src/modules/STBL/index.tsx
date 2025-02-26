@@ -5,6 +5,7 @@ import { formatUnits, parseUnits } from "viem";
 import { useStore } from "@nanostores/react";
 
 import { writeContract } from "@wagmi/core";
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { connected, account } from "@store";
@@ -14,6 +15,8 @@ import { Loader } from "@ui";
 import { getDate } from "@utils";
 
 import { Timer } from "./components";
+
+import { getTransactionReceipt } from "./functions";
 
 import {
   sonicClient,
@@ -33,7 +36,16 @@ const STBL = (): JSX.Element => {
 
   const USDC = "0x29219dd400f2bf60e5a23d13be72b486d4038894";
 
-  const [balance, setBalance] = useState(1);
+  const input = useRef<HTMLInputElement>(null);
+
+  const [balance, setBalance] = useState(0);
+  const [allowance, setAllowance] = useState(0);
+
+  const [inputValue, setInputValue] = useState("");
+  const [button, setButton] = useState("");
+
+  const [transactionInProgress, setTransactionInProgress] = useState(false);
+  const [needConfirm, setNeedConfirm] = useState(false);
 
   const [saleData, setSaleData] = useState({
     price: "-",
@@ -47,13 +59,123 @@ const STBL = (): JSX.Element => {
     maxRaise: "-",
   });
 
-  const [inputValue, setInputValue] = useState("");
-  const [transactionInProgress, setTransactionInProgress] = useState(false);
-  const [needConfirm, setNeedConfirm] = useState(false);
-  const [button, setButton] = useState("");
-  const [loader, setLoader] = useState<boolean>(false);
+  const resetFormAfterTx = () => {
+    setButton("none");
+    input.current.value = "";
+    setInputValue("");
+    getData();
+    getBalance();
+    getAllowance();
+  };
 
-  const input = useRef<HTMLInputElement>(null);
+  const handleInputChange = (type = "") => {
+    let numericValue = input.current.value.replace(/[^0-9.]/g, "");
+
+    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+
+    if (numericValue.startsWith(".")) {
+      numericValue = "0" + numericValue;
+    }
+
+    if (type === "max") {
+      numericValue = balance.toString();
+    }
+
+    buyPreview(numericValue);
+
+    setInputValue(numericValue);
+    input.current.value = numericValue;
+  };
+
+  const approve = async () => {
+    setTransactionInProgress(true);
+
+    const value = Number(input.current.value);
+
+    if (!!value) {
+      try {
+        let parsedValue = parseUnits(String(value), 6);
+
+        setNeedConfirm(true);
+        const _approve = await writeContract(wagmiConfig, {
+          address: USDC,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [SALE_CONTRACT, parsedValue],
+        });
+        setNeedConfirm(false);
+
+        const transaction = await getTransactionReceipt(_approve);
+
+        if (transaction?.status === "success") {
+          const _allowance = await getAllowance();
+
+          if (Number(_allowance) >= value) {
+            setButton("buy");
+          } else {
+            setButton("needApprove");
+          }
+        }
+      } catch (error) {
+        setNeedConfirm(false);
+        console.error("Approve error:", error);
+      }
+    }
+    setTransactionInProgress(false);
+  };
+
+  const buy = async () => {
+    setTransactionInProgress(true);
+
+    const value = Number(input.current.value);
+
+    if (!!value) {
+      try {
+        let parsedValue = parseUnits(String(value), 6);
+
+        setNeedConfirm(true);
+        let buy = await writeContract(wagmiConfig, {
+          address: SALE_CONTRACT,
+          abi: SaleABI,
+          functionName: "buy",
+          args: [parsedValue],
+        });
+        setNeedConfirm(false);
+        setTransactionInProgress(true);
+
+        const transaction = await getTransactionReceipt(buy);
+
+        if (transaction.status === "success") {
+          resetFormAfterTx();
+        }
+
+        setTransactionInProgress(false);
+      } catch (error) {
+        setNeedConfirm(false);
+        console.error("Buy errror:", error);
+      }
+    }
+
+    setTransactionInProgress(false);
+  };
+
+  const buyPreview = (value: string) => {
+    if (!Number(value)) {
+      setButton("none");
+      return;
+    }
+
+    if (Number(value) > Number(balance)) {
+      setButton("insufficientBalance");
+    } else if (Number(value) > Number(allowance)) {
+      setButton("needApprove");
+    } else if (
+      Number(value) <= Number(allowance) &&
+      Number(value) <= Number(balance)
+    ) {
+      setButton("buy");
+    }
+  };
 
   const getAllowance = async () => {
     const newAllowance = await sonicClient.readContract({
@@ -63,51 +185,30 @@ const STBL = (): JSX.Element => {
       args: [$account as TAddress, SALE_CONTRACT],
     });
 
-    console.log(newAllowance);
-  };
+    const _allowance = formatUnits(newAllowance, 6);
 
-  const approve = async () => {
-    try {
-      let sum = parseUnits(100, 6);
-      setNeedConfirm(true);
-      const assetApprove = await writeContract(wagmiConfig, {
-        address: USDC,
-        abi: ERC20ABI,
-        functionName: "approve",
-        args: [SALE_CONTRACT, sum],
-      });
-      setNeedConfirm(false);
-    } catch (error) {
-      console.error("Approve error:", error);
-    }
-  };
+    setAllowance(Number(_allowance));
 
-  const buy = async () => {};
+    return Number(_allowance);
+  };
 
   const getBalance = async () => {
     try {
-      const USDCBalance = await sonicClient.readContract({
+      const usdcBalance = await sonicClient.readContract({
         address: USDC,
         abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
-      console.log(USDCBalance);
+
+      let parsedBalance = formatUnits(usdcBalance, 6);
+
+      if (parsedBalance) {
+        setBalance(Number(parsedBalance));
+      }
     } catch (error) {
       console.error("Get balance error:", error);
     }
-  };
-
-  const handleInputChange = (type = "") => {
-    let numericValue = input.current.value.replace(/\D/g, "");
-
-    if (type === "max") {
-      numericValue = balance;
-    }
-
-    setInputValue(numericValue);
-
-    input.current.value = numericValue;
   };
 
   const getData = async () => {
@@ -188,6 +289,7 @@ const STBL = (): JSX.Element => {
   useEffect(() => {
     if ($account) {
       getBalance();
+      getAllowance();
     }
   }, [$account]);
 
@@ -284,7 +386,7 @@ const STBL = (): JSX.Element => {
               )}
             </label>
             <div
-              className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
+              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
                 !!balance ? "" : "opacity-0"
               }`}
             >
@@ -337,7 +439,7 @@ const STBL = (): JSX.Element => {
                     disabled
                     className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
                   >
-                    {loader ? "Loading..." : "Enter Amount"}
+                    Enter Amount
                   </button>
                 )}
               </>
