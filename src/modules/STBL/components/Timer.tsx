@@ -45,8 +45,8 @@ const Timer: React.FC<IProps> = ({ start, end }) => {
   }
 
   return (
-    <div className="font-manrope text-[24px] font-bold text-center">
-      <h3>{status === "beforeStart" ? "Starts" : "Ends"} in:</h3>
+    <div className="font-manrope text-[18px] sm:text-[20px] text-center uppercase flex items-center gap-2">
+      <h3>{status === "beforeStart" ? "Starts" : "Ends"} in</h3>
       <h5>{formatTime(timeLeft)}</h5>
     </div>
   );
