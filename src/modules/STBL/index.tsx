@@ -78,7 +78,7 @@ const STBL = (): JSX.Element => {
     }
 
     if (type === "max") {
-      numericValue = balance.toString();
+      numericValue = String(balance / Number(saleData.price));
     }
 
     buyPreview(numericValue);
@@ -90,11 +90,11 @@ const STBL = (): JSX.Element => {
   const approve = async () => {
     setTransactionInProgress(true);
 
-    const value = Number(input.current.value);
+    const usdcValue = Number(input.current.value) * Number(saleData.price);
 
-    if (!!value) {
+    if (!!usdcValue) {
       try {
-        let parsedValue = parseUnits(String(value), 6);
+        let parsedValue = parseUnits(String(usdcValue), 6);
 
         setNeedConfirm(true);
         const _approve = await writeContract(wagmiConfig, {
@@ -110,7 +110,7 @@ const STBL = (): JSX.Element => {
         if (transaction?.status === "success") {
           const _allowance = await getAllowance();
 
-          if (Number(_allowance) >= value) {
+          if (Number(_allowance) >= usdcValue) {
             setButton("buy");
           } else {
             setButton("needApprove");
@@ -131,7 +131,7 @@ const STBL = (): JSX.Element => {
 
     if (!!value) {
       try {
-        let parsedValue = parseUnits(String(value), 6);
+        let parsedValue = parseUnits(String(value), 18);
 
         setNeedConfirm(true);
         let buy = await writeContract(wagmiConfig, {
@@ -165,13 +165,15 @@ const STBL = (): JSX.Element => {
       return;
     }
 
-    if (Number(value) > Number(balance)) {
+    const usdcValue = Number(value) * Number(saleData.price);
+
+    if (Number(usdcValue) > Number(balance)) {
       setButton("insufficientBalance");
-    } else if (Number(value) > Number(allowance)) {
+    } else if (Number(usdcValue) > Number(allowance)) {
       setButton("needApprove");
     } else if (
-      Number(value) <= Number(allowance) &&
-      Number(value) <= Number(balance)
+      Number(usdcValue) <= Number(allowance) &&
+      Number(usdcValue) <= Number(balance)
     ) {
       setButton("buy");
     }
@@ -450,8 +452,16 @@ const STBL = (): JSX.Element => {
                 !!balance ? "" : "opacity-0"
               }`}
             >
-              <span>Balance: </span>
+              <span>USDC Balance: </span>
               <span>{!!balance ? balance : "0"}</span>
+            </div>
+            <div
+              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
+                !!balance ? "" : "opacity-0"
+              }`}
+            >
+              <span>Amount in USDC: </span>
+              <span>{Number(inputValue) * Number(saleData.price)}</span>
             </div>
           </div>
 
