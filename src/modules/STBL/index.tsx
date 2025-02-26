@@ -12,7 +12,7 @@ import { connected, account } from "@store";
 
 import { Loader } from "@ui";
 
-import { getDate, formatNumber } from "@utils";
+import { formatNumber } from "@utils";
 
 import { Timer } from "./components";
 
@@ -46,6 +46,8 @@ const STBL = (): JSX.Element => {
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
+
+  const [isStarted, setIsStarted] = useState(true);
 
   const [saleData, setSaleData] = useState({
     price: "-",
@@ -283,6 +285,12 @@ const STBL = (): JSX.Element => {
         raised,
         maxRaise,
       });
+
+      const now = Math.floor(Date.now() / 1000);
+
+      const _isStarted = Number(start) < now;
+
+      setIsStarted(_isStarted);
     } catch (error) {
       console.error("Get data error:", error);
     }
@@ -327,7 +335,7 @@ const STBL = (): JSX.Element => {
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Sold</span>
                   <p className="text-[28px] font-bold">
-                    {formatNumber(+saleData.sold, "format")} / 4 000 000{" "}
+                    {formatNumber(+saleData.sold, "format")} / 4M{" "}
                     <span className="text-[#A995FF]">STBL</span>
                   </p>
                 </div>
@@ -359,7 +367,7 @@ const STBL = (): JSX.Element => {
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Supply</span>
                   <p className="text-[28px] font-bold">
-                    100 000 000 <span className="text-[#A995FF]">STBL</span>
+                    100M <span className="text-[#A995FF]">STBL</span>
                   </p>
                 </div>
                 {/*<div className="flex flex-col items-start">
@@ -410,7 +418,7 @@ const STBL = (): JSX.Element => {
         </div>
       </div>
       <br />
-      <div className="bg-accent-950 w-[400px] h-[300px] rounded-2xl">
+      <div className="bg-accent-950 w-[400px] h-[200px] rounded-2xl">
         <div className="px-5 py-3 flex flex-col justify-between h-full">
           <div>
             <label className="relative block h-[40px] w-full md:w-[345px]">
@@ -447,21 +455,27 @@ const STBL = (): JSX.Element => {
                 </button>
               )}
             </label>
-            <div
-              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
-                !!balance ? "" : "opacity-0"
-              }`}
-            >
-              <span>USDC Balance: </span>
-              <span>{!!balance ? balance : "0"}</span>
-            </div>
-            <div
-              className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
-                !!balance ? "" : "opacity-0"
-              }`}
-            >
-              <span>Amount in USDC: </span>
-              <span>{Number(inputValue) * Number(saleData.price)}</span>
+            <div className="flex flex-col items-start gap-2 mt-2">
+              <div
+                className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 marker:${
+                  !!balance ? "" : "opacity-0"
+                }`}
+              >
+                <span>USDC Balance: </span>
+                <span>{!!balance ? balance : "0"}</span>
+              </div>
+              <div
+                className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 ${
+                  !!balance ? "" : "opacity-0"
+                }`}
+              >
+                <span>Amount in USDC: </span>
+                <span>
+                  {!!inputValue && !!saleData.price
+                    ? Number(inputValue) * Number(saleData.price)
+                    : ""}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -472,14 +486,18 @@ const STBL = (): JSX.Element => {
                   <button
                     disabled={transactionInProgress}
                     className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                      transactionInProgress
+                      transactionInProgress || !isStarted
                         ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
                         : ""
                     }`}
                     type="button"
                     onClick={buy}
                   >
-                    <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
+                    {isStarted ? (
+                      <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
+                    ) : (
+                      <p>Wait for the sale to start</p>
+                    )}
 
                     {transactionInProgress && <Loader color={"#a6a0b2"} />}
                   </button>
