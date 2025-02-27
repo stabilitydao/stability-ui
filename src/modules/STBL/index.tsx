@@ -10,7 +10,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { connected, account } from "@store";
 
-import { Loader } from "@ui";
+import { Loader, Skeleton } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -329,52 +329,69 @@ const STBL = (): JSX.Element => {
               <div className="flex items-end md:flex-nowrap flex-wrap gap-5 md:gap-[50px]">
                 <div className="flex flex-col items-start md:w-[120px]">
                   <span className="text-[15px] font-light">Sale price</span>
-                  <div className="flex items-center justify-start gap-2">
-                    <img
-                      className="w-[24px] h-[24px] rounded-full"
-                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                      alt="USDC.e"
-                    />
-                    <span className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      {saleData.price}
-                    </span>
-                  </div>
+                  {saleData.price !== "-" ? (
+                    <div className="flex items-center justify-start gap-2">
+                      <img
+                        className="w-[24px] h-[24px] rounded-full"
+                        src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                        alt="USDC.e"
+                      />
+                      <span className="text-[20px] min-[850px]:text-[28px] font-bold">
+                        {saleData.price}
+                      </span>
+                    </div>
+                  ) : (
+                    <Skeleton width={100} height={45} />
+                  )}
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Sold</span>
-                  <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                    {formatNumber(+saleData.sold, "format")} / 4M{" "}
-                    <span className="text-[#A995FF]">STBL</span>
-                  </p>
+                  {saleData.sold !== "-" ? (
+                    <p className="text-[20px] min-[850px]:text-[28px] font-bold">
+                      {formatNumber(+saleData.sold, "format")} / 4M{" "}
+                      <span className="text-[#A995FF]">STBL</span>
+                    </p>
+                  ) : (
+                    <Skeleton width={157} height={45} />
+                  )}
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Raised</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img
-                      className="w-[24px] h-[24px] rounded-full"
-                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                      alt="USDC.e"
-                    />
-                    <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      {saleData.raised}
-                    </p>
-                  </div>
+
+                  {saleData.raised !== "-" ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <img
+                        className="w-[24px] h-[24px] rounded-full"
+                        src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                        alt="USDC.e"
+                      />
+                      <p className="text-[20px] min-[850px]:text-[28px] font-bold">
+                        {formatNumber(saleData.raised, "format")}
+                      </p>
+                    </div>
+                  ) : (
+                    <Skeleton height={48} />
+                  )}
                 </div>
               </div>
 
               <div className="flex items-end md:flex-nowrap flex-wrap gap-5 md:gap-[50px]">
                 <div className="flex flex-col items-start md:w-[120px]">
                   <span className="text-[15px] font-light">TGE price</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img
-                      className="w-[24px] h-[24px] rounded-full"
-                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                      alt="USDC.e"
-                    />
-                    <span className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      0.18
-                    </span>
-                  </div>
+                  {!!saleData.tge ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <img
+                        className="w-[24px] h-[24px] rounded-full"
+                        src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                        alt="USDC.e"
+                      />
+                      <span className="text-[20px] min-[850px]:text-[28px] font-bold">
+                        0.18
+                      </span>
+                    </div>
+                  ) : (
+                    <Skeleton width={85} height={45} />
+                  )}
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Supply</span>
@@ -498,7 +515,7 @@ const STBL = (): JSX.Element => {
                 <>
                   {button === "buy" ? (
                     <button
-                      disabled={transactionInProgress}
+                      disabled={transactionInProgress || !isStarted}
                       className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
                         transactionInProgress || !isStarted
                           ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
