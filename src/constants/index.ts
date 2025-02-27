@@ -114,6 +114,12 @@ const DEXes = {
   },
 };
 
+const SILO_POINTS = {
+  "0x709833e5b4b98aab812d175510f94bc91cfabd89": 25,
+  "0x2fbeba931563feaab73e8c66d7499c49c8ada224": 42.4,
+  "0xa51e7204054464e656b3658e7dbb63d9b0f150f1": 1,
+};
+
 const CHAINS = [
   {
     name: chains["137"].name,
@@ -237,4 +243,5 @@ export {
   CHAINS_CONFIRMATIONS,
   SONIC_TABLE,
   DEFAULT_TABLE_PARAMS,
+  SILO_POINTS,
 };

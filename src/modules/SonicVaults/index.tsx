@@ -57,6 +57,7 @@ import {
   STABLECOINS,
   CHAINS,
   DEFAULT_TABLE_PARAMS,
+  SILO_POINTS,
   // CHAINS,
   // WBTC,
   // WETH,
@@ -977,8 +978,26 @@ const SonicVaults = (): JSX.Element => {
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
-                            x{vault.sonicActivePoints}
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]">
+                              <img
+                                src="/sonic.png"
+                                alt="sonic"
+                                className="w-5 h-5 rounded-full"
+                              />
+                              <span> x{vault.sonicActivePoints}</span>
+                            </div>
+
+                            {SILO_POINTS[vault.address] && (
+                              <div className="flex items-center rounded-full border border-[#fff699] bg-[#fff699]/[0.16] pr-[6px]">
+                                <img
+                                  src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                                  alt="silo"
+                                  className="w-5 h-5 rounded-full"
+                                />
+                                <span>{SILO_POINTS[vault.address]}</span>
+                              </div>
+                            )}
                           </div>
                         </td>
                         {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
