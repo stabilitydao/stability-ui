@@ -57,6 +57,7 @@ import {
   STABLECOINS,
   CHAINS,
   DEFAULT_TABLE_PARAMS,
+  SILO_POINTS,
   // CHAINS,
   // WBTC,
   // WETH,
@@ -719,8 +720,8 @@ const SonicVaults = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="overflow-x-auto min-[870px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
+      <div className="overflow-x-auto lg:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <table className="table table-auto w-full select-none mb-9 min-w-[1024px] lg:min-w-full">
           <thead className="bg-accent-950">
             <tr className="text-[12px] uppercase">
               {tableStates.map((value: TTableColumn, index: number) => (
@@ -977,8 +978,36 @@ const SonicVaults = (): JSX.Element => {
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
-                            x{vault.sonicActivePoints}
+                          <div className="flex items-center justify-center gap-2">
+                            <div
+                              title="Sonic Activity Points"
+                              className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]"
+                            >
+                              <img
+                                src="/sonic.png"
+                                alt="sonic"
+                                className="w-5 h-5 rounded-full"
+                              />
+                              <span className="text-[10px] ml-[3px] mr-[2px]">
+                                x{vault.sonicActivePoints}
+                              </span>
+                            </div>
+
+                            {SILO_POINTS[vault.address] && (
+                              <div
+                                title="Silo Points per $ / day"
+                                className="flex items-center rounded-full border border-[#fff699] bg-[#fff699]/[0.16] pr-[6px]"
+                              >
+                                <img
+                                  src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                                  alt="silo"
+                                  className="w-5 h-5 rounded-full"
+                                />
+                                <span className="text-[10px] ml-[3px] mr-[2px]">
+                                  {SILO_POINTS[vault.address]}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </td>
                         {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
