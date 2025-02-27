@@ -398,21 +398,21 @@ const STBL = (): JSX.Element => {
         <div className="flex bg-accent-950 flex-col rounded-2xl p-5 w-full md:w-1/2 h-[220px] sm:h-[250px] md:h-full">
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">Sale start</span>
-            <p className="text-[20] sm:text-[28px] font-bold">
+            <p className="text-[20] sm:text-[24px]">
               {new Date(saleData.start * 1000).toLocaleString()}
             </p>
           </div>
 
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">Sale end</span>
-            <p className="text-[20] sm:text-[28px] font-bold">
+            <p className="text-[20] sm:text-[24px]">
               {new Date(saleData.end * 1000).toLocaleString()}
             </p>
           </div>
 
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">TGE</span>
-            <p className="text-[20] sm:text-[28px] font-bold">
+            <p className="text-[20] sm:text-[24px]">
               {new Date(saleData.tge * 1000).toLocaleDateString()}
             </p>
           </div>
