@@ -357,7 +357,6 @@ const STBL = (): JSX.Element => {
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Raised</span>
-
                   {saleData.raised !== "-" ? (
                     <div className="flex items-center justify-center gap-2">
                       <img
@@ -370,7 +369,7 @@ const STBL = (): JSX.Element => {
                       </p>
                     </div>
                   ) : (
-                    <Skeleton height={48} />
+                    <Skeleton height={48} width={150} />
                   )}
                 </div>
               </div>
@@ -404,7 +403,7 @@ const STBL = (): JSX.Element => {
           </div>
 
           <img
-            className="rounded-full w-[200px] h-[200px] hidden md:block"
+            className="rounded-full hidden md:block w-[140px] h-[140px] min-[850px]:w-[200px] min-[850px]:h-[200px]"
             src="/STBL_plain.png"
             alt="STBL"
           />
@@ -415,23 +414,35 @@ const STBL = (): JSX.Element => {
         <div className="flex bg-accent-950 flex-col rounded-2xl p-5 w-full md:w-1/2 h-[220px] sm:h-[250px] md:h-full">
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">Sale start</span>
-            <p className="text-[20] sm:text-[24px]">
-              {new Date(saleData.start * 1000).toLocaleString()}
-            </p>
+            {!!saleData.start ? (
+              <p className="text-[20] sm:text-[24px]">
+                {new Date(saleData.start * 1000).toLocaleString()}
+              </p>
+            ) : (
+              <Skeleton height={40} />
+            )}
           </div>
 
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">Sale end</span>
-            <p className="text-[20] sm:text-[24px]">
-              {new Date(saleData.end * 1000).toLocaleString()}
-            </p>
+            {!!saleData.end ? (
+              <p className="text-[20] sm:text-[24px]">
+                {new Date(saleData.end * 1000).toLocaleString()}
+              </p>
+            ) : (
+              <Skeleton height={40} />
+            )}
           </div>
 
           <div className="flex flex-col items-start">
             <span className="text-[15px] font-light">TGE</span>
-            <p className="text-[20] sm:text-[24px]">
-              {new Date(saleData.tge * 1000).toLocaleDateString()}
-            </p>
+            {!!saleData.tge ? (
+              <p className="text-[20] sm:text-[24px]">
+                {new Date(saleData.tge * 1000).toLocaleDateString()}
+              </p>
+            ) : (
+              <Skeleton height={40} />
+            )}
           </div>
         </div>
 
