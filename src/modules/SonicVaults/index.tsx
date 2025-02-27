@@ -720,8 +720,8 @@ const SonicVaults = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="overflow-x-auto min-[870px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
+      <div className="overflow-x-auto lg:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
+        <table className="table table-auto w-full select-none mb-9 min-w-[1024px] lg:min-w-full">
           <thead className="bg-accent-950">
             <tr className="text-[12px] uppercase">
               {tableStates.map((value: TTableColumn, index: number) => (
@@ -988,7 +988,9 @@ const SonicVaults = (): JSX.Element => {
                                 alt="sonic"
                                 className="w-5 h-5 rounded-full"
                               />
-                              <span className="text-[10px] ml-[3px] mr-[2px]">x{vault.sonicActivePoints}</span>
+                              <span className="text-[10px] ml-[3px] mr-[2px]">
+                                x{vault.sonicActivePoints}
+                              </span>
                             </div>
 
                             {SILO_POINTS[vault.address] && (
@@ -1001,7 +1003,9 @@ const SonicVaults = (): JSX.Element => {
                                   alt="silo"
                                   className="w-5 h-5 rounded-full"
                                 />
-                                <span className="text-[10px] ml-[3px] mr-[2px]">{SILO_POINTS[vault.address]}</span>
+                                <span className="text-[10px] ml-[3px] mr-[2px]">
+                                  {SILO_POINTS[vault.address]}
+                                </span>
                               </div>
                             )}
                           </div>
