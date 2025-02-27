@@ -307,19 +307,27 @@ const STBL = (): JSX.Element => {
     getData();
   }, []);
   return (
-    <div className="w-full xl:min-w-[1200px] max-w-[1400px] font-manrope">
-      <div className="STBL">
-        <div className="flex justify-between items-center h-[400px] py-10 pl-[50px] pr-[80px]">
-          <div className="flex flex-col items-start justify-between h-full">
+    <div className="min-w-full lg:min-w-[1000px] xl:min-w-[1200px] max-w-[1400px] font-manrope">
+      <div className="STBL mb-5">
+        <div className="flex justify-between items-center gap-1 xl:gap-0 h-full md:h-[400px] py-10 px-[50px] xl:pl-[50px] xl:pr-[80px]">
+          <div className="flex flex-col items-start justify-between h-full gap-5 md:gap-0">
             <div>
-              <span className="text-[55px] leading-10">PUBLIC SALE</span>
-              <p className="text-[20px] text-[#949494]">
+              <span className="text-[40px] sm:text-[55px] leading-10">
+                PUBLIC SALE
+              </span>
+              <p className="text-[18px] sm:text-[20px] text-[#949494]">
                 Stability Platform Native Token
               </p>
+              <Timer start={saleData.start} end={saleData.end} />
             </div>
+            <img
+              className="rounded-full w-[100px] h-[100px] md:hidden block self-center"
+              src="/STBL_plain.png"
+              alt="STBL"
+            />
             <div className="flex flex-col gap-3">
-              <div className="flex items-end  gap-[50px]">
-                <div className="flex flex-col items-start  w-[120px]">
+              <div className="flex items-end md:flex-nowrap flex-wrap gap-5 md:gap-[50px]">
+                <div className="flex flex-col items-start md:w-[120px]">
                   <span className="text-[15px] font-light">Sale price</span>
                   <div className="flex items-center justify-start gap-2">
                     <img
@@ -327,14 +335,14 @@ const STBL = (): JSX.Element => {
                       src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
                       alt="USDC.e"
                     />
-                    <span className="text-[28px] font-bold">
+                    <span className="text-[20px] min-[850px]:text-[28px] font-bold">
                       {saleData.price}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Sold</span>
-                  <p className="text-[28px] font-bold">
+                  <p className="text-[20px] min-[850px]:text-[28px] font-bold">
                     {formatNumber(+saleData.sold, "format")} / 4M{" "}
                     <span className="text-[#A995FF]">STBL</span>
                   </p>
@@ -347,13 +355,15 @@ const STBL = (): JSX.Element => {
                       src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
                       alt="USDC.e"
                     />
-                    <p className="text-[28px] font-bold">{saleData.raised}</p>
+                    <p className="text-[20px] min-[850px]:text-[28px] font-bold">
+                      {saleData.raised}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-end gap-[50px]">
-                <div className="flex flex-col items-start w-[120px]">
+              <div className="flex items-end md:flex-nowrap flex-wrap gap-5 md:gap-[50px]">
+                <div className="flex flex-col items-start md:w-[120px]">
                   <span className="text-[15px] font-light">TGE price</span>
                   <div className="flex items-center justify-center gap-2">
                     <img
@@ -361,185 +371,190 @@ const STBL = (): JSX.Element => {
                       src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
                       alt="USDC.e"
                     />
-                    <span className="text-[28px] font-bold">0.18</span>
+                    <span className="text-[20px] min-[850px]:text-[28px] font-bold">
+                      0.18
+                    </span>
                   </div>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Supply</span>
-                  <p className="text-[28px] font-bold">
+                  <p className="text-[20px] min-[850px]:text-[28px] font-bold">
                     100M <span className="text-[#A995FF]">STBL</span>
                   </p>
                 </div>
-                {/*<div className="flex flex-col items-start">
-                  <span className="text-[15px] font-light">Total Raised</span>
-                  <div className="flex items-center justify-center gap-2">
-                    <img src="/sonic.png" alt="Sonic"/>
-                    <p className="text-[28px] font-bold">1,000,000</p>
-                  </div>
-                </div>*/}
               </div>
             </div>
           </div>
+
           <img
-            className="rounded-full w-[200px] h-[200px]"
+            className="rounded-full w-[200px] h-[200px] hidden md:block"
             src="/STBL_plain.png"
             alt="STBL"
           />
         </div>
       </div>
 
-      <br />
-
-      <div className="flex w-full justify-between">
-        <div className="flex bg-accent-900 flex-col p-[20px]">
-          <div className="flex">
-            <span className="w-[200px]">Sale start</span>
-            <span>{new Date(saleData.start * 1000).toLocaleString()}</span>
+      <div className="flex items-center justify-between gap-5 w-full flex-col md:flex-row md:h-[250px]">
+        <div className="flex bg-accent-950 flex-col rounded-2xl p-5 w-full md:w-1/2 h-[220px] sm:h-[250px] md:h-full">
+          <div className="flex flex-col items-start">
+            <span className="text-[15px] font-light">Sale start</span>
+            <p className="text-[20] sm:text-[28px] font-bold">
+              {new Date(saleData.start * 1000).toLocaleString()}
+            </p>
           </div>
-          <div className="flex">
-            <span className="w-[200px]">Sale end</span>
-            <span>{new Date(saleData.end * 1000).toLocaleString()}</span>
-          </div>
-          <div className="flex">
-            <span className="w-[200px]">TGE</span>
-            <span>{new Date(saleData.tge * 1000).toLocaleDateString()}</span>
-          </div>
-        </div>
 
-        <div className="flex items-center">
-          <Timer start={saleData.start} end={saleData.end} />
-        </div>
+          <div className="flex flex-col items-start">
+            <span className="text-[15px] font-light">Sale end</span>
+            <p className="text-[20] sm:text-[28px] font-bold">
+              {new Date(saleData.end * 1000).toLocaleString()}
+            </p>
+          </div>
 
-        <div className="flex bg-accent-900 items-center p-[20px]">
-          <div className="flex">
-            <span className="w-[200px]">You Bought</span>
-            <span>{formatNumber(saleData.bought, "format")}</span>
+          <div className="flex flex-col items-start">
+            <span className="text-[15px] font-light">TGE</span>
+            <p className="text-[20] sm:text-[28px] font-bold">
+              {new Date(saleData.tge * 1000).toLocaleDateString()}
+            </p>
           </div>
         </div>
-      </div>
-      <br />
-      <div className="bg-accent-950 w-[400px] h-[200px] rounded-2xl">
-        <div className="px-5 py-3 flex flex-col justify-between h-full">
-          <div>
-            <label className="relative block h-[40px] w-full md:w-[345px]">
-              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <img
-                  src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                  alt="USDC"
-                  title="USDC"
-                  className="w-4 h-4 text-neutral-500 rounded-full"
-                />
-              </span>
 
-              <input
-                list="amount"
-                ref={input}
-                name="amount"
-                placeholder="0"
-                value={inputValue}
-                onChange={() => handleInputChange()}
-                type="text"
-                pattern="^[0-9]*[.,]?[0-9]*$"
-                inputMode="decimal"
-                autoComplete="off"
-                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10"
-              />
-
-              {!!$connected && !!balance && (
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("max")}
-                  className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
-                >
-                  Max
-                </button>
-              )}
-            </label>
-            <div className="flex flex-col items-start gap-2 mt-2">
-              <div
-                className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 marker:${
-                  !!balance ? "" : "opacity-0"
-                }`}
-              >
-                <span>USDC Balance: </span>
-                <span>{!!balance ? balance : "0"}</span>
-              </div>
-              <div
-                className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 ${
-                  !!balance ? "" : "opacity-0"
-                }`}
-              >
-                <span>Amount in USDC: </span>
-                <span>
-                  {!!inputValue && !!saleData.price
-                    ? Number(inputValue) * Number(saleData.price)
-                    : ""}
+        <div className="bg-accent-950 rounded-2xl w-full md:w-1/2 h-[300px] md:h-full">
+          <div className="px-5 py-3 flex flex-col justify-between h-full">
+            <div className="w-full">
+              <label className="relative block h-[40px] w-full">
+                <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <img
+                    src="/STBL_plain.png"
+                    alt="STBL"
+                    title="STBL"
+                    className="w-4 h-4 text-neutral-500 rounded-full"
+                  />
                 </span>
-              </div>
-            </div>
-          </div>
 
-          <div>
-            {$connected ? (
-              <>
-                {button === "buy" ? (
-                  <button
-                    disabled={transactionInProgress}
-                    className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                      transactionInProgress || !isStarted
-                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                        : ""
-                    }`}
-                    type="button"
-                    onClick={buy}
-                  >
-                    {isStarted ? (
-                      <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
-                    ) : (
-                      <p>Wait for the sale to start</p>
-                    )}
+                <input
+                  list="amount"
+                  ref={input}
+                  name="amount"
+                  placeholder="0"
+                  value={inputValue}
+                  onChange={() => handleInputChange()}
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10"
+                />
 
-                    {transactionInProgress && <Loader color={"#a6a0b2"} />}
-                  </button>
-                ) : button === "needApprove" ? (
+                {!!$connected && !!balance && (
                   <button
-                    disabled={transactionInProgress}
-                    className={`w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
-                      transactionInProgress
-                        ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                        : ""
-                    }`}
                     type="button"
-                    onClick={approve}
+                    onClick={() => handleInputChange("max")}
+                    className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
                   >
-                    <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
-                    {transactionInProgress && <Loader color={"#a6a0b2"} />}
-                  </button>
-                ) : button === "insufficientBalance" ? (
-                  <button
-                    disabled
-                    className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                  >
-                    Insufficient Balance
-                  </button>
-                ) : (
-                  <button
-                    disabled
-                    className="w-full max-w-[425px] md:max-w-[350px] flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
-                  >
-                    Enter Amount
+                    Max
                   </button>
                 )}
-              </>
-            ) : (
-              <button
-                type="button"
-                className="w-full max-w-[425px] md:max-w-[350px] flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
-                onClick={() => open()}
-              >
-                Connect Wallet
-              </button>
-            )}
+              </label>
+              <div className="flex flex-col items-start gap-2 mt-2">
+                <div
+                  className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 marker:${
+                    !!balance ? "" : "opacity-0"
+                  }`}
+                >
+                  <span>USDC Balance: </span>
+                  <span>{!!balance ? balance : "0"}</span>
+                </div>
+                <div
+                  className={`text-[14px] leading-3 text-neutral-500 flex items-center gap-1 ${
+                    !!balance ? "" : "opacity-0"
+                  }`}
+                >
+                  <span>Amount in USDC: </span>
+                  <span>
+                    {!!inputValue && !!saleData.price
+                      ? Number(inputValue) * Number(saleData.price)
+                      : "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start mt-7">
+                <span className="text-[15px] font-light">You Bought</span>
+                <div className="flex items-center justify-center gap-2">
+                  <img
+                    className="w-[24px] h-[24px] rounded-full"
+                    src="/STBL_plain.png"
+                    alt="STBL"
+                  />
+                  <p className="text-[20px] font-bold">
+                    {formatNumber(saleData.bought, "format")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              {$connected ? (
+                <>
+                  {button === "buy" ? (
+                    <button
+                      disabled={transactionInProgress}
+                      className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                        transactionInProgress || !isStarted
+                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                          : ""
+                      }`}
+                      type="button"
+                      onClick={buy}
+                    >
+                      {isStarted ? (
+                        <p>{needConfirm ? "Confirm in wallet" : "Buy"}</p>
+                      ) : (
+                        <p>Wait for the sale to start</p>
+                      )}
+
+                      {transactionInProgress && <Loader color={"#a6a0b2"} />}
+                    </button>
+                  ) : button === "needApprove" ? (
+                    <button
+                      disabled={transactionInProgress}
+                      className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                        transactionInProgress
+                          ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                          : ""
+                      }`}
+                      type="button"
+                      onClick={approve}
+                    >
+                      <p>{needConfirm ? "Confirm in wallet" : "Approve"}</p>
+                      {transactionInProgress && <Loader color={"#a6a0b2"} />}
+                    </button>
+                  ) : button === "insufficientBalance" ? (
+                    <button
+                      disabled
+                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                    >
+                      Insufficient Balance
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full flex items-center justify-center text-[16px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl"
+                    >
+                      Enter Amount
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+                  onClick={() => open()}
+                >
+                  Connect Wallet
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
