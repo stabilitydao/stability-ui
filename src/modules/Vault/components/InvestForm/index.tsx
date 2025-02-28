@@ -2224,7 +2224,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         (logo: string, index: number) => (
                           <img
                             key={`activeOption-${index}-${logo}`}
-                            className="w-6 h-6 rounded-full"
+                            className={`w-6 h-6 ${logo.slice(-14) == "beethovenx.png" ? "" : "rounded-full"}`}
                             src={logo}
                             alt="logo"
                           />
@@ -2285,6 +2285,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     {defaultOption?.symbols}
                   </p>
                 </div>
+
                 {!!underlyingToken.symbol && (
                   <div
                     className="text-center cursor-pointer opacity-60 hover:opacity-100 flex items-center justify-start px-4 py-[10px] gap-2 ml-3"
@@ -2299,7 +2300,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   >
                     {underlyingToken?.logoURI && (
                       <img
-                        className="w-6 h-6 rounded-full"
+                        className={`w-6 h-6 ${underlyingToken.logoURI.slice(-14) == "beethovenx.png" ? "" : "rounded-full"}`}
                         src={underlyingToken.logoURI}
                         alt="logo"
                       />
