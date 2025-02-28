@@ -348,8 +348,7 @@ const STBL = (): JSX.Element => {
                   <span className="text-[15px] font-light">Sold</span>
                   {saleData.sold !== "-" ? (
                     <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      {formatNumber(+"4000000", "format")} / 4M{" "}
-                      <span className="text-[#A995FF]">STBL</span>
+                      4M / 4M <span className="text-[#A995FF]">STBL</span>
                     </p>
                   ) : (
                     <Skeleton width={157} height={45} />
@@ -365,7 +364,7 @@ const STBL = (): JSX.Element => {
                       alt="USDC.e"
                     />
                     <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      {formatNumber("500000", "format")}
+                      500K
                     </p>
                   </div>
                 </div>
