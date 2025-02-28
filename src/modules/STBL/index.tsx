@@ -348,7 +348,7 @@ const STBL = (): JSX.Element => {
                   <span className="text-[15px] font-light">Sold</span>
                   {saleData.sold !== "-" ? (
                     <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      {formatNumber(+saleData.sold, "format")} / 4M{" "}
+                      {formatNumber(+"4000000", "format")} / 4M{" "}
                       <span className="text-[#A995FF]">STBL</span>
                     </p>
                   ) : (
@@ -357,20 +357,17 @@ const STBL = (): JSX.Element => {
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Raised</span>
-                  {saleData.raised !== "-" ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <img
-                        className="w-[24px] h-[24px] rounded-full"
-                        src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
-                        alt="USDC.e"
-                      />
-                      <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                        {formatNumber(saleData.raised, "format")}
-                      </p>
-                    </div>
-                  ) : (
-                    <Skeleton height={48} width={150} />
-                  )}
+
+                  <div className="flex items-center justify-center gap-2">
+                    <img
+                      className="w-[24px] h-[24px] rounded-full"
+                      src="https://raw.githubusercontent.com/sushiswap/list/master/logos/token-logos/token/usdc.jpg"
+                      alt="USDC.e"
+                    />
+                    <p className="text-[20px] min-[850px]:text-[28px] font-bold">
+                      {formatNumber("500000", "format")}
+                    </p>
+                  </div>
                 </div>
               </div>
 
