@@ -47,12 +47,12 @@ const SONIC_TABLE: TTableColumn[] = [
     dataType: "",
     unsortable: true,
   },
-  {
-    name: "Points",
-    keyName: "sonicActivePoints",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "Points",
+  //   keyName: "sonicActivePoints",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   // {
   //   name: "RISK",
   //   keyName: "il",
