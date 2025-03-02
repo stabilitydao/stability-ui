@@ -36,176 +36,74 @@ const STBL = (): JSX.Element => {
 
   const USDC = "0x29219dd400f2bf60e5a23d13be72b486d4038894";
 
-  const input = useRef<HTMLInputElement>(null);
+  const SALE_STBL = "0x4D61CB8553bB5Db02DF3bdc6CDa88AA85b32224b";
 
   const [balance, setBalance] = useState(0);
-  const [allowance, setAllowance] = useState(0);
 
-  const [inputValue, setInputValue] = useState("");
   const [button, setButton] = useState("");
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
 
-  const [isStarted, setIsStarted] = useState(true);
+  const [isEnded, setIsEnded] = useState(false);
 
   const [saleData, setSaleData] = useState({
     price: "-",
     tge: 0,
     start: 0,
     end: 0,
-    sold: "-",
-    allocation: "-",
     bought: "-",
-    raised: "-",
-    maxRaise: "-",
   });
 
   const resetFormAfterTx = () => {
     setButton("none");
-    input.current.value = "";
-    setInputValue("");
     getData();
     getBalance();
-    getAllowance();
   };
 
-  const handleInputChange = (type = "") => {
-    let numericValue = input.current.value.replace(/[^0-9.]/g, "");
-
-    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
-
-    if (numericValue.startsWith(".")) {
-      numericValue = "0" + numericValue;
-    }
-
-    if (type === "max") {
-      numericValue = String(balance / Number(saleData.price));
-    }
-
-    buyPreview(numericValue);
-
-    setInputValue(numericValue);
-    input.current.value = numericValue;
-  };
-
-  const approve = async () => {
+  const claim = async () => {
     setTransactionInProgress(true);
 
-    const usdcValue = Number(input.current.value) * Number(saleData.price);
+    // if (!!value) {
+    //   try {
+    //     let parsedValue = parseUnits(String(value), 18);
 
-    if (!!usdcValue) {
-      try {
-        let parsedValue = parseUnits(String(usdcValue), 6);
+    //     setNeedConfirm(true);
+    //     let buy = await writeContract(wagmiConfig, {
+    //       address: SALE_CONTRACT,
+    //       abi: SaleABI,
+    //       functionName: "buy",
+    //       args: [parsedValue],
+    //     });
+    //     setNeedConfirm(false);
+    //     setTransactionInProgress(true);
 
-        setNeedConfirm(true);
-        const _approve = await writeContract(wagmiConfig, {
-          address: USDC,
-          abi: ERC20ABI,
-          functionName: "approve",
-          args: [SALE_CONTRACT, parsedValue],
-        });
-        setNeedConfirm(false);
+    //     const transaction = await getTransactionReceipt(buy);
 
-        const transaction = await getTransactionReceipt(_approve);
+    //     if (transaction.status === "success") {
+    //       resetFormAfterTx();
+    //     }
 
-        if (transaction?.status === "success") {
-          const _allowance = await getAllowance();
-
-          if (Number(_allowance) >= usdcValue) {
-            setButton("buy");
-          } else {
-            setButton("needApprove");
-          }
-        }
-      } catch (error) {
-        setNeedConfirm(false);
-        console.error("Approve error:", error);
-      }
-    }
-    setTransactionInProgress(false);
-  };
-
-  const buy = async () => {
-    setTransactionInProgress(true);
-
-    const value = Number(input.current.value);
-
-    if (!!value) {
-      try {
-        let parsedValue = parseUnits(String(value), 18);
-
-        setNeedConfirm(true);
-        let buy = await writeContract(wagmiConfig, {
-          address: SALE_CONTRACT,
-          abi: SaleABI,
-          functionName: "buy",
-          args: [parsedValue],
-        });
-        setNeedConfirm(false);
-        setTransactionInProgress(true);
-
-        const transaction = await getTransactionReceipt(buy);
-
-        if (transaction.status === "success") {
-          resetFormAfterTx();
-        }
-
-        setTransactionInProgress(false);
-      } catch (error) {
-        setNeedConfirm(false);
-        console.error("Buy errror:", error);
-      }
-    }
+    //     setTransactionInProgress(false);
+    //   } catch (error) {
+    //     setNeedConfirm(false);
+    //     console.error("Buy errror:", error);
+    //   }
+    // }
 
     setTransactionInProgress(false);
-  };
-
-  const buyPreview = (value: string) => {
-    if (!Number(value)) {
-      setButton("none");
-      return;
-    }
-
-    const usdcValue = Number(value) * Number(saleData.price);
-
-    if (Number(usdcValue) > Number(balance)) {
-      setButton("insufficientBalance");
-    } else if (Number(usdcValue) > Number(allowance)) {
-      setButton("needApprove");
-    } else if (
-      Number(usdcValue) <= Number(allowance) &&
-      Number(usdcValue) <= Number(balance)
-    ) {
-      setButton("buy");
-    }
-  };
-
-  const getAllowance = async () => {
-    const newAllowance = await sonicClient.readContract({
-      address: USDC,
-      abi: ERC20ABI,
-      functionName: "allowance",
-      args: [$account as TAddress, SALE_CONTRACT],
-    });
-
-    const _allowance = formatUnits(newAllowance, 6);
-
-    setAllowance(Number(_allowance));
-
-    return Number(_allowance);
   };
 
   const getBalance = async () => {
     try {
-      const usdcBalance = await sonicClient.readContract({
-        address: USDC,
+      const saleSTBLBalance = await sonicClient.readContract({
+        address: SALE_STBL,
         abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
       });
 
-      let parsedBalance = formatUnits(usdcBalance, 6);
+      let parsedBalance = formatUnits(saleSTBLBalance, 18);
 
       if (parsedBalance) {
         setBalance(Number(parsedBalance));
@@ -243,17 +141,11 @@ const STBL = (): JSX.Element => {
         functionName: "end",
       })) as bigint;
 
-      const sold = (await sonicClient?.readContract({
+      const token = await sonicClient?.readContract({
         address: SALE_CONTRACT,
         abi: SaleABI,
-        functionName: "sold",
-      })) as bigint;
-
-      const allocation = (await sonicClient?.readContract({
-        address: SALE_CONTRACT,
-        abi: SaleABI,
-        functionName: "ALLOCATION_SALE",
-      })) as bigint;
+        functionName: "token",
+      });
 
       if ($account) {
         const userBought = (await sonicClient?.readContract({
@@ -266,31 +158,21 @@ const STBL = (): JSX.Element => {
         bought = formatUnits(userBought, 18);
       }
 
-      const raised = String(
-        Number(formatUnits(price, 6)) * Number(formatUnits(sold, 18))
-      );
-
-      const maxRaise = String(
-        Number(formatUnits(price, 6)) * Number(formatUnits(allocation, 18))
-      );
-
       setSaleData({
         price: formatUnits(price, 6),
         tge: Number(tge),
         start: Number(start),
         end: Number(end),
-        sold: formatUnits(sold, 18),
-        allocation: formatUnits(allocation, 18),
         bought,
-        raised,
-        maxRaise,
       });
 
       const now = Math.floor(Date.now() / 1000);
 
-      const _isStarted = Number(start) < now;
+      const _isEnded =
+        Number(tge) < now &&
+        token !== "0x0000000000000000000000000000000000000000";
 
-      setIsStarted(_isStarted);
+      setIsEnded(_isEnded);
     } catch (error) {
       console.error("Get data error:", error);
     }
@@ -299,13 +181,13 @@ const STBL = (): JSX.Element => {
   useEffect(() => {
     if ($account) {
       getBalance();
-      getAllowance();
     }
   }, [$account]);
 
   useEffect(() => {
     getData();
   }, []);
+
   return (
     <div className="min-w-full lg:min-w-[1000px] xl:min-w-[1200px] max-w-[1400px] font-manrope">
       <div className="STBL mb-5">
@@ -346,13 +228,9 @@ const STBL = (): JSX.Element => {
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Sold</span>
-                  {saleData.sold !== "-" ? (
-                    <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                      4M / 4M <span className="text-[#A995FF]">STBL</span>
-                    </p>
-                  ) : (
-                    <Skeleton width={157} height={45} />
-                  )}
+                  <p className="text-[20px] min-[850px]:text-[28px] font-bold">
+                    4M / 4M <span className="text-[#A995FF]">STBL</span>
+                  </p>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-[15px] font-light">Total Raised</span>
@@ -444,9 +322,15 @@ const STBL = (): JSX.Element => {
 
         <div className="bg-accent-950 rounded-2xl w-full md:w-1/2 h-[300px] md:h-full">
           <div className="px-5 py-3 flex flex-col justify-between h-full">
-            <h5 className="flex items-center justify-center h-full text-[24px]">
-              Public sale complete. Tokens SOLD.
-            </h5>
+            {isEnded ? (
+              <div className="flex items-center justify-center flex-col">
+                <h3>CLAIM {balance} STBL!</h3>
+              </div>
+            ) : (
+              <h5 className="flex items-center justify-center h-full text-[24px]">
+                Public sale complete. Tokens SOLD.
+              </h5>
+            )}
           </div>
         </div>
       </div>
