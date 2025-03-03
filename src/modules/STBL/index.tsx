@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 
 import { useStore } from "@nanostores/react";
 
@@ -11,8 +11,6 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { connected, account } from "@store";
 
 import { Loader, Skeleton } from "@ui";
-
-import { formatNumber } from "@utils";
 
 import { Timer } from "./components";
 
@@ -34,18 +32,16 @@ const STBL = (): JSX.Element => {
 
   const { open } = useWeb3Modal();
 
-  const USDC = "0x29219dd400f2bf60e5a23d13be72b486d4038894";
-
   const SALE_STBL = "0x4D61CB8553bB5Db02DF3bdc6CDa88AA85b32224b";
 
   const [balance, setBalance] = useState(0);
-
-  const [button, setButton] = useState("");
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
 
   const [isEnded, setIsEnded] = useState(false);
+
+  const [claimType, setClaimType] = useState("");
 
   const [saleData, setSaleData] = useState({
     price: "-",
@@ -55,41 +51,30 @@ const STBL = (): JSX.Element => {
     bought: "-",
   });
 
-  const resetFormAfterTx = () => {
-    setButton("none");
-    getData();
-    getBalance();
-  };
-
   const claim = async () => {
     setTransactionInProgress(true);
 
-    // if (!!value) {
-    //   try {
-    //     let parsedValue = parseUnits(String(value), 18);
+    try {
+      setNeedConfirm(true);
+      let claim = await writeContract(wagmiConfig, {
+        address: SALE_CONTRACT,
+        abi: SaleABI,
+        functionName: "claim",
+      });
+      setNeedConfirm(false);
+      setTransactionInProgress(true);
 
-    //     setNeedConfirm(true);
-    //     let buy = await writeContract(wagmiConfig, {
-    //       address: SALE_CONTRACT,
-    //       abi: SaleABI,
-    //       functionName: "buy",
-    //       args: [parsedValue],
-    //     });
-    //     setNeedConfirm(false);
-    //     setTransactionInProgress(true);
+      const transaction = await getTransactionReceipt(claim);
 
-    //     const transaction = await getTransactionReceipt(buy);
+      if (transaction?.status === "success") {
+        setClaimType("claimed");
+      }
 
-    //     if (transaction.status === "success") {
-    //       resetFormAfterTx();
-    //     }
-
-    //     setTransactionInProgress(false);
-    //   } catch (error) {
-    //     setNeedConfirm(false);
-    //     console.error("Buy errror:", error);
-    //   }
-    // }
+      setTransactionInProgress(false);
+    } catch (error) {
+      setNeedConfirm(false);
+      console.error("Claim errror:", error);
+    }
 
     setTransactionInProgress(false);
   };
@@ -103,10 +88,15 @@ const STBL = (): JSX.Element => {
         args: [$account as TAddress],
       });
 
-      let parsedBalance = formatUnits(saleSTBLBalance, 18);
+      let parsedBalance = Number(formatUnits(saleSTBLBalance, 18));
 
       if (parsedBalance) {
-        setBalance(Number(parsedBalance));
+        setBalance(parsedBalance);
+        setClaimType("claim");
+      } else if (Number(saleData.bought) > 0 && Number(parsedBalance) === 0) {
+        setClaimType("claimed");
+      } else if (!Number(saleData.bought)) {
+        setClaimType("noClaim");
       }
     } catch (error) {
       console.error("Get balance error:", error);
@@ -182,7 +172,7 @@ const STBL = (): JSX.Element => {
     if ($account) {
       getBalance();
     }
-  }, [$account]);
+  }, [$account, saleData]);
 
   useEffect(() => {
     getData();
@@ -323,11 +313,58 @@ const STBL = (): JSX.Element => {
         <div className="bg-accent-950 rounded-2xl w-full md:w-1/2 h-[300px] md:h-full">
           <div className="px-5 py-3 flex flex-col justify-between h-full">
             {isEnded ? (
-              <div className="flex items-center justify-center flex-col">
-                <h3>CLAIM {balance} STBL!</h3>
-              </div>
+              <>
+                {$connected ? (
+                  <div className="flex items-center justify-between flex-col h-full">
+                    {claimType === "claimed" ? (
+                      <h3 className="text-light text-[24px]">STBL claimed!</h3>
+                    ) : claimType === "noClaim" ? (
+                      <h3 className="text-light text-[24px]">
+                        No STBL for claim!
+                      </h3>
+                    ) : claimType === "claim" ? (
+                      <h3 className="text-light text-[24px]">
+                        CLAIM {balance} STBL!
+                      </h3>
+                    ) : (
+                      ""
+                    )}
+
+                    {claimType === "claim" && (
+                      <button
+                        disabled={transactionInProgress}
+                        className={`w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl ${
+                          transactionInProgress
+                            ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                            : ""
+                        }`}
+                        type="button"
+                        onClick={claim}
+                      >
+                        <p>{needConfirm ? "Confirm in wallet" : "Claim"}</p>
+
+                        {transactionInProgress && <Loader color={"#a6a0b2"} />}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between flex-col h-full">
+                    <h3 className="text-light text-[24px]">
+                      PLEASE CONNECT YOUR WALLET!
+                    </h3>
+
+                    <button
+                      type="button"
+                      className="w-full flex items-center text-[16px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl"
+                      onClick={() => open()}
+                    >
+                      Connect Wallet
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
-              <h5 className="flex items-center justify-center h-full text-[24px]">
+              <h5 className="flex items-center justify-center h-full text-[24px] text-light">
                 Public sale complete. Tokens SOLD.
               </h5>
             )}
