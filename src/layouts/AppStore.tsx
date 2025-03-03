@@ -579,8 +579,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         /***** SONIC ACTIVE POINTS *****/
         let sonicActivePoints: undefined | number = undefined;
+        let ringsPoints: undefined | number = undefined;
 
         if (chainID === "146") {
+          const scProportionIndex = assets.findIndex((asset) =>
+            ["scETH", "scUSD"].includes(asset.symbol as string)
+          );
+
           let points = strategyAssets.reduce((acc, asset, index) => {
             let whitelistAssetPoints =
               (sonicWhitelistedAssets[
@@ -596,6 +601,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
           if (pointsMultiplier) {
             points *= pointsMultiplier;
+          }
+
+          if (scProportionIndex !== -1) {
+            const scProportion = assetsProportions[scProportionIndex];
+
+            ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
           }
 
           sonicActivePoints = Number(points.toFixed(1));
@@ -652,6 +663,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             yearnProtocols,
             network: chainID,
             sonicActivePoints,
+            ringsPoints,
             leverageLending: vault?.leverageLending,
           };
 

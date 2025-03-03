@@ -823,6 +823,22 @@ const SonicVaults = (): JSX.Element => {
                                   </span>
                                 </div>
                               )}
+
+                              {!!vault.ringsPoints && (
+                                <div
+                                  title="Rings Points"
+                                  className="flex items-center rounded-full border border-[#ac62e4] bg-black pr-[6px]"
+                                >
+                                  <img
+                                    src="/rings.png"
+                                    alt="rings"
+                                    className="w-[14px] h-[14px] rounded-full"
+                                  />
+                                  <span className="text-[10px] ml-[3px] mr-[2px]">
+                                    x{vault.ringsPoints}
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>

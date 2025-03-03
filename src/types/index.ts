@@ -279,6 +279,7 @@ type TVault = {
   yearnProtocols: TYearnProtocol[];
   network: string;
   sonicActivePoints: undefined | number;
+  ringsPoints: undefined | number;
   leverageLending?: TLeverageLendingData;
 };
 
