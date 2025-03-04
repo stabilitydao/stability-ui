@@ -194,7 +194,7 @@ export const getStrategyInfo = (
       ...strategyInfo,
       protocols: [silo],
     };
-  } else if (vaultSymbol.match(/(SiL|SL)$/)) {
+  } else if (vaultSymbol.match(/(SiL|SL|SAL)$/)) {
     strategyInfo = {
       ...strategyInfo,
       protocols: [silo],
