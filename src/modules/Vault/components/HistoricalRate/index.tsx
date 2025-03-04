@@ -33,7 +33,11 @@ type TActiveChart =
 
 const HistoricalRate: React.FC<IProps> = memo(
   ({ network, address, created, vaultStrategy, lastHardWork }) => {
-    const APRType = ["Compound Farm", "Silo Leverage"].includes(vaultStrategy)
+    const APRType = [
+      "Compound Farm",
+      "Silo Leverage",
+      "Silo Advanced Leverage",
+    ].includes(vaultStrategy)
       ? "APR"
       : "Farm APR";
 
