@@ -3128,7 +3128,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         )}
 
         <div className="flex flex-col w-[90%] md:w-full max-w-[425px] md:max-w-[350px] absolute bottom-[25px]">
-          {vault?.strategyInfo?.shortId === "SiL" && (
+          {["SiAL", "SiL"].includes(vault?.strategyInfo?.shortId) && (
             <p className="text-[8px] mb-[9px] text-warning-300">
               Deposit and withdrawal of funds in this vault has its own cost:
               flashloan fee (0.03% * {pointsMultiplier}) on Beets, swap dynamic
