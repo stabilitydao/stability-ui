@@ -171,7 +171,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
         const strategyInfo = getStrategyInfo(
-          vault?.symbol,
           vault.strategyId,
           vault.strategyShortId as StrategyShortId,
           vault.strategySpecific as string,
