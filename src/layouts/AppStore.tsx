@@ -127,7 +127,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               assetsPrices.set(stabilityAPIData?.assetPrices);
               prices = stabilityAPIData?.assetPrices;
             }
-
             apiData.set(stabilityAPIData);
             isResponse = true;
             break;

@@ -769,6 +769,10 @@ const SonicVaults = (): JSX.Element => {
                       Number(vault?.earningData?.apr[$aprFilter]) / 365
                     ).toFixed(2);
 
+                    const isSTBLVault = !!vault.assets.find(
+                      ({ symbol }) => symbol === "STBL"
+                    );
+
                     return (
                       <tr
                         key={vault.name + index}
@@ -1013,16 +1017,21 @@ const SonicVaults = (): JSX.Element => {
                           </div>
                         </td>
                         <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-end">
-                            {formatNumber(gemsAprValue.toFixed(2), "formatAPR")}
-                            %
-                            <img
-                              src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
-                              className="w-[24px] h-[24px] ml-1.5"
-                              title="sGEM1"
-                              alt="sGEM1"
-                            />
-                          </div>
+                          {!isSTBLVault && (
+                            <div className="flex items-center justify-end">
+                              {formatNumber(
+                                gemsAprValue.toFixed(2),
+                                "formatAPR"
+                              )}
+                              %
+                              <img
+                                src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
+                                className="w-[24px] h-[24px] ml-1.5"
+                                title="sGEM1"
+                                alt="sGEM1"
+                              />
+                            </div>
+                          )}
                         </td>
                         {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
