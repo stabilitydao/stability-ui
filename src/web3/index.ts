@@ -26,7 +26,7 @@ import SaleABI from "./abi/SaleABI.ts";
 
 import type { TAddress } from "@types";
 
-const CONTRACT_PAGINATION = 100;
+const CONTRACT_PAGINATION = 20;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 

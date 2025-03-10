@@ -197,9 +197,6 @@ const Users = (): JSX.Element => {
                         ? (Math.round(user.deposit * 100) / 100).toFixed(2)
                         : ""}
                     </td>
-                    <td className="text-center px-4 py-3">
-                      {user.points ? user.points : ""}
-                    </td>
                   </tr>
                 ))}
             </tbody>
