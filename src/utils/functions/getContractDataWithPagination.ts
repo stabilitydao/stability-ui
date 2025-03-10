@@ -78,10 +78,11 @@ const getContractDataWithPagination = async (
             args: [
               userAddress as TAddress,
               BigInt(receivedData),
-              BigInt(Math.min(receivedData + CONTRACT_PAGINATION, dataCount)),
+              BigInt(CONTRACT_PAGINATION),
             ],
           })
         );
+
         receivedData += CONTRACT_PAGINATION;
       }
 

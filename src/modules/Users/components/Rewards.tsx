@@ -30,11 +30,10 @@ const Rewards = (): JSX.Element => {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
 
-  const [userBalance, setUserBalance] = useState({ points: "-", gems: "-" });
+  const [userBalance, setUserBalance] = useState({ gems: "-" });
   const [userData, setUserData] = useState<any>([]); // todo: change type to user rewards
   const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
-    points: "0",
     gems: "2.70M",
   });
 
@@ -57,18 +56,9 @@ const Rewards = (): JSX.Element => {
 
   const getRewardsTotalSupply = async () => {
     if ($apiData?.leaderboards?.absolute.length) {
-      const pointsTotalSupply = $apiData?.leaderboards?.absolute.reduce(
-        (acc, cur) => (acc += cur?.points ?? 0),
-        0
-      );
-
       const _gems = String(formatNumber(2700000, "abbreviate")).slice(1);
 
-      const _points = String(
-        formatNumber(Number(pointsTotalSupply), "abbreviate")
-      ).slice(1);
-
-      setRewardsTotalSupply({ points: _points, gems: _gems });
+      setRewardsTotalSupply({ gems: _gems });
     }
   };
 
@@ -89,18 +79,7 @@ const Rewards = (): JSX.Element => {
   };
 
   const getUserBalance = async () => {
-    const user = $apiData?.leaderboards?.absolute.find(
-      ({ address }) => address === $account?.toLowerCase()
-    );
-
-    let userPoints = "0";
     let user_sGEM1 = "0";
-
-    if (user?.points) {
-      userPoints = String(
-        formatNumber(Number(user?.points), "abbreviate")
-      ).slice(1);
-    }
 
     try {
       const sGEM1Balance = await readContract(wagmiConfig, {
@@ -119,7 +98,7 @@ const Rewards = (): JSX.Element => {
       console.error("Error occurred at getUserBalance:", err);
     }
 
-    setUserBalance({ points: userPoints, gems: user_sGEM1 });
+    setUserBalance({ gems: user_sGEM1 });
   };
 
   const getUserEarnedGems = async () => {
@@ -334,46 +313,6 @@ const Rewards = (): JSX.Element => {
                   <span className="font-bold">{rewardsTotalSupply.gems}</span>
                 </p>
               </div>
-            </div>
-          </div>
-        </div>
-        <div className="pSTBLRewardBg w-[320px] sm:w-[550px] h-[270px] sm:h-[220px] rounded-[10px]">
-          <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
-            <div className="flex flex-col items-start h-full sm:w-2/3">
-              <div className="font-light flex flex-col items-start">
-                <span className="text-[25px] flex items-center gap-2">
-                  <img
-                    src="pSTBL.png"
-                    alt="pSTBL"
-                    title="pSTBL"
-                    className="w-[33px] h-[33px] block sm:hidden"
-                  />{" "}
-                  pSTBL
-                </span>
-                <p className="text-[13px] opacity-70">
-                  Stability Points will be exchanged for $STBL at TGE 2025.
-                </p>
-              </div>
-
-              <p className="text-[28px] mt-6 sm:mt-[9px]">
-                <span className="font-extralight">Balance:</span>
-                <span className="font-bold"> {userBalance.points}</span>
-              </p>
-              <p className="font-light text-[#B0AEFF] text-[12px] mt-[-8px] block sm:hidden">
-                Total Supply:{" "}
-                <span className="font-bold">{rewardsTotalSupply.points}</span>
-              </p>
-            </div>
-            <div className="sm:flex hidden flex-col items-end justify-between text-[12px]  sm:w-1/3 h-full">
-              <img
-                className="w-[93px] h-[93px] sm:block hidden"
-                src="pSTBL.png"
-                alt="pSTBL reward"
-              />
-              <p className="font-light text-[#B0AEFF]">
-                Total Supply:{" "}
-                <span className="font-bold">{rewardsTotalSupply.points}</span>
-              </p>
             </div>
           </div>
         </div>
