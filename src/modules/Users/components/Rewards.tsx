@@ -59,7 +59,7 @@ const Rewards = (): JSX.Element => {
   const getRewardsTotalSupply = async () => {
     if (contests) {
       const formerContests = Object.values(contests).filter(
-        (contest) => contest.start < Date.now() / 1000
+        (contest) => contest.end < Date.now() / 1000
       );
 
       const totalGems1 = formerContests.reduce((acc, cur) => {
