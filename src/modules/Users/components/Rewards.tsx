@@ -21,6 +21,8 @@ import {
 
 import type { TAddress } from "@types";
 
+import { contests } from "@stabilitydao/stability";
+
 import type { ApiMainReply } from "@stabilitydao/stability";
 
 import type { UserRewards } from "@stabilitydao/stability/out/api.types";
@@ -34,7 +36,7 @@ const Rewards = (): JSX.Element => {
   const [userData, setUserData] = useState<any>([]); // todo: change type to user rewards
   const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
-    gems: "2.70M",
+    gems: "-",
   });
 
   const [gemPrice, setGemPrice] = useState("-");
@@ -55,8 +57,17 @@ const Rewards = (): JSX.Element => {
   };
 
   const getRewardsTotalSupply = async () => {
-    if ($apiData?.leaderboards?.absolute.length) {
-      const _gems = String(formatNumber(2700000, "abbreviate")).slice(1);
+    if (contests) {
+      const formerContests = Object.values(contests).filter(
+        (contest) => contest.end < Date.now() / 1000
+      );
+
+      const totalGems1 = formerContests.reduce((acc, cur) => {
+        const reward = cur.rewards?.find(({ type }) => type === "Gems1");
+        return acc + (reward ? reward.totalReward : 0);
+      }, 0);
+
+      const _gems = String(formatNumber(totalGems1, "abbreviate")).slice(1);
 
       setRewardsTotalSupply({ gems: _gems });
     }
