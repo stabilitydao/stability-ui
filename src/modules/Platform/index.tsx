@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import { PlatformUpgrade } from "./components/PlatformUpgrade";
+
 import {
   type ApiMainReply,
   assets,
@@ -17,14 +19,15 @@ import { formatNumber } from "@utils";
 
 import { CountersBlockCompact, Skeleton } from "@ui";
 
-import { apiData, currentChainID, platformVersions } from "@store";
+import { apiData, platformVersions } from "@store";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 import packageJson from "../../../package.json";
 
 const Platform = (): JSX.Element => {
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = "146";
+  // const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
 
@@ -148,7 +151,7 @@ const Platform = (): JSX.Element => {
       <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
 
       <div className="px-6">
-        <div className="flex p-[16px] gap-[8px] bg-accent-950 rounded-[24px] w-full">
+        <div className="flex p-[16px] gap-[8px] bg-accent-950 rounded-[10px] w-full">
           <svg
             className="mt-[2px]"
             width="24"
@@ -175,6 +178,8 @@ const Platform = (): JSX.Element => {
           </div>
         </div>
       </div>
+
+      <PlatformUpgrade />
 
       <div className="flex flex-wrap justify-center p-[36px]">
         {platformData.map(({ name, content }) => (

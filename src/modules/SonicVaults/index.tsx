@@ -2,13 +2,9 @@ import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-// import { formatUnits} from "viem";
-
 import { useStore } from "@nanostores/react";
 
 import { isMobile } from "react-device-detect";
-
-// import { deployments } from "@stabilitydao/stability";
 
 import { APRModal } from "./components/modals/APRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
@@ -17,14 +13,9 @@ import { Pagination } from "./components/Pagination";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
 
-import { chains, deployments } from "@stabilitydao/stability";
+import { chains } from "@stabilitydao/stability";
 
-import {
-  TimeDifferenceIndicator,
-  FullPageLoader,
-  ErrorMessage,
-  ExplorerLink,
-} from "@ui";
+import { TimeDifferenceIndicator, FullPageLoader, ErrorMessage } from "@ui";
 
 import {
   vaults,
@@ -33,59 +24,31 @@ import {
   connected,
   error,
   visible,
-  publicClient,
-  platformVersions,
   apiData,
-  // platformVersions,
-  // currentChainID,
-  // assetsPrices,
 } from "@store";
 
 import { toVault, initFilters } from "./functions";
 
-import {
-  formatNumber,
-  formatFromBigInt,
-  dataSorter,
-  getShortAddress,
-} from "@utils";
+import { formatNumber, formatFromBigInt, dataSorter } from "@utils";
 
 import {
   SONIC_TABLE,
   TABLE_FILTERS,
   PAGINATION_VAULTS,
   STABLECOINS,
-  CHAINS,
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
-  // CHAINS,
-  // WBTC,
-  // WETH,
-  // WMATIC,
 } from "@constants";
-
-import { PlatformABI } from "@web3";
 
 import type {
   TVault,
   TTableColumn,
-  // TPendingPlatformUpgrade,
-  // TAddress,
-  // TUpgradesTable,
   TEarningData,
   TVaults,
   TAPRPeriod,
-  TPendingPlatformUpgrade,
-  TUpgradesTable,
-  TAddress,
   TTableActiveParams,
   TVSHoldModalState,
 } from "@types";
-
-// type TToken = {
-//   logo: string;
-//   price: string;
-// };
 
 const SonicVaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
@@ -99,9 +62,6 @@ const SonicVaults = (): JSX.Element => {
 
   const $error = useStore(error);
   const $visible = useStore(visible);
-  const $publicClient = useStore(publicClient);
-  const $platformVersions = useStore(platformVersions);
-  const $currentChainID = "146";
   // const $currentChainID = useStore(currentChainID);
   // const $assetsPrices = useStore(assetsPrices);
 
@@ -163,11 +123,6 @@ const SonicVaults = (): JSX.Element => {
     isVsActive: false,
   });
 
-  const [platformUpdates, setPlatformUpdates] =
-    useState<TPendingPlatformUpgrade>();
-
-  const [lockTime, setLockTime] = useState({ start: "", end: "" });
-  const [upgradesTable, setUpgradesTable] = useState<TUpgradesTable[]>([]);
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [currentTab, setCurrentTab] = useState(urlTab);
@@ -236,102 +191,6 @@ const SonicVaults = (): JSX.Element => {
     window.history.pushState({}, "", newUrl.toString());
 
     setActiveNetworks(updatedNetworks);
-  };
-
-  const fetchPlatformUpdates = async () => {
-    try {
-      const pendingPlatformUpgrade: any = await $publicClient?.readContract({
-        address: deployments[$currentChainID]?.core.platform,
-        abi: PlatformABI,
-        functionName: "pendingPlatformUpgrade",
-      });
-      let upgrated = [];
-      if (pendingPlatformUpgrade?.proxies.length) {
-        const promises = pendingPlatformUpgrade.proxies.map(
-          async (proxy: TAddress, index: number) => {
-            const moduleContracts = Object.keys(
-              deployments[$currentChainID].core
-            );
-            const upgratedData = await Promise.all(
-              moduleContracts.map(async (moduleContract: string) => {
-                //Can't use CoreContracts type
-                //@ts-ignore
-                const address =
-                  deployments[$currentChainID].core[moduleContract];
-                if (proxy.toLowerCase() === address.toLowerCase()) {
-                  const oldImplementation = await $publicClient?.readContract({
-                    address: address,
-                    abi: [
-                      {
-                        inputs: [],
-                        name: "implementation",
-                        outputs: [
-                          {
-                            internalType: "address",
-                            name: "",
-                            type: "address",
-                          },
-                        ],
-                        stateMutability: "view",
-                        type: "function",
-                      },
-                    ],
-                    functionName: "implementation",
-                  });
-                  const oldImplementationVersion =
-                    await $publicClient?.readContract({
-                      address: oldImplementation,
-                      abi: PlatformABI,
-                      functionName: "VERSION",
-                    });
-                  const newImplementationVersion =
-                    await $publicClient?.readContract({
-                      address: pendingPlatformUpgrade.newImplementations[index],
-                      abi: PlatformABI,
-                      functionName: "VERSION",
-                    });
-                  return {
-                    contract: moduleContract,
-                    oldVersion: oldImplementationVersion,
-                    newVersion: newImplementationVersion,
-                    proxy: proxy,
-                    oldImplementation: oldImplementation,
-                    newImplementation:
-                      pendingPlatformUpgrade.newImplementations[index],
-                  };
-                }
-              })
-            );
-
-            return upgratedData.filter((data) => data !== undefined);
-          }
-        );
-        upgrated = (await Promise.all(promises)).flat();
-      }
-
-      /////***** TIME CHECK  *****/////
-      const lockTime: any = await $publicClient?.readContract({
-        address: deployments[$currentChainID].core.platform,
-        abi: PlatformABI,
-        functionName: "TIME_LOCK",
-      });
-      const platformUpgradeTimelock: any = await $publicClient?.readContract({
-        address: deployments[$currentChainID].core.platform,
-        abi: PlatformABI,
-        functionName: "platformUpgradeTimelock",
-      });
-      if (lockTime && platformUpgradeTimelock) {
-        setLockTime({
-          start: `${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleDateString()} ${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleTimeString()}`,
-          end: `${new Date(Number(platformUpgradeTimelock) * 1000).toLocaleDateString()} ${new Date(Number(platformUpgradeTimelock) * 1000).toLocaleTimeString()}`,
-        });
-      }
-      /////***** SET DATA  *****/////
-      setUpgradesTable(upgrated);
-      setPlatformUpdates(pendingPlatformUpgrade);
-    } catch (error) {
-      console.error("Error fetching platform updates:", error);
-    }
   };
 
   const resetTable = () => {
@@ -565,10 +424,6 @@ const SonicVaults = (): JSX.Element => {
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
-      /////***** AFTER PAGE LOADING *****/ /////
-      if (!upgradesTable.length) {
-        fetchPlatformUpdates();
-      }
     }
   };
 
@@ -595,93 +450,8 @@ const SonicVaults = (): JSX.Element => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
   }, [$isVaultsLoaded, isLocalVaultsLoaded]);
 
-  const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
-
   return (
     <>
-      {!!platformUpdates?.newVersion &&
-        platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
-        !!upgradesTable?.length && (
-          <div className="p-3  mt-3 bg-accent-900 rounded-[10px]">
-            <h3 className="mb-2 text-[18px] font-medium">
-              Time-locked platform upgrade in progress
-            </h3>
-            <div className="flex gap-3 text-[14px]">
-              <span className="w-[100px]">Version:</span>
-              <span>
-                {$platformVersions[$currentChainID]} -{">"}{" "}
-                {platformUpdates.newVersion}
-              </span>
-            </div>
-            <div className="flex gap-3 text-[14px]">
-              <span className="w-[100px]">Timelock:</span>
-              <span>
-                {lockTime.start} -{">"} {lockTime.end}
-              </span>
-            </div>
-
-            <div className="overflow-x-auto mt-2">
-              <table className="table table-auto w-full rounded-lg">
-                <thead className="">
-                  <tr className="text-[12px] text-neutral-600 uppercase whitespace-nowrap">
-                    <th className="text-left">Contract</th>
-                    <th className="text-left">Version</th>
-                    <th className="text-left">Proxy</th>
-                    <th className="text-left">Old Implementation</th>
-                    <th className="text-left">New Implementation</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[14px]">
-                  {!!upgradesTable.length &&
-                    upgradesTable.map((upgrade) => (
-                      <tr key={upgrade.contract} className="">
-                        <td className="text-left min-w-[100px] capitalize">
-                          <p>{upgrade.contract}</p>
-                        </td>
-                        <td className="text-left min-w-[100px]">
-                          {upgrade.oldVersion} {"->"} {upgrade.newVersion}
-                        </td>
-                        {upgrade?.proxy && (
-                          <td className="text-left min-w-[150px]">
-                            <span className="flex items-center">
-                              {getShortAddress(upgrade.proxy, 6, 4)}
-                              <ExplorerLink
-                                explorer={explorer || ""}
-                                address={upgrade.proxy}
-                              />
-                            </span>
-                          </td>
-                        )}
-                        {upgrade.oldImplementation && (
-                          <td className="text-left min-w-[150px]">
-                            <span className="flex items-center">
-                              {getShortAddress(upgrade.oldImplementation, 6, 4)}
-                              <ExplorerLink
-                                explorer={explorer || ""}
-                                address={upgrade.oldImplementation}
-                              />
-                            </span>
-                          </td>
-                        )}
-                        {upgrade?.newImplementation && (
-                          <td className="text-left min-w-[150px]">
-                            <span className="flex items-center">
-                              {getShortAddress(upgrade.newImplementation, 6, 4)}
-                              <ExplorerLink
-                                explorer={explorer || ""}
-                                address={upgrade.newImplementation}
-                              />
-                            </span>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
       <div
         className={`${
           isLoading ? "pointer-events-none" : "pointer-events-auto"
