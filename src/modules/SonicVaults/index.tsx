@@ -769,9 +769,11 @@ const SonicVaults = (): JSX.Element => {
                       Number(vault?.earningData?.apr[$aprFilter]) / 365
                     ).toFixed(2);
 
-                    const isSTBLVault = !!vault.assets.find(
-                      ({ symbol }) => symbol === "STBL"
-                    );
+                    const isSTBLVault =
+                      Array.isArray(vault?.assets) &&
+                      vault.assets.some(
+                        (asset) => asset?.symbol && asset?.symbol === "STBL"
+                      );
 
                     return (
                       <tr
@@ -785,14 +787,14 @@ const SonicVaults = (): JSX.Element => {
                             <div className="flex items-center w-[52px] justify-center">
                               {vault.assets.map((asset, index) => (
                                 <img
-                                  src={asset.logo}
-                                  alt={asset.symbol}
+                                  src={asset?.logo}
+                                  alt={asset?.symbol}
                                   className={`w-6 h-6 rounded-full ${
                                     !index &&
                                     vault.assets.length > 1 &&
                                     "mr-[-10px] z-[5]"
                                   }`}
-                                  key={asset.logo + index}
+                                  key={asset?.logo + index}
                                 />
                               ))}
                             </div>

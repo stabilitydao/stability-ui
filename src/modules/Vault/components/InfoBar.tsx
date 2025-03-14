@@ -143,12 +143,12 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                 value={
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
-                      {vault.assets.map((asset) => (
+                      {vault.assets.map((asset, index) => (
                         <img
-                          key={asset.address}
-                          src={asset.logo}
-                          alt={asset.symbol}
-                          title={asset.symbol}
+                          key={asset?.address + index}
+                          src={asset?.logo}
+                          alt={asset?.symbol}
+                          title={asset?.symbol}
                           className="w-6 h-6 rounded-full"
                         />
                       ))}
