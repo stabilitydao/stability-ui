@@ -136,7 +136,7 @@ const Assets: React.FC<IProps> = memo(
       const amountsInUSD = amounts.map((amount: string, index: number) => {
         const tokenAddress: TAddress = tokens[index]?.address as TAddress;
 
-        const tokenPrice: string = $assetsPrices[network][tokenAddress].price;
+        const tokenPrice: string = $assetsPrices[network][tokenAddress]?.price;
 
         return Number(tokenPrice) * Number(amount);
       });
@@ -250,8 +250,8 @@ const Assets: React.FC<IProps> = memo(
 
               const priceOnCreation = formatUnits(onCreationPrice[index], 18);
 
-              const price: number = $assetsPrices[network][asset.address]
-                ? Number($assetsPrices[network][asset.address].price)
+              const price: number = $assetsPrices[network][asset?.address]
+                ? Number($assetsPrices[network][asset?.address]?.price)
                 : 0;
 
               const creationDate = getDate(Number(created));

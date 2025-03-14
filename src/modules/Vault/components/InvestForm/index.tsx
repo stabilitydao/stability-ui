@@ -382,7 +382,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     const logoURIs: string[] = [];
 
     for (let i = 0; i < assets.length; i++) {
-      const token = getTokenData(assets[i].toLowerCase());
+      const token = getTokenData(assets?.[i]?.toLowerCase());
 
       if (token) {
         symbols.push(token.symbol);
@@ -1711,7 +1711,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         let localAssets = defaultOption?.assetsArray;
         if (shortId === "IQMF" || shortId === "IRMF") {
           assetsLength = [BIG_INT_VALUES.ZERO, BIG_INT_VALUES.ZERO];
-          localAssets = vault.assets.map((asset) => asset?.address);
+          localAssets = vault?.assets.map((asset) => asset?.address);
         }
         const { result } = await _publicClient?.simulateContract({
           address: vault.address,
@@ -1908,7 +1908,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }
 
     if (!amount) {
-      const secondAsset = defaultOption.assetsArray.find(
+      const secondAsset = defaultOption?.assetsArray.find(
         (address) => address != asset
       );
 
@@ -1966,10 +1966,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
           if (shortId === "IQMF" || shortId === "IRMF") {
             // IQMF & IRMF strategies only
-            let assets: TAddress[] = vault.assets.map(
+            let assets: TAddress[] = vault?.assets.map(
               (asset) => asset?.address
             );
-            let IQMFAmounts: bigint[] = vault.assetsProportions.map(
+            let IQMFAmounts: bigint[] = vault?.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : BIG_INT_VALUES.ZERO)
             );
 
@@ -2034,7 +2034,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const isSingleTokenStrategy = useMemo(() => {
     return (
       shortId === "CF" ||
-      (shortId === "Y" && vault.assets[0].address === option[0])
+      (shortId === "Y" && vault?.assets[0]?.address === option[0])
     );
   }, [vault]);
 
@@ -2045,9 +2045,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const isSingleTokenStrategyZap = useMemo(() => {
     if (isSingleTokenStrategy) {
-      return isSingleTokenStrategy && option[0] != defaultOption.assets;
+      return isSingleTokenStrategy && option[0] != defaultOption?.assets;
     }
-    return option[0] != defaultOption.assets;
+    return option[0] != defaultOption?.assets;
   }, [isSingleTokenStrategy, option, defaultOption]);
 
   const pointsMultiplier = useMemo(
@@ -2177,7 +2177,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     if (vault) {
       // !!!! big bug was with filtering
       // but need think and maybe fix it
-      const assetsData = vault.assets.map((asset: TAsset) =>
+      const assetsData = vault?.assets.map((asset: TAsset) =>
         asset?.address.toLowerCase()
       );
       /*.filter((_, index) => vault.assetsProportions[index])*/
