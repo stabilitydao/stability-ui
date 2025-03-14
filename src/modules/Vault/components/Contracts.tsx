@@ -80,7 +80,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         if (vault?.pool?.address) {
           const poolSymbol =
             vault?.assets.length > 1
-              ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
+              ? `${vault?.assets[0]?.symbol}-${vault.assets[1]?.symbol}`
               : vault?.assets[0]?.symbol;
 
           const dexPool = Object.values(DEXes).find((dex) =>
@@ -101,7 +101,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         if (vault?.pool?.address) {
           const poolSymbol =
             vault?.assets.length > 1
-              ? `${vault?.assets[0]?.symbol}-${vault.assets[1].symbol}`
+              ? `${vault?.assets[0]?.symbol}-${vault.assets[1]?.symbol}`
               : vault?.assets[0]?.symbol;
 
           contractsInfo.push({
@@ -118,9 +118,9 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         vault.assets.map((asset) => {
           contractsInfo.push({
             logo: asset?.logo,
-            symbol: asset.symbol,
+            symbol: asset?.symbol,
             type: "Asset",
-            address: asset.address,
+            address: asset?.address,
             isCopy: false,
           });
         });
@@ -194,7 +194,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                     data-testid="contractsAddress"
                     className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]"
                   >
-                    {address.slice(0, 6)}...{address.slice(-4)}
+                    {address?.slice(0, 6)}...{address?.slice(-4)}
                   </span>
                   <div className="flex items-center">
                     {isCopy ? (

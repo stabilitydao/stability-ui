@@ -505,8 +505,8 @@ const SonicVaults = (): JSX.Element => {
     //search
     sortedVaults = sortedVaults.filter(
       (vault: TVault) =>
-        vault.symbol.toLowerCase().includes(searchValue) ||
-        vault.assetsSymbol.toLowerCase().includes(searchValue)
+        vault?.symbol.toLowerCase().includes(searchValue) ||
+        vault?.assetsSymbol.toLowerCase().includes(searchValue)
     );
     // pagination upd
     if (currentTab != 1) {
