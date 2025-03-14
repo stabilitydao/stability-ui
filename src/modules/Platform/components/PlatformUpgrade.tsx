@@ -131,6 +131,12 @@ const PlatformUpgrade = (): JSX.Element => {
     }
   }, []);
 
+  useEffect(() => {
+    console.log("platformUpdates:", platformUpdates);
+    console.log("upgradesTable: ", upgradesTable);
+    console.log("platform version: ", $platformVersions[$currentChainID]);
+  }, [upgradesTable, platformUpdates]);
+
   const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
 
   return (
