@@ -1340,7 +1340,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     try {
       if (shortId === "IQMF" || shortId === "IRMF") {
         // IQMF & IRMF strategies only
-        let assets: TAddress[] = vault.assets.map((asset) => asset.address);
+        let assets: TAddress[] = vault.assets.map((asset) => asset?.address);
         let IQMFAmounts: bigint[] = vault.assetsProportions.map((proportion) =>
           proportion ? amounts[0] : BIG_INT_VALUES.ZERO
         );
@@ -1432,7 +1432,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
     let localAssets = defaultOption?.assetsArray;
     if (shortId === "IQMF" || shortId === "IRMF") {
-      localAssets = vault.assets.map((asset) => asset.address);
+      localAssets = vault.assets.map((asset) => asset?.address);
     }
 
     if (underlyingToken?.address === option[0]) {
@@ -1711,7 +1711,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         let localAssets = defaultOption?.assetsArray;
         if (shortId === "IQMF" || shortId === "IRMF") {
           assetsLength = [BIG_INT_VALUES.ZERO, BIG_INT_VALUES.ZERO];
-          localAssets = vault.assets.map((asset) => asset.address);
+          localAssets = vault.assets.map((asset) => asset?.address);
         }
         const { result } = await _publicClient?.simulateContract({
           address: vault.address,
@@ -1966,7 +1966,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
           if (shortId === "IQMF" || shortId === "IRMF") {
             // IQMF & IRMF strategies only
-            let assets: TAddress[] = vault.assets.map((asset) => asset.address);
+            let assets: TAddress[] = vault.assets.map(
+              (asset) => asset?.address
+            );
             let IQMFAmounts: bigint[] = vault.assetsProportions.map(
               (proportion) => (proportion ? amounts[0] : BIG_INT_VALUES.ZERO)
             );
@@ -2176,7 +2178,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       // !!!! big bug was with filtering
       // but need think and maybe fix it
       const assetsData = vault.assets.map((asset: TAsset) =>
-        asset.address.toLowerCase()
+        asset?.address.toLowerCase()
       );
       /*.filter((_, index) => vault.assetsProportions[index])*/
       if (assetsData?.length) {
@@ -2420,9 +2422,9 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                             <label className="relative block h-[40px] w-full md:w-[345px]">
                               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                                 <img
-                                  src={currentAsset.logoURI}
-                                  alt={currentAsset.name}
-                                  title={currentAsset.name}
+                                  src={currentAsset?.logoURI}
+                                  alt={currentAsset?.name}
+                                  title={currentAsset?.name}
                                   className="w-4 h-4 text-neutral-500 rounded-full"
                                 />
                               </span>

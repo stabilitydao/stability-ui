@@ -581,7 +581,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         if (chainID === "146") {
           const scProportionIndex = assets.findIndex((asset) =>
-            ["scETH", "scUSD"].includes(asset.symbol as string)
+            ["scETH", "scUSD"].includes(asset?.symbol as string)
           );
 
           let points = strategyAssets.reduce((acc, asset, index) => {
