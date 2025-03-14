@@ -580,34 +580,47 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let ringsPoints: undefined | number = undefined;
 
         if (chainID === "146") {
-          const scProportionIndex = assets.findIndex((asset) =>
-            ["scETH", "scUSD"].includes(asset?.symbol as string)
-          );
+          switch (vault?.address?.toLowerCase()) {
+            case "0x4422117b942f4a87261c52348c36aefb0dcddb1a":
+              sonicActivePoints = 72;
+              break;
+            case "0x908db38302177901b10ffa74fa80adaeb0351ff1":
+              sonicActivePoints = 108;
+              ringsPoints = 18;
+              break;
+            default:
+              const scProportionIndex = assets.findIndex((asset) =>
+                ["scETH", "scUSD"].includes(asset?.symbol as string)
+              );
 
-          let points = strategyAssets.reduce((acc, asset, index) => {
-            let whitelistAssetPoints =
-              (sonicWhitelistedAssets[
-                asset as keyof typeof sonicWhitelistedAssets
-              ] ?? 0) * 2;
-            return (
-              acc +
-              ((assetsProportions?.[index] ?? 0) / 100) * whitelistAssetPoints
-            );
-          }, 0);
+              let points = strategyAssets.reduce((acc, asset, index) => {
+                let whitelistAssetPoints =
+                  (sonicWhitelistedAssets[
+                    asset as keyof typeof sonicWhitelistedAssets
+                  ] ?? 0) * 2;
+                return (
+                  acc +
+                  ((assetsProportions?.[index] ?? 0) / 100) *
+                    whitelistAssetPoints
+                );
+              }, 0);
 
-          const pointsMultiplier = extractPointsMultiplier(strategySpecific);
+              const pointsMultiplier =
+                extractPointsMultiplier(strategySpecific);
 
-          if (pointsMultiplier) {
-            points *= pointsMultiplier;
+              if (pointsMultiplier) {
+                points *= pointsMultiplier;
+              }
+
+              if (scProportionIndex !== -1) {
+                const scProportion = assetsProportions[scProportionIndex];
+
+                ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
+              }
+
+              sonicActivePoints = Number(points.toFixed(1));
+              break;
           }
-
-          if (scProportionIndex !== -1) {
-            const scProportion = assetsProportions[scProportionIndex];
-
-            ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
-          }
-
-          sonicActivePoints = Number(points.toFixed(1));
         }
 
         (vaults as { [key: string]: unknown })[vault?.address?.toLowerCase()] =
