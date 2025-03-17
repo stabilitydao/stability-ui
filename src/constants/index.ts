@@ -121,6 +121,7 @@ const SILO_POINTS = {
   "0xd13369f16e11ae3881f22c1dd37957c241bd0662": 14,
   "0x4422117b942f4a87261c52348c36aefb0dcddb1a": 13.5,
   "0x908db38302177901b10ffa74fa80adaeb0351ff1": 13.5,
+  "0x46bc0f0073ff1a6281d401cdc6cd56cec0495047": 9,
 };
 
 const CHAINS = [

@@ -714,9 +714,14 @@ const SonicVaults = (): JSX.Element => {
                                 : "text-[#eaecef]"
                             }`}
                           >
-                            <p className="text-end">
-                              {formatNumber(aprValue, "formatAPR")}%
-                            </p>
+                            <div className="flex flex-col justify-end">
+                              <p>{formatNumber(aprValue, "formatAPR")}%</p>
+                              {!!vault?.liveAPR && (
+                                <p className="text-[12px] text-neutral-700">
+                                  live. {vault?.liveAPR?.toFixed(2)}%
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <div className="visible__tooltip">
                             <div className="flex items-start flex-col gap-4">

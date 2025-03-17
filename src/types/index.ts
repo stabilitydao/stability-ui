@@ -281,6 +281,7 @@ type TVault = {
   sonicActivePoints: undefined | number;
   ringsPoints: undefined | number;
   leverageLending?: TLeverageLendingData;
+  liveAPR: undefined | number;
 };
 
 type TLeverageLendingData = {
