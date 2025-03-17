@@ -112,6 +112,11 @@ const DEXes = {
     algo: "",
     img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
   },
+  shadowExchange: {
+    name: "Shadow Exchange",
+    algo: "",
+    img: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/shadow.png",
+  },
 };
 
 const SILO_POINTS = {
