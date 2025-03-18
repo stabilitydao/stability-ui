@@ -580,6 +580,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let ringsPoints: undefined | number = undefined;
 
         let liveAPR: undefined | number = undefined;
+        let assetAPR: undefined | number = undefined;
 
         if (chainID === "146") {
           // Points
@@ -629,7 +630,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               break;
           }
 
-          // Leverage lending live APR
+          // Leverage lending live APR & asset APR
           if (vault?.leverageLending && vault?.assets?.length === 1) {
             const LLAssets = stabilityAPIData?.underlyings?.[146];
 
@@ -640,6 +641,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
               const dailyAPR = assetAPRData?.apr?.daily ?? 0;
 
+              assetAPR = dailyAPR;
               liveAPR = dailyAPR + supplyAPR - borrowAPR;
             }
           }
@@ -699,6 +701,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             ringsPoints,
             leverageLending: vault?.leverageLending,
             liveAPR,
+            assetAPR,
           };
 
         return vaults;

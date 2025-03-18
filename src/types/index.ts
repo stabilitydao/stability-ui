@@ -282,6 +282,7 @@ type TVault = {
   ringsPoints: undefined | number;
   leverageLending?: TLeverageLendingData;
   liveAPR: undefined | number;
+  assetAPR: undefined | number;
 };
 
 type TLeverageLendingData = {
