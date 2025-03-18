@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import axios from "axios";
 
+// import { formatUnits } from "viem";
+
 import { useStore } from "@nanostores/react";
 
 import { account } from "@store";
@@ -20,33 +22,49 @@ const SonicPointsButton = (): JSX.Element => {
     totalPoints: "-",
     passivePoints: "-",
     activityPoints: "-",
+    // ringsPoints: "-",
     rank: "-",
   });
 
   const getUserData = async () => {
     try {
-      const data = await axios.get(
-        `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${$account}`
-      );
+      // ringsResponse
+      const [sonicResponse] = await Promise.all([
+        axios.get(
+          `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${$account}`
+        ),
+        // axios.get(`https://points-api.rings.money/points/${$account}`),
+      ]);
+
+      const sonicData = sonicResponse?.data;
+      // const ringsData = ringsResponse?.data;
 
       const totalPoints = String(
-        formatNumber(data.data.sonic_points, "abbreviate")
+        formatNumber(sonicData.sonic_points, "abbreviate")
       ).slice(1);
 
       const passivePoints = String(
-        formatNumber(data.data.passive_liquidity_points, "abbreviate")
+        formatNumber(sonicData.passive_liquidity_points, "abbreviate")
       ).slice(1);
 
       const activityPoints = String(
-        formatNumber(data.data.active_liquidity_points, "abbreviate")
+        formatNumber(sonicData.active_liquidity_points, "abbreviate")
       ).slice(1);
 
-      const rank = data.data.rank;
+      // const ringsPoints = String(
+      //   formatNumber(
+      //     Number(formatUnits(ringsData.total, 36)).toFixed(),
+      //     "abbreviate"
+      //   )
+      // ).slice(1);
+
+      const rank = sonicData.rank;
 
       setUser({
         totalPoints,
         passivePoints,
         activityPoints,
+        // ringsPoints,
         rank,
       });
     } catch (error) {
@@ -151,6 +169,13 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.activityPoints}</p>
             </div>
           </div>
+          {/* <div className="flex items-center gap-[8px]">
+            <img src="/rings.png" alt="Rings" className="w-[34px]" />
+            <div>
+              <span className="text-neutral-500 text-[12px]">Rings Points</span>
+              <p className="text-[14px] leading-4">{user.ringsPoints}</p>
+            </div>
+          </div> */}
           <div className="flex items-center justify-between mt-3">
             <span className="text-[14px]">Rank:</span>
             <span className="text-warning-400">{user.rank}</span>

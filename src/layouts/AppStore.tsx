@@ -579,7 +579,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         let sonicActivePoints: undefined | number = undefined;
         let ringsPoints: undefined | number = undefined;
 
+        let liveAPR: undefined | number = undefined;
+        let assetAPR: undefined | number = undefined;
+
         if (chainID === "146") {
+          // Points
           switch (vault?.address?.toLowerCase()) {
             case "0x4422117b942f4a87261c52348c36aefb0dcddb1a":
               sonicActivePoints = 72;
@@ -587,6 +591,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             case "0x908db38302177901b10ffa74fa80adaeb0351ff1":
               sonicActivePoints = 108;
               ringsPoints = 18;
+              break;
+            case "0x46bc0f0073ff1a6281d401cdc6cd56cec0495047":
+              sonicActivePoints = 48;
+              ringsPoints = 9;
               break;
             default:
               const scProportionIndex = assets.findIndex((asset) =>
@@ -620,6 +628,22 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               sonicActivePoints = Number(points.toFixed(1));
               break;
+          }
+
+          // Leverage lending live APR & asset APR
+          if (vault?.leverageLending && vault?.assets?.length === 1) {
+            const LLAssets = stabilityAPIData?.underlyings?.[146];
+
+            const assetAPRData = LLAssets?.[vault?.assets?.[0]];
+
+            if (assetAPRData) {
+              const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
+              const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
+              const dailyAPR = assetAPRData?.apr?.daily ?? 0;
+
+              assetAPR = dailyAPR;
+              liveAPR = dailyAPR + supplyAPR - borrowAPR;
+            }
           }
         }
 
@@ -676,6 +700,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             sonicActivePoints,
             ringsPoints,
             leverageLending: vault?.leverageLending,
+            liveAPR,
+            assetAPR,
           };
 
         return vaults;

@@ -90,9 +90,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
             <Strategy network={network} vault={localVault} />
           </div>
         </div>
-        {isLeverageLending && (
-          <LeverageLending data={localVault?.leverageLending} />
-        )}
+        {isLeverageLending && <LeverageLending vault={localVault} />}
 
         <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
           <div className="w-full lg:w-1/2">
