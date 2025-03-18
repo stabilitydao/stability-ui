@@ -639,10 +639,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             if (assetAPRData) {
               const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
               const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
+              const leverage = vault?.leverageLending?.leverage ?? 0;
               const dailyAPR = assetAPRData?.apr?.daily ?? 0;
 
               assetAPR = dailyAPR;
-              liveAPR = dailyAPR + supplyAPR - borrowAPR;
+              liveAPR = (dailyAPR + supplyAPR - borrowAPR) * leverage;
             }
           }
         }
