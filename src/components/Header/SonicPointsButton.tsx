@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from "react";
 
 import axios from "axios";
 
-// import { formatUnits } from "viem";
+import { formatUnits } from "viem";
 
 import { useStore } from "@nanostores/react";
 
 import { account } from "@store";
 
 import { playAudio, formatNumber } from "@utils";
+
+import { seeds } from "@stabilitydao/stability";
 
 const SonicPointsButton = (): JSX.Element => {
   const $account = useStore(account);
@@ -22,22 +24,24 @@ const SonicPointsButton = (): JSX.Element => {
     totalPoints: "-",
     passivePoints: "-",
     activityPoints: "-",
-    // ringsPoints: "-",
+    ringsPoints: "-",
+    siloPoints: "-",
     rank: "-",
   });
 
   const getUserData = async () => {
     try {
-      // ringsResponse
-      const [sonicResponse] = await Promise.all([
+      const [sonicResponse, ringsResponse, siloResponse] = await Promise.all([
         axios.get(
           `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${$account}`
         ),
-        // axios.get(`https://points-api.rings.money/points/${$account}`),
+        axios.get(`https://points-api.rings.money/points/${$account}`),
+        axios.get(`${seeds[0]}/rewards/silo-points/${$account}`),
       ]);
 
       const sonicData = sonicResponse?.data;
-      // const ringsData = ringsResponse?.data;
+      const ringsData = ringsResponse?.data;
+      const siloData = siloResponse?.data;
 
       const totalPoints = String(
         formatNumber(sonicData.sonic_points, "abbreviate")
@@ -51,12 +55,16 @@ const SonicPointsButton = (): JSX.Element => {
         formatNumber(sonicData.active_liquidity_points, "abbreviate")
       ).slice(1);
 
-      // const ringsPoints = String(
-      //   formatNumber(
-      //     Number(formatUnits(ringsData.total, 36)).toFixed(),
-      //     "abbreviate"
-      //   )
-      // ).slice(1);
+      const ringsPoints = String(
+        formatNumber(
+          Number(formatUnits(ringsData.total, 36)).toFixed(),
+          "abbreviate"
+        )
+      ).slice(1);
+
+      const siloPoints = String(
+        formatNumber(siloData?.userPoints ?? 0, "abbreviate")
+      ).slice(1);
 
       const rank = sonicData.rank;
 
@@ -64,7 +72,8 @@ const SonicPointsButton = (): JSX.Element => {
         totalPoints,
         passivePoints,
         activityPoints,
-        // ringsPoints,
+        ringsPoints,
+        siloPoints,
         rank,
       });
     } catch (error) {
@@ -169,16 +178,31 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.activityPoints}</p>
             </div>
           </div>
-          {/* <div className="flex items-center gap-[8px]">
+
+          <div className="flex items-center justify-between mt-3">
+            <span className="text-[14px]">Rank:</span>
+            <span className="text-warning-400">{user.rank}</span>
+          </div>
+
+          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
+
+          <div className="flex items-center gap-[8px]">
             <img src="/rings.png" alt="Rings" className="w-[34px]" />
             <div>
               <span className="text-neutral-500 text-[12px]">Rings Points</span>
               <p className="text-[14px] leading-4">{user.ringsPoints}</p>
             </div>
-          </div> */}
-          <div className="flex items-center justify-between mt-3">
-            <span className="text-[14px]">Rank:</span>
-            <span className="text-warning-400">{user.rank}</span>
+          </div>
+          <div className="flex items-center gap-[8px]">
+            <img
+              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+              alt="Silo"
+              className="w-[34px] rounded-full"
+            />
+            <div>
+              <span className="text-neutral-500 text-[12px]">Silo Points</span>
+              <p className="text-[14px] leading-4">{user.siloPoints}</p>
+            </div>
           </div>
         </div>
       )}
