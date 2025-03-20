@@ -631,7 +631,23 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           }
 
           // Leverage lending live APR & asset APR
-          if (vault?.leverageLending && vault?.assets?.length === 1) {
+          if (
+            vault?.address?.toLowerCase() ===
+            "0x2fbeba931563feaab73e8c66d7499c49c8ada224"
+          ) {
+            const stS = (stabilityAPIData?.underlyings?.[146] as any)?.[
+              "0xE5DA20F15420aD15DE0fa650600aFc998bbE3955"
+            ];
+
+            if (stS) {
+              const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
+              const borrowAPR = vault?.leverageLending?.borrowApr ?? 0;
+              const leverage = vault?.leverageLending?.leverage ?? 0;
+              const stSAPR = stS?.apr?.daily ?? 0;
+
+              liveAPR = (supplyAPR - borrowAPR - stSAPR) * leverage;
+            }
+          } else if (vault?.leverageLending && vault?.assets?.length === 1) {
             const LLAssets = stabilityAPIData?.underlyings?.[146];
 
             const assetAPRData = LLAssets?.[vault?.assets?.[0]];
