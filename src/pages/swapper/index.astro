@@ -1,0 +1,10 @@
+---
+import {Swapper} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Swapper">
+    <div class="platform max-w-[1200px]">
+        <Swapper client:only="react" />
+    </div>
+</Layout>
