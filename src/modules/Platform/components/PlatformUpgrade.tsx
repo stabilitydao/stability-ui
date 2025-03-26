@@ -133,6 +133,14 @@ const PlatformUpgrade = (): JSX.Element => {
 
   const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
 
+  useEffect(() => {
+    console.log("--------------------------------------------");
+    console.log("currentChainID", $currentChainID);
+    console.log("platformUpdates", platformUpdates);
+    console.log("platformVersion", $platformVersions);
+    console.log("upgradesTable", upgradesTable);
+  }, [platformUpdates, $platformVersions, upgradesTable]);
+
   return (
     <>
       {!!platformUpdates?.newVersion &&
@@ -216,7 +224,9 @@ const PlatformUpgrade = (): JSX.Element => {
             </table>
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="opacity-0">update</div>
+      )}
     </>
   );
 };
