@@ -8,6 +8,8 @@ import { sortTable, getShortAddress } from "@utils";
 
 import { BC_POOL_TABLE, POOL_TABLE } from "@constants";
 
+import { GRAPH_ENDPOINTS } from "src/constants/env";
+
 import type { TAddress, TTableColumn, TPoolTable } from "@types";
 
 const Swapper = (): JSX.Element => {
@@ -19,8 +21,7 @@ const Swapper = (): JSX.Element => {
 
   const initTablesData = async () => {
     try {
-      const GRAPH_URL =
-        "https://api.goldsky.com/api/public/project_cm2v16o5ct0ql01vr3m5o0vt2/subgraphs/stability-sonic/0.0.27/gn";
+      const GRAPH_URL = GRAPH_ENDPOINTS[146];
 
       const GRAPH_QUERY = `{
               ammadapterEntities {

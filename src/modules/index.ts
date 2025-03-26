@@ -19,6 +19,7 @@ import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { SonicVaults } from "./SonicVaults";
 import { STBL } from "./STBL";
+import { XSTBL } from "./xSTBL";
 
 export {
   Factory,
@@ -41,5 +42,6 @@ export {
   Home,
   SonicVaults,
   STBL,
+  XSTBL,
   Swapper,
 };
