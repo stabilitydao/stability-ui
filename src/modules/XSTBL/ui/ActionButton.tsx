@@ -1,10 +1,11 @@
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useSwitchChain } from "wagmi";
 
 import { useStore } from "@nanostores/react";
 
 import { Loader } from "@ui";
 
-import { connected } from "@store";
+import { connected, currentChainID } from "@store";
 
 interface IProps {
   type: string;
@@ -20,8 +21,10 @@ const ActionButton: React.FC<IProps> = ({
   actionFunction,
 }) => {
   const $connected = useStore(connected);
+  const $currentChainID = useStore(currentChainID);
 
   const { open } = useWeb3Modal();
+  const { switchChain } = useSwitchChain();
 
   const actionTypes = [
     "Convert",
@@ -30,40 +33,52 @@ const ActionButton: React.FC<IProps> = ({
     "Cancel Vest",
     "Stake",
     "Unstake",
+    "Approve",
   ];
 
   return (
     <div>
       {$connected ? (
         <>
-          {actionTypes.includes(type) ? (
-            <button
-              disabled={transactionInProgress}
-              className={`w-full flex items-center text-[20px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl h-[50px] ${
-                transactionInProgress
-                  ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
-                  : ""
-              }`}
-              type="button"
-              onClick={actionFunction}
-            >
-              <p>{needConfirm ? "Confirm in wallet" : type}</p>
+          {$currentChainID === "146" ? (
+            <>
+              {actionTypes.includes(type) ? (
+                <button
+                  disabled={transactionInProgress}
+                  className={`w-full flex items-center text-[20px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl h-[50px] ${
+                    transactionInProgress
+                      ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                      : ""
+                  }`}
+                  type="button"
+                  onClick={actionFunction}
+                >
+                  <p>{needConfirm ? "Confirm in wallet" : type}</p>
 
-              {transactionInProgress && <Loader color={"#a6a0b2"} />}
-            </button>
-          ) : type === "insufficientBalance" ? (
-            <button
-              disabled
-              className="w-full flex items-center justify-center text-[20px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl h-[50px]"
-            >
-              Insufficient Balance
-            </button>
+                  {transactionInProgress && <Loader color={"#a6a0b2"} />}
+                </button>
+              ) : type === "insufficientBalance" ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center text-[20px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl h-[50px]"
+                >
+                  Insufficient Balance
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center text-[20px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl h-[50px]"
+                >
+                  Enter Amount
+                </button>
+              )}
+            </>
           ) : (
             <button
-              disabled
-              className="w-full flex items-center justify-center text-[20px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl h-[50px]"
+              className="w-full flex items-center text-[20px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl h-[50px]"
+              onClick={() => switchChain({ chainId: 146 })}
             >
-              Enter Amount
+              Switch Network
             </button>
           )}
         </>

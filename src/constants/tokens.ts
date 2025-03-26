@@ -42,6 +42,21 @@ const cbETH: TAddress[] = ["0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22"];
 const MORE: TAddress[] = ["0x25ea98ac87a38142561ea70143fd44c4772a16b6"];
 const USTB: TAddress[] = ["0x83fedbc0b85c6e29b589aa6bdefb1cc581935ecd"];
 
+const STABILITY_TOKENS = {
+  146: {
+    stbl: {
+      address: "0x78a76316F66224CBaCA6e70acB24D5ee5b2Bd2c7",
+      symbol: "STBL",
+      decimals: 18,
+    },
+    xstbl: {
+      address: "0x902215dd96a291b256a3aef6c4dee62d2a9b80cb",
+      symbl: "xSTBL",
+      decimals: 18,
+    },
+  },
+};
+
 export {
   USDC,
   USDT,
@@ -59,4 +74,5 @@ export {
   MORE,
   USTB,
   scUSD,
+  STABILITY_TOKENS,
 };

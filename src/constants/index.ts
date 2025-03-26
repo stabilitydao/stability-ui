@@ -33,6 +33,7 @@ import {
   MORE,
   USTB,
   scUSD,
+  STABILITY_TOKENS,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
@@ -257,4 +258,5 @@ export {
   BC_POOL_TABLE,
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
+  STABILITY_TOKENS,
 };
