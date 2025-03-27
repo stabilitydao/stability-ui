@@ -147,7 +147,7 @@ const Stake = (): JSX.Element => {
             setButton("Stake");
           }
         }
-      } catch (err) {
+      } catch (error) {
         setNeedConfirm(false);
         const newAllowance = await sonicClient.readContract({
           address: STABILITY_TOKENS[146].xstbl.address as TAddress,
@@ -165,6 +165,8 @@ const Stake = (): JSX.Element => {
         if (Number(parsedAllowance) >= Number(amount)) {
           setButton("Stake");
         }
+
+        console.error("Approve error:", error);
       }
     }
     setTransactionInProgress(false);

@@ -157,7 +157,7 @@ const ConvertForm = (): JSX.Element => {
             setButton("Convert");
           }
         }
-      } catch (err) {
+      } catch (error) {
         setNeedConfirm(false);
         const newAllowance = await sonicClient.readContract({
           address: STABILITY_TOKENS[146].stbl.address as TAddress,
@@ -178,6 +178,7 @@ const ConvertForm = (): JSX.Element => {
         if (Number(parsedAllowance) >= Number(amount)) {
           setButton("Convert");
         }
+        console.error("Approve error:", error);
       }
     }
     setTransactionInProgress(false);
