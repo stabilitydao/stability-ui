@@ -132,7 +132,7 @@ const PlatformUpgrade = (): JSX.Element => {
 
   useEffect(() => {
     fetchPlatformUpdates();
-  }, []);
+  }, [deployments, $publicClient, $platformVersions]);
 
   const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
 
