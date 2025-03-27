@@ -64,6 +64,13 @@ const ActionButton: React.FC<IProps> = ({
                 >
                   Insufficient Balance
                 </button>
+              ) : type === "disabledCancelVest" ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center text-[20px] font-semibold text-neutral-500 bg-neutral-900 py-3 rounded-2xl h-[50px]"
+                >
+                  Cancel Vest
+                </button>
               ) : (
                 <button
                   disabled

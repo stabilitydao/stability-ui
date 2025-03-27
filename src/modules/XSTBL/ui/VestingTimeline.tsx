@@ -1,10 +1,46 @@
+import { useState, useEffect } from "react";
+
+import { formatNumber } from "@utils";
+
 interface IProps {
   type: string;
+  value: number;
+  activeVest: {
+    id: number;
+    amount: number;
+    start: number;
+    end: number;
+    isFullyExited: boolean;
+  };
 }
 
-const VestingTimeline: React.FC<IProps> = ({ type }) => {
+function getTimeProgress(start: number, end: number): number {
+  const totalDays = (end - start) / (1000 * 60 * 60 * 24);
+  const passedDays = (Date.now() - start) / (1000 * 60 * 60 * 24);
+
+  const progress = Math.min((passedDays / totalDays) * totalDays, totalDays);
+
+  return Number(progress.toFixed(1));
+}
+
+const VestingTimeline: React.FC<IProps> = ({ type, value, activeVest }) => {
+  const [progress, setProgress] = useState({ time: 0, bar: 0 });
+
+  useEffect(() => {
+    if (activeVest) {
+      const timeProgress = getTimeProgress(
+        activeVest.start * 1000,
+        activeVest.end * 1000
+      );
+
+      const barProgress = (100 / 180) * timeProgress;
+
+      setProgress({ time: timeProgress, bar: barProgress });
+    }
+  }, [activeVest]);
+
   return (
-    <div className="mb-12 mt-16">
+    <div className="my-12">
       {type === "vestedExit" ? (
         <div className="relative h-16 w-full">
           <div
@@ -14,13 +50,13 @@ const VestingTimeline: React.FC<IProps> = ({ type }) => {
             Cancel Ends
           </div>
           <div className="absolute right-0 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined">
-            0.016404 xSTBL
+            {formatNumber(value, "format")} xSTBL
           </div>
           <div
             className="absolute -translate-x-1/2 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined"
             style={{ left: "33.3333%" }}
           >
-            0.010936 xSTBL
+            {formatNumber(value / 1.5, "format")} xSTBL
           </div>
           <div className="bg-accent-900 rounded-2xl relative h-full overflow-hidden">
             <div
@@ -67,13 +103,7 @@ const VestingTimeline: React.FC<IProps> = ({ type }) => {
             Cancel Ends
           </div>
           <div className="absolute right-0 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined">
-            0.016404 xSTBL
-          </div>
-          <div
-            className="absolute -translate-x-1/2 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined"
-            style={{ left: "33.3333%" }}
-          >
-            0.010936 xSTBL
+            {formatNumber(activeVest.amount, "format")} xSTBL
           </div>
           <div className="bg-accent-900 rounded-2xl relative h-full overflow-hidden">
             <div
@@ -88,12 +118,14 @@ const VestingTimeline: React.FC<IProps> = ({ type }) => {
             >
               <div className="absolute inset-y-0 left-1/2 w-32 -translate-x-1/2 bg-gradient-to-r from-transparent via-accent-500/20 to-transparent"></div>
             </div>
-            <div
-              className="absolute h-full w-[4px] -translate-x-1/2 bg-accent-500"
-              style={{ left: "33.3333%" }}
-            >
-              <div className="absolute inset-y-0 left-1/2 w-32 -translate-x-1/2 bg-gradient-to-r from-transparent via-accent-500/20 to-transparent"></div>
-            </div>
+            {!activeVest.isFullyExited && (
+              <div
+                className="absolute h-full w-[4px] -translate-x-1/2 bg-accent-500"
+                style={{ left: `${progress.bar}%` }}
+              >
+                <div className="absolute inset-y-0 left-1/2 w-32 -translate-x-1/2 bg-gradient-to-r from-transparent via-accent-500/20 to-transparent"></div>
+              </div>
+            )}
           </div>
           <div
             className="absolute -translate-x-1/2 top-full translate-y-1 whitespace-nowrap text-base font-bold text-dark"
@@ -104,12 +136,14 @@ const VestingTimeline: React.FC<IProps> = ({ type }) => {
           <div className="absolute right-0 top-full translate-y-1 whitespace-nowrap text-base font-bold text-dark">
             180 days
           </div>
-          <div
-            className="absolute -translate-x-1/2 top-full translate-y-1 whitespace-nowrap text-base font-bold text-dark"
-            style={{ left: "33.3333%" }}
-          >
-            61 days
-          </div>
+          {!activeVest.isFullyExited && (
+            <div
+              className="absolute -translate-x-1/2 top-full translate-y-1 whitespace-nowrap text-base font-bold text-dark"
+              style={{ left: `${progress.bar}%` }}
+            >
+              {progress.time} days
+            </div>
+          )}
         </div>
       ) : (
         ""

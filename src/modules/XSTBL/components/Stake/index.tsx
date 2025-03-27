@@ -415,7 +415,6 @@ const Stake = (): JSX.Element => {
                 </>
               ) : (
                 <>
-                  {" "}
                   {!!$connected && !!balances.stakedXSTBL && (
                     <button
                       type="button"

@@ -1,32 +1,71 @@
 import { useState, useEffect, useRef } from "react";
 
+import { formatUnits, parseUnits } from "viem";
+
+import { writeContract } from "@wagmi/core";
+
 import { useStore } from "@nanostores/react";
 
-import { ActionButton, VestingTimeline } from "../../ui";
+import { ActionButton, VestingTimeline, Timer } from "../../ui";
 
-import { connected } from "@store";
+import { getTransactionReceipt } from "../../functions";
+
+import {
+  sonicClient,
+  ERC20ABI,
+  wagmiConfig,
+  IXStakingABI,
+  IXSTBLABI,
+  IRevenueRouterABI,
+} from "@web3";
+
+import { formatNumber } from "@utils";
+
+import { account, connected, lastTx } from "@store";
+
+import { STABILITY_TOKENS } from "@constants";
+
+import type { TAddress } from "@types";
 
 const VestedExit: React.FC = () => {
   const $connected = useStore(connected);
+  const $account = useStore(account);
+  const $lastTx = useStore(lastTx);
 
   const input = useRef<HTMLInputElement>(null);
+  const dropDownRef = useRef<HTMLDivElement>(null);
+
+  const [timelineValue, setTimelineValue] = useState(0);
 
   const [balance, setBalance] = useState(0);
 
-  const [inputValue, setInputValue] = useState("");
-  const [button, setButton] = useState("Vest"); // Cancel Vest || Vest
+  const [button, setButton] = useState(""); // Cancel Vest || Vest
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
 
+  const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+
   const [vestType, setVestType] = useState("vestedExit"); //exitVest
+
+  const [vestData, setVestData] = useState<
+    { amount: number; start: number; end: number; isFullyExited: boolean }[]
+  >([]);
+
+  const [activeVest, setActiveVest] = useState<{
+    id: number;
+    amount: number;
+    start: number;
+    end: number;
+    isFullyExited: boolean;
+  }>({ id: 0, amount: 0, start: 0, end: 0, isFullyExited: true });
 
   const handleInputChange = (type = "") => {
     let numericValue = input?.current?.value.replace(/[^0-9.]/g, "");
 
-    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+    numericValue = numericValue?.replace(/^(\d*\.)(.*)\./, "$1$2");
 
-    if (numericValue.startsWith(".")) {
+    if (numericValue?.startsWith(".")) {
       numericValue = "0" + numericValue;
     }
 
@@ -34,17 +73,37 @@ const VestedExit: React.FC = () => {
       numericValue = balance.toString();
     }
 
-    // buyPreview(numericValue);
+    if (input?.current) {
+      input.current.value = numericValue;
 
-    // setInputValue(numericValue);
-    input.current.value = numericValue;
+      if (!Number(numericValue)) {
+        setButton("");
+      } else if (Number(numericValue) > balance) {
+        setButton("insufficientBalance");
+      } else if (Number(numericValue) <= balance) {
+        setButton("Vest");
+      }
+      setTimelineValue(Number(input.current.value));
+    }
   };
 
-  const vestHandler = async () => {
+  const handleActiveVest = (id: number) => {
+    const _activeVest = vestData[id];
+
+    if (_activeVest.isFullyExited) {
+      setButton("disabledCancelVest");
+    } else {
+      setButton("Cancel Vest");
+    }
+    setDropDownSelector(false);
+    setActiveVest(_activeVest);
+  };
+
+  const vestFunctionHandler = async () => {
     if (button === "Vest") {
       await vest();
     }
-    if (button === "Cancel Vest") {
+    if (button === "Cancel Vest" && vestData.length) {
       await cancelVest();
     }
   };
@@ -52,39 +111,160 @@ const VestedExit: React.FC = () => {
   const vestedTypeHandler = (type: string) => {
     if (type === "exitVest") {
       setVestType("exitVest");
-      setButton("Cancel Vest");
+      if (activeVest.isFullyExited) {
+        setButton("disabledCancelVest");
+      } else {
+        setButton("Cancel Vest");
+      }
     } else if (type === "vestedExit") {
       setButton("");
+      setTimelineValue(0);
       setVestType("vestedExit");
     }
   };
 
   const cancelVest = async () => {
-    console.log("cancelVest");
+    setTransactionInProgress(true);
+    try {
+      setNeedConfirm(true);
+
+      const vestID = activeVest.id - 1;
+
+      const convertSTBL = await writeContract(wagmiConfig, {
+        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        abi: IXSTBLABI,
+        functionName: "exitVest",
+        args: [vestID],
+      });
+      setNeedConfirm(false);
+
+      const transaction = await getTransactionReceipt(convertSTBL);
+
+      if (transaction?.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+
+        setButton("disabledCancelVest");
+      }
+    } catch (error) {
+      setNeedConfirm(false);
+      console.error("Exit vest error:", error);
+    }
+    setTransactionInProgress(false);
   };
 
   const vest = async () => {
-    console.log("vest");
+    setTransactionInProgress(true);
+    const decimals = STABILITY_TOKENS[146].stbl.decimals;
+
+    const amount = Number(input?.current?.value);
+
+    const value = parseUnits(String(amount), decimals);
+
+    try {
+      setNeedConfirm(true);
+      const convertSTBL = await writeContract(wagmiConfig, {
+        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        abi: IXSTBLABI,
+        functionName: "createVest",
+        args: [value],
+      });
+      setNeedConfirm(false);
+
+      const transaction = await getTransactionReceipt(convertSTBL);
+
+      if (transaction?.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+
+        input.current.value = "";
+        setButton("");
+      }
+    } catch (error) {
+      setNeedConfirm(false);
+      console.error("Create vest error:", error);
+    }
+    setTransactionInProgress(false);
   };
 
-  useEffect(() => {}, []);
+  const getData = async () => {
+    try {
+      const XSTBLBalance = await sonicClient.readContract({
+        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        abi: ERC20ABI,
+        functionName: "balanceOf",
+        args: [$account as TAddress],
+      });
+
+      const userTotalVests = await sonicClient.readContract({
+        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+        abi: IXSTBLABI,
+        functionName: "usersTotalVests",
+        args: [$account as TAddress],
+      });
+
+      const userVests = [];
+
+      for (let i = 0; i < Number(userTotalVests); i++) {
+        const vestInfo = (await sonicClient.readContract({
+          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          abi: IXSTBLABI,
+          functionName: "vestInfo",
+          args: [$account as TAddress, i],
+        })) as [bigint, bigint, bigint];
+
+        if (vestInfo?.length === 3) {
+          let amount = Number(
+            formatUnits(
+              vestInfo?.[0] as bigint,
+              STABILITY_TOKENS[146].xstbl.decimals
+            )
+          );
+
+          let start = Number(vestInfo[1]);
+
+          let end = Number(vestInfo[2]);
+
+          let isFullyExited = !amount;
+
+          userVests.push({ id: i + 1, amount, start, end, isFullyExited });
+        }
+      }
+
+      let parsedBalance = Number(
+        formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+      );
+
+      setBalance(parsedBalance);
+      setVestData(userVests);
+      setActiveVest(userVests[userVests.length - 1]);
+    } catch (error) {
+      console.error("Get STBL balance error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if ($account) {
+      getData();
+    }
+  }, [$account, $lastTx]);
 
   return (
     <div className="bg-accent-950 p-5 rounded-2xl flex flex-col gap-3 justify-between lg:w-[70%]">
       <div className="flex flex-col gap-3">
         <div className="flex items-center font-semibold relative text-[26px]">
           <p
-            className={`w-1/2 md:w-auto whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-4 border-b-[1.5px] border-transparent ${vestType === "vestedExit" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+            className={`w-1/2 md:w-auto whitespace-nowrap z-20 text-center px-4 pb-4 border-b-[1.5px] border-transparent ${vestType === "vestedExit" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"} ${!!vestData.length ? "cursor-pointer" : ""}`}
             onClick={() => vestedTypeHandler("vestedExit")}
           >
             Vested Exit
           </p>
-          <p
-            className={`w-1/2 md:w-auto whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-4 border-b-[1.5px]  border-transparent ${vestType === "exitVest" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
-            onClick={() => vestedTypeHandler("exitVest")}
-          >
-            Exit Vest
-          </p>
+          {!!vestData.length && (
+            <p
+              className={`w-1/2 md:w-auto whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-4 border-b-[1.5px]  border-transparent ${vestType === "exitVest" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+              onClick={() => vestedTypeHandler("exitVest")}
+            >
+              Exit Vest
+            </p>
+          )}
         </div>
 
         <span className="text-[18px]">
@@ -94,8 +274,8 @@ const VestedExit: React.FC = () => {
         </span>
       </div>
       <div>
-        <div>
-          {vestType === "vestedExit" && (
+        {vestType === "vestedExit" && (
+          <div>
             <label className="relative block h-[60px] w-full">
               <img
                 src="/STBL_plain.png"
@@ -120,52 +300,108 @@ const VestedExit: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleInputChange("max")}
-                  className="absolute inset-y-0 right-1 flex items-center px-3 py-1 text-accent-400 text-[12px] font-semibold"
+                  className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
                 >
                   Max
                 </button>
               )}
             </label>
-          )}
 
-          <div
-            className={`text-[12px] leading-3 text-neutral-500 flex items-center gap-1 mt-1 ${
-              !!balance ? "" : "opacity-0"
-            }`}
-          >
-            <span>Balance: </span>
-            <span>{!!balance ? balance : "0"}</span>
+            <div
+              className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
+                !!balance ? "" : "opacity-0"
+              }`}
+            >
+              <span>Balance: </span>
+              <span>{!!balance ? balance : "0"} xSTBL</span>
+            </div>
           </div>
-        </div>
+        )}
 
-        <VestingTimeline type={vestType} />
+        <VestingTimeline
+          type={vestType}
+          value={timelineValue}
+          activeVest={activeVest}
+        />
 
         {vestType === "exitVest" && (
-          <div className="my-8 flex flex-col">
-            <div className="flex items-center gap-3 py-3 px-4 bg-accent-900 rounded-t-2xl border border-accent-500">
-              <img src="/logo.svg" alt="STBL" className="w-5 h-5" />
-              <span>xSTBL Vest #1</span>
+          <div className="my-8 flex flex-col relative">
+            <div
+              onClick={() => setDropDownSelector((prevState) => !prevState)}
+              className="flex items-center justify-between py-3 px-4 bg-accent-900 rounded-t-2xl border border-accent-500 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <img src="/logo.svg" alt="STBL" className="w-5 h-5" />
+                <span>xSTBL Vest #{activeVest.id}</span>
+              </div>
+
+              <img
+                className={`transition delay-[50ms] select-none ${
+                  dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
+                }`}
+                src="/arrow-down.svg"
+                alt="arrowDown"
+              />
             </div>
-            <div className="flex flex-col gap-1 bg-transparent py-3 px-4 border border-t-0 rounded-b-2xl border-accent-500">
-              <div className="flex items-center justify-between">
-                <span className="opacity-70 text-light text-[18px]">
-                  Amount:
-                </span>
-                <span>0.001 xSTBL</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="opacity-70 text-light text-[18px]">
-                  Vest end:
-                </span>
-                <span>21/09/25</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="opacity-70 text-light text-[18px]">
-                  Time left to exit:
-                </span>
-                <span>13:23:10:01</span>
+            <div
+              ref={dropDownRef}
+              className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 top-[55px] select-none ${
+                dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
+              } `}
+            >
+              <div className="flex flex-col items-start">
+                {vestData.map((data, index: number) => (
+                  <div
+                    key={data.id}
+                    onClick={() => handleActiveVest(index)}
+                    className={`${!index ? "rounded-t-2xl" : ""} ${index === vestData.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center justify-between gap-2 ${
+                      data.id === activeVest.id ? "bg-accent-800" : ""
+                    }`}
+                    title={`xSTBL Vest #${data.id}`}
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-[16px] overflow-hidden text-ellipsis whitespace-nowrap">
+                        xSTBL Vest #{data.id}
+                      </span>
+                      <span className="text-[14px]">
+                        {data.isFullyExited
+                          ? "User Exited"
+                          : `Lock amount: ${data.amount} xSTBL`}
+                      </span>
+                    </div>
+                    <span className="text-[16px]">{`Expires: ${new Date(data.end * 1000).toLocaleDateString()}`}</span>
+                  </div>
+                ))}
               </div>
             </div>
+            {activeVest.isFullyExited ? (
+              <div className="text-center bg-transparent py-3 px-4 border border-t-0 rounded-b-2xl border-accent-500">
+                Fully Exited
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1 bg-transparent py-3 px-4 border border-t-0 rounded-b-2xl border-accent-500">
+                <div className="flex items-center justify-between">
+                  <span className="opacity-70 text-light text-[18px]">
+                    Amount:
+                  </span>
+                  <span>{formatNumber(activeVest.amount, "format")} xSTBL</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="opacity-70 text-light text-[18px]">
+                    Vest end:
+                  </span>
+                  <span>
+                    {new Date(activeVest.end * 1000).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="opacity-70 text-light text-[18px]">
+                    Time left to exit:
+                  </span>
+                  <Timer end={activeVest.end} />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -173,7 +409,7 @@ const VestedExit: React.FC = () => {
           type={button}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
-          actionFunction={vestHandler}
+          actionFunction={vestFunctionHandler}
         />
       </div>
     </div>
