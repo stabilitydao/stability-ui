@@ -233,27 +233,6 @@ const Stake = (): JSX.Element => {
         pendingRevenue: 0,
       };
 
-      const XSTBLBalance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
-        abi: ERC20ABI,
-        functionName: "balanceOf",
-        args: [$account as TAddress],
-      });
-
-      const stakedSTBLBalance = await sonicClient.readContract({
-        address: STAKING_CONTRACT as TAddress,
-        abi: IXStakingABI,
-        functionName: "balanceOf",
-        args: [$account as TAddress],
-      });
-
-      const stakedSTBLAllowance = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, STAKING_CONTRACT as TAddress],
-      });
-
       const _totalStaked = await sonicClient.readContract({
         address: STAKING_CONTRACT,
         abi: IXStakingABI,
@@ -272,21 +251,6 @@ const Stake = (): JSX.Element => {
         functionName: "pendingRevenue",
       });
 
-      let parsedBalance = Number(
-        formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
-      );
-
-      let parsedStakedBalance = Number(
-        formatUnits(
-          stakedSTBLBalance as bigint,
-          STABILITY_TOKENS[146].xstbl.decimals
-        )
-      );
-
-      let parsedAllowance = Number(
-        formatUnits(stakedSTBLAllowance, STABILITY_TOKENS[146].xstbl.decimals)
-      );
-
       let parsedTotal = Number(formatUnits(_totalStaked as bigint, 18));
 
       let parsedPendingRebase = Number(
@@ -296,6 +260,10 @@ const Stake = (): JSX.Element => {
       let parsedPendingRevenue = Number(
         formatUnits(pendingRevenue as bigint, 18)
       );
+
+      if (parsedTotal) {
+        _dashboardData.totalStaked = parsedTotal;
+      }
 
       const stblPrice =
         Number(
@@ -313,33 +281,67 @@ const Stake = (): JSX.Element => {
         }
       }
 
-      if (parsedTotal) {
-        _dashboardData.totalStaked = parsedTotal;
+      if ($account) {
+        const XSTBLBalance = await sonicClient.readContract({
+          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          abi: ERC20ABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        });
+
+        const stakedSTBLBalance = await sonicClient.readContract({
+          address: STAKING_CONTRACT as TAddress,
+          abi: IXStakingABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        });
+
+        const stakedSTBLAllowance = await sonicClient.readContract({
+          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, STAKING_CONTRACT as TAddress],
+        });
+
+        let parsedBalance = Number(
+          formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+        );
+
+        let parsedStakedBalance = Number(
+          formatUnits(
+            stakedSTBLBalance as bigint,
+            STABILITY_TOKENS[146].xstbl.decimals
+          )
+        );
+
+        let parsedAllowance = Number(
+          formatUnits(stakedSTBLAllowance, STABILITY_TOKENS[146].xstbl.decimals)
+        );
+
+        if (parsedBalance) {
+          _balances.xstbl = parsedBalance;
+        }
+
+        if (parsedStakedBalance) {
+          _balances.stakedXSTBL = parsedStakedBalance;
+          _dashboardData.userStaked = parsedStakedBalance;
+        }
+
+        if (parsedAllowance) {
+          setAllowance(parsedAllowance);
+        }
+
+        setBalances(_balances);
       }
 
-      if (parsedBalance) {
-        _balances.xstbl = parsedBalance;
-      }
-
-      if (parsedStakedBalance) {
-        _balances.stakedXSTBL = parsedStakedBalance;
-        _dashboardData.userStaked = parsedStakedBalance;
-      }
-
-      if (parsedAllowance) {
-        setAllowance(parsedAllowance);
-      }
       setDashboardData(_dashboardData);
-      setBalances(_balances);
     } catch (error) {
       console.error("Get STBL balance error:", error);
     }
   };
 
   useEffect(() => {
-    if ($account) {
-      getData();
-    }
+    getData();
   }, [$account, $lastTx]);
 
   return (
@@ -430,7 +432,7 @@ const Stake = (): JSX.Element => {
             {stakeType === "Stake" ? (
               <div
                 className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                  !!balances.xstbl ? "" : "opacity-0"
+                  $connected ? "" : "opacity-0"
                 }`}
               >
                 <span>Balance: </span>
@@ -439,7 +441,7 @@ const Stake = (): JSX.Element => {
             ) : (
               <div
                 className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                  !!balances.stakedXSTBL ? "" : "opacity-0"
+                  $connected ? "" : "opacity-0"
                 }`}
               >
                 <span>Balance: </span>

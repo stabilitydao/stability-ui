@@ -1,3 +1,4 @@
 import { getTransactionReceipt } from "./getTransactionReceipt";
+import { getTimeProgress } from "./getTimeProgress";
 
-export { getTransactionReceipt };
+export { getTransactionReceipt, getTimeProgress };

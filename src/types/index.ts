@@ -652,6 +652,14 @@ type TStakeDashboardData = {
   pendingRevenue: number;
 };
 
+type TVestPeriod = {
+  id: number;
+  amount: number;
+  start: number;
+  end: number;
+  isFullyExited: boolean;
+};
+
 export type {
   TPlatformData,
   TInitParams,
@@ -731,4 +739,5 @@ export type {
   TVSHoldModalState,
   TTableActiveParams,
   TStakeDashboardData,
+  TVestPeriod,
 };

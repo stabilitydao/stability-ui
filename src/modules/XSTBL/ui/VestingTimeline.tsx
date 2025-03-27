@@ -2,25 +2,14 @@ import { useState, useEffect } from "react";
 
 import { formatNumber } from "@utils";
 
+import { getTimeProgress } from "../functions";
+
+import type { TVestPeriod } from "@types";
+
 interface IProps {
   type: string;
   value: number;
-  activeVest: {
-    id: number;
-    amount: number;
-    start: number;
-    end: number;
-    isFullyExited: boolean;
-  };
-}
-
-function getTimeProgress(start: number, end: number): number {
-  const totalDays = (end - start) / (1000 * 60 * 60 * 24);
-  const passedDays = (Date.now() - start) / (1000 * 60 * 60 * 24);
-
-  const progress = Math.min((passedDays / totalDays) * totalDays, totalDays);
-
-  return Number(progress.toFixed(1));
+  activeVest: TVestPeriod;
 }
 
 const VestingTimeline: React.FC<IProps> = ({ type, value, activeVest }) => {

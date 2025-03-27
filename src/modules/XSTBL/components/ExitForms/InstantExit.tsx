@@ -161,7 +161,7 @@ const InstantExit: React.FC = () => {
           </label>
           <div
             className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-              !!balance ? "" : "opacity-0"
+              $connected ? "" : "opacity-0"
             }`}
           >
             <span>Balance: </span>

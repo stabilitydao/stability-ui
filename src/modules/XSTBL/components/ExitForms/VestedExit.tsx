@@ -10,14 +10,7 @@ import { ActionButton, VestingTimeline, Timer } from "../../ui";
 
 import { getTransactionReceipt } from "../../functions";
 
-import {
-  sonicClient,
-  ERC20ABI,
-  wagmiConfig,
-  IXStakingABI,
-  IXSTBLABI,
-  IRevenueRouterABI,
-} from "@web3";
+import { sonicClient, ERC20ABI, wagmiConfig, IXSTBLABI } from "@web3";
 
 import { formatNumber } from "@utils";
 
@@ -25,7 +18,7 @@ import { account, connected, lastTx } from "@store";
 
 import { STABILITY_TOKENS } from "@constants";
 
-import type { TAddress } from "@types";
+import type { TAddress, TVestPeriod } from "@types";
 
 const VestedExit: React.FC = () => {
   const $connected = useStore(connected);
@@ -39,26 +32,24 @@ const VestedExit: React.FC = () => {
 
   const [balance, setBalance] = useState(0);
 
-  const [button, setButton] = useState(""); // Cancel Vest || Vest
+  const [button, setButton] = useState("");
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
 
   const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
 
-  const [vestType, setVestType] = useState("vestedExit"); //exitVest
+  const [vestType, setVestType] = useState("vestedExit");
 
-  const [vestData, setVestData] = useState<
-    { amount: number; start: number; end: number; isFullyExited: boolean }[]
-  >([]);
+  const [vestData, setVestData] = useState<TVestPeriod[]>([]);
 
-  const [activeVest, setActiveVest] = useState<{
-    id: number;
-    amount: number;
-    start: number;
-    end: number;
-    isFullyExited: boolean;
-  }>({ id: 0, amount: 0, start: 0, end: 0, isFullyExited: true });
+  const [activeVest, setActiveVest] = useState<TVestPeriod>({
+    id: 0,
+    amount: 0,
+    start: 0,
+    end: 0,
+    isFullyExited: true,
+  });
 
   const handleInputChange = (type = "") => {
     let numericValue = input?.current?.value.replace(/[^0-9.]/g, "");
@@ -95,6 +86,7 @@ const VestedExit: React.FC = () => {
     } else {
       setButton("Cancel Vest");
     }
+
     setDropDownSelector(false);
     setActiveVest(_activeVest);
   };
@@ -309,7 +301,7 @@ const VestedExit: React.FC = () => {
 
             <div
               className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                !!balance ? "" : "opacity-0"
+                $connected ? "" : "opacity-0"
               }`}
             >
               <span>Balance: </span>
@@ -350,26 +342,26 @@ const VestedExit: React.FC = () => {
               } `}
             >
               <div className="flex flex-col items-start">
-                {vestData.map((data, index: number) => (
+                {vestData.map((vest, index: number) => (
                   <div
-                    key={data.id}
+                    key={vest.id}
                     onClick={() => handleActiveVest(index)}
                     className={`${!index ? "rounded-t-2xl" : ""} ${index === vestData.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center justify-between gap-2 ${
-                      data.id === activeVest.id ? "bg-accent-800" : ""
+                      vest.id === activeVest.id ? "bg-accent-800" : ""
                     }`}
-                    title={`xSTBL Vest #${data.id}`}
+                    title={`xSTBL Vest #${vest.id}`}
                   >
                     <div className="flex flex-col items-start">
                       <span className="text-[16px] overflow-hidden text-ellipsis whitespace-nowrap">
-                        xSTBL Vest #{data.id}
+                        xSTBL Vest #{vest.id}
                       </span>
                       <span className="text-[14px]">
-                        {data.isFullyExited
+                        {vest.isFullyExited
                           ? "User Exited"
-                          : `Lock amount: ${data.amount} xSTBL`}
+                          : `Lock amount: ${vest.amount} xSTBL`}
                       </span>
                     </div>
-                    <span className="text-[16px]">{`Expires: ${new Date(data.end * 1000).toLocaleDateString()}`}</span>
+                    <span className="text-[16px]">{`Expires: ${new Date(vest.end * 1000).toLocaleDateString()}`}</span>
                   </div>
                 ))}
               </div>
