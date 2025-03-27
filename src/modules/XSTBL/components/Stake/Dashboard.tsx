@@ -1,5 +1,9 @@
+import { formatNumber } from "@utils";
+
+import type { TStakeDashboardData } from "@types";
+
 interface IProps {
-  data: any;
+  data: TStakeDashboardData;
 }
 
 const Dashboard: React.FC<IProps> = ({ data }) => {
@@ -11,17 +15,19 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
         </span>
         <span className="text-[60px]">${data.pendingRebase.toFixed(3)}</span>
         <span className="text-[22px]">distributed in 01:14:17:47</span>
-        <span className="text-[18px] opacity-50">3,741 xSTBL</span>
+        <span className="text-[18px] opacity-50">
+          {formatNumber(data.pendingRebaseInSTBL, "format")} xSTBL
+        </span>
       </div>
       <div className="flex flex-col md:w-1/2 w-full gap-5">
         <div className="flex justify-between items-center p-3 rounded-2xl bg-accent-900">
           <span>Total Staked</span>
-          <span>{data.totalStaked} xSTBL</span>
+          <span>{formatNumber(data.totalStaked, "format")} xSTBL</span>
         </div>
         <div className="flex flex-col justify-between p-3 rounded-2xl bg-accent-900 h-full">
           <div className="flex items-center justify-between w-full">
             <span>Your Stake</span>
-            <span>{data.userStaked} xSTBL</span>
+            <span>{formatNumber(data.userStaked, "format")} xSTBL</span>
           </div>
           <div className="flex items-center justify-between w-full">
             <span>Rebase APR</span>
@@ -33,7 +39,7 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
           </div>
 
           <div className="flex items-center justify-between w-full">
-            <span>Panding revenue</span>
+            <span>Pending revenue</span>
             <span>${data.pendingRevenue.toFixed(3)}</span>
           </div>
         </div>

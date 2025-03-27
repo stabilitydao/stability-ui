@@ -644,6 +644,14 @@ type TTableActiveParams = {
   filters: number;
 };
 
+type TStakeDashboardData = {
+  totalStaked: number;
+  userStaked: number;
+  pendingRebase: number;
+  pendingRebaseInSTBL: number;
+  pendingRevenue: number;
+};
+
 export type {
   TPlatformData,
   TInitParams,
@@ -722,4 +730,5 @@ export type {
   TOptionInfo,
   TVSHoldModalState,
   TTableActiveParams,
+  TStakeDashboardData,
 };

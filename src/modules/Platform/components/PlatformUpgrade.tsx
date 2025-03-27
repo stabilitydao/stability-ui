@@ -36,7 +36,9 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });
+
       let upgrated = [];
+
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
           async (proxy: TAddress, index: number) => {
@@ -126,12 +128,18 @@ const PlatformUpgrade = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (!upgradesTable.length) {
-      fetchPlatformUpdates();
-    }
+    fetchPlatformUpdates();
   }, []);
 
   const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
+
+  useEffect(() => {
+    console.log("--------------------------------------------");
+    console.log("currentChainID", $currentChainID);
+    console.log("platformUpdates", platformUpdates);
+    console.log("platformVersion", $platformVersions);
+    console.log("upgradesTable", upgradesTable);
+  }, [platformUpdates, $platformVersions, upgradesTable]);
 
   return (
     <>

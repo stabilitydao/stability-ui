@@ -8,6 +8,8 @@ import { useStore } from "@nanostores/react";
 
 import { Dashboard } from "./Dashboard";
 
+import { formatNumber } from "@utils";
+
 import { ActionButton } from "../../ui";
 
 import { getTransactionReceipt } from "../../functions";
@@ -25,7 +27,7 @@ import {
 
 import { STABILITY_TOKENS } from "@constants";
 
-import type { TAddress } from "@types";
+import type { TStakeDashboardData, TAddress } from "@types";
 
 const Stake = (): JSX.Element => {
   const $connected = useStore(connected);
@@ -38,10 +40,11 @@ const Stake = (): JSX.Element => {
   const [balances, setBalances] = useState({ xstbl: 0, stakedXSTBL: 0 });
   const [allowance, setAllowance] = useState(0);
 
-  const [dashboardData, setDashboardData] = useState({
+  const [dashboardData, setDashboardData] = useState<TStakeDashboardData>({
     totalStaked: 0,
     userStaked: 0,
     pendingRebase: 0,
+    pendingRebaseInSTBL: 0,
     pendingRevenue: 0,
   });
 
@@ -186,6 +189,7 @@ const Stake = (): JSX.Element => {
         functionName: funcName,
         args: [value],
       });
+
       setNeedConfirm(false);
 
       const transaction = await getTransactionReceipt(_action);
@@ -221,10 +225,11 @@ const Stake = (): JSX.Element => {
   const getData = async () => {
     try {
       const _balances = { xstbl: 0, stakedXSTBL: 0 };
-      const _dashboardData = {
+      const _dashboardData: TStakeDashboardData = {
         totalStaked: 0,
         userStaked: 0,
         pendingRebase: 0,
+        pendingRebaseInSTBL: 0,
         pendingRevenue: 0,
       };
 
@@ -301,6 +306,7 @@ const Stake = (): JSX.Element => {
       if (stblPrice) {
         if (parsedPendingRebase) {
           _dashboardData.pendingRebase = parsedPendingRebase * stblPrice;
+          _dashboardData.pendingRebaseInSTBL = parsedPendingRebase;
         }
         if (parsedPendingRevenue) {
           _dashboardData.pendingRevenue = parsedPendingRevenue * stblPrice;
@@ -353,7 +359,7 @@ const Stake = (): JSX.Element => {
             <div className="flex flex-col items-start mb-5 mt-5 md:mb-0">
               <span className="text-[15px] font-light">Your stake</span>
               <p className="text-[20px] min-[850px]:text-[28px] font-bold">
-                {balances.stakedXSTBL}{" "}
+                {formatNumber(balances.stakedXSTBL, "format")}{" "}
                 <span className="text-[#A995FF]">xSTBL</span>
               </p>
             </div>
