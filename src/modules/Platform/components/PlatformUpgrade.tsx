@@ -36,6 +36,7 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });
+      console.log("pendingPlatformUpgrade", pendingPlatformUpgrade);
       let upgrated = [];
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
@@ -43,12 +44,14 @@ const PlatformUpgrade = (): JSX.Element => {
             const moduleContracts = Object.keys(
               deployments[$currentChainID].core
             );
+            console.log("modeuleContracts", moduleContracts);
             const upgratedData = await Promise.all(
               moduleContracts.map(async (moduleContract: string) => {
                 //Can't use CoreContracts type
                 //@ts-ignore
                 const address =
                   deployments[$currentChainID].core[moduleContract];
+                console.log("address", address);
                 if (proxy.toLowerCase() === address.toLowerCase()) {
                   const oldImplementation = await $publicClient?.readContract({
                     address: address,
@@ -111,6 +114,8 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "platformUpgradeTimelock",
       });
+      console.log("lockTime", lockTime);
+      console.log("platformUpgradeTimelock", platformUpgradeTimelock);
       if (lockTime && platformUpgradeTimelock) {
         setLockTime({
           start: `${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleDateString()} ${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleTimeString()}`,
@@ -126,9 +131,7 @@ const PlatformUpgrade = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (!upgradesTable.length) {
-      fetchPlatformUpdates();
-    }
+    fetchPlatformUpdates();
   }, []);
 
   const explorer = CHAINS.find((chain) => chain.id === "146")?.explorer;
