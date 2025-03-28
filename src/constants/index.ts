@@ -12,6 +12,8 @@ import {
   LEADERBOARD_TABLE,
   SONIC_TABLE,
   DEFAULT_TABLE_PARAMS,
+  POOL_TABLE,
+  BC_POOL_TABLE,
 } from "./tables";
 
 import {
@@ -31,6 +33,7 @@ import {
   MORE,
   USTB,
   scUSD,
+  STABILITY_TOKENS,
 } from "./tokens";
 
 const APRsType = ["latest", "24h", "week"];
@@ -251,6 +254,9 @@ export {
   LEADERBOARD_TABLE,
   CHAINS_CONFIRMATIONS,
   SONIC_TABLE,
+  POOL_TABLE,
+  BC_POOL_TABLE,
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
+  STABILITY_TOKENS,
 };

@@ -38,6 +38,7 @@ const PlatformUpgrade = (): JSX.Element => {
       });
 
       let upgrated = [];
+
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
           async (proxy: TAddress, index: number) => {

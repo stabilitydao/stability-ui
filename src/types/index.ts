@@ -439,6 +439,7 @@ type TContractInfo = {
   type: string;
   isCopy: boolean;
 };
+
 type TUpgradesTable = {
   contract: string;
   oldVersion: string;
@@ -446,6 +447,14 @@ type TUpgradesTable = {
   proxy: TAddress;
   oldImplementation: TAddress;
   newImplementation: TAddress;
+};
+
+type TPoolTable = {
+  id: TAddress;
+  ammAdapter: TAddress;
+  pool?: TAddress;
+  tokenIn: TAddress;
+  tokenOut: TAddress;
 };
 
 //// CHART
@@ -557,7 +566,8 @@ type TTableData =
   | DeFiOrganization[]
   | TTableStrategy[]
   | TLeaderboard[]
-  | IExtendedYieldContest[];
+  | IExtendedYieldContest[]
+  | TPoolTable[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
@@ -565,7 +575,8 @@ type TDispatchedTableData =
   | Dispatch<SetStateAction<DeFiOrganization[]>>
   | Dispatch<SetStateAction<TTableStrategy[]>>
   | Dispatch<SetStateAction<TLeaderboard[]>>
-  | Dispatch<SetStateAction<IExtendedYieldContest[]>>;
+  | Dispatch<SetStateAction<IExtendedYieldContest[]>>
+  | Dispatch<SetStateAction<TPoolTable[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -633,6 +644,22 @@ type TTableActiveParams = {
   filters: number;
 };
 
+type TStakeDashboardData = {
+  totalStaked: number;
+  userStaked: number;
+  pendingRebase: number;
+  pendingRebaseInSTBL: number;
+  pendingRevenue: number;
+};
+
+type TVestPeriod = {
+  id: number;
+  amount: number;
+  start: number;
+  end: number;
+  isFullyExited: boolean;
+};
+
 export type {
   TPlatformData,
   TInitParams,
@@ -694,6 +721,7 @@ export type {
   TSort,
   TAssetData,
   TTableData,
+  TPoolTable,
   TDispatchedTableData,
   TStrategyState,
   TTableStrategy,
@@ -710,4 +738,6 @@ export type {
   TOptionInfo,
   TVSHoldModalState,
   TTableActiveParams,
+  TStakeDashboardData,
+  TVestPeriod,
 };

@@ -23,6 +23,9 @@ import PriceReaderABI from "./abi/PriceReaderABI.ts";
 import IFrontendABI from "./abi/IFrontendABI.ts";
 import IMerkleDistributor from "./abi/IMerkleDistributor.ts";
 import SaleABI from "./abi/SaleABI.ts";
+import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
+import IXStakingABI from "./abi/IXStakingABI.ts";
+import IXSTBLABI from "./abi/IXSTBLABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -155,6 +158,9 @@ export {
   PriceReaderABI,
   IFrontendABI,
   IMerkleDistributor,
+  IRevenueRouterABI,
+  IXStakingABI,
+  IXSTBLABI,
   sGEM1,
   merkleDistributor,
   maticClient,

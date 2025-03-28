@@ -126,6 +126,20 @@ const Platform = (): JSX.Element => {
     },
   ];
 
+  //todo: get value from backend
+  const swapperInfo = [
+    {
+      name: "Pools",
+      value: "50",
+      color: "#2D67FB",
+    },
+    {
+      name: "Blue Chip Pools",
+      value: "4",
+      color: "#4FAE2D",
+    },
+  ];
+
   useEffect(() => {
     if (
       $apiData?.total?.tvl &&
@@ -240,6 +254,13 @@ const Platform = (): JSX.Element => {
           link="/factory"
           linkTitle="Go to Factory"
           counters={factoryInfo}
+        />
+
+        <CountersBlockCompact
+          title="Swapper"
+          link="/swapper"
+          linkTitle="Go to Swapper"
+          counters={swapperInfo}
         />
       </div>
 

@@ -33,6 +33,7 @@ const Header = (): JSX.Element => {
     platformPaths.some((path) => currentPath.includes(path));
 
   const isVaults = currentPath.includes("vault");
+
   return (
     <WagmiLayout>
       <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
@@ -61,6 +62,9 @@ const Header = (): JSX.Element => {
           >
             Users
           </a>
+          {/* <a className={currentPath === "xstbl" ? "active" : ""} href="/xstbl">
+            xSTBL
+          </a> */}
           <a className={isPlatform ? "active" : ""} href="/platform">
             Platform
           </a>
@@ -90,6 +94,13 @@ const Header = (): JSX.Element => {
           >
             Users
           </a>
+
+          {/* <a
+            className={`px-4 py-[10px] font-semibold ${currentPath === "xstbl" ? "bg-accent-800 rounded-[16px]" : ""}`}
+            href="/xstbl"
+          >
+            xSTBL
+          </a> */}
           <a
             className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"

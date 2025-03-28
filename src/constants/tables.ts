@@ -343,6 +343,74 @@ const LEADERBOARD_TABLE: TTableColumn[] = [
   },
 ];
 
+const POOL_TABLE: TTableColumn[] = [
+  {
+    name: "ID",
+    keyName: "id",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "AMM ADAPTER",
+    keyName: "ammAdapter",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "TOKEN IN",
+    keyName: "tokenIn",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "TOKEN OUT",
+    keyName: "tokenOut",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+];
+const BC_POOL_TABLE: TTableColumn[] = [
+  {
+    name: "ID",
+    keyName: "id",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "AMM ADAPTER",
+    keyName: "ammAdapter",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "POOL",
+    keyName: "pool",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "TOKEN IN",
+    keyName: "tokenIn",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "TOKEN OUT",
+    keyName: "tokenOut",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -361,4 +429,6 @@ export {
   LEADERBOARD_TABLE,
   SONIC_TABLE,
   DEFAULT_TABLE_PARAMS,
+  POOL_TABLE,
+  BC_POOL_TABLE,
 };

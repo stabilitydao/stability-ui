@@ -393,7 +393,8 @@ const Assets: React.FC<IProps> = memo(
                             client,
                             asset?.address,
                             asset?.decimals,
-                            asset?.symbol
+                            asset?.symbol,
+                            asset?.logo
                           )
                         }
                         className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"

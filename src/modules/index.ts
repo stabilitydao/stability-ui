@@ -13,11 +13,13 @@ import { Network } from "./Platform/components/Network";
 import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
+import { Swapper } from "./Platform/components/Swapper";
 import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { SonicVaults } from "./SonicVaults";
 import { STBL } from "./STBL";
+import { XSTBL } from "./XSTBL";
 
 export {
   Factory,
@@ -40,4 +42,6 @@ export {
   Home,
   SonicVaults,
   STBL,
+  XSTBL,
+  Swapper,
 };
