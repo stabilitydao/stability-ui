@@ -2,26 +2,6 @@ import { useState } from "react";
 
 import WagmiLayout from "@layouts/WagmiLayout";
 
-// import { useState, useEffect, useRef } from "react";
-
-// import { formatUnits, parseUnits } from "viem";
-
-// import { useStore } from "@nanostores/react";
-
-// import { writeContract } from "@wagmi/core";
-
-// import { ActionButton } from "../ui";
-
-// import { getTransactionReceipt } from "../functions";
-
-// import { sonicClient, ERC20ABI, } from "@web3";
-
-// import { connected, account, lastTx } from "@store";
-
-// import { STABILITY_TOKENS } from "@constants";
-
-// import type { TAddress } from "@types";
-
 import {
   ConvertForm,
   ExitForms,
@@ -36,11 +16,6 @@ const XSTBL = (): JSX.Element => {
   return (
     <WagmiLayout>
       <div className="min-w-full lg:min-w-[1000px] xl:min-w-[1200px] max-w-[1400px] font-manrope flex flex-col gap-5">
-        {/* <div className="flex items-center gap-3">
-        <img src="/STBL_plain.png" alt="STBL" className="w-[60px] h-[60px]" />
-        <h3 className="text-[30px] font-light">xSTBL</h3>
-      </div> */}
-
         <div className="bg-accent-950 p-5 rounded-2xl lg:hidden flex flex-col gap-3">
           <div
             onClick={() => setActiveForm("convert")}
