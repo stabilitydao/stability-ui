@@ -58,12 +58,12 @@ const Stake = (): JSX.Element => {
     pendingRevenueInSTBL: 0,
     APR: 0,
     timestamp: 0,
-    isDataLoaded: false,
   });
 
   const [button, setButton] = useState("");
 
   const [isClaimable, setIsClaimable] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
@@ -298,7 +298,6 @@ const Stake = (): JSX.Element => {
         pendingRevenueInSTBL: 0,
         APR: 0,
         timestamp: 0,
-        isDataLoaded: false,
       };
 
       const _totalStaked = await sonicClient.readContract({
@@ -445,9 +444,9 @@ const Stake = (): JSX.Element => {
         setBalances(_balances);
       }
 
-      _dashboardData.isDataLoaded = true;
-
       setDashboardData(_dashboardData);
+
+      setIsLoaded(true);
     } catch (error) {
       console.error("Get STBL balance error:", error);
     }
@@ -459,7 +458,7 @@ const Stake = (): JSX.Element => {
 
   return (
     <div className="flex flex-col gap-5">
-      <Dashboard data={dashboardData} />
+      <Dashboard data={dashboardData} isLoaded={isLoaded} />
       <div className="bg-accent-950 p-5 rounded-2xl flex justify-between flex-col md:flex-row">
         <div className="flex flex-col justify-between">
           <div className="flex flex-col">

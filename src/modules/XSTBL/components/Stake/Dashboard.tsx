@@ -12,9 +12,10 @@ import type { TStakeDashboardData } from "@types";
 
 interface IProps {
   data: TStakeDashboardData;
+  isLoaded: boolean;
 }
 
-const Dashboard: React.FC<IProps> = ({ data }) => {
+const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
   const $connected = useStore(connected);
 
   return (
@@ -22,21 +23,21 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
       <div className="flex flex-col items-center justify-center STBL md:w-1/2 w-full">
         <h3 className="text-[30px] font-bold">Pending revenue</h3>
         <div className="flex items-center justify-between flex-col md:flex-row w-full px-3">
-          <div className="flex items-center justify-between flex-col">
+          <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
             <span className="text-[18px] lg:text-[20px] font-bold text-center">
               xSTBL exit penalties (100%)
             </span>
-            {data.isDataLoaded ? (
+            {isLoaded ? (
               <span className="text-[28px] lg:text-[40px]">
                 ${data.pendingRebase.toFixed(3)}
               </span>
             ) : (
-              <div className="mb-2">
+              <div className="mb-1">
                 <Skeleton height={64} width={100} />
               </div>
             )}
 
-            {data.isDataLoaded ? (
+            {isLoaded ? (
               <span className="text-[18px] opacity-50">
                 {formatNumber(data.pendingRebaseInSTBL, "format")} xSTBL
               </span>
@@ -44,21 +45,21 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
               <Skeleton height={28} width={100} />
             )}
           </div>
-          <div className="flex items-center justify-between flex-col">
+          <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
             <span className="text-[18px] lg:text-[20px] font-bold text-center">
               Vault fees (50%)
             </span>
-            {data.isDataLoaded ? (
+            {isLoaded ? (
               <span className="text-[28px] lg:text-[40px]">
                 ${data.pendingRevenue.toFixed(3)}
               </span>
             ) : (
-              <div className="mb-2">
+              <div className="mb-1">
                 <Skeleton height={64} width={100} />
               </div>
             )}
 
-            {data.isDataLoaded ? (
+            {isLoaded ? (
               <span className="text-[18px] opacity-50">
                 {formatNumber(data.pendingRevenueInSTBL, "format")} xSTBL
               </span>
@@ -68,18 +69,18 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
           </div>
         </div>
 
-        {data.isDataLoaded ? (
-          <span className="text-[22px]">
+        {isLoaded ? (
+          <span className="text-[22px] h-[70px]">
             distributed in <Timer end={data.timestamp} />
           </span>
         ) : (
-          <Skeleton height={32} width={130} />
+          <Skeleton height={70} width={130} />
         )}
       </div>
       <div className="flex flex-col md:w-1/2 w-full gap-5">
         <div className="flex justify-between items-center p-3 rounded-2xl bg-accent-900 flex-wrap">
           <span>Total Staked</span>
-          {data.isDataLoaded ? (
+          {isLoaded ? (
             <span className="text-[18px] lg:text-[20px]">
               {formatNumber(data.totalStaked, "format")} xSTBL | $
               {formatNumber(data.totalStakedInUSD, "format")}
@@ -93,7 +94,7 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
             <span>Your Stake</span>
             {$connected ? (
               <>
-                {data.isDataLoaded ? (
+                {isLoaded ? (
                   <span className="text-[18px] lg:text-[20px]">
                     {formatNumber(data.userStaked, "format")} xSTBL | $
                     {formatNumber(data.userStakedInUSD, "format")}
@@ -108,7 +109,7 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
           </div>
           <div className="flex items-center justify-between w-full flex-wrap">
             <span>Total APR</span>
-            {data.isDataLoaded ? (
+            {isLoaded ? (
               <span className="text-[18px] lg:text-[20px]">
                 {formatNumber(data.APR, "formatAPR")}%
               </span>
@@ -121,8 +122,7 @@ const Dashboard: React.FC<IProps> = ({ data }) => {
 
             {$connected ? (
               <>
-                {" "}
-                {data.isDataLoaded ? (
+                {isLoaded ? (
                   <span className="text-[18px] lg:text-[20px]">
                     {formatNumber(data.estimatedProfit, "format")} xSTBL | $
                     {formatNumber(data.estimatedProfitInUSD, "format")}
