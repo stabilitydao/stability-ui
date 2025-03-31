@@ -58,6 +58,7 @@ const Stake = (): JSX.Element => {
     pendingRevenueInSTBL: 0,
     APR: 0,
     timestamp: 0,
+    isDataLoaded: false,
   });
 
   const [button, setButton] = useState("");
@@ -297,6 +298,7 @@ const Stake = (): JSX.Element => {
         pendingRevenueInSTBL: 0,
         APR: 0,
         timestamp: 0,
+        isDataLoaded: false,
       };
 
       const _totalStaked = await sonicClient.readContract({
@@ -443,6 +445,8 @@ const Stake = (): JSX.Element => {
         setBalances(_balances);
       }
 
+      _dashboardData.isDataLoaded = true;
+
       setDashboardData(_dashboardData);
     } catch (error) {
       console.error("Get STBL balance error:", error);
@@ -451,7 +455,7 @@ const Stake = (): JSX.Element => {
 
   useEffect(() => {
     getData();
-  }, [$account, $lastTx]);
+  }, [$account, $lastTx, $assetsPrices]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -461,8 +465,8 @@ const Stake = (): JSX.Element => {
           <div className="flex flex-col">
             <span className="text-[26px]">Stake xSTBL</span>
             <span className="text-[18px]">
-              Stake your xSTBL to earn 100% of protocol fees, vote incentives,
-              and penalties from exits.
+              Stake your xSTBL to earn revenue from Stability profit generating
+              units.
             </span>
           </div>
 
