@@ -646,10 +646,17 @@ type TTableActiveParams = {
 
 type TStakeDashboardData = {
   totalStaked: number;
+  totalStakedInUSD: number;
   userStaked: number;
+  userStakedInUSD: number;
   pendingRebase: number;
+  estimatedProfit: number;
+  estimatedProfitInUSD: number;
   pendingRebaseInSTBL: number;
   pendingRevenue: number;
+  pendingRevenueInSTBL: number;
+  APR: number;
+  timestamp: number;
 };
 
 type TVestPeriod = {

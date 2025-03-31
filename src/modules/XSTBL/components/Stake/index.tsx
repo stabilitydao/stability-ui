@@ -42,10 +42,17 @@ const Stake = (): JSX.Element => {
 
   const [dashboardData, setDashboardData] = useState<TStakeDashboardData>({
     totalStaked: 0,
+    totalStakedInUSD: 0,
     userStaked: 0,
+    userStakedInUSD: 0,
     pendingRebase: 0,
+    estimatedProfit: 0,
+    estimatedProfitInUSD: 0,
     pendingRebaseInSTBL: 0,
     pendingRevenue: 0,
+    pendingRevenueInSTBL: 0,
+    APR: 0,
+    timestamp: 0,
   });
 
   const [button, setButton] = useState("");
@@ -226,13 +233,27 @@ const Stake = (): JSX.Element => {
 
   const getData = async () => {
     try {
+      const SECONDS_IN_WEEK = 7 * 24 * 60 * 60;
+
+      const SECONDS_IN_YEAR = 365 * 24 * 60 * 60;
+
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+
       const _balances = { xstbl: 0, stakedXSTBL: 0 };
+
       const _dashboardData: TStakeDashboardData = {
         totalStaked: 0,
+        totalStakedInUSD: 0,
         userStaked: 0,
+        userStakedInUSD: 0,
         pendingRebase: 0,
+        estimatedProfit: 0,
+        estimatedProfitInUSD: 0,
         pendingRebaseInSTBL: 0,
         pendingRevenue: 0,
+        pendingRevenueInSTBL: 0,
+        APR: 0,
+        timestamp: 0,
       };
 
       const _totalStaked = await sonicClient.readContract({
@@ -273,13 +294,27 @@ const Stake = (): JSX.Element => {
             ?.price
         ) || 0;
 
+      _dashboardData.timestamp =
+        Math.floor(currentTimestamp / SECONDS_IN_WEEK + 1) * SECONDS_IN_WEEK;
+
       if (stblPrice) {
+        _dashboardData.totalStakedInUSD = parsedTotal * stblPrice;
+
         if (parsedPendingRebase) {
           _dashboardData.pendingRebase = parsedPendingRebase * stblPrice;
           _dashboardData.pendingRebaseInSTBL = parsedPendingRebase;
         }
         if (parsedPendingRevenue) {
           _dashboardData.pendingRevenue = parsedPendingRevenue * stblPrice;
+          _dashboardData.pendingRevenueInSTBL = parsedPendingRevenue;
+
+          const timePassed =
+            currentTimestamp - (_dashboardData.timestamp - SECONDS_IN_WEEK);
+
+          _dashboardData.APR =
+            (parsedPendingRevenue / parsedTotal) *
+            (SECONDS_IN_YEAR / timePassed) *
+            100;
         }
       }
 
@@ -327,6 +362,13 @@ const Stake = (): JSX.Element => {
         if (parsedStakedBalance) {
           _balances.stakedXSTBL = parsedStakedBalance;
           _dashboardData.userStaked = parsedStakedBalance;
+          _dashboardData.userStakedInUSD = parsedStakedBalance * stblPrice;
+
+          _dashboardData.estimatedProfit =
+            (parsedPendingRebase * parsedStakedBalance) / parsedTotal;
+
+          _dashboardData.estimatedProfitInUSD =
+            _dashboardData.estimatedProfit * stblPrice;
         }
 
         if (parsedAllowance) {
