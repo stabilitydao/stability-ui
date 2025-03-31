@@ -37,7 +37,12 @@ const Stake = (): JSX.Element => {
 
   const input = useRef<HTMLInputElement>(null);
 
-  const [balances, setBalances] = useState({ xstbl: 0, stakedXSTBL: 0 });
+  const [balances, setBalances] = useState({
+    xstbl: 0,
+    stakedXSTBL: 0,
+    earned: 0,
+  });
+
   const [allowance, setAllowance] = useState(0);
 
   const [dashboardData, setDashboardData] = useState<TStakeDashboardData>({
@@ -56,6 +61,8 @@ const Stake = (): JSX.Element => {
   });
 
   const [button, setButton] = useState("");
+
+  const [isClaimable, setIsClaimable] = useState(false);
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
   const [needConfirm, setNeedConfirm] = useState(false);
@@ -216,17 +223,53 @@ const Stake = (): JSX.Element => {
     setTransactionInProgress(false);
   };
 
+  const claim = async () => {
+    setTransactionInProgress(true);
+    try {
+      setNeedConfirm(true);
+
+      const getReward = await writeContract(wagmiConfig, {
+        address: STAKING_CONTRACT,
+        abi: IXStakingABI,
+        functionName: "getReward",
+      });
+
+      setNeedConfirm(false);
+
+      const transaction = await getTransactionReceipt(getReward);
+
+      if (transaction?.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+
+        setIsClaimable(false);
+        setStakeType("Stake");
+        setButton("");
+      }
+    } catch (error) {
+      setNeedConfirm(false);
+      console.error("Claim action error:", error);
+    }
+    setTransactionInProgress(false);
+  };
+
   const stakeHandler = async () => {
     if (button === "Approve") {
       await approve();
     } else if (["Stake", "Unstake"].includes(button)) {
       await stakeAction(stakeType);
+    } else if (button.includes("Claim")) {
+      await claim();
     }
   };
 
   const stakeTypeHandler = (type: string) => {
     setStakeType(type);
-    setButton("");
+
+    if (type === "Claim") {
+      setButton(`Claim ${balances.earned} xSTBL`);
+    } else {
+      setButton("");
+    }
 
     input.current.value = "";
   };
@@ -239,7 +282,7 @@ const Stake = (): JSX.Element => {
 
       const currentTimestamp = Math.floor(Date.now() / 1000);
 
-      const _balances = { xstbl: 0, stakedXSTBL: 0 };
+      const _balances = { xstbl: 0, stakedXSTBL: 0, earned: 0 };
 
       const _dashboardData: TStakeDashboardData = {
         totalStaked: 0,
@@ -340,8 +383,19 @@ const Stake = (): JSX.Element => {
           args: [$account as TAddress, STAKING_CONTRACT as TAddress],
         });
 
+        const earned = (await sonicClient.readContract({
+          address: STAKING_CONTRACT as TAddress,
+          abi: IXStakingABI,
+          functionName: "earned",
+          args: [$account as TAddress],
+        })) as bigint;
+
         let parsedBalance = Number(
           formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+        );
+
+        let parsedEarned = Number(
+          formatUnits(earned, STABILITY_TOKENS[146].xstbl.decimals)
         );
 
         let parsedStakedBalance = Number(
@@ -359,13 +413,19 @@ const Stake = (): JSX.Element => {
           _balances.xstbl = parsedBalance;
         }
 
+        if (parsedEarned) {
+          _balances.earned = parsedEarned;
+
+          setIsClaimable(!!parsedEarned);
+        }
+
         if (parsedStakedBalance) {
           _balances.stakedXSTBL = parsedStakedBalance;
           _dashboardData.userStaked = parsedStakedBalance;
           _dashboardData.userStakedInUSD = parsedStakedBalance * stblPrice;
 
           _dashboardData.estimatedProfit =
-            (parsedPendingRebase * parsedStakedBalance) / parsedTotal;
+            (parsedPendingRevenue * parsedStakedBalance) / parsedTotal;
 
           _dashboardData.estimatedProfitInUSD =
             _dashboardData.estimatedProfit * stblPrice;
@@ -411,8 +471,17 @@ const Stake = (): JSX.Element => {
             </div>
           )}
         </div>
-        <div className="lg:w-1/3">
+        <div className="lg:w-1/3 flex flex-col justify-between">
           <div className="flex items-center font-semibold relative text-[20px] mb-2 select-none">
+            {isClaimable && (
+              <p
+                className={`whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-2 border-b-[1.5px] border-transparent w-1/2 ${stakeType === "Claim" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+                onClick={() => stakeTypeHandler("Claim")}
+              >
+                Claim
+              </p>
+            )}
+
             <p
               className={`whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-2 border-b-[1.5px] border-transparent w-1/2 ${stakeType === "Stake" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
               onClick={() => stakeTypeHandler("Stake")}
@@ -426,7 +495,7 @@ const Stake = (): JSX.Element => {
               Unstake
             </p>
           </div>
-          <div>
+          <div className={`${stakeType === "Claim" ? "hidden" : ""}`}>
             <label className="relative block h-[60px] w-full">
               <img
                 src="/STBL_plain.png"
@@ -495,6 +564,7 @@ const Stake = (): JSX.Element => {
               </div>
             )}
           </div>
+
           <ActionButton
             type={button}
             transactionInProgress={transactionInProgress}

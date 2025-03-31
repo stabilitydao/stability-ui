@@ -71,6 +71,21 @@ const ActionButton: React.FC<IProps> = ({
                 >
                   Cancel Vest
                 </button>
+              ) : type.includes("Claim") ? (
+                <button
+                  disabled={transactionInProgress}
+                  className={`w-full flex items-center text-[20px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl h-[50px] ${
+                    transactionInProgress
+                      ? "text-neutral-500 bg-neutral-900 flex items-center justify-center gap-2"
+                      : ""
+                  }`}
+                  type="button"
+                  onClick={actionFunction}
+                >
+                  <p>{needConfirm ? "Confirm in wallet" : type}</p>
+
+                  {transactionInProgress && <Loader color={"#a6a0b2"} />}
+                </button>
               ) : (
                 <button
                   disabled
