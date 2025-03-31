@@ -62,9 +62,9 @@ const Header = (): JSX.Element => {
           >
             Users
           </a>
-          {/* <a className={currentPath === "xstbl" ? "active" : ""} href="/xstbl">
+          <a className={currentPath === "xstbl" ? "active" : ""} href="/xstbl">
             xSTBL
-          </a> */}
+          </a>
           <a className={isPlatform ? "active" : ""} href="/platform">
             Platform
           </a>
@@ -95,12 +95,12 @@ const Header = (): JSX.Element => {
             Users
           </a>
 
-          {/* <a
+          <a
             className={`px-4 py-[10px] font-semibold ${currentPath === "xstbl" ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/xstbl"
           >
             xSTBL
-          </a> */}
+          </a>
           <a
             className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"
