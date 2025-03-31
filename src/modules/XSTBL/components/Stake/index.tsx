@@ -340,14 +340,21 @@ const Stake = (): JSX.Element => {
       _dashboardData.timestamp =
         Math.floor(currentTimestamp / SECONDS_IN_WEEK + 1) * SECONDS_IN_WEEK;
 
+      let allIncome = 0;
+
       if (stblPrice) {
         _dashboardData.totalStakedInUSD = parsedTotal * stblPrice;
 
         if (parsedPendingRebase) {
+          allIncome += parsedPendingRebase;
+
           _dashboardData.pendingRebase = parsedPendingRebase * stblPrice;
           _dashboardData.pendingRebaseInSTBL = parsedPendingRebase;
         }
+
         if (parsedPendingRevenue) {
+          allIncome += parsedPendingRevenue;
+
           _dashboardData.pendingRevenue = parsedPendingRevenue * stblPrice;
           _dashboardData.pendingRevenueInSTBL = parsedPendingRevenue;
 
@@ -355,9 +362,7 @@ const Stake = (): JSX.Element => {
             currentTimestamp - (_dashboardData.timestamp - SECONDS_IN_WEEK);
 
           _dashboardData.APR =
-            (parsedPendingRevenue / parsedTotal) *
-            (SECONDS_IN_YEAR / timePassed) *
-            100;
+            (allIncome / parsedTotal) * (SECONDS_IN_YEAR / timePassed) * 100;
         }
       }
 
@@ -425,7 +430,7 @@ const Stake = (): JSX.Element => {
           _dashboardData.userStakedInUSD = parsedStakedBalance * stblPrice;
 
           _dashboardData.estimatedProfit =
-            (parsedPendingRevenue * parsedStakedBalance) / parsedTotal;
+            (allIncome * parsedStakedBalance) / parsedTotal;
 
           _dashboardData.estimatedProfitInUSD =
             _dashboardData.estimatedProfit * stblPrice;
