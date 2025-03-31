@@ -657,7 +657,6 @@ type TStakeDashboardData = {
   pendingRevenueInSTBL: number;
   APR: number;
   timestamp: number;
-  isDataLoaded: boolean;
 };
 
 type TVestPeriod = {
