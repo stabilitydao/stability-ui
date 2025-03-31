@@ -44,6 +44,13 @@ const XSTBL = (): JSX.Element => {
         </div>
 
         <h3 className="text-[32px] font-bolt text-center mt-5 lg:block hidden">
+          STAKING
+        </h3>
+        <div className="hidden lg:block">
+          <Stake />
+        </div>
+
+        <h3 className="text-[32px] font-bolt text-center mt-5 lg:block hidden">
           ENTER
         </h3>
         <div className="hidden lg:block">
@@ -54,12 +61,6 @@ const XSTBL = (): JSX.Element => {
           EXIT
         </h3>
         <ExitForms />
-        <h3 className="text-[32px] font-bolt text-center mt-5 lg:block hidden">
-          STAKING
-        </h3>
-        <div className="hidden lg:block">
-          <Stake />
-        </div>
 
         <div className="block lg:hidden">
           {activeForm === "convert" ? (
