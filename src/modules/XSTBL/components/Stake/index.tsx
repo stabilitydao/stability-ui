@@ -277,6 +277,7 @@ const Stake = (): JSX.Element => {
 
   const getData = async () => {
     try {
+      setIsLoaded(false);
       const SECONDS_IN_WEEK = 7 * 24 * 60 * 60;
 
       const SECONDS_IN_YEAR = 365 * 24 * 60 * 60;
@@ -446,9 +447,7 @@ const Stake = (): JSX.Element => {
 
       setDashboardData(_dashboardData);
 
-      setTimeout(() => {
-        setIsLoaded(true);
-      }, 200);
+      setIsLoaded(true);
     } catch (error) {
       console.error("Get STBL balance error:", error);
     }
