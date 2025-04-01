@@ -446,7 +446,9 @@ const Stake = (): JSX.Element => {
 
       setDashboardData(_dashboardData);
 
-      setIsLoaded(true);
+      setTimeout(() => {
+        setIsLoaded(true);
+      }, 200);
     } catch (error) {
       console.error("Get STBL balance error:", error);
     }

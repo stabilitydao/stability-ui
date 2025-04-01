@@ -189,7 +189,7 @@ export const formatNumber = (
       } else if (value >= 10000) {
         changedValue = (value / 1000).toFixed(1) + "K";
       } else {
-        changedValue = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        changedValue = value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       }
 
       break;

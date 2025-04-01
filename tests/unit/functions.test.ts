@@ -335,8 +335,8 @@ describe("formatNumber", () => {
   });
 
   it("should handle APR cases correctly", () => {
-    expect(formatNumber(0, "formatAPR")).toBe("0");
-    expect(formatNumber(9999, "formatAPR")).toBe("9 999");
+    expect(formatNumber(0, "formatAPR")).toBe("0.00");
+    expect(formatNumber(1204.6012353, "formatAPR")).toBe("1 204.60");
     expect(formatNumber(10000, "formatAPR")).toBe("10.0K");
     expect(formatNumber(1000000, "formatAPR")).toBe("1.0M");
   });
