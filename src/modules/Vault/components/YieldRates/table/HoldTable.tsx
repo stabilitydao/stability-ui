@@ -9,7 +9,7 @@ interface IProps {
 const HoldTable: React.FC<IProps> = ({
   shareData,
   holdData,
-  daysFromCreation= 0,
+  daysFromCreation = 0,
 }) => {
   return (
     <table className="font-manrope w-full">
@@ -38,7 +38,9 @@ const HoldTable: React.FC<IProps> = ({
         {!!holdData &&
           holdData.map((aprsData) => (
             <tr key={aprsData.symbol} className="h-[48px] hover:bg-accent-950">
-              <td>{aprsData.symbol}</td>
+              <td className="truncate max-w-[100px] sm:max-w-[130px]">
+                {aprsData.symbol}
+              </td>
               <td className="text-right py-1">{aprsData.initPrice}</td>
               <td className="text-right py-1">{aprsData.price}</td>
               <td className="text-right py-1">
