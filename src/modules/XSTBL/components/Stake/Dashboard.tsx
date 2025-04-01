@@ -22,7 +22,7 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
     <div className="bg-accent-950 p-5 rounded-2xl flex justify-center md:justify-between gap-5 flex-col md:flex-row md:h-[300px]">
       <div className="flex flex-col items-center justify-center STBL md:w-1/2 w-full">
         <h3 className="text-[30px] font-bold">Pending revenue</h3>
-        <div className="flex items-center justify-between flex-col md:flex-row w-full px-3">
+        <div className="flex items-center justify-between flex-col md:flex-row w-full px-3 h-[220px] md:h-auto">
           <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
             <span className="text-[18px] lg:text-[20px] font-bold text-center">
               xSTBL exit penalties (100%)
@@ -32,9 +32,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                 ${data.pendingRebase.toFixed(3)}
               </span>
             ) : (
-              <div className="mb-1">
-                <Skeleton height={64} width={100} />
-              </div>
+              <>
+                <div className="hidden md:block">
+                  <Skeleton height={64} width={100} />
+                </div>
+                <div className="mb-1 block md:hidden">
+                  <Skeleton height={44.8} width={100} />
+                </div>
+              </>
             )}
 
             {isLoaded ? (
@@ -42,7 +47,7 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                 {formatNumber(data.pendingRebaseInSTBL, "format")} xSTBL
               </span>
             ) : (
-              <Skeleton height={28} width={100} />
+              <Skeleton height={28.8} width={100} />
             )}
           </div>
           <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
@@ -54,9 +59,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                 ${data.pendingRevenue.toFixed(3)}
               </span>
             ) : (
-              <div className="mb-1">
-                <Skeleton height={64} width={100} />
-              </div>
+              <>
+                <div className="hidden md:block">
+                  <Skeleton height={64} width={100} />
+                </div>
+                <div className="mb-1 block md:hidden">
+                  <Skeleton height={44.8} width={100} />
+                </div>
+              </>
             )}
 
             {isLoaded ? (
@@ -64,7 +74,7 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                 {formatNumber(data.pendingRevenueInSTBL, "format")} xSTBL
               </span>
             ) : (
-              <Skeleton height={28} width={100} />
+              <Skeleton height={28.8} width={100} />
             )}
           </div>
         </div>
@@ -86,7 +96,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
               {formatNumber(data.totalStakedInUSD, "format")}
             </span>
           ) : (
-            <Skeleton height={32} width={130} />
+            <>
+              <div className="hidden md:block">
+                <Skeleton height={32} width={130} />
+              </div>
+              <div className="mb-1 block md:hidden">
+                <Skeleton height={28.8} width={216} />
+              </div>
+            </>
           )}
         </div>
         <div className="flex flex-col justify-between p-3 rounded-2xl bg-accent-900 h-full">
@@ -100,7 +117,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                     {formatNumber(data.userStakedInUSD, "format")}
                   </span>
                 ) : (
-                  <Skeleton height={32} width={130} />
+                  <>
+                    <div className="hidden md:block">
+                      <Skeleton height={32} width={130} />
+                    </div>
+                    <div className="mb-1 block md:hidden">
+                      <Skeleton height={28.8} width={100} />
+                    </div>
+                  </>
                 )}
               </>
             ) : (
@@ -114,7 +138,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                 {formatNumber(data.APR, "formatAPR")}%
               </span>
             ) : (
-              <Skeleton height={32} width={130} />
+              <>
+                <div className="hidden md:block">
+                  <Skeleton height={32} width={130} />
+                </div>
+                <div className="mb-1 block md:hidden">
+                  <Skeleton height={28.8} width={100} />
+                </div>
+              </>
             )}
           </div>
           <div className="flex items-center justify-between w-full flex-wrap">
@@ -128,7 +159,14 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
                     {formatNumber(data.estimatedProfitInUSD, "format")}
                   </span>
                 ) : (
-                  <Skeleton height={32} width={130} />
+                  <>
+                    <div className="hidden md:block">
+                      <Skeleton height={32} width={130} />
+                    </div>
+                    <div className="mb-1 block md:hidden">
+                      <Skeleton height={28.8} width={130} />
+                    </div>
+                  </>
                 )}
               </>
             ) : (
