@@ -200,7 +200,9 @@ const SonicPointsButton = (): JSX.Element => {
               className="w-[34px] rounded-full"
             />
             <div>
-              <span className="text-neutral-500 text-[12px]">Silo Points</span>
+              <span className="text-neutral-500 text-[12px]">
+                Earned on Stability
+              </span>
               <p className="text-[14px] leading-4">{user.siloPoints}</p>
             </div>
           </div> */}
