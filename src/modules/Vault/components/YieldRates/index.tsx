@@ -223,7 +223,9 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
 
                     return (
                       <tr key={index} className="h-[48px] hover:bg-accent-950">
-                        <td>VAULT VS {aprsData?.symbol} HODL</td>
+                        <td className="truncate max-w-[120px] sm:max-w-[200px]">
+                          VAULT VS {aprsData?.symbol} HODL
+                        </td>
                         {assetData.map((cell, index) => (
                           <VSHoldTableCell
                             key={`${cell.data}+${index}`}

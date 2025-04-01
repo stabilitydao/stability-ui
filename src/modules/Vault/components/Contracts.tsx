@@ -177,7 +177,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                   <div className="flex flex-col items-start">
                     <span
                       data-testid="contractsSymbol"
-                      className="text-[14px] sm:text-[18px]"
+                      className="text-[14px] sm:text-[18px] truncate max-w-[120px] sm:max-w-[200px] inline-block"
                     >
                       {symbol}
                     </span>
