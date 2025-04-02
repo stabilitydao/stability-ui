@@ -570,19 +570,21 @@ const SonicVaults = (): JSX.Element => {
                             </div>
                             <span className="mr-2">{vault.assetsSymbol}</span>
                             <div className="flex items-center justify-center gap-1">
-                              <div
-                                title="Sonic Activity Points"
-                                className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]"
-                              >
-                                <img
-                                  src="/sonic.png"
-                                  alt="sonic"
-                                  className="w-[14px] h-[14px] rounded-full"
-                                />
-                                <span className="text-[10px] ml-[3px] mr-[2px]">
-                                  x{vault.sonicActivePoints}
-                                </span>
-                              </div>
+                              {!vault.symbol.includes("PT-") && (
+                                <div
+                                  title="Sonic Activity Points"
+                                  className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]"
+                                >
+                                  <img
+                                    src="/sonic.png"
+                                    alt="sonic"
+                                    className="w-[14px] h-[14px] rounded-full"
+                                  />
+                                  <span className="text-[10px] ml-[3px] mr-[2px]">
+                                    x{vault.sonicActivePoints}
+                                  </span>
+                                </div>
+                              )}
 
                               {SILO_POINTS[vault.address] && (
                                 <div
