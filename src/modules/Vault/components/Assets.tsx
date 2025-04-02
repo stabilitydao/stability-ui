@@ -258,11 +258,9 @@ const Assets: React.FC<IProps> = memo(
 
               /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
               const oracleLink =
-                network != "111188"
-                  ? CHAINLINK_STABLECOINS[
-                      assetData?.symbol as keyof typeof CHAINLINK_STABLECOINS
-                    ]
-                  : "";
+                CHAINLINK_STABLECOINS[
+                  assetData?.symbol as keyof typeof CHAINLINK_STABLECOINS
+                ];
 
               return (
                 assetData && (
