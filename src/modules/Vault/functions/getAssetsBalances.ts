@@ -32,13 +32,12 @@ export const getAssetsBalances = (
 
   if (balances) {
     for (let i = 0; i < options.length; i++) {
+      const assetBalance = balances[options[i].toLowerCase()];
+
       const decimals = getTokenData(options[i])?.decimals;
 
-      if (decimals) {
-        balance[options[i]] = formatUnits(
-          balances[options[i].toLowerCase()],
-          decimals
-        );
+      if (assetBalance && decimals) {
+        balance[options[i]] = formatUnits(assetBalance, decimals);
       }
     }
   }
