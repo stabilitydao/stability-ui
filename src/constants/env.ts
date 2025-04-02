@@ -9,10 +9,6 @@ const GRAPH_ENDPOINTS: { [key: string]: string } = {
     "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY
   ),
-  111188: deployments[111188].subgraph.replace(
-    "[api-key]",
-    import.meta.env.PUBLIC_GRAPH_API_KEY
-  ),
   146: deployments[146].subgraph.replace(
     "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY

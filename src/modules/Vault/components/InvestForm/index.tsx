@@ -191,13 +191,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     vault?.alm?.protocol === "Ichi" ||
     vault.strategyInfo.protocols[0].name === "Ichi";
 
-  const DEX =
-    network === "111188"
-      ? {
-          logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Pearl.png",
-          title: "Pearl DeX",
-        }
-      : (ZAP_ROUTERS[agg] ?? ZAP_ROUTERS.swapper);
+  const DEX = ZAP_ROUTERS[agg] ?? ZAP_ROUTERS.swapper;
 
   const checkButtonApproveDeposit = (apprDepo: string[]) => {
     if (shortId === "IQMF" || shortId === "IRMF") {

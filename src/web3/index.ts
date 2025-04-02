@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http, createPublicClient } from "viem";
 
-import { base, polygon, real, sonic } from "viem/chains";
+import { base, polygon, sonic } from "viem/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -33,7 +33,7 @@ const CONTRACT_PAGINATION = 20;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
-// 137 || 8453 || 111188 || 146
+// 137 || 8453 || 146
 const platforms: { [key: string]: TAddress } = Object.entries(
   deployments
 ).reduce(
@@ -94,7 +94,7 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [polygon, base, real, sonic],
+  chains: [polygon, base, sonic],
   projectId: walletConnectProjectId,
   metadata,
 });
@@ -114,11 +114,6 @@ const baseClient = createPublicClient({
   transport: http("https://mainnet.base.org"),
 });
 
-const realClient = createPublicClient({
-  chain: real,
-  transport: http("https://real.drpc.org"),
-});
-
 const sonicClient = createPublicClient({
   chain: sonic,
   transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
@@ -128,7 +123,6 @@ const web3clients = {
   "137": maticClient,
   "146": sonicClient,
   "8453": baseClient,
-  "111188": realClient,
 };
 
 export {
@@ -166,7 +160,6 @@ export {
   maticClient,
   sonicClient,
   baseClient,
-  realClient,
   web3clients,
   SaleABI,
   SALE_CONTRACT,
