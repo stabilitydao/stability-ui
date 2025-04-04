@@ -107,12 +107,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const getDataFromStabilityAPI = async () => {
     const maxRetries = 3;
-    let isResponse = false;
-    try {
-      for (const seed of seeds) {
-        let currentRetry = 0;
 
-        while (currentRetry < maxRetries) {
+    try {
+      let isResponse = false;
+
+      for (let currentRetry = 0; currentRetry < maxRetries; currentRetry++) {
+        for (const seed of seeds) {
           try {
             const response = await axios.get(seed);
 
@@ -124,24 +124,27 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             }
 
             if (stabilityAPIData?.assetPrices) {
-              assetsPrices.set(stabilityAPIData?.assetPrices);
-              prices = stabilityAPIData?.assetPrices;
+              assetsPrices.set(stabilityAPIData.assetPrices);
+              prices = stabilityAPIData.assetPrices;
             }
+
             apiData.set(stabilityAPIData);
             isResponse = true;
             break;
           } catch (err) {
             console.log("API Error:", err);
-            currentRetry++;
-            if (currentRetry < maxRetries) {
-              console.log(`Retrying (${currentRetry}/${maxRetries})...`, seed);
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
+            console.log(
+              `Retrying (${currentRetry + 1}/${maxRetries})...`,
+              seed
+            );
           }
         }
 
         if (isResponse) break;
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
+
       if (!isResponse) {
         throw new Error("API error");
       }

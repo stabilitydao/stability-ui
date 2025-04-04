@@ -44,6 +44,7 @@ body.no-scroll {
     margin: 5px 0;
   }
 }
+
 @media screen and (max-width: 767px) {
   .burger-menu {
     width: 32px;
