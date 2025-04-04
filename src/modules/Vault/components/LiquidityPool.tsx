@@ -147,11 +147,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
               ))}
           </div>
 
-          {!!dexPool && (
-            <div>
-              <FieldValue name="ALGO" value={dexPool.algo} />
-            </div>
-          )}
+          {!!dexPool?.algo && <FieldValue name="ALGO" value={dexPool?.algo} />}
         </div>
       </div>
     </>

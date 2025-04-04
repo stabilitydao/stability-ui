@@ -3,6 +3,8 @@ import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
 import { useSwitchChain, useAccount } from "wagmi";
 
+import { isMobile } from "react-device-detect";
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { deployments } from "@stabilitydao/stability";
@@ -90,7 +92,7 @@ const Wallet = (): JSX.Element => {
     customContent.innerHTML = userAssets.join("");
     customContent.setAttribute(
       "style",
-      "display: flex; align-items:center;justify-content:center; flex-wrap: wrap; gap: 10px;"
+      `display: flex; align-items:center;justify-content:center; flex-wrap: wrap; gap: 10px; overflow-y: auto; ${isMobile ? "max-height:100px;" : "max-height:300px;"}`
     );
 
     customDescription.innerHTML = `<p style="margin:0; color:#949e9e;">$${userBalance}</p>`;
@@ -156,12 +158,12 @@ const Wallet = (): JSX.Element => {
 
     const assetsTemplates = assets.map(
       (asset) =>
-        `<div style="width:70px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px;flex-grow:1;">
+        `<div style="width:100px; height:100px; color:#fff; background-color:rgba(255, 255, 255, 0.02); border-radius:4px;flex-grow:1;">
           <div style="display:flex; flex-direction:column; align-items:center; padding:10px;">
             <img style="width: 32px; height:32px; border-radius:100%" src=${
               asset.logo
             } alt="logo" />
-            <p style="margin:0; font-size:14px; margin-top:2px;">${
+            <p style="margin:0; font-size:13px; margin-top:2px;">${
               asset.symbol
             }</p>
             <div style="font-size:12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;">
