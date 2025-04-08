@@ -267,7 +267,7 @@ const Stake = (): JSX.Element => {
     setStakeType(type);
 
     if (type === "Claim") {
-      setButton(`Claim ${balances.earned} xSTBL`);
+      setButton(`Claim ${balances.earned.toFixed(2)} xSTBL`);
     } else {
       setButton("");
     }
