@@ -215,6 +215,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
         tvl: tvl as string,
       };
     });
+
     if (data) setTableData(data);
   };
 
@@ -343,45 +344,47 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
           )}
         </div>
 
-        <table className="table table-auto w-full rounded-lg">
-          <thead className="bg-[#0b0e11]">
-            <tr className="text-[16px] text-[#8f8f8f] uppercase">
-              <th>Ticks</th>
-              <th>In Range</th>
-              {!!vault?.assets &&
-                vault?.assets?.map((asset) => (
-                  <th key={asset.symbol}>{asset.symbol}</th>
-                ))}
-              <th className="hidden md:block">TVL</th>
-            </tr>
-          </thead>
-          <tbody className="text-[16px]">
-            {tableData &&
-              tableData.map((position, index) => (
-                <tr key={position.tvl + index} className="hover:bg-[#2B3139]">
-                  <td>
-                    <span className="mr-4">{position.lowerTick}</span>
-                    <span>{position.upperTick}</span>
-                  </td>
-                  <td className="py-1 flex justify-end">
-                    {position.inRange ? (
-                      <img src="/icons/done.svg" alt="Yes" />
-                    ) : (
-                      <img src="/icons/close.svg" alt="No" />
-                    )}
-                  </td>
-                  {position.amounts.map((amount, index: number) => (
-                    <td key={amount + index} className="text-right py-1">
-                      {amount}
-                    </td>
+        <div className="max-h-[300px] overflow-y-auto">
+          <table className="table table-auto w-full rounded-lg">
+            <thead className="bg-[#0b0e11] sticky top-0 z-10">
+              <tr className="text-[16px] text-[#8f8f8f] uppercase">
+                <th>Ticks</th>
+                <th>In Range</th>
+                {!!vault?.assets &&
+                  vault?.assets?.map((asset) => (
+                    <th key={asset.symbol}>{asset.symbol}</th>
                   ))}
-                  <td className="text-right py-1 hidden md:block">
-                    {position.tvl}
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+                <th className="hidden md:block">TVL</th>
+              </tr>
+            </thead>
+            <tbody className="text-[16px]">
+              {tableData &&
+                tableData.map((position, index) => (
+                  <tr key={position.tvl + index} className="hover:bg-[#2B3139]">
+                    <td>
+                      <span className="mr-4">{position.lowerTick}</span>
+                      <span>{position.upperTick}</span>
+                    </td>
+                    <td className="py-1 flex justify-end">
+                      {position.inRange ? (
+                        <img src="/icons/done.svg" alt="Yes" />
+                      ) : (
+                        <img src="/icons/close.svg" alt="No" />
+                      )}
+                    </td>
+                    {position.amounts.map((amount, index: number) => (
+                      <td key={amount + index} className="text-right py-1">
+                        {amount}
+                      </td>
+                    ))}
+                    <td className="text-right py-1 hidden md:block">
+                      {position.tvl}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

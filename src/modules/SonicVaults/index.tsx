@@ -102,6 +102,7 @@ const SonicVaults = (): JSX.Element => {
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
+  // const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
@@ -464,22 +465,37 @@ const SonicVaults = (): JSX.Element => {
           activeNetworksHandler={activeNetworksHandler}
         /> */}
         <div className="flex items-center gap-2 flex-col min-[1440px]:flex-row font-semibold text-[14px]">
-          <label className="relative block w-full">
-            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <img
-                src="/search.svg"
-                alt="Search"
-                className="w-4 h-4 text-neutral-500"
+          <div className="w-full relative">
+            <label className="relative block w-full">
+              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <img
+                  src="/search.svg"
+                  alt="Search"
+                  className="w-4 h-4 text-neutral-500"
+                />
+              </span>
+              <input
+                type="text"
+                className="mt-1 lg:mt-0 w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10"
+                placeholder="Search"
+                ref={search}
+                onChange={() => tableHandler()}
               />
-            </span>
-            <input
-              type="text"
-              className="mt-1 lg:mt-0 w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10"
-              placeholder="Search"
-              ref={search}
-              onChange={() => tableHandler()}
-            />
-          </label>
+            </label>
+            {/* {searchHistory.length > 0 && (
+              <ul className="absolute left-0 mt-2 w-full bg-accent-900 text-neutral-50 font-manrope rounded-2xl z-[10]">
+                {searchHistory.map((text, index) => (
+                  <li
+                    key={text + index}
+                    className={`p-2 cursor-pointer hover:bg-accent-800 ${!index ? "hover:rounded-t-2xl" : index === searchHistory.length - 1 ? "hover:rounded-b-2xl" : ""}`}
+                  >
+                    {text}
+                  </li>
+                ))}
+              </ul>
+            )} */}
+          </div>
+
           <Filters
             filters={tableFilters}
             setFilters={setTableFilters}

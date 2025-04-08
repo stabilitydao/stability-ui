@@ -10,6 +10,7 @@ import { SonicPointsButton } from "./SonicPointsButton";
 import { WagmiLayout } from "@layouts";
 
 import "./header.css";
+
 const Header = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1); // remove the first "/"
