@@ -26,6 +26,8 @@ const SonicPointsButton = (): JSX.Element => {
     activityPoints: "-",
     ringsPoints: "-",
     siloPoints: "-",
+    stabilitySiloPoints: "-",
+    allSiloPoints: "-",
     rank: "-",
   });
 
@@ -63,7 +65,25 @@ const SonicPointsButton = (): JSX.Element => {
       ).slice(1);
 
       const siloPoints = String(
-        formatNumber(siloData?.userPoints ?? 0, "abbreviate")
+        formatNumber(siloData?.siloPoints ?? 0, "abbreviate")
+      ).slice(1);
+
+      const stabilitySiloPoints = String(
+        formatNumber(siloData?.stabilitySiloPoints ?? 0, "abbreviate")
+      ).slice(1);
+
+      let _allSiloPoints: number = 0;
+
+      if (siloData?.siloPoints) {
+        _allSiloPoints += siloData?.siloPoints;
+      }
+
+      if (siloData?.stabilitySiloPoints) {
+        _allSiloPoints += siloData?.stabilitySiloPoints;
+      }
+
+      const allSiloPoints = String(
+        formatNumber(_allSiloPoints, "abbreviate")
       ).slice(1);
 
       const rank = sonicData.rank;
@@ -74,6 +94,8 @@ const SonicPointsButton = (): JSX.Element => {
         activityPoints,
         ringsPoints,
         siloPoints,
+        stabilitySiloPoints,
+        allSiloPoints,
         rank,
       });
     } catch (error) {
@@ -150,7 +172,7 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.totalPoints}</p>
             </div>
           </div>
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-2">
             <div
               className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#BD6EAC] text-white bg-[#BD6EAC]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
               onClick={() => playAudio("pp", 0.3)}
@@ -164,7 +186,7 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.passivePoints}</p>
             </div>
           </div>
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-2">
             <div
               className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#6EBD70] text-white bg-[#6EBD70]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
               onClick={() => playAudio("ap", 0.3)}
@@ -186,26 +208,53 @@ const SonicPointsButton = (): JSX.Element => {
 
           <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
 
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-2">
             <img src="/rings.png" alt="Rings" className="w-[34px]" />
             <div>
               <span className="text-neutral-500 text-[12px]">Rings Points</span>
               <p className="text-[14px] leading-4">{user.ringsPoints}</p>
             </div>
           </div>
-          {/* <div className="flex items-center gap-[8px]">
+          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
+
+          <div className="flex items-center gap-2">
             <img
               src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
               alt="Silo"
               className="w-[34px] rounded-full"
             />
             <div>
+              <span className="text-neutral-500 text-[12px]">Silo Points</span>
+              <p className="text-[14px] leading-4">{user.allSiloPoints}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-[14px]">
+            <img
+              src="/logo.svg"
+              alt="Stability"
+              className="w-[22px] ml-[6px]"
+            />
+            <div>
               <span className="text-neutral-500 text-[12px]">
-                Earned on Stability
+                Stability App
               </span>
+              <p className="text-[14px] leading-4">
+                {user.stabilitySiloPoints}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-[14px]">
+            <img
+              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+              alt="Silo"
+              className="w-[22px] rounded-full ml-[6px]"
+            />
+            <div>
+              <span className="text-neutral-500 text-[12px]">Silo App</span>
               <p className="text-[14px] leading-4">{user.siloPoints}</p>
             </div>
-          </div> */}
+          </div>
         </div>
       )}
     </div>

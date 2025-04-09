@@ -602,7 +602,9 @@ const SonicVaults = (): JSX.Element => {
                                 </div>
                               )}
 
-                              {SILO_POINTS[vault.address] && (
+                              {SILO_POINTS[
+                                vault.address as keyof typeof SILO_POINTS
+                              ] && (
                                 <div
                                   title="Silo Points per $ / day"
                                   className="flex items-center rounded-full border border-[#fff699] bg-[#fff699]/[0.16] pr-[6px]"
@@ -613,7 +615,11 @@ const SonicVaults = (): JSX.Element => {
                                     className="w-[14px] h-[14px] rounded-full"
                                   />
                                   <span className="text-[10px] ml-[3px] mr-[2px]">
-                                    {SILO_POINTS[vault.address]}
+                                    {
+                                      SILO_POINTS[
+                                        vault.address as keyof typeof SILO_POINTS
+                                      ]
+                                    }
                                   </span>
                                 </div>
                               )}
