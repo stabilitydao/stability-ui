@@ -2407,7 +2407,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                 !!balances[asset] ? "" : "opacity-0"
                               }`}
                             >
-                              <span>Balance: </span>
+                              <span>Balance:</span>
                               <span>
                                 {!!balances[asset] ? balances[asset] : "0"}
                               </span>
@@ -2533,7 +2533,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     !!balances[option[0]] ? "" : "opacity-0"
                   }`}
                 >
-                  <span>Balance: </span>
+                  <span>Balance:</span>
                   <span>
                     {!!balances[option[0]] ? balances[option[0]] : "0"}
                   </span>
@@ -2812,13 +2812,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             <div className="grid text-[15px] w-full">
               <div
                 className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
-                  !!balances[option[0]] ? "" : "opacity-0"
+                  !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                    ? ""
+                    : "opacity-0"
                 }`}
               >
                 <span>Balance:</span>
                 <span>
-                  {!!balances[option[0]] &&
-                  !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
+                  {!!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
                     ? parseFloat(
                         formatUnits(
                           $vaultData?.[network]?.[vault.address]
@@ -2856,7 +2857,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   inputMode="decimal"
                   className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                 />
-                {!!balances[option[0]] && (
+                {!!$vaultData[network][vault.address]?.vaultUserBalance && (
                   <button
                     type="button"
                     onClick={() => {
