@@ -191,6 +191,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     vault?.alm?.protocol === "Ichi" ||
     vault.strategyInfo.protocols[0].name === "Ichi";
 
+  const isSiloStrategies = ["SiAL", "SiL", "SiF"].includes(
+    vault.strategyInfo.shortId
+  );
+
   const DEX = ZAP_ROUTERS[agg] ?? ZAP_ROUTERS.swapper;
 
   const checkButtonApproveDeposit = (apprDepo: string[]) => {
@@ -2028,7 +2032,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const isSingleTokenStrategy = useMemo(() => {
     return (
       shortId === "CF" ||
-      (shortId === "Y" && vault?.assets[0]?.address === option[0])
+      (shortId === "Y" && vault?.assets[0]?.address === option[0]) ||
+      isSiloStrategies
     );
   }, [vault]);
 
@@ -2953,7 +2958,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                     </div>
                   ))}
 
-                {!isSingleTokenStrategy && isNotUnderlying && $connected && (
+                {isSingleTokenStrategyZap && isNotUnderlying && $connected && (
                   <div>
                     {option.length < 2 && (
                       <p
