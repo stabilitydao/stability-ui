@@ -215,7 +215,7 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.ringsPoints}</p>
             </div>
           </div>
-          {/* <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
+          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
 
           <div className="flex items-center gap-2">
             <img
@@ -254,7 +254,7 @@ const SonicPointsButton = (): JSX.Element => {
               <span className="text-neutral-500 text-[12px]">Silo App</span>
               <p className="text-[14px] leading-4">{user.siloPoints}</p>
             </div>
-          </div> */}
+          </div>
         </div>
       )}
     </div>
