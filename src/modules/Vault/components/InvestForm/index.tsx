@@ -2409,7 +2409,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                           <div className="min-w-full h-[64px]">
                             <div
                               className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
-                                !!balances[asset] ? "" : "opacity-0"
+                                $connected ? "" : "opacity-0"
                               }`}
                             >
                               <span>Balance:</span>
@@ -2535,7 +2535,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <div className="flex flex-col text-[15px] w-full">
                 <div
                   className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
-                    !!balances[option[0]] ? "" : "opacity-0"
+                    $connected ? "" : "opacity-0"
                   }`}
                 >
                   <span>Balance:</span>
@@ -2817,9 +2817,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             <div className="grid text-[15px] w-full">
               <div
                 className={`h-3 text-[12px] leading-3 text-neutral-500  flex items-center gap-1 ${
-                  !!$vaultData?.[network]?.[vault.address]?.vaultUserBalance
-                    ? ""
-                    : "opacity-0"
+                  $connected ? "" : "opacity-0"
                 }`}
               >
                 <span>Balance:</span>
