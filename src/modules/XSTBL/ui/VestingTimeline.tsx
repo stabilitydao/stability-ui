@@ -39,13 +39,17 @@ const VestingTimeline: React.FC<IProps> = ({ type, value, activeVest }) => {
             Cancel Ends
           </div>
           <div className="absolute right-0 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined">
-            {formatNumber(value, "format")} xSTBL
+            {Number(value) > 0.0001 ? formatNumber(value, "format") : "0.00"}{" "}
+            xSTBL
           </div>
           <div
             className="absolute -translate-x-1/2 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined"
             style={{ left: "33.3333%" }}
           >
-            {formatNumber(value / 1.5, "format")} xSTBL
+            {Number(value) > 0.0001
+              ? formatNumber(value / 1.5, "format")
+              : "0.00"}{" "}
+            xSTBL
           </div>
           <div className="bg-accent-900 rounded-2xl relative h-full overflow-hidden">
             <div
@@ -92,7 +96,10 @@ const VestingTimeline: React.FC<IProps> = ({ type, value, activeVest }) => {
             Cancel Ends
           </div>
           <div className="absolute right-0 bottom-full -translate-y-0.5 whitespace-nowrap text-base font-bold undefined">
-            {formatNumber(activeVest.amount, "format")} xSTBL
+            {Number(activeVest.amount) > 0.0001
+              ? formatNumber(activeVest.amount, "format")
+              : "0.00"}
+            xSTBL
           </div>
           <div className="bg-accent-900 rounded-2xl relative h-full overflow-hidden">
             <div

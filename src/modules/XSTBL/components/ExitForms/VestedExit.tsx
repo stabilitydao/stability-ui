@@ -30,7 +30,7 @@ const VestedExit: React.FC = () => {
 
   const [timelineValue, setTimelineValue] = useState(0);
 
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState("0");
 
   const [button, setButton] = useState("");
 
@@ -69,9 +69,9 @@ const VestedExit: React.FC = () => {
 
       if (!Number(numericValue)) {
         setButton("");
-      } else if (Number(numericValue) > balance) {
+      } else if (Number(numericValue) > Number(balance)) {
         setButton("insufficientBalance");
-      } else if (Number(numericValue) <= balance) {
+      } else if (Number(numericValue) <= Number(balance)) {
         setButton("Vest");
       }
       setTimelineValue(Number(input.current.value));
@@ -221,8 +221,9 @@ const VestedExit: React.FC = () => {
         }
       }
 
-      let parsedBalance = Number(
-        formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+      let parsedBalance = formatUnits(
+        XSTBLBalance,
+        STABILITY_TOKENS[146].xstbl.decimals
       );
 
       setBalance(parsedBalance);
