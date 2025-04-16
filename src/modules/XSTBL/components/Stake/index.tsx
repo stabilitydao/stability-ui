@@ -31,7 +31,7 @@ import type { TStakeDashboardData, TAddress } from "@types";
 
 const Stake = (): JSX.Element => {
   const $connected = useStore(connected);
-  const $account = "0x88888887C3ebD4a33E34a15Db4254C74C75E5D4A"; //useStore(account);
+  const $account = useStore(account);
   const $lastTx = useStore(lastTx);
   const $assetsPrices = useStore(assetsPrices);
 
