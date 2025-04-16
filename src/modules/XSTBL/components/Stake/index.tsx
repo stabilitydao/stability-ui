@@ -38,9 +38,9 @@ const Stake = (): JSX.Element => {
   const input = useRef<HTMLInputElement>(null);
 
   const [balances, setBalances] = useState({
-    xstbl: 0,
-    stakedXSTBL: 0,
-    earned: 0,
+    xstbl: "0",
+    stakedXSTBL: "0",
+    earned: "0",
   });
 
   const [allowance, setAllowance] = useState(0);
@@ -267,7 +267,7 @@ const Stake = (): JSX.Element => {
     setStakeType(type);
 
     if (type === "Claim") {
-      setButton(`Claim ${balances.earned.toFixed(2)} xSTBL`);
+      setButton(`Claim ${Number(balances.earned).toFixed(2)} xSTBL`);
     } else {
       setButton("");
     }
@@ -284,7 +284,7 @@ const Stake = (): JSX.Element => {
 
       const currentTimestamp = Math.floor(Date.now() / 1000);
 
-      const _balances = { xstbl: 0, stakedXSTBL: 0, earned: 0 };
+      const _balances = { xstbl: "0", stakedXSTBL: "0", earned: "0" };
 
       const _dashboardData: TStakeDashboardData = {
         totalStaked: 0,
@@ -397,19 +397,19 @@ const Stake = (): JSX.Element => {
           args: [$account as TAddress],
         })) as bigint;
 
-        let parsedBalance = Number(
-          formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+        let parsedBalance = formatUnits(
+          XSTBLBalance,
+          STABILITY_TOKENS[146].xstbl.decimals
         );
 
-        let parsedEarned = Number(
-          formatUnits(earned, STABILITY_TOKENS[146].xstbl.decimals)
+        let parsedEarned = formatUnits(
+          earned,
+          STABILITY_TOKENS[146].xstbl.decimals
         );
 
-        let parsedStakedBalance = Number(
-          formatUnits(
-            stakedSTBLBalance as bigint,
-            STABILITY_TOKENS[146].xstbl.decimals
-          )
+        let parsedStakedBalance = formatUnits(
+          stakedSTBLBalance as bigint,
+          STABILITY_TOKENS[146].xstbl.decimals
         );
 
         let parsedAllowance = Number(
@@ -423,16 +423,18 @@ const Stake = (): JSX.Element => {
         if (parsedEarned) {
           _balances.earned = parsedEarned;
 
-          setIsClaimable(!!parsedEarned);
+          setIsClaimable(!!Number(parsedEarned));
         }
 
         if (parsedStakedBalance) {
           _balances.stakedXSTBL = parsedStakedBalance;
-          _dashboardData.userStaked = parsedStakedBalance;
-          _dashboardData.userStakedInUSD = parsedStakedBalance * stblPrice;
+
+          _dashboardData.userStaked = Number(parsedStakedBalance);
+          _dashboardData.userStakedInUSD =
+            Number(parsedStakedBalance) * stblPrice;
 
           _dashboardData.estimatedProfit =
-            (allIncome * parsedStakedBalance) / parsedTotal;
+            (allIncome * Number(parsedStakedBalance)) / parsedTotal;
 
           _dashboardData.estimatedProfitInUSD =
             _dashboardData.estimatedProfit * stblPrice;

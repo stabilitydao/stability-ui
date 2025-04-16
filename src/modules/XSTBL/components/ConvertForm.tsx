@@ -25,7 +25,7 @@ const ConvertForm = (): JSX.Element => {
 
   const input = useRef<HTMLInputElement>(null);
 
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState("0");
   const [allowance, setAllowance] = useState(0);
 
   const [button, setButton] = useState("");
@@ -80,8 +80,9 @@ const ConvertForm = (): JSX.Element => {
         ],
       });
 
-      let parsedBalance = Number(
-        formatUnits(STBLBalance, STABILITY_TOKENS[146].stbl.decimals)
+      let parsedBalance = formatUnits(
+        STBLBalance,
+        STABILITY_TOKENS[146].stbl.decimals
       );
 
       let parsedAllowance = Number(

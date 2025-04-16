@@ -25,7 +25,7 @@ const InstantExit: React.FC = () => {
 
   const input = useRef<HTMLInputElement>(null);
 
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState("0");
 
   const [button, setButton] = useState("");
 
@@ -67,8 +67,9 @@ const InstantExit: React.FC = () => {
         args: [$account as TAddress],
       });
 
-      let parsedBalance = Number(
-        formatUnits(XSTBLBalance, STABILITY_TOKENS[146].xstbl.decimals)
+      let parsedBalance = formatUnits(
+        XSTBLBalance,
+        STABILITY_TOKENS[146].xstbl.decimals
       );
 
       if (parsedBalance) {
