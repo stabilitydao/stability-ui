@@ -31,7 +31,7 @@ import type { TStakeDashboardData, TAddress } from "@types";
 
 const Stake = (): JSX.Element => {
   const $connected = useStore(connected);
-  const $account = useStore(account);
+  const $account = "0x88888887C3ebD4a33E34a15Db4254C74C75E5D4A"; //useStore(account);
   const $lastTx = useStore(lastTx);
   const $assetsPrices = useStore(assetsPrices);
 
@@ -267,6 +267,7 @@ const Stake = (): JSX.Element => {
     setStakeType(type);
 
     if (type === "Claim") {
+      console.log(balances.earned);
       setButton(`Claim ${Number(balances.earned).toFixed(2)} xSTBL`);
     } else {
       setButton("");
@@ -423,7 +424,7 @@ const Stake = (): JSX.Element => {
         if (parsedEarned) {
           _balances.earned = parsedEarned;
 
-          setIsClaimable(!!parsedEarned);
+          setIsClaimable(!!Number(parsedEarned));
         }
 
         if (parsedStakedBalance) {

@@ -193,12 +193,12 @@ const Users = (): JSX.Element => {
           </div>
 
           {activeContest != "ABSOLUTE" && (
-            <div className="w-full flex items-center justify-center">
+            <div className="w-full flex items-center justify-center mt-[-20px]">
               <a
                 className="bg-accent-900 max-w-[250px] min-w-[100px] text-[14px] font-semibold h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
                 href={`/contests/${activeContestID}`}
               >
-                All Users
+                Show all
               </a>
             </div>
           )}
