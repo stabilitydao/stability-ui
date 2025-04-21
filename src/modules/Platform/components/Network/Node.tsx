@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@ui";
 import { apiData } from "@store";
 
 import type { NodeState } from "@stabilitydao/stability/out/api.types";
+import {formatLifeTime} from "./index.tsx";
 
 const shortMachineId = (machineId: string): string => {
   return `${machineId.slice(0, 4)}...${machineId.slice(-4)}`;
@@ -19,6 +20,7 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
   const $apiData: ApiMainReply = useStore(apiData);
   const nodeState: NodeState | undefined =
     $apiData?.network.nodes[machineIdHash];
+  const isOnline = !!(nodeState?.lastSeen && ((new Date()).getTime() / 1000) - nodeState.lastSeen < 180)
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
@@ -46,14 +48,19 @@ const Node: React.FC<IProps> = ({ machineIdHash }) => {
             </div>
           </div>
         )}
-        <div className="flex flex-col mb-5">
-          <div className="text-[12px] font-bold">Last seen</div>
-          <div>{nodeState?.lastSeen}</div>
-        </div>
-        <div className="flex flex-col mb-5">
-          <div className="text-[12px] font-bold">Lifetime</div>
-          <div>{nodeState?.lifetime}</div>
-        </div>
+
+        {isOnline ?
+          <div className="flex flex-col mb-5">
+            <div className="text-[12px] font-bold">Lifetime</div>
+            <div>{formatLifeTime(nodeState.lifetime)}</div>
+          </div>
+          :
+          <div className="flex flex-col mb-5">
+            <div className="text-[12px] font-bold">Last seen</div>
+            <div>{formatLifeTime((new Date().getTime() / 1000) - Number(nodeState?.lastSeen))} ago</div>
+          </div>
+        }
+
         <div className="flex flex-col mb-5">
           <div className="text-[12px] font-bold">About</div>
           <div>{nodeState?.about}</div>
