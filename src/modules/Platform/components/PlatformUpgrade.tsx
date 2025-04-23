@@ -45,12 +45,14 @@ const PlatformUpgrade = (): JSX.Element => {
             const moduleContracts = Object.keys(
               deployments[$currentChainID].core
             );
+
             const upgratedData = await Promise.all(
               moduleContracts.map(async (moduleContract: string) => {
                 //Can't use CoreContracts type
                 //@ts-ignore
                 const address =
                   deployments[$currentChainID].core[moduleContract];
+
                 if (proxy.toLowerCase() === address.toLowerCase()) {
                   const oldImplementation = await $publicClient?.readContract({
                     address: address,
@@ -113,6 +115,7 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "platformUpgradeTimelock",
       });
+
       if (lockTime && platformUpgradeTimelock) {
         setLockTime({
           start: `${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleDateString()} ${new Date(Number(platformUpgradeTimelock - lockTime) * 1000).toLocaleTimeString()}`,
