@@ -24,10 +24,6 @@ const Swapper = (): JSX.Element => {
       const GRAPH_URL = GRAPH_ENDPOINTS[146];
 
       const GRAPH_QUERY = `{
-              ammadapterEntities {
-                  id
-                  name
-              }
               bcpoolEntities {
                   pool
                   id
