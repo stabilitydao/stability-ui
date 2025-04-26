@@ -225,7 +225,7 @@ const Wallet = (): JSX.Element => {
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
-          <p className="lg:flex hidden">{currentChain?.name}</p>
+          <p className="min-[1200px]:flex hidden">{currentChain?.name}</p>
         </button>
       )}
       {isSwitchNetwork && (
