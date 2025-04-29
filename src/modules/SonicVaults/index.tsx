@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
@@ -29,7 +29,7 @@ import {
 
 import { toVault, initFilters } from "./functions";
 
-import { formatNumber, formatFromBigInt, dataSorter } from "@utils";
+import { formatNumber, formatFromBigInt, dataSorter, debounce } from "@utils";
 
 import {
   SONIC_TABLE,
@@ -102,7 +102,7 @@ const SonicVaults = (): JSX.Element => {
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
-  // const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
@@ -148,6 +148,15 @@ const SonicVaults = (): JSX.Element => {
   const userVaultsCondition =
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
+
+  const handleSearch = (value: string) => {
+    if (search?.current) {
+      search.current.value = value;
+
+      tableHandler();
+      setSearchHistory([]);
+    }
+  };
 
   const activeNetworksHandler = async (chainIDs: string[]) => {
     let updatedNetworks = activeNetworks.map((network) =>
@@ -237,6 +246,27 @@ const SonicVaults = (): JSX.Element => {
     tableHandler(_tableStates, DEFAULT_TABLE_PARAMS);
   };
 
+  const updateHistorySearch = useCallback(
+    debounce((value: string) => {
+      if (!value) return;
+
+      const history = JSON.parse(
+        localStorage.getItem("searchHistory") as string
+      );
+
+      if (Array.isArray(history) && history.includes(value)) return;
+
+      let newValues = history ? [...history, value] : [value];
+
+      if (newValues.length > 10) {
+        newValues.shift();
+      }
+
+      localStorage.setItem("searchHistory", JSON.stringify(newValues));
+    }, 2000),
+    []
+  );
+
   const tableHandler = (
     table: TTableColumn[] = tableStates,
     tableParams = activeTableParams
@@ -244,6 +274,9 @@ const SonicVaults = (): JSX.Element => {
     if (!$vaults) return;
 
     const searchValue: string = String(search?.current?.value.toLowerCase());
+
+    //@ts-ignore
+    updateHistorySearch(searchValue);
 
     let activeNetworksVaults: { [key: string]: TVault[] } = {};
 
@@ -282,11 +315,11 @@ const SonicVaults = (): JSX.Element => {
             sortedVaults = sortedVaults.filter((vault: TVault) => {
               if (vault.assets.length > 1) {
                 return (
-                  STABLECOINS.includes(vault.assets[0].address) &&
-                  STABLECOINS.includes(vault.assets[1].address)
+                  STABLECOINS.includes(vault?.assets[0]?.address) &&
+                  STABLECOINS.includes(vault?.assets[1]?.address)
                 );
               }
-              return STABLECOINS.includes(vault.assets[0].address);
+              return STABLECOINS.includes(vault?.assets[0]?.address);
             });
           }
           break;
@@ -395,9 +428,22 @@ const SonicVaults = (): JSX.Element => {
       _activeTableParams = { ..._activeTableParams, sort: 0 };
     }
 
+    // search history
+    const history = JSON.parse(localStorage.getItem("searchHistory") as string);
+
+    const historyData: string[] = [];
+    if (Array.isArray(history) && searchValue) {
+      for (const historyValue of history) {
+        if (historyValue.includes(searchValue)) {
+          historyData.push(historyValue);
+        }
+      }
+    }
+
     setActiveTableParams(_activeTableParams);
     setFilteredVaults(sortedVaults);
     setTableStates(table);
+    setSearchHistory(historyData);
   };
 
   const initVaults = async () => {
@@ -482,18 +528,19 @@ const SonicVaults = (): JSX.Element => {
                 onChange={() => tableHandler()}
               />
             </label>
-            {/* {searchHistory.length > 0 && (
+            {searchHistory.length > 0 && (
               <ul className="absolute left-0 mt-2 w-full bg-accent-900 text-neutral-50 font-manrope rounded-2xl z-[10]">
                 {searchHistory.map((text, index) => (
                   <li
                     key={text + index}
                     className={`p-2 cursor-pointer hover:bg-accent-800 ${!index ? "hover:rounded-t-2xl" : index === searchHistory.length - 1 ? "hover:rounded-b-2xl" : ""}`}
+                    onClick={() => handleSearch(text)}
                   >
                     {text}
                   </li>
                 ))}
               </ul>
-            )} */}
+            )}
           </div>
 
           <Filters

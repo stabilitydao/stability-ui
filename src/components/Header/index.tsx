@@ -66,6 +66,7 @@ const Header = (): JSX.Element => {
           <a className={currentPath === "xstbl" ? "active" : ""} href="/xstbl">
             xSTBL
           </a>
+          <a href="https://stability.market/">Lend/Borrow</a>
           <a className={isPlatform ? "active" : ""} href="/platform">
             Platform
           </a>
@@ -102,6 +103,7 @@ const Header = (): JSX.Element => {
           >
             xSTBL
           </a>
+          <a href="https://stability.market/">Lend/Borrow</a>
           <a
             className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
             href="/platform"

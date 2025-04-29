@@ -349,11 +349,11 @@ const Vaults = (): JSX.Element => {
             sortedVaults = sortedVaults.filter((vault: TVault) => {
               if (vault.assets.length > 1) {
                 return (
-                  STABLECOINS.includes(vault.assets[0].address) &&
-                  STABLECOINS.includes(vault.assets[1].address)
+                  STABLECOINS.includes(vault?.assets[0]?.address) &&
+                  STABLECOINS.includes(vault?.assets[1]?.address)
                 );
               }
-              return STABLECOINS.includes(vault.assets[0].address);
+              return STABLECOINS.includes(vault?.assets[0]?.address);
             });
           }
           break;
