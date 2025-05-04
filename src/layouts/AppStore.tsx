@@ -255,6 +255,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           daily: "0",
           weekly: "0",
         };
+        let totalAPRArray = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
         let APYArray = {
           latest: "0",
           daily: "0",
@@ -266,6 +271,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           weekly: "0",
         };
         let farmAPR = {
+          latest: "0",
+          daily: "0",
+          weekly: "0",
+        };
+        let gemsAPR = {
           latest: "0",
           daily: "0",
           weekly: "0",
@@ -328,8 +338,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             2
           );
 
-          APY = calculateAPY(APR).toFixed(2);
-
           APRWithoutFees = Number(vault?.income?.aprLatest).toFixed(2) || "0";
 
           ///////
@@ -359,23 +367,51 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     vault.strategyShortId
                   ),
           };
+
+          gemsAPR = {
+            latest: String(
+              Number(APRArray.latest) *
+                stabilityAPIData.rewards.gemsAprMultiplier
+            ),
+            daily: String(
+              Number(APRArray.daily) *
+                stabilityAPIData.rewards.gemsAprMultiplier
+            ),
+            weekly: String(
+              Number(APRArray.weekly) *
+                stabilityAPIData.rewards.gemsAprMultiplier
+            ),
+          };
+
+          totalAPRArray = {
+            latest: (Number(APRArray.latest) + Number(gemsAPR.latest)).toFixed(
+              2
+            ),
+            daily: (Number(APRArray.daily) + Number(gemsAPR.daily)).toFixed(2),
+            weekly: (Number(APRArray.weekly) + Number(gemsAPR.weekly)).toFixed(
+              2
+            ),
+          };
+
+          APY = calculateAPY(totalAPRArray.latest).toFixed(2);
+
           APYArray = {
-            latest: Number(APR) < 0 ? "0" : APY,
+            latest: Number(totalAPRArray.latest) < 0 ? "0" : APY,
             daily:
-              dailyTotalAPRWithFees < 0
+              Number(totalAPRArray.daily) < 0
                 ? "0"
                 : determineAPR(
                     vault?.income?.apr24h,
-                    calculateAPY(dailyTotalAPRWithFees).toFixed(2),
+                    calculateAPY(totalAPRArray.daily).toFixed(2),
                     APY,
                     vault.strategyShortId
                   ),
             weekly:
-              weeklyTotalAPRWithFees < 0
+              Number(totalAPRArray.weekly) < 0
                 ? "0"
                 : determineAPR(
                     vault?.income?.aprWeek,
-                    calculateAPY(weeklyTotalAPRWithFees).toFixed(2),
+                    calculateAPY(Number(totalAPRArray.weekly)).toFixed(2),
                     APY,
                     vault.strategyShortId
                   ),
@@ -632,7 +668,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               sonicActivePoints = Number(points.toFixed(1));
               break;
           }
-
           // Leverage lending live APR & asset APR
           if (
             vault?.address?.toLowerCase() ===
@@ -700,12 +735,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             gasReserve: vault.gasReserve,
             rebalances,
             earningData: {
-              apr: APRArray,
+              apr: totalAPRArray,
               apy: APYArray,
               poolSwapFeesAPR,
               farmAPR,
+              gemsAPR,
             },
-            sortAPR: APRArray?.latest,
+            sortAPR: totalAPRArray?.latest,
             pool: vault.pool,
             alm: vault.alm,
             risk: vault?.risk,

@@ -127,6 +127,7 @@ type TEarningData = {
   apy: TAPRData;
   poolSwapFeesAPR: TAPRData;
   farmAPR: TAPRData;
+  gemsAPR: TAPRData;
 };
 
 type TVaults = {
