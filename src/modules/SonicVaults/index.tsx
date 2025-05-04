@@ -24,7 +24,6 @@ import {
   connected,
   error,
   visible,
-  apiData,
 } from "@store";
 
 import { toVault, initFilters } from "./functions";
@@ -54,7 +53,6 @@ const SonicVaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
 
   const $vaults = useStore(vaults);
-  const $apiData = useStore(apiData);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
