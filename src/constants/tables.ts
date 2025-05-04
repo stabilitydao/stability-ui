@@ -8,20 +8,12 @@ const TABLE_FILTERS: TTableFilters[] = [
 ];
 
 const SONIC_TABLE: TTableColumn[] = [
-  // { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
   {
     name: "Assets",
     keyName: "assetsSymbol",
     sortType: "none",
     dataType: "string",
   },
-  // { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
-  // {
-  //   name: "Type",
-  //   keyName: "type",
-  //   sortType: "none",
-  //   dataType: "string",
-  // },
   {
     name: "Strategy",
     keyName: "strategy",
@@ -29,36 +21,12 @@ const SONIC_TABLE: TTableColumn[] = [
     dataType: "string",
   },
   {
-    name: "Income APR",
+    name: "Total APR",
     keyName: "earningData",
     sortType: "none",
     dataType: "number",
   },
-  // {
-  //   name: "VS HODL APR",
-  //   keyName: "vsHoldAPR",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
-  {
-    name: "Extra rewards APR",
-    keyName: "",
-    sortType: "none",
-    dataType: "",
-    unsortable: true,
-  },
-  // {
-  //   name: "Points",
-  //   keyName: "sonicActivePoints",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
-  // {
-  //   name: "RISK",
-  //   keyName: "il",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
+
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
   {
     name: "Balance",
@@ -76,13 +44,6 @@ const TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "string",
   },
-  // { name: "Status", keyName: "status", sortType: "none", dataType: "number" },
-  // {
-  //   name: "Type",
-  //   keyName: "type",
-  //   sortType: "none",
-  //   dataType: "string",
-  // },
   {
     name: "Strategy",
     keyName: "strategy",
@@ -135,18 +96,6 @@ const CHAINS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  // {
-  //   name: "Treasury",
-  //   keyName: "multisig",
-  //   sortType: "none",
-  //   dataType: "string",
-  // },
-  // {
-  //   name: "Issue",
-  //   keyName: "chainLibGithubId",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
   { name: "Status", keyName: "status", sortType: "none", dataType: "string" },
   {
     name: "Strategies",

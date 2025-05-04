@@ -24,7 +24,6 @@ import {
   connected,
   error,
   visible,
-  apiData,
 } from "@store";
 
 import { toVault, initFilters } from "./functions";
@@ -54,7 +53,6 @@ const SonicVaults = (): JSX.Element => {
   const { open } = useWeb3Modal();
 
   const $vaults = useStore(vaults);
-  const $apiData = useStore(apiData);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
@@ -583,13 +581,6 @@ const SonicVaults = (): JSX.Element => {
                       vault?.earningData?.apr[$aprFilter]
                     );
 
-                    let gemsAprValue = 0;
-
-                    if (aprValue >= 0) {
-                      gemsAprValue =
-                        aprValue * $apiData.rewards?.gemsAprMultiplier;
-                    }
-
                     const apyValue = vault.earningData.apy[$aprFilter];
 
                     const swapFeesAPRValue =
@@ -601,6 +592,10 @@ const SonicVaults = (): JSX.Element => {
                     const dailyAPRValue = (
                       Number(vault?.earningData?.apr[$aprFilter]) / 365
                     ).toFixed(2);
+
+                    const gemsAprValue = Number(
+                      vault.earningData.gemsAPR[$aprFilter]
+                    );
 
                     const isSTBLVault =
                       Array.isArray(vault?.assets) &&
@@ -648,7 +643,6 @@ const SonicVaults = (): JSX.Element => {
                                   </span>
                                 </div>
                               )}
-
                               {SILO_POINTS[
                                 vault.address as keyof typeof SILO_POINTS
                               ] && (
@@ -689,21 +683,6 @@ const SonicVaults = (): JSX.Element => {
                             </div>
                           </div>
                         </td>
-                        {/* <td className="px-2 min-[1130px]:px-1 py-2 table-cell w-[50px]">
-                          <div className="flex items-center justify-center">
-                            {vault?.risk?.isRektStrategy ? (
-                              <div
-                                className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
-                                title={vault?.risk?.isRektStrategy as string}
-                              ></div>
-                            ) : (
-                              <VaultState status={vault.status} />
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
-                          <VaultType type={vault.type} />
-                        </td> */}
                         <td className="pl-2 py-2 whitespace-nowrap">
                           <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
                             {vault.strategyInfo && (
@@ -761,7 +740,6 @@ const SonicVaults = (): JSX.Element => {
                             )}
                           </div>
                         </td>
-
                         <td
                           onClick={(e) => {
                             if (isMobile) {
@@ -853,6 +831,18 @@ const SonicVaults = (): JSX.Element => {
                                     {formatNumber(dailyAPRValue, "formatAPR")}%
                                   </p>
                                 </div>
+                                {!isSTBLVault && (
+                                  <div className="font-bold flex items-center justify-between">
+                                    <p>Gems APR</p>
+                                    <div className="flex items-center justify-end">
+                                      {formatNumber(
+                                        gemsAprValue.toFixed(2),
+                                        "formatAPR"
+                                      )}
+                                      %
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                               <div className="flex items-center justify-between w-full">
                                 <p>Last Hard Work</p>
@@ -864,67 +854,6 @@ const SonicVaults = (): JSX.Element => {
                             <i></i>
                           </div>
                         </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          {!isSTBLVault && (
-                            <div className="flex items-center justify-end">
-                              {formatNumber(
-                                gemsAprValue.toFixed(2),
-                                "formatAPR"
-                              )}
-                              %
-                              <img
-                                src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
-                                className="w-[24px] h-[24px] ml-1.5"
-                                title="sGEM1"
-                                alt="sGEM1"
-                              />
-                            </div>
-                          )}
-                        </td>
-                        {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center gap-2">
-                            <div
-                              title="Sonic Activity Points"
-                              className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]"
-                            >
-                              <img
-                                src="/sonic.png"
-                                alt="sonic"
-                                className="w-5 h-5 rounded-full"
-                              />
-                              <span className="text-[10px] ml-[3px] mr-[2px]">
-                                x{vault.sonicActivePoints}
-                              </span>
-                            </div>
-
-                            {SILO_POINTS[vault.address] && (
-                              <div
-                                title="Silo Points per $ / day"
-                                className="flex items-center rounded-full border border-[#fff699] bg-[#fff699]/[0.16] pr-[6px]"
-                              >
-                                <img
-                                  src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-                                  alt="silo"
-                                  className="w-5 h-5 rounded-full"
-                                />
-                                <span className="text-[10px] ml-[3px] mr-[2px]">
-                                  {SILO_POINTS[vault.address]}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </td> */}
-                        {/* <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
-                            <RiskIndicator
-                              riskSymbol={
-                                vault?.risk?.isRektStrategy
-                                  ? vault?.risk?.symbol
-                                  : (vault.strategyInfo.il?.title as string)
-                              }
-                            />
-                          </div>
-                        </td> */}
                         <td className="px-2 min-[1130px]:px-4 py-2 text-right">
                           {formatNumber(vault.tvl, "abbreviate")}
                         </td>
