@@ -45,7 +45,8 @@ type TAssetData = {
   symbol: string;
   website: string;
   price: number;
-  addresses: number;
+  tags: string[];
+  img: string;
 };
 type TTableStrategy = {
   id: string;
