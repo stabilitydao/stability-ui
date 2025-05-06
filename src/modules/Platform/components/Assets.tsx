@@ -8,7 +8,7 @@ import { sortTable, formatNumber } from "@utils";
 
 import { Breadcrumbs, TableColumnSort, HeadingText, Checkbox } from "@ui";
 
-import {assetsPrices, tokens} from "@store";
+import {assetsPrices} from "@store";
 
 import { ASSETS_TABLE } from "@constants";
 
