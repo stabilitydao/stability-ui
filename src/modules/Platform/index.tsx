@@ -24,6 +24,7 @@ import { apiData, platformVersions } from "@store";
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 import packageJson from "../../../package.json";
+import {NodeState} from "@stabilitydao/stability/out/api.types";
 
 const Platform = (): JSX.Element => {
   const $currentChainID = "146";
@@ -106,8 +107,11 @@ const Platform = (): JSX.Element => {
 
   const networksInfo = [
     {
-      name: "Nodes",
-      value: Object.keys($apiData?.network.nodes || []).length.toString(),
+      name: "Nodes online",
+      value: Object.keys($apiData?.network.nodes || []).filter(machingId => {
+        const nodeState = $apiData?.network.nodes[machingId] as unknown as NodeState|undefined
+        return !!(nodeState?.lastSeen && ((new Date()).getTime() / 1000) - nodeState.lastSeen < 180)
+      }).length.toString(),
       color: "#2D67FB",
     },
     { name: "Seed nodes", value: seeds.length.toString(), color: "#4FAE2D" },
@@ -215,6 +219,25 @@ const Platform = (): JSX.Element => {
 
       <div className="flex flex-wrap">
         <CountersBlockCompact
+          title="Network"
+          link="/network"
+          linkTitle="View Stability Network"
+          counters={networksInfo}
+        />
+        <CountersBlockCompact
+          title="Swapper"
+          link="/swapper"
+          linkTitle="Go to Swapper"
+          counters={swapperInfo}
+        />
+        <CountersBlockCompact
+          title="Assets"
+          link="/assets"
+          linkTitle="View all assets"
+          counters={assetsInfo}
+        />
+
+        <CountersBlockCompact
           title="Strategies"
           link="/strategies"
           linkTitle="Go to strategies"
@@ -236,32 +259,12 @@ const Platform = (): JSX.Element => {
         />
 
         <CountersBlockCompact
-          title="Assets"
-          link="/assets"
-          linkTitle="View all assets"
-          counters={assetsInfo}
-        />
-
-        <CountersBlockCompact
-          title="Network"
-          link="/network"
-          linkTitle="View Stability Network"
-          counters={networksInfo}
-        />
-
-        <CountersBlockCompact
           title="Factory"
           link="/factory"
           linkTitle="Go to Factory"
           counters={factoryInfo}
         />
 
-        <CountersBlockCompact
-          title="Swapper"
-          link="/swapper"
-          linkTitle="Go to Swapper"
-          counters={swapperInfo}
-        />
       </div>
 
       <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>
