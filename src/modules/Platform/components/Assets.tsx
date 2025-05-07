@@ -6,7 +6,7 @@ import { assets } from "@stabilitydao/stability";
 
 import { sortTable, formatNumber } from "@utils";
 
-import { Breadcrumbs, TableColumnSort, HeadingText, Checkbox } from "@ui";
+import { TableColumnSort, HeadingText, Checkbox } from "@ui";
 
 import { assetsPrices } from "@store";
 
@@ -79,8 +79,6 @@ const Assets = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Assets"]} />
-
       <HeadingText text="Assets" scale={1} />
 
       <div className="flex items-center justify-start mb-3 select-none font-manrope text-[14px] font-semibold">

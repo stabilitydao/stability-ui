@@ -4,7 +4,7 @@ import { integrations } from "@stabilitydao/stability";
 
 import { ProtocolBadge } from "../../ui";
 
-import { Breadcrumbs, TableColumnSort, HeadingText } from "@ui";
+import { TableColumnSort, HeadingText } from "@ui";
 
 import { sortTable } from "@utils";
 
@@ -40,8 +40,6 @@ const Integrations = (): JSX.Element => {
   }, []);
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Integrations"]} />
-
       <HeadingText text="Integrations" scale={1} />
 
       <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">

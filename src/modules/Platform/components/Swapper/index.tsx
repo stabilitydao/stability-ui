@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
-import { Breadcrumbs, TableColumnSort, HeadingText, FullPageLoader } from "@ui";
+import { TableColumnSort, HeadingText, FullPageLoader } from "@ui";
 
 import { sortTable, getShortAddress } from "@utils";
 
@@ -58,8 +58,6 @@ const Swapper = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Swapper"]} />
-
       <HeadingText text="Swapper" scale={1} />
 
       {BCPoolTableData.length && poolTableData.length ? (

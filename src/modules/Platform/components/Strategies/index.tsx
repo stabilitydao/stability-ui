@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { strategies, type StrategyShortId } from "@stabilitydao/stability";
 
-import { Breadcrumbs, HeadingText, TableColumnSort, Counter } from "@ui";
+import { HeadingText, TableColumnSort, Counter } from "@ui";
 
 import { StrategyStatus, ProtocolsChip } from "../../ui";
 
@@ -154,8 +154,6 @@ const Strategies = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Strategies"]} />
-
       <HeadingText text="Strategies" scale={1} />
 
       <div className="bg-accent-950 p-[26px] rounded-[44px] mb-6 flex flex-col select-none">

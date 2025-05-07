@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 
-import {
-  Breadcrumbs,
-  HeadingText,
-  FullPageLoader,
-  TableColumnSort,
-  Badge,
-} from "@ui";
+import { HeadingText, FullPageLoader, TableColumnSort, Badge } from "@ui";
 
 import {
   sortTable,
@@ -76,7 +70,6 @@ const Contests = (): JSX.Element => {
   }, [contests]);
   return (
     <div className="xl:min-w-[1200px] w-full max-w-[1200px]">
-      <Breadcrumbs links={["Users", "Contests"]} />
       <HeadingText text="Contests" scale={1} />
       {tableData.length ? (
         <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[800px]">

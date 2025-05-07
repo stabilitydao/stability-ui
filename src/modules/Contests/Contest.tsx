@@ -4,7 +4,7 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { Breadcrumbs, HeadingText, TableColumnSort, FullPageLoader } from "@ui";
+import { HeadingText, TableColumnSort, FullPageLoader } from "@ui";
 
 import {
   getShortAddress,
@@ -70,7 +70,6 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
   }, [contestId, isActiveContest]);
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Users", "Contests", contest.name]} />
       {!!contest?.img && (
         <img
           src={`https://raw.githubusercontent.com/stabilitydao/.github/main/covers/${contest.img}`}

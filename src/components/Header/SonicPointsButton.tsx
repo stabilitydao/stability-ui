@@ -131,30 +131,27 @@ const SonicPointsButton = (): JSX.Element => {
   }, [sonicBtn]);
 
   return (
-    <div className="relative">
+    <div className="relative border-l border-[#23252A] min-h-full">
       <button
         ref={buttonRef}
-        className="bg-accent-900 h-8 md:h-10 sm:py-1 px-1 min-[1430px]:px-3 rounded-xl sm:gap-3 flex items-center justify-center min-[1430px]:justify-start w-10 min-[1430px]:w-[160px]"
+        className="flex items-center justify-center gap-2 min-h-full px-4"
         onClick={() => setSonicBtn((prev) => !prev)}
       >
         <img
           className="w-5 h-5 min-[1430px]:w-[26px] min-[1430px]:h-[26px] rounded-full"
-          src="/sonic-gem.svg"
+          src="/icons/sonic_gem_icon.svg"
           alt="Sonic gem icon"
         />
-        <div className="min-[1430px]:flex flex-col items-start hidden">
-          <div className="flex items-center gap-1">
-            <span className="text-neutral-500 text-[12px]">Sonic Points</span>
-            <img
-              className={`transition delay-[50ms] w-2 h-2 ${
-                sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
-              }`}
-              src="/icons/arrow-down.svg"
-              alt="arrowDown"
-            />
-          </div>
-          <span className="text-[14px] leading-4">{user.totalPoints}</span>
-        </div>
+
+        <span className="text-[14px]">Sonic points: {user.totalPoints}</span>
+
+        <img
+          className={`transition delay-[50ms] w-3 h-3 ${
+            sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
+          }`}
+          src="/icons/arrow-down.svg"
+          alt="arrowDown"
+        />
       </button>
       {sonicBtn && (
         <div

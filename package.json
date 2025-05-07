@@ -39,6 +39,7 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.0.0",
     "recharts": "^2.13.0-alpha.4",
+    "tailwind-merge": "^3.2.0",
     "tailwindcss": "^3.3.5",
     "vercel": "^32.5.0",
     "viem": "^2.21.57",

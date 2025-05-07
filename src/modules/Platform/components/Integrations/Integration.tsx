@@ -10,7 +10,7 @@ import { protocolStatusInfo } from "@stabilitydao/stability/out/integrations";
 
 import { StrategyStatus, ProtocolsChip } from "../../ui";
 
-import { Breadcrumbs, HeadingText } from "@ui";
+import { HeadingText } from "@ui";
 
 import { extractDomain } from "@utils";
 
@@ -40,7 +40,6 @@ const Integration: React.FC<IProps> = ({ integrationName }) => {
 
   return (
     <div className="flex flex-col lg:w-[960px] xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Integrations", integration.name]} />
       <div className="flex flex-col">
         <div className="flex items-center justify-center gap-2">
           <img

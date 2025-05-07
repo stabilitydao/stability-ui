@@ -217,6 +217,18 @@ const BIG_INT_VALUES = {
   LARGE: BigInt(10 ** 30),
 };
 
+const PATHS = [
+  { name: "Dashboard", logo: "dashboard", path: "dashboard" },
+  { name: "All Vaults", logo: "vaults", path: "vaults" },
+  { name: "Leveraged Farming", logo: "farming", path: "leveraged-farming" },
+  { name: "Metavaults", logo: "metavaults", path: "metavaults" },
+  { name: "ALM", logo: "alm", path: "alm" },
+  { name: "Users", logo: "users", path: "users" },
+  { name: "xSTBL", logo: "xstbl", path: "xstbl" },
+  { name: "Agents", logo: "agents", path: "agents" },
+  { name: "Platform", logo: "platform", path: "platform" },
+];
+
 export {
   APRsType,
   TABLE,
@@ -257,4 +269,5 @@ export {
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
   STABILITY_TOKENS,
+  PATHS,
 };

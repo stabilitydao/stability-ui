@@ -15,7 +15,7 @@ import { UnderlyingALM } from "./components/UnderlyingALM";
 import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, FullPageLoader, ErrorMessage, Breadcrumbs } from "@ui";
+import { Toast, FullPageLoader, ErrorMessage } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -55,7 +55,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
   return vault && localVault ? (
     <WagmiLayout>
       <main className="w-full xl:min-w-[1200px] mx-auto font-manrope">
-        <Breadcrumbs links={["Vaults", localVault.symbol]} />
         <VaultBar vault={localVault} />
         <div className="flex items-center lg:items-start justify-between gap-3 mt-6 flex-col lg:flex-row">
           <div className="w-full md:w-1/2 lg:w-3/5 md:min-w-[600px] lg:min-w-0">

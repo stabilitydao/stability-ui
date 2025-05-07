@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 import { formatUnits } from "viem";
-import { useSwitchChain, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 
 import { isMobile } from "react-device-detect";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-
-import { deployments } from "@stabilitydao/stability";
 
 import {
   account,
@@ -28,8 +26,6 @@ import type { TAddress } from "@types";
 
 const Wallet = (): JSX.Element => {
   const { open } = useWeb3Modal();
-  const { chain } = useAccount();
-  const { switchChain } = useSwitchChain();
   const { connector } = useAccount();
 
   const $account = useStore(account);
@@ -207,16 +203,11 @@ const Wallet = (): JSX.Element => {
     localStorage.removeItem("@w3m/connected_wallet_image_url");
   }, []);
 
-  const isSwitchNetwork = useMemo(
-    () => chain && !Object.keys(deployments).map(Number).includes(chain?.id),
-    []
-  );
-
   return (
-    <div className="flex gap-3 flex-nowrap justify-end whitespace-nowrap text-neutral-50 text-[16px] font-semibold">
+    <div className="flex flex-nowrap justify-end whitespace-nowrap text-[14px] font-semibold">
       {currentChain && $account && (
         <button
-          className="bg-accent-900 h-8 md:h-10 sm:py-1 md:px-3 rounded-xl sm:gap-1 flex items-center justify-center w-8 md:w-full"
+          className="flex items-center gap-2 border-l border-[#23252A] min-h-full px-4"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
@@ -228,17 +219,9 @@ const Wallet = (): JSX.Element => {
           <p className="min-[1200px]:flex hidden">{currentChain?.name}</p>
         </button>
       )}
-      {isSwitchNetwork && (
-        <button
-          className="bg-button sm:py-1 px-2 rounded-md mx-2 sm:mx-4 flex items-center sm:gap-1"
-          onClick={() => switchChain({ chainId: 137 })}
-        >
-          <p>Switch Network</p>
-        </button>
-      )}
       <button
         data-testid="connectButton"
-        className="bg-accent-500 h-8 md:h-10 md:px-3 md:min-w-[150px] py-1 rounded-xl flex items-center justify-center gap-1 w-8 md:w-full "
+        className="flex items-center gap-2 border-l border-[#23252A] min-h-full pl-4"
         onClick={() => openProfile()}
       >
         {$account && providerImage ? (
