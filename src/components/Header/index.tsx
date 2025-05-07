@@ -37,7 +37,7 @@ const Header = (): JSX.Element => {
 
   return (
     <WagmiLayout>
-      <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
+      <header className="font-manrope bg-accent-950 md:bg-transparent header">
         <a data-testid="stability-logo" href="/" title="Stability">
           <img
             className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"

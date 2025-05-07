@@ -4,6 +4,7 @@ import App from "./App";
 
 import { Header} from "@components/Header"
 import { Footer } from "@components/Footer";
+import { Navbar } from "@components/Navbar";
 
 interface IProps {
   title: string;
@@ -59,30 +60,36 @@ const {
   </head>
   <body>
     <App client:only="react">
-      <Header client:only="react"/>
-      <main>
-        <slot />
-      </main>
-      <Footer client:only="react"/>
+		<div class="layout">
+			<Navbar client:only="react"/>
+			<div class="container">
+				<Header client:only="react"/>
+				<main class="content">
+					<slot />
+				</main>
+				<Footer client:only="react"/>
+			</div>
+		</div>
     </App>
   </body>
 </html>
 <style is:global>
-
 	html {
 		width:100vw;
 		overflow-x: hidden;
+		font-family: system-ui, sans-serif;
+		background: #0C0620;
+	}
+
+	* {
+		outline: none;
 	}
 
 	html, body {
 		height: 100%;
 		margin: 0;
+		overflow: hidden;
 	}
-	body {
-		display: flex;
-  		flex-direction: column;
-	}
-
 	::-webkit-scrollbar {
 	    width: 8px;
 	}
@@ -113,25 +120,51 @@ const {
 	::selection {
 		background-color: rgb(150, 99, 238);
 	}
-	* {
-		outline: none;
+
+	.layout {
+  		display: flex;
+		width:100%;
 	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #0C0620;
-		background-size: 224px;
-	}
-	body {
-		margin: 0;
-	}
-	header {
-		color: aliceblue; 
-		/* background-color: #23262d; */
-		display: flex; 
-		justify-content: space-between;
+
+	.header {
+		position: fixed;
+		top: 0;
+		left: 250px;
+		width: calc(100% - 250px);
+		height: 52px;
+		background-color: #23262d;
+		z-index: 1000;
+		display: flex;
 		align-items: center;
-		height: 60px;
+		justify-content: space-between;
 	}
+
+	.navbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 250px;
+		height: 100vh;
+		background-color: #111;
+		z-index: 1000;
+	}
+
+	.container {
+		position: relative;
+		left: 250px;
+		width: calc(100% - 250px);
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+	}
+
+	.content {
+		margin-top: 60px; 
+		padding: 1rem;
+		height: calc(100vh - 60px);
+		overflow-y: auto;
+	}
+
 	.title {
 		display: flex;
 		align-items: center;
