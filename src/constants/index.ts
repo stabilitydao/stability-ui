@@ -148,14 +148,14 @@ const CHAINS = [
     nativeCurrency: "POL",
     active: true, // main page active networks
   },
-  {
-    name: chains["8453"].name,
-    id: "8453",
-    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
-    explorer: "https://basescan.org/address/",
-    nativeCurrency: "ETH",
-    active: true, // main page active networks
-  },
+  // {
+  //   name: chains["8453"].name,
+  //   id: "8453",
+  //   logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
+  //   explorer: "https://basescan.org/address/",
+  //   nativeCurrency: "ETH",
+  //   active: true, // main page active networks
+  // },
   {
     name: chains["146"].name,
     id: "146",
