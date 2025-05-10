@@ -26,6 +26,9 @@ import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
 import { ShareSkeleton } from "./Skeletons/ShareSkeleton";
 import { Skeleton } from "./Skeletons/Skeleton";
 
+import { NavIcon } from "./NavIcon";
+import { GridIcon, RowsIcon, ArrowIcon } from "./Icons";
+
 export {
   Toast,
   TextModal,
@@ -53,4 +56,8 @@ export {
   Counter,
   BalanceVisibilityToggler,
   ExplorerLink,
+  NavIcon,
+  RowsIcon,
+  GridIcon,
+  ArrowIcon,
 };

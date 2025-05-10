@@ -1,8 +1,8 @@
 import type { TTableColumn, TTableFilters } from "@types";
 
 const TABLE_FILTERS: TTableFilters[] = [
-  { name: "Stablecoins", type: "single", state: false },
   { name: "Strategies", type: "dropdown", state: true },
+  { name: "Stablecoins", type: "single", state: false },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];
@@ -21,7 +21,7 @@ const SONIC_TABLE: TTableColumn[] = [
     dataType: "string",
   },
   {
-    name: "Total APR",
+    name: "APR",
     keyName: "earningData",
     sortType: "none",
     dataType: "number",

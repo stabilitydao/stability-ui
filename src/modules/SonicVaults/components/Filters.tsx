@@ -210,17 +210,17 @@ const Filters: React.FC<IProps> = memo(
 
     return (
       filters.length && (
-        <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 min-[1440px]:py-9 select-none lg:min-w-[60%] font-manrope text-[14px] font-semibold">
+        <div className="flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold">
           {filters.map((filter: TTableFilters) => (
             <div data-testid="filter" key={filter.name}>
               {filter.type === "single" ? (
-                <label className="inline-flex items-center cursor-pointer bg-accent-900 h-10 rounded-2xl">
-                  <div className="flex items-center gap-[10px] py-[10px] px-4">
+                <label className="inline-flex items-center cursor-pointer bg-transparent h-[48px] border border-[#23252A] rounded-lg">
+                  <div className="flex items-center gap-3 py-[13px] px-5">
                     <Checkbox
                       checked={filter.state}
                       onChange={() => activeFiltersHandler(filter)}
                     />
-                    <span className="text-neutral-50">{filter.name}</span>
+                    <span>{filter.name}</span>
                   </div>
                 </label>
               ) : filter.type === "multiple" ? (
@@ -243,20 +243,21 @@ const Filters: React.FC<IProps> = memo(
                   ))}
                 </div>
               ) : filter.type === "dropdown" ? (
-                <div className="relative select-none w-[220px]">
+                <div className="relative select-none w-[200px]">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       setDropDownSelector((prevState) => !prevState);
                     }}
                     data-testid="strategyFilterDropdown"
-                    className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
+                    className="flex items-center justify-between gap-1 px-5 py-[13px] h-[48px] bg-transparent border border-[#23252A] rounded-lg cursor-pointer"
                   >
-                    <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
-                      {filter.name}: {activeStrategies}
+                    <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px]">
+                      <span className="text-[#97979A]">{filter.name}: </span>
+                      <span>{activeStrategies}</span>
                     </p>
                     <img
-                      className={`transition delay-[50ms] ${
+                      className={`transition delay-[50ms] w-4 h-4 ${
                         dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
                       }`}
                       src="/arrow-down.svg"
@@ -304,25 +305,25 @@ const Filters: React.FC<IProps> = memo(
                 filter.type === "sample" && (
                   <div
                     key={filter.name}
-                    className="flex items-center justify-center bg-accent-900 h-10 rounded-2xl"
+                    className="flex items-center justify-center bg-transparent border border-[#23252A] h-[48px] rounded-lg"
                   >
-                    <div className="flex items-center justify-center px-1">
+                    <div className="flex items-center justify-center p-2">
                       <p
                         onClick={() => activeFiltersHandler(filter, "All")}
-                        className={`py-1 px-4 cursor-pointer rounded-xl ${
+                        className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
                           !filter.state
-                            ? "bg-accent-500 text-neutral-50 h-8"
-                            : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                            ? "bg-[#22242A] border border-[#2C2E33]"
+                            : "text-[#97979A]" //hover
                         }`}
                       >
                         All
                       </p>
                       <p
                         onClick={() => activeFiltersHandler(filter)}
-                        className={`px-2 py-1 cursor-pointer rounded-xl  ${
+                        className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
                           filter.state
-                            ? "bg-accent-500 text-neutral-50 h-8"
-                            : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                            ? "bg-[#22242A] border border-[#2C2E33]"
+                            : "text-[#97979A]" //hover
                         }`}
                       >
                         {filter.name}
@@ -334,18 +335,22 @@ const Filters: React.FC<IProps> = memo(
             </div>
           ))}
           <div
-            className={`flex items-center justify-center bg-accent-900 h-10 rounded-2xl w-[100px] ${allParams ? "opacity-100 cursor-pointer" : "opacity-30"}`}
+            className={`flex items-center justify-center h-[48px] rounded-lg w-[100px] border border-[#2C2E33] ${allParams ? "opacity-100 cursor-pointer" : "opacity-30"}`}
             onClick={allParams ? resetTable : undefined}
           >
-            <div className="flex items-center justify-center gap-2 px-1">
+            <div className="flex items-center justify-center gap-2">
+              <p>Clear</p>
               {allParams ? (
-                <span className="bg-accent-500 rounded-full w-[23px] text-center">
+                <span className="bg-[#22242A] border border-[#2C2E33] rounded-lg w-[20px] text-center">
                   {allParams}
                 </span>
               ) : (
-                <img className="w-4 h-4" src="/close.svg" alt="close" />
+                <img
+                  className="w-3 h-3 mx-1"
+                  src="/icons/circle-xmark.png"
+                  alt="close"
+                />
               )}
-              <p>Clear All</p>
             </div>
           </div>
         </div>

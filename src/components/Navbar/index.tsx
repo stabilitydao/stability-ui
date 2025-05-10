@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { NavIcon } from "@ui";
+
 import { cn } from "@utils";
 
 import { PATHS } from "@constants";
@@ -61,7 +63,7 @@ const Navbar = (): JSX.Element => {
             className="ml-[14px]"
           />
           <div className="mt-4">
-            {PATHS.map(({ name, logo, path }) => (
+            {PATHS.map(({ name, path }) => (
               <div
                 key={name}
                 className={cn(
@@ -81,7 +83,7 @@ const Navbar = (): JSX.Element => {
                   >
                     {name}
                   </span>
-                  <img src={`/icons/${logo}_icon.svg`} alt={name} />
+                  <NavIcon path={path} isActive={activePath === path} />
                 </a>
               </div>
             ))}

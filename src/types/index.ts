@@ -668,6 +668,8 @@ type TVestPeriod = {
   isFullyExited: boolean;
 };
 
+type TDisplay = "rows" | "grid";
+
 export type {
   TPlatformData,
   TInitParams,
@@ -748,4 +750,5 @@ export type {
   TTableActiveParams,
   TStakeDashboardData,
   TVestPeriod,
+  TDisplay,
 };

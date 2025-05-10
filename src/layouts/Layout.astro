@@ -3,7 +3,6 @@ import App from "./App";
 // import { ViewTransitions } from 'astro:transitions';
 
 import { Header} from "@components/Header"
-import { Footer } from "@components/Footer";
 import { Navbar } from "@components/Navbar";
 
 interface IProps {
@@ -67,7 +66,6 @@ const {
 				<main class="content">
 					<slot />
 				</main>
-				<Footer client:only="react"/>
 			</div>
 		</div>
     </App>
@@ -76,7 +74,7 @@ const {
 <style is:global>
 	html {
 		width:100vw;
-		overflow-x: hidden;
+		/* overflow-x: hidden; */
 		font-family: "Manrope", sans-serif;
 		background: #090909;
 	}
@@ -88,37 +86,19 @@ const {
 	html, body {
 		height: 100%;
 		margin: 0;
-		overflow: hidden;
+		overflow-x: hidden;
 	}
 	::-webkit-scrollbar {
 	    width: 8px;
 	}
 
 	::-webkit-scrollbar-track {
-	    background-color: #0C0C1C;
+		background-color: #0b0b0b;
 	}
 
 	::-webkit-scrollbar-thumb {
-		background-color: #272451;
-		border-radius: 12px;
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background-color: #30127f;
-	}
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	::selection {
-		background-color: rgb(150, 99, 238);
+		background-color: #101012;
+		border-radius: 8px;
 	}
 
 	.layout {
@@ -162,7 +142,6 @@ const {
 		margin-top: 60px; 
 		padding: 1rem;
 		height: calc(100vh - 60px);
-		overflow-y: auto;
 	}
 
 	.title {

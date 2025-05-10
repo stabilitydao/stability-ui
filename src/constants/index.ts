@@ -1,5 +1,7 @@
 import { chains, integrations } from "@stabilitydao/stability";
 
+import { DashboardIcon } from "@ui";
+
 import {
   TABLE_FILTERS,
   TABLE,
@@ -48,7 +50,9 @@ const STABLECOINS = [
   ...scUSD,
 ];
 
-const PAGINATION_VAULTS = 20;
+const PAGINATIONS_VARIANTS = [5, 10, 15, 20, 30];
+
+const PAGINATION_VAULTS = 5;
 
 const MONTHS = [
   "Jan",
@@ -218,15 +222,15 @@ const BIG_INT_VALUES = {
 };
 
 const PATHS = [
-  { name: "Dashboard", logo: "dashboard", path: "dashboard" },
-  { name: "All Vaults", logo: "vaults", path: "vaults" },
-  { name: "Leveraged Farming", logo: "farming", path: "leveraged-farming" },
-  { name: "Metavaults", logo: "metavaults", path: "metavaults" },
-  { name: "ALM", logo: "alm", path: "alm" },
-  { name: "Users", logo: "users", path: "users" },
-  { name: "xSTBL", logo: "xstbl", path: "xstbl" },
-  { name: "Agents", logo: "agents", path: "agents" },
-  { name: "Platform", logo: "platform", path: "platform" },
+  { name: "Dashboard", path: "dashboard" },
+  { name: "All Vaults", path: "vaults" },
+  { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Metavaults", path: "metavaults" },
+  { name: "ALM", path: "alm" },
+  { name: "Users", path: "users" },
+  { name: "xSTBL", path: "xstbl" },
+  { name: "Agents", path: "agents" },
+  { name: "Platform", path: "platform" },
 ];
 
 export {
@@ -234,6 +238,7 @@ export {
   TABLE,
   TABLE_FILTERS,
   CHAINS_TABLE,
+  PAGINATIONS_VARIANTS,
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,

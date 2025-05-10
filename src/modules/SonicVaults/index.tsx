@@ -15,7 +15,14 @@ import { Portfolio } from "./components/Portfolio";
 
 import { chains } from "@stabilitydao/stability";
 
-import { TimeDifferenceIndicator, FullPageLoader, ErrorMessage } from "@ui";
+import {
+  TimeDifferenceIndicator,
+  FullPageLoader,
+  ErrorMessage,
+  APRtimeSwitcher,
+  GridIcon,
+  RowsIcon,
+} from "@ui";
 
 import {
   vaults,
@@ -26,9 +33,15 @@ import {
   visible,
 } from "@store";
 
-import { toVault, initFilters } from "./functions";
+import { initFilters } from "./functions";
 
-import { formatNumber, formatFromBigInt, dataSorter, debounce } from "@utils";
+import {
+  formatNumber,
+  formatFromBigInt,
+  dataSorter,
+  debounce,
+  cn,
+} from "@utils";
 
 import {
   SONIC_TABLE,
@@ -47,6 +60,7 @@ import type {
   TAPRPeriod,
   TTableActiveParams,
   TVSHoldModalState,
+  TDisplay,
 } from "@types";
 
 const SonicVaults = (): JSX.Element => {
@@ -72,6 +86,7 @@ const SonicVaults = (): JSX.Element => {
     useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
 
   const [allParams, setAllParams] = useState<number>(0);
+  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
 
   let urlTab = 1;
 
@@ -128,6 +143,7 @@ const SonicVaults = (): JSX.Element => {
 
   const [tableStates, setTableStates] = useState(urlTableStates);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
+  const [displayType, setDisplayType] = useState<TDisplay>("rows");
   const [activeNetworks, setActiveNetworks] = useState([
     {
       name: chains["146"].name,
@@ -139,8 +155,8 @@ const SonicVaults = (): JSX.Element => {
     },
   ]);
 
-  const lastTabIndex = currentTab * PAGINATION_VAULTS;
-  const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
+  const lastTabIndex = currentTab * pagination;
+  const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   const userVaultsCondition =
@@ -401,7 +417,7 @@ const SonicVaults = (): JSX.Element => {
     );
     // pagination upd
     if (currentTab != 1) {
-      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_VAULTS);
+      const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
 
       if (disponibleTabs < currentTab) {
         setCurrentTab(1);
@@ -503,25 +519,42 @@ const SonicVaults = (): JSX.Element => {
         }`}
       >
         <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
+
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="font-bold text-[40px] leading-[48px] text-start mb-5">
+              Vaults
+            </h2>
+            <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
+              Aggregates every active strategy across chains and protocols.
+              <br />
+              Explore, compare, and deposit into vaults optimized for yield,
+              <br />
+              auto-compounding, and multi-protocol integration—all
+            </h3>
+          </div>
+          <APRtimeSwitcher withText={true} />
+        </div>
         <Portfolio vaults={localVaults} />
+
         {/* <NetworkFilters
           activeNetworks={activeNetworks}
           activeNetworksHandler={activeNetworksHandler}
         /> */}
-        <div className="flex items-center gap-2 flex-col min-[1440px]:flex-row font-semibold text-[14px]">
-          <div className="w-full relative">
-            <label className="relative block w-full">
+        <div className="flex items-center justify-between gap-2 mt-10 mb-4">
+          <div className="max-w-[240px] w-full relative text-[16px]">
+            <label className="relative block">
               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <img
                   src="/search.svg"
                   alt="Search"
-                  className="w-4 h-4 text-neutral-500"
+                  className="w-5 h-5 text-[#97979A]"
                 />
               </span>
               <input
                 type="text"
-                className="mt-1 lg:mt-0 w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10"
-                placeholder="Search"
+                className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-3"
+                placeholder="Search asset"
                 ref={search}
                 onChange={() => tableHandler()}
               />
@@ -548,366 +581,690 @@ const SonicVaults = (): JSX.Element => {
             setTableParams={setActiveTableParams}
             resetTable={resetTable}
           />
+          <div className="flex items-center gap-1">
+            <div
+              className={cn(
+                "border border-[#2C2E33] rounded-lg cursor-pointer",
+                displayType === "rows" && "bg-[#22242A]"
+              )}
+              onClick={() => setDisplayType("rows")}
+            >
+              <div className="p-3">
+                <RowsIcon isActive={displayType === "rows"} />
+              </div>
+            </div>
+            <div
+              className={cn(
+                "border border-[#2C2E33] rounded-lg cursor-pointer",
+                displayType === "grid" && "bg-[#22242A]"
+              )}
+              onClick={() => setDisplayType("grid")}
+            >
+              <div className="p-3">
+                <GridIcon isActive={displayType === "grid"} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto lg:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full select-none mb-9 min-w-[1024px] lg:min-w-full">
-          <thead className="bg-accent-950">
-            <tr className="text-[12px] uppercase">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <ColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  table={tableStates}
-                  sort={tableHandler}
-                />
-              ))}
-            </tr>
-          </thead>
-          <tbody className="font-manrope font-semibold text-[14px]">
-            {isLoading ? (
-              <tr className="relative h-[80px]">
-                <td className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
-                  <FullPageLoader />
-                </td>
-              </tr>
-            ) : localVaults?.length ? (
-              <>
-                {currentTabVaults?.length ? (
-                  currentTabVaults.map((vault: TVault, index: number) => {
-                    const aprValue = Number(
-                      vault?.earningData?.apr[$aprFilter]
+      <div className="pb-5">
+        <div
+          className={cn(
+            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
+            displayType === "grid" && "hidden"
+          )}
+        >
+          {tableStates.map((value: TTableColumn, index: number) => (
+            <ColumnSort
+              key={value.name + index}
+              index={index}
+              value={value.name}
+              table={tableStates}
+              sort={tableHandler}
+            />
+          ))}
+        </div>
+        <div
+          className={cn(
+            displayType === "grid" && "flex items-center gap-6 flex-wrap"
+          )}
+        >
+          {isLoading ? (
+            <div className="relative h-[80px]">
+              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
+                <FullPageLoader />
+              </div>
+            </div>
+          ) : localVaults?.length ? (
+            <>
+              {currentTabVaults?.length ? (
+                currentTabVaults.map((vault: TVault, index: number) => {
+                  const aprValue = Number(vault?.earningData?.apr[$aprFilter]);
+
+                  const apyValue = vault.earningData.apy[$aprFilter];
+
+                  const swapFeesAPRValue =
+                    vault.earningData.poolSwapFeesAPR[$aprFilter];
+
+                  const strategyAPRValue =
+                    vault.earningData.farmAPR[$aprFilter];
+
+                  const dailyAPRValue = (
+                    Number(vault?.earningData?.apr[$aprFilter]) / 365
+                  ).toFixed(2);
+
+                  const gemsAprValue = Number(
+                    vault.earningData.gemsAPR[$aprFilter]
+                  );
+
+                  const isSTBLVault =
+                    Array.isArray(vault?.assets) &&
+                    vault.assets.some(
+                      (asset) => asset?.symbol && asset?.symbol === "STBL"
                     );
 
-                    const apyValue = vault.earningData.apy[$aprFilter];
-
-                    const swapFeesAPRValue =
-                      vault.earningData.poolSwapFeesAPR[$aprFilter];
-
-                    const strategyAPRValue =
-                      vault.earningData.farmAPR[$aprFilter];
-
-                    const dailyAPRValue = (
-                      Number(vault?.earningData?.apr[$aprFilter]) / 365
-                    ).toFixed(2);
-
-                    const gemsAprValue = Number(
-                      vault.earningData.gemsAPR[$aprFilter]
-                    );
-
-                    const isSTBLVault =
-                      Array.isArray(vault?.assets) &&
-                      vault.assets.some(
-                        (asset) => asset?.symbol && asset?.symbol === "STBL"
-                      );
-
+                  if (displayType === "grid") {
                     return (
-                      <tr
+                      <a
                         key={vault.name + index}
-                        className="text-center min-[1020px]:hover:bg-accent-950 cursor-pointer h-[48px] font-medium relative"
-                        onClick={() => toVault(vault.network, vault.address)}
+                        className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-[258px]"
                         data-testid="vault"
+                        href={`/vaults/vault/${vault.network}/${vault.address}`}
                       >
-                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
-                          <div className="flex items-center gap-1">
-                            <div className="flex items-center w-[52px] justify-center">
+                        <div className="p-6 flex flex-col gap-6">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center">
                               {vault.assets.map((asset, index) => (
                                 <img
                                   src={asset?.logo}
                                   alt={asset?.symbol}
-                                  className={`w-6 h-6 rounded-full ${
+                                  className={`w-10 h-10 rounded-full ${
                                     !index &&
                                     vault.assets.length > 1 &&
-                                    "mr-[-10px] z-[5]"
+                                    "mr-[-16px] z-[5]"
                                   }`}
                                   key={asset?.logo + index}
                                 />
                               ))}
                             </div>
-                            <span className="mr-2">{vault.assetsSymbol}</span>
-                            <div className="flex items-center justify-center gap-1">
-                              {!vault.symbol.includes("PT-") && (
-                                <div
-                                  title="Sonic Activity Points"
-                                  className="flex items-center rounded-full border border-[#6EBD70] bg-[#6EBD70]/[0.16] pr-[6px]"
-                                >
-                                  <img
-                                    src="/sonic.png"
-                                    alt="sonic"
-                                    className="w-[14px] h-[14px] rounded-full"
-                                  />
-                                  <span className="text-[10px] ml-[3px] mr-[2px]">
-                                    x{vault.sonicActivePoints}
-                                  </span>
-                                </div>
-                              )}
-                              {SILO_POINTS[
-                                vault.address as keyof typeof SILO_POINTS
-                              ] && (
-                                <div
-                                  title="Silo Points per $ / day"
-                                  className="flex items-center rounded-full border border-[#fff699] bg-[#fff699]/[0.16] pr-[6px]"
-                                >
-                                  <img
-                                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-                                    alt="silo"
-                                    className="w-[14px] h-[14px] rounded-full"
-                                  />
-                                  <span className="text-[10px] ml-[3px] mr-[2px]">
-                                    {
-                                      SILO_POINTS[
-                                        vault.address as keyof typeof SILO_POINTS
-                                      ]
-                                    }
-                                  </span>
-                                </div>
-                              )}
 
-                              {!!vault.ringsPoints && (
-                                <div
-                                  title="Rings Points"
-                                  className="flex items-center rounded-full border border-[#ac62e4] bg-black pr-[6px]"
-                                >
-                                  <img
-                                    src="/rings.png"
-                                    alt="rings"
-                                    className="w-[14px] h-[14px] rounded-full"
-                                  />
-                                  <span className="text-[10px] ml-[3px] mr-[2px]">
-                                    x{vault.ringsPoints}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="pl-2 py-2 whitespace-nowrap">
-                          <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
-                            {vault.strategyInfo && (
-                              <>
-                                <div
-                                  style={{
-                                    backgroundColor: vault.strategyInfo.bgColor,
-                                    color: vault.strategyInfo.color,
-                                  }}
-                                  className="px-3 rounded-[10px] flex items-center  justify-start"
-                                >
-                                  <span
-                                    className="text-[14px] w-[30px] flex justify-center"
-                                    title={vault.strategyInfo.id}
+                            <div className="flex flex-col items-start gap-1">
+                              <span className="font-semibold text-[16px]">
+                                {vault.assetsSymbol}
+                              </span>
+                              <div className="flex items-center justify-center gap-1">
+                                {!vault.symbol.includes("PT-") && (
+                                  <div
+                                    title="Sonic Activity Points"
+                                    className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
                                   >
-                                    {vault.strategyInfo.shortId}
-                                  </span>
-                                  <span
-                                    className={`pl-2 flex h-8 items-center`}
-                                  >
-                                    <span className="min-w-[24px] flex items-center">
-                                      {vault.strategyInfo.protocols.map(
-                                        (protocol, index) => (
-                                          <img
-                                            className="h-6 w-6 mx-[2px]"
-                                            key={
-                                              protocol.logoSrc + String(index)
-                                            }
-                                            src={protocol.logoSrc}
-                                            alt={protocol.name}
-                                            title={protocol.name}
-                                            style={{
-                                              zIndex:
-                                                vault.strategyInfo.protocols
-                                                  .length - index,
-                                            }}
-                                          />
-                                        )
-                                      )}
-                                    </span>
-                                    {vault.strategySpecific && (
-                                      <span
-                                        className={`font-bold text-[#b6bdd7] inline ${
-                                          vault.strategySpecific.length > 10
-                                            ? "lowercase text-[10px] pl-[12px] whitespace-pre-wrap max-w-[70px] text-left"
-                                            : "uppercase text-[10px] pl-[12px]"
-                                        }`}
-                                      >
-                                        {vault.strategySpecific}
+                                    <div className="flex items-center gap-1 px-2">
+                                      <img
+                                        src="/sonic.png"
+                                        alt="sonic"
+                                        className="w-4 h-4 rounded-full"
+                                      />
+                                      <span className="text-[12px]">
+                                        x{vault.sonicActivePoints}
                                       </span>
-                                    )}
-                                  </span>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                        <td
-                          onClick={(e) => {
-                            if (isMobile) {
-                              e.stopPropagation();
-                              setAprModal({
-                                earningData: vault.earningData,
-                                daily: vault.daily,
-                                lastHardWork: vault.lastHardWork,
-                                symbol: vault?.risk?.symbol as string,
-                                state: true,
-                                pool: vault?.pool,
-                              });
-                            }
-                          }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                        >
-                          <div
-                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault?.risk?.isRektStrategy
-                                ? "text-[#818181]"
-                                : "text-[#eaecef]"
-                            }`}
-                          >
-                            <div className="flex flex-col justify-end">
-                              <p>{formatNumber(aprValue, "formatAPR")}%</p>
-                              {!!vault?.liveAPR && (
-                                <p className="text-[12px] text-neutral-700">
-                                  live. {vault?.liveAPR?.toFixed(2)}%
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="visible__tooltip">
-                            <div className="flex items-start flex-col gap-4">
-                              <div className="flex flex-col gap-1 w-full">
-                                {!!vault?.risk?.isRektStrategy && (
-                                  <div className="flex flex-col items-center gap-2 mb-[10px]">
-                                    <h3 className="text-[#f52a11] font-bold">
-                                      {vault?.risk?.symbol} VAULT
-                                    </h3>
-                                    <p className="text-[12px] text-start">
-                                      Rekt vault regularly incurs losses,
-                                      potentially leading to rapid USD value
-                                      decline, with returns insufficient to
-                                      offset the losses.
-                                    </p>
+                                    </div>
                                   </div>
                                 )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APY</p>
-                                  <p className="text-end">
-                                    {formatNumber(apyValue, "formatAPR")}%
-                                  </p>
-                                </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APR</p>
-                                  <p className="text-end">
+                                {SILO_POINTS[
+                                  vault.address as keyof typeof SILO_POINTS
+                                ] && (
+                                  <div
+                                    title="Silo Points per $ / day"
+                                    className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
+                                  >
+                                    <div className="flex items-center gap-1 px-2">
+                                      <img
+                                        src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                                        alt="silo"
+                                        className="w-4 h-4 rounded-full"
+                                      />
+                                      <span className="text-[12px]">
+                                        {
+                                          SILO_POINTS[
+                                            vault.address as keyof typeof SILO_POINTS
+                                          ]
+                                        }
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {!!vault.ringsPoints && (
+                                  <div
+                                    title="Rings Points"
+                                    className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"
+                                  >
+                                    <div className="flex items-center gap-1 px-2">
+                                      <img
+                                        src="/rings.png"
+                                        alt="rings"
+                                        className="w-4 h-4 rounded-full"
+                                      />
+                                      <span className="text-[12px]">
+                                        x{vault.ringsPoints}
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[#97979A] text-[14px]">
+                                Strategy
+                              </span>
+                              <div className="flex items-center text-[12px]">
+                                {vault.strategyInfo && (
+                                  <div
+                                    style={{
+                                      backgroundColor:
+                                        vault.strategyInfo.bgColor + "66",
+                                      border: `1px solid ${vault.strategyInfo.bgColor}`,
+                                    }}
+                                    className="px-2 rounded-[4px] h-6 flex items-center gap-1"
+                                  >
+                                    <span
+                                      style={{
+                                        color: vault.strategyInfo.color,
+                                      }}
+                                      title={vault.strategyInfo.id}
+                                    >
+                                      {vault.strategyInfo.shortId}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <span className="flex items-center">
+                                        {vault.strategyInfo.protocols.map(
+                                          (protocol, index) => (
+                                            <div
+                                              key={
+                                                protocol.logoSrc + String(index)
+                                              }
+                                              className={cn(
+                                                "h-4 w-4 rounded-full bg-black flex items-center justify-center",
+                                                !index &&
+                                                  vault.strategyInfo.protocols
+                                                    .length > 1 &&
+                                                  "mr-[-6px] z-[5]"
+                                              )}
+                                            >
+                                              <img
+                                                className="rounded-full"
+                                                src={protocol.logoSrc}
+                                                alt={protocol.name}
+                                                title={protocol.name}
+                                                style={{
+                                                  zIndex:
+                                                    vault.strategyInfo.protocols
+                                                      .length - index,
+                                                }}
+                                              />
+                                            </div>
+                                          )
+                                        )}
+                                      </span>
+                                      {vault.strategySpecific && (
+                                        <span>{vault.strategySpecific}</span>
+                                      )}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[#97979A] text-[14px]">
+                                APR
+                              </span>
+                              <div
+                                onClick={(e) => {
+                                  if (isMobile) {
+                                    e.stopPropagation();
+                                    setAprModal({
+                                      earningData: vault.earningData,
+                                      daily: vault.daily,
+                                      lastHardWork: vault.lastHardWork,
+                                      symbol: vault?.risk?.symbol as string,
+                                      state: true,
+                                      pool: vault?.pool,
+                                    });
+                                  }
+                                }}
+                                className="tooltip cursor-help"
+                              >
+                                <div
+                                  className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
+                                    vault?.risk?.isRektStrategy
+                                      ? "text-[#818181]"
+                                      : "text-[#eaecef]"
+                                  }`}
+                                >
+                                  <p className="text-[14px] font-bold">
                                     {formatNumber(aprValue, "formatAPR")}%
                                   </p>
                                 </div>
+                                <div className="visible__tooltip">
+                                  <div className="flex items-start flex-col gap-4">
+                                    <div className="flex flex-col gap-1 w-full">
+                                      {!!vault?.risk?.isRektStrategy && (
+                                        <div className="flex flex-col items-center gap-2 mb-[10px]">
+                                          <h3 className="text-[#f52a11] font-bold">
+                                            {vault?.risk?.symbol} VAULT
+                                          </h3>
+                                          <p className="text-[12px] text-start">
+                                            Rekt vault regularly incurs losses,
+                                            potentially leading to rapid USD
+                                            value decline, with returns
+                                            insufficient to offset the losses.
+                                          </p>
+                                        </div>
+                                      )}
+                                      <div className="font-bold flex items-center justify-between">
+                                        <p>Total APY</p>
+                                        <p className="text-end">
+                                          {formatNumber(apyValue, "formatAPR")}%
+                                        </p>
+                                      </div>
+                                      <div className="font-bold flex items-center justify-between">
+                                        <p>Total APR</p>
+                                        <p className="text-end">
+                                          {formatNumber(aprValue, "formatAPR")}%
+                                        </p>
+                                      </div>
 
-                                {vault?.earningData?.poolSwapFeesAPR.daily !=
-                                  "-" &&
-                                  vault?.pool && (
-                                    <div className="font-bold flex items-center justify-between">
-                                      <p>Pool swap fees APR</p>
-                                      <p className="text-end">
-                                        {formatNumber(
-                                          swapFeesAPRValue,
-                                          "formatAPR"
+                                      {vault?.earningData?.poolSwapFeesAPR
+                                        .daily != "-" &&
+                                        vault?.pool && (
+                                          <div className="font-bold flex items-center justify-between">
+                                            <p>Pool swap fees APR</p>
+                                            <p className="text-end">
+                                              {formatNumber(
+                                                swapFeesAPRValue,
+                                                "formatAPR"
+                                              )}
+                                              %
+                                            </p>
+                                          </div>
                                         )}
-                                        %
-                                      </p>
+                                      <div className="font-bold flex items-center justify-between">
+                                        <p>Strategy APR</p>
+                                        <p className="text-end">
+                                          {formatNumber(
+                                            strategyAPRValue,
+                                            "formatAPR"
+                                          )}
+                                          %
+                                        </p>
+                                      </div>
+                                      <div className="font-bold flex items-center justify-between">
+                                        <p>Daily</p>
+                                        <p className="text-end">
+                                          {formatNumber(
+                                            dailyAPRValue,
+                                            "formatAPR"
+                                          )}
+                                          %
+                                        </p>
+                                      </div>
+                                      {!isSTBLVault && (
+                                        <div className="font-bold flex items-center justify-between">
+                                          <p>Gems APR</p>
+                                          <div className="flex items-center justify-end">
+                                            {formatNumber(
+                                              gemsAprValue.toFixed(2),
+                                              "formatAPR"
+                                            )}
+                                            %
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
+                                    <div className="flex items-center justify-between w-full">
+                                      <p>Last Hard Work</p>
+                                      <TimeDifferenceIndicator
+                                        unix={vault.lastHardWork}
+                                      />
+                                    </div>
+                                  </div>
+                                  <i></i>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between text-[14px]">
+                              <span className="text-[#97979A]">TVL</span>
+                              <span className="font-bold">
+                                {formatNumber(vault.tvl, "abbreviate")}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[14px]">
+                              <span className="text-[#97979A]">Balance</span>
+                              <p
+                                className={`${!$visible && "blur select-none"} font-bold`}
+                              >
+                                {$visible
+                                  ? `$${formatNumber(vault.balanceInUSD, "format")}`
+                                  : "$000"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <a
+                      key={vault.name + index}
+                      className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0"
+                      data-testid="vault"
+                      href={`/vaults/vault/${vault.network}/${vault.address}`}
+                    >
+                      <div className="flex items-center w-[30%] justify-between px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center">
+                            {vault.assets.map((asset, index) => (
+                              <img
+                                src={asset?.logo}
+                                alt={asset?.symbol}
+                                className={`w-8 h-8 rounded-full ${
+                                  !index &&
+                                  vault.assets.length > 1 &&
+                                  "mr-[-8px] z-[5]"
+                                }`}
+                                key={asset?.logo + index}
+                              />
+                            ))}
+                          </div>
+                          <span className="font-semibold text-[16px]">
+                            {vault.assetsSymbol}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-1">
+                          {!vault.symbol.includes("PT-") && (
+                            <div
+                              title="Sonic Activity Points"
+                              className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
+                            >
+                              <div className="flex items-center gap-1 px-2">
+                                <img
+                                  src="/sonic.png"
+                                  alt="sonic"
+                                  className="w-4 h-4 rounded-full"
+                                />
+                                <span className="text-[12px]">
+                                  x{vault.sonicActivePoints}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {SILO_POINTS[
+                            vault.address as keyof typeof SILO_POINTS
+                          ] && (
+                            <div
+                              title="Silo Points per $ / day"
+                              className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
+                            >
+                              <div className="flex items-center gap-1 px-2">
+                                <img
+                                  src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                                  alt="silo"
+                                  className="w-4 h-4 rounded-full"
+                                />
+                                <span className="text-[12px]">
+                                  {
+                                    SILO_POINTS[
+                                      vault.address as keyof typeof SILO_POINTS
+                                    ]
+                                  }
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {!!vault.ringsPoints && (
+                            <div
+                              title="Rings Points"
+                              className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"
+                            >
+                              <div className="flex items-center gap-1 px-2">
+                                <img
+                                  src="/rings.png"
+                                  alt="rings"
+                                  className="w-4 h-4 rounded-full"
+                                />
+                                <span className="text-[12px]">
+                                  x{vault.ringsPoints}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="px-4 w-[17.5%]">
+                        <div className="flex items-center text-[12px]">
+                          {vault.strategyInfo && (
+                            <div
+                              style={{
+                                backgroundColor:
+                                  vault.strategyInfo.bgColor + "66",
+                                border: `1px solid ${vault.strategyInfo.bgColor}`,
+                              }}
+                              className="px-2 rounded-[4px] h-6 flex items-center gap-1"
+                            >
+                              <span
+                                style={{ color: vault.strategyInfo.color }}
+                                title={vault.strategyInfo.id}
+                              >
+                                {vault.strategyInfo.shortId}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="flex items-center">
+                                  {vault.strategyInfo.protocols.map(
+                                    (protocol, index) => (
+                                      <div
+                                        key={protocol.logoSrc + String(index)}
+                                        className={cn(
+                                          "h-4 w-4 rounded-full bg-black flex items-center justify-center",
+                                          !index &&
+                                            vault.strategyInfo.protocols
+                                              .length > 1 &&
+                                            "mr-[-6px] z-[5]"
+                                        )}
+                                      >
+                                        <img
+                                          className="rounded-full"
+                                          src={protocol.logoSrc}
+                                          alt={protocol.name}
+                                          title={protocol.name}
+                                          style={{
+                                            zIndex:
+                                              vault.strategyInfo.protocols
+                                                .length - index,
+                                          }}
+                                        />
+                                      </div>
+                                    )
                                   )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Strategy APR</p>
-                                  <p className="text-end">
-                                    {formatNumber(
-                                      strategyAPRValue,
-                                      "formatAPR"
-                                    )}
-                                    %
+                                </span>
+                                {vault.strategySpecific && (
+                                  <span>{vault.strategySpecific}</span>
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div
+                        onClick={(e) => {
+                          if (isMobile) {
+                            e.stopPropagation();
+                            setAprModal({
+                              earningData: vault.earningData,
+                              daily: vault.daily,
+                              lastHardWork: vault.lastHardWork,
+                              symbol: vault?.risk?.symbol as string,
+                              state: true,
+                              pool: vault?.pool,
+                            });
+                          }
+                        }}
+                        className="px-4 w-[17.5%] tooltip cursor-help"
+                      >
+                        <div
+                          className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
+                            vault?.risk?.isRektStrategy
+                              ? "text-[#818181]"
+                              : "text-[#eaecef]"
+                          }`}
+                        >
+                          <div className="flex flex-col justify-end">
+                            <p className="text-[16px]">
+                              {formatNumber(aprValue, "formatAPR")}%
+                            </p>
+                            {!!vault?.liveAPR && (
+                              <p className="text-[14px] text-[#97979A]">
+                                live. {vault?.liveAPR?.toFixed(2)}%
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="visible__tooltip">
+                          <div className="flex items-start flex-col gap-4">
+                            <div className="flex flex-col gap-1 w-full">
+                              {!!vault?.risk?.isRektStrategy && (
+                                <div className="flex flex-col items-center gap-2 mb-[10px]">
+                                  <h3 className="text-[#f52a11] font-bold">
+                                    {vault?.risk?.symbol} VAULT
+                                  </h3>
+                                  <p className="text-[12px] text-start">
+                                    Rekt vault regularly incurs losses,
+                                    potentially leading to rapid USD value
+                                    decline, with returns insufficient to offset
+                                    the losses.
                                   </p>
                                 </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Daily</p>
-                                  <p className="text-end">
-                                    {formatNumber(dailyAPRValue, "formatAPR")}%
-                                  </p>
-                                </div>
-                                {!isSTBLVault && (
+                              )}
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Total APY</p>
+                                <p className="text-end">
+                                  {formatNumber(apyValue, "formatAPR")}%
+                                </p>
+                              </div>
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Total APR</p>
+                                <p className="text-end">
+                                  {formatNumber(aprValue, "formatAPR")}%
+                                </p>
+                              </div>
+
+                              {vault?.earningData?.poolSwapFeesAPR.daily !=
+                                "-" &&
+                                vault?.pool && (
                                   <div className="font-bold flex items-center justify-between">
-                                    <p>Gems APR</p>
-                                    <div className="flex items-center justify-end">
+                                    <p>Pool swap fees APR</p>
+                                    <p className="text-end">
                                       {formatNumber(
-                                        gemsAprValue.toFixed(2),
+                                        swapFeesAPRValue,
                                         "formatAPR"
                                       )}
                                       %
-                                    </div>
+                                    </p>
                                   </div>
                                 )}
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Strategy APR</p>
+                                <p className="text-end">
+                                  {formatNumber(strategyAPRValue, "formatAPR")}%
+                                </p>
                               </div>
-                              <div className="flex items-center justify-between w-full">
-                                <p>Last Hard Work</p>
-                                <TimeDifferenceIndicator
-                                  unix={vault.lastHardWork}
-                                />
+                              <div className="font-bold flex items-center justify-between">
+                                <p>Daily</p>
+                                <p className="text-end">
+                                  {formatNumber(dailyAPRValue, "formatAPR")}%
+                                </p>
                               </div>
+                              {!isSTBLVault && (
+                                <div className="font-bold flex items-center justify-between">
+                                  <p>Gems APR</p>
+                                  <div className="flex items-center justify-end">
+                                    {formatNumber(
+                                      gemsAprValue.toFixed(2),
+                                      "formatAPR"
+                                    )}
+                                    %
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            <i></i>
+                            <div className="flex items-center justify-between w-full">
+                              <p>Last Hard Work</p>
+                              <TimeDifferenceIndicator
+                                unix={vault.lastHardWork}
+                              />
+                            </div>
                           </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-right">
-                          {formatNumber(vault.tvl, "abbreviate")}
-                        </td>
-                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right">
-                          <p className={`${!$visible && "blur select-none"}`}>
-                            {$visible
-                              ? `$${formatNumber(vault.balanceInUSD, "format")}`
-                              : "$000"}
-                          </p>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr className="text-start h-[60px] font-medium">
-                    {userVaultsCondition ? (
-                      <td>
-                        <p className="text-[18px]">
-                          You haven't connected your wallet.
+                          <i></i>
+                        </div>
+                      </div>
+                      <div className="px-4 text-right text-[16px] w-[17.5%]">
+                        {formatNumber(vault.tvl, "abbreviate")}
+                      </div>
+                      <div className="px-4 text-right text-[16px] w-[17.5%]">
+                        <p className={`${!$visible && "blur select-none"}`}>
+                          {$visible
+                            ? `$${formatNumber(vault.balanceInUSD, "format")}`
+                            : "$000"}
                         </p>
-                        <p>Connect to view your vaults.</p>
-                        <button
-                          className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-md min-w-[120px] mt-2"
-                          onClick={() => open()}
-                        >
-                          Connect Wallet
-                        </button>
-                      </td>
-                    ) : (
-                      <td>
-                        <p className="text-[18px]">No results found.</p>
-                        <p>
-                          Try clearing your filters or changing your search
-                          term.
-                        </p>
-                      </td>
-                    )}
-                  </tr>
-                )}
-              </>
-            ) : (
-              <tr className="text-start h-[60px] font-medium">
-                <td>No vaults</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                      </div>
+                    </a>
+                  );
+                })
+              ) : (
+                <div className="text-start h-[60px] font-medium">
+                  {userVaultsCondition ? (
+                    <div>
+                      <p className="text-[18px]">
+                        You haven't connected your wallet.
+                      </p>
+                      <p>Connect to view your vaults.</p>
+                      <button
+                        className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-md min-w-[120px] mt-2"
+                        onClick={() => open()}
+                      >
+                        Connect Wallet
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-[18px]">No results found.</p>
+                      <p>
+                        Try clearing your filters or changing your search term.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-start h-[60px] font-medium">No vaults</div>
+          )}
+        </div>
+        <Pagination
+          pagination={pagination}
+          vaults={filteredVaults}
+          tab={currentTab}
+          display={displayType}
+          setTab={setCurrentTab}
+          setPagination={setPagination}
+        />
       </div>
 
-      <Pagination
-        vaults={filteredVaults}
-        tab={currentTab}
-        setTab={setCurrentTab}
-      />
       {aprModal.state && (
         <APRModal state={aprModal} setModalState={setAprModal} />
       )}
