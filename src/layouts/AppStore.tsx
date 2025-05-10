@@ -776,7 +776,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const vaultsData: TVaultDataKey = {};
 
     await Promise.all(
-      CHAINS.map(async (chain) => {
+      Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
+        const chain = CHAINS.find(({ id }) => id === key);
+        if (!chain) return;
         /////***** SET VAULTS DATA *****/////
         const APIVaultsData = Object.values(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
