@@ -31,6 +31,7 @@
     "astro": "^3.4.3",
     "axios": "^1.6.2",
     "eslint-plugin-astro": "^1.2.3",
+    "framer-motion": "^12.11.0",
     "http-proxy-middleware": "^2.0.6",
     "nanostores": "^0.9.3",
     "playwright": "^1.48.0",

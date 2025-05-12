@@ -20,6 +20,7 @@ import { Badge } from "./Badge";
 import { Counter } from "./Counter";
 import { BalanceVisibilityToggler } from "./BalanceVisibilityToggler";
 import { ExplorerLink } from "./ExplorerLink";
+import { Pagination } from "./Pagination";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -28,6 +29,10 @@ import { Skeleton } from "./Skeletons/Skeleton";
 
 import { NavIcon } from "./NavIcon";
 import { GridIcon, RowsIcon, ArrowIcon } from "./Icons";
+
+import { VaultsTable } from "./Tables/Vaults";
+
+import { DisplayType } from "./DisplayType";
 
 export {
   Toast,
@@ -60,4 +65,7 @@ export {
   RowsIcon,
   GridIcon,
   ArrowIcon,
+  Pagination,
+  VaultsTable,
+  DisplayType,
 };
