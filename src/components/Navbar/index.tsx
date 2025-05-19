@@ -57,11 +57,14 @@ const Navbar = (): JSX.Element => {
     <nav className="navbar">
       <div className="pt-5 pb-[30px] px-4 flex flex-col justify-between h-full">
         <div>
-          <img
-            src="/stability-logo.png"
-            alt="Stability logo"
-            className="ml-[14px]"
-          />
+          <a href="/">
+            <img
+              src="/stability-logo.png"
+              alt="Stability logo"
+              className="ml-[14px]"
+            />
+          </a>
+
           <div className="mt-4">
             {PATHS.map(({ name, path }) => (
               <div

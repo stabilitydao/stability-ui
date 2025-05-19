@@ -23,6 +23,7 @@ import { LeveragedFarming } from "./LeveragedFarming";
 import { Metavaults } from "./Metavaults";
 import { ALM } from "./ALM";
 import { Agents } from "./Agents";
+import { Metavault } from "./Metavault";
 
 export {
   Factory,
@@ -50,4 +51,5 @@ export {
   Metavaults,
   ALM,
   Agents,
+  Metavault,
 };

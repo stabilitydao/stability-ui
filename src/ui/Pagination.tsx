@@ -1,8 +1,8 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useRef } from "react";
 
 import { ArrowIcon } from "@ui";
 
-import { cn } from "@utils";
+import { cn, useClickOutside } from "@utils";
 
 import { PAGINATIONS_VARIANTS } from "@constants";
 
@@ -22,6 +22,12 @@ const Pagination: React.FC<IProps> = memo(
     const newUrl = new URL(window.location.href);
     const params = new URLSearchParams(newUrl.search);
 
+    const itemsDropDownRef = useRef<HTMLDivElement>(null);
+    const pagesDropDownRef = useRef<HTMLDivElement>(null);
+
+    const [isPagesDropDown, setIsPagesDropDown] = useState<boolean>(false);
+    const [isItemsDropDown, setIsItemsDropDown] = useState<boolean>(false);
+
     const paginationNumbers = [];
 
     for (let i = 1; i <= Math.ceil(vaults.length / pagination); i++) {
@@ -34,9 +40,6 @@ const Pagination: React.FC<IProps> = memo(
         pagination * tab >= vaults.length ? vaults.length : pagination * tab,
     };
 
-    const [isPagesPopup, setIsPagesPopup] = useState<boolean>(false);
-    const [isItemsPopup, setIsItemsPopup] = useState<boolean>(false);
-
     useEffect(() => {
       if (tab === 1) {
         params.delete("page");
@@ -48,6 +51,9 @@ const Pagination: React.FC<IProps> = memo(
       window.history.pushState({}, "", newUrl.toString());
     }, [tab]);
 
+    useClickOutside(itemsDropDownRef, () => setIsItemsDropDown(false));
+    useClickOutside(pagesDropDownRef, () => setIsPagesDropDown(false));
+
     return (
       <div
         className={cn(
@@ -58,26 +64,27 @@ const Pagination: React.FC<IProps> = memo(
         <div className="px-4 h-full flex items-center justify-between">
           <div className="flex items-center">
             <div
+              ref={itemsDropDownRef}
               className="flex items-center gap-4 py-3 pr-4 border-r border-[#23252A] h-full cursor-pointer relative"
-              onClick={() => setIsItemsPopup((prev) => !prev)}
+              onClick={() => setIsItemsDropDown((prev) => !prev)}
             >
               <span className="text-[#97979a]">Items per page:</span>
               <div className="flex items-center gap-1">
                 <span>{pagination}</span>
-                <ArrowIcon isActive={true} rotate={isItemsPopup ? 180 : 0} />
+                <ArrowIcon isActive={true} rotate={isItemsDropDown ? 180 : 0} />
               </div>
               <div
                 className={cn(
-                  "absolute bottom-full mb-1 w-full rounded-lg bg-[#101012] z-10",
-                  !isItemsPopup && "hidden"
+                  "absolute bottom-full mb-2 w-full rounded-lg bg-[#1C1D1F] border border-[#383B42] p-[6px] z-10",
+                  !isItemsDropDown && "hidden"
                 )}
               >
                 {PAGINATIONS_VARIANTS.map((number) => (
-                  <p
-                    className={`px-4 rounded-[4px] cursor-pointer py-2 bg-accent-900 hover:bg-accent-800 ${
+                  <div
+                    className={`p-[6px] rounded-lg flex items-center justify-between ${
                       pagination === number
-                        ? "outline outline-accent-500 outline-[1.5px] cursor-default"
-                        : ""
+                        ? "bg-[#27292E] cursor-default"
+                        : "cursor-pointer"
                     }`}
                     onClick={() => {
                       setPagination(number);
@@ -85,8 +92,11 @@ const Pagination: React.FC<IProps> = memo(
                     }}
                     key={`${number}-pagination`}
                   >
-                    {number}
-                  </p>
+                    <span>{number}</span>
+                    {pagination === number && (
+                      <img src="/icons/checkmark.svg" alt="Checkmark" />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -121,12 +131,14 @@ const Pagination: React.FC<IProps> = memo(
               </span>
             </div>
             <div
+              ref={pagesDropDownRef}
               className={cn(
                 "flex items-center gap-1 cursor-pointer py-3 relative",
                 paginationNumbers.length < 2 && "cursor-default"
               )}
               onClick={() =>
-                paginationNumbers.length > 1 && setIsPagesPopup((prev) => !prev)
+                paginationNumbers.length > 1 &&
+                setIsPagesDropDown((prev) => !prev)
               }
             >
               <div className="flex items-center gap-1">
@@ -139,7 +151,7 @@ const Pagination: React.FC<IProps> = memo(
                 </span>
                 <ArrowIcon
                   isActive={paginationNumbers.length > 1}
-                  rotate={isPagesPopup ? 180 : 0}
+                  rotate={isPagesDropDown ? 180 : 0}
                 />
               </div>
               <span className="text-[#97979a]">
@@ -147,22 +159,25 @@ const Pagination: React.FC<IProps> = memo(
               </span>
               <div
                 className={cn(
-                  "absolute bottom-full mb-1 w-full rounded-lg bg-[#101012] z-10",
-                  !isPagesPopup && "hidden"
+                  "absolute bottom-full mb-2 w-full rounded-lg bg-[#1C1D1F] border border-[#383B42] p-[6px] z-10",
+                  !isPagesDropDown && "hidden"
                 )}
               >
                 {paginationNumbers.map((number) => (
-                  <p
-                    className={`px-4 rounded-[4px] cursor-pointer py-2 bg-accent-900 hover:bg-accent-800 ${
+                  <div
+                    className={`p-[6px] rounded-lg flex items-center justify-between ${
                       tab === number
-                        ? "outline outline-accent-500 outline-[1.5px] cursor-default"
-                        : ""
+                        ? "bg-[#27292E] cursor-default"
+                        : "cursor-pointer"
                     }`}
                     onClick={() => setTab(number)}
-                    key={number}
+                    key={`${number}-page`}
                   >
-                    {number}
-                  </p>
+                    <span>{number}</span>
+                    {tab === number && (
+                      <img src="/icons/checkmark.svg" alt="Checkmark" />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>

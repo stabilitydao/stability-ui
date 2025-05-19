@@ -5,7 +5,7 @@ const { strategyId } = Astro.params as {strategyId:string};
 ---
 
 <Layout>
-    <div class="my-vault max-w-[1200px]">
+    <div class="max-w-[1200px]">
         <Strategy strategyId={strategyId} client:only="react" />
     </div>
 </Layout>

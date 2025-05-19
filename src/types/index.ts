@@ -668,7 +668,16 @@ type TVestPeriod = {
   isFullyExited: boolean;
 };
 
-type TDisplay = "rows" | "grid";
+// enums
+export enum DisplayTypes {
+  Rows = "rows",
+  Grid = "grid",
+}
+
+export enum TransactionTypes {
+  Deposit = "deposit",
+  Withdraw = "withdraw",
+}
 
 export type {
   TPlatformData,
@@ -750,5 +759,4 @@ export type {
   TTableActiveParams,
   TStakeDashboardData,
   TVestPeriod,
-  TDisplay,
 };

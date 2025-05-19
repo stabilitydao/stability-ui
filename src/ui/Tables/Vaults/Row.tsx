@@ -143,7 +143,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="visible__tooltip">
-          <div className="flex items-start flex-col gap-4">
+          <div className="flex items-start flex-col gap-2">
             <div className="flex flex-col gap-1 w-full">
               {!!vault?.risk?.isRektStrategy && (
                 <div className="flex flex-col items-center gap-2 mb-[10px]">
@@ -157,51 +157,63 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   </p>
                 </div>
               )}
-              <div className="font-bold flex items-center justify-between">
-                <p>Total APY</p>
-                <p className="text-end">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  Total APY
+                </p>
+                <p className="text-end font-semibold">
                   {formatNumber(APRs.APY, "formatAPR")}%
                 </p>
               </div>
-              <div className="font-bold flex items-center justify-between">
-                <p>Total APR</p>
-                <p className="text-end">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  Total APR
+                </p>
+                <p className="text-end font-semibold">
                   {formatNumber(APRs.APR, "formatAPR")}%
                 </p>
               </div>
 
               {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
                 vault?.pool && (
-                  <div className="font-bold flex items-center justify-between">
-                    <p>Pool swap fees APR</p>
-                    <p className="text-end">
+                  <div className="flex items-center justify-between">
+                    <p className="leading-5 text-[#97979A] font-medium">
+                      Pool swap fees APR
+                    </p>
+                    <p className="text-end font-semibold">
                       {formatNumber(APRs.swapFees, "formatAPR")}%
                     </p>
                   </div>
                 )}
-              <div className="font-bold flex items-center justify-between">
-                <p>Strategy APR</p>
-                <p className="text-end">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  Strategy APR
+                </p>
+                <p className="text-end font-semibold">
                   {formatNumber(APRs.strategyAPR, "formatAPR")}%
                 </p>
               </div>
-              <div className="font-bold flex items-center justify-between">
-                <p>Daily</p>
-                <p className="text-end">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">Daily</p>
+                <p className="text-end font-semibold">
                   {formatNumber(APRs.dailyAPR, "formatAPR")}%
                 </p>
               </div>
               {!isSTBLVault && (
-                <div className="font-bold flex items-center justify-between">
-                  <p>Gems APR</p>
-                  <div className="flex items-center justify-end">
+                <div className="flex items-center justify-between">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Gems APR
+                  </p>
+                  <p className="text-end font-semibold">
                     {formatNumber(APRs.gemsAPR, "formatAPR")}%
-                  </div>
+                  </p>
                 </div>
               )}
             </div>
             <div className="flex items-center justify-between w-full">
-              <p>Last Hard Work</p>
+              <p className="leading-5 text-[#97979A] font-medium">
+                Last Hard Work
+              </p>
               <TimeDifferenceIndicator unix={vault.lastHardWork} />
             </div>
           </div>

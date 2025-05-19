@@ -10,7 +10,6 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import {
   account,
   assetsBalances,
-  visible,
   assetsPrices,
   publicClient,
   currentChainID,
@@ -18,7 +17,7 @@ import {
 
 import { IERC721Enumerable } from "@web3";
 
-import { getTokenData } from "@utils";
+import { cn, getTokenData } from "@utils";
 
 import { CHAINS, PM } from "@constants";
 
@@ -30,7 +29,6 @@ const Wallet = (): JSX.Element => {
 
   const $account = useStore(account);
   const $currentChainID = useStore(currentChainID);
-  const $visible = useStore(visible);
   const $publicClient = useStore(publicClient);
   const $assetsBalances = useStore(assetsBalances);
   const $assetsPrices = useStore(assetsPrices);
@@ -227,13 +225,14 @@ const Wallet = (): JSX.Element => {
         {$account && providerImage ? (
           <img className="w-4 h-4" src={providerImage} alt="providerImage" />
         ) : (
-          <img
-            className="w-4 h-4 md:hidden block"
-            src="/wallet.svg"
-            alt="walletImage"
-          />
+          <img className="w-4 h-4" src="/icons/wallet.svg" alt="Wallet" />
         )}
-        <span className={`${!$visible && "blur select-none"} md:block hidden`}>
+        <span
+          className={cn(
+            "text-[14px] leading-5 font-medium",
+            !$account && "text-[#A193F2] "
+          )}
+        >
           {$account
             ? `${$account.slice(0, 6)}...${$account.slice(-4)}`
             : "Connect Wallet"}

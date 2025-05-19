@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import { cn, capitalize } from "@utils";
+
 import { aprFilter } from "@store";
 
 import { APRsType } from "@constants";
@@ -61,7 +63,7 @@ const APRtimeSwitcher: React.FC<IProps> = ({ withText = false }) => {
   }, [dropDownRef]);
 
   return (
-    <div className="relative select-none switcher font-manrope text-[14px] font-semibold">
+    <div className="relative select-none switcher font-manrope font-semibold w-[170px]">
       <div
         onClick={(e) => {
           e.stopPropagation();
@@ -82,36 +84,42 @@ const APRtimeSwitcher: React.FC<IProps> = ({ withText = false }) => {
         </p>
 
         <img
-          className={`transition delay-[50ms] w-3 h-3 ${
+          className={cn(
+            "transition delay-[50ms] w-3 h-3",
             dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-          }`}
+          )}
           src="/icons/arrow-down.svg"
           alt="arrowDown"
         />
       </div>
       <div
         ref={dropDownRef}
-        className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
+        className={cn(
+          "bg-[#1C1D1F] mt-2 rounded-lg border border-[#383B42] w-full z-20",
           dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
-        } `}
+        )}
       >
-        <div className="flex flex-col items-start">
-          {APRsType.map((APRType, index: number) => {
+        <div className="flex flex-col items-start text-[14px] leading-5 font-medium p-[6px]">
+          {APRsType.map((APRType) => {
             const isActive =
               activeAPRType.includes(APRType) ||
               (activeAPRType === "daily" && APRType === "24h");
 
+            const text = APRType === "24h" ? "24 hours" : capitalize(APRType);
+
             return (
-              <p
+              <div
                 key={APRType}
                 onClick={() => APRsHandler(APRType)}
-                className={`${!index && "rounded-t-2xl"} ${index === APRsType.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-                  isActive ? "bg-accent-800" : ""
-                }`}
                 data-testid="APRType"
+                className={cn(
+                  "p-[6px] cursor-pointer w-full rounded-lg flex items-center justify-between",
+                  isActive && "bg-[#27292E] cursor-default"
+                )}
               >
-                {APRType}
-              </p>
+                <p>{text}</p>
+                {isActive && <img src="/icons/checkmark.svg" alt="Checkmark" />}
+              </div>
             );
           })}
         </div>

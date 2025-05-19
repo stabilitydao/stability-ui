@@ -4,6 +4,8 @@ import type { Dispatch, SetStateAction } from "react";
 
 import { Checkbox } from "@ui";
 
+import { cn, useClickOutside } from "@utils";
+
 import type {
   TTableActiveParams,
   TTableFilters,
@@ -193,20 +195,7 @@ const Filters: React.FC<IProps> = memo(
       }
     }, [searchParams]);
 
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          dropDownRef.current &&
-          !dropDownRef.current?.contains(event.target as Node)
-        ) {
-          setDropDownSelector(false);
-        }
-      };
-      document.addEventListener("click", handleClickOutside);
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }, []);
+    useClickOutside(dropDownRef, () => setDropDownSelector(false));
 
     return (
       filters.length && (
@@ -257,20 +246,22 @@ const Filters: React.FC<IProps> = memo(
                       <span>{activeStrategies}</span>
                     </p>
                     <img
-                      className={`transition delay-[50ms] w-4 h-4 ${
+                      className={cn(
+                        "transition delay-[50ms] w-4 h-4",
                         dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-                      }`}
+                      )}
                       src="/arrow-down.svg"
                       alt="arrowDown"
                     />
                   </div>
                   <div
                     ref={dropDownRef}
-                    className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
+                    className={cn(
+                      "bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg w-full z-20 mt-2",
                       dropDownSelector
                         ? "absolute transition delay-[50ms]"
                         : "hidden"
-                    } `}
+                    )}
                   >
                     <div className="flex flex-col items-start">
                       {filter.variants?.map(
@@ -280,9 +271,9 @@ const Filters: React.FC<IProps> = memo(
                             onClick={() =>
                               activeFiltersHandler(filter, variant.name)
                             }
-                            className={`${!index ? "rounded-t-2xl" : ""} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center gap-2 ${
-                              variant.state ? "bg-accent-800" : ""
-                            }`}
+                            className={cn(
+                              "p-[6px] cursor-pointer w-full flex items-center gap-2"
+                            )}
                             data-testid="strategy"
                             title={variant.title}
                           >
@@ -292,7 +283,7 @@ const Filters: React.FC<IProps> = memo(
                                 activeFiltersHandler(filter, variant.name)
                               }
                             />
-                            <span className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap">
+                            <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
                               {variant.title}
                             </span>
                           </div>

@@ -33,6 +33,8 @@ import {
   DEFAULT_TABLE_PARAMS,
 } from "@constants";
 
+import { DisplayTypes } from "@types";
+
 import type {
   TVault,
   TTableColumn,
@@ -41,7 +43,6 @@ import type {
   TAPRPeriod,
   TTableActiveParams,
   TVSHoldModalState,
-  TDisplay,
 } from "@types";
 
 const SonicVaults = (): JSX.Element => {
@@ -117,7 +118,9 @@ const SonicVaults = (): JSX.Element => {
 
   const [tableStates, setTableStates] = useState(urlTableStates);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
-  const [displayType, setDisplayType] = useState<TDisplay>("rows");
+  const [displayType, setDisplayType] = useState<DisplayTypes>(
+    DisplayTypes.Rows
+  );
   const [activeNetworks, setActiveNetworks] = useState([
     {
       name: chains["146"].name,
@@ -143,6 +146,19 @@ const SonicVaults = (): JSX.Element => {
 
       tableHandler();
       setSearchHistory([]);
+    }
+  };
+
+  const clearSearchHistory = (history: string[]) => {
+    if (history.length === searchHistory.length) {
+      localStorage.setItem("searchHistory", JSON.stringify([]));
+      setSearchHistory([]);
+    } else {
+      const updatedHistory = searchHistory.filter(
+        (item) => !history.includes(item)
+      );
+      localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+      setSearchHistory(updatedHistory);
     }
   };
 
@@ -246,12 +262,12 @@ const SonicVaults = (): JSX.Element => {
 
       let newValues = history ? [...history, value] : [value];
 
-      if (newValues.length > 10) {
+      if (newValues.length > 5) {
         newValues.shift();
       }
 
       localStorage.setItem("searchHistory", JSON.stringify(newValues));
-    }, 2000),
+    }, 3000),
     []
   );
 
@@ -511,10 +527,6 @@ const SonicVaults = (): JSX.Element => {
         </div>
         <Portfolio vaults={localVaults} />
 
-        {/* <NetworkFilters
-          activeNetworks={activeNetworks}
-          activeNetworksHandler={activeNetworksHandler}
-        /> */}
         <div className="flex items-center justify-between gap-2 mt-10 mb-4">
           <div className="max-w-[240px] w-full relative text-[16px]">
             <label className="relative block">
@@ -527,24 +539,55 @@ const SonicVaults = (): JSX.Element => {
               </span>
               <input
                 type="text"
-                className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-3"
+                className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-10"
                 placeholder="Search asset"
                 ref={search}
                 onChange={() => tableHandler()}
               />
+
+              <span
+                onClick={() => handleSearch("")}
+                className={cn(
+                  "absolute inset-y-0 right-4 flex items-center cursor-pointer",
+                  !search?.current?.value && "hidden"
+                )}
+              >
+                <img src="/icons/circle-xmark.png" alt="xmark" />
+              </span>
             </label>
-            {searchHistory.length > 0 && (
-              <ul className="absolute left-0 mt-2 w-full bg-accent-900 text-neutral-50 font-manrope rounded-2xl z-[10]">
+            {!!searchHistory.length && (
+              <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[10] p-[6px]">
+                <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
+                  Recent searches
+                </span>
                 {searchHistory.map((text, index) => (
-                  <li
+                  <div
                     key={text + index}
-                    className={`p-2 cursor-pointer hover:bg-accent-800 ${!index ? "hover:rounded-t-2xl" : index === searchHistory.length - 1 ? "hover:rounded-b-2xl" : ""}`}
-                    onClick={() => handleSearch(text)}
+                    className={cn(
+                      "cursor-pointer flex items-center justify-between"
+                    )}
                   >
-                    {text}
-                  </li>
+                    <span
+                      className="text-ellipsis whitespace-nowrap overflow-hidden text-[14px] leading-5 font-medium py-[6px] pl-[6px]"
+                      onClick={() => handleSearch(text)}
+                    >
+                      {text}
+                    </span>
+                    <img
+                      className="py-[6px] pr-[6px]"
+                      onClick={() => clearSearchHistory([text])}
+                      src="/icons/xmark.svg"
+                      alt="xmark"
+                    />
+                  </div>
                 ))}
-              </ul>
+                <button
+                  className="text-[#A193F2] text-[12px] leading-[14px] font-medium p-[6px] w-full text-start"
+                  onClick={() => clearSearchHistory(searchHistory)}
+                >
+                  Clear all
+                </button>
+              </div>
             )}
           </div>
 
@@ -578,8 +621,13 @@ const SonicVaults = (): JSX.Element => {
         </div>
         <div>
           {isLoading ? (
-            <div className="relative h-[80px]">
-              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
+            <div
+              className={cn(
+                "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
+                displayType === "grid" && "rounded-lg border-b"
+              )}
+            >
+              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
                 <FullPageLoader />
               </div>
             </div>
@@ -611,11 +659,6 @@ const SonicVaults = (): JSX.Element => {
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
-      {/* <a href="/factory">
-        <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
-          Create vault
-        </button>
-      </a> */}
     </>
   );
 };

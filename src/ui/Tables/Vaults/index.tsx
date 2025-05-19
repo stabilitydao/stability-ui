@@ -4,11 +4,11 @@ import { Row } from "./Row";
 
 import { cn } from "@utils";
 
-import { TVault, TAPRModal, TAPRPeriod } from "@types";
+import { TVault, TAPRModal, TAPRPeriod, DisplayTypes } from "@types";
 
 interface IProps {
   vaults: TVault[];
-  display: string;
+  display: DisplayTypes;
   isUserVaults: boolean;
   period: TAPRPeriod;
   setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
@@ -22,7 +22,7 @@ const VaultsTable: React.FC<IProps> = ({
   setModalState,
 }) => {
   if (!vaults?.length) {
-    return <EmptyTable isUserVaults={isUserVaults} />;
+    return <EmptyTable isUserVaults={isUserVaults} display={display} />;
   }
 
   return (

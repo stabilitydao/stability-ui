@@ -17,9 +17,9 @@ const Skeleton = (props: React.SVGProps<SVGSVGElement>): JSX.Element => {
         ry="10"
         width="320"
         height="63"
-        fill="#a995ff"
+        fill="#1B1D21"
       />
-      <rect x="0" y="0" rx="10" ry="10" width="320" height="63" fill="#4d41bd">
+      <rect x="0" y="0" rx="10" ry="10" width="320" height="63" fill="#1B1D21">
         <animate
           attributeName="opacity"
           dur="2s"

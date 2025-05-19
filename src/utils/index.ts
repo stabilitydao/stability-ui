@@ -26,6 +26,10 @@ import { getContractDataWithPagination } from "./functions/getContractDataWithPa
 import { extractPointsMultiplier } from "./functions/extractPointsMultiplier";
 import { playAudio } from "./functions/playAudio";
 import { cn } from "./functions/cn";
+import { capitalize } from "./functions/capilatize";
+
+/* HOOKS */
+import { useClickOutside } from "./hooks/useClickOutside";
 
 export {
   getTokenData,
@@ -55,4 +59,6 @@ export {
   extractPointsMultiplier,
   playAudio,
   cn,
+  capitalize,
+  useClickOutside,
 };

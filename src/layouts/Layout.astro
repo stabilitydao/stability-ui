@@ -61,6 +61,12 @@ const {
     <App client:only="react">
 		<div class="layout">
 			<Navbar client:only="react"/>
+			<div
+				class="w-full h-[50%] absolute"
+				style={{
+					background: `linear-gradient(180deg, rgba(97, 106, 115, 0.00) 0%, rgba(97, 106, 115, 0.12) 40%, rgba(97, 106, 115, 0.12) 60%, rgba(0, 0, 0, 0.00) 100%)`,
+				}}
+			/>
 			<div class="container">
 				<Header client:only="react"/>
 				<main class="content">
@@ -74,7 +80,6 @@ const {
 <style is:global>
 	html {
 		width:100vw;
-		/* overflow-x: hidden; */
 		font-family: "Manrope", sans-serif;
 		background: #090909;
 	}
@@ -367,19 +372,19 @@ const {
 	}
 
 	.tooltip .visible__tooltip {
-		width:250px;
+		width:200px;
 		left:50%;
 		top:-17px;
 		transform:translate(-30%,-100%);
-		padding:10px 20px;
-		color:#ffffff;
-		background-color:#26282f;
+		padding:8px;
+		background-color:#1C1D1F;
 		font-size:14px;
+		border: 1px solid #383B42;
 		border-radius:8px;
 		position:absolute;
 		z-index:99999999;
 		box-sizing:border-box;
-		box-shadow:0 1px 8px rgba(0,0,0,0.5);
+		box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.18), 0px 2px 5px 0px rgba(0, 0, 0, 0.18), 0px 3px 8px 0px rgba(0, 0, 0, 0.18), 0px 20px 20px -8px rgba(0, 0, 0, 0.18);
 		display:none;
 		pointer-events: none;
 	}
@@ -406,7 +411,7 @@ const {
 	.tooltip .visible__tooltip i {
 		position:absolute;
 		top:99%;
-		left:30%;
+		left:50%;
 		margin-left:-15px;
 		width:30px;
 		height:15px;
@@ -481,5 +486,63 @@ const {
 
 	.sGem1RewardBg {
 		background: linear-gradient(117deg, rgba(19, 28, 37, 0.50) 29%, rgba(43, 70, 97, 0.50) 63%);
+	}
+
+	/* Loader */
+	.loader {
+		width: 44px;
+		height: 44px;
+		animation: loader-animation 2s infinite ease;
+		transform-style: preserve-3d;
+	}
+
+	.loader > div {
+		background-color: rgba(145,128,244,0.16);
+		height: 100%;
+		position: absolute;
+		width: 100%;
+		border: 2px solid #9180F4;
+	}
+
+	.loader div:nth-of-type(1) {
+		transform: translateZ(-22px) rotateY(180deg);
+	}
+
+	.loader div:nth-of-type(2) {
+		transform: rotateY(-270deg) translateX(50%);
+		transform-origin: top right;
+	}
+
+	.loader div:nth-of-type(3) {
+		transform: rotateY(270deg) translateX(-50%);
+		transform-origin: center left;
+	}
+
+	.loader div:nth-of-type(4) {
+		transform: rotateX(90deg) translateY(-50%);
+		transform-origin: top center;
+	}
+
+	.loader div:nth-of-type(5) {
+		transform: rotateX(-90deg) translateY(50%);
+		transform-origin: bottom center;
+	}
+
+	.loader div:nth-of-type(6) {
+		transform: translateZ(22px);
+	}
+
+	@keyframes loader-animation {
+		0% {
+			transform: rotate(45deg) rotateX(-25deg) rotateY(25deg);
+		}
+
+		50% {
+			transform: rotate(45deg) rotateX(-385deg) rotateY(25deg);
+		}
+
+		100% {
+			transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
+		}
 	}
 </style>

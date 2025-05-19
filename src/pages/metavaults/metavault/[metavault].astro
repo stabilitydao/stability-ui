@@ -1,0 +1,15 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+import {Metavault} from "@modules"
+
+import type {TAddress} from '@types';
+
+const { metavault } = Astro.params as {metavault:TAddress};;
+---
+
+<Layout title="Vault">
+    <div class="max-w-[1200px]">
+        <Metavault metavault={metavault} client:only="react" />
+    </div>
+</Layout>

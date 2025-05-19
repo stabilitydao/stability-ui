@@ -2,11 +2,11 @@ import { RowsIcon, GridIcon } from "./Icons";
 
 import { cn } from "@utils";
 
-import { TDisplay } from "@types";
+import { DisplayTypes } from "@types";
 
 interface IProps {
   type: string;
-  setType: (type: TDisplay) => void;
+  setType: (type: DisplayTypes) => void;
 }
 
 const DisplayType: React.FC<IProps> = ({ type, setType }) => {
@@ -17,7 +17,7 @@ const DisplayType: React.FC<IProps> = ({ type, setType }) => {
           "border border-[#2C2E33] rounded-lg cursor-pointer",
           type === "rows" && "bg-[#22242A]"
         )}
-        onClick={() => setType("rows")}
+        onClick={() => setType(DisplayTypes.Rows)}
       >
         <div className="p-3">
           <RowsIcon isActive={type === "rows"} />
@@ -28,7 +28,7 @@ const DisplayType: React.FC<IProps> = ({ type, setType }) => {
           "border border-[#2C2E33] rounded-lg cursor-pointer",
           type === "grid" && "bg-[#22242A]"
         )}
-        onClick={() => setType("grid")}
+        onClick={() => setType(DisplayTypes.Grid)}
       >
         <div className="p-3">
           <GridIcon isActive={type === "grid"} />

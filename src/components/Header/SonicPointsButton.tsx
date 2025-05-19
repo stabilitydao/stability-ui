@@ -156,7 +156,7 @@ const SonicPointsButton = (): JSX.Element => {
       {sonicBtn && (
         <div
           ref={menuRef}
-          className="bg-accent-900 absolute left-[-70px] md:left-0 top-[50px] w-[160px] rounded-xl py-1 px-3 z-[100]"
+          className="bg-[#1C1D1F] border border-[#383B42] absolute left-[-70px] md:left-0 top-[60px] w-full rounded-lg z-[100] py-4"
         >
           <div className="flex items-center gap-[15px] min-[1430px]:hidden">
             <img
@@ -169,87 +169,88 @@ const SonicPointsButton = (): JSX.Element => {
               <p className="text-[14px] leading-4">{user.totalPoints}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1 mb-4 px-4">
             <div
-              className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#BD6EAC] text-white bg-[#BD6EAC]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
+              className="flex flex-col items-center gap-1 py-1 px-2 bg-[#40331a] border border-[#FFA500] rounded-lg cursor-pointer"
               onClick={() => playAudio("pp", 0.3)}
             >
-              <span className="font-medium">PP</span>
-            </div>
-            <div>
-              <span className="text-neutral-500 text-[12px]">
+              <span className="text-[14px] leading-4">
+                {user.passivePoints}
+              </span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
                 Passive Points
               </span>
-              <p className="text-[14px] leading-4">{user.passivePoints}</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
             <div
-              className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#6EBD70] text-white bg-[#6EBD70]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
+              className="flex flex-col items-center gap-1 py-1 px-2 bg-[#233729] border border-[#48C05C] rounded-lg cursor-pointer"
               onClick={() => playAudio("ap", 0.3)}
             >
-              <span className="font-medium">AP</span>
-            </div>
-            <div>
-              <span className="text-neutral-500 text-[12px]">
+              <span className="text-[14px] leading-4">
+                {user.activityPoints}
+              </span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
                 Activity Points
               </span>
-              <p className="text-[14px] leading-4">{user.activityPoints}</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-1 py-1 px-2 bg-[#27292F] border border-[#383B42] rounded-lg">
+              <span className="text-[14px] leading-4">{user.rank}</span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Rank
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-3">
-            <span className="text-[14px]">Rank:</span>
-            <span className="text-warning-400">{user.rank}</span>
-          </div>
-
-          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
-
-          <div className="flex items-center gap-2">
-            <img src="/rings.png" alt="Rings" className="w-[34px]" />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Rings Points</span>
+          <div className="flex gap-2 px-4">
+            <img src="/rings.png" alt="Rings" className="w-4 h-4" />
+            <div className="flex flex-col gap-1">
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Rings Points
+              </span>
               <p className="text-[14px] leading-4">{user.ringsPoints}</p>
             </div>
           </div>
-          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
 
-          <div className="flex items-center gap-2">
-            <img
-              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-              alt="Silo"
-              className="w-[34px] rounded-full"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Silo Points</span>
-              <p className="text-[14px] leading-4">{user.allSiloPoints}</p>
-            </div>
-          </div>
+          <div className="h-[1px] bg-[#383B42] rounded-full my-2"></div>
 
-          <div className="flex items-center gap-[14px]">
-            <img
-              src="/logo.svg"
-              alt="Stability"
-              className="w-[22px] ml-[6px]"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">
-                Stability App
-              </span>
-              <p className="text-[14px] leading-4">
-                {user.stabilitySiloPoints}
-              </p>
+          <div className="flex flex-col gap-2 px-4">
+            <div className="flex gap-2">
+              <img
+                src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                alt="Silo"
+                className="w-4 h-4 rounded-full"
+              />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Silo Points
+                </span>
+                <p className="text-[14px] leading-4">{user.allSiloPoints}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-[14px]">
-            <img
-              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-              alt="Silo"
-              className="w-[22px] rounded-full ml-[6px]"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Silo App</span>
-              <p className="text-[14px] leading-4">{user.siloPoints}</p>
+
+            <div className="flex gap-2">
+              <img src="/logo.svg" alt="Stability" className="w-4 h-4" />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Stability App
+                </span>
+                <p className="text-[14px] leading-4">
+                  {user.stabilitySiloPoints}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <img
+                src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                alt="Silo"
+                className="w-4 h-4 rounded-full"
+              />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Silo App
+                </span>
+                <p className="text-[14px] leading-4">{user.siloPoints}</p>
+              </div>
             </div>
           </div>
         </div>

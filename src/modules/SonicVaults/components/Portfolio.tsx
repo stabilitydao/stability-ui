@@ -13,7 +13,7 @@ import {
 
 import { connected, visible, isWeb3Load, aprFilter } from "@store";
 
-import { formatNumber, calculateAPY } from "@utils";
+import { formatNumber, calculateAPY, cn } from "@utils";
 
 import type { TVault } from "@types";
 
@@ -139,7 +139,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
-                  <Skeleton height={21} width={100} />
+                  <Skeleton height={40} width={100} />
                 </div>
               ) : (
                 <p className={`${!$visible && "blur select-none"}`}>
@@ -160,10 +160,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
-                  <Skeleton height={21} width={100} />
+                  <Skeleton height={40} width={100} />
                 </div>
               ) : (
-                <p className={`${!$visible && "blur select-none"}`}>
+                <p className={cn(!$visible && "blur select-none")}>
                   {$visible ? dailyYield : "000$"}
                 </p>
               )}
@@ -179,10 +179,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
-                  <Skeleton height={21} width={100} />
+                  <Skeleton height={40} width={100} />
                 </div>
               ) : (
-                <p className={`${!$visible && "blur select-none"}`}>
+                <p className={cn(!$visible && "blur select-none")}>
                   {$visible ? monthlyYield : "000$"}
                 </p>
               )}
@@ -198,10 +198,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
-                  <Skeleton height={21} width={100} />
+                  <Skeleton height={40} width={100} />
                 </div>
               ) : (
-                <p className={`${!$visible && "blur select-none"}`}>
+                <p className={cn(!$visible && "blur select-none")}>
                   {$visible ? avgApr : "000$"}
                 </p>
               )}
@@ -217,10 +217,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
-                  <Skeleton height={21} width={100} />
+                  <Skeleton height={40} width={100} />
                 </div>
               ) : (
-                <p className={`${!$visible && "blur select-none"}`}>
+                <p className={cn(!$visible && "blur select-none")}>
                   {$visible ? avgApy : "0000"}
                 </p>
               )}
