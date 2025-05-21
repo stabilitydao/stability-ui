@@ -9,7 +9,7 @@ import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
-import { STABILITY_AAVE_POOLS } from "@constants";
+import { STABILITY_AAVE_POOLS, STABILITY_STRATEGY_LABELS } from "@constants";
 
 import type { TAddress, TPlatformData, TVault } from "@types";
 
@@ -87,9 +87,15 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
     }
   }, [vault, vaultTypes, strategyTypes]);
 
-  const isStabilityLogo = STABILITY_AAVE_POOLS.some((addr) =>
+  const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
     vault.strategySpecific.includes(addr)
   );
+
+  const isStabilityLogo = !!matchedAddress;
+
+  const strategySpecific = matchedAddress
+    ? STABILITY_STRATEGY_LABELS[matchedAddress]
+    : vault.strategySpecific;
 
   return (
     <div>
@@ -158,9 +164,9 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
                     />
                   ))}
                 </div>
-              ) : vault.strategySpecific ? (
+              ) : strategySpecific ? (
                 <span className="font-bold rounded-[4px] text-[#b6bdd7] inline uppercase text-[10px] px-[6px]">
-                  {vault.strategySpecific}
+                  {strategySpecific}
                 </span>
               ) : (
                 ""

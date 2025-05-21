@@ -219,6 +219,12 @@ const BIG_INT_VALUES = {
 
 const STABILITY_AAVE_POOLS = ["0x1f67..4ad8", "0xaa1c..1665", "0x4895..b094"];
 
+const STABILITY_STRATEGY_LABELS: { [address: string]: string } = {
+  [STABILITY_AAVE_POOLS[0]]: "Stream",
+  [STABILITY_AAVE_POOLS[1]]: "Main",
+  [STABILITY_AAVE_POOLS[2]]: "Stable Jack",
+};
+
 export {
   APRsType,
   TABLE,
@@ -260,4 +266,5 @@ export {
   SILO_POINTS,
   STABILITY_TOKENS,
   STABILITY_AAVE_POOLS,
+  STABILITY_STRATEGY_LABELS,
 };
