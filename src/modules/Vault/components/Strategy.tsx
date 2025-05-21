@@ -95,7 +95,11 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
 
   const strategySpecific = matchedAddress
     ? STABILITY_STRATEGY_LABELS[matchedAddress]
-    : vault.strategySpecific;
+    : vault.strategySpecific.includes("0xb38d..97b8")
+      ? "MEV Capital"
+      : vault.strategySpecific.includes("0xeeb1..cb6c")
+        ? "Re7 Labs"
+        : vault.strategySpecific;
 
   return (
     <div>
