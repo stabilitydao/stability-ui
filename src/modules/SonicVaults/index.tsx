@@ -38,6 +38,7 @@ import {
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
   STABILITY_AAVE_POOLS,
+  STABILITY_STRATEGY_LABELS,
 } from "@constants";
 
 import type {
@@ -598,9 +599,15 @@ const SonicVaults = (): JSX.Element => {
                       vault.earningData.gemsAPR[$aprFilter]
                     );
 
-                    const isStabilityLogo = STABILITY_AAVE_POOLS.some((addr) =>
+                    const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
                       vault.strategySpecific.includes(addr)
                     );
+
+                    const isStabilityLogo = !!matchedAddress;
+
+                    const strategySpecific = matchedAddress
+                      ? STABILITY_STRATEGY_LABELS[matchedAddress]
+                      : vault.strategySpecific;
 
                     const isSTBLVault =
                       Array.isArray(vault?.assets) &&
@@ -737,15 +744,15 @@ const SonicVaults = (): JSX.Element => {
                                         )
                                       )}
                                     </span>
-                                    {vault.strategySpecific && (
+                                    {strategySpecific && (
                                       <span
                                         className={`font-bold text-[#b6bdd7] inline ${
-                                          vault.strategySpecific.length > 10
+                                          strategySpecific.length > 10
                                             ? "lowercase text-[10px] pl-[12px] whitespace-pre-wrap max-w-[70px] text-left"
                                             : "uppercase text-[10px] pl-[12px]"
                                         }`}
                                       >
-                                        {vault.strategySpecific}
+                                        {strategySpecific}
                                       </span>
                                     )}
                                   </span>
