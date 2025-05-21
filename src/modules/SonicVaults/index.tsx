@@ -37,6 +37,7 @@ import {
   STABLECOINS,
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
+  STABILITY_AAVE_POOLS,
 } from "@constants";
 
 import type {
@@ -597,6 +598,10 @@ const SonicVaults = (): JSX.Element => {
                       vault.earningData.gemsAPR[$aprFilter]
                     );
 
+                    const isStabilityLogo = STABILITY_AAVE_POOLS.some((addr) =>
+                      vault.strategySpecific.includes(addr)
+                    );
+
                     const isSTBLVault =
                       Array.isArray(vault?.assets) &&
                       vault.assets.some(
@@ -704,22 +709,31 @@ const SonicVaults = (): JSX.Element => {
                                     className={`pl-2 flex h-8 items-center`}
                                   >
                                     <span className="min-w-[24px] flex items-center">
-                                      {vault.strategyInfo.protocols.map(
-                                        (protocol, index) => (
-                                          <img
-                                            className="h-6 w-6 mx-[2px]"
-                                            key={
-                                              protocol.logoSrc + String(index)
-                                            }
-                                            src={protocol.logoSrc}
-                                            alt={protocol.name}
-                                            title={protocol.name}
-                                            style={{
-                                              zIndex:
-                                                vault.strategyInfo.protocols
-                                                  .length - index,
-                                            }}
-                                          />
+                                      {isStabilityLogo ? (
+                                        <img
+                                          className="h-6 w-6 mx-[2px]"
+                                          src="/logo.svg"
+                                          alt="Stability"
+                                          title="Stability"
+                                        />
+                                      ) : (
+                                        vault.strategyInfo.protocols.map(
+                                          (protocol, index) => (
+                                            <img
+                                              className="h-6 w-6 mx-[2px]"
+                                              key={
+                                                protocol.logoSrc + String(index)
+                                              }
+                                              src={protocol.logoSrc}
+                                              alt={protocol.name}
+                                              title={protocol.name}
+                                              style={{
+                                                zIndex:
+                                                  vault.strategyInfo.protocols
+                                                    .length - index,
+                                              }}
+                                            />
+                                          )
                                         )
                                       )}
                                     </span>

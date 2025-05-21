@@ -19,7 +19,7 @@ import { aprFilter, visible } from "@store";
 
 import { formatFromBigInt, formatNumber } from "@utils";
 
-import { CHAINS } from "@constants";
+import { CHAINS, STABILITY_AAVE_POOLS } from "@constants";
 
 import type { TAPRPeriod, TVault } from "@types";
 import { seeds } from "@stabilitydao/stability";
@@ -94,6 +94,14 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     }
     return vault.strategyInfo.il?.title as string;
   }, [vault]);
+
+  const isStabilityLogo = useMemo(
+    () =>
+      STABILITY_AAVE_POOLS.some((addr) =>
+        vault.strategySpecific.includes(addr)
+      ),
+    [vault]
+  );
 
   return (
     <div className="bg-accent-950 rounded-2xl font-manrope">
@@ -172,15 +180,24 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                         className="flex items-start gap-0.5"
                         data-testid="infoBarStrategyesLogo"
                       >
-                        {vault?.strategyInfo?.protocols.map(
-                          (protocol, index) => (
-                            <img
-                              key={protocol?.name + index}
-                              className="w-6 h-6 rounded-full"
-                              src={protocol?.logoSrc}
-                              alt={protocol?.name}
-                              title={protocol?.name}
-                            />
+                        {isStabilityLogo ? (
+                          <img
+                            className="w-6 h-6 rounded-full"
+                            src="/logo.svg"
+                            alt="Stability"
+                            title="Stability"
+                          />
+                        ) : (
+                          vault?.strategyInfo?.protocols.map(
+                            (protocol, index) => (
+                              <img
+                                key={protocol?.name + index}
+                                className="w-6 h-6 rounded-full"
+                                src={protocol?.logoSrc}
+                                alt={protocol?.name}
+                                title={protocol?.name}
+                              />
+                            )
                           )
                         )}
                       </div>
