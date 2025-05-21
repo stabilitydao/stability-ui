@@ -9,6 +9,8 @@ import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
+import { STABILITY_AAVE_POOLS } from "@constants";
+
 import type { TAddress, TPlatformData, TVault } from "@types";
 
 interface IProps {
@@ -84,6 +86,11 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, vaultTypes, strategyTypes]);
+
+  const isStabilityLogo = STABILITY_AAVE_POOLS.some((addr) =>
+    vault.strategySpecific.includes(addr)
+  );
+
   return (
     <div>
       <HeadingText
@@ -106,19 +113,28 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
             </span>
             <span className="px-2 rounded-r-[10px] bg-accent-900 flex h-8 items-center min-w-[160px]">
               <span className="flex min-w-[42px] justify-center">
-                {vault.strategyInfo.protocols.map((protocol, index) => (
+                {isStabilityLogo ? (
                   <img
-                    className={`h-6 w-6 ${
-                      vault.strategyInfo.protocols.length > 1 &&
-                      index &&
-                      "ml-[-4px]"
-                    }`}
-                    key={index}
-                    src={protocol.logoSrc}
-                    alt={protocol.name}
-                    title={protocol.name}
+                    className="h-6 w-6 mx-[2px]"
+                    src="/logo.svg"
+                    alt="Stability"
+                    title="Stability"
                   />
-                ))}
+                ) : (
+                  vault.strategyInfo.protocols.map((protocol, index) => (
+                    <img
+                      className={`h-6 w-6 ${
+                        vault.strategyInfo.protocols.length > 1 &&
+                        index &&
+                        "ml-[-4px]"
+                      }`}
+                      key={index}
+                      src={protocol.logoSrc}
+                      alt={protocol.name}
+                      title={protocol.name}
+                    />
+                  ))
+                )}
               </span>
               <span className="flex">
                 {vault?.strategyInfo?.baseStrategies.includes("Farming") && (

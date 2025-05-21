@@ -217,6 +217,8 @@ const BIG_INT_VALUES = {
   LARGE: BigInt(10 ** 30),
 };
 
+const STABILITY_AAVE_POOLS = ["0x1f67..4ad8", "0xaa1c..1665", "0x4895..b094"];
+
 export {
   APRsType,
   TABLE,
@@ -257,4 +259,5 @@ export {
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
   STABILITY_TOKENS,
+  STABILITY_AAVE_POOLS,
 };
