@@ -1,13 +1,27 @@
 import { useState, useEffect } from "react";
 
+import { useStore } from "@nanostores/react";
+
 import { FullPageLoader } from "@ui";
 
+import { MetaVaultsLinks } from "./components/MetaVaultsLinks";
+
+import { metaVaults } from "@store";
+
 const Metavaults = (): JSX.Element => {
-  const initMetavaults = async () => {};
+  const $metaVaults = useStore(metaVaults);
+
+  const [localMetaVaults, setLocalMetaVaults] = useState([]);
+
+  const initMetavaults = async () => {
+    setLocalMetaVaults($metaVaults);
+  };
 
   useEffect(() => {
-    initMetavaults();
-  }, []);
+    if ($metaVaults.length) {
+      initMetavaults();
+    }
+  }, [$metaVaults]);
 
   return (
     <div className="mx-auto flex flex-col gap-10">
@@ -21,132 +35,14 @@ const Metavaults = (): JSX.Element => {
         </h3>
       </div>
       <div className="pb-5">
-        {false ? (
+        {!localMetaVaults.length ? (
           <div className="relative h-[80px]">
             <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
               <FullPageLoader />
             </div>
           </div>
         ) : (
-          <div className="flex items-center flex-wrap gap-[25px]">
-            <a
-              href="/metavaults/metavault/0x123"
-              className="rounded-lg bg-[#101012] border border-[#23252A] max-w-[352px]"
-            >
-              <div className="p-6 flex flex-col gap-10">
-                <img
-                  className="w-16 h-16 rounded-full"
-                  src="/profit.png"
-                  alt="logo"
-                />
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[24px] font-semibold">
-                      USD Metavault
-                    </span>
-                    <p className="text-[#97979A] text-[16px]">
-                      Create and deploy new yield farms using stablecoins and
-                      DeFi primitives for consistent returns
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Total deposited</span>
-                      <span className="font-semibold">1,250,000 USD</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Active strategies</span>
-                      <span className="font-semibold">5</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">
-                        Protocols integrated
-                      </span>
-                      <span className="font-semibold">4</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <a
-              href="#"
-              className="rounded-lg bg-[#101012] border border-[#23252A] max-w-[352px]"
-            >
-              <div className="p-6 flex flex-col gap-10">
-                <img
-                  className="w-16 h-16 rounded-full"
-                  src="/profit.png"
-                  alt="logo"
-                />
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[24px] font-semibold">
-                      USD Metavault
-                    </span>
-                    <p className="text-[#97979A] text-[16px]">
-                      Create and deploy new yield farms using stablecoins and
-                      DeFi primitives for consistent returns
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Total deposited</span>
-                      <span className="font-semibold">1,250,000 USD</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Active strategies</span>
-                      <span className="font-semibold">5</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">
-                        Protocols integrated
-                      </span>
-                      <span className="font-semibold">4</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <a
-              href="#"
-              className="rounded-lg bg-[#101012] border border-[#23252A] max-w-[352px]"
-            >
-              <div className="p-6 flex flex-col gap-10">
-                <img
-                  className="w-16 h-16 rounded-full"
-                  src="/profit.png"
-                  alt="logo"
-                />
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[24px] font-semibold">
-                      USD Metavault
-                    </span>
-                    <p className="text-[#97979A] text-[16px]">
-                      Create and deploy new yield farms using stablecoins and
-                      DeFi primitives for consistent returns
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Total deposited</span>
-                      <span className="font-semibold">1,250,000 USD</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">Active strategies</span>
-                      <span className="font-semibold">5</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[16px]">
-                      <span className="text-[#97979A]">
-                        Protocols integrated
-                      </span>
-                      <span className="font-semibold">4</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
+          <MetaVaultsLinks metaVaults={localMetaVaults} />
         )}
       </div>
     </div>

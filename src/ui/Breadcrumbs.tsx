@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { vaults } from "@store";
+import { metaVaults, vaults } from "@store";
 
 import { PATHS } from "@constants";
 
@@ -13,6 +13,7 @@ const Breadcrumbs = (): JSX.Element => {
   const currentPath = pathname.slice(1);
 
   const $vaults = useStore(vaults);
+  const $metaVaults = useStore(metaVaults);
 
   const [paths, setPaths] = useState<{ name: string; path: string }[]>([]);
 
@@ -73,10 +74,26 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (["assets", "swapper", "factory"].includes(main)) {
       add("Platform", "platform");
       add(main.charAt(0).toUpperCase() + main.slice(1));
+    } else if (
+      main === "metavaults" &&
+      rest[0] === "metavault" &&
+      rest.length === 2 &&
+      $metaVaults
+    ) {
+      // rest length == 2 bcs no chain id
+      // todo change to 3 (with chain id)
+      const [, , metaVaultAddress] = currentPath.split("/");
+
+      const symbol =
+        $metaVaults.find(({ address }) => address === metaVaultAddress)?.name ||
+        "Meta Vault";
+
+      add("Meta Vaults", "metavaults");
+      add(symbol);
     }
 
     setPaths(crumbs);
-  }, [currentPath, $vaults]);
+  }, [currentPath, $vaults, $metaVaults]);
 
   return (
     <div className="font-manrope text-[14px] flex gap-1">

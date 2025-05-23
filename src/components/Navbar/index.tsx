@@ -28,7 +28,6 @@ const Navbar = (): JSX.Element => {
       "xstbl",
       "dashboard",
       "leveraged-farming",
-      "metavaults",
       "alm",
       "agents",
     ];
@@ -38,7 +37,7 @@ const Navbar = (): JSX.Element => {
       platformPaths.some((path) => currentPath.includes(path));
 
     const isVaults =
-      currentPath !== "metavaults" && currentPath.includes("vault");
+      !currentPath.includes("metavaults") && currentPath.includes("vault");
 
     const isBasicPage = basicPaths.includes(currentPath);
 
@@ -48,6 +47,8 @@ const Navbar = (): JSX.Element => {
       setActivePath("platform");
     } else if (currentPath === "users" || currentPath.includes("contests")) {
       setActivePath("users");
+    } else if (currentPath.includes("metavaults")) {
+      setActivePath("metavaults");
     } else if (isBasicPage) {
       setActivePath(currentPath);
     }

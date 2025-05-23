@@ -1,5 +1,4 @@
 import { RewardsCarousel } from "../../RewardsCarousel";
-import { StrategyBadge } from "./StrategyBadge";
 
 import { formatNumber } from "@utils";
 
@@ -23,7 +22,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   return (
     <a
-      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-[258px] overflow-hidden"
+      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-[352px] overflow-hidden"
       data-testid="vault"
       href={`/vaults/vault/${vault.network}/${vault.address}`}
     >
@@ -55,28 +54,21 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="text-[#97979A] text-[14px]">Strategy</span>
-            <StrategyBadge
-              info={vault.strategyInfo}
-              specific={vault.strategySpecific}
-            />
-          </div>
-          <div className="flex items-center justify-between">
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
               onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                setModalState({
-                  earningData: vault.earningData,
-                  daily: vault.daily,
-                  lastHardWork: vault.lastHardWork,
-                  symbol: vault?.risk?.symbol as string,
-                  state: true,
-                  pool: vault?.pool,
-                });
+                // e.stopPropagation();
+                // e.preventDefault();
+                // setModalState({
+                //   earningData: vault.earningData,
+                //   daily: vault.daily,
+                //   lastHardWork: vault.lastHardWork,
+                //   symbol: vault?.risk?.symbol as string,
+                //   state: true,
+                //   pool: vault?.pool,
+                // });
               }}
-              className="cursor-help"
+              // className="cursor-help"
             >
               <div
                 className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
@@ -98,7 +90,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </span>
           </div>
           <div className="flex items-center justify-between text-[14px]">
-            <span className="text-[#97979A]">Balance</span>
+            <span className="text-[#97979A]">Deposit</span>
             <p className="font-bold">
               ${formatNumber(vault.balanceInUSD, "format")}
             </p>

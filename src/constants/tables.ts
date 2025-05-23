@@ -360,6 +360,34 @@ const BC_POOL_TABLE: TTableColumn[] = [
   },
 ];
 
+const METAVAULT_TABLE: TTableColumn[] = [
+  {
+    name: "Name",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "APR",
+    keyName: "earningData",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "TVL",
+    keyName: "tvl",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Deposit",
+    keyName: "balanceInUSD",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -380,4 +408,5 @@ export {
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
+  METAVAULT_TABLE,
 };

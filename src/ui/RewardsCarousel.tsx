@@ -12,7 +12,7 @@ interface IProps {
   points: { sonic: number | undefined; rings: number | undefined };
 }
 
-const Rewards: React.FC<IProps> = ({ address, symbol, points }) => {
+const RewardsCarousel: React.FC<IProps> = ({ address, symbol, points }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -82,4 +82,4 @@ const Rewards: React.FC<IProps> = ({ address, symbol, points }) => {
   );
 };
 
-export { Rewards };
+export { RewardsCarousel };

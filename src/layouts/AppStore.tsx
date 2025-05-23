@@ -38,6 +38,7 @@ import {
   assetsPrices,
   assetsBalances,
   vaultData,
+  metaVaults,
 } from "@store";
 
 import { platforms, frontendContracts, web3clients } from "@web3";
@@ -79,6 +80,86 @@ import type {
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+
+///
+function enrichAndResolveMetaVaults(vaults, metaVaults) {
+  function collectAll(vaultAddress, visited = new Set()) {
+    const strategies = [];
+    const protocols = [];
+    const endVaults = [];
+
+    const vaultKey = vaultAddress.toLowerCase();
+    if (visited.has(vaultKey)) return { strategies, protocols, endVaults };
+    visited.add(vaultKey);
+
+    const vaultData = vaults?.[vaultKey];
+
+    if (vaultData?.strategyInfo) {
+      const { shortId, protocols: vaultProtocols } = vaultData.strategyInfo;
+
+      if (shortId) strategies.push(shortId);
+
+      vaultProtocols?.forEach(({ name }) => {
+        if (name) protocols.push(name);
+      });
+
+      endVaults.push(vaultKey);
+    } else {
+      const meta = metaVaults.find((m) => m.address.toLowerCase() === vaultKey);
+      if (meta) {
+        for (const subVault of meta.vaults) {
+          const result = collectAll(subVault, visited);
+
+          result.strategies.forEach((s) => {
+            if (!strategies.includes(s)) strategies.push(s);
+          });
+
+          result.protocols.forEach((p) => {
+            if (!protocols.includes(p)) protocols.push(p);
+          });
+
+          result.endVaults.forEach((ev) => {
+            if (!endVaults.includes(ev)) endVaults.push(ev);
+          });
+        }
+      }
+    }
+
+    return { strategies, protocols, endVaults };
+  }
+
+  return metaVaults.map((meta) => {
+    const visited = new Set();
+
+    const allStrategies = [];
+    const allProtocols = [];
+    const allEndVaults = [];
+
+    for (const vault of meta.vaults) {
+      const { strategies, protocols, endVaults } = collectAll(vault, visited);
+
+      strategies.forEach((s) => {
+        if (!allStrategies.includes(s)) allStrategies.push(s);
+      });
+
+      protocols.forEach((p) => {
+        if (!allProtocols.includes(p)) allProtocols.push(p);
+      });
+
+      endVaults.forEach((ev) => {
+        if (!allEndVaults.includes(ev)) allEndVaults.push(ev);
+      });
+    }
+
+    return {
+      ...meta,
+      strategies: allStrategies,
+      protocols: allProtocols,
+      endVaults: allEndVaults,
+    };
+  });
+}
+///
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -889,6 +970,24 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
       })
     );
+    ///
+    const _metaVaults = Object.values(stabilityAPIData.metaVaults).map(
+      (metaVault) => ({
+        ...metaVault,
+        deposited: formatUnits(
+          metaVault.deposited.reduce((acc, cur) => (acc += Number(cur)), 0),
+          6
+        ),
+      })
+    );
+
+    const enrichedMetaVaults = enrichAndResolveMetaVaults(
+      localVaults[146],
+      _metaVaults
+    );
+
+    metaVaults.set(enrichedMetaVaults);
+    ///
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
     vaultData.set(vaultsData);

@@ -1,7 +1,5 @@
 import { chains, integrations } from "@stabilitydao/stability";
 
-import { DashboardIcon } from "@ui";
-
 import {
   TABLE_FILTERS,
   TABLE,
@@ -16,6 +14,7 @@ import {
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
+  METAVAULT_TABLE,
 } from "./tables";
 
 import {
@@ -225,7 +224,7 @@ const PATHS = [
   { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
-  { name: "Metavaults", path: "metavaults" },
+  { name: "Meta Vaults", path: "metavaults" },
   { name: "ALM", path: "alm" },
   { name: "Users", path: "users" },
   { name: "xSTBL", path: "xstbl" },
@@ -275,4 +274,5 @@ export {
   SILO_POINTS,
   STABILITY_TOKENS,
   PATHS,
+  METAVAULT_TABLE,
 };

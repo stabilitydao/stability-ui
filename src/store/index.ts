@@ -50,6 +50,7 @@ const currentChainID = atom("146");
 // deepMaps
 
 const vaults = deepMap<any>(false);
+const metaVaults = deepMap<any>(false);
 
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
@@ -92,4 +93,5 @@ export {
   persister,
   aprFilter,
   currentChainID,
+  metaVaults,
 };
