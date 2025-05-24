@@ -8,7 +8,7 @@ import { useStore } from "@nanostores/react";
 
 import { ActionButton, VestingTimeline, Timer } from "../../ui";
 
-import { getTransactionReceipt } from "../../functions";
+import { getTransactionReceipt } from "@utils";
 
 import { sonicClient, ERC20ABI, wagmiConfig, IXSTBLABI } from "@web3";
 

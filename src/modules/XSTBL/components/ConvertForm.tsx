@@ -8,7 +8,7 @@ import { writeContract } from "@wagmi/core";
 
 import { ActionButton } from "../ui";
 
-import { getTransactionReceipt } from "../functions";
+import { getTransactionReceipt } from "@utils";
 
 import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
 

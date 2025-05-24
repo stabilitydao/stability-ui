@@ -35,6 +35,8 @@ import { MetaVaultsTable } from "./Tables/MetaVaults";
 
 import { DisplayType } from "./DisplayType";
 
+import { ActionButton } from "./ActionButton";
+
 export {
   Toast,
   TextModal,
@@ -70,4 +72,5 @@ export {
   VaultsTable,
   DisplayType,
   MetaVaultsTable,
+  ActionButton,
 };

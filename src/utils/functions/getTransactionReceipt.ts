@@ -4,9 +4,7 @@ import { wagmiConfig } from "@web3";
 
 import type { TAddress } from "@types";
 
-export const getTransactionReceipt = async (
-  hash: TAddress
-): Promise<unknown> => {
+const getTransactionReceipt = async (hash: TAddress): Promise<unknown> => {
   const interval = 2000;
   const maxConfirmations = 30;
 
@@ -35,3 +33,4 @@ export const getTransactionReceipt = async (
     "Transaction was not confirmed after the maximum number of attempts"
   );
 };
+export { getTransactionReceipt };

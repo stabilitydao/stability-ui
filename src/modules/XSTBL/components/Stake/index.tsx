@@ -12,7 +12,7 @@ import { formatNumber } from "@utils";
 
 import { ActionButton } from "../../ui";
 
-import { getTransactionReceipt } from "../../functions";
+import { getTransactionReceipt } from "@utils";
 
 import { connected, account, lastTx, assetsPrices } from "@store";
 

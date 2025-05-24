@@ -27,6 +27,7 @@ import { extractPointsMultiplier } from "./functions/extractPointsMultiplier";
 import { playAudio } from "./functions/playAudio";
 import { cn } from "./functions/cn";
 import { capitalize } from "./functions/capilatize";
+import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -61,4 +62,5 @@ export {
   cn,
   capitalize,
   useClickOutside,
+  getTransactionReceipt,
 };

@@ -8,7 +8,7 @@ import { useStore } from "@nanostores/react";
 
 import { ActionButton } from "../../ui";
 
-import { getTransactionReceipt } from "../../functions";
+import { getTransactionReceipt } from "@utils";
 
 import { connected, account, lastTx } from "@store";
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
 
 import { DisplayType, FullPageLoader, Pagination, MetaVaultsTable } from "@ui";
@@ -12,7 +13,7 @@ import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
 import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
 
-import { TransactionTypes, DisplayTypes } from "@types";
+import { DisplayTypes } from "@types";
 
 import type { TAddress, TTableColumn, TVault, TEarningData } from "@types";
 
@@ -31,9 +32,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [currentTab, setCurrentTab] = useState(1);
-  const [actionType, setActionType] = useState<TransactionTypes>(
-    TransactionTypes.Deposit
-  );
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -51,16 +49,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
   // const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
-
-  const [value, setValue] = useState("0.00");
-  const balance = "0.00";
-
-  const handleChange = (e) => {
-    const newValue = e.target.value;
-    if (/^\d*\.?\d{0,2}$/.test(newValue)) {
-      setValue(newValue);
-    }
-  };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
     if (!$vaults) return;
@@ -174,18 +162,20 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
               Historical APY
             </span>
-            <span className="font-semibold text-[18px] leading-6">
-              -- 4.35%
-            </span>
+            {!!localMetaVault && (
+              <span className="font-semibold text-[18px] leading-6">
+                {formatNumber(localMetaVault.APR, "formatAPR")}%
+              </span>
+            )}
           </div>
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
               Daily returns
             </span>
             <span className="font-semibold text-[18px] leading-6">
-              -- 1.41 USD
+               1.41 USD
             </span>
-          </div>
+          </div> */}
           <div className="flex flex-col gap-2">
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
               Protocols
@@ -336,93 +326,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           </div>
         </div>
       </div>
-      <div className="bg-[#101012] border border-[#23252A] rounded-lg w-[352px] h-[410px]">
-        <div className="p-6">
-          <div className="flex items-center gap-2 text-[14px] mb-6">
-            <span
-              className={cn(
-                "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
-                actionType === "deposit" &&
-                  "bg-[#22242A] text-white cursor-default"
-              )}
-              onClick={() => setActionType(TransactionTypes.Deposit)}
-            >
-              Deposit
-            </span>
-
-            <span
-              className={cn(
-                "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
-                actionType === "withdraw" &&
-                  "bg-[#22242A] text-white cursor-default"
-              )}
-              onClick={() => setActionType(TransactionTypes.Withdraw)}
-            >
-              Withdraw
-            </span>
-          </div>
-          <div className="flex justify-between gap-6">
-            <div className="flex flex-col gap-1">
-              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                My position
-              </span>
-              <span className="text-[24px] leading-8 font-semibold">0 USD</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                My wallet balance
-              </span>
-              <span className="text-[24px] leading-8 font-semibold">0 USD</span>
-            </div>
-          </div>
-          <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] my-3">
-            <div className="flex items-center justify-between">
-              <input
-                type="text"
-                value={value}
-                onChange={handleChange}
-                className="bg-transparent text-2xl font-semibold outline-none w-full"
-              />
-              <div className="bg-[#151618] border border-[#23252A] rounded-lg cursor-pointer px-3 py-1 text-[14px]">
-                USD
-              </div>
-            </div>
-            <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
-              Balance: {balance}
-            </div>
-          </label>
-          <div className="flex flex-col gap-2 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-[#97979A] text-[16px] leading-6">
-                  Max Slippage
-                </span>
-                <img src="/icons/questionmark.svg" alt="Question mark" />
-              </div>
-              <span className="text-[16px] leading-6 font-semibold">0.50%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-[#97979A] text-[16px] leading-6">
-                  Completion time
-                </span>
-                <img src="/icons/questionmark.svg" alt="Question mark" />
-              </div>
-              <span className="text-[16px] leading-6 font-semibold">
-                ~ 48 hours
-              </span>
-            </div>
-          </div>
-          <button
-            className={cn(
-              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
-            )}
-            type="button"
-          >
-            <p className="px-6 py-4">Deposit</p>
-          </button>
-        </div>
-      </div>
+      <Form metaVault={localMetaVault} />
     </div>
   );
 };

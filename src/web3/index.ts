@@ -26,6 +26,7 @@ import SaleABI from "./abi/SaleABI.ts";
 import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
 import IXStakingABI from "./abi/IXStakingABI.ts";
 import IXSTBLABI from "./abi/IXSTBLABI.ts";
+import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -163,4 +164,5 @@ export {
   web3clients,
   SaleABI,
   SALE_CONTRACT,
+  IMetaVaultABI,
 };

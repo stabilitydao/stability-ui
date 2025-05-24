@@ -221,15 +221,15 @@ const BIG_INT_VALUES = {
 };
 
 const PATHS = [
-  { name: "Dashboard", path: "dashboard" },
+  // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
   { name: "ALM", path: "alm" },
   { name: "Users", path: "users" },
   { name: "xSTBL", path: "xstbl" },
-  { name: "Agents", path: "agents" },
-  { name: "Platform", path: "platform" },
+  // { name: "Agents", path: "agents" },
+  // { name: "Platform", path: "platform" },
 ];
 
 export {
