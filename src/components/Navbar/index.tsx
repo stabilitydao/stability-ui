@@ -18,6 +18,8 @@ const Navbar = (): JSX.Element => {
 
   const [activePath, setActivePath] = useState("");
 
+  const [prices, setPrices] = useState([]);
+
   useEffect(() => {
     const platformPaths = [
       "platform",
@@ -60,6 +62,15 @@ const Navbar = (): JSX.Element => {
     }
   }, []);
 
+  useEffect(() => {
+    if ($apiData) {
+      const _prices = Object.entries($apiData.prices).sort(
+        (a, b) => Number(b[1].price) - Number(a[1].price)
+      );
+      setPrices(_prices);
+    }
+  }, [$apiData]);
+
   return (
     <nav className="navbar">
       <div className="pt-5 pb-[30px] px-4 flex flex-col justify-between h-full">
@@ -101,41 +112,39 @@ const Navbar = (): JSX.Element => {
         </div>
         <div className="flex flex-col gap-[25px]">
           <div className="flex flex-col gap-1 w-full text-white">
-            {Object.entries($apiData.prices)
-              .sort((a, b) => Number(b[1].price) - Number(a[1].price))
-              .map(([symbol, data]) => (
-                <div
-                  key={symbol}
-                  title={symbol}
-                  className="flex items-center justify-between border border-[#23252A] rounded-lg px-4 py-2"
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={`/features/${symbol.toLowerCase()}.png`}
-                      alt={symbol}
-                      className="w-6 h-6"
-                    />
-                    <span className="text-[14px] font-semibold">{symbol}</span>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[12px] font-semibold">
-                      {formatNumber(
-                        data.price,
-                        Number(data.price) < 1
-                          ? "formatWithLongDecimalPart"
-                          : "format"
-                      )}
-                      $
-                    </span>
-                    <span
-                      className={`text-[10px] font-medium ${data.priceChange >= 0 ? "text-[#48C05C]" : "text-[#DE4343]"}`}
-                    >
-                      {data.priceChange > 0 ? "+" : ""}
-                      {data.priceChange}%
-                    </span>
-                  </div>
+            {prices.map(([symbol, data]) => (
+              <div
+                key={symbol}
+                title={symbol}
+                className="flex items-center justify-between border border-[#23252A] rounded-lg px-4 py-2"
+              >
+                <div className="flex items-center gap-3">
+                  <img
+                    src={`/features/${symbol.toLowerCase()}.png`}
+                    alt={symbol}
+                    className="w-6 h-6"
+                  />
+                  <span className="text-[14px] font-semibold">{symbol}</span>
                 </div>
-              ))}
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-[12px] font-semibold">
+                    {formatNumber(
+                      data.price,
+                      Number(data.price) < 1
+                        ? "formatWithLongDecimalPart"
+                        : "format"
+                    )}
+                    $
+                  </span>
+                  <span
+                    className={`text-[10px] font-medium ${data.priceChange >= 0 ? "text-[#48C05C]" : "text-[#DE4343]"}`}
+                  >
+                    {data.priceChange > 0 ? "+" : ""}
+                    {data.priceChange}%
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
           <div className="text-[#97979A] flex flex-col">
             <a href="#" className="px-4 py-2">
