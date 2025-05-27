@@ -98,7 +98,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       );
 
       if (metaVault) {
-        let protocols = metaVault.protocols.map((name) =>
+        let protocols = ["Stability", "Aave", ...metaVault.protocols];
+
+        protocols = protocols.map((name) =>
           Object.values(PROTOCOLS).find((protocol) => protocol.name === name)
         );
 
