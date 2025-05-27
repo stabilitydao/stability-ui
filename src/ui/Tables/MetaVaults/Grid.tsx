@@ -77,7 +77,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                     : "text-[#eaecef]"
                 }`}
               >
-                <p className="text-[14px] font-bold">
+                <p className="text-[14px] font-bold text-[#48c05c]">
                   {formatNumber(APRs.APR, "formatAPR")}%
                 </p>
               </div>

@@ -3,6 +3,7 @@ import type React from "react";
 import { useEffect } from "react";
 
 import { formatUnits } from "viem";
+
 import axios from "axios";
 
 import { useStore } from "@nanostores/react";
@@ -39,6 +40,7 @@ import {
   assetsBalances,
   vaultData,
   metaVaults,
+  marketPrices,
 } from "@store";
 
 import { platforms, frontendContracts, web3clients } from "@web3";
@@ -986,12 +988,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       _metaVaults
     );
 
-    metaVaults.set(enrichedMetaVaults);
     ///
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
+    marketPrices.set(stabilityAPIData.prices);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
+    metaVaults.set(enrichedMetaVaults);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);

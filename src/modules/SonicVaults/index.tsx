@@ -598,7 +598,12 @@ const SonicVaults = (): JSX.Element => {
             setTableParams={setActiveTableParams}
             resetTable={resetTable}
           />
-          <DisplayType type={displayType} setType={setDisplayType} />
+          <DisplayType
+            type={displayType}
+            setType={setDisplayType}
+            pagination={pagination}
+            setPagination={setPagination}
+          />
         </div>
       </div>
 

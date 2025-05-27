@@ -79,7 +79,9 @@ const Pagination: React.FC<IProps> = memo(
                   !isItemsDropDown && "hidden"
                 )}
               >
-                {PAGINATIONS_VARIANTS.map((number) => (
+                {PAGINATIONS_VARIANTS[
+                  display as keyof typeof PAGINATIONS_VARIANTS
+                ].map((number) => (
                   <div
                     className={`p-[6px] rounded-lg flex items-center justify-between ${
                       pagination === number

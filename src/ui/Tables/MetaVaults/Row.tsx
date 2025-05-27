@@ -118,11 +118,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         }}
         className="px-4 w-[20%]" //tooltip cursor-help
       >
-        <div
-          className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
-            vault?.risk?.isRektStrategy ? "text-[#818181]" : "text-[#eaecef]"
-          }`}
-        >
+        <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
           <div className="flex flex-col justify-end">
             <p className="text-[16px]">
               {formatNumber(APRs.APR, "formatAPR")}%

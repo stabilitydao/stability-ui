@@ -156,7 +156,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </span>
             {!!localMetaVault && (
               <span className="font-semibold text-[18px] leading-6">
-                ${formatNumber(localMetaVault.deposited, "withSpaces")}
+                ${formatNumber(localMetaVault.deposited, "format")}
               </span>
             )}
           </div>
@@ -276,7 +276,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                     </div>
                   </div> 
             </div> */}
-            <DisplayType type={displayType} setType={setDisplayType} />
+            <DisplayType
+              type={displayType}
+              setType={setDisplayType}
+              pagination={pagination}
+              setPagination={setPagination}
+            />
           </div>
           <div>
             <div

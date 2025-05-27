@@ -35,7 +35,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                 <div className="flex items-center justify-between text-[16px]">
                   <span className="text-[#97979A]">Total deposited</span>
                   <span className="font-semibold">
-                    {formatNumber(metaVault.deposited, "withSpaces")} USD
+                    {formatNumber(metaVault.deposited, "format")} USD
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[16px]">

@@ -609,6 +609,7 @@ type TAPIData = {
       };
     };
   };
+  prices: TMarketPrices;
   error?: string;
 };
 
@@ -667,6 +668,13 @@ type TVestPeriod = {
   end: number;
   isFullyExited: boolean;
 };
+
+type TMarketPrice = {
+  price: string;
+  priceChange: number;
+};
+
+type TMarketPrices = Record<string, TMarketPrice>;
 
 // enums
 export enum DisplayTypes {
@@ -759,4 +767,6 @@ export type {
   TTableActiveParams,
   TStakeDashboardData,
   TVestPeriod,
+  TMarketPrice,
+  TMarketPrices,
 };

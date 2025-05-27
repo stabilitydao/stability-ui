@@ -49,7 +49,10 @@ const STABLECOINS = [
   ...scUSD,
 ];
 
-const PAGINATIONS_VARIANTS = [5, 10, 15, 20, 30];
+const PAGINATIONS_VARIANTS = {
+  rows: [5, 10, 15, 20, 30],
+  grid: [4, 8, 12, 16, 20],
+};
 
 const PAGINATION_VAULTS = 5;
 

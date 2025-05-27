@@ -17,6 +17,7 @@ import type {
   TTokens,
   TVaultDataKey,
   TAPRPeriod,
+  TMarketPrices,
 } from "@types";
 
 // atoms
@@ -31,6 +32,8 @@ const assetsPrices = atom<TMultichainPrices>({});
 const assetsBalances = atom<{ [key: string]: TBalances }>({});
 const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
+
+const marketPrices = atom<TMarketPrices>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
@@ -94,4 +97,5 @@ export {
   aprFilter,
   currentChainID,
   metaVaults,
+  marketPrices,
 };

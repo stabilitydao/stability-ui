@@ -91,4 +91,5 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     </div>
   );
 };
+
 export { ColumnSort };
