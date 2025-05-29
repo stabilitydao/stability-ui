@@ -4,10 +4,13 @@ import { getAddress } from "viem";
 
 import { HeadingText } from "@ui";
 
+import { cn } from "@utils";
+
 import { DEXes, CHAINS } from "@constants";
 
-import type { TAddress, TVault, TContractInfo } from "@types";
 import { seeds } from "@stabilitydao/stability";
+
+import type { TAddress, TVault, TContractInfo } from "@types";
 
 interface IProps {
   vault: TVault;
@@ -141,210 +144,95 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   );
 
   return (
-    <div className="rounded-md h-full">
-      <HeadingText text="Contracts" scale={2} styles="text-left md:mb-0 mb-2" />
-      <table className="w-full lg:max-w-[500px] text-[16px]">
-        <tbody>
-          {contracts.map(
-            ({ address, logo, symbol, type, isCopy }, index: number) => (
-              <tr
-                key={address + index}
-                className="border-b border-[#4f5158] h-[60px]"
-              >
-                <td>
-                  <div
-                    data-testid="contractsLogo"
-                    className="ml-3 hidden sm:block"
-                  >
-                    {logo === "proportions" ? (
-                      <img
-                        src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
-                        alt="logo"
-                        className="w-[26px] h-[26px] rounded-full"
-                      />
-                    ) : (
-                      <img
-                        className={`w-[26px] h-[26px] ${
-                          type != "Strategy" && "rounded-full"
-                        }`}
-                        src={logo}
-                        alt="logo"
-                      />
-                    )}
-                  </div>
-                </td>
-                <td>
-                  <div className="flex flex-col items-start">
-                    <span
-                      data-testid="contractsSymbol"
-                      className="text-[14px] sm:text-[18px] truncate max-w-[120px] sm:max-w-[200px] inline-block"
-                    >
-                      {symbol}
-                    </span>
-                    <span
-                      data-testid="contractsType"
-                      className="text-[#8D8E96] text-[14px] mt-[-6px]"
-                    >
-                      {type}
-                    </span>
-                  </div>
-                </td>
-                <td className="flex items-center justify-end gap-3 sm:gap-5 h-[60px]">
-                  <span
-                    data-testid="contractsAddress"
-                    className="whitespace-nowrap font-mono text-[14px] sm:text-[16px]"
-                  >
-                    {address?.slice(0, 6)}...{address?.slice(-4)}
-                  </span>
-                  <div className="flex items-center">
-                    {isCopy ? (
-                      <div className="px-1 py-1">
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5 14L8.23309 16.4248C8.66178 16.7463 9.26772 16.6728 9.60705 16.2581L18 6"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </div>
-                    ) : (
-                      <div
-                        data-testid="contractCopyBtn"
-                        onClick={() => copyHandler(address)}
-                        className="cursor-pointer px-1 py-1"
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
-                            stroke="white"
-                            strokeWidth="2"
-                          />
-                          <rect
-                            x="10"
-                            y="10"
-                            width="10"
-                            height="10"
-                            rx="2"
-                            stroke="white"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      </div>
-                    )}
-
-                    <a
-                      data-testid="contractLinkBtn"
-                      className="flex items-center px-1 py-1 whitespace-nowrap"
-                      href={`${explorer}${address}`}
-                      target="_blank"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-external-link ms-1"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                        <path d="M11 13l9 -9"></path>
-                        <path d="M15 4h5v5"></path>
-                      </svg>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            )
-          )}
-
-          {/* <tr>
-            <td>
-              <img className="ml-3 w-8 h-8" src="/logo.svg" alt="logo" />
-            </td>
-            <td>ZAP</td>
-            <td className="flex items-center justify-end gap-5 h-[60px]">
-              <span className="font-mono whitespace-nowrap">
-                {$platformZAP.slice(0, 6)}...{$platformZAP.slice(-4)}
-              </span>
-              <div className="flex items-center">
-                <div
-                  onClick={() => copyAddress($platformZAP as TAddress)}
-                  className="cursor-pointer px-1 py-1"
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M14 7V7C14 6.06812 14 5.60218 13.8478 5.23463C13.6448 4.74458 13.2554 4.35523 12.7654 4.15224C12.3978 4 11.9319 4 11 4H8C6.11438 4 5.17157 4 4.58579 4.58579C4 5.17157 4 6.11438 4 8V11C4 11.9319 4 12.3978 4.15224 12.7654C4.35523 13.2554 4.74458 13.6448 5.23463 13.8478C5.60218 14 6.06812 14 7 14V14"
-                      stroke="white"
-                      strokeWidth="2"
+    <div>
+      <HeadingText text="Contracts" scale={2} styles="text-left mb-4" />
+      <div className="w-full">
+        <div className="flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden">
+          <div className="px-4 w-[50%]"></div>
+          <div className="text-right w-[30%]">Address</div>
+          <div className="text-right w-[20%] pr-4">Actions</div>
+        </div>
+        {contracts.map(
+          ({ address, logo, symbol, type, isCopy }, index: number) => (
+            <div
+              key={address + index}
+              className={cn(
+                "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]",
+                contracts.length - 1 === index && "rounded-b-lg"
+              )}
+            >
+              <div className="px-4 w-[50%] flex items-center gap-3">
+                <div data-testid="contractsLogo">
+                  {logo === "proportions" ? (
+                    <img
+                      src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
+                      alt="logo"
+                      className="w-10 h-10 rounded-full"
                     />
-                    <rect
-                      x="10"
-                      y="10"
-                      width="10"
-                      height="10"
-                      rx="2"
-                      stroke="white"
-                      strokeWidth="2"
+                  ) : (
+                    <img
+                      className={cn(
+                        "w-10 h-10",
+                        type != "Strategy" && "rounded-full"
+                      )}
+                      src={logo}
+                      alt="logo"
                     />
-                  </svg>
+                  )}
                 </div>
 
-                <a
-                  className="flex items-center px-1 py-1 whitespace-nowrap"
-                  href={`https://polygonscan.com/address/${$platformZAP}`}
-                  target="_blank"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-external-link ms-1"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                <div className="flex flex-col items-start">
+                  <span
+                    data-testid="contractsSymbol"
+                    className="text-[16px] leading-5 font-semibold"
                   >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6"></path>
-                    <path d="M11 13l9 -9"></path>
-                    <path d="M15 4h5v5"></path>
-                  </svg>
-                </a>
+                    {symbol}
+                  </span>
+                  <span
+                    data-testid="contractsType"
+                    className="text-[#97979A] text-[14px] leading-[16px] font-medium"
+                  >
+                    {type}
+                  </span>
+                </div>
               </div>
-            </td>
-          </tr> */}
-        </tbody>
-      </table>
+
+              <div className="w-[30%] text-end">
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+              </div>
+
+              <div className="w-[20%] pr-4">
+                <div className="flex items-center justify-end gap-1">
+                  {isCopy ? (
+                    <img
+                      className="px-1 py-1"
+                      src="/icons/checkmark.svg"
+                      alt="Checkmark icon"
+                    />
+                  ) : (
+                    <img
+                      data-testid="contractCopyBtn"
+                      onClick={() => copyHandler(address)}
+                      className="px-1 py-1 cursor-pointer"
+                      src="/icons/copy.png"
+                      alt="Copy icon"
+                    />
+                  )}
+
+                  <a
+                    data-testid="contractLinkBtn"
+                    className="flex items-center px-1 py-1 whitespace-nowrap"
+                    href={`${explorer}${address}`}
+                    target="_blank"
+                  >
+                    <img src="/icons/link.png" alt="External link icon" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 });

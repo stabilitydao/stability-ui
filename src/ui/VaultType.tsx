@@ -8,7 +8,7 @@ const VaultType = ({
   const vaultTypes = [
     {
       type: "Compounding",
-      styles: "text-[#00bb99] bg-[#00110a]",
+      styles: "text-white bg-[#192c1e] border border-[#48C05C] rounded-md",
       symbol: "C",
     },
     { type: "Rewarding", styles: "text-[#6052ff] bg-[#090816]", symbol: "R" },
@@ -24,7 +24,7 @@ const VaultType = ({
   return greater ? (
     <span
       title={`${currentType?.type} vault`}
-      className={`text-[16px] flex self-center items-center justify-center font-bold h-8 px-0 rounded-md uppercase ${currentType?.styles} max-w-[165px]`}
+      className={`text-[14px] px-3 py-2 flex self-center items-center justify-center h-8 ${currentType?.styles} max-w-[120px]`}
     >
       {currentType?.type}
     </span>

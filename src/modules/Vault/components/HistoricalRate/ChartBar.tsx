@@ -90,14 +90,18 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
         data={chart.data}
         margin={{ left: 50 }}
       >
-        <CartesianGrid strokeDasharray="1 1" stroke="#434395" />
+        <CartesianGrid
+          strokeDasharray="5 5"
+          stroke="#23252a"
+          vertical={false}
+        />
         <XAxis
           dataKey="timestamp"
           tickLine={false}
           tick={({ x, y, payload }) => (
             <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
-          style={{ fill: "#958CA1" }}
+          style={{ fill: "#97979A" }}
         />
         <YAxis
           domain={[min, "auto"]}
@@ -106,7 +110,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#958CA1",
+            fill: "#97979A",
             fontSize: "12px",
           }}
         />
@@ -117,7 +121,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           {chart.data.map((_: TChartData, index: number) => (
             <Cell
               cursor="pointer"
-              fill="#612FFB"
+              fill="#5E6AD2"
               key={`cell-${index}`}
               radius={[10, 10, 0, 0] as any}
             />

@@ -7,12 +7,10 @@ interface IProps {
 
 const FieldValue: React.FC<IProps> = ({ name, value, bottomValue, testId }) => {
   return (
-    <div className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col">
-      <div className="h-[12px] flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
-        {name}
-      </div>
+    <div className="flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col gap-1">
+      <div className="flex text-[14px] leading-5 text-[#97979A]">{name}</div>
       <div
-        className="h-[40px] flex items-center text-[18px] font-semibold whitespace-nowrap"
+        className="flex items-center text-[20px] leading-6 font-semibold whitespace-nowrap"
         {...(testId && { "data-testid": testId })}
       >
         {value}

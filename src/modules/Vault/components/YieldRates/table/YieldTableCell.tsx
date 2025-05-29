@@ -1,20 +1,23 @@
 import { memo } from "react";
 
+import { cn } from "@utils";
+
 interface IProps {
   isSharePrice: boolean;
   data: string | number;
   testID?: string;
+  customClassName?: string;
 }
 
 const YieldTableCell: React.FC<IProps> = memo(
-  ({ isSharePrice, data, testID = "" }) => {
+  ({ isSharePrice, data, testID = "", customClassName }) => {
     return (
-      <td
+      <div
         {...(!!testID && { "data-testid": testID })}
-        className="text-right py-1"
+        className={cn("text-right w-[20%]", customClassName)}
       >
         {isSharePrice ? `${data}%` : "-"}
-      </td>
+      </div>
     );
   }
 );

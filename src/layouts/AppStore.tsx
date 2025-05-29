@@ -973,13 +973,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       })
     );
     ///
-    const _metaVaults = Object.values(stabilityAPIData.metaVaults).map(
+    const _metaVaults = Object.values(stabilityAPIData.metaVaults[146]).map(
       (metaVault) => ({
         ...metaVault,
-        deposited: formatUnits(
-          metaVault.deposited.reduce((acc, cur) => (acc += Number(cur)), 0),
-          6
-        ),
+        deposited: formatUnits(Number(metaVault.deposited), 6),
       })
     );
 

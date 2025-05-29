@@ -7,7 +7,7 @@ import { ChartBar } from "./ChartBar";
 
 import { ChartSkeleton, HeadingText } from "@ui";
 
-import { formatFromBigInt, getTimeDifference } from "@utils";
+import { formatFromBigInt, getTimeDifference, cn } from "@utils";
 
 import { GRAPH_ENDPOINTS } from "src/constants/env";
 
@@ -531,35 +531,51 @@ const HistoricalRate: React.FC<IProps> = memo(
     }, []);
 
     return (
-      <div className="rounded-md mt-5">
-        <div className="rounded-t-md flex flex-col md:flex-row justify-between items-center h-[60px] md:px-4">
+      <div className=" mt-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <HeadingText text="Historical Rate" scale={2} />
           {activeChart && (
-            <div className="flex items-center font-semibold relative text-[14px]">
+            <div className="flex items-center font-semibold relative text-[14px] leading-5 gap-2">
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px] border-transparent ${activeChart.name === "APR" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+                className={cn(
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  activeChart.name === "APR"
+                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                    : "text-[#97979A] border !border-[#23252A]"
+                )}
                 onClick={() => chartHandler("APR")}
               >
                 {APRType}
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "vsHodl" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+                className={cn(
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  activeChart.name === "vsHodl"
+                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                    : "text-[#97979A] border !border-[#23252A]"
+                )}
                 onClick={() => chartHandler("vsHodl")}
               >
                 VS HODL APR
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${activeChart.name === "TVL" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+                className={cn(
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  activeChart.name === "TVL"
+                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                    : "text-[#97979A] border !border-[#23252A]"
+                )}
                 onClick={() => chartHandler("TVL")}
               >
                 TVL
               </p>
               <p
-                className={`whitespace-nowrap cursor-pointer z-20 text-center p-4 border-b-[1.5px]  border-transparent ${
+                className={cn(
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
                   activeChart.name === "sharePrice"
-                    ? "text-neutral-50 !border-accent-500"
-                    : "text-neutral-500 hover:border-accent-800"
-                }`}
+                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                    : "text-[#97979A] border !border-[#23252A]"
+                )}
                 onClick={() => chartHandler("sharePrice")}
               >
                 Price
@@ -569,7 +585,12 @@ const HistoricalRate: React.FC<IProps> = memo(
         </div>
         {isData ? (
           <>
-            <div className="pb-3 pt-10 md:py-3 md:px-4">
+            <div
+              className={cn(
+                "bg-[#101012] border border-[#23252A] rounded-lg pr-6 py-6",
+                ["TVL", "sharePrice"].includes(activeChart?.name) && "pl-6"
+              )}
+            >
               {activeChart ? (
                 <>
                   {activeChart.name === "APR" ? (
@@ -586,52 +607,44 @@ const HistoricalRate: React.FC<IProps> = memo(
             </div>
 
             {activeChart && (
-              <div className="flex items-center justify-end  select-none font-manrope text-[14px] font-semibold">
-                <div className="flex items-center justify-center bg-accent-900 h-10 rounded-2xl w-full max-w-[200px]">
-                  {/* <p
-      onClick={() => timelineHandler(timelineSegments.DAY as TSegment)}
-      className="opacity-50 hover:opacity-100 cursor-pointer"
-    >
-      1D
-    </p> */}
-                  <div className="flex items-center justify-center px-1">
-                    <p
-                      onClick={() =>
-                        timelineHandler(timelineSegments.WEEK as TSegment)
-                      }
-                      className={`py-1 px-4 cursor-pointer rounded-xl ${
-                        timeline === "WEEK"
-                          ? "bg-accent-500 text-neutral-50 h-8"
-                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
-                      }`}
-                    >
-                      Week
-                    </p>
-                    <p
-                      onClick={() =>
-                        timelineHandler(timelineSegments.MONTH as TSegment)
-                      }
-                      className={`py-1 px-4 cursor-pointer  rounded-xl ${
-                        timeline === "MONTH"
-                          ? "bg-accent-500 text-neutral-50 h-8"
-                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
-                      }`}
-                    >
-                      Month
-                    </p>
-                    <p
-                      onClick={() =>
-                        timelineHandler(timelineSegments.YEAR as TSegment)
-                      }
-                      className={`py-1 px-4 cursor-pointer rounded-xl ${
-                        timeline === "YEAR"
-                          ? "bg-accent-500 text-neutral-50 h-8 hover:bg-accent-500 hover:text-neutral-50"
-                          : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
-                      }`}
-                    >
-                      All
-                    </p>
-                  </div>
+              <div className="flex items-center justify-end mt-4 ">
+                <div className="flex items-center p-2 bg-transparent border border-[#23252A] h-[48px] rounded-lg select-none text-[16px] font-semibold">
+                  <p
+                    onClick={() =>
+                      timelineHandler(timelineSegments.WEEK as TSegment)
+                    }
+                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
+                      timeline === "WEEK"
+                        ? "bg-[#22242A] border border-[#2C2E33]"
+                        : "text-[#97979A]" //hover
+                    }`}
+                  >
+                    Week
+                  </p>
+                  <p
+                    onClick={() =>
+                      timelineHandler(timelineSegments.MONTH as TSegment)
+                    }
+                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
+                      timeline === "MONTH"
+                        ? "bg-[#22242A] border border-[#2C2E33]"
+                        : "text-[#97979A]" //hover
+                    }`}
+                  >
+                    Month
+                  </p>
+                  <p
+                    onClick={() =>
+                      timelineHandler(timelineSegments.YEAR as TSegment)
+                    }
+                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
+                      timeline === "YEAR"
+                        ? "bg-[#22242A] border border-[#2C2E33]"
+                        : "text-[#97979A]" //hover
+                    }`}
+                  >
+                    All
+                  </p>
                 </div>
               </div>
             )}

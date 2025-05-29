@@ -1,5 +1,5 @@
 import { RewardsCarousel } from "../../RewardsCarousel";
-import { StrategyBadge } from "./StrategyBadge";
+import { StrategyBadge } from "../../StrategyBadge";
 
 import { formatNumber } from "@utils";
 

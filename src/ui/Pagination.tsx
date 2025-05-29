@@ -51,6 +51,10 @@ const Pagination: React.FC<IProps> = memo(
       window.history.pushState({}, "", newUrl.toString());
     }, [tab]);
 
+    useEffect(() => {
+      setTab(1);
+    }, [display]);
+
     useClickOutside(itemsDropDownRef, () => setIsItemsDropDown(false));
     useClickOutside(pagesDropDownRef, () => setIsPagesDropDown(false));
 
@@ -161,7 +165,7 @@ const Pagination: React.FC<IProps> = memo(
               </span>
               <div
                 className={cn(
-                  "absolute bottom-full mb-2 w-full rounded-lg bg-[#1C1D1F] border border-[#383B42] p-[6px] z-10",
+                  "absolute bottom-full mb-2 w-full rounded-lg bg-[#1C1D1F] border border-[#383B42] p-[6px] z-10 max-h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#383B42] scrollbar-track-transparent",
                   !isPagesDropDown && "hidden"
                 )}
               >

@@ -1,6 +1,6 @@
 import { isMobile } from "react-device-detect";
 
-import { StrategyBadge } from "./StrategyBadge";
+import { StrategyBadge } from "../../StrategyBadge";
 
 import { TimeDifferenceIndicator } from "@ui";
 

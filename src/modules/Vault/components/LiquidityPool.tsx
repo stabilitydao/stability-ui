@@ -79,26 +79,25 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, $assetsPrices]);
   return (
     <>
-      <HeadingText
-        text="Liquidity Pool"
-        scale={2}
-        styles="text-left md:ml-4 md:mb-0 mb-2"
-      />
-      <div className="flex flex-col gap-6 md:ml-4">
-        <div className="flex items-center gap-3">
+      <HeadingText text="Liquidity Pool" scale={2} styles="text-left mb-4" />
+      <div className="flex flex-col items-start gap-6 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+        <div className="flex items-center gap-4">
           <img
             data-testid="poolLogo"
             src={protocol.logoSrc}
             alt={protocol.name}
-            className="rounded-full w-7 h-7"
+            className="rounded-full w-10 h-10"
           />
-          <div className="flex flex-col">
-            <span data-testid="poolName" className="text-[18px] font-semibold">
+          <div className="flex flex-col gap-1">
+            <span
+              data-testid="poolName"
+              className="text-[16px] leading-5 font-semibold"
+            >
               {protocol.name}
             </span>
             <span
               data-testid="poolSymbol"
-              className="text-[12px] leading-3 text-neutral-500"
+              className="text-[14px] leading-3  text-[#97979A]"
             >
               {poolSymbol}
             </span>
@@ -106,7 +105,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
 
         <div className="flex items-start gap-10 flex-wrap">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             <FieldValue
               name="TVL"
               value={
@@ -119,13 +118,13 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
             {!!vault.pool.fee && (
               <FieldValue
-                name="FEE"
+                name="Fee"
                 value={`${vault.pool.fee}%`}
                 testId="poolFee"
               />
             )}
           </div>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {!!poolAssets &&
               poolAssets.map((poolAsset, index: number) => (
                 <div

@@ -1,21 +1,24 @@
 import { memo } from "react";
 
+import { cn } from "@utils";
+
 interface IProps {
   isVsActive: boolean;
   vsHold: number;
   testID?: string;
+  customClassName?: string;
 }
 
 const VSHoldTableCell: React.FC<IProps> = memo(
-  ({ isVsActive, vsHold, testID = "" }) => {
+  ({ isVsActive, vsHold, testID = "", customClassName }) => {
     return (
-      <td
+      <div
         {...(!!testID && { "data-testid": testID })}
-        className={`text-right ${
-          isVsActive
-            ? `text-[12px] md:text-[14px] ${vsHold > 0 ? "text-success-400" : "text-error-400"}`
-            : ""
-        }`}
+        className={cn(
+          "text-right w-[17.5%]",
+          isVsActive && `${vsHold > 0 ? "text-success-400" : "text-error-400"}`,
+          customClassName
+        )}
       >
         {isVsActive ? (
           <>
@@ -25,7 +28,7 @@ const VSHoldTableCell: React.FC<IProps> = memo(
         ) : (
           "-"
         )}
-      </td>
+      </div>
     );
   }
 );

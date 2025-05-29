@@ -250,21 +250,21 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <>
-      <HeadingText
-        text="Underlying ALM"
-        scale={2}
-        styles="text-left md:ml-4 md:mb-0 mb-2"
-      />
-      <div className="flex flex-col gap-6 md:ml-4">
-        <div className="flex items-center gap-3">
+      <HeadingText text="Underlying ALM" scale={2} styles="text-left mb-4" />
+
+      <div className="flex flex-col items-start gap-6 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+        <div className="flex items-center gap-4">
           <img
             src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${vault.alm.protocol}.svg`}
             alt={vault.alm.protocol}
-            className="rounded-full w-7 h-7"
+            className="rounded-full w-10 h-10"
           />
-          <div className="flex flex-col">
-            <span className="text-[16px]">{vault.alm.protocol}</span>
-            <span className="text-[14px] text-[#8d8e96]">
+
+          <div className="flex flex-col gap-1">
+            <span className="text-[16px] leading-5 font-semibold">
+              {vault.alm.protocol}
+            </span>
+            <span className="text-[14px] leading-3  text-[#97979A]">
               {vault.underlying.symbol}
             </span>
           </div>
@@ -273,14 +273,16 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
         <div className="flex gap-10">
           <div className="flex flex-col gap-5">
             <div className="flex flex-col">
-              <span className="text-[14px] text-[#8d8e96]">TVL</span>
+              <span className="flex text-[14px] leading-5 text-[#97979A]">
+                TVL
+              </span>
               <span className="text-[16px]">
                 {formatNumber(vault.alm.tvl, "abbreviate")}
               </span>
             </div>
             {!!vault?.rebalances?.daily && (
               <div className="flex flex-col">
-                <span className="text-[14px] text-[#8d8e96]">
+                <span className="flex text-[14px] leading-5 text-[#97979A]">
                   Rebalances 24H / 7D
                 </span>
                 <span className="text-[16px]">
@@ -294,7 +296,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
             {!!almAssets &&
               almAssets.map((almAsset, index: number) => (
                 <div key={almAsset.amount + index} className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
+                  <span className="flex text-[14px] leading-5 text-[#97979A]">
                     {almAsset.symbol}
                   </span>
                   <span className="text-[16px]">
@@ -306,7 +308,9 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
           {!!almFee && (
             <div className="flex flex-col">
-              <span className="text-[14px] text-[#8d8e96]">FEE</span>
+              <span className="flex text-[14px] leading-5 text-[#97979A]">
+                Fee
+              </span>
               <span className="text-[16px]">{almFee}</span>
             </div>
           )}
@@ -314,28 +318,28 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
             <div className="flex gap-5 flex-wrap md:flex-nowrap">
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
-                    POOL SWAP FEE
+                  <span className="flex text-[14px] leading-5 text-[#97979A]">
+                    Pool swap fee
                   </span>
                   <span className="text-[16px]">{defiedgeFee.poolSwapFee}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
-                    REBALANCE FEE
+                  <span className="flex text-[14px] leading-5 text-[#97979A]">
+                    Rebalance fee
                   </span>
                   <span className="text-[16px]">{defiedgeFee.rebalance}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
-                    DEPOSIT FEE
+                  <span className="flex text-[14px] leading-5 text-[#97979A]">
+                    Deposit fee
                   </span>
                   <span className="text-[16px]">{defiedgeFee.deposit}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[14px] text-[#8d8e96]">
-                    WITHDRAW FEE
+                  <span className="flex text-[14px] leading-5 text-[#97979A]">
+                    Withdraw Fee
                   </span>
                   <span className="text-[16px]">{defiedgeFee.withdraw}</span>
                 </div>
@@ -344,7 +348,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
           )}
         </div>
 
-        <div className="max-h-[300px] overflow-y-auto">
+        {/* <div className="max-h-[300px] overflow-y-auto">
           <table className="table table-auto w-full rounded-lg">
             <thead className="bg-[#0b0e11] sticky top-0 z-10">
               <tr className="text-[16px] text-[#8f8f8f] uppercase">
@@ -384,7 +388,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
                 ))}
             </tbody>
           </table>
-        </div>
+        </div> */}
       </div>
     </>
   );

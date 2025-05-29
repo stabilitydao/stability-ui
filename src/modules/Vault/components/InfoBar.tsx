@@ -96,37 +96,35 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault]);
 
   return (
-    <div className="bg-accent-950 rounded-2xl font-manrope">
-      <div className="bg-accent-900 rounded-t-2xl lg:flex hidden justify-between items-center h-[56px] px-6">
-        <div
-          data-testid="infoBarHeader"
-          className="hidden lg:flex justify-between items-center gap-0.5 w-full"
-        >
-          <div className="flex items-center">
-            <img
-              src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
-              alt="logo"
-              className="w-[28px] h-[28px] rounded-full mr-1.5"
-            />
-            <HeadingText text={vault.symbol} scale={2} />
-          </div>
-
-          <a
-            href={`/chains/${vaultChain?.id}`}
-            className="flex items-center cursor-pointer"
-          >
-            <img
-              className="w-6 h-6 rounded-full hidden lg:flex mr-1"
-              src={vaultChain?.logoURI}
-              alt={vaultChain?.name}
-              title={vaultChain?.name}
-            />
-            {vaultChain?.name}
-          </a>
+    <div className="w-full rounded-lg bg-[#101012] border border-[#23252A]">
+      <div
+        data-testid="infoBarHeader"
+        className="w-full bg-gradient-to-b from-[rgba(255,255,255,0.05)] to-[rgba(0,0,0,0)] rounded-t-lg flex justify-between items-center px-6 py-[10px] border-b border-[#23252A] text-[20px] leading-6 font-semibold"
+      >
+        <div className="flex items-center gap-4">
+          <img
+            src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
+            alt="logo"
+            className="w-10 h-10 rounded-full"
+          />
+          <HeadingText text={vault.symbol} scale={2} />
         </div>
+
+        <a
+          href={`/chains/${vaultChain?.id}`}
+          className="flex items-center cursor-pointer gap-3"
+        >
+          <img
+            className="w-10 h-10 rounded-full"
+            src={vaultChain?.logoURI}
+            alt={vaultChain?.name}
+            title={vaultChain?.name}
+          />
+          {vaultChain?.name}
+        </a>
       </div>
 
-      <div className="flex w-full gap-5 p-6 md:pb-0">
+      <div className="flex gap-5 p-6 md:pb-0">
         <div className="flex items-start justify-between flex-col flex-nowrap w-full md:gap-[10px]">
           <div className="flex justify-between flex-col md:flex-row items-start gap-2 md:gap-3 w-full">
             <div className="w-full md:w-1/3 ">
@@ -166,7 +164,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
               <FieldValue
                 name="Strategy"
                 value={
-                  <div className="flex gap-0.5 items-end h-[29px]">
+                  <div className="flex gap-0.5 items-end">
                     {!!vault?.strategyInfo?.protocols.length && (
                       <div
                         className="flex items-start gap-0.5"
@@ -263,7 +261,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex justify-between flex-col md:flex-row items-start md:gap-3 w-full ">
             <div className="w-full md:w-1/3 ">
               <FieldValue
-                name="SHARE PRICE"
+                name="Share price"
                 value={
                   <p data-testid="infoBarSP">
                     ${Number(vault.shareprice).toFixed(5)}
@@ -274,7 +272,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
             <div className="w-full md:w-1/3 ">
               <FieldValue
-                name="Last HardWork"
+                name="Last Hard Work"
                 value={<TimeDifferenceIndicator unix={vault?.lastHardWork} />}
                 testId="infoBarHardWork"
               />
@@ -293,15 +291,15 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
       </div>
 
-      <div className="flex w-full flex-col md:flex-row px-6 pb-6 md:pb-2 pt-6 bg-accent-900 rounded-b-2xl gap-0 md:gap-3">
+      <div className="flex flex-col md:flex-row px-6 pt-3 pb-0 bg-[#1B1D21] rounded-b-lg border-t border-[#23252A]">
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
-          <div className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col">
-            <div className="h-[12px] flex items-center gap-1 uppercase text-[12px] leading-3 text-neutral-500">
-              <span>DEPOSITED</span>
+          <div className="flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col gap-1">
+            <div className="flex items-center gap-1 text-[14px] leading-5 text-[#97979A]">
+              <span>Deposited</span>
               <BalanceVisibilityToggler />
             </div>
-            <div className="h-[40px] flex items-center text-[18px] font-semibold whitespace-nowrap">
-              <div className="flex h-[28px] items-center">
+            <div className="flex items-center text-[20px] leading-6 font-semibold whitespace-nowrap">
+              <div className="flex items-center">
                 <div
                   className={`${!$visible && "blur select-none"} text-[18px] font-semibold flex whitespace-nowrap`}
                 >
@@ -318,7 +316,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <FieldValue
-            name="DAILY"
+            name="Daily"
             value={
               <p className={`${!$visible && "blur select-none"}`}>
                 {earnData.dailyEarn}$
@@ -329,7 +327,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
         <div className="flex items-start flex-col lg:flex-row justify-between w-full gap-5 lg:gap-0">
           <FieldValue
-            name="MONTHLY"
+            name="Monthly"
             value={
               <p className={`${!$visible && "blur select-none"}`}>
                 {earnData.monthlyEarn}$
