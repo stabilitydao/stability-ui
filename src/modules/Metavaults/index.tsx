@@ -30,8 +30,10 @@ const Metavaults = (): JSX.Element => {
           Metavaults
         </h2>
         <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
-          Metavaults are automated vaults that combine multiple DeFi <br />{" "}
-          protocols and assets into a single strategy
+          Metavaults are automated vaults that combine multiple DeFi protocols
+          and assets <br /> into a single strategy while automatically
+          rebalancing positions across <br /> integrated DeFi protocols and
+          assets, maximizing returns
         </h3>
       </div>
       <div className="pb-5">

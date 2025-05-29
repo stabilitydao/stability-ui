@@ -145,27 +145,28 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             USD Metavault
           </h2>
           <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
-            Create and deploy new yield farms using stablecoins and DeFi for
-            <br /> consistent returns
+            {localMetaVault.symbol} stablecoins deployed across integrated
+            lending protocols <br /> automatically rebalanced on Sonic to
+            maximise returns
           </h3>
         </div>
         <div className="flex items-center flex-wrap gap-6 mb-10">
           <div className="flex flex-col gap-2">
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              Total deposited
+              TVL
             </span>
             {!!localMetaVault && (
               <span className="font-semibold text-[18px] leading-6">
-                ${formatNumber(localMetaVault.deposited, "format")}
+                {formatNumber(localMetaVault.deposited, "abbreviate")}
               </span>
             )}
           </div>
           <div className="flex flex-col gap-2">
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              Historical APY
+              APR
             </span>
             {!!localMetaVault && (
-              <span className="font-semibold text-[18px] leading-6">
+              <span className="font-semibold text-[18px] leading-6 ">
                 {formatNumber(localMetaVault.APR, "formatAPR")}%
               </span>
             )}
@@ -333,7 +334,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           </div>
         </div>
       </div>
-      <Form metaVault={localMetaVault} />
+      <div>
+        <img className="w-[352px]" src="/v3.png" alt="" />
+        <Form metaVault={localMetaVault} />
+      </div>
     </div>
   );
 };

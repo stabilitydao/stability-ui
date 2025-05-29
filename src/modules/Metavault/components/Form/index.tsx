@@ -310,7 +310,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   return (
     <WagmiLayout>
-      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-[439px]">
+      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-[86px]">
         <div className="flex items-center gap-2 text-[14px] mb-6">
           <span
             className={cn(

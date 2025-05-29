@@ -27,27 +27,22 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                   {metaVault.name}
                 </span>
                 <p className="text-[#97979A] text-[16px]">
-                  Create and deploy new yield farms using stablecoins and DeFi
-                  primitives for consistent returns
+                  {metaVault.symbol} stablecoins deployed across integrated
+                  lending protocols automatically rebalanced on Sonic to
+                  maximise returns
                 </p>
               </div>
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between text-[16px]">
-                  <span className="text-[#97979A]">Total deposited</span>
+                  <span className="text-[#97979A]">TVL</span>
                   <span className="font-semibold">
-                    {formatNumber(metaVault.deposited, "format")} USD
+                    {formatNumber(metaVault.deposited, "abbreviate")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-[16px]">
-                  <span className="text-[#97979A]">Active strategies</span>
-                  <span className="font-semibold">
-                    {metaVault.strategies.length}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-[16px]">
-                  <span className="text-[#97979A]">Protocols integrated</span>
-                  <span className="font-semibold">
-                    {metaVault.protocols.length}
+                  <span className="text-[#97979A]">APR</span>
+                  <span className="font-semibold text-[#48c05c]">
+                    {formatNumber(metaVault.APR, "formatAPR")}%
                   </span>
                 </div>
               </div>
