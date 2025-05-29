@@ -223,6 +223,14 @@ const BIG_INT_VALUES = {
   LARGE: BigInt(10 ** 30),
 };
 
+const STABILITY_AAVE_POOLS = ["0x1f67..4ad8", "0xaa1c..1665", "0x4895..b094"];
+
+const STABILITY_STRATEGY_LABELS: { [address: string]: string } = {
+  [STABILITY_AAVE_POOLS[0]]: "Stream",
+  [STABILITY_AAVE_POOLS[1]]: "Main",
+  [STABILITY_AAVE_POOLS[2]]: "Stable Jack",
+};
+
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
@@ -278,4 +286,6 @@ export {
   STABILITY_TOKENS,
   PATHS,
   METAVAULT_TABLE,
+  STABILITY_AAVE_POOLS,
+  STABILITY_STRATEGY_LABELS,
 };

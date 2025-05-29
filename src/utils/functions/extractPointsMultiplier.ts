@@ -14,6 +14,10 @@
  */
 
 export const extractPointsMultiplier = (text: string): number | null => {
+  if (!text || text.includes("0x")) {
+    return null;
+  }
+
   if (text === "22 wS x8.7") {
     return 9.6;
   }
