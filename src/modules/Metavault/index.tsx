@@ -232,7 +232,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       </div>
 
       <div className="flex items-start justify-between flex-col-reverse lg:flex-row gap-6">
-        <div className="flex flex-col gap-4 w-full lg:w-[728px]">
+        <div className="flex flex-col gap-4 w-full lg:w-[850px]">
           <span className="font-semibold text-[24px] leading-8">
             Yield Opportunities
           </span>

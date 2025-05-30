@@ -2,6 +2,8 @@ import { RewardsCarousel } from "../../RewardsCarousel";
 
 import { formatNumber } from "@utils";
 
+import { VAULTS_WITH_NAME } from "@constants";
+
 import { TVault, TAPRModal } from "@types";
 
 interface IProps {
@@ -43,7 +45,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
           <div className="flex flex-col items-start gap-1">
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault.assetsSymbol}
+              {VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
             </span>
             <RewardsCarousel
               address={vault.address}
