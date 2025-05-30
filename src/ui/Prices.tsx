@@ -8,7 +8,11 @@ import { marketPrices } from "@store";
 
 import type { TMarketPrice } from "@types";
 
-const Prices = (): JSX.Element => {
+interface IProps {
+  isMobile?: boolean;
+}
+
+const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
   const $marketPrices = useStore(marketPrices);
 
   const [prices, setPrices] = useState<[string, TMarketPrice][]>([]);

@@ -131,7 +131,7 @@ const SonicPointsButton = (): JSX.Element => {
   }, [sonicBtn]);
 
   return (
-    <div className="relative border-l border-[#23252A] min-h-full">
+    <div className="relative border-l border-[#23252A] min-h-full hidden md:block">
       <button
         ref={buttonRef}
         className="flex items-center justify-center gap-2 min-h-full px-4"

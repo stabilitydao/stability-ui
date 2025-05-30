@@ -4,6 +4,7 @@ import App from "./App";
 
 import { Header} from "@components/Header"
 import { Navbar } from "@components/Navbar";
+import {Menu} from "@components/Menu"
 
 interface IProps {
   title: string;
@@ -61,6 +62,7 @@ const {
     <App client:only="react">
 		<div class="layout">
 			<Navbar client:only="react"/>
+			<Menu client:only="react" />
 			<div
 				class="w-full h-[50%] absolute"
 				style={{
@@ -132,6 +134,11 @@ const {
 		background-color: #101012;
 		z-index: 1000;
 		border-right:1px #23252A solid;
+
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch; 
+		scrollbar-width: thin; 
+		scrollbar-color: #2a2a2e transparent;
 	}
 
 	.container {
@@ -147,6 +154,26 @@ const {
 		margin-top: 60px; 
 		padding: 1rem;
 		height: calc(100vh - 60px);
+	}
+
+	@media screen and (max-width: 1440px) {
+		.header {
+			left: 0px;
+			width: 100%;
+			background-color:#111114;
+		}
+		.container {
+			left: 0px;
+			width:100%;
+		}
+
+		.content {
+			margin-top: 100px; 
+		}
+
+		.navbar {
+			z-index: 1500;
+		}
 	}
 
 	.title {
@@ -169,42 +196,6 @@ const {
 		margin: auto 6px auto 10px;
 		height: 32px;
 	}
-	.menu {
-		display: flex;
-		justify-content: center;
-		gap:12px;
-	}
-	.menu-nav a {
-		width: 100%;
-	}
-	@media screen and (max-width: 1080px) {
-		.menu {
-			display: none;
-		}
-	}
-	.menu > a {
-		margin: 0;
-		min-width: 90px;
-		height: 40px;
-		color: #fcf3f6;
-		display: flex;
-		align-self: center;
-		align-items: center;
-		justify-content: center;
-		font-weight: 600;
-		padding: 10px 16px;
-		border-radius: 16px;
-	}
-	.menu > a.active {
-		background:  #3D1E9F;
-	}
-	.menu > a.active:hover {
-		background:  #3D1E9F;
-	}
-	.menu > a:hover {
-		background-color: #2B1570;
-	}
-
 	main {
 		margin: 0 auto auto auto;
 		padding: 1rem 0.5rem;
@@ -228,43 +219,6 @@ const {
 	}
 	h2 {
 		text-align: center;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.dotted-underline {
-		text-decoration:underline dotted;
-		text-underline-position:under;
-	}
-	.btn {
-		cursor: pointer;
-		text-wrap: nowrap;
-		min-width: 100px;
-		height: 30px;
-		color: white;
-		background-color: #424658;
-		display: inline-flex;
-		margin: 10px;
-		align-self: center;
-		align-items: center;
-		justify-content: center;
-		text-decoration: none;
-	}
-
-	.create-btn {
-		min-width: 50px;
-		padding: 0 10px;
-	}
-
-	.btn-primary {
-		height: 40px;
-		padding: 0 30px;
-		font-size: 1.2rem;
-		font-weight: bold;
 	}
 
 	.overlay {
@@ -293,45 +247,6 @@ const {
 		border-radius: 6px;
 	}
 
-	.modal-title {
-		font-weight: bold;
-		font-size: 1.5rem;
-		display: flex;
-		justify-content: center;
-
-	}
-
-	.build-form {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.build-form > .group {
-		width: 100%;
-		display: flex;
-	}
-
-	.group-label {
-		display: flex;
-		min-width: 150px;
-	}
-
-	.build-form .action {
-		margin-top: 40px;
-		display: flex;
-		justify-content: center;
-	}
-	.build-form .success {
-		margin-top: 40px;
-		margin-bottom: 20px;
-		padding: 10px;
-		display: flex;
-		justify-content: center;
-		color: greenyellow;
-		background-color: green;
-		font-size: 1.4rem;
-		font-weight: bold;
-	}
 	.what-to-build .msg {
 		/* max-width: 600px; */
 		margin: 0 auto;
@@ -352,11 +267,6 @@ const {
 		margin-right: 10px;
 	}
 
-	.token-logo {
-		border-radius: 50%;
-		width: 32px;
-		height: 32px;
-	}
 	/* TOOLTIP */
 
 	.tooltip {
@@ -544,5 +454,19 @@ const {
 		100% {
 			transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
 		}
+	}
+
+	/** FONTS ***/
+
+	.page-title__font {
+		font-size: calc(32px + 8 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 48px;
+		font-weight: 600;
+	}
+
+	.page-description__font {
+		font-size: calc(18px + 2 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 32px;
+		font-weight: 500;
 	}
 </style>

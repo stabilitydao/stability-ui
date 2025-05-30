@@ -14,25 +14,26 @@ const Metavaults = (): JSX.Element => {
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
 
   const initMetavaults = async () => {
-    setLocalMetaVaults($metaVaults);
+    setLocalMetaVaults($metaVaults["146"]);
   };
 
   useEffect(() => {
-    if ($metaVaults.length) {
+    if ($metaVaults && $metaVaults["146"].length) {
       initMetavaults();
     }
   }, [$metaVaults]);
 
   return (
-    <div className="mx-auto flex flex-col gap-10">
+    <div className="mx-auto flex flex-col gap-6 md:gap-10">
       <div>
-        <h2 className="font-bold text-[40px] leading-[48px] text-start mb-5">
-          Metavaults
+        <h2 className="page-title__font text-start mb-2 md:mb-5">
+          Meta Vaults
         </h2>
-        <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
+        <h3 className="text-[#97979a] page-description__font">
           Metavaults are automated vaults that combine multiple DeFi protocols
-          and assets <br /> into a single strategy while automatically
-          rebalancing positions across <br /> integrated DeFi protocols and
+          and assets <br className="hidden lg:block" /> into a single strategy
+          while automatically rebalancing positions across
+          <br className="hidden lg:block" /> integrated DeFi protocols and
           assets, maximizing returns
         </h3>
       </div>

@@ -22,6 +22,7 @@ import { BalanceVisibilityToggler } from "./BalanceVisibilityToggler";
 import { ExplorerLink } from "./ExplorerLink";
 import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
+import { Prices } from "./Prices";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -75,4 +76,5 @@ export {
   MetaVaultsTable,
   ActionButton,
   StrategyBadge,
+  Prices,
 };

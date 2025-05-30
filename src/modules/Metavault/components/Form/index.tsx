@@ -16,10 +16,10 @@ import { IMetaVaultABI, ERC20ABI, sonicClient, wagmiConfig } from "@web3";
 
 import { account, assetsBalances, assetsPrices, lastTx } from "@store";
 
-import { TransactionTypes, TAddress } from "@types";
+import { TransactionTypes, TAddress, TMetaVault } from "@types";
 
 interface IProps {
-  metaVault: any;
+  metaVault: TMetaVault;
 }
 
 const Form: React.FC<IProps> = ({ metaVault }) => {
@@ -46,6 +46,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const [allowance, setAllowance] = useState(0);
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
+
   const [needConfirm, setNeedConfirm] = useState(false);
 
   const handleInputChange = (e) => {
@@ -66,10 +67,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     //     numericValue = balances.stakedXSTBL.toString();
     //   }
     // }
-    const balance =
-      actionType === TransactionTypes.Deposit
-        ? formatUnits(balances[actionAssets[actionType]?.address], 6)
-        : formatUnits(balances[actionAssets[actionType]?.address], 18);
+
+    const balance = formatUnits(
+      balances[actionAssets[actionType]?.address],
+      actionType === TransactionTypes.Deposit ? 6 : 18
+    );
 
     if (!Number(numericValue)) {
       setButton("");
@@ -157,6 +159,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         console.error("Approve error:", error);
       }
     }
+
     setTransactionInProgress(false);
   };
 
@@ -298,7 +301,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   };
 
   useEffect(() => {
-    if (metaVault) {
+    if (metaVault.address) {
       getData();
     }
   }, [$account, $lastTx, $assetsPrices, metaVault, $assetsBalances]);
@@ -310,7 +313,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   return (
     <WagmiLayout>
-      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-[86px]">
+      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-0 lg:mt-[115px]">
         <div className="flex items-center gap-2 text-[14px] mb-6">
           <span
             className={cn(
@@ -334,23 +337,18 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             Withdraw
           </span>
         </div>
-        <p>
-          {capitalize(actionType)} token: {actionAssets[actionType].symbol}
-        </p>
-        {/* <div className="flex justify-between gap-6">
-      <div className="flex flex-col gap-1">
-        <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-          My position
-        </span>
-        <span className="text-[24px] leading-8 font-semibold">0 USD</span>
-      </div>
-      <div className="flex flex-col gap-1">
-        <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-          My wallet balance
-        </span>
-        <span className="text-[24px] leading-8 font-semibold">0 USD</span>
-      </div>
-    </div> */}
+        <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
+          <img
+            src={actionAssets[actionType].logoURI}
+            alt={actionAssets[actionType].symbol}
+            title={actionAssets[actionType].symbol}
+            className="w-4 h-4 rounded-full"
+          />
+          <span className="text-[16px] leading-6 font-medium">
+            {actionAssets[actionType].symbol}
+          </span>
+        </div>
+
         <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] my-3">
           <div className="flex items-center justify-between">
             <input
@@ -374,7 +372,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             </div>
           )}
         </label>
-        <div className="flex flex-col gap-2 mb-4">
+        {/* <div className="flex flex-col gap-2 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[#97979A] text-[16px] leading-6">
@@ -395,7 +393,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
               ~ 48 hours
             </span>
           </div>
-        </div>
+        </div> */}
         <ActionButton
           type={button}
           transactionInProgress={transactionInProgress}

@@ -42,6 +42,8 @@ const tokens = atom<TTokens>({});
 
 const connected = atom<boolean | undefined>();
 
+const isNavbar = atom<boolean>(false);
+
 const reload = atom<boolean>(false);
 const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
@@ -98,4 +100,5 @@ export {
   currentChainID,
   metaVaults,
   marketPrices,
+  isNavbar,
 };

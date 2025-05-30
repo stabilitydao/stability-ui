@@ -78,15 +78,15 @@ const Breadcrumbs = (): JSX.Element => {
       main === "metavaults" &&
       rest[0] === "metavault" &&
       rest.length === 2 &&
-      $metaVaults
+      $metaVaults["146"]
     ) {
       // rest length == 2 bcs no chain id
       // todo change to 3 (with chain id)
       const [, , metaVaultAddress] = currentPath.split("/");
 
       const symbol =
-        $metaVaults.find(({ address }) => address === metaVaultAddress)?.name ||
-        "Meta Vault";
+        $metaVaults["146"].find(({ address }) => address === metaVaultAddress)
+          ?.name || "Meta Vault";
 
       add("Meta Vaults", "metavaults");
       add(symbol);

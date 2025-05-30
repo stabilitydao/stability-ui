@@ -15,7 +15,13 @@ import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
 
 import { DisplayTypes } from "@types";
 
-import type { TAddress, TTableColumn, TVault, TEarningData } from "@types";
+import type {
+  TAddress,
+  TTableColumn,
+  TVault,
+  TEarningData,
+  TMetaVault,
+} from "@types";
 
 interface IProps {
   metavault: TAddress;
@@ -28,7 +34,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
-  const [localMetaVault, setLocalMetaVault] = useState(false);
+  const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
   const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [currentTab, setCurrentTab] = useState(1);
@@ -47,6 +53,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   );
 
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
+
+  const lastTabIndex = currentTab * pagination;
+  const firstTabIndex = lastTabIndex - pagination;
+  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   // const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
 
@@ -91,10 +101,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     setTableStates(table);
   };
 
-  const initVaults = async () => {
-    if ($metaVaults) {
-      const metaVault = $metaVaults.find(
-        ({ address }) => address === metavault
+  const initMetaVaults = async () => {
+    if ($metaVaults["146"]) {
+      const metaVault = $metaVaults["146"].find(
+        ({ address }: { address: TAddress }) => address === metavault
       );
 
       if (metaVault) {
@@ -105,10 +115,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         );
 
         const vaults = metaVault.endVaults
-          .map((address) => $vaults[146][address])
-          .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
-          .map((vault) => {
-            const tVault = vault as TVault;
+          .map((address: TAddress) => $vaults[146][address])
+          .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
+          .map((vault: TVault) => {
+            const tVault = vault;
             const balance = formatFromBigInt(tVault.balance, 18);
 
             return {
@@ -126,52 +136,49 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   };
 
   useEffect(() => {
-    initVaults();
+    initMetaVaults();
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
 
   const isLoading = useMemo(() => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
   }, [$isVaultsLoaded, isLocalVaultsLoaded]);
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   return (
-    <div className="mx-auto flex gap-6 pb-6">
-      <div className="flex flex-col gap-10">
-        <div className="mb-6">
-          <h2 className="font-bold text-[40px] leading-[48px] text-start mb-4">
-            USD Metavault
-          </h2>
-          <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
-            {localMetaVault.symbol} stablecoins deployed across integrated
-            lending protocols <br /> automatically rebalanced on Sonic to
-            maximise returns
-          </h3>
-        </div>
-        <div className="flex items-center flex-wrap gap-6 mb-10">
-          <div className="flex flex-col gap-2">
-            <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              TVL
-            </span>
-            {!!localMetaVault && (
-              <span className="font-semibold text-[18px] leading-6">
-                {formatNumber(localMetaVault.deposited, "abbreviate")}
-              </span>
-            )}
+    <div className="mx-auto flex flex-col gap-6 pb-6">
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex flex-col gap-10">
+          <div>
+            <h2 className="page-title__font text-start mb-4">
+              {localMetaVault.symbol} Meta Vault
+            </h2>
+            <h3 className="text-[#97979a] page-description__font">
+              {localMetaVault.symbol} stablecoins deployed across integrated
+              lending protocols <br /> automatically rebalanced on Sonic to
+              maximise returns
+            </h3>
           </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              APR
-            </span>
-            {!!localMetaVault && (
-              <span className="font-semibold text-[18px] leading-6 ">
-                {formatNumber(localMetaVault.APR, "formatAPR")}%
+          <div className="flex items-center flex-wrap gap-6">
+            <div className="flex flex-col gap-2">
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                TVL
               </span>
-            )}
-          </div>
-          {/* <div className="flex flex-col gap-2">
+              {!!localMetaVault?.address && (
+                <span className="font-semibold text-[18px] leading-6">
+                  {formatNumber(localMetaVault.deposited, "abbreviate")}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                APR
+              </span>
+              {!!localMetaVault?.address && (
+                <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
+                  {formatNumber(localMetaVault.APR, "formatAPR")}%
+                </span>
+              )}
+            </div>
+            {/* <div className="flex flex-col gap-2">
             <span className="text-[#97979A] text-[14px] leading-5 font-medium">
               Daily returns
             </span>
@@ -179,104 +186,57 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                1.41 USD
             </span>
           </div> */}
-          <div className="flex flex-col gap-2">
-            <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              Protocols
-            </span>
-            {!!localMetaVault && (
-              <div className="flex items-center">
-                {localMetaVault.protocols.map(({ name, logoSrc }, index) => (
-                  <img
-                    className={cn(
-                      "w-6 h-6 rounded-full",
-                      index && "ml-[-6px]",
-                      `z-[${50 - index}]`
-                    )}
-                    key={name + index}
-                    src={logoSrc}
-                    alt={name}
-                    title={name}
-                  />
-                ))}
+            <div className="flex flex-col gap-2">
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                Protocols
+              </span>
+              {!!localMetaVault?.address && (
+                <div className="flex items-center">
+                  {localMetaVault?.protocols.map(({ name, logoSrc }, index) => (
+                    <img
+                      className={cn(
+                        "w-6 h-6 rounded-full",
+                        index && "ml-[-6px]",
+                        `z-[${50 - index}]`
+                      )}
+                      key={name + index}
+                      src={logoSrc}
+                      alt={name}
+                      title={name}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                Chain
+              </span>
+              <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
+                <img
+                  className="w-6 h-6"
+                  src="/sonic.png"
+                  alt="Sonic chain"
+                  title="Sonic chain"
+                />
+                <span>Sonic</span>
               </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              Chain
-            </span>
-            <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
-              <img
-                className="w-6 h-6"
-                src="/sonic.png"
-                alt="Sonic chain"
-                title="Sonic chain"
-              />
-              <span>Sonic</span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4 w-[728px]">
+        <img
+          className="w-[352px] hidden lg:block"
+          src="/ui-stack-preview.png"
+          alt="Representative icon"
+        />
+      </div>
+
+      <div className="flex items-start justify-between flex-col-reverse lg:flex-row gap-6">
+        <div className="flex flex-col gap-4 w-full lg:w-[728px]">
           <span className="font-semibold text-[24px] leading-8">
             Yield Opportunities
           </span>
           <div className="flex items-center justify-end">
-            {/* <div className="relative select-none w-[100px]">
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropDownSelector((prevState) => !prevState);
-                }}
-                className="flex items-center justify-between gap-1 px-5 py-[13px] h-[48px] bg-transparent border border-[#23252A] rounded-lg cursor-pointer"
-              >
-                <p className="w-[100px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px]">
-                  Type
-                </p>
-                <img
-                  className={`transition delay-[50ms] w-4 h-4 ${
-                    dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-                  }`}
-                  src="/arrow-down.svg"
-                  alt="arrowDown"
-                />
-              </div>
-             <div
-                    ref={dropDownRef}
-                    className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
-                      dropDownSelector
-                        ? "absolute transition delay-[50ms]"
-                        : "hidden"
-                    } `}
-                  >
-                    <div className="flex flex-col items-start">
-                      {filter.variants?.map(
-                        (variant: TTAbleFiltersVariant, index: number) => (
-                          <div
-                            key={variant.name}
-                            onClick={() =>
-                              activeFiltersHandler(filter, variant.name)
-                            }
-                            className={`${!index ? "rounded-t-2xl" : ""} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center gap-2 ${
-                              variant.state ? "bg-accent-800" : ""
-                            }`}
-                            data-testid="strategy"
-                            title={variant.title}
-                          >
-                            <Checkbox
-                              checked={variant.state}
-                              onChange={() =>
-                                activeFiltersHandler(filter, variant.name)
-                              }
-                            />
-                            <span className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap">
-                              {variant.title}
-                            </span>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div> 
-            </div> */}
             <DisplayType
               type={displayType}
               setType={setDisplayType}
@@ -333,9 +293,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             />
           </div>
         </div>
-      </div>
-      <div>
-        <img className="w-[352px]" src="/v3.png" alt="" />
         <Form metaVault={localMetaVault} />
       </div>
     </div>

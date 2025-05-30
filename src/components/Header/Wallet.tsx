@@ -205,7 +205,7 @@ const Wallet = (): JSX.Element => {
     <div className="flex flex-nowrap justify-end whitespace-nowrap text-[14px] font-semibold">
       {currentChain && $account && (
         <button
-          className="flex items-center gap-2 border-l border-[#23252A] min-h-full px-4"
+          className="items-center gap-2 border-l border-[#23252A] min-h-full px-4 hidden md:flex"
           id="network"
           onClick={() => open({ view: "Networks" })}
         >
@@ -214,12 +214,12 @@ const Wallet = (): JSX.Element => {
             src={currentChain?.logoURI}
             alt={currentChain?.name}
           />
-          <p className="min-[1200px]:flex hidden">{currentChain?.name}</p>
+          <p>{currentChain?.name}</p>
         </button>
       )}
       <button
         data-testid="connectButton"
-        className="flex items-center gap-2 border-l border-[#23252A] min-h-full pl-4"
+        className="flex items-center gap-2 border-x md:border-l md:border-x-0 border-[#23252A] min-h-full px-4 md:pl-4"
         onClick={() => openProfile()}
       >
         {$account && providerImage ? (

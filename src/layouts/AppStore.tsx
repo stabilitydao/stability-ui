@@ -56,6 +56,7 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  enrichAndResolveMetaVaults,
 } from "@utils";
 
 import {
@@ -78,90 +79,12 @@ import type {
   TPlatformData,
   TBalances,
   TTokens,
+  TMetaVaults,
+  TMetaVault,
   // TAsset,
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
-
-///
-function enrichAndResolveMetaVaults(vaults, metaVaults) {
-  function collectAll(vaultAddress, visited = new Set()) {
-    const strategies = [];
-    const protocols = [];
-    const endVaults = [];
-
-    const vaultKey = vaultAddress.toLowerCase();
-    if (visited.has(vaultKey)) return { strategies, protocols, endVaults };
-    visited.add(vaultKey);
-
-    const vaultData = vaults?.[vaultKey];
-
-    if (vaultData?.strategyInfo) {
-      const { shortId, protocols: vaultProtocols } = vaultData.strategyInfo;
-
-      if (shortId) strategies.push(shortId);
-
-      vaultProtocols?.forEach(({ name }) => {
-        if (name) protocols.push(name);
-      });
-
-      endVaults.push(vaultKey);
-    } else {
-      const meta = metaVaults.find((m) => m.address.toLowerCase() === vaultKey);
-      if (meta) {
-        for (const subVault of meta.vaults) {
-          const result = collectAll(subVault, visited);
-
-          result.strategies.forEach((s) => {
-            if (!strategies.includes(s)) strategies.push(s);
-          });
-
-          result.protocols.forEach((p) => {
-            if (!protocols.includes(p)) protocols.push(p);
-          });
-
-          result.endVaults.forEach((ev) => {
-            if (!endVaults.includes(ev)) endVaults.push(ev);
-          });
-        }
-      }
-    }
-
-    return { strategies, protocols, endVaults };
-  }
-
-  return metaVaults.map((meta) => {
-    const visited = new Set();
-
-    const allStrategies = [];
-    const allProtocols = [];
-    const allEndVaults = [];
-
-    for (const vault of meta.vaults) {
-      const { strategies, protocols, endVaults } = collectAll(vault, visited);
-
-      strategies.forEach((s) => {
-        if (!allStrategies.includes(s)) allStrategies.push(s);
-      });
-
-      protocols.forEach((p) => {
-        if (!allProtocols.includes(p)) allProtocols.push(p);
-      });
-
-      endVaults.forEach((ev) => {
-        if (!allEndVaults.includes(ev)) allEndVaults.push(ev);
-      });
-    }
-
-    return {
-      ...meta,
-      strategies: allStrategies,
-      protocols: allProtocols,
-      endVaults: allEndVaults,
-    };
-  });
-}
-///
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { address, isConnected } = useAccount();
@@ -178,6 +101,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const localVaults: {
     [network: string]: TVaults;
   } = {};
+
+  const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
   let prices: TMultichainPrices = {};
 
@@ -858,6 +783,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const assetBalances: { [key: string]: TBalances } = {};
     const vaultsData: TVaultDataKey = {};
 
+    /***** VAULTS *****/
     await Promise.all(
       Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
         const chain = CHAINS.find(({ id }) => id === key);
@@ -972,26 +898,39 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
       })
     );
-    ///
-    const _metaVaults = Object.values(stabilityAPIData.metaVaults[146]).map(
-      (metaVault) => ({
-        ...metaVault,
-        deposited: formatUnits(Number(metaVault.deposited), 6),
-      })
+
+    /***** META VAULTS *****/
+    await Promise.all(
+      Object.keys(stabilityAPIData?.metaVaults as TMetaVault[]).map(
+        async (key) => {
+          const chain = CHAINS.find(({ id }) => id === key);
+          if (!chain) return;
+          /////***** SET VAULTS DATA *****/////
+          const APIMetaVaultsData = Object.values(
+            stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+          );
+
+          if (APIMetaVaultsData.length) {
+            const _metaVaults = APIMetaVaultsData.map((metaVault) => ({
+              ...metaVault,
+              deposited: formatUnits(Number(metaVault.deposited), 6),
+            }));
+
+            localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
+              localVaults[chain.id],
+              _metaVaults
+            );
+          }
+        }
+      )
     );
 
-    const enrichedMetaVaults = enrichAndResolveMetaVaults(
-      localVaults[146],
-      _metaVaults
-    );
-
-    ///
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
     marketPrices.set(stabilityAPIData.prices);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
-    metaVaults.set(enrichedMetaVaults);
+    metaVaults.set(localMetaVaults);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);

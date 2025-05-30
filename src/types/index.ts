@@ -134,6 +134,10 @@ type TVaults = {
   [vaultAddress: string]: TVault;
 };
 
+type TMetaVaults = {
+  [vaultAddress: string]: TMetaVault;
+};
+
 type TVaultData = {
   [address: TAddress]: {
     vaultSharePrice: bigint;
@@ -284,6 +288,22 @@ type TVault = {
   leverageLending?: TLeverageLendingData;
   liveAPR: undefined | number;
   assetAPR: undefined | number;
+};
+
+type TMetaVault = {
+  address: TAddress;
+  symbol: string;
+  name: string;
+  APR: string;
+  sharePrice: string;
+  assets: TAddress[];
+  decimals: number;
+  deposited: string;
+  tvl: string;
+  vaults: TAddress[];
+  endVaults?: TAddress[];
+  protocols?: string[];
+  strategies?: string[];
 };
 
 type TLeverageLendingData = {
@@ -595,6 +615,7 @@ type TAPIData = {
   // services?: string[];
   assetPrices?: TMultichainPrices;
   vaults?: TVaults;
+  metaVaults?: TMetaVault[];
   underlyings?: TVaults;
   platforms?: {
     [chainID: string]: {
@@ -609,6 +630,7 @@ type TAPIData = {
       };
     };
   };
+  rewards: { gemsAprMultiplier: number };
   prices: TMarketPrices;
   error?: string;
 };
@@ -769,4 +791,6 @@ export type {
   TVestPeriod,
   TMarketPrice,
   TMarketPrices,
+  TMetaVault,
+  TMetaVaults,
 };

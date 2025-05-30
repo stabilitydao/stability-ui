@@ -28,6 +28,7 @@ import { playAudio } from "./functions/playAudio";
 import { cn } from "./functions/cn";
 import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
+import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -63,4 +64,5 @@ export {
   capitalize,
   useClickOutside,
   getTransactionReceipt,
+  enrichAndResolveMetaVaults,
 };
