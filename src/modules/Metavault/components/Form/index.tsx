@@ -8,15 +8,17 @@ import { formatUnits, parseUnits } from "viem";
 
 import { useStore } from "@nanostores/react";
 
+import { TabSwitcher } from "./TabSwitcher";
+
 import { ActionButton } from "@ui";
 
-import { cn, capitalize, getTokenData, getTransactionReceipt } from "@utils";
+import { getTokenData, getTransactionReceipt, formatNumber } from "@utils";
 
 import { IMetaVaultABI, ERC20ABI, sonicClient, wagmiConfig } from "@web3";
 
 import { account, assetsBalances, assetsPrices, lastTx } from "@store";
 
-import { TransactionTypes, TAddress, TMetaVault } from "@types";
+import { TransactionTypes, TAddress, TMetaVault, TTokenData } from "@types";
 
 interface IProps {
   metaVault: TMetaVault;
@@ -32,9 +34,21 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     TransactionTypes.Deposit
   );
 
-  const [actionAssets, setActionAssets] = useState({
-    deposit: false,
-    withdraw: false,
+  const [activeAsset, setActiveAsset] = useState<{
+    deposit: TTokenData;
+    withdraw: TTokenData;
+  }>({
+    deposit: {} as TTokenData,
+    withdraw: {} as TTokenData,
+  });
+
+  // @dev - State needed for multiple option
+  const [formAssets, setFormAssets] = useState<{
+    deposit: TTokenData[];
+    withdraw: TTokenData[];
+  }>({
+    deposit: [],
+    withdraw: [],
   });
 
   const [button, setButton] = useState<string>("none");
@@ -58,20 +72,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       numericValue = "0" + numericValue;
     }
 
-    // if (type === "max") {
-    //   if (stakeType === "Stake") {
-    //     numericValue = balances.xstbl.toString();
-    //   }
-
-    //   if (stakeType === "Unstake") {
-    //     numericValue = balances.stakedXSTBL.toString();
-    //   }
-    // }
-
-    const balance = formatUnits(
-      balances[actionAssets[actionType]?.address],
-      actionType === TransactionTypes.Deposit ? 6 : 18
-    );
+    const balance = balances[activeAsset[actionType]?.address].balance;
 
     if (!Number(numericValue)) {
       setButton("");
@@ -96,9 +97,9 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const approve = async () => {
     setTransactionInProgress(true);
-    const depositToken = actionAssets.deposit.address;
+    const depositToken = activeAsset.deposit.address;
 
-    const decimals = actionAssets.deposit.decimals;
+    const decimals = activeAsset.deposit.decimals;
 
     const amount = Number(value);
 
@@ -128,7 +129,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
           });
 
           let parsedAllowance = Number(
-            formatUnits(newAllowance, actionAssets.deposit.decimals)
+            formatUnits(newAllowance, activeAsset.deposit.decimals)
           );
 
           setAllowance(parsedAllowance);
@@ -147,7 +148,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         });
 
         let parsedAllowance = Number(
-          formatUnits(newAllowance, actionAssets.deposit.decimals)
+          formatUnits(newAllowance, activeAsset.deposit.decimals)
         );
 
         setAllowance(parsedAllowance);
@@ -166,7 +167,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const deposit = async () => {
     setTransactionInProgress(true);
 
-    const decimals = actionAssets.deposit.decimals;
+    const decimals = activeAsset.deposit.decimals;
 
     const amount = Number(value);
 
@@ -180,7 +181,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         address: metaVault.address,
         abi: IMetaVaultABI,
         functionName: "depositAssets",
-        args: [[actionAssets.deposit.address], [_value], shares, $account],
+        args: [[activeAsset.deposit.address], [_value], shares, $account],
       });
 
       setNeedConfirm(false);
@@ -203,7 +204,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const withdraw = async () => {
     setTransactionInProgress(true);
 
-    const decimals = actionAssets.withdraw.decimals;
+    const decimals = activeAsset.withdraw.decimals;
 
     const amount = Number(value);
 
@@ -217,7 +218,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         address: metaVault.address,
         abi: IMetaVaultABI,
         functionName: "withdrawAssets",
-        args: [[actionAssets.withdraw.address], _value, [shares]],
+        args: [[activeAsset.withdraw.address], _value, [shares]],
       });
 
       setNeedConfirm(false);
@@ -249,6 +250,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const getData = async () => {
     try {
+      const newBalances: Record<
+        string,
+        { bigIntBalance: bigint; balance: string }
+      > = {};
+
       const assetsForDeposit = await sonicClient.readContract({
         address: metaVault.address,
         abi: IMetaVaultABI,
@@ -261,39 +267,69 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         functionName: "assetsForWithdraw",
       });
 
-      const metaVaultAllowance = await sonicClient.readContract({
-        address: assetsForDeposit[0] as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, metaVault.address as TAddress],
-      });
+      if ($account) {
+        const metaVaultAllowance = await sonicClient.readContract({
+          address: assetsForDeposit[0] as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, metaVault.address as TAddress],
+        });
 
-      const metaVaultBalance = (await sonicClient.readContract({
-        address: metaVault.address,
-        abi: IMetaVaultABI,
-        functionName: "balanceOf",
-        args: [$account as TAddress],
-      })) as bigint;
+        const metaVaultBalance = (await sonicClient.readContract({
+          address: metaVault.address,
+          abi: IMetaVaultABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        })) as bigint;
 
-      let parsedAllowance = Number(
-        formatUnits(
-          metaVaultAllowance,
-          getTokenData(assetsForDeposit[0].toLowerCase()).decimals
-        )
-      );
+        const decimals =
+          getTokenData(assetsForDeposit[0].toLowerCase())?.decimals || 18;
 
-      if (parsedAllowance) {
-        setAllowance(parsedAllowance);
+        let parsedAllowance = Number(formatUnits(metaVaultAllowance, decimals));
+
+        if (parsedAllowance) {
+          setAllowance(parsedAllowance);
+        }
+
+        assetsForDeposit.forEach((address) => {
+          const key = address.toLowerCase();
+
+          const _decimals = getTokenData(key)?.decimals || 18;
+
+          const bigIntBalance = $assetsBalances[146]?.[key] ?? BigInt(0);
+
+          newBalances[key] = {
+            bigIntBalance,
+            balance: formatUnits(bigIntBalance, _decimals),
+          };
+        });
+
+        assetsForWithdraw.forEach((address) => {
+          const key = address.toLowerCase();
+
+          newBalances[key] = {
+            bigIntBalance: metaVaultBalance,
+            balance: formatUnits(metaVaultBalance, 18),
+          };
+        });
+
+        setBalances(newBalances);
       }
-      setBalances({
-        [assetsForDeposit[0].toLowerCase()]:
-          $assetsBalances[146][assetsForDeposit[0].toLowerCase()],
-        [assetsForWithdraw[0].toLowerCase()]: metaVaultBalance,
+
+      setFormAssets({
+        deposit: assetsForDeposit.map((asset) =>
+          getTokenData(asset.toLowerCase())
+        ) as TTokenData[],
+        withdraw: assetsForWithdraw.map((asset) =>
+          getTokenData(asset.toLowerCase())
+        ) as TTokenData[],
       });
 
-      setActionAssets({
-        deposit: getTokenData(assetsForDeposit[0].toLowerCase()),
-        withdraw: getTokenData(assetsForWithdraw[0].toLowerCase()),
+      setActiveAsset({
+        deposit: getTokenData(assetsForDeposit[0].toLowerCase()) as TTokenData,
+        withdraw: getTokenData(
+          assetsForWithdraw[0].toLowerCase()
+        ) as TTokenData,
       });
     } catch (error) {
       console.error("Get data error:", error);
@@ -314,38 +350,16 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   return (
     <WagmiLayout>
       <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-0 lg:mt-[115px]">
-        <div className="flex items-center gap-2 text-[14px] mb-6">
-          <span
-            className={cn(
-              "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
-              actionType === "deposit" &&
-                "bg-[#22242A] text-white cursor-default"
-            )}
-            onClick={() => setActionType(TransactionTypes.Deposit)}
-          >
-            Deposit
-          </span>
-
-          <span
-            className={cn(
-              "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
-              actionType === "withdraw" &&
-                "bg-[#22242A] text-white cursor-default"
-            )}
-            onClick={() => setActionType(TransactionTypes.Withdraw)}
-          >
-            Withdraw
-          </span>
-        </div>
+        <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
           <img
-            src={actionAssets[actionType].logoURI}
-            alt={actionAssets[actionType].symbol}
-            title={actionAssets[actionType].symbol}
+            src={activeAsset[actionType].logoURI}
+            alt={activeAsset[actionType].symbol}
+            title={activeAsset[actionType].symbol}
             className="w-4 h-4 rounded-full"
           />
           <span className="text-[16px] leading-6 font-medium">
-            {actionAssets[actionType].symbol}
+            {activeAsset[actionType].symbol}
           </span>
         </div>
 
@@ -358,16 +372,25 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
               onChange={handleInputChange}
               className="bg-transparent text-2xl font-semibold outline-none w-full"
             />
-            <div className="bg-[#151618] border border-[#23252A] rounded-lg cursor-pointer px-3 py-1 text-[14px]">
-              USD
+            <div
+              className="bg-[#151618] border border-[#23252A] rounded-lg cursor-pointer px-3 py-1 text-[14px]"
+              onClick={() =>
+                handleInputChange({
+                  target: {
+                    value: balances[activeAsset[actionType]?.address].balance,
+                  },
+                })
+              }
+            >
+              MAX
             </div>
           </div>
-          {!!balances && !!actionAssets[actionType] && (
+          {Object.keys(balances).length && !!activeAsset[actionType] && (
             <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
               Balance:{" "}
-              {formatUnits(
-                balances[actionAssets[actionType]?.address],
-                actionType === TransactionTypes.Deposit ? 6 : 18
+              {formatNumber(
+                balances[activeAsset[actionType]?.address].balance,
+                "format"
               )}
             </div>
           )}

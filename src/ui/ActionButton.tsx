@@ -52,7 +52,7 @@ const ActionButton: React.FC<IProps> = ({
                   disabled={transactionInProgress}
                   className={cn(
                     "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold",
-                    transactionInProgress && "text-neutral-500 bg-neutral-900"
+                    transactionInProgress && "text-[#6A6B6F] bg-[#35363B]"
                   )}
                   type="button"
                   onClick={actionFunction}
@@ -66,10 +66,12 @@ const ActionButton: React.FC<IProps> = ({
                 <button
                   disabled
                   className={cn(
-                    "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
+                    "bg-[#35363B] rounded-lg w-full text-[16px] leading-5 font-bold"
                   )}
                 >
-                  <p className="px-6 py-4">Insufficient Balance</p>
+                  <p className="px-6 py-4 text-[#6A6B6F]">
+                    Insufficient Balance
+                  </p>
                 </button>
               ) : type === "disabledCancelVest" ? (
                 <button
@@ -85,7 +87,7 @@ const ActionButton: React.FC<IProps> = ({
                   disabled={transactionInProgress}
                   className={cn(
                     "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold",
-                    transactionInProgress && "text-neutral-500 bg-neutral-900"
+                    transactionInProgress && "text-[#6A6B6F] bg-[#35363B]"
                   )}
                   type="button"
                   onClick={actionFunction}
@@ -99,10 +101,10 @@ const ActionButton: React.FC<IProps> = ({
                 <button
                   disabled
                   className={cn(
-                    "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
+                    "bg-[#35363B] rounded-lg w-full text-[16px] leading-5 font-bold"
                   )}
                 >
-                  <p className="px-6 py-4"> Enter Amount</p>
+                  <p className="px-6 py-4 text-[#6A6B6F]">Enter Amount</p>
                 </button>
               )}
             </>
@@ -113,7 +115,7 @@ const ActionButton: React.FC<IProps> = ({
               )}
               onClick={() => switchChain({ chainId: 146 })}
             >
-              <p className="px-6 py-4"> Switch Network </p>
+              <p className="px-6 py-4">Switch Network </p>
             </button>
           )}
         </>
@@ -125,7 +127,7 @@ const ActionButton: React.FC<IProps> = ({
           )}
           onClick={() => open()}
         >
-          <p className="px-6 py-4"> Connect Wallet</p>
+          <p className="px-6 py-4">Connect Wallet</p>
         </button>
       )}
     </div>
