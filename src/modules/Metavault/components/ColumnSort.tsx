@@ -9,10 +9,10 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Name: "w-[40%]",
-    APR: "w-[20%] justify-end",
-    TVL: "w-[20%] justify-end",
-    Deposit: "w-[20%] justify-end",
+    Name: "w-1/4 md:w-[40%]",
+    APR: "w-1/4 md:w-[20%] justify-center md:justify-end",
+    TVL: "w-1/4 md:w-[20%] justify-center md:justify-end",
+    Deposit: "w-1/4 md:w-[20%] justify-center md:justify-end",
   };
 
   const tabController = () => {
@@ -79,6 +79,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
           height="16"
           viewBox="0 0 16 16"
           fill="none"
+          className="flex-shrink-0"
         >
           <path
             fillRule="evenodd"

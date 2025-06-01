@@ -30,7 +30,7 @@ const VaultsTable: React.FC<IProps> = ({
       key={display}
       className={cn(
         display === "grid" &&
-          "flex items-center gap-6 flex-wrap justify-between"
+          "flex items-center gap-3 md:gap-6 flex-wrap justify-between"
       )}
     >
       {vaults.map((vault: TVault, index: number) => {

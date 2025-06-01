@@ -65,11 +65,11 @@ const Pagination: React.FC<IProps> = memo(
           display === "grid" && "rounded-lg mt-6"
         )}
       >
-        <div className="px-4 h-full flex items-center justify-between">
+        <div className="px-0 md:px-4 h-full flex items-center justify-between">
           <div className="flex items-center">
             <div
               ref={itemsDropDownRef}
-              className="flex items-center gap-4 py-3 pr-4 border-r border-[#23252A] h-full cursor-pointer relative"
+              className="hidden md:flex items-center gap-4 py-3 pr-4 border-r border-[#23252A] h-full cursor-pointer relative"
               onClick={() => setIsItemsDropDown((prev) => !prev)}
             >
               <span className="text-[#97979a]">Items per page:</span>
@@ -118,18 +118,21 @@ const Pagination: React.FC<IProps> = memo(
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center md:gap-4">
             <div
               className={cn(
-                "flex items-center gap-1 py-3",
+                "flex items-center gap-1 md:py-3",
                 tab - 1 && "cursor-pointer"
               )}
               onClick={() => tab - 1 && setTab(tab - 1)}
             >
-              <ArrowIcon isActive={!!(tab - 1)} rotate={90} />
+              <div className="md:p-0 p-4 md:border-l-0 border-l border-[#23252A]">
+                <ArrowIcon isActive={!!(tab - 1)} rotate={90} />
+              </div>
+
               <span
                 className={cn(
-                  "text-[14px] text-[#97979a]",
+                  "text-[14px] text-[#97979a] hidden md:block",
                   tab - 1 && "text-white"
                 )}
               >
@@ -139,7 +142,7 @@ const Pagination: React.FC<IProps> = memo(
             <div
               ref={pagesDropDownRef}
               className={cn(
-                "flex items-center gap-1 cursor-pointer py-3 relative",
+                "hidden md:flex items-center gap-1 cursor-pointer py-3 relative",
                 paginationNumbers.length < 2 && "cursor-default"
               )}
               onClick={() =>
@@ -189,7 +192,7 @@ const Pagination: React.FC<IProps> = memo(
             </div>
             <div
               className={cn(
-                "flex items-center gap-1 py-3",
+                "flex items-center gap-1 md:py-3",
                 tab + 1 <= paginationNumbers.length && "cursor-pointer"
               )}
               onClick={() =>
@@ -198,16 +201,18 @@ const Pagination: React.FC<IProps> = memo(
             >
               <span
                 className={cn(
-                  "text-[14px] text-[#97979a]",
+                  "text-[14px] text-[#97979a] hidden md:block",
                   tab + 1 <= paginationNumbers.length && "text-white"
                 )}
               >
                 Next
               </span>
-              <ArrowIcon
-                isActive={tab + 1 <= paginationNumbers.length}
-                rotate={270}
-              />
+              <div className="md:p-0 p-4 md:border-l-0 border-l border-[#23252A]">
+                <ArrowIcon
+                  isActive={tab + 1 <= paginationNumbers.length}
+                  rotate={270}
+                />
+              </div>
             </div>
           </div>
         </div>

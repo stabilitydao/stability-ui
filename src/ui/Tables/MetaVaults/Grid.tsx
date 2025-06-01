@@ -24,11 +24,11 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   return (
     <a
-      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-[352px] overflow-hidden"
+      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-full md:w-[48%] overflow-hidden"
       data-testid="vault"
       href={`/vaults/vault/${vault.network}/${vault.address}`}
     >
-      <div className="p-6 flex flex-col gap-6">
+      <div className="p-6 flex flex-col gap-3 md:gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
             {vault.assets.map((asset, index) => (

@@ -512,22 +512,22 @@ const SonicVaults = (): JSX.Element => {
 
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="font-bold text-[40px] leading-[48px] text-start mb-5">
-              Vaults
-            </h2>
-            <h3 className="text-[#97979a] font-medium text-[20px] leading-8">
+            <h2 className="page-title__font text-start mb-2 md:mb-5">Vaults</h2>
+            <h3 className="text-[#97979a] page-description__font">
               Aggregates every active strategy across chains and protocols.
-              <br />
+              <br className="hidden md:block" />
               Explore, compare, and deposit into vaults optimized for yield,
-              <br />
+              <br className="hidden md:block" />
               auto-compounding, and multi-protocol integration—all
             </h3>
           </div>
-          <APRtimeSwitcher withText={true} />
+          <div className="md:block hidden">
+            <APRtimeSwitcher withText={true} />
+          </div>
         </div>
         <Portfolio vaults={localVaults} />
 
-        <div className="flex items-center justify-between gap-2 mt-10 mb-4">
+        <div className="flex items-center xl:justify-between gap-2 mt-6 md:mt-10 mb-4">
           <div className="max-w-[240px] w-full relative text-[16px]">
             <label className="relative block">
               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -598,6 +598,7 @@ const SonicVaults = (): JSX.Element => {
             setTableParams={setActiveTableParams}
             resetTable={resetTable}
           />
+
           <DisplayType
             type={displayType}
             setType={setDisplayType}

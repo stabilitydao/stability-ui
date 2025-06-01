@@ -10,6 +10,7 @@ import { PlatformIcon } from "./Platform";
 import { RowsIcon } from "./Rows";
 import { GridIcon } from "./Grid";
 import { ArrowIcon } from "./Arrow";
+import { FiltersIcon } from "./Filters";
 
 export {
   DashboardIcon,
@@ -24,4 +25,5 @@ export {
   RowsIcon,
   GridIcon,
   ArrowIcon,
+  FiltersIcon,
 };

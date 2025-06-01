@@ -34,14 +34,14 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                   maximise returns
                 </p>
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-[150px]">
+              <div className="flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
+                <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
                   <span className="text-[#97979A]">TVL</span>
                   <span className="font-semibold">
                     {formatNumber(metaVault.deposited, "abbreviate")}
                   </span>
                 </div>
-                <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-[150px]">
+                <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
                   <span className="text-[#97979A]">APR</span>
                   <span className="font-semibold text-[#48c05c]">
                     {formatNumber(metaVault.APR, "formatAPR")}%

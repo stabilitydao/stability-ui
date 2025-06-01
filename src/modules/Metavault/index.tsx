@@ -146,19 +146,19 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-4 md:gap-10">
           <div>
             <h2 className="page-title__font text-start mb-4">
               {localMetaVault.symbol} Meta Vault
             </h2>
             <h3 className="text-[#97979a] page-description__font">
               {localMetaVault.symbol} stablecoins deployed across integrated
-              lending protocols <br /> automatically rebalanced on Sonic to
-              maximise returns
+              lending protocols <br className="lg:block hidden" /> automatically
+              rebalanced on Sonic to maximise returns
             </h3>
           </div>
-          <div className="flex items-center flex-wrap gap-6">
-            <div className="flex flex-col gap-2">
+          <div className="flex items-center flex-wrap md:gap-6">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 TVL
               </span>
@@ -168,7 +168,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </span>
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 APR
               </span>
@@ -186,7 +186,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                1.41 USD
             </span>
           </div> */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Protocols
               </span>
@@ -208,7 +208,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Chain
               </span>
@@ -233,10 +233,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
       <div className="flex items-start justify-between flex-col-reverse lg:flex-row gap-6">
         <div className="flex flex-col gap-4 w-full lg:w-[850px]">
-          <span className="font-semibold text-[24px] leading-8">
+          <span className="font-semibold text-[24px] leading-8 hidden md:block">
             Yield Opportunities
           </span>
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between md:justify-end">
+            <span className="font-semibold text-[18px] leading-6 block md:hidden">
+              Yield Opportunities
+            </span>
+
             <DisplayType
               type={displayType}
               setType={setDisplayType}

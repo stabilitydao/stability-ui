@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, memo } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
-import { Checkbox } from "@ui";
+import { Checkbox, FiltersIcon } from "@ui";
 
-import { cn, useClickOutside } from "@utils";
+import { cn, useClickOutside, useModalClickOutside } from "@utils";
 
 import type {
   TTableActiveParams,
@@ -26,11 +26,15 @@ const Filters: React.FC<IProps> = memo(
 
     const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
 
+    const [modal, setModal] = useState<boolean>(false);
+
     const [activeStrategies, setActiveStrategies] = useState(
       searchParams.get("strategies") ? searchParams.get("strategies") : "All"
     );
 
     const dropDownRef = useRef<HTMLDivElement>(null);
+
+    const modalRef = useRef<HTMLDivElement>(null);
 
     const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
       const filterName = filters.find((item) => item.name === filter.name);
@@ -196,10 +200,11 @@ const Filters: React.FC<IProps> = memo(
     }, [searchParams]);
 
     useClickOutside(dropDownRef, () => setDropDownSelector(false));
+    useModalClickOutside(modalRef, () => setModal((prev) => !prev));
 
-    return (
-      filters.length && (
-        <div className="flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold">
+    return filters.length ? (
+      <div>
+        <div className="hidden xl:flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold flex-shrink-0">
           {filters.map((filter: TTableFilters) => (
             <div data-testid="filter" key={filter.name}>
               {filter.type === "single" ? (
@@ -345,8 +350,112 @@ const Filters: React.FC<IProps> = memo(
             </div>
           </div>
         </div>
-      )
-    );
+        <div
+          className={cn(
+            "border border-[#35363b] bg-[#1d1e23] rounded-lg cursor-pointer block xl:hidden ml-auto"
+          )}
+          onClick={() => setModal(true)}
+        >
+          <div className="p-3">
+            <FiltersIcon isActive={true} />
+          </div>
+        </div>
+        {modal && (
+          <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center xl:hidden">
+            <div
+              ref={modalRef}
+              className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
+            >
+              <div className="flex justify-between items-center p-4 border-b border-[#232429]">
+                <h2 className="text-[18px] leading-6 font-semibold">Filters</h2>
+                <button onClick={() => setModal(false)}>
+                  <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3 p-4">
+                {filters.map((filter) => (
+                  <div
+                    key={filter.name}
+                    className="flex items-center justify-between gap-2"
+                  >
+                    <p className="text-[14px] leading-5 font-medium">
+                      {filter.name}
+                    </p>
+                    {filter.type === "single" ? (
+                      <Checkbox
+                        checked={filter.state}
+                        onChange={() => activeFiltersHandler(filter)}
+                      />
+                    ) : filter.type === "sample" ? (
+                      <div className="flex gap-2 bg-[#18191c] border border-[#232429] rounded-lg text-[14px] leading-4">
+                        <button
+                          onClick={() => activeFiltersHandler(filter, "All")}
+                          className={`px-3 py-1 rounded ${
+                            !filter.state
+                              ? "bg-[#232429] border border-[#232429]"
+                              : "text-[#97979A]"
+                          }`}
+                        >
+                          All
+                        </button>
+                        <button
+                          onClick={() => activeFiltersHandler(filter)}
+                          className={`px-3 py-1 rounded ${
+                            filter.state
+                              ? "bg-[#232429] border border-[#232429]"
+                              : "text-[#97979A]"
+                          }`}
+                        >
+                          {filter.name}
+                        </button>
+                      </div>
+                    ) : filter.type === "dropdown" ? (
+                      <div className="flex flex-col gap-1 text-[14px] leading-4 max-h-[70px] overflow-y-auto">
+                        {filter.variants?.map((variant) => (
+                          <label
+                            key={variant.name}
+                            className="inline-flex items-center gap-2"
+                          >
+                            <Checkbox
+                              checked={variant.state}
+                              onChange={() =>
+                                activeFiltersHandler(filter, variant.name)
+                              }
+                            />
+                            <span>{variant.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className={cn(
+                  "flex justify-between items-center px-4 pb-4",
+                  !allParams && "hidden"
+                )}
+              >
+                <button
+                  onClick={resetTable}
+                  className="text-[#816FEA] text-[14px] leading-5 font-semibold"
+                >
+                  Clear all
+                </button>
+                <button
+                  onClick={() => setModal(false)}
+                  className="text-[14px] leading-5 font-semibold px-4 py-3 bg-[#816FEA] rounded-lg"
+                >
+                  View results
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : null;
   }
 );
 

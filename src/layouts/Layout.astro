@@ -164,7 +164,7 @@ const {
 		}
 		.container {
 			left: 0px;
-			width:100%;
+			min-width:100%;
 		}
 
 		.content {
@@ -406,6 +406,7 @@ const {
 		transform-style: preserve-3d;
 	}
 
+
 	.loader > div {
 		background-color: rgba(145,128,244,0.16);
 		height: 100%;
@@ -468,5 +469,11 @@ const {
 		font-size: calc(18px + 2 * ((100vw - 360px) / (1440 - 320)));
 		line-height: 32px;
 		font-weight: 500;
+	}
+
+	.portfolio__font {
+		font-size: calc(32px + 8 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 48px;
+		font-weight: 600;
 	}
 </style>

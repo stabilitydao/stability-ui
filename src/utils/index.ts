@@ -32,6 +32,7 @@ import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaul
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
+import { useModalClickOutside } from "./hooks/useModalClickOutside";
 
 export {
   getTokenData,
@@ -63,6 +64,7 @@ export {
   cn,
   capitalize,
   useClickOutside,
+  useModalClickOutside,
   getTransactionReceipt,
   enrichAndResolveMetaVaults,
 };

@@ -120,8 +120,8 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   }, [$aprFilter, vaults]);
 
   return (
-    <div className="font-manrope mt-10 bg-[#101012] border border-[#23252A] rounded-lg">
-      <div className="pt-6 pb-7 px-6">
+    <div className="font-manrope mt-4 md:mt-10 bg-[#101012] border border-[#23252A] rounded-lg">
+      <div className="md:pt-6 md:pb-7 md:px-6 p-4">
         {/* <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h3 className="text-[1.4rem] font-medium">Portfolio</h3>
@@ -130,12 +130,12 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
         </div> */}
         <div className="flex items-center justify-start gap-6 flex-wrap whitespace-nowrap w-full">
           <div className="flex-1 flex flex-col items-start">
-            <h2 className="text-[14px]  select-none text-[#97979A] leading-5">
+            <h2 className="text-[14px] select-none text-[#97979A] leading-5">
               Deposited
             </h2>
             <div
               data-testid="portfolioDeposited"
-              className="text-[40px] text-white font-semibold"
+              className="portfolio__font text-white"
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
@@ -156,7 +156,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </h2>
             <div
               data-testid="portfolioDaily"
-              className="text-[40px] text-white font-semibold"
+              className="portfolio__font text-white"
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
@@ -175,7 +175,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </h2>
             <div
               data-testid="portfolioMonthly"
-              className="text-[40px] text-white font-semibold"
+              className="portfolio__font text-white"
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
@@ -194,7 +194,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </h2>
             <div
               data-testid="portfolioAPR"
-              className="text-[40px] text-white font-semibold"
+              className="portfolio__font text-white"
             >
               {$isWeb3Load ? (
                 <div className="mt-2">
@@ -213,7 +213,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
             </h2>
             <div
               data-testid="portfolioAPY"
-              className="text-[40px] text-white font-semibold"
+              className="portfolio__font text-white"
             >
               {$isWeb3Load ? (
                 <div className="mt-2">

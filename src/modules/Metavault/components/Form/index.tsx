@@ -12,11 +12,17 @@ import { TabSwitcher } from "./TabSwitcher";
 
 import { ActionButton } from "@ui";
 
-import { getTokenData, getTransactionReceipt, formatNumber } from "@utils";
+import { getTokenData, getTransactionReceipt, formatNumber, cn } from "@utils";
 
 import { IMetaVaultABI, ERC20ABI, sonicClient, wagmiConfig } from "@web3";
 
-import { account, assetsBalances, assetsPrices, lastTx } from "@store";
+import {
+  account,
+  assetsBalances,
+  assetsPrices,
+  connected,
+  lastTx,
+} from "@store";
 
 import { TransactionTypes, TAddress, TMetaVault, TTokenData } from "@types";
 
@@ -25,6 +31,7 @@ interface IProps {
 }
 
 const Form: React.FC<IProps> = ({ metaVault }) => {
+  const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
   const $assetsPrices = useStore(assetsPrices);
@@ -62,6 +69,16 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const [transactionInProgress, setTransactionInProgress] = useState(false);
 
   const [needConfirm, setNeedConfirm] = useState(false);
+
+  const handleMaxInputChange = () => {
+    if ($connected) {
+      handleInputChange({
+        target: {
+          value: balances[activeAsset[actionType]?.address].balance,
+        },
+      });
+    }
+  };
 
   const handleInputChange = (e) => {
     let numericValue = e.target.value.replace(/[^0-9.]/g, "");
@@ -349,7 +366,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   return (
     <WagmiLayout>
-      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-[352px] self-start mt-0 lg:mt-[115px]">
+      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-full lg:w-[352px] self-start mt-0 lg:mt-[115px]">
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
           <img
@@ -373,19 +390,16 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
               className="bg-transparent text-2xl font-semibold outline-none w-full"
             />
             <div
-              className="bg-[#151618] border border-[#23252A] rounded-lg cursor-pointer px-3 py-1 text-[14px]"
-              onClick={() =>
-                handleInputChange({
-                  target: {
-                    value: balances[activeAsset[actionType]?.address].balance,
-                  },
-                })
-              }
+              className={cn(
+                "bg-[#151618] border border-[#23252A] rounded-lg px-3 py-1 text-[14px]",
+                $connected && "cursor-pointer"
+              )}
+              onClick={handleMaxInputChange}
             >
               MAX
             </div>
           </div>
-          {Object.keys(balances).length && !!activeAsset[actionType] && (
+          {Object.keys(balances).length && !!activeAsset[actionType] ? (
             <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
               Balance:{" "}
               {formatNumber(
@@ -393,7 +407,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
                 "format"
               )}
             </div>
-          )}
+          ) : null}
         </label>
         {/* <div className="flex flex-col gap-2 mb-4">
           <div className="flex items-center justify-between">

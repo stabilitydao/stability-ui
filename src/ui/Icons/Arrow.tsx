@@ -13,7 +13,7 @@ export const ArrowIcon: React.FC<IProps> = ({ isActive, rotate = 0 }) => {
       viewBox="0 0 10 6"
       fill="none"
       style={{ transform: `rotate(${rotate}deg)` }}
-      className="transition delay-[50ms]"
+      className="transition delay-[50ms] md:w-[10px] md:h-[6px] w-4 h-4"
     >
       <path
         d="M4.99993 3.78101L8.2998 0.481201L9.2426 1.42401L4.99993 5.66668L0.757324 1.42401L1.70013 0.481201L4.99993 3.78101Z"

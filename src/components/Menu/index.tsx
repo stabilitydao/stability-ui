@@ -97,8 +97,6 @@ const Menu = (): JSX.Element => {
                 />
               </div>
 
-              <Prices isMobile={true} />
-
               <div className="flex flex-col gap-2">
                 {PATHS.map(({ name, path }) => (
                   <div
@@ -125,6 +123,8 @@ const Menu = (): JSX.Element => {
                   </div>
                 ))}
               </div>
+
+              <Prices isMobile={true} />
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">
                 <div className="flex items-center">
