@@ -152,9 +152,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               {localMetaVault.symbol} Meta Vault
             </h2>
             <h3 className="text-[#97979a] page-description__font">
-              {localMetaVault.symbol} stablecoins deployed across integrated
-              lending protocols <br className="lg:block hidden" /> automatically
-              rebalanced on Sonic to maximise returns
+              {localMetaVault.symbol === "metaUSD"
+                ? "Stablecoins"
+                : localMetaVault.symbol}{" "}
+              deployed across protocols automatically{" "}
+              <br className="lg:block hidden" /> rebalanced for maximum returns
+              on sonic
             </h3>
           </div>
           <div className="flex items-center flex-wrap md:gap-6">

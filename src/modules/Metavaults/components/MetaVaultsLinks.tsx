@@ -28,10 +28,13 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                 <span className="text-[24px] font-semibold">
                   {metaVault.name}
                 </span>
+
                 <p className="text-[#97979A] text-[16px]">
-                  {metaVault.symbol} stablecoins deployed across integrated
-                  lending protocols automatically rebalanced on Sonic to
-                  maximise returns
+                  {metaVault.symbol === "metaUSD"
+                    ? "Stablecoins"
+                    : metaVault.symbol}{" "}
+                  deployed across protocols automatically rebalanced for maximum
+                  returns on sonic
                 </p>
               </div>
               <div className="flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
