@@ -6,11 +6,9 @@ import { cn, useClickOutside } from "@utils";
 
 import { PAGINATIONS_VARIANTS } from "@constants";
 
-import type { TVault } from "@types";
-
 interface IProps {
   pagination: number;
-  vaults: TVault[];
+  data: unknown[];
   tab: number;
   display: string;
   setTab: (number: number) => void;
@@ -18,7 +16,7 @@ interface IProps {
 }
 
 const Pagination: React.FC<IProps> = memo(
-  ({ pagination, vaults, tab, display, setTab, setPagination }) => {
+  ({ pagination, data, tab, display, setTab, setPagination }) => {
     const newUrl = new URL(window.location.href);
     const params = new URLSearchParams(newUrl.search);
 
@@ -30,14 +28,13 @@ const Pagination: React.FC<IProps> = memo(
 
     const paginationNumbers = [];
 
-    for (let i = 1; i <= Math.ceil(vaults.length / pagination); i++) {
+    for (let i = 1; i <= Math.ceil(data.length / pagination); i++) {
       paginationNumbers.push(i);
     }
 
     const VISIBLE_VAULTS = {
       first: tab === 1 ? tab : pagination * (tab - 1) + 1,
-      latest:
-        pagination * tab >= vaults.length ? vaults.length : pagination * tab,
+      latest: pagination * tab >= data.length ? data.length : pagination * tab,
     };
 
     useEffect(() => {
@@ -110,10 +107,10 @@ const Pagination: React.FC<IProps> = memo(
               {!!VISIBLE_VAULTS.latest ? (
                 <span className="text-[#97979a]">
                   {VISIBLE_VAULTS.first}-{VISIBLE_VAULTS.latest} of{" "}
-                  {vaults.length} items
+                  {data.length} items
                 </span>
               ) : (
-                <span className="text-[#97979a]">{vaults.length} items</span>
+                <span className="text-[#97979a]">{data.length} items</span>
               )}
             </div>
           </div>

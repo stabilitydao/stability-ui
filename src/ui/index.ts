@@ -30,7 +30,13 @@ import { ShareSkeleton } from "./Skeletons/ShareSkeleton";
 import { Skeleton } from "./Skeletons/Skeleton";
 
 import { NavIcon } from "./NavIcon";
-import { GridIcon, RowsIcon, ArrowIcon, FiltersIcon } from "./Icons";
+import {
+  GridIcon,
+  RowsIcon,
+  ArrowIcon,
+  FiltersIcon,
+  ArrowRightIcon,
+} from "./Icons";
 
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
@@ -78,4 +84,5 @@ export {
   StrategyBadge,
   Prices,
   FiltersIcon,
+  ArrowRightIcon,
 };

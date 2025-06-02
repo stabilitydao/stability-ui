@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
+import { cn } from "@utils";
+
 import type {
   TTableColumn,
   TSort,
@@ -26,6 +28,19 @@ const TableColumnSort: React.FC<TProps> = ({
   tableData,
   setTableData,
 }) => {
+  const styles: Record<string, string> = {
+    Rank: "w-[10%] justify-start",
+    Address: "w-[30%] justify-start",
+    Earned: "w-[30%] justify-end",
+    Deposit: "w-[30%] justify-end",
+    Status: "w-[10%] justify-start",
+    Name: "w-[20%] justify-start",
+    Dates: "w-[20%] justify-start",
+    Task: "w-[20%] justify-end",
+    Rewards: "w-[20%] justify-end",
+    Quest: "w-[10%] justify-end",
+  };
+
   const tabController = () => {
     if (table[index].unsortable) return;
 
@@ -57,36 +72,39 @@ const TableColumnSort: React.FC<TProps> = ({
     sort({ table: updatedTable, setTable, tableData, setTableData });
   };
   return (
-    <th
+    <div
       onClick={tabController}
-      className={`text-[12px] px-2 font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} ${!index ? "sticky left-0 md:relative z-10 w-[150px] bg-accent-950" : ""}`}
+      className={cn(
+        "flex items-center justify-center text-[12px] font-manrope font-semibold px-4 py-2 whitespace-nowrap",
+        !table[index].unsortable && "cursor-pointer",
+        styles[value]
+      )}
+      data-testid="sort"
     >
       <p
-        className={`inline-block ${table[index].sortType !== "none" ? "text-neutral-50" : "text-neutral-600"}`}
+        className={`${table[index].sortType !== "none" ? "text-white" : "text-[#97979A]"}`}
       >
         {value}
       </p>
 
       {!table[index].unsortable && (
         <svg
-          width="15"
-          height="14"
-          viewBox="0 0 15 14"
           xmlns="http://www.w3.org/2000/svg"
-          className={`inline-block ml-1 transition duration-300 ease-in-out ${
-            table[index].sortType === "ascendentic" && "rotate-[180deg]"
-          }`}
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          className="flex-shrink-0"
         >
           <path
-            d="M7.50008 2.91669V11.0834M7.50008 11.0834L11.5834 7.00002M7.50008 11.0834L3.41675 7.00002"
-            stroke={table[index].sortType !== "none" ? "#F9F8FA" : "#958CA1"}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M5.8335 5.8995V7.00048H10.1668V5.8995L8.00016 3.56543L5.8335 5.8995ZM10.1668 10.1013V9.00032H5.8335V10.1013L8.00016 12.4354L10.1668 10.1013Z"
+            fill="#97979A"
           />
         </svg>
       )}
-    </th>
+    </div>
   );
 };
 

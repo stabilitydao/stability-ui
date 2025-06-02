@@ -651,7 +651,7 @@ const SonicVaults = (): JSX.Element => {
         </div>
         <Pagination
           pagination={pagination}
-          vaults={filteredVaults}
+          data={filteredVaults}
           tab={currentTab}
           display={displayType}
           setTab={setCurrentTab}

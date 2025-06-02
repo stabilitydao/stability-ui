@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import { isMobile } from "react-device-detect";
 
-import { ArrowIcon, TimeDifferenceIndicator, StrategyBadge } from "@ui";
+import {
+  ArrowIcon,
+  TimeDifferenceIndicator,
+  StrategyBadge,
+  ArrowRightIcon,
+} from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -283,7 +288,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
           >
             View vault
-            <img src="/icons/arrow-right.svg" alt="Arrow right" />
+            <ArrowRightIcon />
           </a>
         </div>
       ) : null}

@@ -1,29 +1,31 @@
 import { useState, useEffect } from "react";
 
-import { HeadingText, FullPageLoader, TableColumnSort, Badge } from "@ui";
+import { FullPageLoader, TableColumnSort, Badge, Pagination } from "@ui";
 
 import {
   sortTable,
   formatTimestampToDate,
   getTokenData,
   formatNumber,
+  cn,
 } from "@utils";
 
-import { CONTESTS_TABLE } from "@constants";
+import { CONTESTS_TABLE, PAGINATION_VAULTS } from "@constants";
 
 import { contests } from "@stabilitydao/stability";
 
-import type { TTableColumn, IExtendedYieldContest } from "@types";
+import { DisplayTypes } from "@types";
 
-const toContest = (contestId: string): void => {
-  window.location.href = `/contests/${contestId}`;
-};
+import type { TTableColumn, IExtendedYieldContest } from "@types";
 
 const CURRENT_TIMESTAMP_IN_SECONDS = Math.floor(Date.now() / 1000);
 
 const Contests = (): JSX.Element => {
   const [tableStates, setTableStates] = useState(CONTESTS_TABLE);
   const [tableData, setTableData] = useState<IExtendedYieldContest[]>([]);
+
+  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [currentTab, setCurrentTab] = useState<number>(1);
 
   const initTableData = async () => {
     if (contests) {
@@ -65,34 +67,84 @@ const Contests = (): JSX.Element => {
     }
   };
 
+  const lastTabIndex = currentTab * pagination;
+  const firstTabIndex = lastTabIndex - pagination;
+  const currentTabData = tableData.slice(firstTabIndex, lastTabIndex);
+
   useEffect(() => {
     initTableData();
   }, [contests]);
   return (
-    <div className="xl:min-w-[1200px] w-full max-w-[1200px]">
-      <HeadingText text="Contests" scale={1} />
-      {tableData.length ? (
-        <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[800px]">
-          <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[800px] lg:min-w-full">
-            <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-              <tr className="text-[12px] uppercase">
-                {tableStates.map((value: TTableColumn, index: number) => (
-                  <TableColumnSort
-                    key={value.name + index}
-                    index={index}
-                    value={value.name}
-                    sort={sortTable}
-                    table={tableStates}
-                    setTable={setTableStates}
-                    tableData={tableData}
-                    setTableData={setTableData}
-                  />
-                ))}
-              </tr>
-            </thead>
-            <tbody className="text-[14px]">
-              {!!tableData.length &&
-                tableData.map(
+    <div className="min-w-full flex flex-col gap-10 xl:min-w-[1000px]">
+      <div className="flex flex-col gap-4">
+        <h2 className="page-title__font text-start">Contests</h2>
+        <h3 className="text-[#97979a] page-description__font">
+          Join yield contests to earn sGEM rewards. Compete by <br /> depositing
+          into vaults, track your rank, and maximize <br /> returns through
+          strategic participation
+        </h3>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {/* <div className="flex items-center gap-4 text-[14px] leading-5 font-semibold">
+          {TABLE_TYPES.map((type: string) => {
+            const isActive = activeContest === type;
+            // @ts-ignore
+            const hasContestData = !!allContests[type]?.length;
+
+            let dateRange = type;
+
+            switch (type) {
+              case "PAST":
+                if (previousPeriod) {
+                  dateRange = `${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].end)}`;
+                }
+
+                break;
+              case "ACTIVE":
+                dateRange = `${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].end)}`;
+                break;
+
+              case "ABSOLUTE":
+                dateRange = "Absolute";
+
+              default:
+                break;
+            }
+            return (
+              <button
+                key={type}
+                className={cn(
+                  "h-10 px-4 #97979A border border-[#2C2E33] rounded-lg text-[#97979A]",
+                  hasContestData ? "cursor-pointer" : "opacity-50",
+                  isActive && "text-[#FFF] bg-[#22242A]"
+                )}
+                onClick={() => hasContestData && handleActiveContest(type)}
+              >
+                {dateRange}
+              </button>
+            );
+          })}
+        </div> */}
+        <div className="pb-5">
+          <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
+            {tableStates.map((value: TTableColumn, index: number) => (
+              <TableColumnSort
+                key={value.name + index}
+                index={index}
+                value={value.name}
+                sort={sortTable}
+                table={tableStates}
+                setTable={setTableStates}
+                tableData={tableData}
+                setTableData={setTableData}
+              />
+            ))}
+          </div>
+          <div>
+            {currentTabData.length ? (
+              <div>
+                {currentTabData.map(
                   ({
                     id,
                     status,
@@ -116,28 +168,39 @@ const Contests = (): JSX.Element => {
                         : "Future";
 
                     return (
-                      <tr
+                      <a
                         key={name}
-                        className="h-[48px] hover:bg-accent-950 cursor-pointer"
-                        onClick={() => toContest(id)}
+                        href={`/contests/${id}`}
+                        className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] relative flex items-center text-[16px] leading-5 font-medium"
                       >
-                        <td className="px-4 py-3 text-center sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10">
+                        <div className="px-4 w-[10%] text-start text-[#97979A]">
                           <Badge
                             state={badgeState}
                             text={badgeText}
                             greater={true}
                           />
-                        </td>
-                        <td
-                          className={`px-4 py-3 text-center ${contests[id].hidden ? "text-neutral-500" : ""}`}
+                        </div>
+                        <div
+                          className={cn(
+                            "px-4 text-start w-[20%]",
+                            contests[id].hidden && "text-[#97979A]"
+                          )}
                         >
                           {name}
-                        </td>
-                        <td className="text-center px-4 py-3">
+                        </div>
+                        <div className="px-4 w-[20%] text-start text-nowrap">
                           {`${formatTimestampToDate(start, true)} - ${formatTimestampToDate(end, true)}`}
-                        </td>
-                        <td className="text-center px-4 py-3">{minEarn}</td>
-                        <td className="text-left px-4 py-3">
+                        </div>
+                        <div className="px-4 w-[20%] flex items-center justify-end">
+                          {minEarn === "TBA" ? (
+                            <div className="flex items-center justify-center h-6 w-10 bg-[#252528] rounded-[4px] border border-[#58595D] text-[12px] leading-4">
+                              TBA
+                            </div>
+                          ) : (
+                            minEarn
+                          )}
+                        </div>
+                        <div className="px-4 w-[20%] text-start">
                           {Array.isArray(rewards) ? (
                             <div className="flex items-center flex-wrap gap-2">
                               {rewards?.map((reward, index: number) => (
@@ -197,10 +260,12 @@ const Contests = (): JSX.Element => {
                               ))}
                             </div>
                           ) : (
-                            <div>TBA</div>
+                            <div className="flex items-center justify-center h-6 w-10 bg-[#252528] rounded-[4px] border border-[#58595D] text-[12px] leading-4">
+                              TBA
+                            </div>
                           )}
-                        </td>
-                        <td className="text-left px-4 py-3">
+                        </div>
+                        <div className="px-4 w-[10%] flex items-center justify-end">
                           {!!quests?.intract && (
                             <img
                               className="w-6"
@@ -209,17 +274,30 @@ const Contests = (): JSX.Element => {
                               title="Intract"
                             />
                           )}
-                        </td>
-                      </tr>
+                        </div>
+                      </a>
                     );
                   }
                 )}
-            </tbody>
-          </table>
+              </div>
+            ) : (
+              <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
+                <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
+                  <FullPageLoader />
+                </div>
+              </div>
+            )}
+          </div>
+          <Pagination
+            pagination={pagination}
+            data={tableData}
+            tab={currentTab}
+            display={DisplayTypes.Rows}
+            setTab={setCurrentTab}
+            setPagination={setPagination}
+          />
         </div>
-      ) : (
-        <FullPageLoader />
-      )}
+      </div>
     </div>
   );
 };
