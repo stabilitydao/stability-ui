@@ -380,12 +380,12 @@ const METAVAULT_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "Deposit",
-    keyName: "balanceInUSD",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "Deposit",
+  //   keyName: "balanceInUSD",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
 ];
 
 const DEFAULT_TABLE_PARAMS = {

@@ -1,4 +1,4 @@
-import { RewardsCarousel } from "../../RewardsCarousel";
+// import { RewardsCarousel } from "../../RewardsCarousel";
 
 import { formatNumber } from "@utils";
 
@@ -44,14 +44,14 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
 
           <div className="flex flex-col items-start gap-1">
-            <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
+            <span className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap">
               {VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
             </span>
-            <RewardsCarousel
+            {/* <RewardsCarousel
               address={vault.address}
               symbol={vault.symbol}
               points={POINTS}
-            />
+            /> */}
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -90,12 +90,6 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             <span className="font-bold">
               {formatNumber(vault.tvl, "abbreviate")}
             </span>
-          </div>
-          <div className="flex items-center justify-between text-[14px]">
-            <span className="text-[#97979A]">Deposit</span>
-            <p className="font-bold">
-              ${formatNumber(vault.balanceInUSD, "format")}
-            </p>
           </div>
         </div>
       </div>

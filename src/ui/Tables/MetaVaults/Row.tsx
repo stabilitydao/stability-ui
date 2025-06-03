@@ -4,14 +4,14 @@ import { isMobile } from "react-device-detect";
 
 import {
   ArrowIcon,
-  TimeDifferenceIndicator,
+  // TimeDifferenceIndicator,
   StrategyBadge,
   ArrowRightIcon,
 } from "@ui";
 
 import { formatNumber } from "@utils";
 
-import { SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
+import { VAULTS_WITH_NAME } from "@constants";
 
 import { TVault, TAPRModal } from "@types";
 
@@ -48,7 +48,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           }
         }}
       >
-        <div className="flex items-center w-full md:w-[40%] justify-between px-4">
+        <div className="flex items-center w-full md:w-[60%] justify-between px-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center">
               {vault.assets.map((asset, index) => (
@@ -63,7 +63,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               ))}
             </div>
             <span
-              className="font-semibold text-[16px] max-w-[80px] lg:max-w-[110px] truncate overflow-hidden whitespace-nowrap"
+              className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] md:max-w-full"
               title={VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
             >
               {VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
@@ -71,7 +71,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
 
           <div className="flex items-center justify-center gap-1 flex-shrink-0">
-            {!vault.symbol.includes("PT-") && (
+            {/* {!vault.symbol.includes("PT-") && (
               <div
                 title="Sonic Activity Points"
                 className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -120,7 +120,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   <span className="text-[12px]">x{vault.ringsPoints}</span>
                 </div>
               </div>
-            )}
+            )} */}
             <div className="block md:hidden ml-2">
               <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
             </div>
@@ -235,9 +235,6 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         <div className="px-4 text-right text-[16px] w-[20%] hidden md:block">
           {formatNumber(vault.tvl, "abbreviate")}
         </div>
-        <div className="px-4 text-right text-[16px] w-[20%] hidden md:block">
-          <p>${formatNumber(vault.balanceInUSD, "format")}</p>
-        </div>
       </a>
       {expandedData ? (
         <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] md:hidden">
@@ -273,14 +270,6 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </span>
             <span className="text-[16px]">
               {formatNumber(vault.tvl, "abbreviate")}
-            </span>
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Balance
-            </span>
-            <span className="text-[16px]">
-              ${formatNumber(vault.balanceInUSD, "format")}
             </span>
           </div>
           <a

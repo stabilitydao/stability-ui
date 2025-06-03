@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices } from "@ui";
+import { Prices, NavIcon } from "@ui";
 
-import { NavIcon } from "@ui";
+import { cn, formatNumber } from "@utils";
 
-import { cn } from "@utils";
-
-import { isNavbar } from "@store";
+import { apiData, isNavbar } from "@store";
 
 import { PATHS } from "@constants";
 
@@ -19,6 +17,8 @@ const Menu = (): JSX.Element => {
   const currentPath = pathname.slice(1);
 
   const $isNavbar = useStore(isNavbar);
+  const $apiData = useStore(apiData);
+
   const [activePath, setActivePath] = useState("");
 
   useEffect(() => {
@@ -62,6 +62,14 @@ const Menu = (): JSX.Element => {
       setActivePath(currentPath);
     }
   }, []);
+
+  const TVL = useMemo(
+    () =>
+      $apiData?.total?.tvl
+        ? formatNumber($apiData?.total.tvl || 0, "withSpaces")
+        : "0",
+    [$apiData]
+  );
 
   return (
     <div className="block md:hidden">
@@ -125,6 +133,13 @@ const Menu = (): JSX.Element => {
               </div>
 
               <Prices isMobile={true} />
+
+              {TVL ? (
+                <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
+                  <span className="text-[#97979A]">AUM</span>
+                  <span className="text-white">${TVL}</span>
+                </div>
+              ) : null}
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">
                 <div className="flex items-center">
