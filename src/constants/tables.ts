@@ -370,16 +370,23 @@ const METAVAULT_TABLE: TTableColumn[] = [
   },
   {
     name: "APR",
-    keyName: "earningData",
+    keyName: "APR",
     sortType: "none",
     dataType: "number",
   },
   {
-    name: "TVL",
-    keyName: "tvl",
+    name: "Allocation (current / target)",
+    keyName: "",
     sortType: "none",
-    dataType: "number",
+    dataType: "",
+    unsortable: true,
   },
+  // {
+  //   name: "TVL",
+  //   keyName: "tvl",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   // {
   //   name: "Deposit",
   //   keyName: "balanceInUSD",

@@ -7,7 +7,9 @@ import { ColumnSort } from "./components/ColumnSort";
 
 import { DisplayType, FullPageLoader, Pagination, MetaVaultsTable } from "@ui";
 
-import { cn, formatNumber, formatFromBigInt, dataSorter } from "@utils";
+import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
+
+import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -67,25 +69,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
-        if (state.keyName === "earningData") {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            dataSorter(
-              a.earningData.apr.latest,
-              b.earningData.apr.latest,
-              state.dataType,
-              state.sortType
-            )
-          );
-        } else {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            dataSorter(
-              String(a[state.keyName as keyof TVault]),
-              String(b[state.keyName as keyof TVault]),
-              state.dataType,
-              state.sortType
-            )
-          );
-        }
+        sortedVaults = [...sortedVaults].sort((a, b) =>
+          dataSorter(
+            String(a[state.keyName as keyof TVault]),
+            String(b[state.keyName as keyof TVault]),
+            state.dataType,
+            state.sortType
+          )
+        );
       }
     });
 
@@ -102,41 +93,76 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   };
 
   const initMetaVaults = async () => {
-    if ($metaVaults["146"]) {
-      const metaVault = $metaVaults["146"].find(
-        ({ address }: { address: TAddress }) => address === metavault
-      );
+    const chainId = "146";
+    const metaVaultList = $metaVaults[chainId];
 
-      if (metaVault) {
-        let protocols = ["Stability", "Aave", ...metaVault.protocols];
+    if (!metaVaultList || !$vaults) return;
 
-        protocols = protocols.map((name) =>
-          Object.values(PROTOCOLS).find((protocol) => protocol.name === name)
-        );
+    const metaVault = metaVaultList.find(
+      ({ address }: { address: TAddress }) => address === metavault
+    );
 
-        const vaults = metaVault.endVaults
-          .map((address: TAddress) => $vaults[146][address])
-          .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
-          .map((vault: TVault) => {
-            const tVault = vault;
-            const balance = formatFromBigInt(tVault.balance, 18);
+    if (!metaVault) return;
 
-            return {
-              ...tVault,
-              balanceInUSD: balance * Number(tVault.shareprice),
-            };
-          });
+    const proportions = await getMetaVaultProportions(metavault);
 
-        setLocalVaults(vaults);
-        setFilteredVaults(vaults);
-        setLocalMetaVault({ ...metaVault, protocols });
-        setIsLocalVaultsLoaded(true);
-      }
-    }
+    const protocols = ["Stability", "Aave", ...metaVault.protocols].map(
+      (name) => Object.values(PROTOCOLS).find((p) => p.name === name)
+    );
+
+    const vaults = await Promise.all(
+      metaVault.endVaults.map(async (entry, index: number) => {
+        if (entry.isMetaVault) {
+          const subMetaVault = metaVaultList.find(
+            (v) => v.address === entry.metaVault
+          );
+          if (!subMetaVault) return null;
+
+          const { current, target } = await getMetaVaultProportions(
+            entry.metaVault as TAddress
+          );
+
+          const vaultsData = entry.vaults.map((address, i) => ({
+            ...$vaults[chainId][address],
+            proportions: { current: current[i], target: target[i] },
+            APR: $vaults[chainId][address].earningData.apr.latest,
+          }));
+
+          return {
+            ...subMetaVault,
+            proportions: {
+              current: proportions.current[index],
+              target: proportions.target[index],
+            },
+            vaults: vaultsData,
+            isMetaVault: true,
+          };
+        }
+
+        return {
+          ...$vaults[chainId][entry.vault],
+          APR: $vaults[chainId][entry.vault].earningData.apr.latest,
+          proportions: {
+            current: proportions.current[index],
+            target: proportions.target[index],
+          },
+          isMetaVault: false,
+        };
+      })
+    );
+
+    const cleanedVaults = vaults.filter(Boolean);
+
+    setLocalVaults(cleanedVaults);
+    setFilteredVaults(cleanedVaults);
+    setLocalMetaVault({ ...metaVault, protocols });
+    setIsLocalVaultsLoaded(true);
   };
 
   useEffect(() => {
-    initMetaVaults();
+    if ($isVaultsLoaded) {
+      initMetaVaults();
+    }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
 
   const isLoading = useMemo(() => {
@@ -195,19 +221,21 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               </span>
               {!!localMetaVault?.address && (
                 <div className="flex items-center">
-                  {localMetaVault?.protocols.map(({ name, logoSrc }, index) => (
-                    <img
-                      className={cn(
-                        "w-6 h-6 rounded-full",
-                        index && "ml-[-6px]",
-                        `z-[${50 - index}]`
-                      )}
-                      key={name + index}
-                      src={logoSrc}
-                      alt={name}
-                      title={name}
-                    />
-                  ))}
+                  {localMetaVault?.protocols?.map(
+                    ({ name, logoSrc }, index) => (
+                      <img
+                        className={cn(
+                          "w-6 h-6 rounded-full",
+                          index && "ml-[-6px]",
+                          `z-[${50 - index}]`
+                        )}
+                        key={name + index}
+                        src={logoSrc}
+                        alt={name}
+                        title={name}
+                      />
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -244,12 +272,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               Yield Opportunities
             </span>
 
-            <DisplayType
+            {/* <DisplayType
               type={displayType}
               setType={setDisplayType}
               pagination={pagination}
               setPagination={setPagination}
-            />
+            /> */}
           </div>
           <div>
             <div

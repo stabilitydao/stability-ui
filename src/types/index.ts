@@ -288,6 +288,10 @@ type TVault = {
   leverageLending?: TLeverageLendingData;
   liveAPR: undefined | number;
   assetAPR: undefined | number;
+
+  ///// meta vault
+  isMetaVault?: boolean;
+  proportions?: { current: number[]; target: number };
 };
 
 type TMetaVault = {
@@ -305,6 +309,13 @@ type TMetaVault = {
   protocols?: string[];
   strategies?: string[];
 };
+
+type TEndMetaVaults = {
+  isMetaVault: boolean;
+  metaVault?: TAddress;
+  vault?: TAddress;
+  vaults?: TAddress[];
+}[];
 
 type TLeverageLendingData = {
   borrowApr: number;
@@ -793,4 +804,5 @@ export type {
   TMarketPrices,
   TMetaVault,
   TMetaVaults,
+  TEndMetaVaults,
 };

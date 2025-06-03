@@ -1,37 +1,53 @@
-import type { TMetaVault, TVaults, TAddress } from "@types";
+import type { TMetaVault, TVaults, TAddress, TEndMetaVaults } from "@types";
 
 /**
  * Recursively enriches a list of meta vaults with aggregated strategy IDs, protocol names,
- * and terminal (end) vault addresses. Traverses through both direct vaults and nested meta vaults.
+ * and resolved end vault structures. The function traverses each meta vault and collects:
  *
+ * - all unique strategy shortIds used in terminal (non-meta) vaults;
+ * - all protocol names used across strategies;
+ * - all end vaults, represented as either:
+ *    - `{ vault: string, isMetaVault: false }` — for regular vaults,
+ *    - `{ metaVault: string, vaults: string[], isMetaVault: true }` — for nested meta vaults.
+ *
+ * It also handles cyclic references by tracking visited vaults,
+ * and removes duplicates in the resulting `endVaults` array.
  *
  * @example
  * ```ts
  * const enriched = enrichAndResolveMetaVaults(vaults, metaVaults);
  * console.log(enriched[0].strategies); // ["strategy1", "strategy2"]
- * console.log(enriched[0].protocols); // ["Aave", "Curve"]
- * console.log(enriched[0].endVaults); // ["0xabc...", "0xdef..."]
+ * console.log(enriched[0].protocols);  // ["Aave", "Curve"]
+ * console.log(enriched[0].endVaults);  // [
+ *   { vault: "0xabc...", isMetaVault: false },
+ *   { metaVault: "0xmeta...", vaults: ["0xaaa", "0xbbb"], isMetaVault: true }
+ * ]
  * ```
  *
- * @param {TVaults} vaults - An object where keys are vault addresses.
- * @param {TMetaVault[]} metaVaults - A list of meta vaults, each containing nested vault addresses (which may be meta or end vaults).
+ * @param {TVaults} vaults - A dictionary of vaults keyed by address, containing strategy and protocol information.
+ * @param {TMetaVault[]} metaVaults - A list of meta vaults, each containing nested vault addresses (which may refer to meta vaults or base vaults).
  *
- * @returns {TMetaVault[]} An array of meta vaults, each enriched with resolved strategies, protocols, and endVaults.
+ * @returns {TMetaVault[]} A new array of meta vaults enriched with resolved strategies, protocols, and structured end vault information.
  */
 
 const enrichAndResolveMetaVaults = (
   vaults: TVaults,
   metaVaults: TMetaVault[]
 ): TMetaVault[] => {
-  const collectAll = (vaultAddress: TAddress, visited = new Set()) => {
+  const collectAll = (
+    vaultAddress: TAddress,
+    visited = new Set<string>()
+  ): {
+    strategies: string[];
+    protocols: string[];
+    endVaults: TEndMetaVaults;
+  } => {
     const strategies: string[] = [];
     const protocols: string[] = [];
-    const endVaults: TAddress[] = [];
+    const endVaults: TEndMetaVaults = [];
 
     const vaultKey = vaultAddress.toLowerCase() as TAddress;
-
     if (visited.has(vaultKey)) return { strategies, protocols, endVaults };
-
     visited.add(vaultKey);
 
     const vaultData = vaults?.[vaultKey];
@@ -40,18 +56,19 @@ const enrichAndResolveMetaVaults = (
       const { shortId, protocols: vaultProtocols } = vaultData.strategyInfo;
 
       if (shortId) strategies.push(shortId);
-
       vaultProtocols?.forEach(({ name }) => {
         if (name) protocols.push(name);
       });
 
-      endVaults.push(vaultKey);
+      endVaults.push({ vault: vaultKey, isMetaVault: false });
     } else {
       const keyMetaVault = metaVaults.find(
         (metaVault) => metaVault.address.toLowerCase() === vaultKey
       );
 
       if (keyMetaVault) {
+        const nestedVaults: TAddress[] = [];
+
         for (const subVault of keyMetaVault.vaults) {
           const result = collectAll(subVault, visited);
 
@@ -63,8 +80,26 @@ const enrichAndResolveMetaVaults = (
             if (!protocols.includes(protocol)) protocols.push(protocol);
           });
 
-          result.endVaults.forEach((endVault) => {
-            if (!endVaults.includes(endVault)) endVaults.push(endVault);
+          result.endVaults.forEach((endVaultObj) => {
+            if ("vault" in endVaultObj) {
+              nestedVaults.push(endVaultObj?.vault);
+            } else {
+              const alreadyExists = endVaults.some(
+                (ev) =>
+                  "metaVault" in ev &&
+                  ev?.metaVault?.toLowerCase() ===
+                    endVaultObj?.metaVault?.toLowerCase()
+              );
+              if (!alreadyExists) endVaults.push(endVaultObj);
+            }
+          });
+        }
+
+        if (nestedVaults.length > 0) {
+          endVaults.push({
+            metaVault: vaultKey,
+            vaults: nestedVaults,
+            isMetaVault: true,
           });
         }
       }
@@ -74,11 +109,11 @@ const enrichAndResolveMetaVaults = (
   };
 
   return metaVaults.map((meta) => {
-    const visited = new Set();
+    const visited = new Set<string>();
 
     const allStrategies: string[] = [];
     const allProtocols: string[] = [];
-    const allEndVaults: TAddress[] = [];
+    const allEndVaults: TEndMetaVaults = [];
 
     for (const vault of meta.vaults) {
       const { strategies, protocols, endVaults } = collectAll(vault, visited);
@@ -87,12 +122,22 @@ const enrichAndResolveMetaVaults = (
         if (!allStrategies.includes(strategy)) allStrategies.push(strategy);
       });
 
-      protocols.forEach((protocols) => {
-        if (!allProtocols.includes(protocols)) allProtocols.push(protocols);
+      protocols.forEach((protocol) => {
+        if (!allProtocols.includes(protocol)) allProtocols.push(protocol);
       });
 
-      endVaults.forEach((endVault) => {
-        if (!allEndVaults.includes(endVault)) allEndVaults.push(endVault);
+      endVaults.forEach((ev) => {
+        const isDuplicate = allEndVaults.some((existing) => {
+          if ("vault" in ev && "vault" in existing) {
+            return existing.vault === ev.vault;
+          }
+          if ("metaVault" in ev && "metaVault" in existing) {
+            return existing.metaVault === ev.metaVault;
+          }
+          return false;
+        });
+
+        if (!isDuplicate) allEndVaults.push(ev);
       });
     }
 

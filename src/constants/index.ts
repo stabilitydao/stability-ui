@@ -54,7 +54,7 @@ const PAGINATIONS_VARIANTS = {
   grid: [4, 8, 12, 16, 20],
 };
 
-const PAGINATION_VAULTS = 5;
+const PAGINATION_VAULTS = 10;
 
 const MONTHS = [
   "Jan",
@@ -233,7 +233,7 @@ const STABILITY_STRATEGY_LABELS: { [address: string]: string } = {
 
 const VAULTS_WITH_NAME = {
   "0xa51e7204054464e656b3658e7dbb63d9b0f150f1": "Silo USDC(53)",
-  "0xb94b31f3dedaadbda6aa1cec4f49749273929972": "Euler USDC(Re7 Labs Cluster)",
+  "0xb94b31f3dedaadbda6aa1cec4f49749273929972": "Euler scUSD(Re7 Labs Cluster)",
   "0xd248c4b6ec709feed32851a9f883afeac294ad30": "Silo USDC(34)",
   "0x14d17757e88df8f59069ffa573570a50ed652866": "Silo scUSD(46)",
   "0x2ebb3c7808b86f94df9731ae830ab6ea8cb431d8": "SIlo USDC(27)",

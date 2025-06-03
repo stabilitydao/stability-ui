@@ -4,12 +4,12 @@ import { isMobile } from "react-device-detect";
 
 import {
   ArrowIcon,
-  // TimeDifferenceIndicator,
+  TimeDifferenceIndicator,
   StrategyBadge,
   ArrowRightIcon,
 } from "@ui";
 
-import { formatNumber } from "@utils";
+import { cn, formatNumber } from "@utils";
 
 import { VAULTS_WITH_NAME } from "@constants";
 
@@ -35,12 +35,25 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     Array.isArray(vault?.assets) &&
     vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
 
+  const symbol = vault?.isMetaVault
+    ? vault.symbol
+    : VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol;
+
   return (
     <div className="border border-[#23252A] border-b-0">
       <a
-        className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center"
+        className={cn(
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center",
+          !vault?.isMetaVault
+            ? "cursor-default md:cursor-pointer"
+            : "cursor-default"
+        )}
         data-testid="vault"
-        href={`/vaults/vault/${vault.network}/${vault.address}`}
+        href={
+          vault?.isMetaVault
+            ? "#"
+            : `/vaults/vault/${vault.network}/${vault.address}`
+        }
         onClick={(e) => {
           if (window.innerWidth <= 767) {
             e.preventDefault();
@@ -48,25 +61,38 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           }
         }}
       >
-        <div className="flex items-center w-full md:w-[60%] justify-between px-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center w-full md:w-[50%] justify-between px-4">
+          <div
+            className={cn(
+              "flex items-center gap-3",
+              !vault?.isMetaVault && "ml-3 md:ml-5"
+            )}
+          >
             <div className="flex items-center justify-center">
-              {vault.assets.map((asset, index) => (
+              {vault?.isMetaVault ? (
                 <img
-                  src={asset?.logo}
-                  alt={asset?.symbol}
-                  className={`w-8 h-8 rounded-full flex-shrink-0 ${
-                    !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
-                  }`}
-                  key={asset?.logo + index}
+                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  src={`/features/${vault.symbol}.png`}
+                  alt="logo"
                 />
-              ))}
+              ) : (
+                vault.assets.map((asset, index) => (
+                  <img
+                    src={asset?.logo}
+                    alt={asset?.symbol}
+                    className={`w-8 h-8 rounded-full flex-shrink-0 ${
+                      !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
+                    }`}
+                    key={asset?.logo + index}
+                  />
+                ))
+              )}
             </div>
             <span
               className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] md:max-w-full"
-              title={VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
+              title={symbol}
             >
-              {VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol}
+              {symbol}
             </span>
           </div>
 
@@ -128,19 +154,22 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         </div>
         <div
           onClick={(e) => {
-            if (isMobile) {
+            if (isMobile && !vault?.isMetaVault) {
               e.stopPropagation();
-              // setModalState({
-              //   earningData: vault.earningData,
-              //   daily: vault.daily,
-              //   lastHardWork: vault.lastHardWork,
-              //   symbol: vault?.risk?.symbol as string,
-              //   state: true,
-              //   pool: vault?.pool,
-              // });
+              setModalState({
+                earningData: vault.earningData,
+                daily: vault.daily,
+                lastHardWork: vault.lastHardWork,
+                symbol: vault?.risk?.symbol as string,
+                state: true,
+                pool: vault?.pool,
+              });
             }
           }}
-          className="px-4 w-[20%] hidden md:block" //tooltip cursor-help
+          className={cn(
+            "px-4 w-[20%] hidden md:block",
+            !vault?.isMetaVault && "tooltip cursor-help"
+          )}
         >
           <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
             <div className="flex flex-col justify-end">
@@ -154,99 +183,108 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               )}
             </div>
           </div>
-          {/* <div className="visible__tooltip">
-        <div className="flex items-start flex-col gap-2">
-          <div className="flex flex-col gap-1 w-full">
-            {!!vault?.risk?.isRektStrategy && (
-              <div className="flex flex-col items-center gap-2 mb-[10px]">
-                <h3 className="text-[#f52a11] font-bold">
-                  {vault?.risk?.symbol} VAULT
-                </h3>
-                <p className="text-[12px] text-start">
-                  Rekt vault regularly incurs losses, potentially leading to
-                  rapid USD value decline, with returns insufficient to offset
-                  the losses.
-                </p>
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <p className="leading-5 text-[#97979A] font-medium">
-                Total APY
-              </p>
-              <p className="text-end font-semibold">
-                {formatNumber(APRs.APY, "formatAPR")}%
-              </p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="leading-5 text-[#97979A] font-medium">
-                Total APR
-              </p>
-              <p className="text-end font-semibold">
-                {formatNumber(APRs.APR, "formatAPR")}%
-              </p>
-            </div>
-
-            {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
-              vault?.pool && (
+          <div
+            className={cn(!vault?.isMetaVault ? "visible__tooltip" : "hidden")}
+          >
+            <div className="flex items-start flex-col gap-2">
+              <div className="flex flex-col gap-1 w-full">
+                {!!vault?.risk?.isRektStrategy && (
+                  <div className="flex flex-col items-center gap-2 mb-[10px]">
+                    <h3 className="text-[#f52a11] font-bold">
+                      {vault?.risk?.symbol} VAULT
+                    </h3>
+                    <p className="text-[12px] text-start">
+                      Rekt vault regularly incurs losses, potentially leading to
+                      rapid USD value decline, with returns insufficient to
+                      offset the losses.
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <p className="leading-5 text-[#97979A] font-medium">
-                    Pool swap fees APR
+                    Total APY
                   </p>
                   <p className="text-end font-semibold">
-                    {formatNumber(APRs.swapFees, "formatAPR")}%
+                    {formatNumber(APRs.APY, "formatAPR")}%
                   </p>
                 </div>
-              )}
-            <div className="flex items-center justify-between">
-              <p className="leading-5 text-[#97979A] font-medium">
-                Strategy APR
-              </p>
-              <p className="text-end font-semibold">
-                {formatNumber(APRs.strategyAPR, "formatAPR")}%
-              </p>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="leading-5 text-[#97979A] font-medium">Daily</p>
-              <p className="text-end font-semibold">
-                {formatNumber(APRs.dailyAPR, "formatAPR")}%
-              </p>
-            </div>
-            {!isSTBLVault && (
-              <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">
-                  Gems APR
-                </p>
-                <p className="text-end font-semibold">
-                  {formatNumber(APRs.gemsAPR, "formatAPR")}%
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Total APR
+                  </p>
+                  <p className="text-end font-semibold">
+                    {formatNumber(APRs.APR, "formatAPR")}%
+                  </p>
+                </div>
+
+                {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
+                  vault?.pool && (
+                    <div className="flex items-center justify-between">
+                      <p className="leading-5 text-[#97979A] font-medium">
+                        Pool swap fees APR
+                      </p>
+                      <p className="text-end font-semibold">
+                        {formatNumber(APRs.swapFees, "formatAPR")}%
+                      </p>
+                    </div>
+                  )}
+                <div className="flex items-center justify-between">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Strategy APR
+                  </p>
+                  <p className="text-end font-semibold">
+                    {formatNumber(APRs.strategyAPR, "formatAPR")}%
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="leading-5 text-[#97979A] font-medium">Daily</p>
+                  <p className="text-end font-semibold">
+                    {formatNumber(APRs.dailyAPR, "formatAPR")}%
+                  </p>
+                </div>
+                {!isSTBLVault && (
+                  <div className="flex items-center justify-between">
+                    <p className="leading-5 text-[#97979A] font-medium">
+                      Gems APR
+                    </p>
+                    <p className="text-end font-semibold">
+                      {formatNumber(APRs.gemsAPR, "formatAPR")}%
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <p className="leading-5 text-[#97979A] font-medium">
-              Last Hard Work
-            </p>
-            <TimeDifferenceIndicator unix={vault.lastHardWork} />
+              <div className="flex items-center justify-between w-full">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  Last Hard Work
+                </p>
+                <TimeDifferenceIndicator unix={vault.lastHardWork} />
+              </div>
+            </div>
+            <i></i>
           </div>
         </div>
-        <i></i>
-      </div> */}
-        </div>
-        <div className="px-4 text-right text-[16px] w-[20%] hidden md:block">
-          {formatNumber(vault.tvl, "abbreviate")}
+        <div className="px-4 text-right text-[16px] w-[30%] hidden md:block">
+          {(vault?.proportions?.current || vault?.proportions?.target) && (
+            <span>
+              {Number(vault.proportions?.current).toFixed(2)}% /{" "}
+              {Number(vault.proportions?.target).toFixed(2)}%
+            </span>
+          )}
         </div>
       </a>
       {expandedData ? (
         <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] md:hidden">
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Strategy
-            </span>
-            <StrategyBadge
-              info={vault.strategyInfo}
-              specific={vault.strategySpecific}
-            />
-          </div>
+          {!vault?.isMetaVault && (
+            <div className="flex items-center justify-between w-full">
+              <span className="text-[#909193] text-[14px] leading-5 font-medium">
+                Strategy
+              </span>
+              <StrategyBadge
+                info={vault.strategyInfo}
+                specific={vault.strategySpecific}
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
               APR
@@ -264,21 +302,27 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               </div>
             </div>
           </div>
+
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              TVL
+              Allocation
             </span>
-            <span className="text-[16px]">
-              {formatNumber(vault.tvl, "abbreviate")}
-            </span>
+            {(vault?.proportions?.current || vault?.proportions?.target) && (
+              <span className="text-[16px]">
+                {Number(vault.proportions?.current).toFixed(2)}% /{" "}
+                {Number(vault.proportions?.target).toFixed(2)}%
+              </span>
+            )}
           </div>
-          <a
-            href={`/vaults/vault/${vault.network}/${vault.address}`}
-            className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
-          >
-            View vault
-            <ArrowRightIcon />
-          </a>
+          {!vault?.isMetaVault && (
+            <a
+              href={`/vaults/vault/${vault.network}/${vault.address}`}
+              className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
+            >
+              View vault
+              <ArrowRightIcon />
+            </a>
+          )}
         </div>
       ) : null}
     </div>

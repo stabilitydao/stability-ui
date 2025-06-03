@@ -366,7 +366,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   return (
     <WagmiLayout>
-      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-full lg:w-[352px] self-start mt-0 lg:mt-[115px]">
+      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-full lg:w-[352px] self-start mt-0 lg:mt-[64px]">
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
           <img
