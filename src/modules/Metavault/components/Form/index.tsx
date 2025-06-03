@@ -16,6 +16,8 @@ import { getTokenData, getTransactionReceipt, formatNumber, cn } from "@utils";
 
 import { IMetaVaultABI, ERC20ABI, sonicClient, wagmiConfig } from "@web3";
 
+import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+
 import {
   account,
   assetsBalances,
@@ -82,6 +84,50 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     }
   };
 
+  const getGasLimit = async (
+    address: TAddress,
+    functionName: string,
+    params: any[]
+  ) => {
+    try {
+      const gas = await sonicClient.estimateContractGas({
+        address: address,
+        abi: IMetaVaultABI,
+        functionName: functionName,
+        args: params,
+        account: $account as TAddress,
+      });
+
+      const gasLimit = BigInt(
+        Math.trunc(Number(gas) * Number(DEFAULT_TRANSACTION_SETTINGS.gasLimit))
+      );
+
+      if (gasLimit) {
+        return gasLimit;
+      }
+
+      return BigInt(10000);
+    } catch (error) {
+      console.error("Failed to get gasLimit", error);
+    }
+  };
+
+  const errorHandler = (err: Error) => {
+    lastTx.set("No transaction hash...");
+    if (err instanceof Error) {
+      // const errorData = {
+      //   state: true,
+      //   type: err.name,
+      //   description: getShortMessage(err.message),
+      // };
+    }
+    alert("TX ERROR");
+    setValue("");
+    setButton("");
+    setNeedConfirm(false);
+    console.error("ERROR:", err);
+  };
+
   const handleInputChange = (e) => {
     let numericValue = e.target.value.replace(/[^0-9.]/g, "");
 
@@ -134,11 +180,17 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         const approveSum = parseUnits(String(amount), decimals);
 
         setNeedConfirm(true);
+
+        const params = [metaVault.address, approveSum];
+
+        const gasLimit = await getGasLimit(depositToken, "approve", params);
+
         const depositApprove = await writeContract(wagmiConfig, {
           address: depositToken,
           abi: ERC20ABI,
           functionName: "approve",
-          args: [metaVault.address, approveSum],
+          args: params,
+          gas: gasLimit,
         });
         setNeedConfirm(false);
 
@@ -183,7 +235,9 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
           setButton("Deposit");
         }
 
-        console.error("Approve error:", error);
+        if (error instanceof Error) {
+          errorHandler(error);
+        }
       }
     }
 
@@ -203,11 +257,26 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
     try {
       setNeedConfirm(true);
+
+      const params = [
+        [activeAsset.deposit.address],
+        [_value],
+        shares,
+        $account,
+      ];
+
+      const gasLimit = await getGasLimit(
+        metaVault.address,
+        "depositAssets",
+        params
+      );
+
       const _action = await writeContract(wagmiConfig, {
         address: metaVault.address,
         abi: IMetaVaultABI,
         functionName: "depositAssets",
-        args: [[activeAsset.deposit.address], [_value], shares, $account],
+        args: params,
+        gas: gasLimit,
       });
 
       setNeedConfirm(false);
@@ -221,8 +290,9 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         setButton("");
       }
     } catch (error) {
-      setNeedConfirm(false);
-      console.error("Deposit error:", error);
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
     }
     setTransactionInProgress(false);
   };
@@ -240,11 +310,21 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
     try {
       setNeedConfirm(true);
+
+      const params = [[activeAsset.withdraw.address], _value, [shares]];
+
+      const gasLimit = await getGasLimit(
+        metaVault.address,
+        "withdrawAssets",
+        params
+      );
+
       const _action = await writeContract(wagmiConfig, {
         address: metaVault.address,
         abi: IMetaVaultABI,
         functionName: "withdrawAssets",
-        args: [[activeAsset.withdraw.address], _value, [shares]],
+        args: params,
+        gas: gasLimit,
       });
 
       setNeedConfirm(false);
@@ -258,8 +338,9 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         setButton("");
       }
     } catch (error) {
-      setNeedConfirm(false);
-      console.error("Deposit error:", error);
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
     }
     setTransactionInProgress(false);
   };

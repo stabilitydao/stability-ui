@@ -663,6 +663,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         args: [argsAddress, approveSum],
         account: $account as TAddress,
       });
+
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(settings.gasLimit))
       );
