@@ -70,6 +70,8 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const [needConfirm, setNeedConfirm] = useState(false);
 
+  const [maxWithdraw, setMaxWithdraw] = useState(0);
+
   const handleMaxInputChange = () => {
     if ($connected) {
       handleInputChange({
@@ -90,6 +92,13 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     }
 
     const balance = balances[activeAsset[actionType]?.address].balance;
+
+    if (
+      Number(numericValue) > Number(maxWithdraw) &&
+      actionType === TransactionTypes.Withdraw
+    ) {
+      numericValue = maxWithdraw;
+    }
 
     if (!Number(numericValue)) {
       setButton("");
@@ -284,6 +293,16 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         functionName: "assetsForWithdraw",
       });
 
+      const maxWithdrawAmountTx = await sonicClient.readContract({
+        address: metaVault.address,
+        abi: IMetaVaultABI,
+        functionName: "maxWithdrawAmountTx",
+      });
+
+      if (maxWithdrawAmountTx) {
+        setMaxWithdraw(formatUnits(maxWithdrawAmountTx, 18));
+      }
+
       if ($account) {
         const metaVaultAllowance = await sonicClient.readContract({
           address: assetsForDeposit[0] as TAddress,
@@ -409,6 +428,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             </div>
           ) : null}
         </label>
+        {actionType === TransactionTypes.Withdraw && (
+          <div className="text-[#909193] text-[14px] leading-5 font-medium mb-3">
+            Max withdraw next tx: {formatNumber(maxWithdraw, "format")}
+          </div>
+        )}
         {/* <div className="flex flex-col gap-2 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

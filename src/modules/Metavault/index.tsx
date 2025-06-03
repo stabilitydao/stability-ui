@@ -215,7 +215,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                1.41 USD
             </span>
           </div> */}
-            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Protocols
               </span>
@@ -239,7 +239,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2">
+            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Chain
               </span>
