@@ -14,9 +14,15 @@ import { ActionButton } from "@ui";
 
 import { getTokenData, getTransactionReceipt, formatNumber, cn } from "@utils";
 
-import { IMetaVaultABI, ERC20ABI, sonicClient, wagmiConfig } from "@web3";
+import {
+  IMetaVaultABI,
+  ERC20ABI,
+  sonicClient,
+  wagmiConfig,
+  WrappedMetaVaultABI,
+} from "@web3";
 
-import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS, META_VAULTS_TYPE } from "@constants";
 
 import {
   account,
@@ -55,9 +61,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const [formAssets, setFormAssets] = useState<{
     deposit: TTokenData[];
     withdraw: TTokenData[];
+    wrap: {};
   }>({
     deposit: [],
     withdraw: [],
+    wrap: {},
   });
 
   const [button, setButton] = useState<string>("none");
@@ -66,7 +74,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const [balances, setBalances] = useState({});
 
-  const [allowance, setAllowance] = useState(0);
+  const [allowance, setAllowance] = useState({ deposit: 0, wrap: 0 });
 
   const [transactionInProgress, setTransactionInProgress] = useState(false);
 
@@ -90,9 +98,15 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     params: any[]
   ) => {
     try {
+      const abi = [TransactionTypes.Wrap, TransactionTypes.Unwrap].includes(
+        actionType
+      )
+        ? WrappedMetaVaultABI
+        : IMetaVaultABI;
+
       const gas = await sonicClient.estimateContractGas({
         address: address,
-        abi: IMetaVaultABI,
+        abi: abi,
         functionName: functionName,
         args: params,
         account: $account as TAddress,
@@ -151,7 +165,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     } else if (actionType === TransactionTypes.Deposit) {
       if (Number(numericValue) > Number(balance)) {
         setButton("insufficientBalance");
-      } else if (Number(numericValue) > Number(allowance)) {
+      } else if (Number(numericValue) > Number(allowance.deposit)) {
         setButton("Approve");
       } else if (Number(numericValue) <= Number(balance)) {
         setButton("Deposit");
@@ -162,6 +176,20 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       } else if (Number(numericValue) <= Number(balance)) {
         setButton("Withdraw");
       }
+    } else if (actionType === TransactionTypes.Wrap) {
+      if (Number(numericValue) > Number(balance)) {
+        setButton("insufficientBalance");
+      } else if (Number(numericValue) > Number(allowance.wrap)) {
+        setButton("Approve");
+      } else if (Number(numericValue) <= Number(balance)) {
+        setButton("Wrap");
+      }
+    } else if (actionType === TransactionTypes.Unwrap) {
+      if (Number(numericValue) > Number(balance)) {
+        setButton("insufficientBalance");
+      } else if (Number(numericValue) <= Number(balance)) {
+        setButton("Unwrap");
+      }
     }
 
     setValue(numericValue);
@@ -169,9 +197,15 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const approve = async () => {
     setTransactionInProgress(true);
-    const depositToken = activeAsset.deposit.address;
+    const depositToken =
+      TransactionTypes.Deposit === actionType
+        ? activeAsset.deposit.address
+        : activeAsset.wrap.address;
 
-    const decimals = activeAsset.deposit.decimals;
+    const decimals =
+      TransactionTypes.Deposit === actionType
+        ? activeAsset.deposit.decimals
+        : activeAsset.wrap.decimals;
 
     const amount = Number(value);
 
@@ -181,7 +215,12 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
         setNeedConfirm(true);
 
-        const params = [metaVault.address, approveSum];
+        const params = [
+          TransactionTypes.Deposit === actionType
+            ? metaVault.address
+            : activeAsset.unwrap.address,
+          approveSum,
+        ];
 
         const gasLimit = await getGasLimit(depositToken, "approve", params);
 
@@ -200,39 +239,59 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
           lastTx.set(transaction?.transactionHash);
 
           const newAllowance = await sonicClient.readContract({
-            address: depositToken as TAddress,
+            address:
+              TransactionTypes.Deposit === actionType
+                ? depositToken
+                : activeAsset.wrap.address,
             abi: ERC20ABI,
             functionName: "allowance",
-            args: [$account as TAddress, metaVault.address as TAddress],
+            args: [
+              $account as TAddress,
+              TransactionTypes.Deposit === actionType
+                ? metaVault.address
+                : activeAsset.unwrap.address,
+            ],
           });
 
           let parsedAllowance = Number(
-            formatUnits(newAllowance, activeAsset.deposit.decimals)
+            formatUnits(newAllowance, activeAsset[actionType].decimals)
           );
 
-          setAllowance(parsedAllowance);
+          setAllowance((prev) => ({ ...prev, [actionType]: parsedAllowance }));
 
           if (Number(parsedAllowance) >= Number(amount)) {
-            setButton("Deposit");
+            setButton(
+              TransactionTypes.Deposit === actionType ? "Deposit" : "Wrap"
+            );
           }
         }
       } catch (error) {
         setNeedConfirm(false);
         const newAllowance = await sonicClient.readContract({
-          address: depositToken as TAddress,
+          address:
+            TransactionTypes.Deposit === actionType
+              ? depositToken
+              : activeAsset.wrap.address,
           abi: ERC20ABI,
           functionName: "allowance",
-          args: [$account as TAddress, metaVault.address as TAddress],
+          args: [
+            $account as TAddress,
+            TransactionTypes.Deposit === actionType
+              ? metaVault.address
+              : activeAsset.unwrap.address,
+          ],
         });
 
         let parsedAllowance = Number(
           formatUnits(newAllowance, activeAsset.deposit.decimals)
         );
 
-        setAllowance(parsedAllowance);
+        setAllowance((prev) => ({ ...prev, [actionType]: parsedAllowance }));
 
         if (Number(parsedAllowance) >= Number(amount)) {
-          setButton("Deposit");
+          setButton(
+            TransactionTypes.Deposit === actionType ? "Deposit" : "Wrap"
+          );
         }
 
         if (error instanceof Error) {
@@ -345,6 +404,98 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     setTransactionInProgress(false);
   };
 
+  const wrap = async () => {
+    setTransactionInProgress(true);
+
+    const decimals = activeAsset.wrap.decimals;
+
+    const amount = Number(value);
+
+    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+
+    try {
+      setNeedConfirm(true);
+
+      const params = [shares, $account];
+
+      const gasLimit = await getGasLimit(
+        activeAsset.unwrap.address,
+        "deposit",
+        params
+      );
+
+      const _action = await writeContract(wagmiConfig, {
+        address: activeAsset.unwrap.address,
+        abi: WrappedMetaVaultABI,
+        functionName: "deposit",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const transaction = await getTransactionReceipt(_action);
+
+      if (transaction?.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+
+        setValue("");
+        setButton("");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    }
+    setTransactionInProgress(false);
+  };
+
+  const unwrap = async () => {
+    setTransactionInProgress(true);
+
+    const decimals = 18;
+
+    const amount = Number(value);
+
+    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+
+    try {
+      setNeedConfirm(true);
+
+      const params = [shares, $account, $account];
+
+      const gasLimit = await getGasLimit(
+        activeAsset.unwrap.address,
+        "withdraw",
+        params
+      );
+
+      const _action = await writeContract(wagmiConfig, {
+        address: activeAsset.unwrap.address,
+        abi: WrappedMetaVaultABI,
+        functionName: "withdraw",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const transaction = await getTransactionReceipt(_action);
+
+      if (transaction?.status === "success") {
+        lastTx.set(transaction?.transactionHash);
+
+        setValue("");
+        setButton("");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    }
+    setTransactionInProgress(false);
+  };
+
   const formHandler = async () => {
     if (button === "Approve") {
       await approve();
@@ -352,6 +503,10 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       await deposit();
     } else if (button === "Withdraw") {
       await withdraw();
+    } else if (button === "Wrap") {
+      await wrap();
+    } else if (button === "Unwrap") {
+      await unwrap();
     }
   };
 
@@ -384,12 +539,46 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         setMaxWithdraw(formatUnits(maxWithdrawAmountTx, 18));
       }
 
+      let wrap = {};
+      let unwrap = {};
+
+      if (META_VAULTS_TYPE[metaVault.symbol] === "multiVault") {
+        wrap = getTokenData(assetsForDeposit[0].toLowerCase());
+
+        if (metaVault.symbol === "metaUSDC") {
+          unwrap = {
+            address: "0xeeeeeee6d95e55a468d32feb5d6648754d10a967",
+            symbol: "wmetaUSDC",
+          };
+        }
+
+        if (metaVault.symbol === "metascUSD") {
+          unwrap = {
+            address: "0xcccccccca9fc69a2b32408730011edb3205a93a1",
+            symbol: "wmetascUSD",
+          };
+        }
+      } else if (META_VAULTS_TYPE[metaVault.symbol] === "metaVault") {
+        wrap = metaVault;
+        unwrap = {
+          address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
+          symbol: "wmetaUSD",
+        };
+      }
+
       if ($account) {
         const metaVaultAllowance = await sonicClient.readContract({
           address: assetsForDeposit[0] as TAddress,
           abi: ERC20ABI,
           functionName: "allowance",
           args: [$account as TAddress, metaVault.address as TAddress],
+        });
+
+        const wrappedMetaVaultAllowance = await sonicClient.readContract({
+          address: wrap.address as TAddress,
+          abi: ERC20ABI,
+          functionName: "allowance",
+          args: [$account as TAddress, unwrap.address as TAddress],
         });
 
         const metaVaultBalance = (await sonicClient.readContract({
@@ -399,14 +588,26 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
           args: [$account as TAddress],
         })) as bigint;
 
+        const wrapMetaVaultBalance = (await sonicClient.readContract({
+          address: unwrap.address,
+          abi: WrappedMetaVaultABI,
+          functionName: "balanceOf",
+          args: [$account as TAddress],
+        })) as bigint;
+
         const decimals =
           getTokenData(assetsForDeposit[0].toLowerCase())?.decimals || 18;
 
         let parsedAllowance = Number(formatUnits(metaVaultAllowance, decimals));
 
-        if (parsedAllowance) {
-          setAllowance(parsedAllowance);
-        }
+        let parsedWrappedAllowance = Number(
+          formatUnits(wrappedMetaVaultAllowance, 18)
+        );
+
+        setAllowance({
+          deposit: parsedAllowance,
+          wrap: parsedWrappedAllowance,
+        });
 
         assetsForDeposit.forEach((address) => {
           const key = address.toLowerCase();
@@ -430,6 +631,40 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
           };
         });
 
+        // if (META_VAULTS_TYPE[metaVault.symbol] === "multiVault") {
+
+        //   const wrapKey = metaVault.address.toLowerCase();
+        //   const unwrapKey = unwrap.address;
+
+        //     if (metaVault.symbol === "metaUSDC") {
+        //   unwrap = {
+        //     address: "0xeeeeeee6d95e55a468d32feb5d6648754d10a967",
+        //     symbol: "wmetaUSDC",
+        //   };
+        // }
+
+        // if (metaVault.symbol === "metascUSD") {
+        //   unwrap = {
+        //     address: "0xcccccccca9fc69a2b32408730011edb3205a93a1",
+        //     symbol: "wmetascUSD",
+        //   };
+        // }
+
+        // } else if (META_VAULTS_TYPE[metaVault.symbol] === "metaVault") {
+        const wrapKey = metaVault.address.toLowerCase();
+        const unwrapKey = unwrap.address;
+
+        newBalances[wrapKey] = {
+          bigIntBalance: metaVaultBalance,
+          balance: formatUnits(metaVaultBalance, 18),
+        };
+
+        newBalances[unwrapKey] = {
+          bigIntBalance: wrapMetaVaultBalance,
+          balance: formatUnits(wrapMetaVaultBalance, 18),
+        };
+        // }
+
         setBalances(newBalances);
       }
 
@@ -440,6 +675,8 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         withdraw: assetsForWithdraw.map((asset) =>
           getTokenData(asset.toLowerCase())
         ) as TTokenData[],
+        wrap,
+        unwrap,
       });
 
       setActiveAsset({
@@ -447,6 +684,8 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         withdraw: getTokenData(
           assetsForWithdraw[0].toLowerCase()
         ) as TTokenData,
+        wrap,
+        unwrap,
       });
     } catch (error) {
       console.error("Get data error:", error);
@@ -469,14 +708,24 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-full lg:w-[352px] self-start mt-0 lg:mt-[64px]">
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
-          <img
-            src={activeAsset[actionType].logoURI}
-            alt={activeAsset[actionType].symbol}
-            title={activeAsset[actionType].symbol}
-            className="w-4 h-4 rounded-full"
-          />
+          {TransactionTypes.Wrap === actionType &&
+          META_VAULTS_TYPE[metaVault.symbol] === "metaVault" ? (
+            <img
+              src={`/features/${activeAsset?.[actionType].symbol}.png`}
+              alt={activeAsset?.[actionType].symbol}
+              title={activeAsset?.[actionType].symbol}
+              className="w-4 h-4 rounded-full"
+            />
+          ) : (
+            <img
+              src={activeAsset?.[actionType].logoURI}
+              alt={activeAsset?.[actionType].symbol}
+              title={activeAsset?.[actionType].symbol}
+              className="w-4 h-4 rounded-full"
+            />
+          )}
           <span className="text-[16px] leading-6 font-medium">
-            {activeAsset[actionType].symbol}
+            {activeAsset?.[actionType].symbol}
           </span>
         </div>
 

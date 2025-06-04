@@ -27,6 +27,7 @@ import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
 import IXStakingABI from "./abi/IXStakingABI.ts";
 import IXSTBLABI from "./abi/IXSTBLABI.ts";
 import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
+import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -165,4 +166,5 @@ export {
   SaleABI,
   SALE_CONTRACT,
   IMetaVaultABI,
+  WrappedMetaVaultABI,
 };

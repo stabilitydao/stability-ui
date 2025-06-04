@@ -718,6 +718,8 @@ export enum DisplayTypes {
 export enum TransactionTypes {
   Deposit = "deposit",
   Withdraw = "withdraw",
+  Wrap = "wrap",
+  Unwrap = "unwrap",
 }
 
 export type {

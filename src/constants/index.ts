@@ -246,6 +246,12 @@ const VAULTS_WITH_NAME = {
   "0x7fc269e8a80d4cfbbcfab99a6bceac06227e2336": "Stability Stablejack USDC",
 };
 
+const META_VAULTS_TYPE = {
+  metaUSD: "metaVault",
+  metaUSDC: "multiVault",
+  metascUSD: "multiVault",
+};
+
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
@@ -304,4 +310,5 @@ export {
   STABILITY_AAVE_POOLS,
   STABILITY_STRATEGY_LABELS,
   VAULTS_WITH_NAME,
+  META_VAULTS_TYPE,
 };

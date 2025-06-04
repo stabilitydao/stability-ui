@@ -39,6 +39,8 @@ const ActionButton: React.FC<IProps> = ({
     "Stake",
     "Unstake",
     "Approve",
+    "Wrap",
+    "Unwrap",
   ];
 
   return (
