@@ -72,7 +72,12 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const [value, setValue] = useState("");
 
-  const [balances, setBalances] = useState({});
+  const [balances, setBalances] = useState({
+    deposit: {},
+    withdraw: {},
+    wrap: {},
+    unwrap: {},
+  });
 
   const [allowance, setAllowance] = useState({ deposit: 0, wrap: 0 });
 
@@ -81,16 +86,6 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const [needConfirm, setNeedConfirm] = useState(false);
 
   const [maxWithdraw, setMaxWithdraw] = useState(0);
-
-  const handleMaxInputChange = () => {
-    if ($connected) {
-      handleInputChange({
-        target: {
-          value: balances[activeAsset[actionType]?.address].balance,
-        },
-      });
-    }
-  };
 
   const getGasLimit = async (
     address: TAddress,
@@ -142,6 +137,16 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     console.error("ERROR:", err);
   };
 
+  const handleMaxInputChange = () => {
+    if ($connected) {
+      handleInputChange({
+        target: {
+          value: Object.values(balances?.[actionType])[0]?.balance,
+        },
+      });
+    }
+  };
+
   const handleInputChange = (e) => {
     let numericValue = e.target.value.replace(/[^0-9.]/g, "");
 
@@ -151,7 +156,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       numericValue = "0" + numericValue;
     }
 
-    const balance = balances[activeAsset[actionType]?.address].balance;
+    const balance = Object.values(balances?.[actionType])[0]?.balance;
 
     if (
       Number(numericValue) > Number(maxWithdraw) &&
@@ -205,7 +210,9 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     const decimals =
       TransactionTypes.Deposit === actionType
         ? activeAsset.deposit.decimals
-        : activeAsset.wrap.decimals;
+        : metaVault.symbol != "metaUSD"
+          ? activeAsset.withdraw.decimals
+          : 18;
 
     const amount = Number(value);
 
@@ -407,7 +414,8 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const wrap = async () => {
     setTransactionInProgress(true);
 
-    const decimals = activeAsset.wrap.decimals;
+    const decimals =
+      metaVault.symbol != "metaUSD" ? activeAsset.withdraw.decimals : 18;
 
     const amount = Number(value);
 
@@ -453,7 +461,8 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   const unwrap = async () => {
     setTransactionInProgress(true);
 
-    const decimals = 18;
+    const decimals =
+      metaVault.symbol != "metaUSD" ? activeAsset.withdraw.decimals : 18;
 
     const amount = Number(value);
 
@@ -515,7 +524,12 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       const newBalances: Record<
         string,
         { bigIntBalance: bigint; balance: string }
-      > = {};
+      > = {
+        deposit: {},
+        withdraw: {},
+        wrap: {},
+        unwrap: {},
+      };
 
       const assetsForDeposit = await sonicClient.readContract({
         address: metaVault.address,
@@ -616,7 +630,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
           const bigIntBalance = $assetsBalances[146]?.[key] ?? BigInt(0);
 
-          newBalances[key] = {
+          newBalances.deposit[key] = {
             bigIntBalance,
             balance: formatUnits(bigIntBalance, _decimals),
           };
@@ -625,45 +639,31 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         assetsForWithdraw.forEach((address) => {
           const key = address.toLowerCase();
 
-          newBalances[key] = {
+          newBalances.withdraw[key] = {
             bigIntBalance: metaVaultBalance,
             balance: formatUnits(metaVaultBalance, 18),
           };
         });
 
-        // if (META_VAULTS_TYPE[metaVault.symbol] === "multiVault") {
-
-        //   const wrapKey = metaVault.address.toLowerCase();
-        //   const unwrapKey = unwrap.address;
-
-        //     if (metaVault.symbol === "metaUSDC") {
-        //   unwrap = {
-        //     address: "0xeeeeeee6d95e55a468d32feb5d6648754d10a967",
-        //     symbol: "wmetaUSDC",
-        //   };
-        // }
-
-        // if (metaVault.symbol === "metascUSD") {
-        //   unwrap = {
-        //     address: "0xcccccccca9fc69a2b32408730011edb3205a93a1",
-        //     symbol: "wmetascUSD",
-        //   };
-        // }
-
-        // } else if (META_VAULTS_TYPE[metaVault.symbol] === "metaVault") {
-        const wrapKey = metaVault.address.toLowerCase();
+        const wrapKey = wrap.address;
         const unwrapKey = unwrap.address;
 
-        newBalances[wrapKey] = {
-          bigIntBalance: metaVaultBalance,
-          balance: formatUnits(metaVaultBalance, 18),
-        };
+        if (META_VAULTS_TYPE[metaVault.symbol] === "multiVault") {
+          newBalances.wrap[wrapKey] = Object.values(newBalances.deposit)[0];
+        } else {
+          newBalances.wrap[wrapKey] = {
+            bigIntBalance: metaVaultBalance,
+            balance: formatUnits(metaVaultBalance, 18),
+          };
+        }
 
-        newBalances[unwrapKey] = {
+        newBalances.unwrap[unwrapKey] = {
           bigIntBalance: wrapMetaVaultBalance,
-          balance: formatUnits(wrapMetaVaultBalance, 18),
+          balance: formatUnits(
+            wrapMetaVaultBalance,
+            metaVault.symbol != "metaUSD" ? activeAsset.withdraw.decimals : 18
+          ),
         };
-        // }
 
         setBalances(newBalances);
       }
@@ -752,7 +752,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
               Balance:{" "}
               {formatNumber(
-                balances[activeAsset[actionType]?.address].balance,
+                Object.values(balances?.[actionType])[0]?.balance || 0,
                 "format"
               )}
             </div>
