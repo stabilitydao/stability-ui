@@ -708,8 +708,12 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg w-full lg:w-[352px] self-start mt-0 lg:mt-[64px]">
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <div className="bg-[#1B1D21] border border-[#23252A] rounded-lg py-3 px-4 flex items-center gap-3">
-          {TransactionTypes.Wrap === actionType &&
-          META_VAULTS_TYPE[metaVault.symbol] === "metaVault" ? (
+          {([TransactionTypes.Wrap, TransactionTypes.Unwrap].includes(
+            actionType
+          ) &&
+            META_VAULTS_TYPE[metaVault.symbol] === "metaVault") ||
+          (TransactionTypes.Unwrap === actionType &&
+            META_VAULTS_TYPE[metaVault.symbol] === "multiVault") ? (
             <img
               src={`/features/${activeAsset?.[actionType].symbol}.png`}
               alt={activeAsset?.[actionType].symbol}

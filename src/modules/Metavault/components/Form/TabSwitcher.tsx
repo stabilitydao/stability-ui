@@ -1,10 +1,12 @@
 import { useState } from "react";
-import type React from "react";
+
+import { isMobile } from "react-device-detect";
 
 import { motion } from "framer-motion";
 
 import { cn } from "@utils";
 
+import type React from "react";
 import { TransactionTypes } from "@types";
 
 interface IProps {
@@ -19,8 +21,8 @@ const TabSwitcher: React.FC<IProps> = ({ actionType, setActionType }) => {
     <div className=" overflow-x-auto hide-scrollbar">
       <motion.div
         className="flex items-center gap-2 text-[14px] mb-6"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => !isMobile && setHovered(true)}
+        onMouseLeave={() => !isMobile && setHovered(false)}
         animate={hovered ? { x: "-30%" } : { x: 0 }}
         transition={{
           duration: 3,

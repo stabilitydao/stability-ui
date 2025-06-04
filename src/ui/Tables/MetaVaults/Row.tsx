@@ -43,15 +43,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     <div className="border border-[#23252A] border-b-0">
       <a
         className={cn(
-          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center",
-          !vault?.isMetaVault
-            ? "cursor-default md:cursor-pointer"
-            : "cursor-default"
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer"
         )}
         data-testid="vault"
         href={
           vault?.isMetaVault
-            ? "#"
+            ? `/metavaults/metavault/${vault.address}`
             : `/vaults/vault/${vault.network}/${vault.address}`
         }
         onClick={(e) => {
@@ -314,15 +311,18 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               </span>
             )}
           </div>
-          {!vault?.isMetaVault && (
-            <a
-              href={`/vaults/vault/${vault.network}/${vault.address}`}
-              className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
-            >
-              View vault
-              <ArrowRightIcon />
-            </a>
-          )}
+
+          <a
+            href={
+              vault?.isMetaVault
+                ? `/metavaults/metavault/${vault.address}`
+                : `/vaults/vault/${vault.network}/${vault.address}`
+            }
+            className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
+          >
+            {vault?.isMetaVault ? "View Meta Vault" : "View Vault"}
+            <ArrowRightIcon />
+          </a>
         </div>
       ) : null}
     </div>
