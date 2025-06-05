@@ -241,7 +241,7 @@ const VAULTS_WITH_NAME = {
   "0x96a8055090e87bfe18bdf3794e9d676f196efd80": "Silo USDC (8)",
   "0x38274302e0dd5779b4e0a3e401023cfb48ff5c23": "Silo USDC (36)",
   "0xfbb02d242527f3b56af3f087acddaa25d5e8acc4":
-    "Euler scUSD(MEV capital Sonic cluster)",
+    "Euler scUSD (MEV capital Sonic cluster)",
   "0x0c8ce5afc38c94e163f0ddeb2da65df4904734f3": "Stability Stream USDC",
   "0x402ae122caece6ce57203e3bd4af7d1e9ac446cb": "Stability USDC",
   "0x7fc269e8a80d4cfbbcfab99a6bceac06227e2336": "Stability Stablejack USDC",
