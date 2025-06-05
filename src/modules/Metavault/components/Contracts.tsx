@@ -65,7 +65,17 @@ const Contracts: React.FC<IProps> = memo(({ metaVault }) => {
                   address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
                   symbol: "wmetaUSD",
                 }
-              : {};
+              : metaVault.symbol === "metawS"
+                ? {
+                    address: "0xffffffff2fcbefae12f1372c56edc769bd411685",
+                    symbol: "wmetawS",
+                  }
+                : metaVault.symbol === "metaS"
+                  ? {
+                      address: "0xbbbbbbbbbd0ae69510ce374a86749f8276647b19",
+                      symbol: "wmetaS",
+                    }
+                  : {};
 
       const contractsInfo = [
         {

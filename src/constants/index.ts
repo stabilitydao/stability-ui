@@ -250,6 +250,8 @@ const META_VAULTS_TYPE = {
   metaUSD: "metaVault",
   metaUSDC: "multiVault",
   metascUSD: "multiVault",
+  metawS: "multiVault",
+  metaS: "multiVault",
 };
 
 const PATHS = [

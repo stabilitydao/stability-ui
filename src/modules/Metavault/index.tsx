@@ -25,6 +25,7 @@ import type {
   TEarningData,
   TMetaVault,
 } from "@types";
+import { formatUnits } from "viem";
 
 interface IProps {
   metavault: TAddress;
@@ -170,6 +171,18 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
   }, [$isVaultsLoaded, isLocalVaultsLoaded]);
 
+  const TVL = useMemo(() => {
+    if (localMetaVault.deposited) {
+      if (["metaS", "metawS"].includes(localMetaVault?.symbol)) {
+        const formattedNum = formatUnits(localMetaVault.deposited, 12);
+
+        return `${formatNumber(formattedNum, "abbreviate").slice(1)} S`;
+      } else {
+        return formatNumber(localMetaVault.deposited, "abbreviate");
+      }
+    }
+  }, [localMetaVault]);
+
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
@@ -192,9 +205,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 TVL
               </span>
+
               {!!localMetaVault?.address && (
                 <span className="font-semibold text-[18px] leading-6">
-                  {formatNumber(localMetaVault.deposited, "abbreviate")}
+                  {TVL}
                 </span>
               )}
             </div>
