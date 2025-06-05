@@ -244,6 +244,8 @@ const VAULTS_WITH_NAME = {
   "0x0c8ce5afc38c94e163f0ddeb2da65df4904734f3": "Stability Stream USDC",
   "0x402ae122caece6ce57203e3bd4af7d1e9ac446cb": "Stability USDC",
   "0x7fc269e8a80d4cfbbcfab99a6bceac06227e2336": "Stability Stablejack USDC",
+  "0x86a4a379d9a2a3b3f0e1f8aa477c82f646344458": "Silo (54)",
+  "0xa70f074ee09df3c0ab7e9eb0c058941ff65b8efe": "Valmore S",
 };
 
 const META_VAULTS_TYPE = {

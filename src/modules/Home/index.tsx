@@ -43,12 +43,20 @@ const Home = (): JSX.Element => {
               solution
               <br className="hidden md:block" /> based on AI.
             </p>
-            <a
-              className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
-              href="/vaults"
-            >
-              Vaults
-            </a>
+            <div className="flex items-center gap-5">
+              <a
+                className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
+                href="/metavaults"
+              >
+                Meta Vaults
+              </a>
+              <a
+                className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
+                href="/vaults"
+              >
+                Vaults
+              </a>
+            </div>
           </div>
         </main>
         <footer className="py-6 md:py-[3rem] px-1 flex items-center lg:items-end justify-between flex-col lg:flex-row md:responsive-font__footer! gap-5 min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px] home-footer">
