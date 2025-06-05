@@ -579,19 +579,19 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             symbol: "wmetawS",
           };
         }
-
-        if (metaVault.symbol === "metaS") {
+      } else if (META_VAULTS_TYPE[metaVault.symbol] === "metaVault") {
+        wrap = metaVault;
+        if (metaVault.symbol === "metaUSD") {
+          unwrap = {
+            address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
+            symbol: "wmetaUSD",
+          };
+        } else {
           unwrap = {
             address: "0xbbbbbbbbbd0ae69510ce374a86749f8276647b19",
             symbol: "wmetaS",
           };
         }
-      } else if (META_VAULTS_TYPE[metaVault.symbol] === "metaVault") {
-        wrap = metaVault;
-        unwrap = {
-          address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
-          symbol: "wmetaUSD",
-        };
       }
 
       if ($account) {
