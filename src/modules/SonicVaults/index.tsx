@@ -19,7 +19,14 @@ import {
   DisplayType,
 } from "@ui";
 
-import { vaults, isVaultsLoaded, aprFilter, connected, error } from "@store";
+import {
+  vaults,
+  isVaultsLoaded,
+  aprFilter,
+  connected,
+  error,
+  metaVaults,
+} from "@store";
 
 import { initFilters } from "./functions";
 
@@ -47,6 +54,7 @@ import type {
 
 const SonicVaults = (): JSX.Element => {
   const $vaults = useStore(vaults);
+  const $metaVaults = useStore(metaVaults);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
@@ -93,6 +101,7 @@ const SonicVaults = (): JSX.Element => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
+  const [localMetaVaults, setLocalMetaVaults] = useState([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -299,14 +308,21 @@ const SonicVaults = (): JSX.Element => {
       return acc;
     }, {});
 
-    let sortedVaults = Object.values(mixedVaults)
+    const allVaults = [
+      ...(localMetaVaults || []),
+      ...Object.values(mixedVaults || []),
+    ];
+
+    let sortedVaults = allVaults
       .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
       .map((vault) => {
-        const balance = formatFromBigInt(vault.balance, 18);
+        const balance = formatFromBigInt(vault.balance ?? 0, 18);
 
         return {
           ...vault,
-          balanceInUSD: balance * Number(vault.shareprice),
+          balanceInUSD: vault?.isMetaVault
+            ? balance
+            : balance * Number(vault.shareprice),
         };
       });
 
@@ -375,18 +391,22 @@ const SonicVaults = (): JSX.Element => {
           break;
       }
     });
+
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
         if (state.keyName === "earningData") {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            dataSorter(
-              a.earningData.apr[$aprFilter],
-              b.earningData.apr[$aprFilter],
-              state.dataType,
-              state.sortType
-            )
-          );
+          sortedVaults = [...sortedVaults].sort((a, b) => {
+            const aAPR = a?.isMetaVault
+              ? Number(a.APR ?? 0)
+              : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
+
+            const bAPR = b?.isMetaVault
+              ? Number(b.APR ?? 0)
+              : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
+
+            return dataSorter(aAPR, bAPR, state.dataType, state.sortType);
+          });
         } else {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
@@ -399,6 +419,7 @@ const SonicVaults = (): JSX.Element => {
         }
       }
     });
+
     //search
     sortedVaults = sortedVaults.filter(
       (vault: TVault) =>
@@ -451,12 +472,17 @@ const SonicVaults = (): JSX.Element => {
   };
 
   const initVaults = async () => {
-    if ($vaults) {
-      const vaults: TVault[] = Object.values($vaults[146])
+    if ($vaults && $metaVaults) {
+      const allVaults = [
+        ...($metaVaults["146"] || []),
+        ...Object.values($vaults[146] || []),
+      ];
+
+      const vaults: TVault[] = allVaults
         .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
           const tVault = vault as TVault;
-          const balance = formatFromBigInt(tVault.balance, 18);
+          const balance = formatFromBigInt(tVault.balance ?? 0, 18);
 
           return {
             ...tVault,
@@ -471,10 +497,14 @@ const SonicVaults = (): JSX.Element => {
         activeNetworksHandler,
         setActiveTableParams
       );
+
       setLocalVaults(vaults);
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
+
+      /*** Meta Vaults ***/
+      setLocalMetaVaults($metaVaults["146"]);
     }
   };
 

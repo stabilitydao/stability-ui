@@ -6,6 +6,8 @@ import { FullPageLoader } from "@ui";
 
 import { MetaVaultsLinks } from "./components/MetaVaultsLinks";
 
+import { META_VAULTS_TYPE } from "@constants";
+
 import { metaVaults } from "@store";
 
 const Metavaults = (): JSX.Element => {
@@ -14,7 +16,13 @@ const Metavaults = (): JSX.Element => {
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
 
   const initMetavaults = async () => {
-    setLocalMetaVaults($metaVaults["146"]);
+    const onlyMetaVaults = $metaVaults["146"].filter(
+      ({ symbol }: { symbol: string }) =>
+        META_VAULTS_TYPE[symbol as keyof typeof META_VAULTS_TYPE] ===
+        "metaVault"
+    );
+
+    setLocalMetaVaults(onlyMetaVaults);
   };
 
   useEffect(() => {
@@ -24,7 +32,7 @@ const Metavaults = (): JSX.Element => {
   }, [$metaVaults]);
 
   return (
-    <div className="mx-auto flex flex-col gap-6 md:gap-10">
+    <div className="mx-auto flex flex-col gap-6 md:gap-10 lg:min-w-[1000px]">
       <div>
         <h2 className="page-title__font text-start mb-2 md:mb-5">
           Meta Vaults

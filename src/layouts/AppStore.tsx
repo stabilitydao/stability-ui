@@ -43,7 +43,12 @@ import {
   marketPrices,
 } from "@store";
 
-import { platforms, frontendContracts, web3clients } from "@web3";
+import {
+  platforms,
+  frontendContracts,
+  web3clients,
+  IMetaVaultABI,
+} from "@web3";
 
 import {
   calculateAPY,
@@ -913,6 +918,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => ({
               ...metaVault,
+              status: "Active",
+              isMetaVault: true,
               deposited: formatUnits(Number(metaVault.deposited), 6),
             }));
 
@@ -920,6 +927,38 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               localVaults[chain.id],
               _metaVaults
             );
+
+            if (isConnected) {
+              let localClient = web3clients[chain.id] ?? web3clients["146"];
+
+              try {
+                const balances = await Promise.all(
+                  localMetaVaults[chain.id].map(async (mv) => {
+                    const metaVaultBalance = (await localClient.readContract({
+                      address: mv.address,
+                      abi: IMetaVaultABI,
+                      functionName: "balanceOf",
+                      args: [address as TAddress],
+                    })) as bigint;
+
+                    return {
+                      ...mv,
+                      balance: metaVaultBalance,
+                    };
+                  })
+                );
+
+                localMetaVaults[chain.id] = balances;
+              } catch (txError: any) {
+                console.log("BLOCKCHAIN ERROR:", txError);
+
+                error.set({
+                  state: true,
+                  type: "WEB3",
+                  description: txError?.message,
+                });
+              }
+            }
           }
         }
       )

@@ -34,19 +34,21 @@ const VaultsTable: React.FC<IProps> = ({
       )}
     >
       {vaults.map((vault: TVault, index: number) => {
-        const aprValue = Number(vault?.earningData?.apr[period]);
+        const aprValue = vault?.isMetaVault
+          ? Number(vault?.APR)
+          : Number(vault?.earningData?.apr[period]);
 
-        const apyValue = vault.earningData.apy[period];
+        const apyValue = vault?.earningData?.apy[period];
 
-        const swapFeesAPRValue = vault.earningData.poolSwapFeesAPR[period];
+        const swapFeesAPRValue = vault?.earningData?.poolSwapFeesAPR[period];
 
-        const strategyAPRValue = vault.earningData.farmAPR[period];
+        const strategyAPRValue = vault?.earningData?.farmAPR[period];
 
         const dailyAPRValue = (
           Number(vault?.earningData?.apr[period]) / 365
         ).toFixed(2);
 
-        const gemsAprValue = Number(vault.earningData.gemsAPR[period]);
+        const gemsAprValue = Number(vault?.earningData?.gemsAPR[period]);
 
         const APR_DATA = {
           APR: aprValue.toFixed(2),

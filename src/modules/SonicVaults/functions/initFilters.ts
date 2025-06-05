@@ -33,13 +33,15 @@ export const initFilters = (
 ): void => {
   const shortNames = Array.from(
     new Map(
-      vaults.map((vault) => [
-        vault.strategyInfo.shortId,
-        {
-          name: vault.strategyInfo.shortId,
-          title: vault.strategy,
-        },
-      ])
+      vaults
+        .filter((vault) => vault?.strategyInfo)
+        .map((vault) => [
+          vault.strategyInfo.shortId,
+          {
+            name: vault.strategyInfo.shortId,
+            title: vault.strategy,
+          },
+        ])
     ).values()
   );
 

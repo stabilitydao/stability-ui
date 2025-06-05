@@ -66,12 +66,17 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        let apr = Number(v?.earningData?.apr?.[$aprFilter]);
+        let apr = v?.isMetaVault
+          ? Number(v.APR)
+          : Number(v?.earningData?.apr?.[$aprFilter]);
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(v.shareprice);
-        apr = Number(apr);
-        const balance = vaultBalance * vaultSharePrice;
+
+        const balance = v?.isMetaVault
+          ? vaultBalance
+          : vaultBalance * vaultSharePrice;
+
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
       }
