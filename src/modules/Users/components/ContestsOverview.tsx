@@ -236,7 +236,7 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                     </span>
 
                     <div className="flex flex-col gap-1">
-                      {contest.rewards.length ? (
+                      {Array.isArray(contest.rewards) ? (
                         <>
                           {contest.rewards.map((reward, index: number) => (
                             <div

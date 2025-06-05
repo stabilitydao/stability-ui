@@ -54,7 +54,7 @@ const PAGINATIONS_VARIANTS = {
   grid: [4, 8, 12, 16, 20],
 };
 
-const PAGINATION_VAULTS = 10;
+const PAGINATION_VAULTS = 20;
 
 const MONTHS = [
   "Jan",

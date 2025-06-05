@@ -4,6 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
+import { Contracts } from "./components/Contracts";
 
 import { DisplayType, FullPageLoader, Pagination, MetaVaultsTable } from "@ui";
 
@@ -207,14 +208,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </span>
               )}
             </div>
-            {/* <div className="flex flex-col gap-2">
-            <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-              Daily returns
-            </span>
-            <span className="font-semibold text-[18px] leading-6">
-               1.41 USD
-            </span>
-          </div> */}
             <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Protocols
@@ -328,7 +321,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             />
           </div>
         </div>
-        <Form metaVault={localMetaVault} />
+        <div className="flex flex-col gap-5 w-full lg:w-[352px] mt-0 lg:mt-[64px]">
+          <Form metaVault={localMetaVault} />
+          <Contracts metaVault={localMetaVault} />
+        </div>
       </div>
     </div>
   );
