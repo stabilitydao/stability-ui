@@ -100,6 +100,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
+  const $metaVaults = useStore(metaVaults);
 
   let isError = false;
 
@@ -920,7 +921,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               ...metaVault,
               status: "Active",
               isMetaVault: true,
-              deposited: formatUnits(Number(metaVault.deposited), 6),
+              deposited: formatUnits(
+                metaVault.deposited,
+                ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
+              ),
             }));
 
             localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
@@ -997,6 +1001,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   };
 
   useEffect(() => {
+    if (!$metaVaults) {
+      metaVaults.set({ "146": deployments["146"].metaVaults });
+    }
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 

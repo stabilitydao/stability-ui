@@ -381,7 +381,7 @@ const SonicVaults = (): JSX.Element => {
 
             if (strategiesToFilter.length) {
               sortedVaults = sortedVaults.filter((vault: TVault) =>
-                strategiesToFilter.includes(vault.strategyInfo.shortId)
+                strategiesToFilter.includes(vault?.strategyInfo?.shortId)
               );
             }
           }

@@ -6,7 +6,13 @@ import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
 import { Contracts } from "./components/Contracts";
 
-import { DisplayType, FullPageLoader, Pagination, MetaVaultsTable } from "@ui";
+import {
+  DisplayType,
+  FullPageLoader,
+  Pagination,
+  MetaVaultsTable,
+  Skeleton,
+} from "@ui";
 
 import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
 
@@ -25,7 +31,6 @@ import type {
   TEarningData,
   TMetaVault,
 } from "@types";
-import { formatUnits } from "viem";
 
 interface IProps {
   metavault: TAddress;
@@ -174,9 +179,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const TVL = useMemo(() => {
     if (localMetaVault.deposited) {
       if (["metaS", "metawS"].includes(localMetaVault?.symbol)) {
-        const formattedNum = formatUnits(localMetaVault.deposited, 12);
-
-        return `${formatNumber(formattedNum, "abbreviate").slice(1)} S`;
+        return `${formatNumber(localMetaVault.deposited, "abbreviate").slice(1)} S`;
       } else {
         return formatNumber(localMetaVault.deposited, "abbreviate");
       }
@@ -188,17 +191,28 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
           <div>
-            <h2 className="page-title__font text-start mb-4">
-              {localMetaVault?.symbol}
-            </h2>
-            <h3 className="text-[#97979a] page-description__font">
-              {localMetaVault?.symbol === "metaUSD"
-                ? "Stablecoins"
-                : localMetaVault?.symbol?.slice(4)}{" "}
-              deployed across protocols automatically{" "}
-              <br className="lg:block hidden" /> rebalanced for maximum returns
-              on sonic
-            </h3>
+            {isLoading ? (
+              <div className="mb-4">
+                <Skeleton height={48} width={250} />
+              </div>
+            ) : (
+              <h2 className="page-title__font text-start mb-4">
+                {localMetaVault?.symbol}
+              </h2>
+            )}
+
+            {isLoading ? (
+              <Skeleton height={64} width={250} />
+            ) : (
+              <h3 className="text-[#97979a] page-description__font">
+                {localMetaVault?.symbol === "metaUSD"
+                  ? "Stablecoins"
+                  : localMetaVault?.symbol?.slice(4)}{" "}
+                deployed across protocols automatically{" "}
+                <br className="lg:block hidden" /> rebalanced for maximum
+                returns on sonic
+              </h3>
+            )}
           </div>
           <div className="flex items-center flex-wrap md:gap-6">
             <div className="flex flex-col gap-2 w-1/2 md:w-auto">
@@ -206,9 +220,13 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 TVL
               </span>
 
-              {!!localMetaVault?.address && (
+              {isLoading ? (
+                <div className="mt-2">
+                  <Skeleton height={24} width={80} />
+                </div>
+              ) : (
                 <span className="font-semibold text-[18px] leading-6">
-                  {TVL}
+                  {!!localMetaVault?.address ? TVL : null}
                 </span>
               )}
             </div>
@@ -216,9 +234,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 APR
               </span>
-              {!!localMetaVault?.address && (
+              {isLoading ? (
+                <div className="mt-2">
+                  <Skeleton height={24} width={80} />
+                </div>
+              ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
-                  {formatNumber(localMetaVault.APR, "formatAPR")}%
+                  {!!localMetaVault?.APR
+                    ? formatNumber(localMetaVault.APR, "formatAPR")
+                    : null}
+                  %
                 </span>
               )}
             </div>
@@ -226,23 +251,30 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Protocols
               </span>
-              {!!localMetaVault?.address && (
+
+              {isLoading ? (
+                <div className="mt-2">
+                  <Skeleton height={24} width={80} />
+                </div>
+              ) : (
                 <div className="flex items-center">
-                  {localMetaVault?.protocols?.map(
-                    ({ name, logoSrc }, index) => (
-                      <img
-                        className={cn(
-                          "w-6 h-6 rounded-full",
-                          index && "ml-[-6px]",
-                          `z-[${50 - index}]`
-                        )}
-                        key={name + index}
-                        src={logoSrc}
-                        alt={name}
-                        title={name}
-                      />
-                    )
-                  )}
+                  {!!localMetaVault?.protocols
+                    ? localMetaVault?.protocols?.map(
+                        ({ name, logoSrc }, index) => (
+                          <img
+                            className={cn(
+                              "w-6 h-6 rounded-full",
+                              index && "ml-[-6px]",
+                              `z-[${50 - index}]`
+                            )}
+                            key={name + index}
+                            src={logoSrc}
+                            alt={name}
+                            title={name}
+                          />
+                        )
+                      )
+                    : null}
                 </div>
               )}
             </div>

@@ -16,6 +16,7 @@ const Metavaults = (): JSX.Element => {
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
 
   const initMetavaults = async () => {
+    // todo: change only to vault type
     const onlyMetaVaults = $metaVaults["146"].filter(
       ({ symbol }: { symbol: string }) =>
         META_VAULTS_TYPE[symbol as keyof typeof META_VAULTS_TYPE] ===

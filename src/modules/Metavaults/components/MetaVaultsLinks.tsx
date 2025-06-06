@@ -1,8 +1,14 @@
 import { memo } from "react";
 
+import { useStore } from "@nanostores/react";
+
 import { formatUnits } from "viem";
 
+import { Skeleton } from "@ui";
+
 import { formatNumber } from "@utils";
+
+import { isWeb3Load } from "@store";
 
 import type { TMetaVault } from "@types";
 
@@ -11,15 +17,15 @@ interface IProps {
 }
 
 const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
+  const $isWeb3Load = useStore(isWeb3Load);
+
   return (
     <div className="flex items-center flex-wrap gap-3 md:gap-[25px]">
       {metaVaults.map((metaVault) => {
         let TVL = "0";
         if (metaVault.deposited) {
           if (["metaS", "metawS"].includes(metaVault?.symbol)) {
-            const formattedNum = formatUnits(metaVault.deposited, 12);
-
-            TVL = `${formatNumber(formattedNum, "abbreviate").slice(1)} S`;
+            TVL = `${formatNumber(metaVault.deposited, "abbreviate").slice(1)} S`;
           } else {
             TVL = formatNumber(metaVault.deposited, "abbreviate");
           }
@@ -38,9 +44,15 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
               />
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
-                  <span className="text-[24px] font-semibold">
-                    {metaVault.name}
-                  </span>
+                  {$isWeb3Load ? (
+                    <div className="mb-2">
+                      <Skeleton height={40} width={150} />
+                    </div>
+                  ) : (
+                    <span className="text-[24px] font-semibold">
+                      {metaVault.name}
+                    </span>
+                  )}
 
                   <p className="text-[#97979A] text-[16px]">
                     {metaVault?.symbol === "metaUSD"
@@ -53,13 +65,21 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                 <div className="flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
                   <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
                     <span className="text-[#97979A]">TVL</span>
-                    <span className="font-semibold">{TVL}</span>
+                    {$isWeb3Load ? (
+                      <Skeleton height={25} width={70} />
+                    ) : (
+                      <span className="font-semibold">{TVL}</span>
+                    )}
                   </div>
                   <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
                     <span className="text-[#97979A]">APR</span>
-                    <span className="font-semibold text-[#48c05c]">
-                      {formatNumber(metaVault.APR, "formatAPR")}%
-                    </span>
+                    {$isWeb3Load ? (
+                      <Skeleton height={25} width={70} />
+                    ) : (
+                      <span className="font-semibold text-[#48c05c]">
+                        {formatNumber(metaVault.APR, "formatAPR")}%
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

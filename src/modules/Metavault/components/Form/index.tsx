@@ -417,9 +417,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     const decimals =
       metaVault.symbol != "metaUSD" ? activeAsset.withdraw.decimals : 18;
 
-    const amount = Number(value);
-
-    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+    const shares = parseUnits(value, decimals);
 
     try {
       setNeedConfirm(true);
@@ -464,9 +462,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     const decimals =
       metaVault.symbol != "metaUSD" ? activeAsset.withdraw.decimals : 18;
 
-    const amount = Number(value);
-
-    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+    const shares = parseUnits(value, decimals);
 
     try {
       setNeedConfirm(true);
