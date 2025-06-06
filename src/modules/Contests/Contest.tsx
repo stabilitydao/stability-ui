@@ -118,14 +118,19 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
                       </span>
                     )}
 
-                    {reward.type === "Gems1" && (
+                    {reward.type.includes("Gems1") && (
                       <span className="flex items-center">
                         <img
                           src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
                           className="w-[24px] h-[24px]"
                           alt="sGEM1"
                         />
-                        <span className="ml-2  font-bold">sGEM1</span>
+                        <span className="ml-2 font-bold">
+                          sGEM1{" "}
+                          {reward.type === "Gems1 Targeted"
+                            ? reward.targetVault
+                            : null}
+                        </span>
                       </span>
                     )}
 
