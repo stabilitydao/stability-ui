@@ -48,6 +48,7 @@ import {
   frontendContracts,
   web3clients,
   IMetaVaultABI,
+  sGEM1,
 } from "@web3";
 
 import {
@@ -917,15 +918,41 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           );
 
           if (APIMetaVaultsData.length) {
-            const _metaVaults = APIMetaVaultsData.map((metaVault) => ({
-              ...metaVault,
-              status: "Active",
-              isMetaVault: true,
-              deposited: formatUnits(
-                metaVault.deposited,
-                ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
-              ),
-            }));
+            let sGEM1Price = 0;
+            const sonicPrices = stabilityAPIData.assetPrices["146"];
+
+            if (sonicPrices) {
+              sGEM1Price = Number(
+                sonicPrices[sGEM1?.toLowerCase() as keyof typeof sonicPrices]
+                  ?.price
+              );
+            }
+
+            const _metaVaults = APIMetaVaultsData.map((metaVault) => {
+              let gemsAPR = 0;
+
+              let totalAPR = "0";
+
+              if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+                const gemsInUSD = 750000 * sGEM1Price;
+                const TVL = Number(metaVault.tvl);
+
+                gemsAPR = (gemsInUSD / TVL) * (365 / 14) * 100;
+                totalAPR = Number(metaVault.APR) + Number(gemsAPR);
+              }
+
+              return {
+                ...metaVault,
+                status: "Active",
+                isMetaVault: true,
+                deposited: formatUnits(
+                  metaVault.deposited,
+                  ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
+                ),
+                gemsAPR,
+                totalAPR,
+              };
+            });
 
             localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
               localVaults[chain.id],
@@ -1002,7 +1029,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   useEffect(() => {
     if (!$metaVaults) {
-      metaVaults.set({ "146": deployments["146"].metaVaults });
+      const metaVaultsWithName = deployments["146"].metaVaults?.map(
+        (metaV) => ({ ...metaV, name: getTokenData(metaV.address)?.name })
+      );
+
+      metaVaults.set({ "146": metaVaultsWithName });
     }
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);

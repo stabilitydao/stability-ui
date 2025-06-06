@@ -22,6 +22,8 @@ import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
 import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
 
+import { getTokenData } from "@stabilitydao/stability";
+
 import { DisplayTypes } from "@types";
 
 import type {
@@ -232,7 +234,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
             <div className="flex flex-col gap-2 w-1/2 md:w-auto">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-                APR
+                TOTAL APR
               </span>
               {isLoading ? (
                 <div className="mt-2">
@@ -240,9 +242,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
-                  {!!localMetaVault?.APR
-                    ? formatNumber(localMetaVault.APR, "formatAPR")
-                    : null}
+                  {["metaUSD", "metaS"].includes(localMetaVault.symbol)
+                    ? formatNumber(localMetaVault?.totalAPR, "formatAPR")
+                    : formatNumber(localMetaVault?.APR, "formatAPR")}
                   %
                 </span>
               )}

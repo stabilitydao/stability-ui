@@ -11,6 +11,7 @@ import { formatNumber } from "@utils";
 import { isWeb3Load } from "@store";
 
 import type { TMetaVault } from "@types";
+import { getTokenData } from "@stabilitydao/stability";
 
 interface IProps {
   metaVaults: TMetaVault[];
@@ -30,6 +31,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
             TVL = formatNumber(metaVault.deposited, "abbreviate");
           }
         }
+
         return (
           <a
             key={metaVault.address}
@@ -44,15 +46,9 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
               />
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
-                  {$isWeb3Load ? (
-                    <div className="mb-2">
-                      <Skeleton height={40} width={150} />
-                    </div>
-                  ) : (
-                    <span className="text-[24px] font-semibold">
-                      {metaVault.name}
-                    </span>
-                  )}
+                  <span className="text-[24px] font-semibold">
+                    {metaVault.name}
+                  </span>
 
                   <p className="text-[#97979A] text-[16px]">
                     {metaVault?.symbol === "metaUSD"
@@ -71,15 +67,46 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                       <span className="font-semibold">{TVL}</span>
                     )}
                   </div>
-                  <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
-                    <span className="text-[#97979A]">APR</span>
+                  <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px] tooltip cursor-help">
+                    <span className="text-[#97979A]">TOTAL APR</span>
                     {$isWeb3Load ? (
                       <Skeleton height={25} width={70} />
                     ) : (
                       <span className="font-semibold text-[#48c05c]">
-                        {formatNumber(metaVault.APR, "formatAPR")}%
+                        {formatNumber(metaVault?.totalAPR || 0, "formatAPR")}%
                       </span>
                     )}
+                    <div className="visible__tooltip">
+                      <div className="flex items-start flex-col gap-2">
+                        <div className="flex flex-col gap-1 w-full">
+                          <div className="flex items-center justify-between">
+                            <p className="leading-5 text-[#97979A] font-medium">
+                              APR
+                            </p>
+                            <p className="text-end font-semibold">
+                              {formatNumber(metaVault?.APR, "formatAPR")}%
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="leading-5 text-[#97979A] font-medium">
+                              Gems APR
+                            </p>
+                            <p className="text-end font-semibold">
+                              {formatNumber(metaVault?.gemsAPR, "formatAPR")}%
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="leading-5 text-[#97979A] font-medium">
+                              Total APR
+                            </p>
+                            <p className="text-end font-semibold">
+                              {formatNumber(metaVault?.totalAPR, "formatAPR")}%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <i></i>
+                    </div>
                   </div>
                 </div>
               </div>
