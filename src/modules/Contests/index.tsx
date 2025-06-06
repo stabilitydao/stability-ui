@@ -167,6 +167,19 @@ const Contests = (): JSX.Element => {
                         ? "Ongoing"
                         : "Future";
 
+                    const isTargetedGems = Array.isArray(rewards)
+                      ? rewards.every(
+                          (reward) => reward.type === "Gems1 Targeted"
+                        )
+                      : false;
+
+                    const totalReward = isTargetedGems
+                      ? rewards?.reduce(
+                          (acc, cur) => (acc += cur.totalReward),
+                          0
+                        )
+                      : 0;
+
                     return (
                       <a
                         key={name}
@@ -203,61 +216,83 @@ const Contests = (): JSX.Element => {
                         <div className="px-4 w-[20%] text-start">
                           {Array.isArray(rewards) ? (
                             <div className="flex items-center flex-wrap gap-2">
-                              {rewards?.map((reward, index: number) => (
-                                <div key={index} className="flex items-center">
+                              {isTargetedGems ? (
+                                <div className="flex items-center">
                                   <div className="mr-1">
-                                    {reward.type === "Points" && (
-                                      <img
-                                        src="/pSTBL.svg"
-                                        className="w-[24px] h-[24px]"
-                                        alt="pSTBL"
-                                      />
-                                    )}
-                                    {reward.type === "Gems1" && (
-                                      <img
-                                        src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
-                                        className="w-[24px] h-[24px]"
-                                        alt="sGEM1"
-                                      />
-                                    )}
-
-                                    {reward.type === "ERC20 Token" && (
-                                      <img
-                                        className="w-[24px] h-[24px] rounded-full"
-                                        src={
-                                          (getTokenData(
-                                            reward.contract?.address as string
-                                          )?.logoURI as string) || "/error.svg"
-                                        }
-                                        alt="token"
-                                      />
-                                    )}
-
-                                    {reward.type === "NFTs" &&
-                                      reward.contract && (
-                                        <span className="inline-flex items-center justify-center text-[11px] font-bold w-[24px] border-[1px]">
-                                          NFT
-                                        </span>
-                                      )}
+                                    <img
+                                      src="/icons/sonic_gem_icon.svg"
+                                      className="w-[24px] h-[24px]"
+                                      alt="sGEM1"
+                                    />
                                   </div>
                                   <div className="flex items-center">
-                                    {reward.winnerReward && reward.winners
-                                      ? String(
-                                          formatNumber(
-                                            reward.winnerReward *
-                                              reward.winners,
-                                            "abbreviateInteger"
-                                          )
-                                        ).slice(1)
-                                      : ""}
-                                    {reward.totalReward &&
-                                      formatNumber(
-                                        reward.totalReward,
-                                        "abbreviateIntegerNotUsd"
-                                      )}
+                                    {formatNumber(
+                                      totalReward,
+                                      "abbreviate"
+                                    ).slice(1)}
                                   </div>
                                 </div>
-                              ))}
+                              ) : (
+                                rewards?.map((reward, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center"
+                                  >
+                                    <div className="mr-1">
+                                      {reward.type === "Points" && (
+                                        <img
+                                          src="/pSTBL.svg"
+                                          className="w-[24px] h-[24px]"
+                                          alt="pSTBL"
+                                        />
+                                      )}
+                                      {reward.type === "Gems1" && (
+                                        <img
+                                          src="/icons/sonic_gem_icon.svg"
+                                          className="w-[24px] h-[24px]"
+                                          alt="sGEM1"
+                                        />
+                                      )}
+
+                                      {reward.type === "ERC20 Token" && (
+                                        <img
+                                          className="w-[24px] h-[24px] rounded-full"
+                                          src={
+                                            (getTokenData(
+                                              reward.contract?.address as string
+                                            )?.logoURI as string) ||
+                                            "/error.svg"
+                                          }
+                                          alt="token"
+                                        />
+                                      )}
+
+                                      {reward.type === "NFTs" &&
+                                        reward.contract && (
+                                          <span className="inline-flex items-center justify-center text-[11px] font-bold w-[24px] border-[1px]">
+                                            NFT
+                                          </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center">
+                                      {reward.winnerReward && reward.winners
+                                        ? String(
+                                            formatNumber(
+                                              reward.winnerReward *
+                                                reward.winners,
+                                              "abbreviateInteger"
+                                            )
+                                          ).slice(1)
+                                        : ""}
+                                      {reward.totalReward &&
+                                        formatNumber(
+                                          reward.totalReward,
+                                          "abbreviateIntegerNotUsd"
+                                        )}
+                                    </div>
+                                  </div>
+                                ))
+                              )}
                             </div>
                           ) : (
                             <div className="flex items-center justify-center h-6 w-10 bg-[#252528] rounded-[4px] border border-[#58595D] text-[12px] leading-4">

@@ -102,17 +102,19 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   return (
-    <div className="flex flex-col xl:min-w-[1200px] max-w-[1200px] w-full">
-      <div className="flex items-center justify-between gap-[28px]">
+    <div className="flex flex-col flex-wrap min-w-full xl:min-w-[1200px] max-w-[1200px] w-full">
+      <div className="flex items-center justify-between gap-[28px] flex-col xl:flex-row">
         <div className="flex flex-col items-start gap-4">
           <h2 className="page-title__font text-start">
             Top Users <br /> & sGEM1 Rewards
           </h2>
           <h3 className="text-[#97979a] page-description__font">
-            Track user performance across yield vaults, contests, and <br />{" "}
-            sGEM1 rewards. Earn points by participating, ranking on the <br />{" "}
-            leaderboard, and unlocking exclusive airdrop benefits <br /> through
-            smart yield farming strategies
+            Track user performance across yield vaults, contests, and{" "}
+            <br className="hidden lg:block" /> sGEM1 rewards. Earn points by
+            participating, ranking on the <br className="hidden lg:block" />{" "}
+            leaderboard, and unlocking exclusive airdrop benefits{" "}
+            <br className="hidden lg:block" /> through smart yield farming
+            strategies
           </h3>
         </div>
 
@@ -177,7 +179,7 @@ const Users = (): JSX.Element => {
               <button
                 key={type}
                 className={cn(
-                  "h-10 px-4 #97979A border border-[#2C2E33] rounded-lg text-[#97979A]",
+                  "h-10 px-4 border border-[#2C2E33] rounded-lg text-[#97979A] text-[10px] md:text-[14px]",
                   hasContestData ? "cursor-pointer" : "opacity-50",
                   isActive && "text-[#FFF] bg-[#22242A]"
                 )}
@@ -209,7 +211,7 @@ const Users = (): JSX.Element => {
                 {currentTabData.map((user: TLeaderboard) => (
                   <div
                     key={user.address}
-                    className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[16px] leading-5"
+                    className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
                   >
                     <div className="px-4 w-[10%] text-start text-[#97979A]">
                       {user.rank}

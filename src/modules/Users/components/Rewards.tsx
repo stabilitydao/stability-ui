@@ -235,10 +235,10 @@ const Rewards = (): JSX.Element => {
           src="/icons/sonic_gem_icon.svg"
           alt="sGEM1"
           title="sGEM1"
-          className="w-[84px] h-[84px]"
+          className="w-[84px] h-[84px] hidden md:block"
         />
       </div>
-      <div className="flex items-center gap-6 w-full">
+      <div className="flex items-start md:items-center gap-6 w-full flex-col md:flex-row">
         <div className="flex flex-col items-start gap-1">
           <span className="text-[#97979A] text-sm font-medium">Balance</span>
 
