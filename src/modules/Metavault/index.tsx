@@ -234,7 +234,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
             <div className="flex flex-col gap-2 w-1/2 md:w-auto">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-                TOTAL APR
+                APR
               </span>
               {isLoading ? (
                 <div className="mt-2">
@@ -242,9 +242,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
-                  {["metaUSD", "metaS"].includes(localMetaVault.symbol)
-                    ? formatNumber(localMetaVault?.totalAPR, "formatAPR")
-                    : formatNumber(localMetaVault?.APR, "formatAPR")}
+                  {!!localMetaVault?.APR
+                    ? formatNumber(localMetaVault?.APR, "formatAPR")
+                    : null}
                   %
                 </span>
               )}
