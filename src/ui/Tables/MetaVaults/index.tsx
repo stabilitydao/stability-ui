@@ -27,6 +27,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
       {vaults.map((vault: TVault, index: number) => {
         if (vault?.isMetaVault) {
           const APRs_DATA = { APR: Number(vault.APR).toFixed(2) };
+
           return (
             <div key={`row/${vault.name + index}`}>
               <Row

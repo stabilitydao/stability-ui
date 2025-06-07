@@ -2,8 +2,6 @@ import { memo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { formatUnits } from "viem";
-
 import { Skeleton } from "@ui";
 
 import { formatNumber } from "@utils";
@@ -11,7 +9,6 @@ import { formatNumber } from "@utils";
 import { isWeb3Load } from "@store";
 
 import type { TMetaVault } from "@types";
-import { getTokenData } from "@stabilitydao/stability";
 
 interface IProps {
   metaVaults: TMetaVault[];
@@ -67,16 +64,17 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                       <span className="font-semibold">{TVL}</span>
                     )}
                   </div>
-                  <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px]">
-                    <span className="text-[#97979A]">APR</span>
+                  <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px] tooltip cursor-help">
+                    <span className="text-[#97979A]">TOTAL APR</span>
                     {$isWeb3Load ? (
                       <Skeleton height={25} width={70} />
                     ) : (
                       <span className="font-semibold text-[#48c05c]">
-                        {formatNumber(metaVault?.APR || 0, "formatAPR")}%
+                        {formatNumber(metaVault?.totalAPR || 0, "formatAPR")}%
                       </span>
                     )}
-                    {/* <div className="visible__tooltip">
+
+                    <div className="visible__tooltip">
                       <div className="flex items-start flex-col gap-2">
                         <div className="flex flex-col gap-1 w-full">
                           <div className="flex items-center justify-between">
@@ -89,10 +87,10 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="leading-5 text-[#97979A] font-medium">
-                              Gems APR
+                              Merkl APR
                             </p>
                             <p className="text-end font-semibold">
-                              {formatNumber(metaVault?.gemsAPR, "formatAPR")}%
+                              {formatNumber(metaVault?.merklAPR, "formatAPR")}%
                             </p>
                           </div>
                           <div className="flex items-center justify-between">
@@ -106,7 +104,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                         </div>
                       </div>
                       <i></i>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
