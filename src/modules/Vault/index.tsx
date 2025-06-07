@@ -54,13 +54,17 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
   return vault && localVault ? (
     <WagmiLayout>
-      <main className="w-full xl:min-w-[1200px] mx-auto font-manrope flex gap-6">
+      <main className="w-full mx-auto font-manrope flex gap-6">
         <div>
           <VaultBar vault={localVault} />
-          <div className="flex items-center justigy-center w-full">
+          <div className="flex items-center justigy-center w-full flex-col xl:flex-row">
             <InfoBar network={network} vault={localVault} />
 
             <Toast network={network} />
+
+            <div className="block xl:hidden my-5 w-full">
+              <InvestForm network={network} vault={localVault} />
+            </div>
           </div>
           <HistoricalRate
             network={network}
@@ -74,11 +78,11 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
           <Contracts vault={localVault} network={network} />
 
-          <div className="flex gap-6 w-full my-6">
-            <div className="w-1/2">
+          <div className="flex md:flex-nowrap flex-wrap gap-6 w-full my-6">
+            <div className="w-full xl:w-1/2">
               <VaultInfo network={network} vault={localVault} />
             </div>
-            <div className="w-1/2">
+            <div className="w-full xl:w-1/2">
               <Strategy network={network} vault={localVault} />
             </div>
           </div>
@@ -101,7 +105,10 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
             strategy={localVault?.strategyAddress}
           />
         </div>
-        <InvestForm network={network} vault={localVault} />
+
+        <div className="hidden xl:block">
+          <InvestForm network={network} vault={localVault} />
+        </div>
       </main>
     </WagmiLayout>
   ) : (

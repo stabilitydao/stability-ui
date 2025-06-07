@@ -22,7 +22,7 @@ import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
 import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
 
-import { getTokenData } from "@stabilitydao/stability";
+import { deployments } from "@stabilitydao/stability";
 
 import { DisplayTypes } from "@types";
 
@@ -188,33 +188,22 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     }
   }, [localMetaVault]);
 
+  const symbol = deployments?.["146"]?.metaVaults?.find(
+    (mv) => mv.address.toLowerCase() === metavault
+  )?.symbol;
+
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
           <div>
-            {isLoading ? (
-              <div className="mb-4">
-                <Skeleton height={48} width={250} />
-              </div>
-            ) : (
-              <h2 className="page-title__font text-start mb-4">
-                {localMetaVault?.symbol}
-              </h2>
-            )}
+            <h2 className="page-title__font text-start mb-4">{symbol}</h2>
 
-            {isLoading ? (
-              <Skeleton height={64} width={250} />
-            ) : (
-              <h3 className="text-[#97979a] page-description__font">
-                {localMetaVault?.symbol === "metaUSD"
-                  ? "Stablecoins"
-                  : localMetaVault?.symbol?.slice(4)}{" "}
-                deployed across protocols automatically{" "}
-                <br className="lg:block hidden" /> rebalanced for maximum
-                returns on sonic
-              </h3>
-            )}
+            <h3 className="text-[#97979a] page-description__font">
+              {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
+              across protocols automatically <br className="lg:block hidden" />{" "}
+              rebalanced for maximum returns on sonic
+            </h3>
           </div>
           <div className="flex items-center flex-wrap md:gap-6">
             <div className="flex flex-col gap-2 w-1/2 md:w-auto">
