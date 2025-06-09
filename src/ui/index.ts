@@ -28,6 +28,7 @@ import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
 import { ShareSkeleton } from "./Skeletons/ShareSkeleton";
 import { Skeleton } from "./Skeletons/Skeleton";
+import { TextSkeleton } from "./Skeletons/TextSkeleton";
 
 import { NavIcon } from "./NavIcon";
 import {
@@ -85,4 +86,5 @@ export {
   Prices,
   FiltersIcon,
   ArrowRightIcon,
+  TextSkeleton,
 };

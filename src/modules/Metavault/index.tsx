@@ -11,7 +11,7 @@ import {
   FullPageLoader,
   Pagination,
   MetaVaultsTable,
-  Skeleton,
+  TextSkeleton,
 } from "@ui";
 
 import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
@@ -212,9 +212,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               </span>
 
               {isLoading ? (
-                <div className="mt-2">
-                  <Skeleton height={24} width={80} />
-                </div>
+                <TextSkeleton lineHeight={24} width={80} />
               ) : (
                 <span className="font-semibold text-[18px] leading-6">
                   {!!localMetaVault?.address ? TVL : null}
@@ -226,9 +224,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 TOTAL APR
               </span>
               {isLoading ? (
-                <div className="mt-2">
-                  <Skeleton height={24} width={80} />
-                </div>
+                <TextSkeleton lineHeight={24} width={80} />
               ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
                   {["metaUSD", "metaS"].includes(localMetaVault.symbol)
@@ -244,9 +240,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               </span>
 
               {isLoading ? (
-                <div className="mt-2">
-                  <Skeleton height={24} width={80} />
-                </div>
+                <TextSkeleton lineHeight={24} width={80} />
               ) : (
                 <div className="flex items-center">
                   {!!localMetaVault?.protocols
@@ -269,6 +263,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               )}
             </div>
+
             <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 Chain
@@ -360,7 +355,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         </div>
         <div className="flex flex-col gap-5 w-full lg:w-[352px] mt-0 lg:mt-[64px]">
           <Form metaVault={localMetaVault} />
-          <Contracts metaVault={localMetaVault} />
+          <Contracts metavault={metavault} />
         </div>
       </div>
     </div>

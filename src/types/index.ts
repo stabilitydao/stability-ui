@@ -468,7 +468,7 @@ type TContractInfo = {
   address: TAddress;
   logo: string;
   symbol: string;
-  type: string;
+  type?: string;
   isCopy: boolean;
 };
 
