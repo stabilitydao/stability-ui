@@ -12,7 +12,7 @@ import {
   TimeDifferenceIndicator,
   VaultType,
   FieldValue,
-  BalanceVisibilityToggler,
+  // BalanceVisibilityToggler,
 } from "@ui";
 
 import { aprFilter, visible } from "@store";
@@ -296,7 +296,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col gap-1">
             <div className="flex items-center gap-1 text-[14px] leading-5 text-[#97979A]">
               <span>Deposited</span>
-              <BalanceVisibilityToggler />
+              {/* <BalanceVisibilityToggler /> */}
             </div>
             <div className="flex items-center text-[20px] leading-6 font-semibold whitespace-nowrap">
               <div className="flex items-center">

@@ -2861,7 +2861,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   inputMode="decimal"
                   className="min-w-full bg-[#1b1d21]  py-[3px] rounded-lg focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[36px] my-[2px] pl-10 text-[14px]"
                 />
-                {!!$vaultData[network][vault.address]?.vaultUserBalance && (
+                {!!$vaultData?.[network]?.[vault.address]?.vaultUserBalance && (
                   <button
                     type="button"
                     onClick={() => {
