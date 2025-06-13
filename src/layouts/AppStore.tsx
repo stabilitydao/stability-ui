@@ -923,9 +923,21 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               let totalAPR = 0;
 
+              let gemsAPR = 0;
+
               if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+                const multiplier =
+                  stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
+                    metaVault.address
+                  ] || 0;
+
+                if (multiplier) {
+                  gemsAPR = Number(metaVault.APR) * Number(multiplier);
+                }
+
                 merklAPR = Number(metaVault.merklAPR);
-                totalAPR = Number(metaVault.APR) + merklAPR;
+
+                totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
               }
 
               return {
@@ -936,6 +948,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   metaVault.deposited,
                   ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
                 ),
+                gemsAPR,
                 merklAPR,
                 totalAPR,
               };

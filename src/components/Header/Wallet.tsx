@@ -229,7 +229,7 @@ const Wallet = (): JSX.Element => {
         )}
         <span
           className={cn(
-            "text-[14px] leading-5 font-medium",
+            "text-[14px] leading-5 font-medium hidden md:block",
             !$account && "text-[#A193F2] "
           )}
         >

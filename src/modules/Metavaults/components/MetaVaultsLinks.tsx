@@ -65,7 +65,10 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                     )}
                   </div>
                   <div className="flex flex-col items-start text-[16px] py-2 px-3 bg-[#1D1E23] rounded-lg border border-[#35363B] min-w-full md:min-w-[150px] tooltip cursor-help">
-                    <span className="text-[#97979A]">TOTAL APR</span>
+                    <p className="flex items-center justify-between w-full">
+                      <span className="text-[#97979A]">TOTAL APR</span>
+                      <img src="/icons/stars.svg" alt="stars" />
+                    </p>
                     {$isWeb3Load ? (
                       <Skeleton height={25} width={70} />
                     ) : (
@@ -91,6 +94,14 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
                             </p>
                             <p className="text-end font-semibold">
                               {formatNumber(metaVault?.merklAPR, "formatAPR")}%
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <p className="leading-5 text-[#97979A] font-medium">
+                              sGEM1 APR
+                            </p>
+                            <p className="text-end font-semibold">
+                              {formatNumber(metaVault?.gemsAPR, "formatAPR")}%
                             </p>
                           </div>
                           <div className="flex items-center justify-between">

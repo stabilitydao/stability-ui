@@ -131,7 +131,7 @@ const SonicPointsButton = (): JSX.Element => {
   }, [sonicBtn]);
 
   return (
-    <div className="relative border-l border-[#23252A] min-h-full hidden md:block">
+    <div className="relative border-l border-[#23252A] min-h-full">
       <button
         ref={buttonRef}
         className="flex items-center justify-center gap-2 min-h-full px-4"
@@ -143,10 +143,12 @@ const SonicPointsButton = (): JSX.Element => {
           alt="Sonic gem icon"
         />
 
-        <span className="text-[14px]">Sonic points: {user.totalPoints}</span>
+        <span className="text-[14px] hidden md:block">
+          Sonic points: {user.totalPoints}
+        </span>
 
         <img
-          className={`transition delay-[50ms] w-3 h-3 ${
+          className={`transition delay-[50ms] w-3 h-3 hidden md:block ${
             sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
           }`}
           src="/icons/arrow-down.svg"
@@ -156,20 +158,16 @@ const SonicPointsButton = (): JSX.Element => {
       {sonicBtn && (
         <div
           ref={menuRef}
-          className="bg-[#1C1D1F] border border-[#383B42] absolute left-[-70px] md:left-0 top-[60px] w-full rounded-lg z-[100] py-4"
+          className="bg-[#1C1D1F] border border-[#383B42] absolute left-[-70px] md:left-0 top-[60px] w-[200px] md:w-full rounded-lg z-[100] py-4"
         >
-          <div className="flex items-center gap-[15px] min-[1430px]:hidden">
-            <img
-              className="w-[26px] h-[26px] rounded-full"
-              src="/sonic-gem.svg"
-              alt="Sonic gem icon"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Sonic Points</span>
-              <p className="text-[14px] leading-4">{user.totalPoints}</p>
-            </div>
-          </div>
           <div className="flex flex-col gap-1 mb-4 px-4">
+            <div className="flex flex-col items-center gap-1 py-1 px-2 bg-[#1C1E31] border border-[#5E6AD2] rounded-lg">
+              <span className="text-[14px] leading-4">{user.totalPoints}</span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Sonic Points
+              </span>
+            </div>
+
             <div
               className="flex flex-col items-center gap-1 py-1 px-2 bg-[#40331a] border border-[#FFA500] rounded-lg cursor-pointer"
               onClick={() => playAudio("pp", 0.3)}
