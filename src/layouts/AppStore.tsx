@@ -982,9 +982,26 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       )
     );
 
+    if (stabilityAPIData.prices) {
+      const formattedPrices = Object.entries(stabilityAPIData.prices).reduce(
+        (acc, [key, value]) => {
+          const isIntegerPrice = ["BTC", "ETH"].includes(key);
+          acc[key] = {
+            ...value,
+            price: isIntegerPrice
+              ? Math.round(parseFloat(value.price)).toString()
+              : value.price,
+          };
+          return acc;
+        },
+        {}
+      );
+
+      marketPrices.set(formattedPrices);
+    }
+
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
-    marketPrices.set(stabilityAPIData.prices);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
     metaVaults.set(localMetaVaults);

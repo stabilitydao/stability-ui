@@ -74,7 +74,6 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                         ? "formatWithLongDecimalPart"
                         : "format"
                     )}
-                    $
                   </span>
                   <span
                     className={cn(
@@ -118,7 +117,6 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                 data.price,
                 Number(data.price) < 1 ? "formatWithLongDecimalPart" : "format"
               )}
-              $
             </span>
             <span
               className={cn(

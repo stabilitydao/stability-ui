@@ -18,7 +18,7 @@ const TabSwitcher: React.FC<IProps> = ({ actionType, setActionType }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div className=" overflow-x-auto hide-scrollbar">
+    <div className="overflow-x-auto hide-scrollbar">
       <motion.div
         className="flex items-center gap-2 text-[14px] mb-6"
         onMouseEnter={() => !isMobile && setHovered(true)}

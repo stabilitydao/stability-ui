@@ -6,9 +6,9 @@ import { writeContract } from "@wagmi/core";
 
 import { useStore } from "@nanostores/react";
 
-import { ActionButton } from "../../ui";
+import { ActionButton } from "@ui";
 
-import { getTransactionReceipt } from "@utils";
+import { getTransactionReceipt, cn } from "@utils";
 
 import { connected, account, lastTx } from "@store";
 
@@ -120,24 +120,19 @@ const InstantExit: React.FC = () => {
   }, [$account, $lastTx]);
 
   return (
-    <div className="bg-accent-950 p-5 rounded-2xl flex flex-col gap-3 justify-between lg:w-1/3">
-      <div className="flex flex-col">
-        <span className="text-[26px]">Instant Exit</span>
-        <span className="text-[18px]">
+    <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col lg:w-1/3">
+      <div className="flex flex-col gap-2 mb-2 md:mb-0">
+        <span className="text-[24px] leading-8 font-semibold">
+          Instant Exit
+        </span>
+        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
           Instantly exit to STBL, incurring a 50% penalty. This process cannot
           be reverted, all forfeited STBL is streamed back to stakers.
         </span>
       </div>
-      <div>
-        <div>
-          <label className="relative block h-[60px] w-full">
-            <img
-              src="/STBL_plain.png"
-              alt="STBL"
-              title="STBL"
-              className="absolute top-[27%] left-4 w-8 h-8 text-neutral-500 rounded-full pointer-events-none"
-            />
-
+      <div className="flex flex-col justify-between gap-4">
+        <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+          <div className="flex items-center justify-between">
             <input
               ref={input}
               name="amount"
@@ -147,28 +142,25 @@ const InstantExit: React.FC = () => {
               pattern="^[0-9]*[.,]?[0-9]*$"
               inputMode="decimal"
               autoComplete="off"
-              className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[60px] my-[2px] pl-[60px] pr-3"
+              className="bg-transparent text-2xl font-semibold outline-none w-full"
             />
+            <div
+              className={cn(
+                "bg-[#151618] border border-[#23252A] rounded-lg px-3 py-1 text-[14px]",
+                $connected && "cursor-pointer"
+              )}
+              onClick={() => handleInputChange("max")}
+            >
+              MAX
+            </div>
+          </div>
 
-            {!!$connected && !!balance && (
-              <button
-                type="button"
-                onClick={() => handleInputChange("max")}
-                className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
-              >
-                Max
-              </button>
-            )}
-          </label>
-          <div
-            className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-              $connected ? "" : "opacity-0"
-            }`}
-          >
+          <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
             <span>Balance: </span>
             <span>{!!balance ? balance : "0"} xSTBL</span>
           </div>
-        </div>
+        </label>
+
         <ActionButton
           type={button}
           transactionInProgress={transactionInProgress}
