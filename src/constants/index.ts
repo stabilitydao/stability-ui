@@ -154,14 +154,14 @@ const CHAINS = [
     nativeCurrency: "POL",
     active: true, // main page active networks
   },
-  {
-    name: chains["8453"].name,
-    id: "8453",
-    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
-    explorer: "https://basescan.org/address/",
-    nativeCurrency: "ETH",
-    active: true, // main page active networks
-  },
+  // {
+  //   name: chains["8453"].name,
+  //   id: "8453",
+  //   logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
+  //   explorer: "https://basescan.org/address/",
+  //   nativeCurrency: "ETH",
+  //   active: true, // main page active networks
+  // },
   {
     name: chains["146"].name,
     id: "146",
@@ -311,10 +311,4 @@ export {
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
   STABILITY_TOKENS,
-  PATHS,
-  METAVAULT_TABLE,
-  STABILITY_AAVE_POOLS,
-  STABILITY_STRATEGY_LABELS,
-  VAULTS_WITH_NAME,
-  META_VAULTS_TYPE,
 };

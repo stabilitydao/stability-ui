@@ -9,6 +9,8 @@ import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
+import { STABILITY_AAVE_POOLS, STABILITY_STRATEGY_LABELS } from "@constants";
+
 import type { TAddress, TPlatformData, TVault } from "@types";
 
 interface IProps {
@@ -84,6 +86,21 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
       setNeedStrategyUpgrade(true);
     }
   }, [vault, vaultTypes, strategyTypes]);
+
+  const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
+    vault.strategySpecific.includes(addr)
+  );
+
+  const isStabilityLogo = !!matchedAddress;
+
+  const strategySpecific = matchedAddress
+    ? STABILITY_STRATEGY_LABELS[matchedAddress]
+    : vault.strategySpecific.includes("0xb38d..97b8")
+      ? "MEV Capital"
+      : vault.strategySpecific.includes("0xeeb1..cb6c")
+        ? "Re7 Labs"
+        : vault.strategySpecific;
+
   return (
     <div>
       <HeadingText text="Strategy" scale={2} styles="text-left mb-4" />

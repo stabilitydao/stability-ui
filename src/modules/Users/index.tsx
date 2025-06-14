@@ -34,7 +34,6 @@ const Users = (): JSX.Element => {
 
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
-
   const { currentPeriod, previousPeriod, nextPeriod } =
     findAllValidPeriods(contests);
 

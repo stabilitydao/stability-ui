@@ -118,7 +118,8 @@ const baseClient = createPublicClient({
 
 const sonicClient = createPublicClient({
   chain: sonic,
-  transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
+  //transport: http(import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"),
+  transport: http("https://sonic.drpc.org"),
 });
 
 const web3clients = {
