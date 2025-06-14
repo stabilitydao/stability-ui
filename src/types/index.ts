@@ -480,6 +480,12 @@ type TContractInfo = {
   isCopy: boolean;
 };
 
+type TMarketInfo = {
+  logo: string;
+  symbol: string;
+  link: string;
+};
+
 type TUpgradesTable = {
   contract: string;
   oldVersion: string;
@@ -815,4 +821,5 @@ export type {
   TMetaVault,
   TMetaVaults,
   TEndMetaVaults,
+  TMarketInfo,
 };

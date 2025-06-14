@@ -185,10 +185,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const strategyAssets: string[] =
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
+        let strategySpecific: string = vault.strategySpecific || "";
+
         const strategyInfo = getStrategyInfo(
           vault.strategyId,
           vault.strategyShortId as StrategyShortId,
-          vault.strategySpecific as string,
+          strategySpecific as string,
           vault.assets as TAddress[]
         );
 
@@ -554,7 +556,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
-        let strategySpecific: string = "";
 
         if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {

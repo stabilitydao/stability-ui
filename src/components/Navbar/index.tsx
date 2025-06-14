@@ -135,12 +135,12 @@ const Navbar = (): JSX.Element => {
                 </div>
               ) : null}
               <div className="text-[#97979A] flex flex-col">
-                <a href="#" className="px-4 py-2">
+                {/* <a href="#" className="px-4 py-2">
                   Privacy Policy
                 </a>
                 <a href="#" className="px-4 py-2">
                   Terms of Use
-                </a>
+                </a> */}
                 <div className="flex items-center gap-4 p-4 pb-0">
                   <a href="https://x.com/stabilitydao" target="_blank">
                     <img src="/socials/x.png" alt="Stability X" />

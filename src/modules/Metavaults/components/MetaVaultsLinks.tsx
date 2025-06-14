@@ -32,7 +32,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults }) => {
         return (
           <a
             key={metaVault.address}
-            href={`/metavaults/metavault/${metaVault.address}`}
+            href={`/metavaults/metavault/${metaVault.address.toLowerCase()}`}
             className="rounded-lg bg-[#101012] border border-[#23252A] max-w-[352px]"
           >
             <div className="p-4 md:p-6 flex flex-col gap-6 md:gap-10">
