@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useStore } from "@nanostores/react";
-
-import { readContract, writeContract } from "@wagmi/core";
+// writeContract
+import { readContract } from "@wagmi/core";
 import { formatUnits } from "viem";
-
-import { HeadingText } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -158,35 +156,35 @@ const Rewards = (): JSX.Element => {
     }
   };
 
-  const claim = async () => {
-    if (!$account) {
-      alert("Please connect your wallet!");
-    }
+  // const claim = async () => {
+  //   if (!$account) {
+  //     alert("Please connect your wallet!");
+  //   }
 
-    try {
-      const gemsAmounts: string[] = [];
-      const proofs: string[][] = [];
+  //   try {
+  //     const gemsAmounts: string[] = [];
+  //     const proofs: string[][] = [];
 
-      contestsToClaim.forEach((contest) => {
-        const contestData = userData.find(
-          ({ contestId }: { contestId: string }) => contest === contestId
-        );
+  //     contestsToClaim.forEach((contest) => {
+  //       const contestData = userData.find(
+  //         ({ contestId }: { contestId: string }) => contest === contestId
+  //       );
 
-        gemsAmounts.push(contestData?.gemsRaw as string);
-        proofs.push(contestData?.proofs as string[]);
-      });
+  //       gemsAmounts.push(contestData?.gemsRaw as string);
+  //       proofs.push(contestData?.proofs as string[]);
+  //     });
 
-      const claim = await writeContract(wagmiConfig, {
-        address: merkleDistributor as TAddress,
-        abi: IMerkleDistributor,
-        functionName: "claim",
-        args: [contestsToClaim, gemsAmounts, proofs, $account as TAddress],
-      });
-      console.log(claim);
-    } catch (err) {
-      console.error("Error occurred at claim:", err);
-    }
-  };
+  //     const claim = await writeContract(wagmiConfig, {
+  //       address: merkleDistributor as TAddress,
+  //       abi: IMerkleDistributor,
+  //       functionName: "claim",
+  //       args: [contestsToClaim, gemsAmounts, proofs, $account as TAddress],
+  //     });
+  //     console.log(claim);
+  //   } catch (err) {
+  //     console.error("Error occurred at claim:", err);
+  //   }
+  // };
 
   useEffect(() => {
     getSGEMPrice();

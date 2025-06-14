@@ -7,7 +7,7 @@ import { ColumnSort } from "./components/ColumnSort";
 import { Contracts } from "./components/Contracts";
 
 import {
-  DisplayType,
+  // DisplayType,
   FullPageLoader,
   Pagination,
   MetaVaultsTable,
@@ -59,9 +59,11 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     pool: {},
   });
 
-  const [displayType, setDisplayType] = useState<DisplayTypes>(
-    DisplayTypes.Rows
-  );
+  // const [displayType, setDisplayType] = useState<DisplayTypes>(
+  //   DisplayTypes.Rows
+  // );
+
+  const displayType = DisplayTypes.Rows;
 
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
@@ -171,6 +173,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   useEffect(() => {
     if ($isVaultsLoaded) {
       initMetaVaults();
+      console.log(aprModal);
     }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
 

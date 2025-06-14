@@ -705,6 +705,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   useEffect(() => {
     if (metaVault.address) {
       getData();
+      console.log(formAssets);
     }
   }, [$account, $lastTx, $assetsPrices, metaVault, $assetsBalances]);
 

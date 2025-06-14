@@ -36,14 +36,14 @@ type TAlmAsset = {
   percent: number;
 };
 
-type TAlmTable = {
-  amounts: string[];
-  amountsInUSD: string[];
-  inRange: boolean;
-  lowerTick: number;
-  upperTick: number;
-  tvl: string;
-};
+// type TAlmTable = {
+//   amounts: string[];
+//   amountsInUSD: string[];
+//   inRange: boolean;
+//   lowerTick: number;
+//   upperTick: number;
+//   tvl: string;
+// };
 
 const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   const $assetsPrices = useStore(assetsPrices);
@@ -51,7 +51,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   const [almAssets, setAlmAssets] = useState<TAlmAsset[]>([]);
   const [almFee, setAlmFee] = useState<string>("");
   const [defiedgeFee, setDefiedgeFee] = useState<TDefiedgeFee>();
-  const [tableData, setTableData] = useState<TAlmTable[]>([]);
+  // const [tableData, setTableData] = useState<TAlmTable[]>([]);
 
   const getAlmFee = async () => {
     let fee = "";
@@ -179,44 +179,39 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
     if (fee) setAlmFee(fee);
   };
   const getTableData = async () => {
-    if (!$assetsPrices[network] || !vault?.alm?.positions) return;
-    const prices = vault.assets.map((asset) =>
-      Number($assetsPrices[network][asset.address].price)
-    );
-
-    const data = vault?.alm?.positions.map((position) => {
-      let amountsInUSD: string[] | number[] = prices.map(
-        //@ts-ignore
-        (price, index) => Number(position[`amountToken${index}`]) * price
-      );
-      let amounts: string[] | number[] = prices.map(
-        //@ts-ignore
-        (_, index) => Number(position[`amountToken${index}`])
-      );
-      amounts = amounts.map((amount) =>
-        formatNumber(amount, "format")
-      ) as string[];
-
-      const tvl = formatNumber(
-        amountsInUSD.reduce((acc, value) => (acc += value), 0),
-        "abbreviate"
-      );
-
-      amountsInUSD = amountsInUSD.map((amount) =>
-        formatNumber(amount, "abbreviate")
-      ) as string[];
-
-      return {
-        amounts,
-        amountsInUSD,
-        inRange: position.inRange,
-        lowerTick: position.lowerTick,
-        upperTick: position.upperTick,
-        tvl: tvl as string,
-      };
-    });
-
-    if (data) setTableData(data);
+    // if (!$assetsPrices[network] || !vault?.alm?.positions) return;
+    // const prices = vault.assets.map((asset) =>
+    //   Number($assetsPrices[network][asset.address].price)
+    // );
+    // const data = vault?.alm?.positions.map((position) => {
+    //   let amountsInUSD: string[] | number[] = prices.map(
+    //     //@ts-ignore
+    //     (price, index) => Number(position[`amountToken${index}`]) * price
+    //   );
+    //   let amounts: string[] | number[] = prices.map(
+    //     //@ts-ignore
+    //     (_, index) => Number(position[`amountToken${index}`])
+    //   );
+    //   amounts = amounts.map((amount) =>
+    //     formatNumber(amount, "format")
+    //   ) as string[];
+    //   const tvl = formatNumber(
+    //     amountsInUSD.reduce((acc, value) => (acc += value), 0),
+    //     "abbreviate"
+    //   );
+    //   amountsInUSD = amountsInUSD.map((amount) =>
+    //     formatNumber(amount, "abbreviate")
+    //   ) as string[];
+    //   return {
+    //     amounts,
+    //     amountsInUSD,
+    //     inRange: position.inRange,
+    //     lowerTick: position.lowerTick,
+    //     upperTick: position.upperTick,
+    //     tvl: tvl as string,
+    //   };
+    // });
+    // if (data) setTableData(data);
   };
 
   useEffect(() => {

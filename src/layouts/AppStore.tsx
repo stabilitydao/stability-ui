@@ -48,7 +48,6 @@ import {
   frontendContracts,
   web3clients,
   IMetaVaultABI,
-  sGEM1,
 } from "@web3";
 
 import {
@@ -85,7 +84,6 @@ import type {
   TPlatformData,
   TBalances,
   TTokens,
-  TMetaVaults,
   TMetaVault,
   // TAsset,
 } from "@types";
