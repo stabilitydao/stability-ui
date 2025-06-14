@@ -354,6 +354,13 @@ type TLeaderboard = {
   deposit: number;
   earned: number;
   points?: number;
+  metaVaults?: {
+    [address: string]: {
+      deposit: number;
+      earned: number;
+    };
+  };
+  metaVaultsEarned: number;
 };
 
 type TTAbleFiltersVariant = {

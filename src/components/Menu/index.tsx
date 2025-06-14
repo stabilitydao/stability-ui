@@ -66,7 +66,7 @@ const Menu = (): JSX.Element => {
   const TVL = useMemo(
     () =>
       $apiData?.total?.tvl
-        ? formatNumber($apiData?.total.tvl || 0, "withSpaces")
+        ? formatNumber($apiData?.total.tvl || 0, "abbreviate")
         : "0",
     [$apiData]
   );
@@ -137,7 +137,7 @@ const Menu = (): JSX.Element => {
               {TVL ? (
                 <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
                   <span className="text-[#97979A]">AUM</span>
-                  <span className="text-white">${TVL}</span>
+                  <span className="text-white">{TVL}</span>
                 </div>
               ) : null}
 

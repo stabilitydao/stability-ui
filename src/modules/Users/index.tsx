@@ -79,7 +79,14 @@ const Users = (): JSX.Element => {
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,
+        metaVaultsEarned: data?.metaVaults
+          ? Object.values(data?.metaVaults).reduce(
+              (acc, cur) => (acc += cur.earned),
+              0
+            )
+          : 0,
       }));
+
       setTableData(contestData);
     }
   };
@@ -217,17 +224,22 @@ const Users = (): JSX.Element => {
                       {user.rank}
                     </div>
                     <div
-                      className={`px-4 w-[30%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
+                      className={`px-4 w-[20%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                       style={{ fontFamily: "monospace" }}
                     >
                       {getShortAddress(user.address, 6, 4)}
                     </div>
-                    <div className="px-4 w-[30%] text-end">
+                    <div className="px-4 w-[25%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="px-4 w-[30%] text-end">
+                    <div className="px-4 w-[25%] text-end">
+                      {user.metaVaultsEarned > 0
+                        ? user.metaVaultsEarned.toFixed(2)
+                        : null}
+                    </div>
+                    <div className="px-4 w-[20%] text-end">
                       {user.deposit
                         ? (Math.round(user.deposit * 100) / 100).toFixed(2)
                         : ""}
