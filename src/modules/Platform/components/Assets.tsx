@@ -91,8 +91,6 @@ const Assets = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Assets"]} />
-
       <HeadingText text="Sonic Assets" scale={1} styles="mb-0" />
 
       <div className="mb-4 flex justify-center">
