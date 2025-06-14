@@ -4,6 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
+import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
 
 import {
@@ -359,6 +360,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex flex-col gap-5 w-full lg:w-[352px] mt-0 lg:mt-[64px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
+          {metavault === "0x1111111199558661bf7ff27b4f1623dc6b91aa3e" && (
+            <LendingMarkets />
+          )}
         </div>
       </div>
     </div>

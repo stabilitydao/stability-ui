@@ -142,14 +142,14 @@ const Menu = (): JSX.Element => {
               ) : null}
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <a href="#" className="p-4">
                     Privacy Policy
                   </a>
                   <a href="#" className="p-4">
                     Term of Use
                   </a>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-4 p-4">
                   <a href="https://x.com/stabilitydao" target="_blank">
                     <img src="/socials/x.png" alt="X" />
