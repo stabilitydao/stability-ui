@@ -131,128 +131,124 @@ const SonicPointsButton = (): JSX.Element => {
   }, [sonicBtn]);
 
   return (
-    <div className="relative">
+    <div className="relative border-l border-[#23252A] min-h-full">
       <button
         ref={buttonRef}
-        className="bg-accent-900 h-8 md:h-10 sm:py-1 px-1 min-[1430px]:px-3 rounded-xl sm:gap-3 flex items-center justify-center min-[1430px]:justify-start w-10 min-[1430px]:w-[160px]"
+        className="flex items-center justify-center gap-2 min-h-full px-4"
         onClick={() => setSonicBtn((prev) => !prev)}
       >
         <img
           className="w-5 h-5 min-[1430px]:w-[26px] min-[1430px]:h-[26px] rounded-full"
-          src="/sonic-gem.svg"
+          src="/icons/sonic_gem_icon.svg"
           alt="Sonic gem icon"
         />
-        <div className="min-[1430px]:flex flex-col items-start hidden">
-          <div className="flex items-center gap-1">
-            <span className="text-neutral-500 text-[12px]">Sonic Points</span>
-            <img
-              className={`transition delay-[50ms] w-2 h-2 ${
-                sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
-              }`}
-              src="/icons/arrow-down.svg"
-              alt="arrowDown"
-            />
-          </div>
-          <span className="text-[14px] leading-4">{user.totalPoints}</span>
-        </div>
+
+        <span className="text-[14px] hidden md:block">
+          Sonic points: {user.totalPoints}
+        </span>
+
+        <img
+          className={`transition delay-[50ms] w-3 h-3 hidden md:block ${
+            sonicBtn ? "rotate-[180deg]" : "rotate-[0deg]"
+          }`}
+          src="/icons/arrow-down.svg"
+          alt="arrowDown"
+        />
       </button>
       {sonicBtn && (
         <div
           ref={menuRef}
-          className="bg-accent-900 absolute left-[-70px] md:left-0 top-[50px] w-[160px] rounded-xl py-1 px-3 z-[100]"
+          className="bg-[#1C1D1F] border border-[#383B42] absolute left-[-70px] md:left-0 top-[60px] w-[200px] md:w-full rounded-lg z-[100] py-4"
         >
-          <div className="flex items-center gap-[15px] min-[1430px]:hidden">
-            <img
-              className="w-[26px] h-[26px] rounded-full"
-              src="/sonic-gem.svg"
-              alt="Sonic gem icon"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Sonic Points</span>
-              <p className="text-[14px] leading-4">{user.totalPoints}</p>
+          <div className="flex flex-col gap-1 mb-4 px-4">
+            <div className="flex flex-col items-center gap-1 py-1 px-2 bg-[#1C1E31] border border-[#5E6AD2] rounded-lg">
+              <span className="text-[14px] leading-4">{user.totalPoints}</span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Sonic Points
+              </span>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
+
             <div
-              className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#BD6EAC] text-white bg-[#BD6EAC]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
+              className="flex flex-col items-center gap-1 py-1 px-2 bg-[#40331a] border border-[#FFA500] rounded-lg cursor-pointer"
               onClick={() => playAudio("pp", 0.3)}
             >
-              <span className="font-medium">PP</span>
-            </div>
-            <div>
-              <span className="text-neutral-500 text-[12px]">
+              <span className="text-[14px] leading-4">
+                {user.passivePoints}
+              </span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
                 Passive Points
               </span>
-              <p className="text-[14px] leading-4">{user.passivePoints}</p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
             <div
-              className="inline-flex items-center gap-x-0.5 rounded-full border cursor-pointer border-[#6EBD70] text-white bg-[#6EBD70]/[0.16] px-2 py-0.5 text-xs active:scale-[.99] active:translate-y-[1px] transition-all ease-slow"
+              className="flex flex-col items-center gap-1 py-1 px-2 bg-[#233729] border border-[#48C05C] rounded-lg cursor-pointer"
               onClick={() => playAudio("ap", 0.3)}
             >
-              <span className="font-medium">AP</span>
-            </div>
-            <div>
-              <span className="text-neutral-500 text-[12px]">
+              <span className="text-[14px] leading-4">
+                {user.activityPoints}
+              </span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
                 Activity Points
               </span>
-              <p className="text-[14px] leading-4">{user.activityPoints}</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-1 py-1 px-2 bg-[#27292F] border border-[#383B42] rounded-lg">
+              <span className="text-[14px] leading-4">{user.rank}</span>
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Rank
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-3">
-            <span className="text-[14px]">Rank:</span>
-            <span className="text-warning-400">{user.rank}</span>
-          </div>
-
-          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
-
-          <div className="flex items-center gap-2">
-            <img src="/rings.png" alt="Rings" className="w-[34px]" />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Rings Points</span>
+          <div className="flex gap-2 px-4">
+            <img src="/rings.png" alt="Rings" className="w-4 h-4" />
+            <div className="flex flex-col gap-1">
+              <span className="text-[#97979A] text-[12px] leading-[14px]">
+                Rings Points
+              </span>
               <p className="text-[14px] leading-4">{user.ringsPoints}</p>
             </div>
           </div>
-          <div className="w-full h-[1px] bg-neutral-700 rounded-full my-2"></div>
 
-          <div className="flex items-center gap-2">
-            <img
-              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-              alt="Silo"
-              className="w-[34px] rounded-full"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Silo Points</span>
-              <p className="text-[14px] leading-4">{user.allSiloPoints}</p>
-            </div>
-          </div>
+          <div className="h-[1px] bg-[#383B42] rounded-full my-2"></div>
 
-          <div className="flex items-center gap-[14px]">
-            <img
-              src="/logo.svg"
-              alt="Stability"
-              className="w-[22px] ml-[6px]"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">
-                Stability App
-              </span>
-              <p className="text-[14px] leading-4">
-                {user.stabilitySiloPoints}
-              </p>
+          <div className="flex flex-col gap-2 px-4">
+            <div className="flex gap-2">
+              <img
+                src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                alt="Silo"
+                className="w-4 h-4 rounded-full"
+              />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Silo Points
+                </span>
+                <p className="text-[14px] leading-4">{user.allSiloPoints}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-[14px]">
-            <img
-              src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-              alt="Silo"
-              className="w-[22px] rounded-full ml-[6px]"
-            />
-            <div>
-              <span className="text-neutral-500 text-[12px]">Silo App</span>
-              <p className="text-[14px] leading-4">{user.siloPoints}</p>
+
+            <div className="flex gap-2">
+              <img src="/logo.svg" alt="Stability" className="w-4 h-4" />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Stability App
+                </span>
+                <p className="text-[14px] leading-4">
+                  {user.stabilitySiloPoints}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <img
+                src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                alt="Silo"
+                className="w-4 h-4 rounded-full"
+              />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#97979A] text-[12px] leading-[14px]">
+                  Silo App
+                </span>
+                <p className="text-[14px] leading-4">{user.siloPoints}</p>
+              </div>
             </div>
           </div>
         </div>

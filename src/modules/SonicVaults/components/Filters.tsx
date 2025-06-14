@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, memo } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
-import { Checkbox } from "@ui";
+import { Checkbox, FiltersIcon } from "@ui";
+
+import { cn, useClickOutside, useModalClickOutside } from "@utils";
 
 import type {
   TTableActiveParams,
@@ -24,11 +26,15 @@ const Filters: React.FC<IProps> = memo(
 
     const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
 
+    const [modal, setModal] = useState<boolean>(false);
+
     const [activeStrategies, setActiveStrategies] = useState(
       searchParams.get("strategies") ? searchParams.get("strategies") : "All"
     );
 
     const dropDownRef = useRef<HTMLDivElement>(null);
+
+    const modalRef = useRef<HTMLDivElement>(null);
 
     const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
       const filterName = filters.find((item) => item.name === filter.name);
@@ -193,34 +199,22 @@ const Filters: React.FC<IProps> = memo(
       }
     }, [searchParams]);
 
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          dropDownRef.current &&
-          !dropDownRef.current?.contains(event.target as Node)
-        ) {
-          setDropDownSelector(false);
-        }
-      };
-      document.addEventListener("click", handleClickOutside);
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }, []);
+    useClickOutside(dropDownRef, () => setDropDownSelector(false));
+    useModalClickOutside(modalRef, () => setModal((prev) => !prev));
 
-    return (
-      filters.length && (
-        <div className="flex items-center justify-evenly flex-wrap gap-3 py-3 min-[1440px]:py-9 select-none lg:min-w-[60%] font-manrope text-[14px] font-semibold">
+    return filters.length ? (
+      <div>
+        <div className="hidden xl:flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold flex-shrink-0">
           {filters.map((filter: TTableFilters) => (
             <div data-testid="filter" key={filter.name}>
               {filter.type === "single" ? (
-                <label className="inline-flex items-center cursor-pointer bg-accent-900 h-10 rounded-2xl">
-                  <div className="flex items-center gap-[10px] py-[10px] px-4">
+                <label className="inline-flex items-center cursor-pointer bg-transparent h-[48px] border border-[#23252A] rounded-lg">
+                  <div className="flex items-center gap-3 py-[13px] px-5">
                     <Checkbox
                       checked={filter.state}
                       onChange={() => activeFiltersHandler(filter)}
                     />
-                    <span className="text-neutral-50">{filter.name}</span>
+                    <span>{filter.name}</span>
                   </div>
                 </label>
               ) : filter.type === "multiple" ? (
@@ -243,60 +237,61 @@ const Filters: React.FC<IProps> = memo(
                   ))}
                 </div>
               ) : filter.type === "dropdown" ? (
-                <div className="relative select-none w-[220px]">
+                <div className="relative select-none w-[200px]">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       setDropDownSelector((prevState) => !prevState);
                     }}
                     data-testid="strategyFilterDropdown"
-                    className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
+                    className="flex items-center justify-between gap-1 px-5 py-[13px] h-[48px] bg-transparent border border-[#23252A] rounded-lg cursor-pointer"
                   >
-                    <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
-                      {filter.name}: {activeStrategies}
+                    <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px]">
+                      <span className="text-[#97979A]">{filter.name}: </span>
+                      <span>{activeStrategies}</span>
                     </p>
                     <img
-                      className={`transition delay-[50ms] ${
+                      className={cn(
+                        "transition delay-[50ms] w-4 h-4",
                         dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-                      }`}
+                      )}
                       src="/arrow-down.svg"
                       alt="arrowDown"
                     />
                   </div>
                   <div
                     ref={dropDownRef}
-                    className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
+                    className={cn(
+                      "bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg w-full z-20 mt-2",
                       dropDownSelector
                         ? "absolute transition delay-[50ms]"
                         : "hidden"
-                    } `}
+                    )}
                   >
                     <div className="flex flex-col items-start">
-                      {filter.variants?.map(
-                        (variant: TTAbleFiltersVariant, index: number) => (
-                          <div
-                            key={variant.name}
-                            onClick={() =>
+                      {filter.variants?.map((variant: TTAbleFiltersVariant) => (
+                        <div
+                          key={variant.name}
+                          onClick={() =>
+                            activeFiltersHandler(filter, variant.name)
+                          }
+                          className={cn(
+                            "p-[6px] cursor-pointer w-full flex items-center gap-2"
+                          )}
+                          data-testid="strategy"
+                          title={variant.title}
+                        >
+                          <Checkbox
+                            checked={variant.state}
+                            onChange={() =>
                               activeFiltersHandler(filter, variant.name)
                             }
-                            className={`${!index ? "rounded-t-2xl" : ""} ${index === filter?.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center gap-2 ${
-                              variant.state ? "bg-accent-800" : ""
-                            }`}
-                            data-testid="strategy"
-                            title={variant.title}
-                          >
-                            <Checkbox
-                              checked={variant.state}
-                              onChange={() =>
-                                activeFiltersHandler(filter, variant.name)
-                              }
-                            />
-                            <span className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap">
-                              {variant.title}
-                            </span>
-                          </div>
-                        )
-                      )}
+                          />
+                          <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+                            {variant.title}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -304,25 +299,25 @@ const Filters: React.FC<IProps> = memo(
                 filter.type === "sample" && (
                   <div
                     key={filter.name}
-                    className="flex items-center justify-center bg-accent-900 h-10 rounded-2xl"
+                    className="flex items-center justify-center bg-transparent border border-[#23252A] h-[48px] rounded-lg"
                   >
-                    <div className="flex items-center justify-center px-1">
+                    <div className="flex items-center justify-center p-2">
                       <p
                         onClick={() => activeFiltersHandler(filter, "All")}
-                        className={`py-1 px-4 cursor-pointer rounded-xl ${
+                        className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
                           !filter.state
-                            ? "bg-accent-500 text-neutral-50 h-8"
-                            : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                            ? "bg-[#22242A] border border-[#2C2E33]"
+                            : "text-[#97979A]" //hover
                         }`}
                       >
                         All
                       </p>
                       <p
                         onClick={() => activeFiltersHandler(filter)}
-                        className={`px-2 py-1 cursor-pointer rounded-xl  ${
+                        className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
                           filter.state
-                            ? "bg-accent-500 text-neutral-50 h-8"
-                            : "text-accent-400 h-full hover:bg-accent-800 hover:text-accent-400"
+                            ? "bg-[#22242A] border border-[#2C2E33]"
+                            : "text-[#97979A]" //hover
                         }`}
                       >
                         {filter.name}
@@ -334,23 +329,131 @@ const Filters: React.FC<IProps> = memo(
             </div>
           ))}
           <div
-            className={`flex items-center justify-center bg-accent-900 h-10 rounded-2xl w-[100px] ${allParams ? "opacity-100 cursor-pointer" : "opacity-30"}`}
+            className={`flex items-center justify-center h-[48px] rounded-lg w-[100px] border border-[#2C2E33] ${allParams ? "opacity-100 cursor-pointer" : "opacity-30"}`}
             onClick={allParams ? resetTable : undefined}
           >
-            <div className="flex items-center justify-center gap-2 px-1">
+            <div className="flex items-center justify-center gap-2">
+              <p>Clear</p>
               {allParams ? (
-                <span className="bg-accent-500 rounded-full w-[23px] text-center">
+                <span className="bg-[#22242A] border border-[#2C2E33] rounded-lg w-[20px] text-center">
                   {allParams}
                 </span>
               ) : (
-                <img className="w-4 h-4" src="/close.svg" alt="close" />
+                <img
+                  className="w-3 h-3 mx-1"
+                  src="/icons/circle-xmark.png"
+                  alt="close"
+                />
               )}
-              <p>Clear All</p>
             </div>
           </div>
         </div>
-      )
-    );
+        <div
+          className={cn(
+            "border border-[#35363b] bg-[#1d1e23] rounded-lg cursor-pointer block xl:hidden ml-auto"
+          )}
+          onClick={() => setModal(true)}
+        >
+          <div className="p-3">
+            <FiltersIcon isActive={true} />
+          </div>
+        </div>
+        {modal && (
+          <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center xl:hidden">
+            <div
+              ref={modalRef}
+              className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
+            >
+              <div className="flex justify-between items-center p-4 border-b border-[#232429]">
+                <h2 className="text-[18px] leading-6 font-semibold">Filters</h2>
+                <button onClick={() => setModal(false)}>
+                  <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-3 p-4">
+                {filters.map((filter) => (
+                  <div
+                    key={filter.name}
+                    className="flex items-center justify-between gap-2"
+                  >
+                    <p className="text-[14px] leading-5 font-medium">
+                      {filter.name}
+                    </p>
+                    {filter.type === "single" ? (
+                      <Checkbox
+                        checked={filter.state}
+                        onChange={() => activeFiltersHandler(filter)}
+                      />
+                    ) : filter.type === "sample" ? (
+                      <div className="flex gap-2 bg-[#18191c] border border-[#232429] rounded-lg text-[14px] leading-4">
+                        <button
+                          onClick={() => activeFiltersHandler(filter, "All")}
+                          className={`px-3 py-1 rounded ${
+                            !filter.state
+                              ? "bg-[#232429] border border-[#232429]"
+                              : "text-[#97979A]"
+                          }`}
+                        >
+                          All
+                        </button>
+                        <button
+                          onClick={() => activeFiltersHandler(filter)}
+                          className={`px-3 py-1 rounded ${
+                            filter.state
+                              ? "bg-[#232429] border border-[#232429]"
+                              : "text-[#97979A]"
+                          }`}
+                        >
+                          {filter.name}
+                        </button>
+                      </div>
+                    ) : filter.type === "dropdown" ? (
+                      <div className="flex flex-col gap-1 text-[14px] leading-4 max-h-[70px] overflow-y-auto">
+                        {filter.variants?.map((variant) => (
+                          <label
+                            key={variant.name}
+                            className="inline-flex items-center gap-2"
+                          >
+                            <Checkbox
+                              checked={variant.state}
+                              onChange={() =>
+                                activeFiltersHandler(filter, variant.name)
+                              }
+                            />
+                            <span>{variant.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className={cn(
+                  "flex justify-between items-center px-4 pb-4",
+                  !allParams && "hidden"
+                )}
+              >
+                <button
+                  onClick={resetTable}
+                  className="text-[#816FEA] text-[14px] leading-5 font-semibold"
+                >
+                  Clear all
+                </button>
+                <button
+                  onClick={() => setModal(false)}
+                  className="text-[14px] leading-5 font-semibold px-4 py-3 bg-[#816FEA] rounded-lg"
+                >
+                  View results
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : null;
   }
 );
 

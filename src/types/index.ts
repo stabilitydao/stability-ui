@@ -135,6 +135,10 @@ type TVaults = {
   [vaultAddress: string]: TVault;
 };
 
+type TMetaVaults = {
+  [vaultAddress: string]: TMetaVault;
+};
+
 type TVaultData = {
   [address: TAddress]: {
     vaultSharePrice: bigint;
@@ -285,7 +289,34 @@ type TVault = {
   leverageLending?: TLeverageLendingData;
   liveAPR: undefined | number;
   assetAPR: undefined | number;
+
+  ///// meta vault
+  isMetaVault?: boolean;
+  proportions?: { current: number[]; target: number };
 };
+
+type TMetaVault = {
+  address: TAddress;
+  symbol: string;
+  name: string;
+  APR: string;
+  sharePrice: string;
+  assets: TAddress[];
+  decimals: number;
+  deposited: string;
+  tvl: string;
+  vaults: TAddress[];
+  endVaults?: TAddress[];
+  protocols?: string[];
+  strategies?: string[];
+};
+
+type TEndMetaVaults = {
+  isMetaVault: boolean;
+  metaVault?: TAddress;
+  vault?: TAddress;
+  vaults?: TAddress[];
+}[];
 
 type TLeverageLendingData = {
   borrowApr: number;
@@ -324,6 +355,13 @@ type TLeaderboard = {
   deposit: number;
   earned: number;
   points?: number;
+  metaVaults?: {
+    [address: string]: {
+      deposit: number;
+      earned: number;
+    };
+  };
+  metaVaultsEarned: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -438,7 +476,7 @@ type TContractInfo = {
   address: TAddress;
   logo: string;
   symbol: string;
-  type: string;
+  type?: string;
   isCopy: boolean;
 };
 
@@ -596,6 +634,7 @@ type TAPIData = {
   // services?: string[];
   assetPrices?: TMultichainPrices;
   vaults?: TVaults;
+  metaVaults?: TMetaVault[];
   underlyings?: TVaults;
   platforms?: {
     [chainID: string]: {
@@ -610,6 +649,8 @@ type TAPIData = {
       };
     };
   };
+  rewards: { gemsAprMultiplier: number };
+  prices: TMarketPrices;
   error?: string;
 };
 
@@ -668,6 +709,26 @@ type TVestPeriod = {
   end: number;
   isFullyExited: boolean;
 };
+
+type TMarketPrice = {
+  price: string;
+  priceChange: number;
+};
+
+type TMarketPrices = Record<string, TMarketPrice>;
+
+// enums
+export enum DisplayTypes {
+  Rows = "rows",
+  Grid = "grid",
+}
+
+export enum TransactionTypes {
+  Deposit = "deposit",
+  Withdraw = "withdraw",
+  Wrap = "wrap",
+  Unwrap = "unwrap",
+}
 
 export type {
   TPlatformData,
@@ -749,4 +810,9 @@ export type {
   TTableActiveParams,
   TStakeDashboardData,
   TVestPeriod,
+  TMarketPrice,
+  TMarketPrices,
+  TMetaVault,
+  TMetaVaults,
+  TEndMetaVaults,
 };

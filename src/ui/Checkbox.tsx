@@ -1,3 +1,5 @@
+import { cn } from "@utils";
+
 interface IProps {
   checked: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -10,7 +12,10 @@ const Checkbox: React.FC<IProps> = ({ checked, onChange }) => {
       onChange={onChange}
       onClick={(event) => event.stopPropagation()}
       type="checkbox"
-      className={`appearance-none h-5 w-5 border-[1.5px] border-accent-500 rounded-md ${!checked ? "hover:bg-accent-800" : ""} checked:bg-accent-500 checked:border-accent-500 focus:outline-none transition duration-300 relative cursor-pointer`}
+      className={cn(
+        "appearance-none h-[18px] w-[18px] bg-transparent border-[1.5px] border-[#626366] rounded-[4px] checked:bg-[#9180F4] checked:border-0 focus:outline-none transition duration-300 relative cursor-pointer flex-shrink-0",
+        !checked && "hover:bg-transparent"
+      )}
     />
   );
 };

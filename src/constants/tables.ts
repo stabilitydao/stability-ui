@@ -1,8 +1,8 @@
 import type { TTableColumn, TTableFilters } from "@types";
 
 const TABLE_FILTERS: TTableFilters[] = [
-  { name: "Stablecoins", type: "single", state: false },
   { name: "Strategies", type: "dropdown", state: true },
+  { name: "Stablecoins", type: "single", state: false },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];
@@ -21,7 +21,7 @@ const SONIC_TABLE: TTableColumn[] = [
     dataType: "string",
   },
   {
-    name: "Total APR",
+    name: "APR",
     keyName: "earningData",
     sortType: "none",
     dataType: "number",
@@ -221,6 +221,12 @@ const USERS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
+    name: "Earned in Metavaults",
+    keyName: "metaVaultsEarned",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
     name: "Deposit",
     keyName: "deposit",
     sortType: "none",
@@ -361,6 +367,41 @@ const BC_POOL_TABLE: TTableColumn[] = [
   },
 ];
 
+const METAVAULT_TABLE: TTableColumn[] = [
+  {
+    name: "Name",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "APR",
+    keyName: "APR",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Allocation (current / target)",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  // {
+  //   name: "TVL",
+  //   keyName: "tvl",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
+  // {
+  //   name: "Deposit",
+  //   keyName: "balanceInUSD",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -381,4 +422,5 @@ export {
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
+  METAVAULT_TABLE,
 };

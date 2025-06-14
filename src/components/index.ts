@@ -1,4 +1,5 @@
 import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { Navbar } from "./Navbar";
+import { Menu } from "./Menu";
 
-export { Header, Footer };
+export { Header, Navbar, Menu };

@@ -11,13 +11,7 @@ import { useStore } from "@nanostores/react";
 
 import { apiData } from "@store";
 
-import {
-  Breadcrumbs,
-  HeadingText,
-  TableColumnSort,
-  Counter,
-  FullPageLoader,
-} from "@ui";
+import { HeadingText, TableColumnSort, Counter, FullPageLoader } from "@ui";
 
 import { ChainStatus } from "../../ui";
 
@@ -224,8 +218,6 @@ const Chains = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Chains"]} />
-
       <HeadingText text="Chains" scale={1} styles="mt-3" />
 
       <div className="bg-accent-950 p-[26px] rounded-[44px] mb-6 flex flex-col select-none">

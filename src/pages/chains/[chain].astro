@@ -12,7 +12,7 @@ const chainData:Chain|undefined = chains[chain]
   metaDescription={chainData ? `Support of the ${chainData.name} blockchain by the Stability platform. Strategies, bridges, protocols, assets and other related information.` : 'Chain with such chain ID was not found'}
   img={chainData ? `/chain-covers/${chain}.png` : ''}
 >
-    <div class="my-vault max-w-[1200px]">
+    <div class="max-w-[1200px]">
         <Chain chain={chain} client:only="react" />
     </div>
 </Layout>

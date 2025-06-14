@@ -14,6 +14,7 @@ import {
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
+  METAVAULT_TABLE,
 } from "./tables";
 
 import {
@@ -47,6 +48,11 @@ const STABLECOINS = [
   ...USTB,
   ...scUSD,
 ];
+
+const PAGINATIONS_VARIANTS = {
+  rows: [5, 10, 15, 20, 30],
+  grid: [4, 8, 12, 16, 20],
+};
 
 const PAGINATION_VAULTS = 20;
 
@@ -177,7 +183,7 @@ const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "5",
   approves: "unlimited",
-  gasLimit: "1.1",
+  gasLimit: "1.2",
 };
 
 const PROTOCOLS = Object.entries(integrations).reduce<
@@ -225,11 +231,51 @@ const STABILITY_STRATEGY_LABELS: { [address: string]: string } = {
   [STABILITY_AAVE_POOLS[2]]: "Stable Jack",
 };
 
+const VAULTS_WITH_NAME = {
+  "0xa51e7204054464e656b3658e7dbb63d9b0f150f1": "Silo USDC (53)",
+  "0xb94b31f3dedaadbda6aa1cec4f49749273929972":
+    "Euler scUSD (Re7 Labs Cluster)",
+  "0xd248c4b6ec709feed32851a9f883afeac294ad30": "Silo USDC (34)",
+  "0x14d17757e88df8f59069ffa573570a50ed652866": "Silo scUSD (46)",
+  "0x2ebb3c7808b86f94df9731ae830ab6ea8cb431d8": "SIlo USDC (27)",
+  "0x96a8055090e87bfe18bdf3794e9d676f196efd80": "Silo USDC (8)",
+  "0x38274302e0dd5779b4e0a3e401023cfb48ff5c23": "Silo USDC (36)",
+  "0xfbb02d242527f3b56af3f087acddaa25d5e8acc4":
+    "Euler scUSD (MEV capital Sonic cluster)",
+  "0x0c8ce5afc38c94e163f0ddeb2da65df4904734f3": "Stability Stream USDC",
+  "0x402ae122caece6ce57203e3bd4af7d1e9ac446cb": "Stability USDC",
+  "0x7fc269e8a80d4cfbbcfab99a6bceac06227e2336": "Stability Stablejack USDC",
+  "0x86a4a379d9a2a3b3f0e1f8aa477c82f646344458": "Silo (54)",
+  "0xa70f074ee09df3c0ab7e9eb0c058941ff65b8efe": "Valmore S",
+  "0xf6fc4ea6c1e6dcb68c5ffab82f6c0ad2d4c94df9": "Silo Valmore",
+};
+
+const META_VAULTS_TYPE = {
+  metaUSD: "metaVault",
+  metaUSDC: "multiVault",
+  metascUSD: "multiVault",
+  metawS: "multiVault",
+  metaS: "metaVault",
+};
+
+const PATHS = [
+  // { name: "Dashboard", path: "dashboard" },
+  { name: "All Vaults", path: "vaults" },
+  // { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Meta Vaults", path: "metavaults" },
+  // { name: "ALM", path: "alm" },
+  { name: "Users", path: "users" },
+  { name: "xSTBL", path: "xstbl" },
+  // { name: "Agents", path: "agents" },
+  // { name: "Platform", path: "platform" },
+];
+
 export {
   APRsType,
   TABLE,
   TABLE_FILTERS,
   CHAINS_TABLE,
+  PAGINATIONS_VARIANTS,
   PAGINATION_VAULTS,
   STABLECOINS,
   CHAINS,
@@ -265,6 +311,10 @@ export {
   DEFAULT_TABLE_PARAMS,
   SILO_POINTS,
   STABILITY_TOKENS,
-  STABILITY_AAVE_POOLS,
+  PATHS,
+  META_VAULTS_TYPE,
+  VAULTS_WITH_NAME,
   STABILITY_STRATEGY_LABELS,
+  STABILITY_AAVE_POOLS,
+  METAVAULT_TABLE,
 };

@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 
 interface IProps {
   end: number;
+  withText?: boolean;
 }
 
-const Timer: React.FC<IProps> = ({ end }) => {
+const Timer: React.FC<IProps> = ({ end, withText = true }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [status, setStatus] = useState<"ended" | "ongoing">();
+  const [status, setStatus] = useState<"beforeStart" | "ongoing" | "ended">();
 
   useEffect(() => {
     const updateTimer = () => {
@@ -28,21 +29,51 @@ const Timer: React.FC<IProps> = ({ end }) => {
   }, [end]);
 
   const formatTime = (seconds: number) => {
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
+    const days = Math.floor(seconds / (3600 * 24));
+    const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
-    return `${d}d ${h}h ${m}m ${s}s`;
+    return [
+      { label: "DAY", value: days },
+      { label: "HOUR", value: hours },
+      { label: "MIN", value: minutes },
+      { label: "SEC", value: secs },
+    ];
   };
 
   if (status === "ended") {
     return null;
   }
 
+  const formattedTime = formatTime(timeLeft);
+
   return (
-    <div className="font-manrope text-[18px] sm:text-[20px] text-center uppercase flex items-center gap-2">
-      <h5>{formatTime(timeLeft)}</h5>
+    <div className="flex items-center gap-3">
+      {withText && (
+        <h3 className="text-[#97979A] text-[14px] leading-5">
+          {status === "beforeStart" ? "Starts" : "Distributed"} in
+        </h3>
+      )}
+
+      <div className="flex gap-1 md:gap-3">
+        {formattedTime.map((unit) => (
+          <div
+            key={unit.label}
+            className="flex flex-col items-center justify-center w-8 h-8 md:w-12 md:h-12 bg-[#101012] rounded-lg border border-[#23252A] font-medium"
+          >
+            <span
+              className="text-[12px] leading-3 md:text-[18px] md:leading-6"
+              style={{ fontFamily: "monospace" }}
+            >
+              {unit.value.toString().padStart(2, "0")}
+            </span>
+            <span className="text-[8px] md:text-[12px] leading-3">
+              {unit.label}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

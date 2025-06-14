@@ -25,6 +25,14 @@ import { setVisibleBalances } from "./functions/setVisibleBalances";
 import { getContractDataWithPagination } from "./functions/getContractDataWithPagination";
 import { extractPointsMultiplier } from "./functions/extractPointsMultiplier";
 import { playAudio } from "./functions/playAudio";
+import { cn } from "./functions/cn";
+import { capitalize } from "./functions/capilatize";
+import { getTransactionReceipt } from "./functions/getTransactionReceipt";
+import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
+
+/* HOOKS */
+import { useClickOutside } from "./hooks/useClickOutside";
+import { useModalClickOutside } from "./hooks/useModalClickOutside";
 
 export {
   getTokenData,
@@ -53,4 +61,10 @@ export {
   getContractDataWithPagination,
   extractPointsMultiplier,
   playAudio,
+  cn,
+  capitalize,
+  useClickOutside,
+  useModalClickOutside,
+  getTransactionReceipt,
+  enrichAndResolveMetaVaults,
 };

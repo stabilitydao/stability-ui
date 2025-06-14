@@ -3,13 +3,13 @@ import { useState, useEffect, memo } from "react";
 import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
 import { useStore } from "@nanostores/react";
 
-import { HeadingText, RiskIndicator } from "@ui";
+import { HeadingText, RiskIndicator, StrategyBadge } from "@ui";
 
 import { connected, platformsData, apiData } from "@store";
 
 import { FactoryABI, wagmiConfig } from "@web3";
 
-import { STABILITY_AAVE_POOLS, STABILITY_STRATEGY_LABELS } from "@constants";
+// import { STABILITY_AAVE_POOLS, STABILITY_STRATEGY_LABELS } from "@constants";
 
 import type { TAddress, TPlatformData, TVault } from "@types";
 
@@ -87,103 +87,36 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
     }
   }, [vault, vaultTypes, strategyTypes]);
 
-  const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
-    vault.strategySpecific.includes(addr)
-  );
+  // const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
+  //   vault.strategySpecific.includes(addr)
+  // );
 
-  const isStabilityLogo = !!matchedAddress;
+  // const isStabilityLogo = !!matchedAddress;
 
-  const strategySpecific = matchedAddress
-    ? STABILITY_STRATEGY_LABELS[matchedAddress]
-    : vault.strategySpecific.includes("0xb38d..97b8")
-      ? "MEV Capital"
-      : vault.strategySpecific.includes("0xeeb1..cb6c")
-        ? "Re7 Labs"
-        : vault.strategySpecific;
+  // const strategySpecific = matchedAddress
+  //   ? STABILITY_STRATEGY_LABELS[matchedAddress]
+  //   : vault.strategySpecific.includes("0xb38d..97b8")
+  //     ? "MEV Capital"
+  //     : vault.strategySpecific.includes("0xeeb1..cb6c")
+  //       ? "Re7 Labs"
+  //       : vault.strategySpecific;
 
   return (
     <div>
-      <HeadingText
-        text="Strategy"
-        scale={2}
-        styles="text-left md:ml-4 md:mb-0 mb-2"
-      />
-      <div className="flex flex-col items-start gap-3 md:p-4">
-        <div className="flex items-start flex-col gap-3">
-          <div className="flex">
-            <span
-              style={{
-                backgroundColor: vault.strategyInfo.bgColor,
-                color: vault.strategyInfo.color,
-              }}
-              className="px-2 rounded-l-[10px] font-bold text-[#ffffff] text-[15px] flex h-8 items-center justify-center w-[70px]"
-              title={vault.strategyInfo.id}
-            >
-              {vault.strategyInfo.shortId}
-            </span>
-            <span className="px-2 rounded-r-[10px] bg-accent-900 flex h-8 items-center min-w-[160px]">
-              <span className="flex min-w-[42px] justify-center">
-                {isStabilityLogo ? (
-                  <img
-                    className="h-6 w-6 mx-[2px]"
-                    src="/logo.svg"
-                    alt="Stability"
-                    title="Stability"
-                  />
-                ) : (
-                  vault.strategyInfo.protocols.map((protocol, index) => (
-                    <img
-                      className={`h-6 w-6 ${
-                        vault.strategyInfo.protocols.length > 1 &&
-                        index &&
-                        "ml-[-4px]"
-                      }`}
-                      key={index}
-                      src={protocol.logoSrc}
-                      alt={protocol.name}
-                      title={protocol.name}
-                    />
-                  ))
-                )}
-              </span>
-              <span className="flex">
-                {vault?.strategyInfo?.baseStrategies.includes("Farming") && (
-                  <img
-                    title="Farming"
-                    alt="Farming"
-                    className="w-6 h-6 ml-1"
-                    src="/features/Farming.svg"
-                  />
-                )}
-              </span>
-              {vault.yearnProtocols.length ? (
-                <div className="flex">
-                  {vault.yearnProtocols.map((protocol) => (
-                    <img
-                      key={protocol.link}
-                      src={protocol.link}
-                      alt={protocol.title}
-                      title={protocol.title}
-                      className="h-6 w-6 rounded-full"
-                    />
-                  ))}
-                </div>
-              ) : strategySpecific ? (
-                <span className="font-bold rounded-[4px] text-[#b6bdd7] inline uppercase text-[10px] px-[6px]">
-                  {strategySpecific}
-                </span>
-              ) : (
-                ""
-              )}
-            </span>
-          </div>
+      <HeadingText text="Strategy" scale={2} styles="text-left mb-4" />
+      <div className="flex flex-col items-start gap-4 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+        <div className="flex items-center justify-between w-full">
+          <StrategyBadge
+            info={vault.strategyInfo}
+            specific={vault.strategySpecific}
+          />
 
           <div
             style={{
-              backgroundColor: vault.strategyInfo.bgColor,
-              color: vault.strategyInfo.color,
+              backgroundColor: vault.strategyInfo.bgColor + "66",
+              border: `1px solid ${vault.strategyInfo.bgColor}`,
             }}
-            className="px-3 rounded-[8px] flex items-center text-[18px] lg:text-[20px] md:py-1 lg:py-0"
+            className="px-2 py-1 rounded-lg flex items-center text-[12px] leading-4 font-medium"
           >
             {vault.yearnProtocols.length ? (
               <div className="flex py-2 gap-2">
@@ -207,36 +140,38 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
         </div>
 
         {vault.strategyDescription && (
-          <div className="mt-2">
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-              DESCRIPTION
+          <div className="flex flex-col gap-1">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+              Description
             </p>
-            <p className="text-[16px] mt-1">{vault.strategyDescription}</p>
+            <p className="text-[16px] leading-5 font-medium">
+              {vault.strategyDescription}
+            </p>
           </div>
         )}
-        <div className="mt-2">
-          <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-            impermanent loss
+        <div className="flex flex-col gap-1">
+          <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+            Impermanent loss
           </p>
-          <div>
+          <div className="flex flex-col gap-1">
             <p
               style={{ color: vault?.strategyInfo?.il?.color }}
               className="text-[20px] font-bold"
             >
               {vault?.strategyInfo?.il?.title}
             </p>
-            <p className="text-[14px]">
+            <p className="text-[16px] leading-5 font-medium">
               {vault?.strategyInfo?.il?.desc != "None" &&
                 vault?.strategyInfo?.il?.desc}
             </p>
           </div>
         </div>
         {!!vault?.risk && vault?.risk?.symbol !== "UNKNOWN" && (
-          <div className="mt-2">
+          <div>
             <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
               RISK
             </p>
-            <div className="flex flex-col gap-2 mt-2">
+            <div className="flex flex-col gap-2">
               <RiskIndicator riskSymbol={vault?.risk?.symbol} />
 
               <div className="flex items-center gap-5 flex-wrap">
@@ -253,15 +188,17 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
         )}
         {vault?.strategyVersion && (
-          <div>
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-              STRATEGY VERSION
+          <div className="flex flex-col gap-1">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
+              Strategy Version
             </p>
-            <p className="text-[16px] mt-1">{vault?.strategyVersion} </p>
+            <p className="text-[20px] leading-6 font-semibold">
+              {vault?.strategyVersion}{" "}
+            </p>
           </div>
         )}
 
-        <div className="mt-2 flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
           {needVaultUpgrade && (
             <button
               onClick={upgradeVault}

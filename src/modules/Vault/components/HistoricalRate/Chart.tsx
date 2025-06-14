@@ -118,17 +118,18 @@ const Chart: React.FC<IProps> = ({ chart }) => {
             <stop offset={1} stopColor="#0c0c1b" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="1 1" stroke="#434395" />
+        <CartesianGrid
+          strokeDasharray="5 5"
+          stroke="#23252a"
+          vertical={false}
+        />
         <XAxis
           dataKey="timestamp"
           tickLine={false}
           tick={({ x, y, payload }) => (
             <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
-          style={{
-            fill: "#958CA1",
-            fontSize: "12px",
-          }}
+          style={{ fill: "#97979A" }}
         />
         <YAxis
           domain={
@@ -143,7 +144,7 @@ const Chart: React.FC<IProps> = ({ chart }) => {
           tickLine={false}
           axisLine={false}
           style={{
-            fill: "#958CA1",
+            fill: "#97979A",
             fontSize: "12px",
           }}
           mirror={true}
@@ -152,7 +153,7 @@ const Chart: React.FC<IProps> = ({ chart }) => {
         <Area
           type="monotone"
           dataKey={chart.name}
-          stroke="#3047ff"
+          stroke="#5E6AD2"
           strokeWidth="2"
           fill="url(#colorUv)"
           points={chart.data.map((entry) => ({

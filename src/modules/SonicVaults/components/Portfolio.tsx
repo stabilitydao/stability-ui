@@ -7,14 +7,13 @@ import { PlatformModal } from "./modals/PlatformModal";
 
 import {
   Skeleton,
-  APRtimeSwitcher,
   FeeAPRModal,
-  BalanceVisibilityToggler,
+  // BalanceVisibilityToggler,
 } from "@ui";
 
 import { connected, visible, isWeb3Load, aprFilter } from "@store";
 
-import { formatNumber, calculateAPY } from "@utils";
+import { formatNumber, calculateAPY, cn } from "@utils";
 
 import type { TVault } from "@types";
 
@@ -67,12 +66,17 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        let apr = Number(v?.earningData?.apr?.[$aprFilter]);
+        let apr = v?.isMetaVault
+          ? Number(v.APR)
+          : Number(v?.earningData?.apr?.[$aprFilter]);
 
         let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
         let vaultSharePrice = Number(v.shareprice);
-        apr = Number(apr);
-        const balance = vaultBalance * vaultSharePrice;
+
+        const balance = v?.isMetaVault
+          ? vaultBalance
+          : vaultBalance * vaultSharePrice;
+
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;
       }
@@ -100,16 +104,11 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   };
 
   const dailyYield = $connected
-    ? `$${formatNumber(portfolio.dailySum, "format")} / ${formatNumber(
-        portfolio.dailyPercent,
-        "format"
-      )}%`
+    ? `$${formatNumber(portfolio.dailySum, "format")}`
     : "-";
+
   const monthlyYield = $connected
-    ? `$${formatNumber(portfolio.monthly, "format")} / ${formatNumber(
-        portfolio.monthPercent,
-        "format"
-      )}%`
+    ? `$${formatNumber(portfolio.monthly, "format")}`
     : "-";
   const avgApr = $connected
     ? `${formatNumber(portfolio.apr, "formatAPR")}%`
@@ -126,208 +125,111 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   }, [$aprFilter, vaults]);
 
   return (
-    <div className="my-2 rounded-sm font-manrope">
-      <div className="p-2">
-        <div className="flex items-center justify-between">
+    <div className="font-manrope mt-4 md:mt-10 bg-[#101012] border border-[#23252A] rounded-lg">
+      <div className="md:pt-6 md:pb-7 md:px-6 p-4">
+        {/* <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h3 className="text-[1.4rem] font-medium">Portfolio</h3>
             <BalanceVisibilityToggler />
           </div>
-          <div className="hidden items-start justify-center flex-col md:flex">
-            <APRtimeSwitcher withText={true} />
-          </div>
-        </div>
-        <div className="flex items-start justify-between flex-wrap lg:flex-nowrap gap-3 mt-[6px]">
-          <div className="hidden md:flex items-center justify-start gap-5 flex-wrap whitespace-nowrap w-full">
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                DEPOSITED
-              </h2>
-              <div
-                data-testid="portfolioDeposited"
-                className="text-[18px] text-neutral-50 font-semibold"
-              >
-                {$isWeb3Load ? (
-                  <div className="mt-2">
-                    <Skeleton height={21} width={100} />
-                  </div>
-                ) : (
-                  <p className={`${!$visible && "blur select-none"}`}>
-                    {$visible
-                      ? `$${formatNumber(portfolio.deposited, "format")}`
-                      : "000$"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="max-w-[130px] w-full md:max-w-[150px]  flex flex-col items-start">
-              <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                DAILY YIELD
-              </h2>
-              <div
-                data-testid="portfolioDaily"
-                className="text-[18px] text-neutral-50 font-semibold"
-              >
-                {$isWeb3Load ? (
-                  <div className="mt-2">
-                    <Skeleton height={21} width={100} />
-                  </div>
-                ) : (
-                  <p className={`${!$visible && "blur select-none"}`}>
-                    {$visible ? dailyYield : "000$"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="w-[120px] md:w-[180px] flex flex-col items-start">
-              <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                MONTHLY YIELD
-              </h2>
-              <div
-                data-testid="portfolioMonthly"
-                className="text-[18px] text-neutral-50 font-semibold"
-              >
-                {$isWeb3Load ? (
-                  <div className="mt-2">
-                    <Skeleton height={21} width={100} />
-                  </div>
-                ) : (
-                  <p className={`${!$visible && "blur select-none"}`}>
-                    {$visible ? monthlyYield : "000$"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                AVG. APR
-              </h2>
-              <div
-                data-testid="portfolioAPR"
-                className="text-[18px] text-neutral-50 font-semibold"
-              >
-                {$isWeb3Load ? (
-                  <div className="mt-2">
-                    <Skeleton height={21} width={100} />
-                  </div>
-                ) : (
-                  <p className={`${!$visible && "blur select-none"}`}>
-                    {$visible ? avgApr : "000$"}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="max-w-[120px] w-full md:w-[120px] flex flex-col items-start">
-              <h2 className="text-[14px]  select-none leading-5 text-[#8D8E96]">
-                AVG. APY
-              </h2>
-              <div
-                data-testid="portfolioAPY"
-                className="text-[18px] text-neutral-50 font-semibold"
-              >
-                {$isWeb3Load ? (
-                  <div className="mt-2">
-                    <Skeleton height={21} width={100} />
-                  </div>
-                ) : (
-                  <p className={`${!$visible && "blur select-none"}`}>
-                    {$visible ? avgApy : "0000"}
-                  </p>
-                )}
-              </div>
+        </div> */}
+        <div className="flex items-center justify-start gap-6 flex-wrap whitespace-nowrap w-full">
+          <div className="flex-1 flex flex-col items-start">
+            <h2 className="text-[14px] select-none text-[#97979A] leading-5">
+              Deposited
+            </h2>
+            <div
+              data-testid="portfolioDeposited"
+              className="portfolio__font text-white"
+            >
+              {$isWeb3Load ? (
+                <div className="mt-2">
+                  <Skeleton height={40} width={100} />
+                </div>
+              ) : (
+                <p className={`${!$visible && "blur select-none"}`}>
+                  {$visible
+                    ? `$${formatNumber(portfolio.deposited, "format")}`
+                    : "000$"}
+                </p>
+              )}
             </div>
           </div>
-          <div className="md:hidden flex items-start justify-between whitespace-nowrap w-full">
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-start">
-                <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                  DEPOSITED
-                </h2>
-                <div className="text-[18px] text-neutral-50 font-semibold">
-                  {$isWeb3Load ? (
-                    <div className="mt-1">
-                      <Skeleton height={21} width={100} />
-                    </div>
-                  ) : (
-                    <p className={`${!$visible && "blur select-none"}`}>
-                      {$visible
-                        ? `$${formatNumber(portfolio.deposited, "format")}`
-                        : "0000"}
-                    </p>
-                  )}
+          <div className="flex-1 flex flex-col items-start">
+            <h2 className="text-[14px] select-none text-[#97979A] leading-5">
+              Daily Yield
+            </h2>
+            <div
+              data-testid="portfolioDaily"
+              className="portfolio__font text-white"
+            >
+              {$isWeb3Load ? (
+                <div className="mt-2">
+                  <Skeleton height={40} width={100} />
                 </div>
-              </div>
-              <div className="flex flex-col items-start">
-                <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                  MONTHLY YIELD
-                </h2>
-                <div className="text-[18px] text-neutral-50 font-semibold">
-                  {$isWeb3Load ? (
-                    <div className="mt-1">
-                      <Skeleton height={21} width={100} />
-                    </div>
-                  ) : (
-                    <p className={`${!$visible && "blur select-none"}`}>
-                      {$visible ? monthlyYield : "0000"}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-col items-start">
-                <h2 className="text-[14px]  select-none leading-5 text-[#8D8E96]">
-                  AVG. APY
-                </h2>
-                <div className="text-[18px] text-neutral-50 font-semibold">
-                  {$isWeb3Load ? (
-                    <div className="mt-1">
-                      <Skeleton height={21} width={100} />
-                    </div>
-                  ) : (
-                    <p className={`${!$visible && "blur select-none"}`}>
-                      {$visible ? avgApy : "0000"}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-start">
-                <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                  DAILY YIELD
-                </h2>
-                <div className="text-[18px] text-neutral-50 font-semibold">
-                  {$isWeb3Load ? (
-                    <div className="mt-1">
-                      <Skeleton height={21} width={130} />
-                    </div>
-                  ) : (
-                    <p className={`${!$visible && "blur select-none"}`}>
-                      {$visible ? dailyYield : "0000"}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-col items-start">
-                <h2 className="text-[14px]  select-none text-neutral-500 leading-5">
-                  AVG. APR
-                </h2>
-                <div className="text-[18px] text-neutral-50 font-semibold">
-                  {$isWeb3Load ? (
-                    <div className="mt-1">
-                      <Skeleton height={21} width={130} />
-                    </div>
-                  ) : (
-                    <p className={`${!$visible && "blur select-none"}`}>
-                      {$visible ? avgApr : "0000"}
-                    </p>
-                  )}
-                </div>
-              </div>
+              ) : (
+                <p className={cn(!$visible && "blur select-none")}>
+                  {$visible ? dailyYield : "000$"}
+                </p>
+              )}
             </div>
           </div>
-
-          <div className="flex items-start justify-between flex-col md:hidden">
-            <APRtimeSwitcher />
+          <div className="flex-1 flex flex-col items-start">
+            <h2 className="text-[14px] select-none text-[#97979A] leading-5">
+              Monthly Yield
+            </h2>
+            <div
+              data-testid="portfolioMonthly"
+              className="portfolio__font text-white"
+            >
+              {$isWeb3Load ? (
+                <div className="mt-2">
+                  <Skeleton height={40} width={100} />
+                </div>
+              ) : (
+                <p className={cn(!$visible && "blur select-none")}>
+                  {$visible ? monthlyYield : "000$"}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 flex flex-col items-start">
+            <h2 className="text-[14px] select-none text-[#97979A] leading-5">
+              AVG. APR
+            </h2>
+            <div
+              data-testid="portfolioAPR"
+              className="portfolio__font text-white"
+            >
+              {$isWeb3Load ? (
+                <div className="mt-2">
+                  <Skeleton height={40} width={100} />
+                </div>
+              ) : (
+                <p className={cn(!$visible && "blur select-none")}>
+                  {$visible ? avgApr : "000$"}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 flex flex-col items-start">
+            <h2 className="text-[14px] select-none leading-5 text-[#8D8E96]">
+              AVG. APY
+            </h2>
+            <div
+              data-testid="portfolioAPY"
+              className="portfolio__font text-white"
+            >
+              {$isWeb3Load ? (
+                <div className="mt-2">
+                  <Skeleton height={40} width={100} />
+                </div>
+              ) : (
+                <p className={cn(!$visible && "blur select-none")}>
+                  {$visible ? avgApy : "0000"}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

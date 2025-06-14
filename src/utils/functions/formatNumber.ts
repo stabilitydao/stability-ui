@@ -180,7 +180,6 @@ export const formatNumber = (
 
       changedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       break;
-
     case "formatAPR":
       value = Number(value);
 

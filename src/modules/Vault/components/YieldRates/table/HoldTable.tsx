@@ -1,3 +1,5 @@
+import { cn } from "@utils";
+
 import type { TShareData, THoldData } from "@types";
 
 interface IProps {
@@ -12,45 +14,47 @@ const HoldTable: React.FC<IProps> = ({
   daysFromCreation = 0,
 }) => {
   return (
-    <table className="font-manrope w-full">
-      <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-        <tr className="text-[14px] uppercase">
-          <th></th>
-          <th className="text-right">INIT PRICE</th>
-          <th className="text-right">PRICE</th>
-          <th className="text-right">CHANGE {daysFromCreation} DAYS</th>
-        </tr>
-      </thead>
-      <tbody className="text-[14px]">
-        {!!shareData && (
-          <tr className="h-[48px] hover:bg-accent-950">
-            <td>Vault</td>
-            <td className="text-right py-1">
-              {shareData.sharePriceOnCreation}
-            </td>
-            <td className="text-right py-1">{shareData.sharePrice}</td>
-            <td className="text-right py-1">
-              {Number(shareData.yieldPercent) > 0 && "+"}
-              {shareData.yieldPercent}%
-            </td>
-          </tr>
-        )}
-        {!!holdData &&
-          holdData.map((aprsData) => (
-            <tr key={aprsData.symbol} className="h-[48px] hover:bg-accent-950">
-              <td className="truncate max-w-[100px] sm:max-w-[130px]">
-                {aprsData.symbol}
-              </td>
-              <td className="text-right py-1">{aprsData.initPrice}</td>
-              <td className="text-right py-1">{aprsData.price}</td>
-              <td className="text-right py-1">
-                {Number(aprsData.priceDifference) > 0 && "+"}
-                {aprsData.priceDifference}%
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
+    <div className="w-full">
+      <div className="flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden">
+        <div className="px-4 w-[40%]"></div>
+        <div className="text-right w-1/5">Init price</div>
+        <div className="text-right w-1/5 pr-4">Price</div>
+        <div className="text-right w-1/5 pr-4">
+          Change {daysFromCreation} days
+        </div>
+      </div>
+
+      <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]">
+        <div className="px-4 w-[40%]">Vault</div>
+        <div className="text-right w-[20%]">
+          {shareData.sharePriceOnCreation}
+        </div>
+        <div className="text-right w-[20%] pr-4">{shareData.sharePrice} </div>
+        <div className="text-right w-[20%] pr-4">
+          {Number(shareData.yieldPercent) > 0 && "+"}
+          {shareData.yieldPercent}%
+        </div>
+      </div>
+
+      {!!holdData &&
+        holdData.map((aprsData, index) => (
+          <div
+            key={aprsData.symbol}
+            className={cn(
+              "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]",
+              holdData.length - 1 === index && "rounded-b-lg"
+            )}
+          >
+            <div className="w-[40%] px-4">{aprsData.symbol}</div>
+            <div className="text-right w-[20%]">{aprsData.initPrice} </div>
+            <div className="text-right w-[20%] pr-4">{aprsData.price}</div>
+            <div className="text-right w-[20%] pr-4">
+              {Number(aprsData.priceDifference) > 0 && "+"}
+              {aprsData.priceDifference}%
+            </div>
+          </div>
+        ))}
+    </div>
   );
 };
 

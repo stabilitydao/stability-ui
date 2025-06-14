@@ -1003,7 +1003,7 @@ const Vaults = (): JSX.Element => {
       </div>
 
       <Pagination
-        vaults={filteredVaults}
+        data={filteredVaults}
         tab={currentTab}
         setTab={setCurrentTab}
       />

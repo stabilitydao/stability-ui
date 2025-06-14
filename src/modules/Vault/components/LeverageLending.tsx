@@ -11,10 +11,10 @@ interface IProps {
 const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
   const supplyAPRComponent = (
     <div className="w-1/2">
-      <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+      <p className="font-medium leading-5 text-[#97979A] text-[14px]">
         SUPPLY APR
       </p>
-      <p className="text-[16px] mt-1">
+      <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
         {vault?.leverageLending?.supplyApr?.toFixed(3)}%
       </p>
     </div>
@@ -22,38 +22,36 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
 
   const borrowAPRComponent = (
     <div className="w-1/2">
-      <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+      <p className="font-medium leading-5 text-[#97979A] text-[14px]">
         BORROW APR
       </p>
-      <p className="text-[16px] mt-1">
+      <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
         {vault?.leverageLending?.borrowApr?.toFixed(3)}%
       </p>
     </div>
   );
 
   return (
-    <div className="lg:w-[580px]">
-      <HeadingText
-        text="Leverage Lending"
-        scale={2}
-        styles="text-left md:ml-4 md:mb-0 mb-2"
-      />
-      <div className="md:p-4 flex flex-col gap-5">
+    <div className="w-full md:w-1/2">
+      <HeadingText text="Leverage Lending" scale={2} styles="text-left mb-4" />
+      <div className="flex flex-col items-start gap-4 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
         <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
           <div>
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               LEVERAGE
             </p>
-            <p className="text-[16px] mt-1">
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
               x{vault?.leverageLending?.leverage?.toFixed(3)}
             </p>
           </div>
           {!!vault?.assetAPR ? (
             <div className="w-1/2">
-              <p className="text-[13px] leading-3 text-[#8D8E96]">
+              <p className="font-medium leading-5 text-[#97979A] text-[14px]">
                 {vault?.assets?.[0]?.symbol} APR
               </p>
-              <p className="text-[16px] mt-1">{vault?.assetAPR?.toFixed(3)}%</p>
+              <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
+                {vault?.assetAPR?.toFixed(3)}%
+              </p>
             </div>
           ) : (
             supplyAPRComponent
@@ -61,10 +59,10 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
         </div>
         <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
           <div className="flex flex-col">
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               LTV
             </p>
-            <p className="text-[16px] mt-1">
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
               {vault?.leverageLending?.ltv?.toFixed(3)}%
             </p>
           </div>
@@ -72,10 +70,10 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
         </div>
         <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
           <div>
-            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
+            <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               MAX LTV
             </p>
-            <p className="text-[16px] mt-1">
+            <p className="text-[20px] leading-6 font-semibold mt-1 flex items-center">
               {vault?.leverageLending?.maxLtv?.toFixed(3)}%
             </p>
           </div>

@@ -10,7 +10,5 @@ import Layout from '@layouts/Layout.astro';
   metaUrl="https://stability.farm/contests"
   metaDescription="All yield contests taking place in the Stability ecosystem."
 >
-    <div class="max-w-[1200px]">
-        <Contests client:only="react" />
-    </div>
+  <Contests client:only="react" />
 </Layout>

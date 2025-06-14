@@ -5,21 +5,21 @@ interface IProps {
 }
 
 const BUTTON_STYLES = {
-  default: "bg-neutral-950",
+  default: "bg-[#151618] border border-[#23252A]",
   bright: "bg-neutral-900",
-  accent: "bg-accent-950 border border-accent-400",
+  accent: "bg-[#1C1E31] border border-[#5E6AD2]",
   error: "bg-error-950 border border-error-400",
   warning: "bg-warning-950 border border-warning-400",
-  success: "bg-success-950 border border-success-400",
+  success: "bg-[#192C1E] border border-[#48C05C]",
 };
 
 const TEXT_STYLES = {
-  default: "text-neutral-500",
+  default: "text-[#97979A]",
   bright: "text-neutral-50",
-  accent: "text-accent-400",
+  accent: "text-[#5E6AD2]",
   error: "text-error-400",
   warning: "text-warning-400",
-  success: "text-success-400",
+  success: "text-[#48C05C]",
 };
 
 const Badge: React.FC<IProps> = ({ state, text, greater = false }) => {
@@ -28,7 +28,7 @@ const Badge: React.FC<IProps> = ({ state, text, greater = false }) => {
 
   return (
     <div
-      className={`flex items-center justify-center rounded-2xl ${greater ? "max-w-[100px]" : "max-w-[60px]"} ${buttonStyle}`}
+      className={`flex items-center justify-center rounded-[4px] ${greater ? "max-w-[100px]" : "max-w-[60px]"} ${buttonStyle}`}
     >
       <p
         className={`font-manrope font-semibold px-2 ${greater ? "text-[12px] leading-[17px] py-1" : "text-[10px] leading-[10px] py-[2px]"} ${textStyle}`}

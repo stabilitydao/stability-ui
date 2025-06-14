@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useStore } from "@nanostores/react";
-
-import { readContract, writeContract } from "@wagmi/core";
+// writeContract
+import { readContract } from "@wagmi/core";
 import { formatUnits } from "viem";
-
-import { HeadingText } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -32,7 +30,7 @@ const Rewards = (): JSX.Element => {
   const $assetsPrices = useStore(assetsPrices);
   const $account = useStore(account);
 
-  const [userBalance, setUserBalance] = useState({ gems: "-" });
+  const [userBalance, setUserBalance] = useState({ gems: "0.00" });
   const [userData, setUserData] = useState<any>([]); // todo: change type to user rewards
   const [gemsEarned, setGemsEarned] = useState("0");
   const [rewardsTotalSupply, setRewardsTotalSupply] = useState({
@@ -158,35 +156,35 @@ const Rewards = (): JSX.Element => {
     }
   };
 
-  const claim = async () => {
-    if (!$account) {
-      alert("Please connect your wallet!");
-    }
+  // const claim = async () => {
+  //   if (!$account) {
+  //     alert("Please connect your wallet!");
+  //   }
 
-    try {
-      const gemsAmounts: string[] = [];
-      const proofs: string[][] = [];
+  //   try {
+  //     const gemsAmounts: string[] = [];
+  //     const proofs: string[][] = [];
 
-      contestsToClaim.forEach((contest) => {
-        const contestData = userData.find(
-          ({ contestId }: { contestId: string }) => contest === contestId
-        );
+  //     contestsToClaim.forEach((contest) => {
+  //       const contestData = userData.find(
+  //         ({ contestId }: { contestId: string }) => contest === contestId
+  //       );
 
-        gemsAmounts.push(contestData?.gemsRaw as string);
-        proofs.push(contestData?.proofs as string[]);
-      });
+  //       gemsAmounts.push(contestData?.gemsRaw as string);
+  //       proofs.push(contestData?.proofs as string[]);
+  //     });
 
-      const claim = await writeContract(wagmiConfig, {
-        address: merkleDistributor as TAddress,
-        abi: IMerkleDistributor,
-        functionName: "claim",
-        args: [contestsToClaim, gemsAmounts, proofs, $account as TAddress],
-      });
-      console.log(claim);
-    } catch (err) {
-      console.error("Error occurred at claim:", err);
-    }
-  };
+  //     const claim = await writeContract(wagmiConfig, {
+  //       address: merkleDistributor as TAddress,
+  //       abi: IMerkleDistributor,
+  //       functionName: "claim",
+  //       args: [contestsToClaim, gemsAmounts, proofs, $account as TAddress],
+  //     });
+  //     console.log(claim);
+  //   } catch (err) {
+  //     console.error("Error occurred at claim:", err);
+  //   }
+  // };
 
   useEffect(() => {
     getSGEMPrice();
@@ -212,122 +210,152 @@ const Rewards = (): JSX.Element => {
     }
   }, [userData]);
   return (
-    <div className="flex flex-col items-center gap-5 mb-4">
-      <HeadingText text="Rewards" scale={2} styles="mb-0" />
-      <p className="flex items-center justify-center text-center">
-        Earning in our vaults you get additional rewards!
-      </p>{" "}
-      <div className="flex items-center justify-center gap-10 font-manrope flex-wrap mb-5">
-        <div className="sGem1RewardBg w-[320px] sm:w-[550px] h-[270px] sm:h-[220px] rounded-[10px]">
-          <div className="py-[15px] pr-[45px] pl-[30px] h-full w-full flex justify-between items-center">
-            <div className="flex flex-col items-start justify-between h-full md:w-2/3">
-              <div className="font-light flex flex-col items-start">
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-[25px] flex items-center gap-2">
-                    <img
-                      src="sGEM1.png"
-                      alt="sGEM1"
-                      title="sGEM1"
-                      className="w-[33px] h-[33px] block sm:hidden"
-                    />
-                    sGEM1
-                  </span>
-                  <a
-                    className="block sm:hidden"
-                    target="_blank"
-                    href="https://www.shadow.so/trade?inputCurrency=0x29219dd400f2Bf60E5a23d13Be72B486D4038894&outputCurrency=0x9A08cD5691E009cC72E2A4d8e7F2e6EE14E96d6d"
-                  >
-                    <img src="mobile_shadow.png" alt="Shadow" title="Shadow" />
-                  </a>
-                </div>
-                <p className="text-[12px]">
-                  <span className="opacity-70">
-                    Sonic Gems are app airdrop points that we give away entirely
-                    to our users.
-                  </span>
+    <div className="p-10 flex flex-col justify-between items-center gap-10 sGem1RewardBg max-w-[536px] rounded-lg border border-[#23252A]">
+      <div className="flex items-start justify-between gap-9">
+        <div className="flex flex-col items-start gap-3">
+          <span className="text-[32px] leading-10 font-semibold">sGEM1</span>
+          <p className="text-[16px] leading-6 font-medium text-[#97979A]">
+            <span>
+              Sonic Gems are app airdrop points that we give away entirely to
+              our users.
+            </span>
 
-                  <a
-                    href="https://stabilitydao.gitbook.io/stability/stability-dao/gems"
-                    target="_blank"
-                    className="underline font-bold ml-1"
-                  >
-                    Read Docs
-                  </a>
-                </p>
-              </div>
-              <div>
-                <p className="text-[28px]">
-                  <span className="font-extralight">Balance:</span>
-                  <span className="font-bold"> {userBalance.gems}</span>
-                </p>
-                <p className="flex items-center gap-[3px] text-[13px] mt-[-5px]">
-                  <span className="text-[#5C5C5E]">Total Earned:</span>
-                  <span className="font-light">{gemsEarned}</span>
-                  <span className="text-[#B52727]">sGEM1</span>
-                </p>
-              </div>
-              <p className="text-[#B0B0B0] text-[15px] sm:flex items-center gap-1 hidden mb-[-5px]">
-                Swap on{" "}
-                <a
-                  target="_blank"
-                  href="https://www.shadow.so/trade?inputCurrency=0x29219dd400f2Bf60E5a23d13Be72B486D4038894&outputCurrency=0x9A08cD5691E009cC72E2A4d8e7F2e6EE14E96d6d"
-                >
-                  <img src="shadow.png" alt="Shadow" title="Shadow" />
-                </a>
-              </p>
-              <div className="w-full flex items-center justify-between sm:hidden">
-                <div className="flex flex-col text-[12px]">
-                  <p className="text-[#EAD9B2]">
-                    Price:
-                    <span className="font-bold mx-[2px]">${gemPrice}</span>
-                    USD
-                  </p>
+            <a
+              href="https://stabilitydao.gitbook.io/stability/stability-dao/gems"
+              target="_blank"
+              className="underline font-bold ml-1 text-[#5E6AD2]"
+            >
+              Read Docs
+            </a>
+          </p>
+        </div>
+        <img
+          src="/icons/sonic_gem_icon.svg"
+          alt="sGEM1"
+          title="sGEM1"
+          className="w-[84px] h-[84px] hidden md:block"
+        />
+      </div>
+      <div className="flex items-start md:items-center gap-6 w-full flex-col md:flex-row">
+        <div className="flex flex-col items-start gap-1">
+          <span className="text-[#97979A] text-sm font-medium">Balance</span>
 
-                  <p className="font-light opacity-50">
-                    Total Supply:{" "}
-                    <span className="font-bold">{rewardsTotalSupply.gems}</span>
-                  </p>
-                </div>
-                {!!contestsToClaim.length && (
-                  <button
-                    className="bg-transparent border border-[#FEF08A] h-7 rounded-md w-[80px] font-light text-[13px]"
-                    onClick={claim}
-                  >
-                    Claim
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col sm:items-end justify-between sm:w-1/3 h-full whitespace-nowrap">
-              <img
-                src="sGEM1.png"
-                alt="sGEM1 reward"
-                className="w-[88px] h-[88px] sm:block hidden"
-              />
-              {!!contestsToClaim.length && (
-                <button
-                  className="bg-transparent border border-[#FEF08A] h-7 sm:w-[88px] rounded-md w-8 font-light text-[13px] sm:block hidden"
-                  onClick={claim}
-                >
-                  Claim
-                </button>
-              )}
-              <div className="hidden sm:flex flex-col items-end text-[12px]">
-                <p className="text-[#EAD9B2]">
-                  Price:
-                  <span className="font-bold mx-[2px]">${gemPrice}</span>
-                  USD
-                </p>
+          <span className="font-semibold text-[32px] leading-10">
+            {userBalance.gems}
+          </span>
 
-                <p className="font-light opacity-50">
-                  Total Supply:{" "}
-                  <span className="font-bold">{rewardsTotalSupply.gems}</span>
-                </p>
-              </div>
-            </div>
-          </div>
+          <span className="text-[#97979A] font-medium text-sm">
+            Total Earned {gemsEarned} sGEM1
+          </span>
+        </div>
+        <div className="flex flex-col items-start gap-1">
+          <span className="text-[#97979A] text-sm font-medium">Price</span>
+
+          <span className="font-semibold text-[32px] leading-10">
+            ${gemPrice}
+          </span>
+
+          <span className="text-[#97979A] font-medium text-sm">
+            Total Supply: {rewardsTotalSupply.gems}
+          </span>
         </div>
       </div>
+
+      {/* <div className="flex flex-col items-start justify-between h-full">
+        <div className="font-light flex flex-col items-start">
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[25px] flex items-center gap-2">
+              <img
+                src="sGEM1.png"
+                alt="sGEM1"
+                title="sGEM1"
+                className="w-[33px] h-[33px] block sm:hidden"
+              />
+              sGEM1
+            </span>
+            <a
+              className="block sm:hidden"
+              target="_blank"
+              href="https://www.shadow.so/trade?inputCurrency=0x29219dd400f2Bf60E5a23d13Be72B486D4038894&outputCurrency=0x9A08cD5691E009cC72E2A4d8e7F2e6EE14E96d6d"
+            >
+              <img src="mobile_shadow.png" alt="Shadow" title="Shadow" />
+            </a>
+          </div>
+          <p className="text-[12px]">
+            <span className="opacity-70">
+              Sonic Gems are app airdrop points that we give away entirely to
+              our users.
+            </span>
+
+            <a
+              href="https://stabilitydao.gitbook.io/stability/stability-dao/gems"
+              target="_blank"
+              className="underline font-bold ml-1"
+            >
+              Read Docs
+            </a>
+          </p>
+        </div>
+        <div>
+          <p className="text-[28px]">
+            <span className="font-extralight">Balance:</span>
+            <span className="font-bold"> {userBalance.gems}</span>
+          </p>
+          <p className="flex items-center gap-[3px] text-[13px] mt-[-5px]">
+            <span className="text-[#5C5C5E]">Total Earned:</span>
+            <span className="font-light">{gemsEarned}</span>
+            <span className="text-[#B52727]">sGEM1</span>
+          </p>
+        </div>
+        <div className="w-full flex items-center justify-between sm:hidden">
+          <div className="flex flex-col text-[12px]">
+            <p className="text-[#EAD9B2]">
+              Price:
+              <span className="font-bold mx-[2px]">${gemPrice}</span>
+              USD
+            </p>
+<p className="font-light opacity-50">
+              Total Supply:{" "}
+              <span className="font-bold">{rewardsTotalSupply.gems}</span>
+            </p>
+          </div>
+          {!!contestsToClaim.length && (
+            <button
+              className="bg-transparent border border-[#FEF08A] h-7 rounded-md w-[80px] font-light text-[13px]"
+              onClick={claim}
+            >
+              Claim
+            </button>
+          )}
+        </div>
+      </div> */}
+      {/* <div className="flex flex-col sm:items-end justify-between sm:w-1/3 h-full whitespace-nowrap">
+        <img
+          src="sGEM1.png"
+          alt="sGEM1 reward"
+          className="w-[88px] h-[88px] sm:block hidden"
+        />
+        {!!contestsToClaim.length && (
+          <button
+            className="bg-transparent border border-[#FEF08A] h-7 sm:w-[88px] rounded-md w-8 font-light text-[13px] sm:block hidden"
+            onClick={claim}
+          >
+            Claim
+          </button>
+        )}
+        <div className="hidden sm:flex flex-col items-end text-[12px]">
+          <p className="text-[#EAD9B2]">
+            Price:
+            <span className="font-bold mx-[2px]">${gemPrice}</span>
+            USD
+          </p>
+
+          <p className="font-light opacity-50">
+            Total Supply:{" "}
+            <span className="font-bold">{rewardsTotalSupply.gems}</span>
+          </p>
+        </div>
+      </div> */}
     </div>
   );
 };

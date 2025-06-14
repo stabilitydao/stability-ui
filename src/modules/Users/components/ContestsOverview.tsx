@@ -17,75 +17,68 @@ interface IContestsProps {
   periodsData: YieldContestWithId[];
 }
 
-const toContest = (contestId: string): void => {
-  window.location.href = `/contests/${contestId}`;
-};
-
 const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
   return (
-    <div className="flex justify-center gap-10 flex-wrap items-stretch w-full">
+    <div className="flex items-stretch justify-between gap-6 min-w-full flex-col xl:flex-row">
       {!!periodsData.length &&
         periodsData.map(
           (contest, index: number) =>
             contest.id && (
-              <div
-                onClick={() => toContest(contest.id)}
+              <a
                 key={contest.start}
-                className="cursor-pointer"
+                href={`/contests/${contest.id}`}
+                className="bg-[#101012] border border-[#23252A] rounded-lg p-6 flex flex-col gap-8 w-full xl:w-[32%]"
               >
-                <div className="bg-accent-950 h-full w-[354px] rounded-2xl p-5 flex flex-col gap-3 items-scenter justify-start text-[18px]">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-[24px] font-bold ${contest.hidden ? "text-neutral-500" : ""}`}
-                    >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col items-start gap-2">
+                    <span className="text-[20px] leading-7 md:text-[24px] md:leading-8 font-semibold">
                       {contest.name}
                     </span>
-                    {!!contest?.integration?.intract && (
-                      <img
-                        className="w-6"
-                        src="/intract.png"
-                        alt="Intract"
-                        title="Intract"
-                      />
-                    )}
+                    <span className="text-[#97979A] text-[16px] leading-5 font-semibold">
+                      {formatTimestampToDate(contest.start)} -{" "}
+                      {formatTimestampToDate(contest.end)}
+                    </span>
                   </div>
-
-                  <div className="flex justify-between items-center flex-wrap gap-2">
-                    <div className="flex items-center text-accent-300 mb-1">
-                      <img
-                        src="/calendar.svg"
-                        alt="calendar"
-                        className="mr-2"
-                      />
-                      <span>
-                        {formatTimestampToDate(contest.start)} -{" "}
-                        {formatTimestampToDate(contest.end)}
-                      </span>
+                  <Badge
+                    state={
+                      !index ? "default" : index === 1 ? "success" : "accent"
+                    }
+                    text={!index ? "Ended" : index === 1 ? "Ongoing" : "Future"}
+                    greater={true}
+                  />
+                </div>
+                <div className="flex flex-col items-start gap-4">
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="text-[#97979A] text-[14px] leading-20 font-medium">
+                      Task
+                    </span>
+                    <div className="text-[20px] leading-7 font-medium">
+                      {contest.minEarn === "TBA" ? (
+                        <span>TBA</span>
+                      ) : (
+                        <p>
+                          Earn{" "}
+                          <span className="text-[#48C05C]">
+                            ${contest.minEarn}+
+                          </span>{" "}
+                          in vaults
+                        </p>
+                      )}
                     </div>
-                    <Badge
-                      state={
-                        !index ? "default" : index === 1 ? "success" : "accent"
-                      }
-                      text={
-                        !index ? "Ended" : index === 1 ? "Ongoing" : "Future"
-                      }
-                      greater={true}
-                    />
-                  </div>
-                  <div className="flex mb-1">
-                    {contest.minEarn === "TBA"
-                      ? "TBA"
-                      : `Earn \$${contest.minEarn}+ in vaults`}
                   </div>
 
-                  {!!contest.rewards.length && (
-                    <div className="flex flex-col mt-2 gap-1">
+                  <div className="flex flex-col gap-1 w-full">
+                    <span className="text-[#97979A] text-[14px] leading-20 font-medium">
+                      Rewards
+                    </span>
+
+                    <div className="flex flex-col gap-1">
                       {Array.isArray(contest.rewards) ? (
                         <>
                           {contest.rewards.map((reward, index: number) => (
                             <div
                               key={index}
-                              className="flex justify-between items-center"
+                              className="flex justify-between items-center w-full"
                             >
                               <div>
                                 {reward.type === "Points" && (
@@ -95,26 +88,29 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                                       className="w-[24px] h-[24px]"
                                       alt="pSTBL"
                                     />
-                                    <span className="ml-2  font-bold">
+                                    <span className="ml-2 font-bold">
                                       pSTBL
                                     </span>
                                   </span>
                                 )}
 
                                 {reward.type.includes("Gems1") && (
-                                  <span className="flex items-center">
+                                  <div className="flex items-center gap-3">
                                     <img
-                                      src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
-                                      className="w-[24px] h-[24px]"
+                                      src="/icons/sonic_gem_icon.svg"
                                       alt="sGEM1"
+                                      title="sGEM1"
+                                      className="w-6 h-6"
                                     />
-                                    <span className="ml-2 font-bold">
+                                    <p className="text-[20px] leading-6 md:text-[28px] md:leading-8 font-medium">
                                       sGEM1{" "}
-                                      {reward.type === "Gems1 Targeted"
-                                        ? reward.targetVault
-                                        : null}
-                                    </span>
-                                  </span>
+                                      {reward.type === "Gems1 Targeted" && (
+                                        <span className="text-[18px] leading-5">
+                                          {reward.targetVault}
+                                        </span>
+                                      )}
+                                    </p>
+                                  </div>
                                 )}
 
                                 {reward.type === "ERC20 Token" && (
@@ -128,7 +124,7 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                                       }
                                       alt=""
                                     />
-                                    <span className="ml-2 font-bold">
+                                    <span className="text-[28px] leading-[32px] font-medium">
                                       {(getTokenData(
                                         reward.contract?.address as string
                                       )?.symbol as string) || "UNKNOWN"}
@@ -141,7 +137,7 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                                     <span className="inline-flex items-center justify-center text-[11px] font-bold w-[24px] border-[1px]">
                                       NFT
                                     </span>
-                                    <span className="ml-2 font-bold">
+                                    <span className="text-[28px] leading-[32px] font-medium">
                                       {getNFTSymbol(
                                         reward.contract?.chain,
                                         reward.contract?.address
@@ -171,29 +167,27 @@ const ContestsOverview = ({ periodsData }: IContestsProps): JSX.Element => {
                                   </svg>
                                   {reward.winners}
                                 </div>
-                              ) : (
-                                ""
-                              )}
+                              ) : null}
                               {reward.totalReward ? (
-                                <div className="flex items-center">
+                                <span className="flex items-center justify-end text-[20px] leading-6 md:text-[28px] md:leading-8 font-semibold">
                                   {formatNumber(
                                     reward.totalReward,
                                     "formatWithoutDecimalPart"
                                   )}
-                                </div>
-                              ) : (
-                                ""
-                              )}
+                                </span>
+                              ) : null}
                             </div>
                           ))}
                         </>
                       ) : (
-                        <div>TBA</div>
+                        <span className="text-[20px] leading-6 md:text-[28px] md:leading-8 font-medium">
+                          TBA
+                        </span>
                       )}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              </a>
             )
         )}
     </div>

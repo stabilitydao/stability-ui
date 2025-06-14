@@ -51,7 +51,7 @@ const SettingsModal: React.FC<IProps> = ({
   return (
     <div
       ref={modalRef}
-      className="bg-accent-1000 absolute w-[250px] min-h-[150px] z-20 top-[50px] right-0 rounded-md text-[18px]"
+      className="bg-[#111114] absolute w-[250px] min-h-[150px] z-20 top-[50px] right-0 rounded-md text-[18px]"
     >
       <div className="p-3 flex flex-col items-start gap-4">
         <div>
@@ -60,7 +60,7 @@ const SettingsModal: React.FC<IProps> = ({
           </p>
           <div className="flex items-center gap-2">
             <input
-              className="bg-accent-900 border-accent-500 w-[80px] py-2 rounded-md pl-5 border h-8"
+              className="bg-[#232429] border-[#2C2E33] w-[80px] py-2 rounded-md pl-5 border h-8"
               name="Slippage"
               placeholder="0"
               value={settingsState.slippage}
@@ -70,9 +70,9 @@ const SettingsModal: React.FC<IProps> = ({
               {TRANSACTION_SETTINGS.slippage.map((value) => (
                 <div
                   key={value}
-                  className={`bg-accent-900 w-10 h-8 flex items-center justify-center rounded-md cursor-pointer ${
+                  className={`bg-[#232429] w-10 h-8 flex items-center justify-center rounded-md cursor-pointer ${
                     settingsState.slippage === value &&
-                    "border border-accent-500"
+                    "border border-[#2C2E33]"
                   }`}
                   onClick={() =>
                     setSettingsState((prev) => ({ ...prev, slippage: value }))
@@ -92,8 +92,8 @@ const SettingsModal: React.FC<IProps> = ({
             {TRANSACTION_SETTINGS.approves.map((value) => (
               <div
                 key={value}
-                className={`bg-accent-900 w-auto h-8 flex items-center justify-center rounded-md cursor-pointer p-2 ${
-                  settingsState.approves === value && "border border-accent-500"
+                className={`bg-[#232429] w-auto h-8 flex items-center justify-center rounded-md cursor-pointer p-2 ${
+                  settingsState.approves === value && "border border-[#2C2E33]"
                 }`}
                 onClick={() =>
                   setSettingsState((prev) => ({ ...prev, approves: value }))
@@ -112,8 +112,8 @@ const SettingsModal: React.FC<IProps> = ({
             {TRANSACTION_SETTINGS.gasLimits.map((value) => (
               <div
                 key={value}
-                className={`bg-accent-900 w-auto h-8 flex items-center justify-center rounded-md cursor-pointer p-2 ${
-                  settingsState.gasLimit === value && "border border-accent-500"
+                className={`bg-[#232429] w-auto h-8 flex items-center justify-center rounded-md cursor-pointer p-2 ${
+                  settingsState.gasLimit === value && "border border-[#2C2E33]"
                 }`}
                 onClick={() =>
                   setSettingsState((prev) => ({ ...prev, gasLimit: value }))

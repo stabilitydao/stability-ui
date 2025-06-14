@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { useStore } from "@nanostores/react";
 
-import Tippy from "@tippyjs/react";
+// import Tippy from "@tippyjs/react";
 
 import { HoldTable, VSHoldTableCell, YieldTableCell } from "./table";
 
@@ -9,7 +9,7 @@ import { HeadingText } from "@ui";
 
 import { connected } from "@store";
 
-import { getTimeDifference, formatNumber } from "@utils";
+import { getTimeDifference, formatNumber, cn } from "@utils";
 
 import "tippy.js/dist/tippy.css";
 
@@ -23,9 +23,10 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
   const $connected = useStore(connected);
 
   const [shareData, setShareData] = useState<TShareData>({});
+  const [activeTable, setActiveTable] = useState("income");
 
-  const vsHoldExplanation =
-    "VS HODL APR compares depositing tokens into a vault vs holding them in a wallet with its ratio and timeline.";
+  // const vsHoldExplanation =
+  //   "VS HODL APR compares depositing tokens into a vault vs holding them in a wallet with its ratio and timeline.";
 
   const totalAPY = [
     { data: vault?.earningData?.apy?.latest, testID: "yieldLatestAPY" },
@@ -84,87 +85,197 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
     getShareData();
   }, [$connected]);
   return (
-    <div>
-      <HeadingText
-        text="Yield Rates"
-        scale={2}
-        styles="text-left md:ml-4 md:mb-0 mb-2"
-      />
+    <div className="my-6">
+      <div className="flex items-center justify-between mb-4">
+        <HeadingText text="Yield Rates" scale={2} styles="text-left" />
 
-      <div className="md:p-4 flex flex-col gap-5">
-        {!!vault?.earningData && (
-          <div>
-            <p className="mb-2">Income</p>
-            <table className="font-manrope w-full">
-              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                <tr className="text-[14px] uppercase">
-                  <th className="px-4 py-2"></th>
-                  <th className="text-right py-2">Latest</th>
-                  <th className="text-right py-2">24h</th>
-                  <th className="text-right">Week</th>
-                </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                <tr className="h-[48px] hover:bg-accent-950">
-                  <td>Total APY</td>
-                  {totalAPY.map(({ data, testID }) => (
-                    <YieldTableCell
-                      key={testID}
-                      isSharePrice={!!Number(vault.shareprice)}
-                      data={formatNumber(data, "formatAPR")}
-                      testID={testID}
-                    />
-                  ))}
-                </tr>
-                <tr className="h-[48px] hover:bg-accent-950">
-                  <td>Total APR</td>
-                  {totalAPR.map(({ data, testID }) => (
-                    <YieldTableCell
-                      key={testID}
-                      isSharePrice={!!Number(vault.shareprice)}
-                      data={formatNumber(data, "formatAPR")}
-                      testID={testID}
-                    />
-                  ))}
-                </tr>
-                {vault.strategyInfo.shortId != "CF" && vault.pool && (
-                  <tr className="h-[48px] hover:bg-accent-950">
-                    <td>Pool swap fees APR</td>
-                    {poolSwapFeeAPR.map(({ data, testID }) => (
-                      <YieldTableCell
-                        key={testID}
-                        isSharePrice={!!Number(vault.shareprice)}
-                        data={formatNumber(data, "formatAPR")}
-                        testID={testID}
-                      />
-                    ))}
-                  </tr>
-                )}
-                <tr className="h-[48px] hover:bg-accent-950">
-                  {vault.strategyInfo.shortId === "CF" ? (
-                    <td>Strategy APR</td>
-                  ) : (
-                    <td>Farm APR</td>
-                  )}
-                  {farmAPR.map(({ data, testID }) => (
-                    <YieldTableCell
-                      key={testID}
-                      isSharePrice={!!Number(vault.shareprice)}
-                      data={formatNumber(data, "formatAPR")}
-                      testID={testID}
-                    />
-                  ))}
-                </tr>
-              </tbody>
-            </table>
+        <div className="flex items-center font-semibold relative text-[14px] leading-5 gap-2">
+          <p
+            className={cn(
+              "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+              activeTable === "income"
+                ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                : "text-[#97979A] border !border-[#23252A]"
+            )}
+            onClick={() => setActiveTable("income")}
+          >
+            Income
+          </p>
+          <p
+            className={cn(
+              "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+              activeTable === "vsHodl"
+                ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                : "text-[#97979A] border !border-[#23252A]"
+            )}
+            onClick={() => setActiveTable("vsHodl")}
+          >
+            VS HODL
+          </p>
+          <p
+            className={cn(
+              "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+              activeTable === "prices"
+                ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                : "text-[#97979A] border !border-[#23252A]"
+            )}
+            onClick={() => setActiveTable("prices")}
+          >
+            Prices
+          </p>
+        </div>
+      </div>
+
+      {!!vault?.earningData && activeTable === "income" && (
+        <div className="w-full">
+          <div className="flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden">
+            <div className="px-4 w-[40%]"></div>
+            <div className="text-right w-1/5">Latest</div>
+            <div className="text-right w-1/5">24H</div>
+            <div className="text-right w-1/5 pr-4">Week</div>
           </div>
-        )}
 
-        {!!vault.assetsVsHold && (
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <p>VS HOLD</p>
-              <Tippy content={vsHoldExplanation} placement="top">
+          <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]">
+            <div className="px-4 w-[40%]">Total APY</div>
+            {totalAPY.map(({ data, testID }, index) => (
+              <YieldTableCell
+                key={testID}
+                isSharePrice={!!Number(vault.shareprice)}
+                data={formatNumber(data, "formatAPR")}
+                testID={testID}
+                customClassName={totalAPY.length - 1 === index ? "pr-4" : ""}
+              />
+            ))}
+          </div>
+
+          <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]">
+            <div className="px-4 w-[40%]">Total APR</div>
+            {totalAPR.map(({ data, testID }, index) => (
+              <YieldTableCell
+                key={testID}
+                isSharePrice={!!Number(vault.shareprice)}
+                data={formatNumber(data, "formatAPR")}
+                testID={testID}
+                customClassName={totalAPR.length - 1 === index ? "pr-4" : ""}
+              />
+            ))}
+          </div>
+
+          {vault.strategyInfo.shortId !== "CF" && vault.pool && (
+            <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]">
+              <div className="px-4 w-[40%]">Pool swap fees APR</div>
+              {poolSwapFeeAPR.map(({ data, testID }, index) => (
+                <YieldTableCell
+                  key={testID}
+                  isSharePrice={!!Number(vault.shareprice)}
+                  data={formatNumber(data, "formatAPR")}
+                  testID={testID}
+                  customClassName={
+                    poolSwapFeeAPR.length - 1 === index ? "pr-4" : ""
+                  }
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold rounded-b-lg bg-[#101012]">
+            <div className="px-4 w-[40%]">
+              {vault.strategyInfo.shortId === "CF"
+                ? "Strategy APR"
+                : "Farm APR"}
+            </div>
+            {farmAPR.map(({ data, testID }, index) => (
+              <YieldTableCell
+                key={testID}
+                isSharePrice={!!Number(vault.shareprice)}
+                data={formatNumber(data, "formatAPR")}
+                testID={testID}
+                customClassName={farmAPR.length - 1 === index ? "pr-4" : ""}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!!vault.assetsVsHold && activeTable === "vsHodl" && (
+        <div className="w-full">
+          <div className="flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden">
+            <div className="px-4 w-[30%]"></div>
+            <div className="text-right w-[17.5%]">APR 24H</div>
+            <div className="text-right w-[17.5%]">APR Week</div>
+            <div className="text-right w-[17.5%]">est APR</div>
+            <div className="text-right w-[17.5%] pr-4">
+              {getTimeDifference(vault.created).days} days
+            </div>
+          </div>
+
+          <div className="flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]">
+            <div className="px-4 w-[30%]">VAULT VS HODL</div>
+            {vsHold.map((cell, index) => (
+              <VSHoldTableCell
+                key={`${cell.data}-${index}`}
+                isVsActive={vault.isVsActive}
+                vsHold={cell.data}
+                testID={cell.testID ?? ""}
+                customClassName={vsHold.length - 1 === index ? "pr-4" : ""}
+              />
+            ))}
+          </div>
+          {vault.assetsVsHold.map((aprsData: THoldData, index: number) => {
+            const assetData = [
+              { data: Number(aprsData.dailyAPR) },
+              { data: Number(aprsData.weeklyAPR) },
+              {
+                data: Number(aprsData.APR),
+                testID: `assetsVsHold${index}`,
+              },
+              {
+                data: Number(aprsData.latestAPR),
+                testID: `tokensHold${index}`,
+              },
+            ];
+
+            return (
+              <div
+                key={`row-${index}-${aprsData.symbol}`}
+                className={cn(
+                  "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012]",
+                  vault.assetsVsHold.length - 1 === index && "rounded-b-lg"
+                )}
+              >
+                <div className="px-4 w-[30%]">
+                  VAULT VS {aprsData?.symbol} HODL
+                </div>
+                {assetData.map((cell, index) => (
+                  <VSHoldTableCell
+                    key={`${cell.data}+${index}`}
+                    isVsActive={vault.isVsActive}
+                    vsHold={cell.data}
+                    testID={cell.testID ?? ""}
+                    customClassName={
+                      assetData.length - 1 === index ? "pr-4" : ""
+                    }
+                  />
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {!!vault.assetsVsHold && activeTable === "prices" && (
+        <HoldTable
+          shareData={shareData}
+          holdData={vault.assetsVsHold}
+          daysFromCreation={getTimeDifference(vault?.created)?.days}
+        />
+      )}
+      {/* <Tippy
+                content={vsHoldExplanation}
+                placement="top"
+                theme="custom"
+                className="bg-[#1C1D1F] text-white border border-[#383B42] rounded-md px-3 py-2 text-sm"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -179,81 +290,7 @@ const YieldRates: React.FC<IProps> = memo(({ vault }) => {
                     fill="white"
                   />
                 </svg>
-              </Tippy>
-            </div>
-
-            <table className="font-manrope w-full">
-              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                <tr className="text-[14px] uppercase">
-                  <th></th>
-                  <th className="text-right">APR 24h</th>
-                  <th className="text-right">APR week</th>
-                  <th className="text-right">est APR</th>
-                  <th className="text-right">
-                    {getTimeDifference(vault.created).days} days
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                <tr className="h-[48px] hover:bg-accent-950">
-                  <td>VAULT VS HODL</td>
-                  {vsHold.map((cell, index) => (
-                    <VSHoldTableCell
-                      key={`${cell.data}-${index}`}
-                      isVsActive={vault.isVsActive}
-                      vsHold={cell.data}
-                      testID={cell.testID ?? ""}
-                    />
-                  ))}
-                </tr>
-                {vault.assetsVsHold.map(
-                  (aprsData: THoldData, index: number) => {
-                    const assetData = [
-                      { data: Number(aprsData.dailyAPR) },
-                      { data: Number(aprsData.weeklyAPR) },
-                      {
-                        data: Number(aprsData.APR),
-                        testID: `assetsVsHold${index}`,
-                      },
-                      {
-                        data: Number(aprsData.latestAPR),
-                        testID: `tokensHold${index}`,
-                      },
-                    ];
-
-                    return (
-                      <tr key={index} className="h-[48px] hover:bg-accent-950">
-                        <td className="truncate max-w-[120px] sm:max-w-[200px]">
-                          VAULT VS {aprsData?.symbol} HODL
-                        </td>
-                        {assetData.map((cell, index) => (
-                          <VSHoldTableCell
-                            key={`${cell.data}+${index}`}
-                            isVsActive={vault.isVsActive}
-                            vsHold={cell.data}
-                            testID={cell.testID ?? ""}
-                          />
-                        ))}
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!!vault.assetsVsHold && (
-          <div>
-            <p className="mb-2">Prices</p>
-            <HoldTable
-              shareData={shareData}
-              holdData={vault.assetsVsHold}
-              daysFromCreation={getTimeDifference(vault?.created)?.days}
-            />
-          </div>
-        )}
-      </div>
+              </Tippy> */}
     </div>
   );
 });

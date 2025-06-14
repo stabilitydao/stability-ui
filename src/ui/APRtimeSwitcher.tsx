@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import { cn, capitalize } from "@utils";
+
 import { aprFilter } from "@store";
 
 import { APRsType } from "@constants";
@@ -59,103 +61,65 @@ const APRtimeSwitcher: React.FC<IProps> = ({ withText = false }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropDownRef]);
-  //   <div className="relative select-none w-[176px]">
-  //   <div
-  //     onClick={(e) => {
-  //       e.stopPropagation();
-  //       setDropDownSelector((prevState) => !prevState);
-  //     }}
-  //     data-testid="strategyFilterDropdown"
-  //     className="flex items-center justify-between gap-3 px-3 py-1 h-10 bg-accent-900 text-neutral-50 rounded-2xl cursor-pointer"
-  //   >
-  //     <p>
-  //       {filter.name}: {activeStrategy}
-  //     </p>
-  //     <img
-  //       className={`transition delay-[50ms] ${
-  //         dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-  //       }`}
-  //       src="/public/arrow-down.svg"
-  //       alt="arrowDown"
-  //     />
-  //   </div>
-  //   <div
-  //     ref={dropDownRef}
-  //     className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
-  //       dropDownSelector
-  //         ? "absolute transition delay-[50ms]"
-  //         : "hidden"
-  //     } `}
-  //   >
-  //     <div className="flex flex-col items-start">
-  //       {filter.variants?.map(
-  //         (variant: TTAbleFiltersVariant, index: number) => (
-  //           <p
-  //             key={variant.name}
-  //             onClick={() =>
-  //               activeFiltersHandler(filter, variant.name)
-  //             }
-  //             className={`${!index && "rounded-t-2xl"} ${index === filter.variants.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-  //               variant.state ? "bg-accent-800" : ""
-  //             }`}
-  //             data-testid="strategy"
-  //           >
-  //             {variant.name}
-  //           </p>
-  //         )
-  //       )}
-  //     </div>
-  //   </div>
-  // </div>
+
   return (
-    <div className="relative select-none w-[160px] switcher font-manrope text-[14px] font-semibold">
+    <div className="relative select-none switcher font-manrope font-semibold w-[170px]">
       <div
         onClick={(e) => {
           e.stopPropagation();
           setDropDownSelector((prevState) => !prevState);
         }}
         data-testid="APRTimeSwitcher"
-        className="flex items-center justify-between gap-3 px-3 py-1 bg-accent-900 text-neutral-50 rounded-2xl h-[36px] cursor-pointer"
+        className="flex items-center justify-between gap-3 px-5 py-3 cursor-pointer border border-[#23252A] rounded-lg"
       >
-        <p>
-          {withText ? "Period:" : ""}{" "}
-          {activeAPRType === "weekly"
-            ? "week"
-            : activeAPRType === "daily"
-              ? "24h"
-              : activeAPRType}
+        <p className="text-[16px]">
+          {withText ? <span className="text-[#97979a]">Period: </span> : ""}
+          <span>
+            {activeAPRType === "weekly"
+              ? "week"
+              : activeAPRType === "daily"
+                ? "24h"
+                : activeAPRType}
+          </span>
         </p>
+
         <img
-          className={`transition delay-[50ms] ${
+          className={cn(
+            "transition delay-[50ms] w-3 h-3",
             dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-          }`}
-          src="/arrow-down.svg"
+          )}
+          src="/icons/arrow-down.svg"
           alt="arrowDown"
         />
       </div>
       <div
         ref={dropDownRef}
-        className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 ${
+        className={cn(
+          "bg-[#1C1D1F] mt-2 rounded-lg border border-[#383B42] w-full z-20",
           dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
-        } `}
+        )}
       >
-        <div className="flex flex-col items-start">
-          {APRsType.map((APRType, index: number) => {
+        <div className="flex flex-col items-start text-[14px] leading-5 font-medium p-[6px]">
+          {APRsType.map((APRType) => {
             const isActive =
               activeAPRType.includes(APRType) ||
               (activeAPRType === "daily" && APRType === "24h");
 
+            const text = APRType === "24h" ? "24 hours" : capitalize(APRType);
+
             return (
-              <p
+              <div
                 key={APRType}
                 onClick={() => APRsHandler(APRType)}
-                className={`${!index && "rounded-t-2xl"} ${index === APRsType.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full ${
-                  isActive ? "bg-accent-800" : ""
-                }`}
                 data-testid="APRType"
+                className={cn(
+                  "p-[6px] cursor-pointer w-full rounded-lg flex items-center justify-between",
+                  isActive && "bg-[#27292E] cursor-default"
+                )}
               >
-                {APRType}
-              </p>
+                <p>{text}</p>
+                {isActive && <img src="/icons/checkmark.svg" alt="Checkmark" />}
+              </div>
             );
           })}
         </div>

@@ -7,7 +7,7 @@ import type {TAddress} from '@types';
 const { network,vault } = Astro.params;
 ---
   <Layout title="Vault">
-    <div class="my-vault max-w-[1200px]">
+    <div class="max-w-[1200px]">
       <Vault network={network} vault={vault as TAddress} client:only="react" />
     </div>
   </Layout>

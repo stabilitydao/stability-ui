@@ -6,9 +6,9 @@ import { useStore } from "@nanostores/react";
 
 import { writeContract } from "@wagmi/core";
 
-import { ActionButton } from "../ui";
+import { ActionButton } from "@ui";
 
-import { getTransactionReceipt } from "../functions";
+import { getTransactionReceipt, cn } from "@utils";
 
 import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig } from "@web3";
 
@@ -225,24 +225,19 @@ const ConvertForm = (): JSX.Element => {
   }, [$account, $lastTx]);
 
   return (
-    <div className="bg-accent-950 p-5 rounded-2xl flex justify-between flex-col md:flex-row">
-      <div className="flex flex-col">
-        <span className="text-[26px]">Convert STBL to xSTBL</span>
-        <span className="text-[18px]">
+    <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col md:flex-row">
+      <div className="flex flex-col gap-2 mb-2 md:mb-0">
+        <span className="text-[24px] leading-8 font-semibold">
+          Convert STBL to xSTBL
+        </span>
+        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
           Convert STBL to xSTBL at any time. The process is instant, and the
           ratio is 1:1.
         </span>
       </div>
-      <div className="lg:w-1/3 mt-5 md:mt-0">
-        <div>
-          <label className="relative block h-[60px] w-full">
-            <img
-              src="/STBL_plain.png"
-              alt="STBL"
-              title="STBL"
-              className="absolute top-[27%] left-4 w-8 h-8 text-neutral-500 rounded-full pointer-events-none"
-            />
-
+      <div className="lg:w-1/3 flex flex-col justify-between gap-4">
+        <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+          <div className="flex items-center justify-between">
             <input
               ref={input}
               name="amount"
@@ -252,28 +247,24 @@ const ConvertForm = (): JSX.Element => {
               pattern="^[0-9]*[.,]?[0-9]*$"
               inputMode="decimal"
               autoComplete="off"
-              className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[60px] my-[2px] pl-[60px] pr-3"
+              className="bg-transparent text-2xl font-semibold outline-none w-full"
             />
+            <div
+              className={cn(
+                "bg-[#151618] border border-[#23252A] rounded-lg px-3 py-1 text-[14px]",
+                $connected && "cursor-pointer"
+              )}
+              onClick={() => handleInputChange("max")}
+            >
+              MAX
+            </div>
+          </div>
 
-            {!!$connected && !!balance && (
-              <button
-                type="button"
-                onClick={() => handleInputChange("max")}
-                className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
-              >
-                Max
-              </button>
-            )}
-          </label>
-          <div
-            className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-              $connected ? "" : "opacity-0"
-            }`}
-          >
+          <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
             <span>Balance: </span>
             <span>{!!balance ? balance : "0"} STBL</span>
           </div>
-        </div>
+        </label>
         <ActionButton
           type={button}
           transactionInProgress={transactionInProgress}

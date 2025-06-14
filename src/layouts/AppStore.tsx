@@ -3,6 +3,7 @@ import type React from "react";
 import { useEffect } from "react";
 
 import { formatUnits } from "viem";
+
 import axios from "axios";
 
 import { useStore } from "@nanostores/react";
@@ -38,9 +39,16 @@ import {
   assetsPrices,
   assetsBalances,
   vaultData,
+  metaVaults,
+  marketPrices,
 } from "@store";
 
-import { platforms, frontendContracts, web3clients } from "@web3";
+import {
+  platforms,
+  frontendContracts,
+  web3clients,
+  IMetaVaultABI,
+} from "@web3";
 
 import {
   calculateAPY,
@@ -53,6 +61,7 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  enrichAndResolveMetaVaults,
 } from "@utils";
 
 import {
@@ -75,6 +84,7 @@ import type {
   TPlatformData,
   TBalances,
   TTokens,
+  TMetaVault,
   // TAsset,
 } from "@types";
 
@@ -89,12 +99,15 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
+  const $metaVaults = useStore(metaVaults);
 
   let isError = false;
 
   const localVaults: {
     [network: string]: TVaults;
   } = {};
+
+  const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
   let prices: TMultichainPrices = {};
 
@@ -775,8 +788,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const assetBalances: { [key: string]: TBalances } = {};
     const vaultsData: TVaultDataKey = {};
 
+    /***** VAULTS *****/
     await Promise.all(
-      CHAINS.map(async (chain) => {
+      Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
+        const chain = CHAINS.find(({ id }) => id === key);
+        if (!chain) return;
         /////***** SET VAULTS DATA *****/////
         const APIVaultsData = Object.values(
           stabilityAPIData?.vaults?.[chain.id] as Vaults
@@ -887,10 +903,119 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
       })
     );
+
+    /***** META VAULTS *****/
+    await Promise.all(
+      Object.keys(stabilityAPIData?.metaVaults as TMetaVault[]).map(
+        async (key) => {
+          const chain = CHAINS.find(({ id }) => id === key);
+          if (!chain) return;
+          /////***** SET VAULTS DATA *****/////
+          const APIMetaVaultsData = Object.values(
+            stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+          );
+
+          if (APIMetaVaultsData.length) {
+            const _metaVaults = APIMetaVaultsData.map((metaVault) => {
+              let merklAPR = 0;
+
+              let totalAPR = 0;
+
+              let gemsAPR = 0;
+
+              if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+                const multiplier =
+                  stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
+                    metaVault.address
+                  ] || 0;
+
+                if (multiplier) {
+                  gemsAPR = Number(metaVault.APR) * Number(multiplier);
+                }
+
+                merklAPR = Number(metaVault.merklAPR);
+
+                totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+              }
+
+              return {
+                ...metaVault,
+                status: "Active",
+                isMetaVault: true,
+                deposited: formatUnits(
+                  metaVault.deposited,
+                  ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
+                ),
+                gemsAPR,
+                merklAPR,
+                totalAPR,
+              };
+            });
+
+            localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
+              localVaults[chain.id],
+              _metaVaults
+            );
+
+            if (isConnected) {
+              let localClient = web3clients[chain.id] ?? web3clients["146"];
+
+              try {
+                const balances = await Promise.all(
+                  localMetaVaults[chain.id].map(async (mv) => {
+                    const metaVaultBalance = (await localClient.readContract({
+                      address: mv.address,
+                      abi: IMetaVaultABI,
+                      functionName: "balanceOf",
+                      args: [address as TAddress],
+                    })) as bigint;
+
+                    return {
+                      ...mv,
+                      balance: metaVaultBalance,
+                    };
+                  })
+                );
+
+                localMetaVaults[chain.id] = balances;
+              } catch (txError: any) {
+                console.log("BLOCKCHAIN ERROR:", txError);
+
+                error.set({
+                  state: true,
+                  type: "WEB3",
+                  description: txError?.message,
+                });
+              }
+            }
+          }
+        }
+      )
+    );
+
+    if (stabilityAPIData.prices) {
+      const formattedPrices = Object.entries(stabilityAPIData.prices).reduce(
+        (acc, [key, value]) => {
+          const isIntegerPrice = ["BTC", "ETH"].includes(key);
+          acc[key] = {
+            ...value,
+            price: isIntegerPrice
+              ? Math.round(parseFloat(value.price)).toString()
+              : value.price,
+          };
+          return acc;
+        },
+        {}
+      );
+
+      marketPrices.set(formattedPrices);
+    }
+
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
+    metaVaults.set(localMetaVaults);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);
@@ -918,6 +1043,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   };
 
   useEffect(() => {
+    if (!$metaVaults) {
+      const metaVaultsWithName = deployments["146"].metaVaults?.map(
+        (metaV) => ({ ...metaV, name: getTokenData(metaV.address)?.name })
+      );
+
+      metaVaults.set({ "146": metaVaultsWithName });
+    }
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 

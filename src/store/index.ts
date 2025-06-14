@@ -17,6 +17,7 @@ import type {
   TTokens,
   TVaultDataKey,
   TAPRPeriod,
+  TMarketPrices,
 } from "@types";
 
 // atoms
@@ -32,12 +33,16 @@ const assetsBalances = atom<{ [key: string]: TBalances }>({});
 const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
+const marketPrices = atom<TMarketPrices>({});
+
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
 
 const tokens = atom<TTokens>({});
 
 const connected = atom<boolean | undefined>();
+
+const isNavbar = atom<boolean>(false);
 
 const reload = atom<boolean>(false);
 const error = atom<TError>(DEFAULT_ERROR);
@@ -50,6 +55,7 @@ const currentChainID = atom("146");
 // deepMaps
 
 const vaults = deepMap<any>(false);
+const metaVaults = deepMap<any>(false);
 
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
@@ -92,4 +98,7 @@ export {
   persister,
   aprFilter,
   currentChainID,
+  metaVaults,
+  marketPrices,
+  isNavbar,
 };

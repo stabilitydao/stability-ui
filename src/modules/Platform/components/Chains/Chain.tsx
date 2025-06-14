@@ -17,7 +17,7 @@ import { apiData, vaults } from "@store";
 
 import { formatNumber } from "@utils";
 
-import { Breadcrumbs, HeadingText } from "@ui";
+import { HeadingText } from "@ui";
 
 import { ChainStatus, StrategyStatus, ProtocolsChip } from "../../ui";
 
@@ -116,8 +116,6 @@ const Chain: React.FC<IProps> = ({ chain }) => {
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full lg:w-[960px]  xl:min-w-[1200px]">
-      <Breadcrumbs links={["Platform", "Chains", chainData.name]} />
-
       <div className="flex flex-col gap-[30px]">
         <div>
           <h1 className="mb-0 flex justify-center items-center text-[36px]">
@@ -203,7 +201,10 @@ const Chain: React.FC<IProps> = ({ chain }) => {
                       className="h-[48px] hover:bg-accent-950"
                     >
                       <td className="px-4 py-2">
-                        <a href={`/strategies/${strategy.shortId.toLowerCase()}`} title="Go to strategy page">
+                        <a
+                          href={`/strategies/${strategy.shortId.toLowerCase()}`}
+                          title="Go to strategy page"
+                        >
                           <ProtocolsChip
                             id={strategy.shortId as StrategyShortId}
                             bgColor={strategy.bgColor}

@@ -1,116 +1,63 @@
-import { useState } from "react";
-
 import { useStore } from "@nanostores/react";
 
-import { account } from "@store";
+import { account, isNavbar } from "@store";
 
 import { Wallet } from "./Wallet";
 import { SonicPointsButton } from "./SonicPointsButton";
+
+import { Breadcrumbs } from "@ui";
 
 import { WagmiLayout } from "@layouts";
 
 import "./header.css";
 
 const Header = (): JSX.Element => {
-  const pathname = window.location.pathname;
-  const currentPath = pathname.slice(1); // remove the first "/"
-
   const $account = useStore(account);
-
-  const platformPaths = [
-    "platform",
-    "strategies",
-    "chains",
-    "integrations",
-    "assets",
-    "factory",
-    "network",
-  ];
-
-  const [menu, setMenu] = useState(false);
-
-  const isPlatform =
-    platformPaths.some((path) => path === currentPath) ||
-    platformPaths.some((path) => currentPath.includes(path));
-
-  const isVaults = currentPath.includes("vault");
+  const $isNavbar = useStore(isNavbar);
 
   return (
     <WagmiLayout>
-      <header className="font-manrope bg-accent-950 md:bg-transparent rounded-b-[16px] relative">
-        <a data-testid="stability-logo" href="/" title="Stability">
-          <img
-            className="w-[105px] h-[48px] md:w-[140px] md:h-[60px]"
-            src="/full_logo_dark.png"
-            alt="Stability logo"
-          />
-        </a>
-        <div className="menu absolute left-1/2 transform -translate-x-1/2 text-[16px]">
-          <a
-            data-testid="vaults-link"
-            className={isVaults ? "active" : ""}
-            href="/vaults"
-          >
-            Vaults
-          </a>
-          <a
-            className={
-              currentPath === "users" || currentPath.includes("contests")
-                ? "active"
-                : ""
-            }
-            href="/users"
-          >
-            Users
-          </a>
-          <a className={currentPath === "xstbl" ? "active" : ""} href="/xstbl">
-            xSTBL
-          </a>
-          <a href="https://stability.market/">Lend/Borrow</a>
-          <a className={isPlatform ? "active" : ""} href="/platform">
-            Platform
-          </a>
-        </div>
-        <div className="flex justify-end mr-[15px] gap-3">
-          {!!$account && <SonicPointsButton />}
+      <header className="font-manrope header">
+        <div className="flex items-center justify-between w-full h-full pl-0 pr-0 xxl:pl-10 md:pr-10">
+          <div className="flex items-center gap-4 h-full">
+            <div
+              className="min-h-full border-r border-[#232429] xxl:border-r-0 hidden md:block"
+              onClick={() => isNavbar.set(!$isNavbar)}
+            >
+              <img
+                src="/icons/sidebar.svg"
+                alt="Sidebar logo"
+                className="p-4 cursor-pointer min-h-full xxl:hidden"
+              />
+            </div>
 
-          <Wallet />
-          <div className="burger-menu" onClick={() => setMenu((prev) => !prev)}>
-            {menu ? (
-              <img className="w-4 h-4" src="/close.svg" alt="close" />
-            ) : (
-              <img className="w-4 h-4" src="/menu.svg" alt="menu" />
-            )}
+            <a className="xxl:hidden pl-4 md:pl-0" href="/">
+              <img src="/long_logo.png" alt="Stability logo" />
+            </a>
+
+            <div className="hidden xxl:block">
+              <Breadcrumbs />
+            </div>
+          </div>
+
+          <div className="flex justify-end h-full">
+            {!!$account && <SonicPointsButton />}
+            <Wallet />
+            <div
+              className="min-h-full block md:hidden"
+              onClick={() => isNavbar.set(!$isNavbar)}
+            >
+              <img
+                src="/icons/icon_menu_bottom.svg"
+                alt="Menu logo"
+                className="p-4 cursor-pointer min-h-full"
+              />
+            </div>
           </div>
         </div>
-        <nav className={`menu-nav text-center gap-3 ${menu && "active"}`}>
-          <a
-            className={`px-4 py-[10px] font-semibold ${isVaults ? "bg-accent-800 rounded-[16px]" : ""}`}
-            href="/vaults"
-          >
-            Vaults
-          </a>
-          <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "users" || currentPath.includes("contests") ? "bg-accent-800 rounded-[16px]" : ""}`}
-            href="/users"
-          >
-            Users
-          </a>
-
-          <a
-            className={`px-4 py-[10px] font-semibold ${currentPath === "xstbl" ? "bg-accent-800 rounded-[16px]" : ""}`}
-            href="/xstbl"
-          >
-            xSTBL
-          </a>
-          <a href="https://stability.market/">Lend/Borrow</a>
-          <a
-            className={`px-4 py-[10px] font-semibold ${isPlatform ? "bg-accent-800 rounded-[16px]" : ""}`}
-            href="/platform"
-          >
-            Platform
-          </a>
-        </nav>
+        <div className="block xxl:hidden py-3 pl-4 border-b border-[#232429] backdrop-blur-md">
+          <Breadcrumbs />
+        </div>
       </header>
     </WagmiLayout>
   );

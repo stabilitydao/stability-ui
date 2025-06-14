@@ -2,7 +2,6 @@ import { Home } from "./Home";
 import { Factory } from "./Factory";
 import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
-import { AI } from "./AI";
 import { Platform } from "./Platform";
 import { Assets } from "./Platform/components/Assets";
 import { Chains } from "./Platform/components/Chains";
@@ -18,14 +17,18 @@ import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { SonicVaults } from "./SonicVaults";
-import { STBL } from "./STBL";
 import { XSTBL } from "./XSTBL";
+import { Dashboard } from "./Dashboard";
+import { LeveragedFarming } from "./LeveragedFarming";
+import { Metavaults } from "./Metavaults";
+import { ALM } from "./ALM";
+import { Agents } from "./Agents";
+import { Metavault } from "./Metavault";
 
 export {
   Factory,
   Vaults,
   Vault,
-  AI,
   Platform,
   Assets,
   Chains,
@@ -41,7 +44,12 @@ export {
   Contest,
   Home,
   SonicVaults,
-  STBL,
   XSTBL,
   Swapper,
+  Dashboard,
+  LeveragedFarming,
+  Metavaults,
+  ALM,
+  Agents,
+  Metavault,
 };

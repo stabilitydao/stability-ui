@@ -25,29 +25,51 @@ const Timer: React.FC<IProps> = ({ start, end }) => {
     };
 
     updateTimer();
-
     const intervalId = setInterval(updateTimer, 1000);
-
     return () => clearInterval(intervalId);
   }, [start, end]);
 
   const formatTime = (seconds: number) => {
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
+    const days = Math.floor(seconds / (3600 * 24));
+    const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
 
-    return `${d}d ${h}h ${m}m ${s}s`;
+    return [
+      { label: "DAY", value: days },
+      { label: "HOUR", value: hours },
+      { label: "MIN", value: minutes },
+      { label: "SEC", value: secs },
+    ];
   };
 
   if (status === "ended") {
     return null;
   }
 
+  const formattedTime = formatTime(timeLeft);
+
   return (
-    <div className="font-manrope text-[24px] font-bold text-center">
-      <h3>{status === "beforeStart" ? "Starts" : "Ends"} in:</h3>
-      <h5>{formatTime(timeLeft)}</h5>
+    <div className="flex flex-col items-center gap-3 px-[34px] py-5 bg-[#151618] border border-[#23252A] rounded-lg">
+      <h3 className="text-[#97979A] text-[14px] leading-5">
+        {status === "beforeStart" ? "STARTS" : "ENDS"} IN
+      </h3>
+      <div className="flex gap-3">
+        {formattedTime.map((unit) => (
+          <div
+            key={unit.label}
+            className="flex flex-col items-center justify-center px-4 py-2 bg-[#101012] rounded-lg border border-[#23252A] font-medium"
+          >
+            <span
+              className="text-[32px] leading-10"
+              style={{ fontFamily: "monospace" }}
+            >
+              {unit.value.toString().padStart(2, "0")}
+            </span>
+            <span className="text-[14px] leading-5">{unit.label}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

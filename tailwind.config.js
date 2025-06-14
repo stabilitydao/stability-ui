@@ -102,7 +102,10 @@ export default {
       fontFamily: {
         manrope: ["Manrope", "sans-serif"],
       },
+      screens: {
+        xxl: "1440px",
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 };

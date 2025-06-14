@@ -3,7 +3,8 @@ import App from "./App";
 // import { ViewTransitions } from 'astro:transitions';
 
 import { Header} from "@components/Header"
-import { Footer } from "@components/Footer";
+import { Navbar } from "@components/Navbar";
+import {Menu} from "@components/Menu"
 
 interface IProps {
   title: string;
@@ -59,79 +60,122 @@ const {
   </head>
   <body>
     <App client:only="react">
-      <Header client:only="react"/>
-      <main>
-        <slot />
-      </main>
-      <Footer client:only="react"/>
+		<div class="layout">
+			<Navbar client:only="react"/>
+			<Menu client:only="react" />
+			<div
+				class="w-full h-[50%] absolute"
+				style={{
+					background: `linear-gradient(180deg, rgba(97, 106, 115, 0.00) 0%, rgba(97, 106, 115, 0.12) 40%, rgba(97, 106, 115, 0.12) 60%, rgba(0, 0, 0, 0.00) 100%)`,
+				}}
+			/>
+			<div class="container">
+				<Header client:only="react"/>
+				<main class="content">
+					<slot />
+				</main>
+			</div>
+		</div>
     </App>
   </body>
 </html>
 <style is:global>
-
 	html {
 		width:100vw;
-		overflow-x: hidden;
+		font-family: "Manrope", sans-serif;
+		background: #090909;
+	}
+
+	* {
+		outline: none;
 	}
 
 	html, body {
 		height: 100%;
 		margin: 0;
+		overflow-x: hidden;
 	}
-	body {
-		display: flex;
-  		flex-direction: column;
-	}
-
 	::-webkit-scrollbar {
 	    width: 8px;
 	}
 
 	::-webkit-scrollbar-track {
-	    background-color: #0C0C1C;
+		background-color: #0b0b0b;
 	}
 
 	::-webkit-scrollbar-thumb {
-		background-color: #272451;
-		border-radius: 12px;
+		background-color: #101012;
+		border-radius: 8px;
 	}
 
-	::-webkit-scrollbar-thumb:hover {
-		background-color: #30127f;
+	.layout {
+  		display: flex;
+		width:100%;
 	}
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
+
+	.header {
+		position: fixed;
+		top: 0;
+		left: 250px;
+		width: calc(100% - 250px);
+		height: 52px;
+		background-color: #0b0b0b;
+		z-index: 1000;
+		border-bottom:1px #23252A solid;
+		color:#fff;
 	}
-	::selection {
-		background-color: rgb(150, 99, 238);
+
+	.navbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 250px;
+		height: 100vh;
+		background-color: #101012;
+		z-index: 1000;
+		border-right:1px #23252A solid;
+
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch; 
+		scrollbar-width: thin; 
+		scrollbar-color: #2a2a2e transparent;
 	}
-	* {
-		outline: none;
+
+	.container {
+		position: relative;
+		left: 250px;
+		width: calc(100% - 250px);
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
 	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #0C0620;
-		background-size: 224px;
+
+	.content {
+		margin-top: 60px; 
+		padding: 1rem;
+		height: calc(100vh - 60px);
 	}
-	body {
-		margin: 0;
+
+	@media screen and (max-width: 1440px) {
+		.header {
+			left: 0px;
+			width: 100%;
+			background-color:#111114;
+		}
+		.container {
+			left: 0px;
+			min-width:100%;
+		}
+
+		.content {
+			margin-top: 100px; 
+		}
+
+		.navbar {
+			z-index: 1500;
+		}
 	}
-	header {
-		color: aliceblue; 
-		/* background-color: #23262d; */
-		display: flex; 
-		justify-content: space-between;
-		align-items: center;
-		height: 60px;
-	}
+
 	.title {
 		display: flex;
 		align-items: center;
@@ -152,42 +196,6 @@ const {
 		margin: auto 6px auto 10px;
 		height: 32px;
 	}
-	.menu {
-		display: flex;
-		justify-content: center;
-		gap:12px;
-	}
-	.menu-nav a {
-		width: 100%;
-	}
-	@media screen and (max-width: 1080px) {
-		.menu {
-			display: none;
-		}
-	}
-	.menu > a {
-		margin: 0;
-		min-width: 90px;
-		height: 40px;
-		color: #fcf3f6;
-		display: flex;
-		align-self: center;
-		align-items: center;
-		justify-content: center;
-		font-weight: 600;
-		padding: 10px 16px;
-		border-radius: 16px;
-	}
-	.menu > a.active {
-		background:  #3D1E9F;
-	}
-	.menu > a.active:hover {
-		background:  #3D1E9F;
-	}
-	.menu > a:hover {
-		background-color: #2B1570;
-	}
-
 	main {
 		margin: 0 auto auto auto;
 		padding: 1rem 0.5rem;
@@ -211,43 +219,6 @@ const {
 	}
 	h2 {
 		text-align: center;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.dotted-underline {
-		text-decoration:underline dotted;
-		text-underline-position:under;
-	}
-	.btn {
-		cursor: pointer;
-		text-wrap: nowrap;
-		min-width: 100px;
-		height: 30px;
-		color: white;
-		background-color: #424658;
-		display: inline-flex;
-		margin: 10px;
-		align-self: center;
-		align-items: center;
-		justify-content: center;
-		text-decoration: none;
-	}
-
-	.create-btn {
-		min-width: 50px;
-		padding: 0 10px;
-	}
-
-	.btn-primary {
-		height: 40px;
-		padding: 0 30px;
-		font-size: 1.2rem;
-		font-weight: bold;
 	}
 
 	.overlay {
@@ -276,45 +247,6 @@ const {
 		border-radius: 6px;
 	}
 
-	.modal-title {
-		font-weight: bold;
-		font-size: 1.5rem;
-		display: flex;
-		justify-content: center;
-
-	}
-
-	.build-form {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.build-form > .group {
-		width: 100%;
-		display: flex;
-	}
-
-	.group-label {
-		display: flex;
-		min-width: 150px;
-	}
-
-	.build-form .action {
-		margin-top: 40px;
-		display: flex;
-		justify-content: center;
-	}
-	.build-form .success {
-		margin-top: 40px;
-		margin-bottom: 20px;
-		padding: 10px;
-		display: flex;
-		justify-content: center;
-		color: greenyellow;
-		background-color: green;
-		font-size: 1.4rem;
-		font-weight: bold;
-	}
 	.what-to-build .msg {
 		/* max-width: 600px; */
 		margin: 0 auto;
@@ -335,11 +267,6 @@ const {
 		margin-right: 10px;
 	}
 
-	.token-logo {
-		border-radius: 50%;
-		width: 32px;
-		height: 32px;
-	}
 	/* TOOLTIP */
 
 	.tooltip {
@@ -355,19 +282,19 @@ const {
 	}
 
 	.tooltip .visible__tooltip {
-		width:250px;
+		width:200px;
 		left:50%;
 		top:-17px;
 		transform:translate(-30%,-100%);
-		padding:10px 20px;
-		color:#ffffff;
-		background-color:#26282f;
+		padding:8px;
+		background-color:#1C1D1F;
 		font-size:14px;
+		border: 1px solid #383B42;
 		border-radius:8px;
 		position:absolute;
 		z-index:99999999;
 		box-sizing:border-box;
-		box-shadow:0 1px 8px rgba(0,0,0,0.5);
+		box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.18), 0px 2px 5px 0px rgba(0, 0, 0, 0.18), 0px 3px 8px 0px rgba(0, 0, 0, 0.18), 0px 20px 20px -8px rgba(0, 0, 0, 0.18);
 		display:none;
 		pointer-events: none;
 	}
@@ -394,7 +321,7 @@ const {
 	.tooltip .visible__tooltip i {
 		position:absolute;
 		top:99%;
-		left:30%;
+		left:50%;
 		margin-left:-15px;
 		width:30px;
 		height:15px;
@@ -461,13 +388,94 @@ const {
     }
 
 	/* Rewards */
+	.sGem1RewardBg {
+    	background: radial-gradient(115% 150.28% at 50% 27.72%, rgba(0, 0, 0, 0.00) 37.41%, rgba(94, 106, 210, 0.80) 69.27%, rgba(255, 255, 255, 0.80) 100%), #101012;
+  	}
 
-	.STBL {
-		background: radial-gradient(123.18% 100% at 14.74% 0%, #0E0627 9.5%, #4113A9 72.34%, #1F094E 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
-		border-radius: 10px;
+	/* Loader */
+	.loader {
+		width: 44px;
+		height: 44px;
+		animation: loader-animation 2s infinite ease;
+		transform-style: preserve-3d;
 	}
 
-	.sGem1RewardBg {
-		background: linear-gradient(117deg, rgba(19, 28, 37, 0.50) 29%, rgba(43, 70, 97, 0.50) 63%);
+
+	.loader > div {
+		background-color: rgba(145,128,244,0.16);
+		height: 100%;
+		position: absolute;
+		width: 100%;
+		border: 2px solid #9180F4;
+	}
+
+	.loader div:nth-of-type(1) {
+		transform: translateZ(-22px) rotateY(180deg);
+	}
+
+	.loader div:nth-of-type(2) {
+		transform: rotateY(-270deg) translateX(50%);
+		transform-origin: top right;
+	}
+
+	.loader div:nth-of-type(3) {
+		transform: rotateY(270deg) translateX(-50%);
+		transform-origin: center left;
+	}
+
+	.loader div:nth-of-type(4) {
+		transform: rotateX(90deg) translateY(-50%);
+		transform-origin: top center;
+	}
+
+	.loader div:nth-of-type(5) {
+		transform: rotateX(-90deg) translateY(50%);
+		transform-origin: bottom center;
+	}
+
+	.loader div:nth-of-type(6) {
+		transform: translateZ(22px);
+	}
+
+	@keyframes loader-animation {
+		0% {
+			transform: rotate(45deg) rotateX(-25deg) rotateY(25deg);
+		}
+
+		50% {
+			transform: rotate(45deg) rotateX(-385deg) rotateY(25deg);
+		}
+
+		100% {
+			transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
+		}
+	}
+
+	/** FONTS ***/
+
+	.page-title__font {
+		font-size: calc(32px + 8 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 48px;
+		font-weight: 600;
+	}
+
+	.page-description__font {
+		font-size: calc(18px + 2 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 32px;
+		font-weight: 500;
+	}
+
+	.portfolio__font {
+		font-size: calc(32px + 8 * ((100vw - 360px) / (1440 - 320)));
+		line-height: 48px;
+		font-weight: 600;
+	}
+	.hide-scrollbar {
+		scrollbar-width: none; 
+		-ms-overflow-style: none; 
+	}
+
+	.hide-scrollbar::-webkit-scrollbar {
+		display: none; 
 	}
 </style>
