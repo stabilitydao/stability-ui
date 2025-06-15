@@ -1,8 +1,8 @@
-import { memo, useMemo, useState, useEffect } from "react";
+import { memo, useState, useEffect, useMemo } from "react";
 
 import { getAddress } from "viem";
 
-import { HeadingText } from "@ui";
+import { ArrowIcon } from "@ui";
 
 import { cn } from "@utils";
 
@@ -21,6 +21,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>>();
 
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
+  const [expandedData, setExpandedData] = useState(true);
 
   const copyHandler = async (address: TAddress) => {
     try {
@@ -144,16 +145,23 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
   );
 
   return (
-    <div>
-      <HeadingText text="Contracts" scale={2} styles="text-left mb-4" />
-      <div className="w-full">
-        <div className="flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden">
-          <div className="px-4 w-[50%]"></div>
-          <div className="text-right w-[30%]">Address</div>
-          <div className="text-right w-[20%] pr-4">Actions</div>
+    <div className="w-full">
+      <div
+        className={cn(
+          "flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden cursor-pointer",
+          !expandedData && "rounded-b-lg"
+        )}
+        onClick={() => setExpandedData((prev) => !prev)}
+      >
+        <div className="px-4 flex items-center gap-2 w-[40%] cursor-pointer">
+          Contracts{" "}
+          <ArrowIcon isActive={false} rotate={expandedData ? 180 : 0} />
         </div>
-        {contracts.map(
-          ({ address, logo, symbol, type, isCopy }, index: number) => (
+        <div className="text-right w-[60%] pr-4">Address</div>
+      </div>
+      {expandedData &&
+        contracts.map(
+          ({ address, logo, type, symbol, isCopy }, index: number) => (
             <div
               key={address + index}
               className={cn(
@@ -161,18 +169,18 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                 contracts.length - 1 === index && "rounded-b-lg"
               )}
             >
-              <div className="px-4 w-[50%] flex items-center gap-3">
+              <div className="px-4 w-[60%] flex items-center gap-2 whitespace-nowrap">
                 <div data-testid="contractsLogo">
                   {logo === "proportions" ? (
                     <img
                       src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                       alt="logo"
-                      className="w-10 h-10 rounded-full"
+                      className="w-8 h-8 rounded-full"
                     />
                   ) : (
                     <img
                       className={cn(
-                        "w-10 h-10",
+                        "w-8 h-8",
                         type != "Strategy" && "rounded-full"
                       )}
                       src={logo}
@@ -181,58 +189,46 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                   )}
                 </div>
 
-                <div className="flex flex-col items-start">
-                  <span
-                    data-testid="contractsSymbol"
-                    className="text-[16px] leading-5 font-semibold"
-                  >
-                    {symbol}
-                  </span>
-                  <span
-                    data-testid="contractsType"
-                    className="text-[#97979A] text-[14px] leading-[16px] font-medium"
-                  >
-                    {type}
-                  </span>
-                </div>
+                <span className="text-[14px] leading-5 font-semibold">
+                  {symbol}
+                </span>
               </div>
 
-              <div className="w-[30%] text-end">
-                {address?.slice(0, 6)}...{address?.slice(-4)}
-              </div>
-
-              <div className="w-[20%] pr-4">
-                <div className="flex items-center justify-end gap-1">
+              <div
+                className="flex items-center justify-end gap-1 text-[14px] leading-5 pr-4 w-full"
+                style={{ fontFamily: "monospace" }}
+              >
+                <div
+                  className="cursor-pointer flex items-center gap-1"
+                  onClick={() => copyHandler(address)}
+                >
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
                   {isCopy ? (
                     <img
-                      className="px-1 py-1"
+                      className="mx:px-1 mx:py-1 flex-shrink-0 w-[26px] h-[26px]"
                       src="/icons/checkmark.svg"
                       alt="Checkmark icon"
                     />
                   ) : (
                     <img
-                      data-testid="contractCopyBtn"
-                      onClick={() => copyHandler(address)}
-                      className="px-1 py-1 cursor-pointer"
+                      className="px-1 py-1 cursor-pointer flex-shrink-0 w-[26px] h-[26px]"
                       src="/icons/copy.png"
                       alt="Copy icon"
                     />
                   )}
-
-                  <a
-                    data-testid="contractLinkBtn"
-                    className="flex items-center px-1 py-1 whitespace-nowrap"
-                    href={`${explorer}${address}`}
-                    target="_blank"
-                  >
-                    <img src="/icons/link.png" alt="External link icon" />
-                  </a>
                 </div>
+
+                <a
+                  className="flex items-center px-1 py-1 whitespace-nowrap flex-shrink-0 w-[26px] h-[26px]"
+                  href={`${explorer}${address}`}
+                  target="_blank"
+                >
+                  <img src="/icons/link.png" alt="External link icon" />
+                </a>
               </div>
             </div>
           )
         )}
-      </div>
     </div>
   );
 });

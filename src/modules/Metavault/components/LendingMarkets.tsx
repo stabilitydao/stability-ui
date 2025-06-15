@@ -15,7 +15,7 @@ const LendingMarkets = (): JSX.Element => {
       const marketsInfo = [
         {
           logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-          symbol: "Silo wmetaUSD",
+          symbol: "Silo wmetaUSD - USDC",
           link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
         },
         {

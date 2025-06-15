@@ -62,8 +62,9 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
             <Toast network={network} />
 
-            <div className="block xl:hidden my-5 w-full">
+            <div className="flex flex-col gap-5 xl:hidden my-5 w-full">
               <InvestForm network={network} vault={localVault} />
+              <Contracts vault={localVault} network={network} />
             </div>
           </div>
           <HistoricalRate
@@ -75,8 +76,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           />
 
           <YieldRates vault={localVault} />
-
-          <Contracts vault={localVault} network={network} />
 
           <div className="flex md:flex-nowrap flex-wrap gap-6 w-full my-6">
             <div className="w-full xl:w-1/2">
@@ -106,8 +105,9 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           />
         </div>
 
-        <div className="hidden xl:block">
+        <div className="hidden xl:flex flex-col gap-5">
           <InvestForm network={network} vault={localVault} />
+          <Contracts vault={localVault} network={network} />
         </div>
       </main>
     </WagmiLayout>

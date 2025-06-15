@@ -924,6 +924,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               let gemsAPR = 0;
 
+              let sonicPoints = 0;
+
               if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
                 const multiplier =
                   stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
@@ -937,6 +939,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 merklAPR = Number(metaVault.merklAPR);
 
                 totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+
+                if (metaVault.symbol === "metaUSD") {
+                  sonicPoints = 12;
+                } else {
+                  sonicPoints = 8;
+                }
               }
 
               return {
@@ -950,6 +958,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 gemsAPR,
                 merklAPR,
                 totalAPR,
+                sonicPoints,
               };
             });
 
