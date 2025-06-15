@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -17,7 +17,7 @@ import {
 
 import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
 
-import { cn, formatNumber, dataSorter } from "@utils";
+import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -40,6 +40,8 @@ interface IProps {
 }
 
 const Metavault: React.FC<IProps> = ({ metavault }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
@@ -59,6 +61,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     state: false,
     pool: {},
   });
+
+  const [modal, setModal] = useState<boolean>(false);
 
   // const [displayType, setDisplayType] = useState<DisplayTypes>(
   //   DisplayTypes.Rows
@@ -196,6 +200,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     (mv) => mv.address.toLowerCase() === metavault
   )?.symbol;
 
+  useModalClickOutside(modalRef, () => setModal((prev) => !prev));
+
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
@@ -223,7 +229,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </span>
               )}
             </div>
-            <div className="flex flex-col gap-2 w-1/2 md:w-auto">
+            <div
+              className="flex flex-col gap-2 w-1/2 md:w-auto cursor-help"
+              onClick={() => {
+                setModal(true);
+              }}
+            >
               <span className="text-[#97979A] text-[14px] leading-5 font-medium">
                 TOTAL APR
               </span>
@@ -282,6 +293,23 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 <span>Sonic</span>
               </div>
             </div>
+
+            {localMetaVault?.sonicPoints && (
+              <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
+                <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                  Sonic AP
+                </span>
+                <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
+                  <img
+                    className="w-6 h-6"
+                    src="/sonic.png"
+                    alt="Sonic chain"
+                    title="Sonic chain"
+                  />
+                  <span>{localMetaVault?.sonicPoints}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <img
@@ -365,6 +393,62 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           )}
         </div>
       </div>
+      {modal && (
+        <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div
+            ref={modalRef}
+            className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
+          >
+            <div className="flex justify-between items-center p-4 border-b border-[#232429]">
+              <h2 className="text-[18px] leading-6 font-semibold">Total APR</h2>
+              <button onClick={() => setModal(false)}>
+                <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">APR</p>
+                <p className="text-end font-semibold">
+                  {formatNumber(localMetaVault?.APR, "formatAPR")}%
+                </p>
+              </div>
+              <a
+                className="flex items-center justify-between"
+                href="https://app.merkl.xyz/users/"
+                target="_blank"
+              >
+                <div className="flex items-center gap-2">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Merkl APR
+                  </p>
+                  <img
+                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg"
+                    alt="Merkl"
+                    className="w-6 h-6"
+                  />
+                </div>
+                <p className="text-end font-semibold">
+                  {formatNumber(localMetaVault?.merklAPR, "formatAPR")}%
+                </p>
+              </a>
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  sGEM1 APR
+                </p>
+                <p className="text-end font-semibold">
+                  {formatNumber(localMetaVault?.gemsAPR, "formatAPR")}%
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-[#2BB656]">
+                <p className="leading-5 font-medium">Total APR</p>
+                <p className="text-end font-semibold">
+                  {formatNumber(localMetaVault?.totalAPR, "formatAPR")}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -6,14 +6,34 @@ import { FullPageLoader } from "@ui";
 
 import { MetaVaultsLinks } from "./components/MetaVaultsLinks";
 
+import { useModalClickOutside, formatNumber } from "@utils";
+
 import { META_VAULTS_TYPE } from "@constants";
 
 import { metaVaults } from "@store";
+
+export type TModal = {
+  APR: number;
+  merklAPR: number;
+  gemsAPR: number;
+  totalAPR: number;
+  isOpen: boolean;
+};
 
 const Metavaults = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
 
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
+
+  const [modal, setModal] = useState<TModal>({
+    APR: 0,
+    merklAPR: 0,
+    gemsAPR: 0,
+    totalAPR: 0,
+    isOpen: false,
+  });
+
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const initMetavaults = async () => {
     // todo: change only to vault type
@@ -31,6 +51,10 @@ const Metavaults = (): JSX.Element => {
       initMetavaults();
     }
   }, [$metaVaults]);
+
+  useModalClickOutside(modalRef, () =>
+    setModal((prev) => ({ ...prev, isOpen: false }))
+  );
 
   return (
     <div className="mx-auto flex flex-col gap-6 md:gap-10 lg:min-w-[1000px]">
@@ -54,9 +78,65 @@ const Metavaults = (): JSX.Element => {
             </div>
           </div>
         ) : (
-          <MetaVaultsLinks metaVaults={localMetaVaults} />
+          <MetaVaultsLinks metaVaults={localMetaVaults} setModal={setModal} />
         )}
       </div>
+      {modal?.isOpen && (
+        <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+          <div
+            ref={modalRef}
+            className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
+          >
+            <div className="flex justify-between items-center p-4 border-b border-[#232429]">
+              <h2 className="text-[18px] leading-6 font-semibold">Total APR</h2>
+              <button onClick={() => setModal({ ...modal, isOpen: false })}>
+                <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3 p-4">
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">APR</p>
+                <p className="text-end font-semibold">
+                  {formatNumber(modal.APR, "formatAPR")}%
+                </p>
+              </div>
+              <a
+                className="flex items-center justify-between"
+                href="https://app.merkl.xyz/users/"
+                target="_blank"
+              >
+                <div className="flex items-center gap-2">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Merkl APR
+                  </p>
+                  <img
+                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg"
+                    alt="Merkl"
+                    className="w-6 h-6"
+                  />
+                </div>
+                <p className="text-end font-semibold">
+                  {formatNumber(modal.merklAPR, "formatAPR")}%
+                </p>
+              </a>
+              <div className="flex items-center justify-between">
+                <p className="leading-5 text-[#97979A] font-medium">
+                  sGEM1 APR
+                </p>
+                <p className="text-end font-semibold">
+                  {formatNumber(modal.gemsAPR, "formatAPR")}%
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-[#2BB656]">
+                <p className="leading-5 font-medium">Total APR</p>
+                <p className="text-end font-semibold">
+                  {formatNumber(modal.totalAPR, "formatAPR")}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
