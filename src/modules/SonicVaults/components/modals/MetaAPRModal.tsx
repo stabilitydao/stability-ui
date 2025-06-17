@@ -1,12 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useStore } from "@nanostores/react";
-
-import { TimeDifferenceIndicator } from "@ui";
-
 import { formatNumber } from "@utils";
-
-import { aprFilter } from "@store";
 
 import type { TAPRModal, TEarningData } from "@types";
 

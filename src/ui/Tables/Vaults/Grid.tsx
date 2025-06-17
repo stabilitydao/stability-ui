@@ -1,7 +1,7 @@
 import { RewardsCarousel } from "../../RewardsCarousel";
 import { StrategyBadge } from "../../StrategyBadge";
 
-import { formatNumber, cn } from "@utils";
+import { formatNumber } from "@utils";
 
 import { TVault, TAPRModal } from "@types";
 

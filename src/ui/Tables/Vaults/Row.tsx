@@ -1,15 +1,8 @@
 import { useState } from "react";
 
-import { isMobile } from "react-device-detect";
+import { ArrowIcon, StrategyBadge, ArrowRightIcon } from "@ui";
 
-import {
-  TimeDifferenceIndicator,
-  ArrowIcon,
-  StrategyBadge,
-  ArrowRightIcon,
-} from "@ui";
-
-import { formatNumber, cn } from "@utils";
+import { formatNumber } from "@utils";
 
 import { SILO_POINTS } from "@constants";
 
@@ -31,9 +24,9 @@ interface IProps {
 const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
   const [expandedData, setExpandedData] = useState(false);
 
-  const isSTBLVault =
-    Array.isArray(vault?.assets) &&
-    vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
+  // const isSTBLVault =
+  //   Array.isArray(vault?.assets) &&
+  //   vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
 
   const link = vault?.isMetaVault
     ? `/metavaults/metavault/${vault.address}`
