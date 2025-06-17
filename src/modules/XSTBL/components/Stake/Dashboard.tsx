@@ -19,8 +19,8 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
   const $connected = useStore(connected);
 
   return (
-    <div className="bg-[#101012] border border-[#23252A] rounded-lg items-center justify-between hidden lg:flex">
-      <div className="flex flex-col md:w-1/3 w-full gap-3 p-6 pr-12">
+    <div className="bg-[#101012] border border-[#23252A] rounded-lg items-center justify-between flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:w-1/3 w-full gap-3 p-4 lg:p-6 lg:pr-12">
         <div className="flex justify-between items-start py-1 px-2 rounded-lg bg-[#21202d] border border-[#5e4eba]">
           <span className="text-[#E3E4E7] text-[18px] leading-6">
             Total Staked
@@ -97,8 +97,8 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center gap-4 md:w-2/3 w-full p-6 border-l border-l-[#23252A]">
-        <div className="flex items-center justify-between w-full">
+      <div className="flex flex-col items-center justify-center gap-4 lg:w-2/3 w-full p-4 lg:p-6 lg:border-l border-l-[#23252A]">
+        <div className="flex items-center justify-between flex-col md:flex-row gap-3 md:gap-0 w-full">
           <h3 className="text-[24px] leading-8 font-semibold">
             Pending revenue
           </h3>
@@ -110,7 +110,7 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
         </div>
 
         <div className="flex items-center justify-between flex-col md:flex-row gap-6 w-full">
-          <div className="flex items-center justify-between flex-col md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
+          <div className="flex items-center justify-between flex-col w-full md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
             <span className="text-center text-[#97979A] text-[16px] leading-6">
               xSTBL exit penalties (100%)
             </span>
@@ -130,7 +130,7 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
               <TextSkeleton lineHeight={24} width={100} />
             )}
           </div>
-          <div className="flex items-center justify-between flex-col md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
+          <div className="flex items-center justify-between flex-col w-full md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
             <span className="text-center text-[#97979A] text-[16px] leading-6">
               Vault fees (50%)
             </span>

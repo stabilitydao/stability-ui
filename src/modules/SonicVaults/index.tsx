@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useStore } from "@nanostores/react";
 
 import { APRModal } from "./components/modals/APRModal";
+import { MetaAPRModal } from "./components/modals/MetaAPRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
@@ -398,11 +399,11 @@ const SonicVaults = (): JSX.Element => {
         if (state.keyName === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) => {
             const aAPR = a?.isMetaVault
-              ? Number(a.APR ?? 0)
+              ? Number(a.totalAPR ?? 0)
               : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
 
             const bAPR = b?.isMetaVault
-              ? Number(b.APR ?? 0)
+              ? Number(b.totalAPR ?? 0)
               : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
 
             return dataSorter(aAPR, bAPR, state.dataType, state.sortType);
@@ -689,9 +690,14 @@ const SonicVaults = (): JSX.Element => {
         />
       </div>
 
-      {aprModal.state && (
+      {aprModal.state && aprModal.type === "vault" && (
         <APRModal state={aprModal} setModalState={setAprModal} />
       )}
+
+      {aprModal.state && aprModal.type === "metaVault" && (
+        <MetaAPRModal state={aprModal} setModalState={setAprModal} />
+      )}
+
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}

@@ -25,6 +25,25 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     ? `/metavaults/metavault/${vault.address}`
     : `/vaults/vault/${vault.network}/${vault.address}`;
 
+  const modalData = !vault?.isMetaVault
+    ? {
+        earningData: vault.earningData,
+        daily: vault.daily,
+        lastHardWork: vault.lastHardWork,
+        symbol: vault?.risk?.symbol as string,
+        state: true,
+        type: "vault",
+        pool: vault?.pool,
+      }
+    : {
+        APR: vault?.APR,
+        merklAPR: vault?.merklAPR,
+        gemsAPR: vault?.gemsAPR,
+        totalAPR: vault?.totalAPR,
+        state: true,
+        type: "metaVault",
+      };
+
   return (
     <a
       className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-full md:w-[258px] overflow-hidden"
@@ -81,20 +100,11 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
               onClick={(e) => {
-                if (!vault.isMetaVault) {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  setModalState({
-                    earningData: vault.earningData,
-                    daily: vault.daily,
-                    lastHardWork: vault.lastHardWork,
-                    symbol: vault?.risk?.symbol as string,
-                    state: true,
-                    pool: vault?.pool,
-                  });
-                }
+                e.stopPropagation();
+                e.preventDefault();
+                setModalState(modalData);
               }}
-              className={cn(!vault?.isMetaVault && "cursor-help")}
+              className="cursor-help"
             >
               <div
                 className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
