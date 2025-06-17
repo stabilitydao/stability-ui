@@ -938,14 +938,14 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
                 merklAPR = Number(metaVault.merklAPR);
 
-                totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
-
                 if (metaVault.symbol === "metaUSD") {
                   sonicPoints = 12;
                 } else {
                   sonicPoints = 8;
                 }
               }
+
+              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
 
               return {
                 ...metaVault,

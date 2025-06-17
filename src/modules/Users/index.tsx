@@ -75,6 +75,7 @@ const Users = (): JSX.Element => {
     if (!!allContests.ACTIVE?.length) {
       //@ts-ignore
       let contestData = allContests[activeContest];
+
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,

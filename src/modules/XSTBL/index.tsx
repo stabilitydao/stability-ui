@@ -77,15 +77,18 @@ const XSTBL = (): JSX.Element => {
         <ExitForms />
 
         <div className="block lg:hidden">
-          {activeForm === "convert" ? (
+          <div className={cn(activeForm === "convert" ? "block" : "hidden")}>
             <ConvertForm />
-          ) : activeForm === "vest" ? (
+          </div>
+          <div className={cn(activeForm === "vest" ? "block" : "hidden")}>
             <VestedExit />
-          ) : activeForm === "exit" ? (
+          </div>
+          <div className={cn(activeForm === "exit" ? "block" : "hidden")}>
             <InstantExit />
-          ) : activeForm === "stake" ? (
+          </div>
+          <div className={cn(activeForm === "stake" ? "block" : "hidden")}>
             <Stake />
-          ) : null}
+          </div>
         </div>
       </div>
     </WagmiLayout>
