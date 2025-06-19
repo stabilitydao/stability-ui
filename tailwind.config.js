@@ -104,6 +104,7 @@ export default {
       },
       screens: {
         xxl: "1440px",
+        xl3: "1560px",
       },
     },
   },

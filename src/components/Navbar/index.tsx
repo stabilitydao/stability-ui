@@ -86,8 +86,8 @@ const Navbar = (): JSX.Element => {
         )}
       </AnimatePresence>
 
-      {($isNavbar || window.innerWidth >= 1440) && (
-        <div className={cn("navbar", !$isNavbar && "hidden xxl:block")}>
+      {($isNavbar || window.innerWidth >= 1560) && (
+        <div className={cn("navbar", !$isNavbar && "hidden xl3:block")}>
           <div className="pt-5 pb-[30px] px-4 flex flex-col justify-between gap-[80px] h-full">
             <div>
               <a href="/">
