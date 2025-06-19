@@ -18,24 +18,24 @@ const Header = (): JSX.Element => {
   return (
     <WagmiLayout>
       <header className="font-manrope header">
-        <div className="flex items-center justify-between w-full h-full pl-0 pr-0 xxl:pl-10 md:pr-10">
+        <div className="flex items-center justify-between w-full h-full pl-0 pr-0 xl3:pl-10 md:pr-10">
           <div className="flex items-center gap-4 h-full">
             <div
-              className="min-h-full border-r border-[#232429] xxl:border-r-0 hidden md:block"
+              className="min-h-full border-r border-[#232429] xl3:border-r-0 hidden md:block"
               onClick={() => isNavbar.set(!$isNavbar)}
             >
               <img
                 src="/icons/sidebar.svg"
                 alt="Sidebar logo"
-                className="p-4 cursor-pointer min-h-full xxl:hidden"
+                className="p-4 cursor-pointer min-h-full xl3:hidden"
               />
             </div>
 
-            <a className="xxl:hidden pl-4 md:pl-0" href="/">
+            <a className="xl3:hidden pl-4 md:pl-0" href="/">
               <img src="/long_logo.png" alt="Stability logo" />
             </a>
 
-            <div className="hidden xxl:block">
+            <div className="hidden xl3:block">
               <Breadcrumbs />
             </div>
           </div>
@@ -55,7 +55,7 @@ const Header = (): JSX.Element => {
             </div>
           </div>
         </div>
-        <div className="block xxl:hidden py-3 pl-4 border-b border-[#232429] backdrop-blur-md">
+        <div className="block xl3:hidden py-3 pl-4 border-b border-[#232429] backdrop-blur-md">
           <Breadcrumbs />
         </div>
       </header>

@@ -66,6 +66,47 @@ const XSTBL = (): JSX.Element => {
             Instant Exit
           </div>
         </div>
+
+        {/* <div className="flex items-center justify-between gap-6 flex-wrap lg:flex-nowrap">
+          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
+            <div className="py-6 flex items-center flex-col gap-1">
+              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
+                Pending APR
+              </span>
+              <span className="text-[#48C05C] text-[40px] leading-[48px] font-semibold">
+                +12.06%
+              </span>
+            </div>
+          </div>
+          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
+            <div className="py-6 flex items-center flex-col gap-1">
+              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
+                Total xSTBL
+              </span>
+              <span className="text-[40px] leading-[48px] font-semibold">
+                773,242.06
+              </span>
+            </div>
+          </div>
+          <div className="w-full bg-[#101012] rounded-lg border border-[#23252A]">
+            <div className="py-6 flex items-center flex-col gap-1">
+              <span className="text-[#97979A] text-[16px] leading-6 font-medium">
+                Total xSTBL, $
+              </span>
+              <span className="text-[40px] leading-[48px] font-semibold">
+                $46,464.12
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <h3 className="text-[24px] leading-8 font-semibold">
+            Generating units
+          </h3>
+          <div></div>
+        </div> */}
+
         <div className="hidden lg:block">
           <Stake />
         </div>
