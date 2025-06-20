@@ -79,8 +79,9 @@ const Contests = (): JSX.Element => {
       <div className="flex flex-col gap-4">
         <h2 className="page-title__font text-start">Contests</h2>
         <h3 className="text-[#97979a] page-description__font">
-          Join yield contests to earn sGEM rewards. Compete by <br /> depositing
-          into vaults, track your rank, and maximize <br /> returns through
+          Join yield contests to earn sGEM rewards. Compete by{" "}
+          <br className="md:block hidden" /> depositing into vaults, track your
+          rank, and maximize <br className="md:block hidden" /> returns through
           strategic participation
         </h3>
       </div>
@@ -248,7 +249,7 @@ const Contests = (): JSX.Element => {
                                       )}
                                       {reward.type === "Gems1" && (
                                         <img
-                                          src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
+                                          src="/icons/sonic_gem_icon.svg"
                                           className="w-[24px] h-[24px]"
                                           alt="sGEM1"
                                         />

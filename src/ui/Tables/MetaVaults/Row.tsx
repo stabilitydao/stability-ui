@@ -25,10 +25,11 @@ interface IProps {
     gemsAPR: string;
   };
   vault: TVault;
+  activeVault: any;
   setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
+const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
   const [expandedData, setExpandedData] = useState(false);
 
   const isSTBLVault =
@@ -39,11 +40,15 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     ? vault.symbol
     : VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol;
 
+  const isDimmed =
+    activeVault?.isHovered && activeVault.address !== vault.address;
+
   return (
-    <div className="border border-[#23252A] border-b-0">
+    <div className={cn("border border-[#23252A] border-b-0")}>
       <a
         className={cn(
-          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer"
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer",
+          isDimmed ? "opacity-30" : "opacity-100"
         )}
         data-testid="vault"
         href={

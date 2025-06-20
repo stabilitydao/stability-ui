@@ -138,11 +138,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             entry.metaVault as TAddress
           );
 
-          const vaultsData = entry.vaults.map((address, i) => ({
-            ...$vaults[chainId][address],
-            proportions: { current: current[i], target: target[i] },
-            APR: $vaults[chainId][address].earningData.apr.latest,
-          }));
+          const vaultsData = entry.vaults
+            .map((address, i) => ({
+              ...$vaults[chainId][address],
+              proportions: { current: current[i], target: target[i] },
+              APR: $vaults[chainId][address].earningData.apr.latest,
+            }))
+            .filter(
+              ({ proportions }) =>
+                proportions.current > 0.1 && !!proportions.target
+            );
 
           return {
             ...subMetaVault,

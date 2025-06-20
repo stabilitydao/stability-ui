@@ -293,6 +293,7 @@ type TVault = {
   ///// meta vault
   isMetaVault?: boolean;
   proportions?: { current: number[]; target: number };
+  vaults?: TVault[];
 };
 
 type TMetaVault = {

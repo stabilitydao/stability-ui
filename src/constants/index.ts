@@ -259,6 +259,14 @@ const META_VAULTS_TYPE = {
   metaS: "metaVault",
 };
 
+const META_VAULTS_COLORS = {
+  "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": "#5E6AD2",
+  "0x22222222780038f8817b3de825a070225e6d9874": "#2333BE",
+  "0x33333333c480194b5b651987b7d00b20ddcbd287": "#38429E",
+  "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": "#252F86",
+  "0x555555554776b14b30597d1032e48f9e16db22a4": "#171F5D",
+};
+
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
@@ -318,4 +326,5 @@ export {
   STABILITY_STRATEGY_LABELS,
   STABILITY_AAVE_POOLS,
   METAVAULT_TABLE,
+  META_VAULTS_COLORS,
 };
