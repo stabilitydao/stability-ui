@@ -105,6 +105,17 @@ const Swapper = (): JSX.Element => {
               </tbody>
             </table>
           </div>
+
+          {/* Add Pools Link Here */}
+          <a
+            className="bg-accent-950 hover:bg-[#1B0D45] mt-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
+            href="/add-pools"
+            target="_blank"
+            title="Go to add pools page"
+          >
+            Add Pools
+          </a>
+
           <HeadingText text="Blue Chip Pools" scale={2} />
           <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
             <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
