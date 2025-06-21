@@ -9,6 +9,11 @@ import { wagmiConfig, SwapperABI } from "@web3";
 import { connected, account, publicClient } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WagmiLayout from "@layouts/WagmiLayout";
+// TODO: Make a modal for selecting token and add search in the modal
+// Make sure that the input selected for `tokenIn` and `tokenOut` is not the default `<option value="">Select a token</option>`
+// But I think creating a special modal for selecting `tokenIn` and `tokenOut` should already prevent this
+// Maybe show a modal when Txn is yet to be approved in wallet, when It is yet to be confirmed, when it has been confirmed and is successful
+import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 const AMM_ADAPTERS = [
     { name: "Solidly (Equalizer, SwapX classic)", address: "0xE3374041F173FFCB0026A82C6EEf94409F713Cf9" },
@@ -18,29 +23,6 @@ const AMM_ADAPTERS = [
     { name: "BalancerV3Stable", address: "0xcd85425fF6C07cF09Ca6Ac8F683E8164F27C143c" },
     { name: "BalancerWeighted", address: "0x7D6641cf68E5169c11d91266D3E410130dE70B9E" },
     { name: "Pendle", address: "0x9fcE12c813fC2280A800e8683b918de121B2437B" },
-];
-
-// TODO: where did you say I should get token list from ??
-const TOKENS = [
-    {
-        name: "USDC",
-        symbol: "USDC",
-        address: "0x...usdc",
-        logo: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
-    },
-    {
-        name: "wS",
-        symbol: "wS",
-        address: "0x...wS",
-        logo: "https://cryptologos.cc/logos/sonic-ws-logo.png",
-    },
-    {
-        name: "WETH",
-        symbol: "WETH",
-        address: "0x...weth",
-        logo: "https://cryptologos.cc/logos/weth-weth-logo.png",
-    },
-    // Add more as needed
 ];
 
 const AddPools = (): JSX.Element => {
@@ -172,7 +154,7 @@ const AddPools = (): JSX.Element => {
                             }}
                         >
                             <option value="">Select a token</option>
-                            {TOKENS.map((token) => (
+                            {tokenlist.tokens.map((token) => (
                                 <option key={token.address} value={token.address}>
                                     {token.symbol}
                                 </option>
@@ -201,7 +183,7 @@ const AddPools = (): JSX.Element => {
                             }}
                         >
                             <option value="">Select a token</option>
-                            {TOKENS.map((token) => (
+                            {tokenlist.tokens.map((token) => (
                                 <option key={token.address} value={token.address}>
                                     {token.symbol}
                                 </option>
