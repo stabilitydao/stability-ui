@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useMemo, useState } from "react";
 import { HeadingText } from "@ui";
 import type { TAddress } from "@types";
@@ -34,9 +33,9 @@ const Modal = ({ open, onClose, children }: ModalProps) =>
             <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
                 <button
                     onClick={onClose}
-                    className="absolute right-4 top-4 text-2xl leading-none transition hover:scale-110"
+                    className="absolute right-4 top-4 text-4xl leading-none transition hover:scale-110"
                 >
-                    ×
+                    &times;
                 </button>
                 {children}
             </div>
@@ -227,7 +226,6 @@ const AddPools = (): JSX.Element => {
         "idle" | "loading" | "success" | "fail"
     >("idle");
     const [gasEstimate, setGasEstimate] = useState<string | null>(null);
-
     const [txStatus, setTxStatus] = useState<TxStatus>("idle");
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
@@ -393,8 +391,13 @@ const AddPools = (): JSX.Element => {
                         <button
                             type="button"
                             onClick={() => setTokenInModalOpen(true)}
-                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
+                            className="flex w-full items-center gap-3 rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         >
+                            <img
+                                src={tokenlist.find((t) => t.symbol === (tokenInSymbol === "Select token" ? "wS" : tokenInSymbol))?.logoURI}
+                                alt={tokenInSymbol}
+                                className="h-6 w-6 rounded-full"
+                            />
                             {tokenInSymbol}
                         </button>
                         <input
@@ -415,8 +418,13 @@ const AddPools = (): JSX.Element => {
                         <button
                             type="button"
                             onClick={() => setTokenOutModalOpen(true)}
-                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
+                            className="flex w-full items-center gap-3 rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         >
+                            <img
+                                src={tokenlist.find((t) => t.symbol === (tokenOutSymbol === "Select token" ? "STBL" : tokenOutSymbol))?.logoURI}
+                                alt={tokenOutSymbol}
+                                className="h-6 w-6 rounded-full"
+                            />
                             {tokenOutSymbol}
                         </button>
                         <input
@@ -446,7 +454,7 @@ const AddPools = (): JSX.Element => {
                         {simulationStatus === "loading" && <span>🔄 Simulating transaction…</span>}
                         {simulationStatus === "success" && (
                             <span className="text-green-400">
-                                ✅ Simulation successful. Gas ≈ {gasEstimate}
+                                ✅ Simulation successful. Gas &approx; {gasEstimate}
                             </span>
                         )}
                         {simulationStatus === "fail" && (
