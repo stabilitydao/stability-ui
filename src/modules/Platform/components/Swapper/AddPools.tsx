@@ -1,15 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { HeadingText, FullPageLoader } from "@ui";
+import { useState } from "react";
+import { HeadingText } from "@ui";
 import type { TAddress } from "@types";
 import type { Address } from "viem";
 
-import { formatUnits, parseUnits } from "viem";
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
-import { getTransactionReceipt } from "@utils";
-import { sonicClient, ERC20ABI, IXSTBLABI, wagmiConfig, SwapperABI } from "@web3";
-import { connected, account, lastTx, currentChainID, publicClient } from "@store";
-import { STABILITY_TOKENS } from "@constants";
+import { wagmiConfig, SwapperABI } from "@web3";
+import { connected, account, publicClient } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WagmiLayout from "@layouts/WagmiLayout";
 
@@ -34,8 +31,8 @@ const TOKENS = [
     {
         name: "wS",
         symbol: "wS",
-        address: "0x...dai",
-        logo: "https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png",
+        address: "0x...wS",
+        logo: "https://cryptologos.cc/logos/sonic-ws-logo.png",
     },
     {
         name: "WETH",
@@ -49,7 +46,6 @@ const TOKENS = [
 const AddPools = (): JSX.Element => {
     const { open } = useWeb3Modal();
     const $connected = useStore(connected);
-    const $lastTx = useStore(lastTx);
     const $publicClient = useStore(publicClient);
     const $account = useStore(account);
 
@@ -63,9 +59,6 @@ const AddPools = (): JSX.Element => {
 
     const [simulationStatus, setSimulationStatus] = useState<"idle" | "loading" | "success" | "fail">("idle");
     const [gasEstimate, setGasEstimate] = useState<string | null>(null);
-
-    const [transactionInProgress, setTransactionInProgress] = useState(false);
-    const [needConfirm, setNeedConfirm] = useState(false);
 
     const finalTokenIn = selectedTokenIn || manualTokenIn;
     const finalTokenOut = selectedTokenOut || manualTokenOut;
@@ -95,7 +88,7 @@ const AddPools = (): JSX.Element => {
             ];
 
             // 1. Simulate the contract interaction
-            const simulation = await $publicClient.simulateContract({
+            await $publicClient.simulateContract({
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
@@ -116,12 +109,9 @@ const AddPools = (): JSX.Element => {
             setSimulationStatus("success");
 
             // 3. Write transaction
-            setTransactionInProgress(true);
-            setNeedConfirm(true);
-
             const gasLimit = BigInt(Number(gasEstimate) * 1.2); // add 20% buffer
 
-            const tx = await writeContract(wagmiConfig, {
+            const txHash = await writeContract(wagmiConfig, {
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
@@ -129,11 +119,10 @@ const AddPools = (): JSX.Element => {
                 gas: gasLimit,
             });
 
-            // console.log("Tx sent: ", tx.hash);
+            console.log("Tx sent: ", txHash);
         } catch (error) {
             console.error("Error in handleSubmit:", error);
             setSimulationStatus("fail");
-            setTransactionInProgress(false);
         }
     };
 
