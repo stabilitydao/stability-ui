@@ -31,11 +31,17 @@ const Donut: React.FC<IProps> = ({ vaults, activeVault, setActiveVault }) => {
 
   return (
     <div className="relative w-full h-full">
-      <PieChart width={220} height={220}>
+      <PieChart
+        width={220}
+        height={220}
+        className="absolute left-1/2 top-1/2 translate-y-[-50%] transform translate-x-[-50%] md:block"
+      >
         <Pie
           data={vaults}
+          className="focus:outline-none"
           cx="50%"
           cy="50%"
+          blendStroke
           innerRadius={70}
           outerRadius={80}
           paddingAngle={2}
@@ -43,6 +49,8 @@ const Donut: React.FC<IProps> = ({ vaults, activeVault, setActiveVault }) => {
           endAngle={-270}
           dataKey="value"
           stroke="none"
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           activeIndex={activeIndex ?? undefined}
           activeShape={(props) => (
             <Sector
@@ -53,16 +61,12 @@ const Donut: React.FC<IProps> = ({ vaults, activeVault, setActiveVault }) => {
               animationDuration={1000}
             />
           )}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
-          isAnimationActive={true}
-          animationDuration={1000}
         >
           {vaults.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
               fill={entry.color}
-              className="cursor-pointer transition-all duration-300"
+              className="cursor-pointer"
             />
           ))}
         </Pie>
@@ -73,7 +77,9 @@ const Donut: React.FC<IProps> = ({ vaults, activeVault, setActiveVault }) => {
           alt={activeVault?.symbol}
           className="w-6 h-6 rounded-full mb-1"
         />
-        <span className="text-xl font-bold">{activeVault?.percentage}%</span>
+        <span className="text-xl font-bold">
+          {activeVault?.value?.toFixed(2)}%
+        </span>
         <span className="text-sm leading-tight">{activeVault?.symbol}</span>
       </div>
     </div>

@@ -5,90 +5,70 @@ import { Donut } from "./Donut";
 
 import { cn } from "@utils";
 
-import { META_VAULTS_COLORS } from "@constants";
-
-import { TVault, TAPRModal, DisplayTypes } from "@types";
+import { TVault, TAPRModal } from "@types";
 
 interface IProps {
   vaults: TVault[];
-  display: DisplayTypes;
   setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const MetaVaultsTable: React.FC<IProps> = ({
-  vaults,
-  display,
-  setModalState,
-}) => {
-  const [defaultVault, setDefaultVault] = useState({});
+const MetaVaultsTable: React.FC<IProps> = ({ vaults, setModalState }) => {
   const [activeVault, setActiveVault] = useState({});
 
   const donutVaults = useMemo(() => {
     const flatVaults = vaults.flatMap((vault) => {
-      const mainImg = vault?.isMetaVault
-        ? `/features/${vault.symbol}.png`
-        : vault.assets[0]?.logo;
+      const baseProps = {
+        symbol: vault.symbol,
+        color: vault.strategyInfo?.color ?? "#ccc",
+        img: vault.assets?.[0]?.logo ?? "",
+        isHovered: false,
+      };
 
-      const result = [
-        {
-          address: vault.address,
-          symbol: vault.symbol,
-          color:
-            META_VAULTS_COLORS?.[
-              vault.address as keyof typeof META_VAULTS_COLORS
-            ],
-          img: mainImg,
-          value: Number(vault.tvl),
-          isHovered: false,
-        },
-      ];
+      if (vault?.isMetaVault) {
+        const currentAllocation = vault.proportions?.current ?? 0;
 
-      if (vault?.vaults?.length) {
-        const subVaults = vault.vaults.map((v) => ({
+        return vault.vaults.map((v) => ({
           address: v.address,
           symbol: v.symbol,
-          color: v.strategyInfo.color,
-          img: v.assets[0]?.logo,
-          value: Number(v.tvl),
+          color: v.strategyInfo?.color ?? "#ccc",
+          img: v.assets?.[0]?.logo ?? "",
+          value: ((v.proportions?.current ?? 0) / 100) * currentAllocation,
           isHovered: false,
         }));
-
-        result.push(...subVaults);
       }
 
-      return result;
+      return [
+        {
+          address: vault.address,
+          ...baseProps,
+          value: vault.proportions?.current ?? 0,
+        },
+      ];
     });
 
-    const total = flatVaults.reduce((sum, v) => sum + v.value, 0);
-
-    const withPercentage = flatVaults.map((v) => ({
-      ...v,
-      percentage: total > 0 ? ((v.value / total) * 100).toFixed(2) : "0.00",
-    }));
-
-    return withPercentage.sort((a, b) => b.value - a.value);
+    return flatVaults.sort((a, b) => Number(b.value) - Number(a.value));
   }, [vaults]);
 
   useEffect(() => {
     if (donutVaults?.length) {
-      setDefaultVault(donutVaults[0]);
       setActiveVault(donutVaults[0]);
     }
   }, [donutVaults]);
 
   return (
     <div
-      key={display}
-      className={cn("bg-[#101012] flex border-l border-[#23252A]")}
+      className={cn(
+        "bg-[#101012] flex flex-col md:flex-row md:border-l border-[#23252A]"
+      )}
     >
-      <div className="sticky top-[80px] xl3:top-10 w-[220px]  h-[220px] border-t border-[#23252A] shrink-0">
+      <div className="md:sticky top-[80px] xl3:top-10 h-[220px] border-t border-x md:border-x-0 border-[#23252A] shrink-0">
         <Donut
           vaults={donutVaults}
           activeVault={activeVault}
           setActiveVault={setActiveVault}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full min-h-full">
         {vaults.map((vault: TVault, index: number) => {
           if (vault?.isMetaVault) {
             const APRs_DATA = { APR: Number(vault.APR).toFixed(2) };
@@ -135,6 +115,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                       vault={endVault}
                       activeVault={activeVault}
                       setModalState={setModalState}
+                      inserted={true}
                     />
                   );
                 })}
@@ -171,6 +152,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
               key={`row/${vault.name + index}`}
               APRs={APR_DATA}
               vault={vault}
+              activeVault={activeVault}
               setModalState={setModalState}
             />
           );

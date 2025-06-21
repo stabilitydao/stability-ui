@@ -27,9 +27,16 @@ interface IProps {
   vault: TVault;
   activeVault: any;
   setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  inserted?: boolean;
 }
 
-const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
+const Row: React.FC<IProps> = ({
+  APRs,
+  vault,
+  activeVault,
+  setModalState,
+  inserted = false,
+}) => {
   const [expandedData, setExpandedData] = useState(false);
 
   const isSTBLVault =
@@ -47,27 +54,26 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
     <div className={cn("border border-[#23252A] border-b-0")}>
       <a
         className={cn(
-          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer",
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default min-[860px]:cursor-pointer",
           isDimmed ? "opacity-30" : "opacity-100"
         )}
-        data-testid="vault"
         href={
           vault?.isMetaVault
             ? `/metavaults/metavault/${vault.address}`
             : `/vaults/vault/${vault.network}/${vault.address}`
         }
         onClick={(e) => {
-          if (window.innerWidth <= 767) {
+          if (window.innerWidth <= 860) {
             e.preventDefault();
             setExpandedData((prev) => !prev);
           }
         }}
       >
-        <div className="flex items-center w-full md:w-[50%] justify-between px-4">
+        <div className="flex items-center w-full min-[860px]:w-[50%] justify-between px-4">
           <div
             className={cn(
               "flex items-center gap-3",
-              !vault?.isMetaVault && "ml-3 md:ml-5"
+              inserted && "ml-3 min-[860px]:ml-5"
             )}
           >
             <div className="flex items-center justify-center">
@@ -91,7 +97,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
               )}
             </div>
             <span
-              className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] md:max-w-full"
+              className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] min-[860px]:max-w-full"
               title={symbol}
             >
               {symbol}
@@ -149,14 +155,14 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
                 </div>
               </div>
             )} */}
-            <div className="block md:hidden ml-2">
+            <div className="block min-[860px]:hidden ml-2">
               <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
             </div>
           </div>
         </div>
         <div
           onClick={(e) => {
-            if (isMobile && !vault?.isMetaVault) {
+            if (window.innerHeight <= 860 && !vault?.isMetaVault) {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,
@@ -169,7 +175,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
             }
           }}
           className={cn(
-            "px-4 w-[20%] hidden md:block",
+            "px-4 w-[20%] hidden min-[860px]:block",
             !vault?.isMetaVault && "tooltip cursor-help"
           )}
         >
@@ -265,7 +271,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
             <i></i>
           </div>
         </div>
-        <div className="px-4 text-right text-[16px] w-[30%] hidden md:block">
+        <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
           {(vault?.proportions?.current || vault?.proportions?.target) && (
             <span>
               {Number(vault.proportions?.current).toFixed(2)}% /{" "}
@@ -275,7 +281,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, activeVault, setModalState }) => {
         </div>
       </a>
       {expandedData ? (
-        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] md:hidden">
+        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] min-[860px]:hidden">
           {!vault?.isMetaVault && (
             <div className="flex items-center justify-between w-full">
               <span className="text-[#909193] text-[14px] leading-5 font-medium">
