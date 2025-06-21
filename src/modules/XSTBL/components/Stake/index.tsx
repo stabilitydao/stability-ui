@@ -8,11 +8,9 @@ import { useStore } from "@nanostores/react";
 
 import { Dashboard } from "./Dashboard";
 
-import { formatNumber } from "@utils";
+import { ActionButton } from "@ui";
 
-import { ActionButton } from "../../ui";
-
-import { getTransactionReceipt } from "@utils";
+import { formatNumber, getTransactionReceipt, cn } from "@utils";
 
 import { connected, account, lastTx, assetsPrices } from "@store";
 
@@ -460,21 +458,25 @@ const Stake = (): JSX.Element => {
   }, [$account, $lastTx, $assetsPrices]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       <Dashboard data={dashboardData} isLoaded={isLoaded} />
-      <div className="bg-accent-950 p-5 rounded-2xl flex justify-between flex-col md:flex-row">
+      <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col md:flex-row">
         <div className="flex flex-col justify-between">
-          <div className="flex flex-col">
-            <span className="text-[26px]">Stake xSTBL</span>
-            <span className="text-[18px]">
+          <div className="flex flex-col gap-2">
+            <span className="text-[24px] leading-8 font-semibold">
+              Stake xSTBL
+            </span>
+            <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
               Stake your xSTBL to earn revenue from Stability profit generating
               units.
             </span>
           </div>
 
           {!!balances.stakedXSTBL && (
-            <div className="flex flex-col items-start mb-5 mt-5 md:mb-0">
-              <span className="text-[15px] font-light">Your stake</span>
+            <div className="flex flex-col items-start gap-1 my-5 md:my-0">
+              <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
+                Your stake
+              </span>
               <p className="text-[20px] min-[850px]:text-[28px] font-bold">
                 {formatNumber(balances.stakedXSTBL, "format")}{" "}
                 <span className="text-[#A995FF]">xSTBL</span>
@@ -482,98 +484,79 @@ const Stake = (): JSX.Element => {
             </div>
           )}
         </div>
-        <div className="lg:w-1/3 flex flex-col justify-between">
-          <div className="flex items-center font-semibold relative text-[20px] mb-2 select-none">
+        <div className="lg:w-1/3 flex flex-col justify-between gap-4">
+          <div className="flex items-center gap-2 text-[14px]">
             {isClaimable && (
-              <p
-                className={`whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-2 border-b-[1.5px] border-transparent w-1/2 ${stakeType === "Claim" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+              <span
+                className={cn(
+                  "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
+                  stakeType === "Claim" &&
+                    "bg-[#22242A] text-white cursor-default"
+                )}
                 onClick={() => stakeTypeHandler("Claim")}
               >
                 Claim
-              </p>
+              </span>
             )}
-
-            <p
-              className={`whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-2 border-b-[1.5px] border-transparent w-1/2 ${stakeType === "Stake" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+            <span
+              className={cn(
+                "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
+                stakeType === "Stake" &&
+                  "bg-[#22242A] text-white cursor-default"
+              )}
               onClick={() => stakeTypeHandler("Stake")}
             >
               Stake
-            </p>
-            <p
-              className={`whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-2 border-b-[1.5px] border-transparent w-1/2 ${stakeType === "Unstake" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
+            </span>
+            <span
+              className={cn(
+                "py-2 px-4 rounded-lg border border-[#2C2E33] cursor-pointer text-[#97979A]",
+                stakeType === "Unstake" &&
+                  "bg-[#22242A] text-white cursor-default"
+              )}
               onClick={() => stakeTypeHandler("Unstake")}
             >
               Unstake
-            </p>
+            </span>
           </div>
-          <div className={`${stakeType === "Claim" ? "hidden" : ""}`}>
-            <label className="relative block h-[60px] w-full">
-              <img
-                src="/STBL_plain.png"
-                alt="STBL"
-                title="STBL"
-                className="absolute top-[27%] left-4 w-8 h-8 text-neutral-500 rounded-full pointer-events-none"
-              />
-
-              <input
-                ref={input}
-                name="amount"
-                placeholder="0"
-                onChange={() => handleInputChange()}
-                type="text"
-                pattern="^[0-9]*[.,]?[0-9]*$"
-                inputMode="decimal"
-                autoComplete="off"
-                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[60px] my-[2px] pl-[60px] pr-3"
-              />
-
+          <div className={cn(stakeType === "Claim" && "hidden")}>
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              <div className="flex items-center justify-between">
+                <input
+                  ref={input}
+                  name="amount"
+                  placeholder="0"
+                  onChange={() => handleInputChange()}
+                  type="text"
+                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+                <div
+                  className={cn(
+                    "bg-[#151618] border border-[#23252A] rounded-lg px-3 py-1 text-[14px]",
+                    $connected && "cursor-pointer"
+                  )}
+                  onClick={() => handleInputChange("max")}
+                >
+                  MAX
+                </div>
+              </div>
               {stakeType === "Stake" ? (
-                <>
-                  {!!$connected && !!balances.xstbl && (
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange("max")}
-                      className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
-                    >
-                      Max
-                    </button>
-                  )}
-                </>
+                <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
+                  <span>Balance: </span>
+                  <span>{!!balances.xstbl ? balances.xstbl : "0"} xSTBL</span>
+                </div>
               ) : (
-                <>
-                  {!!$connected && !!balances.stakedXSTBL && (
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange("max")}
-                      className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
-                    >
-                      Max
-                    </button>
-                  )}
-                </>
+                <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
+                  <span>Balance: </span>
+                  <span>
+                    {!!balances.stakedXSTBL ? balances.stakedXSTBL : "0"} xSTBL
+                  </span>
+                </div>
               )}
             </label>
-            {stakeType === "Stake" ? (
-              <div
-                className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                  $connected ? "" : "opacity-0"
-                }`}
-              >
-                <span>Balance: </span>
-                <span>{!!balances.xstbl ? balances.xstbl : "0"} xSTBL</span>
-              </div>
-            ) : (
-              <div
-                className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                  $connected ? "" : "opacity-0"
-                }`}
-              >
-                <span>Balance: </span>
-                <span>
-                  {!!balances.stakedXSTBL ? balances.stakedXSTBL : "0"} xSTBL
-                </span>
-              </div>
-            )}
           </div>
 
           <ActionButton

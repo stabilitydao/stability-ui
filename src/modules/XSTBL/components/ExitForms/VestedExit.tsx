@@ -6,13 +6,13 @@ import { writeContract } from "@wagmi/core";
 
 import { useStore } from "@nanostores/react";
 
-import { ActionButton, VestingTimeline, Timer } from "../../ui";
+import { ActionButton, ArrowIcon } from "@ui";
 
-import { getTransactionReceipt } from "@utils";
+import { VestingTimeline, Timer } from "../../ui";
+
+import { getTransactionReceipt, formatNumber, cn } from "@utils";
 
 import { sonicClient, ERC20ABI, wagmiConfig, IXSTBLABI } from "@web3";
-
-import { formatNumber } from "@utils";
 
 import { account, connected, lastTx } from "@store";
 
@@ -29,6 +29,7 @@ const VestedExit: React.FC = () => {
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   const [timelineValue, setTimelineValue] = useState(0);
+  const [activeTimeline, setActiveTimeline] = useState<boolean>(false);
 
   const [balance, setBalance] = useState("0");
 
@@ -241,42 +242,60 @@ const VestedExit: React.FC = () => {
   }, [$account, $lastTx]);
 
   return (
-    <div className="bg-accent-950 p-5 rounded-2xl flex flex-col gap-3 justify-between lg:w-[70%]">
+    <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col gap-6 lg:w-[70%]">
       <div className="flex flex-col gap-3">
-        <div className="flex items-center font-semibold relative text-[26px]">
-          <p
-            className={`w-1/2 md:w-auto whitespace-nowrap z-20 text-center px-4 pb-4 border-b-[1.5px] border-transparent ${vestType === "vestedExit" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"} ${!!vestData.length ? "cursor-pointer" : ""}`}
-            onClick={() => vestedTypeHandler("vestedExit")}
-          >
-            Vested Exit
-          </p>
-          {!!vestData.length && (
+        {!!vestData.length ? (
+          <div className="flex items-center font-semibold relative text-[16px] leading-6 w-full bg-[#18191C] border border-[#232429] rounded-lg">
             <p
-              className={`w-1/2 md:w-auto whitespace-nowrap cursor-pointer z-20 text-center px-4 pb-4 border-b-[1.5px]  border-transparent ${vestType === "exitVest" ? "text-neutral-50 !border-accent-500" : "text-neutral-500 hover:border-accent-800"}`}
-              onClick={() => vestedTypeHandler("exitVest")}
+              className={cn(
+                "w-1/2 whitespace-nowrap z-20 text-center px-4 py-3 rounded-lg",
+                vestType === "vestedExit"
+                  ? "bg-[#2C2E33] border border-[#2C2E33]"
+                  : "text-[#6A6B6F]",
+                !!vestData.length && "cursor-pointer"
+              )}
+              onClick={() => vestedTypeHandler("vestedExit")}
             >
-              Exit Vest
+              Vested Exit
             </p>
-          )}
-        </div>
+            {!!vestData.length && (
+              <p
+                className={cn(
+                  "w-1/2 whitespace-nowrap cursor-pointer z-20 text-center px-4 py-3 rounded-lg",
+                  vestType === "exitVest"
+                    ? "bg-[#2C2E33] border border-[#2C2E33]"
+                    : "text-[#6A6B6F]"
+                )}
+                onClick={() => vestedTypeHandler("exitVest")}
+              >
+                Exit Vest
+              </p>
+            )}
+          </div>
+        ) : (
+          <span className="text-[24px] leading-8 font-semibold">
+            Vested Exit
+          </span>
+        )}
 
-        <span className="text-[18px]">
+        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
           Redeem xSTBL over a vesting period. Choose a minimum vest of 15 days
           (1:0.5 ratio) to maximum vest of 6 months (1:1 ratio). You can cancel
           the vest in the first 14 days.
         </span>
       </div>
       <div>
-        {vestType === "vestedExit" && (
-          <div>
-            <label className="relative block h-[60px] w-full">
-              <img
-                src="/STBL_plain.png"
-                alt="STBL"
-                title="STBL"
-                className="absolute top-[27%] left-4 w-8 h-8 text-neutral-500 rounded-full pointer-events-none"
-              />
+        {vestType === "exitVest" && (
+          <VestingTimeline
+            type={vestType}
+            value={timelineValue}
+            activeVest={activeVest}
+          />
+        )}
 
+        {vestType === "vestedExit" && (
+          <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] mb-4">
+            <div className="flex items-center justify-between">
               <input
                 ref={input}
                 name="amount"
@@ -286,46 +305,40 @@ const VestedExit: React.FC = () => {
                 pattern="^[0-9]*[.,]?[0-9]*$"
                 inputMode="decimal"
                 autoComplete="off"
-                className="min-w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-[60px] my-[2px] pl-[60px] pr-3"
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
               />
+              <div
+                className={cn(
+                  "bg-[#151618] border border-[#23252A] rounded-lg px-3 py-1 text-[14px]",
+                  $connected && "cursor-pointer"
+                )}
+                onClick={() => handleInputChange("max")}
+              >
+                MAX
+              </div>
+            </div>
 
-              {!!$connected && !!balance && (
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("max")}
-                  className="absolute top-[27%] right-1 flex items-center px-3 py-1 text-accent-400 text-[16px] font-semibold"
-                >
-                  Max
-                </button>
-              )}
-            </label>
-
-            <div
-              className={`text-[16px] leading-3 text-neutral-500 flex items-center gap-1 my-3 ${
-                $connected ? "" : "opacity-0"
-              }`}
-            >
+            <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
               <span>Balance: </span>
               <span>{!!balance ? balance : "0"} xSTBL</span>
             </div>
-          </div>
+          </label>
         )}
 
-        <VestingTimeline
-          type={vestType}
-          value={timelineValue}
-          activeVest={activeVest}
-        />
-
         {vestType === "exitVest" && (
-          <div className="my-8 flex flex-col relative">
+          <div className="mt-8 mb-6 flex flex-col relative">
+            <span className="text-[#909193] text-[12px] leading-4 font-medium mb-1">
+              Select vest
+            </span>
             <div
               onClick={() => setDropDownSelector((prevState) => !prevState)}
-              className="flex items-center justify-between py-3 px-4 bg-accent-900 rounded-t-2xl border border-accent-500 cursor-pointer"
+              className="flex items-center justify-between py-2 px-3 bg-[#1D1E23] border border-[#35363B] rounded-lg cursor-pointer"
             >
-              <div className="flex items-center gap-3">
-                <img src="/logo.svg" alt="STBL" className="w-5 h-5" />
-                <span>xSTBL Vest #{activeVest.id}</span>
+              <div className="flex items-center gap-2">
+                <img src="/rounded_logo.png" alt="STBL" className="w-5 h-5" />
+                <span className="text-[16px] leading-6 font-medium">
+                  xSTBL Vest #{activeVest.id}
+                </span>
               </div>
 
               <img
@@ -338,7 +351,7 @@ const VestedExit: React.FC = () => {
             </div>
             <div
               ref={dropDownRef}
-              className={`bg-accent-900 mt-2 rounded-2xl w-full z-20 top-[55px] select-none ${
+              className={`bg-[#1C1D1F] border border-[#383B42] mt-3 rounded-lg w-full z-20 top-[55px] select-none p-[6px] ${
                 dropDownSelector ? "absolute transition delay-[50ms]" : "hidden"
               } `}
             >
@@ -346,55 +359,56 @@ const VestedExit: React.FC = () => {
                 {vestData.map((vest, index: number) => (
                   <div
                     key={vest.id}
-                    onClick={() => handleActiveVest(index)}
-                    className={`${!index ? "rounded-t-2xl" : ""} ${index === vestData.length - 1 ? "rounded-b-2xl" : ""} py-[10px] px-4 cursor-pointer w-full flex items-center justify-between gap-2 ${
-                      vest.id === activeVest.id ? "bg-accent-800" : ""
-                    }`}
+                    onClick={() =>
+                      !vest.isFullyExited && handleActiveVest(index)
+                    }
+                    className={cn(
+                      "rounded-lg p-[6px] w-full flex items-center justify-between gap-2",
+                      vest.id === activeVest.id && "bg-[#27292E]",
+                      !vest.isFullyExited && "cursor-pointer"
+                    )}
                     title={`xSTBL Vest #${vest.id}`}
                   >
-                    <div className="flex flex-col items-start">
-                      <span className="text-[16px] overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex flex-col items-start font-medium">
+                      <span className="text-[14px] leading-5 overflow-hidden text-ellipsis whitespace-nowrap">
                         xSTBL Vest #{vest.id}
                       </span>
-                      <span className="text-[14px]">
-                        {vest.isFullyExited
-                          ? "User Exited"
-                          : `Lock amount: ${vest.amount} xSTBL`}
-                      </span>
+                      {vest.isFullyExited ? (
+                        <span className="text-[#97979A] text-[12px] leading-5">
+                          User Exited
+                        </span>
+                      ) : (
+                        <p className="text-[#97979A] text-[12px] leading-5 flex items-center gap-1">
+                          <img src="/icons/lock.svg" alt="lock" />
+                          <span>Lock amount: {vest.amount} xSTBL</span>
+                        </p>
+                      )}
                     </div>
-                    <span className="text-[16px]">{`Expires: ${new Date(vest.end * 1000).toLocaleDateString()}`}</span>
+                    <span className="text-[14px] leading-5 font-medium">{`Expires: ${new Date(vest.end * 1000).toLocaleDateString()}`}</span>
                   </div>
                 ))}
               </div>
             </div>
-            {activeVest.isFullyExited ? (
-              <div className="text-center bg-transparent py-3 px-4 border border-t-0 rounded-b-2xl border-accent-500">
-                Fully Exited
+            <div className="flex flex-col gap-3 mt-3">
+              <div className="flex items-center justify-between text-[16px] leading-5">
+                <span className="text-[#E3E4E7] font-medium">Amount</span>
+                <span className="font-semibold">
+                  {formatNumber(activeVest.amount, "format")} xSTBL
+                </span>
               </div>
-            ) : (
-              <div className="flex flex-col gap-1 bg-transparent py-3 px-4 border border-t-0 rounded-b-2xl border-accent-500">
-                <div className="flex items-center justify-between">
-                  <span className="opacity-70 text-light text-[18px]">
-                    Amount:
-                  </span>
-                  <span>{formatNumber(activeVest.amount, "format")} xSTBL</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="opacity-70 text-light text-[18px]">
-                    Vest end:
-                  </span>
-                  <span>
-                    {new Date(activeVest.end * 1000).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="opacity-70 text-light text-[18px]">
-                    Time left to exit:
-                  </span>
-                  <Timer end={activeVest.end} />
-                </div>
+              <div className="flex items-center justify-between  text-[16px] leading-5">
+                <span className="text-[#E3E4E7] font-medium">Vest end</span>
+                <span className="font-semibold">
+                  {new Date(activeVest.end * 1000).toLocaleDateString()}
+                </span>
               </div>
-            )}
+              <div className="flex items-center justify-between">
+                <span className="text-[#E3E4E7] text-[16px] leading-5 font-medium">
+                  Time left to exit
+                </span>
+                <Timer end={activeVest.end} withText={false} />
+              </div>
+            </div>
           </div>
         )}
 
@@ -404,6 +418,27 @@ const VestedExit: React.FC = () => {
           needConfirm={needConfirm}
           actionFunction={vestFunctionHandler}
         />
+        {vestType === "vestedExit" && (
+          <div className="mt-6 flex flex-col">
+            <div
+              className="flex items-center gap-1 cursor-pointer"
+              onClick={() => setActiveTimeline((prev) => !prev)}
+            >
+              <span className="text-[#97979A] font-semibold text-[16px] leading-6">
+                Timeline
+              </span>
+              <ArrowIcon isActive={false} rotate={activeTimeline ? 180 : 0} />
+            </div>
+
+            {activeTimeline && (
+              <VestingTimeline
+                type={vestType}
+                value={timelineValue}
+                activeVest={activeVest}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -154,14 +154,14 @@ const CHAINS = [
     nativeCurrency: "POL",
     active: true, // main page active networks
   },
-  {
-    name: chains["8453"].name,
-    id: "8453",
-    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
-    explorer: "https://basescan.org/address/",
-    nativeCurrency: "ETH",
-    active: true, // main page active networks
-  },
+  // {
+  //   name: chains["8453"].name,
+  //   id: "8453",
+  //   logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
+  //   explorer: "https://basescan.org/address/",
+  //   nativeCurrency: "ETH",
+  //   active: true, // main page active networks
+  // },
   {
     name: chains["146"].name,
     id: "146",
@@ -248,6 +248,7 @@ const VAULTS_WITH_NAME = {
   "0x86a4a379d9a2a3b3f0e1f8aa477c82f646344458": "Silo (54)",
   "0xa70f074ee09df3c0ab7e9eb0c058941ff65b8efe": "Valmore S",
   "0xf6fc4ea6c1e6dcb68c5ffab82f6c0ad2d4c94df9": "Silo Valmore",
+  "0x8913582701b7c80e883f9e352c1653a16769b173": "xUSD silo",
 };
 
 const META_VAULTS_TYPE = {
@@ -312,9 +313,9 @@ export {
   SILO_POINTS,
   STABILITY_TOKENS,
   PATHS,
-  METAVAULT_TABLE,
-  STABILITY_AAVE_POOLS,
-  STABILITY_STRATEGY_LABELS,
-  VAULTS_WITH_NAME,
   META_VAULTS_TYPE,
+  VAULTS_WITH_NAME,
+  STABILITY_STRATEGY_LABELS,
+  STABILITY_AAVE_POOLS,
+  METAVAULT_TABLE,
 };

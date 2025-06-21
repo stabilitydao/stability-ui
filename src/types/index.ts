@@ -45,7 +45,8 @@ type TAssetData = {
   symbol: string;
   website: string;
   price: number;
-  addresses: number;
+  tags: string[];
+  img: string;
 };
 type TTableStrategy = {
   id: string;
@@ -354,6 +355,13 @@ type TLeaderboard = {
   deposit: number;
   earned: number;
   points?: number;
+  metaVaults?: {
+    [address: string]: {
+      deposit: number;
+      earned: number;
+    };
+  };
+  metaVaultsEarned: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -468,8 +476,14 @@ type TContractInfo = {
   address: TAddress;
   logo: string;
   symbol: string;
-  type: string;
+  type?: string;
   isCopy: boolean;
+};
+
+type TMarketInfo = {
+  logo: string;
+  symbol: string;
+  link: string;
 };
 
 type TUpgradesTable = {
@@ -807,4 +821,5 @@ export type {
   TMetaVault,
   TMetaVaults,
   TEndMetaVaults,
+  TMarketInfo,
 };

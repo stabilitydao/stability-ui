@@ -34,7 +34,6 @@ const Users = (): JSX.Element => {
 
   // const activeContestInfo = contests?.[currentPeriod];
   // const pastContestInfo = contests?.[previousPeriod];
-
   const { currentPeriod, previousPeriod, nextPeriod } =
     findAllValidPeriods(contests);
 
@@ -76,10 +75,18 @@ const Users = (): JSX.Element => {
     if (!!allContests.ACTIVE?.length) {
       //@ts-ignore
       let contestData = allContests[activeContest];
+
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,
+        metaVaultsEarned: data?.metaVaults
+          ? Object.values(data?.metaVaults).reduce(
+              (acc, cur) => (acc += cur.earned),
+              0
+            )
+          : 0,
       }));
+
       setTableData(contestData);
     }
   };
@@ -102,7 +109,7 @@ const Users = (): JSX.Element => {
   }, [activeContest, allContests]);
 
   return (
-    <div className="flex flex-col flex-wrap min-w-full xl:min-w-[1200px] max-w-[1200px] w-full">
+    <div className="flex flex-col flex-wrap min-w-[full]  md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
       <div className="flex items-center justify-between gap-[28px] flex-col xl:flex-row">
         <div className="flex flex-col items-start gap-4">
           <h2 className="page-title__font text-start">
@@ -150,7 +157,7 @@ const Users = (): JSX.Element => {
             </a>
           )}
         </div>
-        <div className="flex items-center gap-4 text-[14px] leading-5 font-semibold">
+        <div className="flex items-center gap-2 md:gap-4 text-[14px] leading-5 font-semibold">
           {TABLE_TYPES.map((type: string) => {
             const isActive = activeContest === type;
             // @ts-ignore
@@ -213,21 +220,26 @@ const Users = (): JSX.Element => {
                     key={user.address}
                     className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
                   >
-                    <div className="px-4 w-[10%] text-start text-[#97979A]">
+                    <div className="px-2 md:px-4 w-[10%] text-start text-[#97979A] hidden md:block">
                       {user.rank}
                     </div>
                     <div
-                      className={`px-4 w-[30%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
+                      className={`px-2 md:px-4 w-1/4 md:w-[20%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                       style={{ fontFamily: "monospace" }}
                     >
                       {getShortAddress(user.address, 6, 4)}
                     </div>
-                    <div className="px-4 w-[30%] text-end">
+                    <div className="px-2 md:px-4 w-[25%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="px-4 w-[30%] text-end">
+                    <div className="px-2 md:px-4 w-[25%] text-end">
+                      {user.metaVaultsEarned > 0
+                        ? user.metaVaultsEarned.toFixed(2)
+                        : null}
+                    </div>
+                    <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
                       {user.deposit
                         ? (Math.round(user.deposit * 100) / 100).toFixed(2)
                         : ""}

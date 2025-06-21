@@ -1,5 +1,7 @@
 import { memo } from "react";
 
+import { VAULTS_WITH_NAME } from "@constants";
+
 import type { TVault } from "@types";
 
 interface IProps {
@@ -13,7 +15,7 @@ const VaultBar: React.FC<IProps> = memo(({ vault }) => {
         data-testid="vaultSymbol"
         className="text-[40px] leading-[48px] font-semibold"
       >
-        {vault.name}
+        {VAULTS_WITH_NAME[vault.address] || vault.name}
       </h1>
       {!!vault?.risk?.isRektStrategy && (
         <div className="text-[12px] lg:text-[14px] border border-[#b75457] text-[#f2aeae] bg-[#3f1f24] rounded-md">

@@ -16,11 +16,11 @@ interface IProps {
     gemsAPR: string;
   };
   vault: TVault;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setModalState?: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  const POINTS = { sonic: vault.sonicActivePoints, rings: vault.ringsPoints };
+const Grid: React.FC<IProps> = ({ APRs, vault }) => {
+  // const POINTS = { sonic: vault.sonicActivePoints, rings: vault.ringsPoints };
 
   return (
     <a
@@ -58,19 +58,19 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           <div className="flex items-center justify-between">
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
-              onClick={(e) => {
-                // e.stopPropagation();
-                // e.preventDefault();
-                // setModalState({
-                //   earningData: vault.earningData,
-                //   daily: vault.daily,
-                //   lastHardWork: vault.lastHardWork,
-                //   symbol: vault?.risk?.symbol as string,
-                //   state: true,
-                //   pool: vault?.pool,
-                // });
-              }}
-              // className="cursor-help"
+            // onClick={(e) => {
+            // e.stopPropagation();
+            // e.preventDefault();
+            // setModalState({
+            //   earningData: vault.earningData,
+            //   daily: vault.daily,
+            //   lastHardWork: vault.lastHardWork,
+            //   symbol: vault?.risk?.symbol as string,
+            //   state: true,
+            //   pool: vault?.pool,
+            // });
+            // }}
+            // className="cursor-help"
             >
               <div
                 className={`whitespace-nowrap w-full text-end flex items-center justify-end ${

@@ -67,7 +67,7 @@ const Navbar = (): JSX.Element => {
   const TVL = useMemo(
     () =>
       $apiData?.total?.tvl
-        ? formatNumber($apiData?.total.tvl || 0, "withSpaces")
+        ? formatNumber($apiData?.total.tvl || 0, "abbreviate")
         : "0",
     [$apiData]
   );
@@ -86,8 +86,8 @@ const Navbar = (): JSX.Element => {
         )}
       </AnimatePresence>
 
-      {($isNavbar || window.innerWidth >= 1440) && (
-        <div className={cn("navbar", !$isNavbar && "hidden xxl:block")}>
+      {($isNavbar || window.innerWidth >= 1560) && (
+        <div className={cn("navbar", !$isNavbar && "hidden xl3:block")}>
           <div className="pt-5 pb-[30px] px-4 flex flex-col justify-between gap-[80px] h-full">
             <div>
               <a href="/">
@@ -131,16 +131,16 @@ const Navbar = (): JSX.Element => {
               {TVL ? (
                 <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
                   <span className="text-[#97979A]">AUM</span>
-                  <span className="text-white">${TVL}</span>
+                  <span className="text-white">{TVL}</span>
                 </div>
               ) : null}
               <div className="text-[#97979A] flex flex-col">
-                <a href="#" className="px-4 py-2">
+                {/* <a href="#" className="px-4 py-2">
                   Privacy Policy
                 </a>
                 <a href="#" className="px-4 py-2">
                   Terms of Use
-                </a>
+                </a> */}
                 <div className="flex items-center gap-4 p-4 pb-0">
                   <a href="https://x.com/stabilitydao" target="_blank">
                     <img src="/socials/x.png" alt="Stability X" />

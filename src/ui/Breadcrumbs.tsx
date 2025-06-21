@@ -85,8 +85,9 @@ const Breadcrumbs = (): JSX.Element => {
       const [, , metaVaultAddress] = currentPath.split("/");
 
       const symbol =
-        $metaVaults["146"].find(({ address }) => address === metaVaultAddress)
-          ?.name || "Meta Vault";
+        $metaVaults["146"].find(
+          ({ address }) => address.toLowerCase() === metaVaultAddress
+        )?.name || "Meta Vault";
 
       add("Meta Vaults", "metavaults");
       add(symbol);

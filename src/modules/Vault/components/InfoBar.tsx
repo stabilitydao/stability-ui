@@ -12,14 +12,14 @@ import {
   TimeDifferenceIndicator,
   VaultType,
   FieldValue,
-  BalanceVisibilityToggler,
+  // BalanceVisibilityToggler,
 } from "@ui";
 
 import { aprFilter, visible } from "@store";
 
 import { formatFromBigInt, formatNumber } from "@utils";
 
-import { CHAINS } from "@constants";
+import { CHAINS, STABILITY_AAVE_POOLS } from "@constants";
 
 import type { TAPRPeriod, TVault } from "@types";
 import { seeds } from "@stabilitydao/stability";
@@ -95,6 +95,14 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
     return vault.strategyInfo.il?.title as string;
   }, [vault]);
 
+  const isStabilityLogo = useMemo(
+    () =>
+      STABILITY_AAVE_POOLS.some((addr) =>
+        vault.strategySpecific.includes(addr)
+      ),
+    [vault]
+  );
+
   return (
     <div className="w-full rounded-lg bg-[#101012] border border-[#23252A]">
       <div
@@ -112,7 +120,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
 
         <a
           href={`/chains/${vaultChain?.id}`}
-          className="flex items-center cursor-pointer gap-3"
+          className="hidden md:flex items-center cursor-pointer gap-3"
         >
           <img
             className="w-10 h-10 rounded-full"
@@ -170,15 +178,24 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                         className="flex items-start gap-0.5"
                         data-testid="infoBarStrategyesLogo"
                       >
-                        {vault?.strategyInfo?.protocols.map(
-                          (protocol, index) => (
-                            <img
-                              key={protocol?.name + index}
-                              className="w-6 h-6 rounded-full"
-                              src={protocol?.logoSrc}
-                              alt={protocol?.name}
-                              title={protocol?.name}
-                            />
+                        {isStabilityLogo ? (
+                          <img
+                            className="w-6 h-6 rounded-full"
+                            src="/logo.svg"
+                            alt="Stability"
+                            title="Stability"
+                          />
+                        ) : (
+                          vault?.strategyInfo?.protocols.map(
+                            (protocol, index) => (
+                              <img
+                                key={protocol?.name + index}
+                                className="w-6 h-6 rounded-full"
+                                src={protocol?.logoSrc}
+                                alt={protocol?.name}
+                                title={protocol?.name}
+                              />
+                            )
                           )
                         )}
                       </div>
@@ -296,7 +313,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
           <div className="flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col gap-1">
             <div className="flex items-center gap-1 text-[14px] leading-5 text-[#97979A]">
               <span>Deposited</span>
-              <BalanceVisibilityToggler />
+              {/* <BalanceVisibilityToggler /> */}
             </div>
             <div className="flex items-center text-[20px] leading-6 font-semibold whitespace-nowrap">
               <div className="flex items-center">

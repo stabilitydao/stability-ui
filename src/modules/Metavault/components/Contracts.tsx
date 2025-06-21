@@ -2,17 +2,19 @@ import { memo, useState, useEffect } from "react";
 
 import { getAddress } from "viem";
 
-import { HeadingText, ArrowIcon } from "@ui";
+import { ArrowIcon } from "@ui";
 
-import { cn } from "@utils";
+import { cn, getTokenData } from "@utils";
 
-import type { TAddress, TMetaVault, TContractInfo } from "@types";
+import { deployments } from "@stabilitydao/stability";
+
+import type { TAddress, TContractInfo } from "@types";
 
 interface IProps {
-  metaVault: TMetaVault;
+  metavault: TAddress;
 }
 
-const Contracts: React.FC<IProps> = memo(({ metaVault }) => {
+const Contracts: React.FC<IProps> = memo(({ metavault }) => {
   const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>>();
 
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
@@ -48,52 +50,40 @@ const Contracts: React.FC<IProps> = memo(({ metaVault }) => {
   };
 
   useEffect(() => {
-    if (metaVault?.address) {
-      const unwrapData =
-        metaVault.symbol === "metaUSDC"
-          ? {
-              address: "0xeeeeeee6d95e55a468d32feb5d6648754d10a967",
-              symbol: "wmetaUSDC",
-            }
-          : metaVault.symbol === "metascUSD"
-            ? {
-                address: "0xcccccccca9fc69a2b32408730011edb3205a93a1",
-                symbol: "wmetascUSD",
-              }
-            : metaVault.symbol === "metaUSD"
-              ? {
-                  address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
-                  symbol: "wmetaUSD",
-                }
-              : metaVault.symbol === "metawS"
-                ? {
-                    address: "0xffffffff2fcbefae12f1372c56edc769bd411685",
-                    symbol: "wmetawS",
-                  }
-                : metaVault.symbol === "metaS"
-                  ? {
-                      address: "0xbbbbbbbbbd0ae69510ce374a86749f8276647b19",
-                      symbol: "wmetaS",
-                    }
-                  : {};
+    if (!metavault) return;
+
+    try {
+      const metaVault = deployments?.["146"]?.metaVaults?.find(
+        (mv) => mv?.address?.toLowerCase() === metavault?.toLowerCase()
+      );
+
+      if (!metaVault?.wrapper || !metaVault?.symbol || !metaVault?.address)
+        return;
+
+      const wrappedMetaVault = getTokenData(metaVault.wrapper);
+
+      if (!wrappedMetaVault?.symbol || !wrappedMetaVault?.address) return;
 
       const contractsInfo = [
         {
           logo: `/features/${metaVault.symbol}.png`,
-          symbol: metaVault?.symbol,
-          address: metaVault?.address,
+          symbol: metaVault.symbol,
+          address: metaVault.address,
           isCopy: false,
         },
         {
-          logo: `/features/${unwrapData.symbol}.png`,
-          symbol: unwrapData.symbol,
-          address: unwrapData.address,
+          logo: `/features/${wrappedMetaVault.symbol}.png`,
+          symbol: wrappedMetaVault.symbol,
+          address: wrappedMetaVault.address,
           isCopy: false,
         },
       ];
+
       setContracts(contractsInfo);
+    } catch (error) {
+      console.error("Failed to set metavault contracts:", error);
     }
-  }, [metaVault]);
+  }, [metavault]);
 
   return (
     <div className="w-full">

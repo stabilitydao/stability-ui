@@ -1,89 +1,106 @@
-import { useState, useEffect, memo } from "react";
-
-import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
-import { useStore } from "@nanostores/react";
+import { memo } from "react";
+// import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
+// import { useStore } from "@nanostores/react";
 
 import { HeadingText, RiskIndicator, StrategyBadge } from "@ui";
+//platformsData,
+// import { connected, apiData } from "@store";
 
-import { connected, platformsData, apiData } from "@store";
+//import { FactoryABI, wagmiConfig } from "@web3";
 
-import { FactoryABI, wagmiConfig } from "@web3";
+// import { STABILITY_AAVE_POOLS, STABILITY_STRATEGY_LABELS } from "@constants";
 
-import type { TAddress, TPlatformData, TVault } from "@types";
-
+import type { TVault } from "@types";
+//TAddress, TPlatformData,
 interface IProps {
   network: string;
   vault: TVault;
 }
 
 const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
-  const $connected = useStore(connected);
-  const $platformsData: TPlatformData = useStore(platformsData);
-  const $apiData = useStore(apiData);
+  console.log(network);
+  // const $connected = useStore(connected);
+  // const $platformsData: TPlatformData = useStore(platformsData);
+  // const $apiData = useStore(apiData);
 
-  const vaultTypes = $apiData.platforms[network].versions.vaultType;
-  const strategyTypes = $apiData.platforms[network].versions.strategy;
+  // const vaultTypes = $apiData.platforms[network].versions.vaultType;
+  // const strategyTypes = $apiData.platforms[network].versions.strategy;
 
-  const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
-  const [needStrategyUpgrade, setNeedStrategyUpgrade] =
-    useState<boolean>(false);
+  // const [needVaultUpgrade, setNeedVaultUpgrade] = useState<boolean>(false);
+  // const [needStrategyUpgrade, setNeedStrategyUpgrade] =
+  //   useState<boolean>(false);
 
-  const upgradeVault = async () => {
-    try {
-      const upgradeVaultProxy = await writeContract(wagmiConfig, {
-        address: $platformsData?.[network]?.factory,
-        abi: FactoryABI,
-        functionName: "upgradeVaultProxy",
-        args: [vault?.address as TAddress],
-      });
+  // const upgradeVault = async () => {
+  //   try {
+  //     const upgradeVaultProxy = await writeContract(wagmiConfig, {
+  //       address: $platformsData?.[network]?.factory,
+  //       abi: FactoryABI,
+  //       functionName: "upgradeVaultProxy",
+  //       args: [vault?.address as TAddress],
+  //     });
 
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 5,
-        hash: upgradeVaultProxy,
-      });
+  //     const transaction = await waitForTransactionReceipt(wagmiConfig, {
+  //       confirmations: 5,
+  //       hash: upgradeVaultProxy,
+  //     });
 
-      if (transaction.status === "success") {
-        setNeedVaultUpgrade(false);
-      }
-    } catch (err) {
-      console.error("UPGRADE VAULT PROXY ERROR:", err);
-    }
-  };
-  const upgradeStrategy = async () => {
-    try {
-      const upgradeStrategyProxy = await writeContract(wagmiConfig, {
-        address: $platformsData?.[network]?.factory,
-        abi: FactoryABI,
-        functionName: "upgradeStrategyProxy",
-        args: [vault.strategyAddress as TAddress],
-      });
+  //     if (transaction.status === "success") {
+  //       setNeedVaultUpgrade(false);
+  //     }
+  //   } catch (err) {
+  //     console.error("UPGRADE VAULT PROXY ERROR:", err);
+  //   }
+  // };
+  // const upgradeStrategy = async () => {
+  //   try {
+  //     const upgradeStrategyProxy = await writeContract(wagmiConfig, {
+  //       address: $platformsData?.[network]?.factory,
+  //       abi: FactoryABI,
+  //       functionName: "upgradeStrategyProxy",
+  //       args: [vault.strategyAddress as TAddress],
+  //     });
 
-      const transaction = await waitForTransactionReceipt(wagmiConfig, {
-        confirmations: 5,
-        hash: upgradeStrategyProxy,
-      });
-      if (transaction.status === "success") {
-        setNeedStrategyUpgrade(false);
-      }
-    } catch (err) {
-      console.error("UPGRADE STRATEGY PROXY ERROR:", err);
-    }
-  };
+  //     const transaction = await waitForTransactionReceipt(wagmiConfig, {
+  //       confirmations: 5,
+  //       hash: upgradeStrategyProxy,
+  //     });
+  //     if (transaction.status === "success") {
+  //       setNeedStrategyUpgrade(false);
+  //     }
+  //   } catch (err) {
+  //     console.error("UPGRADE STRATEGY PROXY ERROR:", err);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (!$connected || !vault || !vaultTypes || !strategyTypes) return;
+  // useEffect(() => {
+  //   if (!$connected || !vault || !vaultTypes || !strategyTypes) return;
 
-    const vaultTypesKey = vault?.type;
-    const strategyTypesKey = vault.strategy;
+  //   const vaultTypesKey = vault?.type;
+  //   const strategyTypesKey = vault.strategy;
 
-    if (vaultTypes[vaultTypesKey] !== vault.version) {
-      setNeedVaultUpgrade(true);
-    }
+  //   if (vaultTypes[vaultTypesKey] !== vault.version) {
+  //     setNeedVaultUpgrade(true);
+  //   }
 
-    if (strategyTypes[strategyTypesKey] !== vault.strategyVersion) {
-      setNeedStrategyUpgrade(true);
-    }
-  }, [vault, vaultTypes, strategyTypes]);
+  //   if (strategyTypes[strategyTypesKey] !== vault.strategyVersion) {
+  //     setNeedStrategyUpgrade(true);
+  //   }
+  // }, [vault, vaultTypes, strategyTypes]);
+
+  // const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
+  //   vault.strategySpecific.includes(addr)
+  // );
+
+  // const isStabilityLogo = !!matchedAddress;
+
+  // const strategySpecific = matchedAddress
+  //   ? STABILITY_STRATEGY_LABELS[matchedAddress]
+  //   : vault.strategySpecific.includes("0xb38d..97b8")
+  //     ? "MEV Capital"
+  //     : vault.strategySpecific.includes("0xeeb1..cb6c")
+  //       ? "Re7 Labs"
+  //       : vault.strategySpecific;
+
   return (
     <div>
       <HeadingText text="Strategy" scale={2} styles="text-left mb-4" />
@@ -181,7 +198,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
           </div>
         )}
 
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* <div className="flex items-center gap-3 flex-wrap">
           {needVaultUpgrade && (
             <button
               onClick={upgradeVault}
@@ -198,7 +215,7 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
               Upgrade to {strategyTypes[vault.strategy]}
             </button>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { assets } from "@stabilitydao/stability";
+import { assets, getAsset } from "@stabilitydao/stability";
 
 import { sortTable, formatNumber } from "@utils";
 
@@ -50,20 +50,32 @@ const Assets = (): JSX.Element => {
         return { ...acc, ...cur };
       }, {});
 
-      const assetsData = assets.map(({ symbol, website, addresses }) => {
-        const assetAddress = tokenlist.tokens
-          .find((token) => token.symbol === symbol)
-          ?.address?.toLowerCase();
+      // sonic tokenlist
+      // todo get chainId from web3 state
 
-        const assetPrice = allPrices[assetAddress as string]?.price || "0";
+      const tokenlistItems = tokenlist.tokens.filter(
+        (token) => token.chainId.toString() == "146"
+      );
 
+      const assetsData: TAssetData[] = tokenlistItems.map((item) => {
+        const assetPrice =
+          allPrices[item.address.toLowerCase() as string]?.price || "0";
+        const asset = getAsset(
+          item.chainId.toString(),
+          item.address as `0x${string}`
+        );
         return {
-          symbol,
-          website,
+          symbol: item.symbol,
+          website: asset?.website || "",
           price: Number(assetPrice),
-          addresses: Object.keys(addresses).length,
+          // @ts-ignore
+          tags: (item.tags as string[])?.map(
+            (tag) => tokenlist.tags[tag]?.name
+          ),
+          img: item.logoURI,
         };
       });
+
       setTableData(assetsData);
       setFilteredTableData(assetsData);
     }
@@ -79,7 +91,13 @@ const Assets = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <HeadingText text="Assets" scale={1} />
+      <HeadingText text="Sonic Assets" scale={1} styles="mb-0" />
+
+      <div className="mb-4 flex justify-center">
+        {tokenlist.name}{" "}
+        {`${tokenlist.version.major}.${tokenlist.version.minor}.${tokenlist.version.patch}`}{" "}
+        from {new Date(Date.parse(tokenlist.timestamp)).toLocaleDateString()}
+      </div>
 
       <div className="flex items-center justify-start mb-3 select-none font-manrope text-[14px] font-semibold">
         <label className="inline-flex items-center cursor-pointer bg-accent-900 h-10 rounded-2xl">
@@ -112,12 +130,43 @@ const Assets = (): JSX.Element => {
         </thead>
         <tbody className="text-[14px]">
           {!!filteredTableData.length &&
-            filteredTableData.map(({ addresses, symbol, price, website }) => (
+            filteredTableData.map(({ symbol, price, website, tags, img }) => (
               <tr className="h-[48px] hover:bg-accent-950" key={symbol}>
-                <td className="px-4 py-3">{symbol}</td>
+                <td className="pl-4 py-3 w-[260px]">
+                  <div className="flex">
+                    <img
+                      src={img}
+                      className="w-[24px] h-[24px] rounded-full mr-2"
+                      alt={symbol}
+                    />
+                    <span className="font-bold">{symbol}</span>
+                  </div>
+                </td>
+                <td
+                  className="px-4 py-3 text-end min-w-[60px]"
+                  style={
+                    price == 0
+                      ? {
+                          color: "red",
+                        }
+                      : {}
+                  }
+                >
+                  <span className="mr-[10px]">
+                    $
+                    {formatNumber(price, price < 1 ? "smallNumbers" : "format")}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  {tags?.map((tag) => (
+                    <div className="inline-flex text-[12px] text-[#eeeeee] font-bold px-3 py-[1px] bg-[#26005f] rounded-2xl mx-2">
+                      {tag}
+                    </div>
+                  ))}
+                </td>
                 <td className="px-4 py-3 ">
                   <a
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-start"
                     href={website}
                     target="_blank"
                     title="Go to asset website"
@@ -125,14 +174,12 @@ const Assets = (): JSX.Element => {
                     <img
                       src="/icons/web.svg"
                       alt="Website"
-                      className="w-[20px]"
+                      className="w-[20px] mr-1"
                     />
+                    {website.replace(/^https:\/\//, "").replace(/\/$/, "") ||
+                      ""}
                   </a>
                 </td>
-                <td className="px-4 py-3 text-end">
-                  ${formatNumber(price, price < 1 ? "smallNumbers" : "format")}
-                </td>
-                <td className="px-4 py-3 text-end">{addresses}</td>
               </tr>
             ))}
         </tbody>

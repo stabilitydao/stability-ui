@@ -48,7 +48,6 @@ import {
   frontendContracts,
   web3clients,
   IMetaVaultABI,
-  sGEM1,
 } from "@web3";
 
 import {
@@ -85,7 +84,6 @@ import type {
   TPlatformData,
   TBalances,
   TTokens,
-  TMetaVaults,
   TMetaVault,
   // TAsset,
 } from "@types";
@@ -187,10 +185,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const strategyAssets: string[] =
           vault?.assets?.map((asset: string) => asset.toLowerCase()) || [];
 
+        let strategySpecific: string = vault.strategySpecific || "";
+
         const strategyInfo = getStrategyInfo(
           vault.strategyId,
           vault.strategyShortId as StrategyShortId,
-          vault.strategySpecific as string,
+          strategySpecific as string,
           vault.assets as TAddress[]
         );
 
@@ -556,7 +556,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
         /////***** YEARN PROTOCOLS *****/////
         let yearnProtocols: TYearnProtocol[] = [];
-        let strategySpecific: string = "";
 
         if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
           YEARN_PROTOCOLS.map((protocol: string) => {
@@ -918,28 +917,35 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           );
 
           if (APIMetaVaultsData.length) {
-            let sGEM1Price = 0;
-            const sonicPrices = stabilityAPIData.assetPrices["146"];
-
-            if (sonicPrices) {
-              sGEM1Price = Number(
-                sonicPrices[sGEM1?.toLowerCase() as keyof typeof sonicPrices]
-                  ?.price
-              );
-            }
-
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
+              let merklAPR = 0;
+
+              let totalAPR = 0;
+
               let gemsAPR = 0;
 
-              let totalAPR = "0";
+              let sonicPoints = 0;
 
               if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
-                const gemsInUSD = 750000 * sGEM1Price;
-                const TVL = Number(metaVault.tvl);
+                const multiplier =
+                  stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
+                    metaVault.address
+                  ] || 0;
 
-                gemsAPR = (gemsInUSD / TVL) * (365 / 14) * 100;
-                totalAPR = Number(metaVault.APR) + Number(gemsAPR);
+                if (multiplier) {
+                  gemsAPR = Number(metaVault.APR) * Number(multiplier);
+                }
+
+                merklAPR = Number(metaVault.merklAPR);
+
+                if (metaVault.symbol === "metaUSD") {
+                  sonicPoints = 12;
+                } else {
+                  sonicPoints = 8;
+                }
               }
+
+              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
 
               return {
                 ...metaVault,
@@ -950,7 +956,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
                 ),
                 gemsAPR,
+                merklAPR,
                 totalAPR,
+                sonicPoints,
               };
             });
 
@@ -995,9 +1003,26 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       )
     );
 
+    if (stabilityAPIData.prices) {
+      const formattedPrices = Object.entries(stabilityAPIData.prices).reduce(
+        (acc, [key, value]) => {
+          const isIntegerPrice = ["BTC", "ETH"].includes(key);
+          acc[key] = {
+            ...value,
+            price: isIntegerPrice
+              ? Math.round(parseFloat(value.price)).toString()
+              : value.price,
+          };
+          return acc;
+        },
+        {}
+      );
+
+      marketPrices.set(formattedPrices);
+    }
+
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);
-    marketPrices.set(stabilityAPIData.prices);
     vaultData.set(vaultsData);
     vaults.set(localVaults);
     metaVaults.set(localMetaVaults);

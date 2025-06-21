@@ -248,7 +248,7 @@ const Contests = (): JSX.Element => {
                                       )}
                                       {reward.type === "Gems1" && (
                                         <img
-                                          src="/icons/sonic_gem_icon.svg"
+                                          src="https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/sGEM1.png"
                                           className="w-[24px] h-[24px]"
                                           alt="sGEM1"
                                         />

@@ -131,23 +131,24 @@ const ASSETS_TABLE: TTableColumn[] = [
     dataType: "string",
   },
   {
-    name: "Website",
-    keyName: "",
-    sortType: "none",
-    dataType: "",
-    unsortable: true,
-  },
-  {
     name: "Price",
     keyName: "price",
     sortType: "none",
     dataType: "number",
   },
   {
-    name: "Addresses",
-    keyName: "addresses",
+    name: "Tags",
+    keyName: "",
     sortType: "none",
-    dataType: "number",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Website",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
   },
 ];
 const INTEGRATIONS_TABLE: TTableColumn[] = [
@@ -216,6 +217,12 @@ const USERS_TABLE: TTableColumn[] = [
   {
     name: "Earned",
     keyName: "earned",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
+    name: "Earned in Metavaults",
+    keyName: "metaVaultsEarned",
     sortType: "descendentic",
     dataType: "number",
   },

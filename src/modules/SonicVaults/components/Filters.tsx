@@ -269,31 +269,29 @@ const Filters: React.FC<IProps> = memo(
                     )}
                   >
                     <div className="flex flex-col items-start">
-                      {filter.variants?.map(
-                        (variant: TTAbleFiltersVariant, index: number) => (
-                          <div
-                            key={variant.name}
-                            onClick={() =>
+                      {filter.variants?.map((variant: TTAbleFiltersVariant) => (
+                        <div
+                          key={variant.name}
+                          onClick={() =>
+                            activeFiltersHandler(filter, variant.name)
+                          }
+                          className={cn(
+                            "p-[6px] cursor-pointer w-full flex items-center gap-2"
+                          )}
+                          data-testid="strategy"
+                          title={variant.title}
+                        >
+                          <Checkbox
+                            checked={variant.state}
+                            onChange={() =>
                               activeFiltersHandler(filter, variant.name)
                             }
-                            className={cn(
-                              "p-[6px] cursor-pointer w-full flex items-center gap-2"
-                            )}
-                            data-testid="strategy"
-                            title={variant.title}
-                          >
-                            <Checkbox
-                              checked={variant.state}
-                              onChange={() =>
-                                activeFiltersHandler(filter, variant.name)
-                              }
-                            />
-                            <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
-                              {variant.title}
-                            </span>
-                          </div>
-                        )
-                      )}
+                          />
+                          <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+                            {variant.title}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>

@@ -4,7 +4,7 @@ import { formatNumber } from "@utils";
 
 import { connected } from "@store";
 
-import { Skeleton } from "@ui";
+import { TextSkeleton, Skeleton } from "@ui";
 
 import { Timer } from "../../ui";
 
@@ -19,112 +19,44 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
   const $connected = useStore(connected);
 
   return (
-    <div className="bg-accent-950 p-5 rounded-2xl flex justify-center md:justify-between gap-5 flex-col md:flex-row md:h-[300px]">
-      <div className="flex flex-col items-center justify-center STBL md:w-1/2 w-full">
-        <h3 className="text-[30px] font-bold">Pending revenue</h3>
-        <div className="flex items-center justify-between flex-col md:flex-row w-full px-3 h-[220px] md:h-auto">
-          <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
-            <span className="text-[18px] lg:text-[20px] font-bold text-center">
-              xSTBL exit penalties (100%)
-            </span>
-            {isLoaded ? (
-              <span className="text-[28px] lg:text-[40px]">
-                ${data.pendingRebase.toFixed(3)}
-              </span>
-            ) : (
-              <>
-                <div className="hidden md:block">
-                  <Skeleton height={64} width={100} />
-                </div>
-                <div className="mb-1 block md:hidden">
-                  <Skeleton height={44.8} width={100} />
-                </div>
-              </>
-            )}
-
-            {isLoaded ? (
-              <span className="text-[18px] opacity-50">
-                {formatNumber(data.pendingRebaseInSTBL, "format")} xSTBL
-              </span>
-            ) : (
-              <Skeleton height={28.8} width={100} />
-            )}
-          </div>
-          <div className="flex items-center justify-between flex-col md:h-[130px] md:w-1/2">
-            <span className="text-[18px] lg:text-[20px] font-bold text-center">
-              Vault fees (50%)
-            </span>
-            {isLoaded ? (
-              <span className="text-[28px] lg:text-[40px]">
-                ${data.pendingRevenue.toFixed(3)}
-              </span>
-            ) : (
-              <>
-                <div className="hidden md:block">
-                  <Skeleton height={64} width={100} />
-                </div>
-                <div className="mb-1 block md:hidden">
-                  <Skeleton height={44.8} width={100} />
-                </div>
-              </>
-            )}
-
-            {isLoaded ? (
-              <span className="text-[18px] opacity-50">
-                {formatNumber(data.pendingRevenueInSTBL, "format")} xSTBL
-              </span>
-            ) : (
-              <Skeleton height={28.8} width={100} />
-            )}
-          </div>
-        </div>
-
-        {isLoaded ? (
-          <span className="text-[22px] h-[70px]">
-            distributed in <Timer end={data.timestamp} />
+    <div className="bg-[#101012] border border-[#23252A] rounded-lg items-center justify-between flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:w-1/3 w-full gap-3 p-4 lg:p-6 lg:pr-12">
+        <div className="flex justify-between items-start py-1 px-2 rounded-lg bg-[#21202d] border border-[#5e4eba]">
+          <span className="text-[#E3E4E7] text-[18px] leading-6">
+            Total Staked
           </span>
-        ) : (
-          <Skeleton height={70} width={130} />
-        )}
-      </div>
-      <div className="flex flex-col md:w-1/2 w-full gap-5">
-        <div className="flex justify-between items-center p-3 rounded-2xl bg-accent-900 flex-wrap">
-          <span>Total Staked</span>
+
           {isLoaded ? (
-            <span className="text-[18px] lg:text-[20px]">
-              {formatNumber(data.totalStaked, "format")} xSTBL | $
-              {formatNumber(data.totalStakedInUSD, "format")}
-            </span>
+            <div className="flex flex-col items-end font-semibold">
+              <span className="text-[18px] leading-6">
+                {formatNumber(data.totalStaked, "format")} xSTBL
+              </span>
+              <span className="text-[14px] leading-5">
+                ${formatNumber(data.totalStakedInUSD, "format")}
+              </span>
+            </div>
           ) : (
-            <>
-              <div className="hidden md:block">
-                <Skeleton height={32} width={130} />
-              </div>
-              <div className="mb-1 block md:hidden">
-                <Skeleton height={28.8} width={216} />
-              </div>
-            </>
+            <div className="flex flex-col items-end">
+              <TextSkeleton lineHeight={24} width={160} />
+              <TextSkeleton lineHeight={20} width={80} />
+            </div>
           )}
         </div>
-        <div className="flex flex-col justify-between p-3 rounded-2xl bg-accent-900 h-full">
+        <div className="flex flex-col justify-between gap-2 h-full">
           <div className="flex items-center justify-between w-full flex-wrap">
-            <span>Your Stake</span>
+            <span className="text-[18px] leading-6 font-medium text-[#E3E4E7]">
+              Your Stake
+            </span>
             {$connected ? (
               <>
                 {isLoaded ? (
-                  <span className="text-[18px] lg:text-[20px]">
-                    {formatNumber(data.userStaked, "format")} xSTBL | $
-                    {formatNumber(data.userStakedInUSD, "format")}
+                  <span className="text-[18px] leading-6 font-semibold">
+                    {formatNumber(data.userStaked, "format")} xSTBL
                   </span>
                 ) : (
-                  <>
-                    <div className="hidden md:block">
-                      <Skeleton height={32} width={130} />
-                    </div>
-                    <div className="mb-1 block md:hidden">
-                      <Skeleton height={28.8} width={100} />
-                    </div>
-                  </>
+                  <div className="hidden md:block">
+                    <TextSkeleton lineHeight={24} width={120} />
+                  </div>
                 )}
               </>
             ) : (
@@ -132,45 +64,90 @@ const Dashboard: React.FC<IProps> = ({ data, isLoaded }) => {
             )}
           </div>
           <div className="flex items-center justify-between w-full flex-wrap">
-            <span>Total APR</span>
+            <span className="text-[18px] leading-6 font-medium text-[#E3E4E7]">
+              Total APR
+            </span>
             {isLoaded ? (
-              <span className="text-[18px] lg:text-[20px]">
+              <span className="text-[18px] leading-6 font-semibold">
                 {formatNumber(data.APR, "formatAPR")}%
               </span>
             ) : (
-              <>
-                <div className="hidden md:block">
-                  <Skeleton height={32} width={130} />
-                </div>
-                <div className="mb-1 block md:hidden">
-                  <Skeleton height={28.8} width={100} />
-                </div>
-              </>
+              <TextSkeleton lineHeight={24} width={130} />
             )}
           </div>
           <div className="flex items-center justify-between w-full flex-wrap">
-            <span>Your estimated profit</span>
+            <span className="text-[18px] leading-6 font-medium text-[#E3E4E7]">
+              Your estimated profit
+            </span>
 
             {$connected ? (
               <>
                 {isLoaded ? (
-                  <span className="text-[18px] lg:text-[20px]">
-                    {formatNumber(data.estimatedProfit, "format")} xSTBL | $
-                    {formatNumber(data.estimatedProfitInUSD, "format")}
+                  <span className="text-[18px] leading-6 font-semibold">
+                    {formatNumber(data.estimatedProfit, "format")} xSTBL
                   </span>
                 ) : (
-                  <>
-                    <div className="hidden md:block">
-                      <Skeleton height={32} width={130} />
-                    </div>
-                    <div className="mb-1 block md:hidden">
-                      <Skeleton height={28.8} width={130} />
-                    </div>
-                  </>
+                  <TextSkeleton lineHeight={24} width={130} />
                 )}
               </>
             ) : (
               <span>-</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center justify-center gap-4 lg:w-2/3 w-full p-4 lg:p-6 lg:border-l border-l-[#23252A]">
+        <div className="flex items-center justify-between flex-col md:flex-row gap-3 md:gap-0 w-full">
+          <h3 className="text-[24px] leading-8 font-semibold">
+            Pending revenue
+          </h3>
+          {isLoaded ? (
+            <Timer end={data.timestamp} />
+          ) : (
+            <Skeleton height={48} width={130} />
+          )}
+        </div>
+
+        <div className="flex items-center justify-between flex-col md:flex-row gap-6 w-full">
+          <div className="flex items-center justify-between flex-col w-full md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
+            <span className="text-center text-[#97979A] text-[16px] leading-6">
+              xSTBL exit penalties (100%)
+            </span>
+            {isLoaded ? (
+              <span className="text-[24px] leading-8 font-semibold">
+                ${data.pendingRebase.toFixed(3)}
+              </span>
+            ) : (
+              <TextSkeleton lineHeight={32} width={100} />
+            )}
+
+            {isLoaded ? (
+              <span className="text-center text-[#97979A] text-[16px] leading-6">
+                {formatNumber(data.pendingRebaseInSTBL, "format")} xSTBL
+              </span>
+            ) : (
+              <TextSkeleton lineHeight={24} width={100} />
+            )}
+          </div>
+          <div className="flex items-center justify-between flex-col w-full md:w-1/2 bg-[#1D1E23] border border-[#35363B] rounded-lg py-2 px-3">
+            <span className="text-center text-[#97979A] text-[16px] leading-6">
+              Vault fees (50%)
+            </span>
+            {isLoaded ? (
+              <span className="text-[24px] leading-8 font-semibold">
+                ${data.pendingRevenue.toFixed(3)}
+              </span>
+            ) : (
+              <TextSkeleton lineHeight={32} width={100} />
+            )}
+
+            {isLoaded ? (
+              <span className="text-center text-[#97979A] text-[16px] leading-6">
+                {formatNumber(data.pendingRevenueInSTBL, "format")} xSTBL
+              </span>
+            ) : (
+              <TextSkeleton lineHeight={24} width={100} />
             )}
           </div>
         </div>
