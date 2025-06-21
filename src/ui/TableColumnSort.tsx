@@ -72,10 +72,10 @@ const TableColumnSort: React.FC<TProps> = ({
     sort({ table: updatedTable, setTable, tableData, setTableData });
   };
   return (
-    <div
+    <th
       onClick={tabController}
       className={cn(
-        "flex items-center justify-center text-[12px] font-manrope font-semibold px-4 py-2 whitespace-nowrap",
+        "text-[12px] font-manrope font-semibold px-4 py-2 whitespace-nowrap",
         !table[index].unsortable && "cursor-pointer",
         styles[value]
       )}
@@ -104,7 +104,7 @@ const TableColumnSort: React.FC<TProps> = ({
           />
         </svg>
       )}
-    </div>
+    </th>
   );
 };
 
