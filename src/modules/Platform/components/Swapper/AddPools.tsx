@@ -1,7 +1,8 @@
-import { useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useMemo, useState } from "react";
 import { HeadingText } from "@ui";
 import type { TAddress } from "@types";
-import type { Address } from "viem";
+import type { Address, Hash, TransactionReceipt } from "viem";
 
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
@@ -9,11 +10,187 @@ import { wagmiConfig, SwapperABI } from "@web3";
 import { connected, account, publicClient } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WagmiLayout from "@layouts/WagmiLayout";
-// TODO: Make a modal for selecting token and add search in the modal
-// Make sure that the input selected for `tokenIn` and `tokenOut` is not the default `<option value="">Select a token</option>`
-// But I think creating a special modal for selecting `tokenIn` and `tokenOut` should already prevent this
-// Maybe show a modal when Txn is yet to be approved in wallet, when It is yet to be confirmed, when it has been confirmed and is successful
-import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
+import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+const shorten = (addr: string) => `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Helper UI components – no external UI libraries required                */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+type ModalProps = {
+    open: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+};
+/** Generic centre‑screen modal */
+const Modal = ({ open, onClose, children }: ModalProps) =>
+    open ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
+                <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 text-2xl leading-none transition hover:scale-110"
+                >
+                    ×
+                </button>
+                {children}
+            </div>
+        </div>
+    ) : null;
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Token‑selection modal with search                                        */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+const tokenlist = tokenlistAll.tokens.filter((token) => token.chainId === 146);
+
+type TokenSelectorModalProps = {
+    open: boolean;
+    onClose: () => void;
+    onSelect: (address: string, symbol: string) => void;
+};
+
+const TokenSelectorModal = ({
+    open,
+    onClose,
+    onSelect,
+}: TokenSelectorModalProps) => {
+    const [query, setQuery] = useState("");
+
+    const filteredTokens = useMemo(() => {
+        if (!query) return tokenlist;
+        const q = query.toLowerCase().trim();
+        return tokenlist.filter(
+            (t) =>
+                t.symbol.toLowerCase().includes(q) ||
+                (t.name ?? "").toLowerCase().includes(q) ||
+                t.address.toLowerCase().includes(q)
+        );
+    }, [query]);
+
+    return (
+        <Modal open={open} onClose={onClose}>
+            <h2 className="mb-4 text-xl font-semibold text-neutral-50">Select token</h2>
+            <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search symbol, name or address"
+                className="mb-4 w-full rounded-2xl bg-accent-900 p-3 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:bg-accent-800 focus:border-accent-500"
+            />
+            <div className="max-h-80 space-y-1 overflow-y-auto">
+                {filteredTokens.map((tok) => (
+                    <button
+                        key={tok.address}
+                        onClick={() => {
+                            onSelect(tok.address, tok.symbol);
+                            onClose();
+                        }}
+                        className="flex w-full items-center justify-between rounded-xl p-3 text-left transition hover:bg-accent-800"
+                    >
+                        <span className="flex items-center gap-3">
+                            <img
+                                src={tok.logoURI}
+                                alt={tok.symbol}
+                                className="h-6 w-6 rounded-full"
+                            />
+                            <span className="font-medium">{tok.symbol}</span>
+                        </span>
+                        <span className="truncate text-right text-xs text-neutral-400">
+                            {shorten(tok.address)}
+                        </span>
+                    </button>
+                ))}
+                {!filteredTokens.length && (
+                    <p className="text-center text-sm text-neutral-500">No results</p>
+                )}
+            </div>
+        </Modal>
+    );
+};
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Transaction‑status modal                                                 */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
+
+type TxStatusModalProps = {
+    status: TxStatus;
+    hash?: Hash | null;
+    error?: string | null;
+    onClose: () => void;
+};
+
+const TxStatusModal = ({
+    status,
+    hash,
+    error,
+    onClose,
+}: TxStatusModalProps) => {
+    if (status === "idle") return null;
+
+    const content = (() => {
+        switch (status) {
+            case "wallet":
+                return "Please confirm the transaction in your wallet…";
+            case "pending":
+                return (
+                    <>
+                        <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
+                        {hash && (
+                            <a
+                                href={`https://sonicscan.org/tx/${hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent-400 underline"
+                            >
+                                View on explorer
+                            </a>
+                        )}
+                    </>
+                );
+            case "success":
+                return (
+                    <>
+                        <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
+                        {hash && (
+                            <a
+                                href={`https://sonicscan.org/tx/${hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent-400 underline"
+                            >
+                                View on explorer
+                            </a>
+                        )}
+                    </>
+                );
+            case "error":
+                return (
+                    <>
+                        <p className="mb-2 text-red-400">❌ Transaction failed.</p>
+                        {error && <pre className="max-w-full whitespace-pre-wrap break-all text-xs">{error}</pre>}
+                    </>
+                );
+        }
+    })();
+
+    return (
+        <Modal open onClose={onClose}>
+            <div className="space-y-2 text-neutral-50">{content}</div>
+        </Modal>
+    );
+};
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Main component                                                           */
+/* ────────────────────────────────────────────────────────────────────────── */
 
 const AMM_ADAPTERS = [
     { name: "Solidly (Equalizer, SwapX classic)", address: "0xE3374041F173FFCB0026A82C6EEf94409F713Cf9" },
@@ -26,60 +203,72 @@ const AMM_ADAPTERS = [
 ];
 
 const AddPools = (): JSX.Element => {
-    const { open } = useWeb3Modal();
+    /* ───────── stores / wallet ───────── */
+    const { open: openConnect } = useWeb3Modal();
     const $connected = useStore(connected);
     const $publicClient = useStore(publicClient);
     const $account = useStore(account);
 
+    /* ───────── form state ───────── */
     const [poolAddress, setPoolAddress] = useState("");
     const [selectedAdapter, setSelectedAdapter] = useState("");
     const [selectedTokenIn, setSelectedTokenIn] = useState("");
     const [selectedTokenOut, setSelectedTokenOut] = useState("");
+    const [tokenInSymbol, setTokenInSymbol] = useState("Select token");
+    const [tokenOutSymbol, setTokenOutSymbol] = useState("Select token");
     const [manualTokenIn, setManualTokenIn] = useState("");
     const [manualTokenOut, setManualTokenOut] = useState("");
     const [rewrite, setRewrite] = useState(false);
 
-    const [simulationStatus, setSimulationStatus] = useState<"idle" | "loading" | "success" | "fail">("idle");
+    /* ───────── UI / modal state ───────── */
+    const [tokenInModalOpen, setTokenInModalOpen] = useState(false);
+    const [tokenOutModalOpen, setTokenOutModalOpen] = useState(false);
+    const [simulationStatus, setSimulationStatus] = useState<
+        "idle" | "loading" | "success" | "fail"
+    >("idle");
     const [gasEstimate, setGasEstimate] = useState<string | null>(null);
 
+    const [txStatus, setTxStatus] = useState<TxStatus>("idle");
+    const [txHash, setTxHash] = useState<Hash | null>(null);
+    const [txError, setTxError] = useState<string | null>(null);
+
+    /* ───────── derived values ───────── */
     const finalTokenIn = selectedTokenIn || manualTokenIn;
     const finalTokenOut = selectedTokenOut || manualTokenOut;
 
+    /* ───────── helpers ───────── */
+    const resetTxState = () => {
+        setTxStatus("idle");
+        setTxHash(null);
+        setTxError(null);
+    };
+
     const handleSubmit = async () => {
+        resetTxState();
+
         if (!poolAddress || !selectedAdapter || !finalTokenIn || !finalTokenOut) {
             setSimulationStatus("fail");
             return;
         }
 
+        const contractAddress: Address = "0xe52Fcf607A8328106723804De1ef65Da512771Be";
+        const functionName = "addPools";
+        const args = [
+            [
+                {
+                    pool: poolAddress as Address,
+                    ammAdapter: selectedAdapter as Address,
+                    tokenIn: finalTokenIn as Address,
+                    tokenOut: finalTokenOut as Address,
+                },
+            ],
+            rewrite,
+        ] as const;
+
         try {
+            /* ───────── simulate ───────── */
             setSimulationStatus("loading");
-
-            const contractAddress = "0xe52Fcf607A8328106723804De1ef65Da512771Be";
-            const functionName = "addPools";
-
-            const args = [
-                [
-                    {
-                        pool: poolAddress as Address,
-                        ammAdapter: selectedAdapter as Address,
-                        tokenIn: finalTokenIn as Address,
-                        tokenOut: finalTokenOut as Address,
-                    }
-                ],
-                rewrite
-            ];
-
-            // 1. Simulate the contract interaction
             await $publicClient.simulateContract({
-                address: contractAddress,
-                abi: SwapperABI,
-                functionName,
-                args,
-                account: $account as TAddress, // account.get() -> $account
-            });
-
-            // 2. Estimate gas based on simulation request
-            const gasEstimate = await $publicClient.estimateContractGas({
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
@@ -87,154 +276,199 @@ const AddPools = (): JSX.Element => {
                 account: $account as TAddress,
             });
 
-            setGasEstimate(gasEstimate.toString());
-            setSimulationStatus("success");
-
-            // 3. Write transaction
-            const gasLimit = BigInt(Number(gasEstimate) * 1.2); // add 20% buffer
-
-            const txHash = await writeContract(wagmiConfig, {
+            /* ───────── estimate gas ───────── */
+            const est = await $publicClient.estimateContractGas({
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
                 args,
-                gas: gasLimit,
+                account: $account as TAddress,
             });
+            const gasWithBuffer = (est * 12n) / 10n; // +20 %
+            setGasEstimate(est.toString());
+            setSimulationStatus("success");
 
-            console.log("Tx sent: ", txHash);
-        } catch (error) {
-            console.error("Error in handleSubmit:", error);
+            /* ───────── wallet approval ───────── */
+            setTxStatus("wallet");
+
+            /* ───────── send tx ───────── */
+            const hash = await writeContract(wagmiConfig, {
+                address: contractAddress,
+                abi: SwapperABI,
+                functionName,
+                args,
+                gas: gasWithBuffer,
+            });
+            setTxHash(hash);
+            setTxStatus("pending");
+
+            /* ───────── wait for confirmation ───────── */
+            const receipt: TransactionReceipt =
+                await $publicClient.waitForTransactionReceipt({ hash });
+            if (receipt.status === "success") {
+                setTxStatus("success");
+            } else {
+                setTxStatus("error");
+                setTxError("Transaction reverted");
+            }
+        } catch (err: unknown) {
+            console.error(err);
             setSimulationStatus("fail");
+            setTxStatus("error");
+            setTxError(
+                err instanceof Error ? err.message : "Unexpected error. Check console."
+            );
         }
     };
 
+    /* ────────────────────────────────────────────────────────────────────── */
+    /* UI                                                                    */
+    /* ────────────────────────────────────────────────────────────────────── */
+
     return (
         <WagmiLayout>
-            <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
+            {/* Token‑selection modals */}
+            <TokenSelectorModal
+                open={tokenInModalOpen}
+                onClose={() => setTokenInModalOpen(false)}
+                onSelect={(address, symbol) => {
+                    setSelectedTokenIn(address);
+                    setTokenInSymbol(symbol);
+                    setManualTokenIn("");
+                }}
+            />
+            <TokenSelectorModal
+                open={tokenOutModalOpen}
+                onClose={() => setTokenOutModalOpen(false)}
+                onSelect={(address, symbol) => {
+                    setSelectedTokenOut(address);
+                    setTokenOutSymbol(symbol);
+                    setManualTokenOut("");
+                }}
+            />
+            {/* Tx‑status modal */}
+            <TxStatusModal
+                status={txStatus}
+                hash={txHash}
+                error={txError}
+                onClose={resetTxState}
+            />
+
+            {/* Main card */}
+            <div className="w-full max-w-[1200px] xl:min-w-[1200px]">
                 <HeadingText text="Add Pools" scale={1} />
 
-                <div className="w-full max-w-[420px] mx-auto p-6 rounded-2xl bg-accent-950 text-white shadow-xl">
-                    {/* Pool Address */}
+                <div className="mx-auto w-full max-w-[420px] rounded-2xl bg-accent-950 p-6 text-white shadow-xl">
+                    {/* Pool address */}
                     <div className="mt-6">
-                        <label className="block text-sm mb-2">Pool Address:</label>
+                        <label className="mb-2 block text-sm">Pool Address:</label>
                         <input
-                            className="min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
-                            placeholder="0x..."
                             value={poolAddress}
                             onChange={(e) => setPoolAddress(e.target.value)}
+                            placeholder="0x..."
+                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         />
                     </div>
 
-                    {/* AMM Adapter */}
+                    {/* AMM adapter */}
                     <div className="mt-6">
-                        <label className="block text-sm mb-2">AMM Adapter:</label>
+                        <label className="mb-2 block text-sm">AMM Adapter:</label>
                         <select
-                            className="min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
                             value={selectedAdapter}
                             onChange={(e) => setSelectedAdapter(e.target.value)}
+                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-neutral-50 outline-none transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         >
                             <option value="">Select an adapter</option>
-                            {AMM_ADAPTERS.map((adapter) => (
-                                <option key={adapter.address} value={adapter.address}>
-                                    {adapter.name}
+                            {AMM_ADAPTERS.map((a) => (
+                                <option key={a.address} value={a.address}>
+                                    {a.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
-                    {/* Token In */}
+                    {/* Token in */}
                     <div className="mt-6">
-                        <label className="block text-sm mb-2">Token In:</label>
-                        <select
-                            className="min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
-                            value={selectedTokenIn}
-                            onChange={(e) => {
-                                setSelectedTokenIn(e.target.value);
-                                setManualTokenIn("");
-                            }}
+                        <label className="mb-2 block text-sm">Token In:</label>
+                        <button
+                            type="button"
+                            onClick={() => setTokenInModalOpen(true)}
+                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         >
-                            <option value="">Select a token</option>
-                            {tokenlist.tokens.map((token) => (
-                                <option key={token.address} value={token.address}>
-                                    {token.symbol}
-                                </option>
-                            ))}
-                        </select>
+                            {tokenInSymbol}
+                        </button>
                         <input
-                            className="mt-3 min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
-                            placeholder="Or enter TokenIn address"
                             value={manualTokenIn}
                             onChange={(e) => {
                                 setManualTokenIn(e.target.value);
                                 setSelectedTokenIn("");
+                                setTokenInSymbol("Custom address");
                             }}
+                            placeholder="Or enter token address"
+                            className="mt-3 w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         />
                     </div>
 
-                    {/* Token Out */}
+                    {/* Token out */}
                     <div className="mt-6">
-                        <label className="block text-sm mb-2">Token Out:</label>
-                        <select
-                            className="min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
-                            value={selectedTokenOut}
-                            onChange={(e) => {
-                                setSelectedTokenOut(e.target.value);
-                                setManualTokenOut("");
-                            }}
+                        <label className="mb-2 block text-sm">Token Out:</label>
+                        <button
+                            type="button"
+                            onClick={() => setTokenOutModalOpen(true)}
+                            className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-left text-neutral-50 transition-all hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         >
-                            <option value="">Select a token</option>
-                            {tokenlist.tokens.map((token) => (
-                                <option key={token.address} value={token.address}>
-                                    {token.symbol}
-                                </option>
-                            ))}
-                        </select>
+                            {tokenOutSymbol}
+                        </button>
                         <input
-                            className="mt-3 min-w-full p-3 rounded-2xl bg-accent-900 hover:bg-accent-800 outline-none border-[2px] border-accent-800 hover:border-accent-500 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300"
-                            placeholder="Or enter TokenOut address"
                             value={manualTokenOut}
                             onChange={(e) => {
                                 setManualTokenOut(e.target.value);
                                 setSelectedTokenOut("");
+                                setTokenOutSymbol("Custom address");
                             }}
+                            placeholder="Or enter token address"
+                            className="mt-3 w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 p-3 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                         />
                     </div>
 
-                    {/* Rewrite Checkbox */}
-                    <div className="mt-6 flex flex-row items-center gap-2">
+                    {/* Rewrite checkbox */}
+                    <div className="mt-6 flex items-center gap-2">
                         <input
                             type="checkbox"
                             checked={rewrite}
-                            onChange={() => setRewrite(!rewrite)}
+                            onChange={() => setRewrite((p) => !p)}
                         />
                         <label className="text-sm">Rewrite</label>
                     </div>
 
-                    {/* Simulation Feedback */}
+                    {/* Simulation feedback */}
                     <div className="mt-4 text-sm">
-                        {simulationStatus === "loading" && <span>🔄 Simulating transaction...</span>}
+                        {simulationStatus === "loading" && <span>🔄 Simulating transaction…</span>}
                         {simulationStatus === "success" && (
-                            <span className="text-green-400">✅ Simulation successful. Gas: {gasEstimate}</span>
+                            <span className="text-green-400">
+                                ✅ Simulation successful. Gas ≈ {gasEstimate}
+                            </span>
                         )}
                         {simulationStatus === "fail" && (
-                            <span className="text-red-400">❌ Simulation failed. Please check inputs.</span>
+                            <span className="text-red-400">
+                                ❌ Simulation failed. Please check inputs.
+                            </span>
                         )}
                     </div>
 
-                    {/* Add Pool */}
+                    {/* Action button */}
                     {$connected ? (
                         <button
-                            type="button"
-                            className="w-full bg-accent-500 transition text-neutral-500 hover:text-neutral-50 text-[20px] font-semibold py-3 rounded-2xl"
                             onClick={handleSubmit}
+                            className="mt-6 w-full rounded-2xl bg-accent-500 py-3 text-[20px] font-semibold text-neutral-50 transition hover:text-neutral-50 disabled:opacity-40"
+                            disabled={simulationStatus === "loading" || txStatus === "wallet"}
                         >
                             Add Pool
                         </button>
                     ) : (
                         <button
-                            type="button"
-                            className="w-full flex items-center text-[20px] bg-accent-500 text-neutral-50 font-semibold justify-center py-3 rounded-2xl h-[50px]"
-                            onClick={() => open()}
+                            onClick={() => openConnect()}
+                            className="mt-6 flex h-[50px] w-full items-center justify-center rounded-2xl bg-accent-500 py-3 text-[20px] font-semibold text-neutral-50"
                         >
                             Connect Wallet
                         </button>
