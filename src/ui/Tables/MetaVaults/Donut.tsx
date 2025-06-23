@@ -73,14 +73,27 @@ const Donut: React.FC<IProps> = ({ vaults, activeVault, setActiveVault }) => {
       </PieChart>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center pointer-events-none">
         <img
-          src={activeVault?.img}
-          alt={activeVault?.symbol}
+          src={
+            activeVault?.img ||
+            (activeVault.name === "Aave V3"
+              ? "/logo_dark.png"
+              : activeVault.logoSrc)
+          }
+          alt={
+            activeVault?.symbol ||
+            (activeVault.name === "Aave V3"
+              ? "/logo_dark.png"
+              : activeVault.name)
+          }
           className="w-6 h-6 rounded-full mb-1"
         />
         <span className="text-xl font-bold">
           {activeVault?.value?.toFixed(2)}%
         </span>
-        <span className="text-sm leading-tight">{activeVault?.symbol}</span>
+        <span className="text-sm leading-tight">
+          {activeVault?.symbol ||
+            (activeVault?.name === "Aave V3" ? "Stability" : activeVault?.name)}
+        </span>
       </div>
     </div>
   );

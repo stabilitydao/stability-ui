@@ -15,11 +15,16 @@ import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
-import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
+import {
+  METAVAULT_TABLE,
+  PROTOCOLS,
+  PAGINATION_VAULTS,
+  PROTOCOLS_TABLE,
+} from "@constants";
 
 import { deployments } from "@stabilitydao/stability";
 
-import { DisplayTypes, MetaVaultTableTypes } from "@types";
+import { MetaVaultTableTypes } from "@types";
 
 import type {
   TAddress,
@@ -42,6 +47,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
+  const [protocolsData, setProtocolsData] = useState([]);
+  const [filteredProtocolsData, setFilteredProtocolsData] = useState([]);
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
   const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
@@ -65,33 +72,72 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
-  const tableHandler = (table: TTableColumn[] = tableStates) => {
-    if (!$vaults) return;
-
-    let sortedVaults = localVaults;
-
-    table.forEach((state: TTableColumn) => {
-      if (state.sortType !== "none") {
-        sortedVaults = [...sortedVaults].sort((a, b) =>
-          dataSorter(
-            String(a[state.keyName as keyof TVault]),
-            String(b[state.keyName as keyof TVault]),
-            state.dataType,
-            state.sortType
-          )
-        );
-      }
-    });
-
-    // // pagination upd
-    if (currentTab != 1) {
-      const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
-      if (disponibleTabs < currentTab) {
-        setCurrentTab(1);
-      }
+  const changeTable = (type: MetaVaultTableTypes) => {
+    if (type === MetaVaultTableTypes.Destinations) {
+      setTableStates(METAVAULT_TABLE);
+    } else if (type === MetaVaultTableTypes.Protocols) {
+      setTableStates(PROTOCOLS_TABLE);
     }
 
-    setFilteredVaults(sortedVaults);
+    setCurrentTab(1);
+    setTableType(type);
+  };
+
+  const tableHandler = (table: TTableColumn[] = tableStates) => {
+    if (tableType === MetaVaultTableTypes.Destinations) {
+      if (!$vaults) return;
+
+      let sortedVaults = localVaults;
+
+      table.forEach((state: TTableColumn) => {
+        if (state.sortType !== "none") {
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            dataSorter(
+              String(a[state.keyName as keyof TVault]),
+              String(b[state.keyName as keyof TVault]),
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
+      });
+
+      // // pagination upd
+      if (currentTab != 1) {
+        const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
+        if (disponibleTabs < currentTab) {
+          setCurrentTab(1);
+        }
+      }
+
+      setFilteredVaults(sortedVaults);
+    } else if (tableType === MetaVaultTableTypes.Protocols) {
+      let sortedProtocols = protocolsData;
+
+      table.forEach((state: TTableColumn) => {
+        if (state.sortType !== "none") {
+          sortedProtocols = [...sortedProtocols].sort((a, b) =>
+            dataSorter(
+              String(a[state.keyName as keyof TVault]),
+              String(b[state.keyName as keyof TVault]),
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
+      });
+
+      // // pagination upd
+      // if (currentTab != 1) {
+      //   const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
+      //   if (disponibleTabs < currentTab) {
+      //     setCurrentTab(1);
+      //   }
+      // }
+
+      setFilteredProtocolsData(sortedProtocols);
+    }
+
     setTableStates(table);
   };
 
@@ -109,8 +155,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const proportions = await getMetaVaultProportions(metavault);
 
-    const protocols = ["Stability", "Aave", ...metaVault.protocols].map(
-      (name) => Object.values(PROTOCOLS).find((p) => p.name === name)
+    const protocols = ["Stability", ...metaVault.protocols].map((name) =>
+      Object.values(PROTOCOLS).find((p) => p.name === name)
     );
 
     const vaults = await Promise.all(
@@ -145,10 +191,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 APR: vault.earningData.apr.latest,
               };
             })
-            .filter(
-              ({ proportions }) =>
-                proportions.current > 0.1 && !!proportions.target
-            );
+            .filter(({ proportions }) => proportions.current > 0.1);
 
           return {
             ...subMetaVault,
@@ -171,8 +214,46 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const cleanedVaults = vaults.filter(Boolean);
 
+    const protocolsAllocation = protocols.slice(1).map((protocol) => {
+      let allocation = 0;
+
+      cleanedVaults.forEach((vault) => {
+        if (vault?.isMetaVault) {
+          vault.vaults.forEach((v) => {
+            if (
+              protocol.name.includes(v.strategy) ||
+              (protocol.name === "Silo V2" &&
+                v.strategy === "Silo Managed Farm")
+            ) {
+              allocation += Number(v.tvl);
+            }
+          });
+        } else if (
+          protocol.name.includes(vault.strategy) ||
+          (protocol.name === "Silo V2" &&
+            vault.strategy === "Silo Managed Farm")
+        ) {
+          allocation += Number(vault.tvl);
+        }
+      });
+
+      return { ...protocol, allocation };
+    });
+
+    const totalAllocation = protocolsAllocation.reduce(
+      (sum, p) => sum + p.allocation,
+      0
+    );
+
+    const allocationsWithPercent = protocolsAllocation.map((p) => ({
+      ...p,
+      value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
+    }));
+
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
+    setProtocolsData(allocationsWithPercent);
+    setFilteredProtocolsData(allocationsWithPercent);
     setLocalMetaVault({ ...metaVault, protocols });
     setIsLocalVaultsLoaded(true);
   };
@@ -325,14 +406,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex flex-col gap-4 w-full xl:w-[850px]">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-[24px] leading-8 hidden md:block">
-              Yield Opportunities
+              Allocations
             </span>
             <div className="flex items-center justify-between md:justify-end">
               <span className="font-semibold text-[18px] leading-6 block md:hidden">
-                Yield Opportunities
+                Allocations
               </span>
             </div>
-            {/* <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
+            <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
               <span
                 className={cn(
                   "px-4 h-10 text-center rounded-lg flex items-center justify-center",
@@ -340,7 +421,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                     ? "text-[#6A6B6F] cursor-pointer"
                     : "bg-[#232429] border border-[#2C2E33]"
                 )}
-                onClick={() => setTableType(MetaVaultTableTypes.Destinations)}
+                onClick={() => changeTable(MetaVaultTableTypes.Destinations)}
               >
                 Destinations
               </span>
@@ -351,11 +432,11 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                     ? "text-[#6A6B6F] cursor-pointer"
                     : "bg-[#232429] border border-[#2C2E33]"
                 )}
-                onClick={() => setTableType(MetaVaultTableTypes.Protocols)}
+                onClick={() => changeTable(MetaVaultTableTypes.Protocols)}
               >
                 Protocols
               </span>
-            </div> */}
+            </div>
           </div>
 
           <div>
@@ -379,7 +460,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               ) : localVaults?.length ? (
                 <MetaVaultsTable
+                  tableType={tableType}
                   vaults={currentTabVaults}
+                  protocols={filteredProtocolsData}
                   setModalState={setAprModal}
                 />
               ) : (
@@ -390,7 +473,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               pagination={pagination}
               data={filteredVaults}
               tab={currentTab}
-              display={DisplayTypes.Rows}
               setTab={setCurrentTab}
               setPagination={setPagination}
             />

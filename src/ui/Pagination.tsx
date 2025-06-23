@@ -6,17 +6,26 @@ import { cn, useClickOutside } from "@utils";
 
 import { PAGINATIONS_VARIANTS } from "@constants";
 
+import { DisplayTypes } from "@types";
+
 interface IProps {
   pagination: number;
   data: unknown[];
   tab: number;
-  display: string;
+  display?: DisplayTypes;
   setTab: (number: number) => void;
   setPagination: (number: number) => void;
 }
 
 const Pagination: React.FC<IProps> = memo(
-  ({ pagination, data, tab, display, setTab, setPagination }) => {
+  ({
+    pagination,
+    data,
+    tab,
+    display = DisplayTypes.Rows,
+    setTab,
+    setPagination,
+  }) => {
     const newUrl = new URL(window.location.href);
     const params = new URLSearchParams(newUrl.search);
 
