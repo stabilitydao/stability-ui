@@ -389,7 +389,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                     alt="Sonic chain"
                     title="Sonic chain"
                   />
-                  <span>{localMetaVault?.sonicPoints}</span>
+                  <span>x{localMetaVault?.sonicPoints}</span>
                 </div>
               </div>
             )}

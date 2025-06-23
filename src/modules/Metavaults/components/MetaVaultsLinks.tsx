@@ -1,7 +1,5 @@
 import { memo } from "react";
 
-import type { Dispatch, SetStateAction } from "react";
-
 import { useStore } from "@nanostores/react";
 
 import { Skeleton } from "@ui";
@@ -9,6 +7,8 @@ import { Skeleton } from "@ui";
 import { formatNumber, cn } from "@utils";
 
 import { isWeb3Load } from "@store";
+
+import type { Dispatch, SetStateAction } from "react";
 
 import type { TMetaVault } from "@types";
 
