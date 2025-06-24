@@ -4,7 +4,9 @@ import { sonicClient, IMetaVaultABI } from "@web3";
 
 import type { TAddress } from "@types";
 
-export const getMetaVaultProportions = async (address: TAddress) => {
+export const getMetaVaultProportions = async (
+  address: TAddress
+): Promise<{ current: number[]; target: number[] }> => {
   const [current, target] = await Promise.all([
     sonicClient.readContract({
       address,

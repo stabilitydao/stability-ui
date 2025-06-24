@@ -301,6 +301,9 @@ type TMetaVault = {
   symbol: string;
   name: string;
   APR: string;
+  totalAPR: string;
+  merklAPR: string;
+  gemsAPR: string;
   sharePrice: string;
   assets: TAddress[];
   decimals: number;
@@ -310,6 +313,7 @@ type TMetaVault = {
   endVaults?: TAddress[];
   protocols?: string[];
   strategies?: string[];
+  sonicPoints?: number;
 };
 
 type TEndMetaVaults = {
@@ -728,6 +732,11 @@ type TMarketPrices = Record<string, TMarketPrice>;
 export enum DisplayTypes {
   Rows = "rows",
   Grid = "grid",
+}
+
+export enum MetaVaultTableTypes {
+  Destinations = "destinations",
+  Protocols = "protocols",
 }
 
 export enum TransactionTypes {

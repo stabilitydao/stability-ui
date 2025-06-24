@@ -1,7 +1,5 @@
 import { memo } from "react";
 
-import type { Dispatch, SetStateAction } from "react";
-
 import { useStore } from "@nanostores/react";
 
 import { Skeleton } from "@ui";
@@ -9,6 +7,8 @@ import { Skeleton } from "@ui";
 import { formatNumber, cn } from "@utils";
 
 import { isWeb3Load } from "@store";
+
+import type { Dispatch, SetStateAction } from "react";
 
 import type { TMetaVault } from "@types";
 
@@ -28,9 +28,9 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
         let TVL = "0";
         if (metaVault.deposited) {
           if (["metaS", "metawS"].includes(metaVault?.symbol)) {
-            TVL = `${formatNumber(metaVault.deposited, "abbreviate").slice(1)} S`;
+            TVL = `${String(formatNumber(metaVault.deposited, "abbreviate")).slice(1)} S`;
           } else {
-            TVL = formatNumber(metaVault.deposited, "abbreviate");
+            TVL = formatNumber(metaVault.deposited, "abbreviate") as string;
           }
         }
 
