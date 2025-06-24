@@ -7,13 +7,7 @@ import { ColumnSort } from "./components/ColumnSort";
 import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
 
-import {
-  // DisplayType,
-  FullPageLoader,
-  Pagination,
-  MetaVaultsTable,
-  TextSkeleton,
-} from "@ui";
+import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
 import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
 
@@ -21,11 +15,16 @@ import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
-import { METAVAULT_TABLE, PROTOCOLS, PAGINATION_VAULTS } from "@constants";
+import {
+  METAVAULT_TABLE,
+  PROTOCOLS,
+  PAGINATION_VAULTS,
+  PROTOCOLS_TABLE,
+} from "@constants";
 
 import { deployments } from "@stabilitydao/stability";
 
-import { DisplayTypes } from "@types";
+import { MetaVaultTableTypes } from "@types";
 
 import type {
   TAddress,
@@ -48,10 +47,13 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
+  const [protocolsData, setProtocolsData] = useState([]);
+  const [filteredProtocolsData, setFilteredProtocolsData] = useState([]);
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
   const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [currentTab, setCurrentTab] = useState(1);
+  const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -64,47 +66,78 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [modal, setModal] = useState<boolean>(false);
 
-  // const [displayType, setDisplayType] = useState<DisplayTypes>(
-  //   DisplayTypes.Rows
-  // );
-
-  const displayType = DisplayTypes.Rows;
-
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
   const lastTabIndex = currentTab * pagination;
   const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
-  // const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
-
-  const tableHandler = (table: TTableColumn[] = tableStates) => {
-    if (!$vaults) return;
-
-    let sortedVaults = localVaults;
-
-    table.forEach((state: TTableColumn) => {
-      if (state.sortType !== "none") {
-        sortedVaults = [...sortedVaults].sort((a, b) =>
-          dataSorter(
-            String(a[state.keyName as keyof TVault]),
-            String(b[state.keyName as keyof TVault]),
-            state.dataType,
-            state.sortType
-          )
-        );
-      }
-    });
-
-    // // pagination upd
-    if (currentTab != 1) {
-      const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
-      if (disponibleTabs < currentTab) {
-        setCurrentTab(1);
-      }
+  const changeTable = (type: MetaVaultTableTypes) => {
+    if (type === MetaVaultTableTypes.Destinations) {
+      setTableStates(METAVAULT_TABLE);
+    } else if (type === MetaVaultTableTypes.Protocols) {
+      setTableStates(PROTOCOLS_TABLE);
     }
 
-    setFilteredVaults(sortedVaults);
+    setCurrentTab(1);
+    setTableType(type);
+  };
+
+  const tableHandler = (table: TTableColumn[] = tableStates) => {
+    if (tableType === MetaVaultTableTypes.Destinations) {
+      if (!$vaults) return;
+
+      let sortedVaults = localVaults;
+
+      table.forEach((state: TTableColumn) => {
+        if (state.sortType !== "none") {
+          sortedVaults = [...sortedVaults].sort((a, b) =>
+            dataSorter(
+              String(a[state.keyName as keyof TVault]),
+              String(b[state.keyName as keyof TVault]),
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
+      });
+
+      // // pagination upd
+      if (currentTab != 1) {
+        const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
+        if (disponibleTabs < currentTab) {
+          setCurrentTab(1);
+        }
+      }
+
+      setFilteredVaults(sortedVaults);
+    } else if (tableType === MetaVaultTableTypes.Protocols) {
+      let sortedProtocols = protocolsData;
+
+      table.forEach((state: TTableColumn) => {
+        if (state.sortType !== "none") {
+          sortedProtocols = [...sortedProtocols].sort((a, b) =>
+            dataSorter(
+              String(a[state.keyName as keyof TVault]),
+              String(b[state.keyName as keyof TVault]),
+              state.dataType,
+              state.sortType
+            )
+          );
+        }
+      });
+
+      // // pagination upd
+      // if (currentTab != 1) {
+      //   const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
+      //   if (disponibleTabs < currentTab) {
+      //     setCurrentTab(1);
+      //   }
+      // }
+
+      setFilteredProtocolsData(sortedProtocols);
+    }
+
     setTableStates(table);
   };
 
@@ -122,46 +155,58 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const proportions = await getMetaVaultProportions(metavault);
 
-    const protocols = ["Stability", "Aave", ...metaVault.protocols].map(
-      (name) => Object.values(PROTOCOLS).find((p) => p.name === name)
+    const protocols = ["Stability", ...metaVault.protocols].map((name) =>
+      Object.values(PROTOCOLS).find((p) => p.name === name)
     );
 
     const vaults = await Promise.all(
       metaVault.endVaults.map(async (entry, index: number) => {
-        if (entry.isMetaVault) {
+        const isMeta = entry.isMetaVault;
+        const vaultAddr = isMeta ? entry.metaVault : entry.vault;
+
+        const current = proportions.current[index];
+        const target = proportions.target[index];
+
+        if (current <= 0.1 && !target) return null;
+
+        if (isMeta) {
           const subMetaVault = metaVaultList.find(
-            (v) => v.address === entry.metaVault
+            (v: TVault) => v.address === vaultAddr
           );
+
           if (!subMetaVault) return null;
 
-          const { current, target } = await getMetaVaultProportions(
-            entry.metaVault as TAddress
-          );
+          const { current: subCurrent, target: subTarget } =
+            await getMetaVaultProportions(vaultAddr as TAddress);
 
-          const vaultsData = entry.vaults.map((address, i) => ({
-            ...$vaults[chainId][address],
-            proportions: { current: current[i], target: target[i] },
-            APR: $vaults[chainId][address].earningData.apr.latest,
-          }));
+          const vaultsData = entry.vaults
+            .map((address: TAddress, i: number) => {
+              const vault = $vaults[chainId][address];
+              return {
+                ...vault,
+                proportions: {
+                  current: subCurrent[i],
+                  target: subTarget[i],
+                },
+                APR: vault.earningData.apr.latest,
+              };
+            })
+            .filter(({ proportions }) => proportions.current > 0.1);
 
           return {
             ...subMetaVault,
-            proportions: {
-              current: proportions.current[index],
-              target: proportions.target[index],
-            },
+            proportions: { current, target },
             vaults: vaultsData,
             isMetaVault: true,
           };
         }
 
+        const vault = $vaults[chainId][vaultAddr];
+
         return {
-          ...$vaults[chainId][entry.vault],
-          APR: $vaults[chainId][entry.vault].earningData.apr.latest,
-          proportions: {
-            current: proportions.current[index],
-            target: proportions.target[index],
-          },
+          ...vault,
+          APR: vault.earningData.apr.latest,
+          proportions: { current, target },
           isMetaVault: false,
         };
       })
@@ -169,8 +214,46 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const cleanedVaults = vaults.filter(Boolean);
 
+    const protocolsAllocation = protocols.slice(1).map((protocol) => {
+      let allocation = 0;
+
+      cleanedVaults.forEach((vault) => {
+        if (vault?.isMetaVault) {
+          vault.vaults.forEach((v) => {
+            if (
+              protocol.name.includes(v.strategy) ||
+              (protocol.name === "Silo V2" &&
+                v.strategy === "Silo Managed Farm")
+            ) {
+              allocation += Number(v.tvl);
+            }
+          });
+        } else if (
+          protocol.name.includes(vault.strategy) ||
+          (protocol.name === "Silo V2" &&
+            vault.strategy === "Silo Managed Farm")
+        ) {
+          allocation += Number(vault.tvl);
+        }
+      });
+
+      return { ...protocol, allocation };
+    });
+
+    const totalAllocation = protocolsAllocation.reduce(
+      (sum, p) => sum + p.allocation,
+      0
+    );
+
+    const allocationsWithPercent = protocolsAllocation.map((p) => ({
+      ...p,
+      value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
+    }));
+
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
+    setProtocolsData(allocationsWithPercent);
+    setFilteredProtocolsData(allocationsWithPercent);
     setLocalMetaVault({ ...metaVault, protocols });
     setIsLocalVaultsLoaded(true);
   };
@@ -189,7 +272,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const TVL = useMemo(() => {
     if (localMetaVault.deposited) {
       if (["metaS", "metawS"].includes(localMetaVault?.symbol)) {
-        return `${formatNumber(localMetaVault.deposited, "abbreviate").slice(1)} S`;
+        return `${String(formatNumber(localMetaVault.deposited, "abbreviate"))?.slice(1)} S`;
       } else {
         return formatNumber(localMetaVault.deposited, "abbreviate");
       }
@@ -211,7 +294,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
-              across protocols automatically <br className="lg:block hidden" />{" "}
+              across protocols automatically <br className="xl:block hidden" />{" "}
               rebalanced for maximum returns on sonic
             </h3>
           </div>
@@ -306,43 +389,58 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                     alt="Sonic chain"
                     title="Sonic chain"
                   />
-                  <span>{localMetaVault?.sonicPoints}</span>
+                  <span>x{localMetaVault?.sonicPoints}</span>
                 </div>
               </div>
             )}
           </div>
         </div>
         <img
-          className="w-[352px] hidden lg:block"
+          className="w-[352px] hidden xl:block"
           src="/ui-stack-preview.png"
           alt="Representative icon"
         />
       </div>
 
-      <div className="flex items-start justify-between flex-col-reverse lg:flex-row gap-6">
-        <div className="flex flex-col gap-4 w-full lg:w-[850px]">
-          <span className="font-semibold text-[24px] leading-8 hidden md:block">
-            Yield Opportunities
-          </span>
-          <div className="flex items-center justify-between md:justify-end">
-            <span className="font-semibold text-[18px] leading-6 block md:hidden">
-              Yield Opportunities
+      <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
+        <div className="flex flex-col gap-4 w-full xl:w-[850px]">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-[24px] leading-8 hidden md:block">
+              Allocations
             </span>
-
-            {/* <DisplayType
-              type={displayType}
-              setType={setDisplayType}
-              pagination={pagination}
-              setPagination={setPagination}
-            /> */}
+            <div className="flex items-center justify-between md:justify-end">
+              <span className="font-semibold text-[18px] leading-6 block md:hidden">
+                Allocations
+              </span>
+            </div>
+            <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
+              <span
+                className={cn(
+                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
+                  tableType != MetaVaultTableTypes.Destinations
+                    ? "text-[#6A6B6F] cursor-pointer"
+                    : "bg-[#232429] border border-[#2C2E33]"
+                )}
+                onClick={() => changeTable(MetaVaultTableTypes.Destinations)}
+              >
+                Destinations
+              </span>
+              <span
+                className={cn(
+                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
+                  tableType != MetaVaultTableTypes.Protocols
+                    ? "text-[#6A6B6F] cursor-pointer"
+                    : "bg-[#232429] border border-[#2C2E33]"
+                )}
+                onClick={() => changeTable(MetaVaultTableTypes.Protocols)}
+              >
+                Protocols
+              </span>
+            </div>
           </div>
+
           <div>
-            <div
-              className={cn(
-                "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
-                displayType === "grid" && "hidden"
-              )}
-            >
+            <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
               {tableStates.map((value: TTableColumn, index: number) => (
                 <ColumnSort
                   key={value.name + index}
@@ -355,20 +453,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
             <div>
               {isLoading ? (
-                <div
-                  className={cn(
-                    "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
-                    displayType === "grid" && "rounded-lg border-b"
-                  )}
-                >
+                <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
                   <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
                     <FullPageLoader />
                   </div>
                 </div>
               ) : localVaults?.length ? (
                 <MetaVaultsTable
+                  tableType={tableType}
                   vaults={currentTabVaults}
-                  display={displayType}
+                  protocols={filteredProtocolsData}
                   setModalState={setAprModal}
                 />
               ) : (
@@ -379,13 +473,13 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               pagination={pagination}
               data={filteredVaults}
               tab={currentTab}
-              display={displayType}
               setTab={setCurrentTab}
               setPagination={setPagination}
             />
           </div>
         </div>
-        <div className="flex flex-col gap-5 w-full lg:w-[352px] mt-0 lg:mt-[64px]">
+
+        <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
           {metavault === "0x1111111199558661bf7ff27b4f1623dc6b91aa3e" && (

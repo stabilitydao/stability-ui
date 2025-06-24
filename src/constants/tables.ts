@@ -402,6 +402,28 @@ const METAVAULT_TABLE: TTableColumn[] = [
   // },
 ];
 
+const PROTOCOLS_TABLE: TTableColumn[] = [
+  {
+    name: "Protocol",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Allocation",
+    keyName: "allocation",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Percent",
+    keyName: "value",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -423,4 +445,5 @@ export {
   POOL_TABLE,
   BC_POOL_TABLE,
   METAVAULT_TABLE,
+  PROTOCOLS_TABLE,
 };
