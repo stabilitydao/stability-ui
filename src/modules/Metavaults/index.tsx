@@ -13,10 +13,10 @@ import { META_VAULTS_TYPE } from "@constants";
 import { metaVaults } from "@store";
 
 export type TModal = {
-  APR: number;
-  merklAPR: number;
-  gemsAPR: number;
-  totalAPR: number;
+  APR: string;
+  merklAPR: string;
+  gemsAPR: string;
+  totalAPR: string;
   isOpen: boolean;
 };
 
@@ -26,10 +26,10 @@ const Metavaults = (): JSX.Element => {
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
 
   const [modal, setModal] = useState<TModal>({
-    APR: 0,
-    merklAPR: 0,
-    gemsAPR: 0,
-    totalAPR: 0,
+    APR: "0",
+    merklAPR: "0",
+    gemsAPR: "0",
+    totalAPR: "0",
     isOpen: false,
   });
 
