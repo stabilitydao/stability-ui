@@ -236,12 +236,13 @@ const AddPools = (): JSX.Element => {
 
     /* ───────── helpers ───────── */
     const resetTxState = () => {
+        setSimulationStatus("idle");
         setTxStatus("idle");
         setTxHash(null);
         setTxError(null);
     };
 
-    const handleSubmit = async () => {
+    const handleAddPools = async () => {
         resetTxState();
 
         if (!poolAddress || !selectedAdapter || !finalTokenIn || !finalTokenOut) {
@@ -467,7 +468,7 @@ const AddPools = (): JSX.Element => {
                     {/* Action button */}
                     {$connected ? (
                         <button
-                            onClick={handleSubmit}
+                            onClick={handleAddPools}
                             className="mt-6 w-full rounded-2xl bg-accent-500 py-3 text-[20px] font-semibold text-neutral-50 transition hover:text-neutral-50 disabled:opacity-40"
                             disabled={simulationStatus === "loading" || txStatus === "wallet"}
                         >
