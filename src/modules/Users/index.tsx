@@ -18,7 +18,7 @@ import { account, apiData } from "@store";
 
 import { contests } from "@stabilitydao/stability";
 
-import { USERS_TABLE, PAGINATION_VAULTS } from "@constants";
+import { USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { TABLE_TYPES } from "./constants";
 
@@ -56,7 +56,7 @@ const Users = (): JSX.Element => {
   const [tableStates, setTableStates] = useState(USERS_TABLE);
   const [tableData, setTableData] = useState<TLeaderboard[]>([]);
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
 
   const handleActiveContest = (type: string) => {

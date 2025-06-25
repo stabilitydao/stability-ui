@@ -14,7 +14,7 @@ import { getDaysFromLastHardWork, calculateAPR } from "../helpers";
 
 import { seeds } from "@stabilitydao/stability";
 
-import { CHAINS, BIG_INT_VALUES, PAGINATION_VAULTS } from "@constants";
+import { CHAINS, BIG_INT_VALUES, PAGINATION_LIMIT } from "@constants";
 
 const SEARCH_VALUES = {
   valid: "WMATIC",
@@ -117,7 +117,7 @@ test.describe("Vaults page tests", () => {
 
     const activeVaults = await page.getByTestId("vault").count();
 
-    await expect(activeVaults).toBe(PAGINATION_VAULTS);
+    await expect(activeVaults).toBe(PAGINATION_LIMIT);
   });
 
   test("should be hide portfolio data", async ({ page }) => {

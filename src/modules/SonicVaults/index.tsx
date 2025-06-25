@@ -36,7 +36,7 @@ import { formatFromBigInt, dataSorter, debounce, cn } from "@utils";
 import {
   SONIC_TABLE,
   TABLE_FILTERS,
-  PAGINATION_VAULTS,
+  PAGINATION_LIMIT,
   STABLECOINS,
   DEFAULT_TABLE_PARAMS,
 } from "@constants";
@@ -70,7 +70,7 @@ const SonicVaults = (): JSX.Element => {
     useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
 
   const [allParams, setAllParams] = useState<number>(0);
-  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
   let urlTab = 1;
 

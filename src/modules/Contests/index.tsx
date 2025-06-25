@@ -10,7 +10,7 @@ import {
   cn,
 } from "@utils";
 
-import { CONTESTS_TABLE, PAGINATION_VAULTS } from "@constants";
+import { CONTESTS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { contests } from "@stabilitydao/stability";
 
@@ -24,7 +24,7 @@ const Contests = (): JSX.Element => {
   const [tableStates, setTableStates] = useState(CONTESTS_TABLE);
   const [tableData, setTableData] = useState<IExtendedYieldContest[]>([]);
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
 
   const initTableData = async () => {

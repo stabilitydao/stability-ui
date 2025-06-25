@@ -16,11 +16,11 @@ import { TVault, TAPRModal } from "@types";
 interface IProps {
   APRs: {
     APR: string;
-    APY: string;
-    swapFees: string;
-    strategyAPR: string;
-    dailyAPR: string;
-    gemsAPR: string;
+    APY?: string;
+    swapFees?: string;
+    strategyAPR?: string;
+    dailyAPR?: string;
+    gemsAPR?: string;
   };
   vault: TVault;
   activeVault: any;
@@ -28,7 +28,7 @@ interface IProps {
   inserted?: boolean;
 }
 
-const Row: React.FC<IProps> = ({
+const Vault: React.FC<IProps> = ({
   APRs,
   vault,
   activeVault,
@@ -49,7 +49,7 @@ const Row: React.FC<IProps> = ({
     activeVault?.isHovered && activeVault.address !== vault.address;
 
   return (
-    <div className={cn("border border-[#23252A] border-b-0")}>
+    <div className={cn("border-t border-[#23252A]")}>
       <a
         className={cn(
           "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default min-[860px]:cursor-pointer",
@@ -103,56 +103,6 @@ const Row: React.FC<IProps> = ({
           </div>
 
           <div className="flex items-center justify-center gap-1 flex-shrink-0">
-            {/* {!vault.symbol.includes("PT-") && (
-              <div
-                title="Sonic Activity Points"
-                className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
-              >
-                <div className="flex items-center gap-1 px-2">
-                  <img
-                    src="/sonic.png"
-                    alt="sonic"
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-[12px]">
-                    x{vault.sonicActivePoints}
-                  </span>
-                </div>
-              </div>
-            )}
-            {SILO_POINTS[vault.address as keyof typeof SILO_POINTS] && (
-              <div
-                title="Silo Points per $ / day"
-                className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
-              >
-                <div className="flex items-center gap-1 px-2">
-                  <img
-                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-                    alt="silo"
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-[12px]">
-                    {SILO_POINTS[vault.address as keyof typeof SILO_POINTS]}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {!!vault.ringsPoints && (
-              <div
-                title="Rings Points"
-                className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"
-              >
-                <div className="flex items-center gap-1 px-2">
-                  <img
-                    src="/rings.png"
-                    alt="rings"
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-[12px]">x{vault.ringsPoints}</span>
-                </div>
-              </div>
-            )} */}
             <div className="block min-[860px]:hidden ml-2">
               <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
             </div>
@@ -211,7 +161,7 @@ const Row: React.FC<IProps> = ({
                     Total APY
                   </p>
                   <p className="text-end font-semibold">
-                    {formatNumber(APRs.APY, "formatAPR")}%
+                    {formatNumber(APRs?.APY ?? 0, "formatAPR")}%
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
@@ -230,7 +180,7 @@ const Row: React.FC<IProps> = ({
                         Pool swap fees APR
                       </p>
                       <p className="text-end font-semibold">
-                        {formatNumber(APRs.swapFees, "formatAPR")}%
+                        {formatNumber(APRs?.swapFees ?? 0, "formatAPR")}%
                       </p>
                     </div>
                   )}
@@ -239,13 +189,13 @@ const Row: React.FC<IProps> = ({
                     Strategy APR
                   </p>
                   <p className="text-end font-semibold">
-                    {formatNumber(APRs.strategyAPR, "formatAPR")}%
+                    {formatNumber(APRs?.strategyAPR ?? 0, "formatAPR")}%
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="leading-5 text-[#97979A] font-medium">Daily</p>
                   <p className="text-end font-semibold">
-                    {formatNumber(APRs.dailyAPR, "formatAPR")}%
+                    {formatNumber(APRs?.dailyAPR ?? 0, "formatAPR")}%
                   </p>
                 </div>
                 {!isSTBLVault && (
@@ -254,7 +204,7 @@ const Row: React.FC<IProps> = ({
                       Gems APR
                     </p>
                     <p className="text-end font-semibold">
-                      {formatNumber(APRs.gemsAPR, "formatAPR")}%
+                      {formatNumber(APRs?.gemsAPR ?? 0, "formatAPR")}%
                     </p>
                   </div>
                 )}
@@ -338,4 +288,4 @@ const Row: React.FC<IProps> = ({
   );
 };
 
-export { Row };
+export { Vault };

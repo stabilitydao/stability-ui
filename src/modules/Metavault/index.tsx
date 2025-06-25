@@ -9,16 +9,16 @@ import { Contracts } from "./components/Contracts";
 
 import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
-import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
-
 import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
+
+import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
 import {
   METAVAULT_TABLE,
   PROTOCOLS,
-  PAGINATION_VAULTS,
+  PAGINATION_LIMIT,
   PROTOCOLS_TABLE,
 } from "@constants";
 
@@ -46,13 +46,19 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const $isVaultsLoaded = useStore(isVaultsLoaded);
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
+
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
-  const [protocolsData, setProtocolsData] = useState([]);
-  const [filteredProtocolsData, setFilteredProtocolsData] = useState([]);
-  const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
-  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [localProtocols, setLocalProtocols] = useState([]);
+
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
+  const [filteredProtocols, setFilteredProtocols] = useState([]);
+
+  const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
+
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
+
   const [currentTab, setCurrentTab] = useState(1);
+
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
 
   const [aprModal, setAprModal] = useState({
@@ -68,10 +74,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   const changeTable = (type: MetaVaultTableTypes) => {
     if (type === MetaVaultTableTypes.Destinations) {
       setTableStates(METAVAULT_TABLE);
@@ -84,64 +86,59 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
-    if (tableType === MetaVaultTableTypes.Destinations) {
-      if (!$vaults) return;
+    const sortData = (
+      data: any[],
+      key: string,
+      dataType: string,
+      sortType: string
+    ) => {
+      return [...data].sort((a, b) =>
+        dataSorter(String(a[key]), String(b[key]), dataType, sortType)
+      );
+    };
 
-      let sortedVaults = localVaults;
+    let sortedList: any[] = [];
 
-      table.forEach((state: TTableColumn) => {
-        if (state.sortType !== "none") {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            dataSorter(
-              String(a[state.keyName as keyof TVault]),
-              String(b[state.keyName as keyof TVault]),
-              state.dataType,
-              state.sortType
-            )
-          );
-        }
-      });
+    switch (tableType) {
+      case MetaVaultTableTypes.Destinations:
+        if (!$vaults) return;
 
-      // // pagination upd
-      if (currentTab != 1) {
-        const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
-        if (disponibleTabs < currentTab) {
-          setCurrentTab(1);
-        }
+        sortedList = table.reduce((acc, state) => {
+          if (state.sortType !== "none") {
+            return sortData(acc, state.keyName, state.dataType, state.sortType);
+          }
+          return acc;
+        }, localVaults);
+
+        setFilteredVaults(sortedList);
+        break;
+
+      case MetaVaultTableTypes.Protocols:
+        sortedList = table.reduce((acc, state) => {
+          if (state.sortType !== "none") {
+            return sortData(acc, state.keyName, state.dataType, state.sortType);
+          }
+          return acc;
+        }, localProtocols);
+
+        setFilteredProtocols(sortedList);
+        break;
+
+      default:
+        return;
+    }
+
+    if (currentTab !== 1 && sortedList.length) {
+      const totalTabs = Math.ceil(sortedList.length / pagination);
+      if (totalTabs < currentTab) {
+        setCurrentTab(1);
       }
-
-      setFilteredVaults(sortedVaults);
-    } else if (tableType === MetaVaultTableTypes.Protocols) {
-      let sortedProtocols = protocolsData;
-
-      table.forEach((state: TTableColumn) => {
-        if (state.sortType !== "none") {
-          sortedProtocols = [...sortedProtocols].sort((a, b) =>
-            dataSorter(
-              String(a[state.keyName as keyof TVault]),
-              String(b[state.keyName as keyof TVault]),
-              state.dataType,
-              state.sortType
-            )
-          );
-        }
-      });
-
-      // // pagination upd
-      // if (currentTab != 1) {
-      //   const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
-      //   if (disponibleTabs < currentTab) {
-      //     setCurrentTab(1);
-      //   }
-      // }
-
-      setFilteredProtocolsData(sortedProtocols);
     }
 
     setTableStates(table);
   };
 
-  const initMetaVaults = async () => {
+  const init = async () => {
     const chainId = "146";
     const metaVaultList = $metaVaults[chainId];
 
@@ -221,16 +218,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         if (vault?.isMetaVault) {
           vault.vaults.forEach((v) => {
             if (
-              protocol.name.includes(v.strategy) ||
-              (protocol.name === "Silo V2" &&
+              protocol?.name.includes(v.strategy) ||
+              (protocol?.name === "Silo V2" &&
                 v.strategy === "Silo Managed Farm")
             ) {
               allocation += Number(v.tvl);
             }
           });
         } else if (
-          protocol.name.includes(vault.strategy) ||
-          (protocol.name === "Silo V2" &&
+          protocol?.name.includes(vault.strategy) ||
+          (protocol?.name === "Silo V2" &&
             vault.strategy === "Silo Managed Farm")
         ) {
           allocation += Number(vault.tvl);
@@ -252,15 +249,15 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
-    setProtocolsData(allocationsWithPercent);
-    setFilteredProtocolsData(allocationsWithPercent);
+    setLocalProtocols(allocationsWithPercent);
+    setFilteredProtocols(allocationsWithPercent);
     setLocalMetaVault({ ...metaVault, protocols });
     setIsLocalVaultsLoaded(true);
   };
 
   useEffect(() => {
     if ($isVaultsLoaded) {
-      initMetaVaults();
+      init();
       console.log(aprModal);
     }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
@@ -282,6 +279,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const symbol = deployments?.["146"]?.metaVaults?.find(
     (mv) => mv.address.toLowerCase() === metavault
   )?.symbol;
+
+  const lastTabIndex = currentTab * pagination;
+  const firstTabIndex = lastTabIndex - pagination;
+  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   useModalClickOutside(modalRef, () => setModal((prev) => !prev));
 
@@ -440,7 +441,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           </div>
 
           <div>
-            <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
+            <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:pl-[220px]">
               {tableStates.map((value: TTableColumn, index: number) => (
                 <ColumnSort
                   key={value.name + index}
@@ -462,7 +463,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 <MetaVaultsTable
                   tableType={tableType}
                   vaults={currentTabVaults}
-                  protocols={filteredProtocolsData}
+                  protocols={filteredProtocols}
                   setModalState={setAprModal}
                 />
               ) : (

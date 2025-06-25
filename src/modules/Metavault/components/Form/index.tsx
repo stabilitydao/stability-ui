@@ -14,6 +14,8 @@ import { ActionButton } from "@ui";
 
 import { getTokenData, getTransactionReceipt, formatNumber, cn } from "@utils";
 
+import { DEFAULT_TRANSACTION_SETTINGS, META_VAULTS_TYPE } from "@constants";
+
 import {
   IMetaVaultABI,
   ERC20ABI,
@@ -21,8 +23,6 @@ import {
   wagmiConfig,
   WrappedMetaVaultABI,
 } from "@web3";
-
-import { DEFAULT_TRANSACTION_SETTINGS, META_VAULTS_TYPE } from "@constants";
 
 import {
   account,
@@ -773,11 +773,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
             </div>
           ) : null}
         </label>
-        {actionType === TransactionTypes.Withdraw && (
+        {/* {actionType === TransactionTypes.Withdraw && (
           <div className="text-[#909193] text-[14px] leading-5 font-medium mb-3">
             Max withdraw next tx: {formatNumber(maxWithdraw, "format")}
           </div>
-        )}
+        )} */}
         {/* <div className="flex flex-col gap-2 mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

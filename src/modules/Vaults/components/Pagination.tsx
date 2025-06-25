@@ -1,5 +1,5 @@
 import { useEffect, memo } from "react";
-import { PAGINATION_VAULTS } from "@constants";
+import { PAGINATION_LIMIT } from "@constants";
 
 import type { TVault } from "@types";
 
@@ -15,16 +15,16 @@ const Pagination: React.FC<IProps> = memo(({ vaults, tab, setTab }) => {
 
   const paginationNumbers = [];
 
-  for (let i = 1; i <= Math.ceil(vaults.length / PAGINATION_VAULTS); i++) {
+  for (let i = 1; i <= Math.ceil(vaults.length / PAGINATION_LIMIT); i++) {
     paginationNumbers.push(i);
   }
 
   const VISIBLE_VAULTS = {
-    first: tab === 1 ? tab : PAGINATION_VAULTS * (tab - 1) + 1,
+    first: tab === 1 ? tab : PAGINATION_LIMIT * (tab - 1) + 1,
     latest:
-      PAGINATION_VAULTS * tab >= vaults.length
+      PAGINATION_LIMIT * tab >= vaults.length
         ? vaults.length
-        : PAGINATION_VAULTS * tab,
+        : PAGINATION_LIMIT * tab,
   };
 
   useEffect(() => {
