@@ -4,25 +4,26 @@ import { ArrowIcon } from "@ui";
 
 import { cn, formatNumber } from "@utils";
 
+import { IProtocol } from "@types";
+
 interface IProps {
-  protocol: any;
+  protocol: IProtocol;
   activeProtocol: any;
 }
 
-const ProtocolRow: React.FC<IProps> = ({ protocol, activeProtocol }) => {
+const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
   const [expandedData, setExpandedData] = useState(false);
 
   const isDimmed =
     activeProtocol?.isHovered && activeProtocol.name !== protocol.name;
 
   return (
-    <div className={cn("border border-[#23252A] border-b-0")}>
-      <a
+    <div className={cn("border-t border-[#23252A]")}>
+      <div
         className={cn(
-          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default min-[860px]:cursor-pointer",
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center",
           isDimmed ? "opacity-30" : "opacity-100"
         )}
-        href="#"
         onClick={(e) => {
           if (window.innerWidth <= 860) {
             e.preventDefault();
@@ -58,47 +59,37 @@ const ProtocolRow: React.FC<IProps> = ({ protocol, activeProtocol }) => {
           </div>
         </div>
         <div className="px-4 w-[20%] hidden min-[860px]:block">
-          <p className="text-[16px] whitespace-nowrap text-end">
-            {formatNumber(protocol.allocation, "format")}
-          </p>
+          <span className="text-[16px] whitespace-nowrap text-end">
+            {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
+          </span>
         </div>
         <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
-          <span>{protocol.value.toFixed(2)}%</span>
+          <span>{protocol?.value?.toFixed(2)}%</span>
         </div>
-      </a>
+      </div>
       {expandedData ? (
         <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] min-[860px]:hidden">
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
               Allocation
             </span>
-            <p className="text-[16px] whitespace-nowrap text-end">
-              {formatNumber(protocol.allocation, "format")}
-            </p>
+            <span className="text-[16px] whitespace-nowrap text-end">
+              {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
+            </span>
           </div>
 
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Percent
+              Proportion
             </span>
-            <span>{protocol.value.toFixed(2)}%</span>
+            <span className="text-[16px] whitespace-nowrap text-end">
+              {protocol?.value?.toFixed(2)}%
+            </span>
           </div>
-
-          {/* <a
-            href={
-              vault?.isMetaVault
-                ? `/metavaults/metavault/${vault.address}`
-                : `/vaults/vault/${vault.network}/${vault.address}`
-            }
-            className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
-          >
-            {vault?.isMetaVault ? "View Meta Vault" : "View Vault"}
-            <ArrowRightIcon />
-          </a> */}
         </div>
       ) : null}
     </div>
   );
 };
 
-export { ProtocolRow };
+export { Protocol };

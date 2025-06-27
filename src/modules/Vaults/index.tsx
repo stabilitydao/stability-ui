@@ -51,7 +51,7 @@ import {
 import {
   TABLE,
   TABLE_FILTERS,
-  PAGINATION_VAULTS,
+  PAGINATION_LIMIT,
   STABLECOINS,
   CHAINS,
   // WBTC,
@@ -164,8 +164,8 @@ const Vaults = (): JSX.Element => {
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
   const [activeNetworks, setActiveNetworks] = useState(CHAINS);
 
-  const lastTabIndex = currentTab * PAGINATION_VAULTS;
-  const firstTabIndex = lastTabIndex - PAGINATION_VAULTS;
+  const lastTabIndex = currentTab * PAGINATION_LIMIT;
+  const firstTabIndex = lastTabIndex - PAGINATION_LIMIT;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   const userVaultsCondition =
@@ -437,7 +437,7 @@ const Vaults = (): JSX.Element => {
     );
     // pagination upd
     if (currentTab != 1) {
-      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_VAULTS);
+      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_LIMIT);
 
       if (disponibleTabs < currentTab) {
         setCurrentTab(1);

@@ -17,7 +17,7 @@ import {
 
 import { Timer } from "./components";
 
-import { LEADERBOARD_TABLE, PAGINATION_VAULTS } from "@constants";
+import { LEADERBOARD_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { contests, seeds } from "@stabilitydao/stability";
 
@@ -39,7 +39,7 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
   const [tableStates, setTableStates] = useState(LEADERBOARD_TABLE);
   const [tableData, setTableData] = useState<TLeaderboard[]>([]);
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_VAULTS);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
 
   const initTableData = async () => {

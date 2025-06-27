@@ -14,7 +14,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     APR: "w-1/2 md:w-[20%] justify-end",
     Allocation: "w-1/2 md:w-[20%] justify-end",
     "Allocation (current / target)": "hidden md:flex md:w-[30%] justify-end",
-    Percent: "hidden md:flex md:w-[30%] justify-end",
+    Proportion: "hidden md:flex md:w-[30%] justify-end",
   };
 
   const tabController = () => {

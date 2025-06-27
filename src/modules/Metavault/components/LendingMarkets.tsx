@@ -19,6 +19,11 @@ const LendingMarkets = (): JSX.Element => {
           link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
         },
         {
+          logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
+          symbol: "Silo wmetaUSD - scUSD",
+          link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
+        },
+        {
           logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
           symbol: "Enclabs wmetaUSD",
           link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",

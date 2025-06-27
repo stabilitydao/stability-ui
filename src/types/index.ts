@@ -16,6 +16,8 @@ interface IL {
 interface IProtocol {
   name: string;
   logoSrc: string;
+  value?: number;
+  allocation?: number;
 }
 
 interface IStrategyInfo {
@@ -311,7 +313,7 @@ type TMetaVault = {
   tvl: string;
   vaults: TAddress[];
   endVaults?: TAddress[];
-  protocols?: string[];
+  protocols?: { name: string; logoSrc: string }[];
   strategies?: string[];
   sonicPoints?: number;
 };
