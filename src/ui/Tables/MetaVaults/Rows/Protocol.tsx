@@ -60,7 +60,7 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
         </div>
         <div className="px-4 w-[20%] hidden min-[860px]:block">
           <span className="text-[16px] whitespace-nowrap text-end">
-            {formatNumber(protocol?.allocation ?? 0, "format")}
+            {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
           </span>
         </div>
         <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
@@ -74,13 +74,13 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
               Allocation
             </span>
             <span className="text-[16px] whitespace-nowrap text-end">
-              {formatNumber(protocol?.allocation ?? 0, "format")}
+              {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
             </span>
           </div>
 
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Percent
+              Proportion
             </span>
             <span className="text-[16px] whitespace-nowrap text-end">
               {protocol?.value?.toFixed(2)}%

@@ -417,7 +417,7 @@ const PROTOCOLS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "Percent",
+    name: "Proportion",
     keyName: "value",
     sortType: "none",
     dataType: "number",
