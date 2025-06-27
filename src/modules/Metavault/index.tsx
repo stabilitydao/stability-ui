@@ -526,14 +526,17 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                   {formatNumber(localMetaVault?.merklAPR, "formatAPR")}%
                 </p>
               </a>
-              <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">
-                  sGEM1 APR
-                </p>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.gemsAPR, "formatAPR")}%
-                </p>
-              </div>
+
+              {!!localMetaVault?.gemsAPR && (
+                <div className="flex items-center justify-between">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    sGEM1 APR
+                  </p>
+                  <p className="text-end font-semibold">
+                    {formatNumber(localMetaVault?.gemsAPR, "formatAPR")}%
+                  </p>
+                </div>
+              )}
               <div className="flex items-center justify-between text-[#2BB656]">
                 <p className="leading-5 font-medium">Total APR</p>
                 <p className="text-end font-semibold">
