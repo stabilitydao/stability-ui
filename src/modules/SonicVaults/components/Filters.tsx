@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
-import { Checkbox, FiltersIcon } from "@ui";
+import { Checkbox, Toggler, FiltersIcon } from "@ui";
 
 import { cn, useClickOutside, useModalClickOutside } from "@utils";
 
@@ -36,6 +36,8 @@ const Filters: React.FC<IProps> = memo(
 
     const modalRef = useRef<HTMLDivElement>(null);
 
+    const mobileOrder = ["Active", "My vaults", "Strategies", "Stablecoins"];
+
     const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
       const filterName = filters.find((item) => item.name === filter.name);
       if (!filterName) return;
@@ -61,36 +63,6 @@ const Filters: React.FC<IProps> = memo(
 
           setFilters(updatedFilters);
           break;
-        // case "multiple":
-        // const updatedFiltersMultiple = filters.map((f) =>
-        //   f.name === filterName.name
-        //     ? {
-        //         ...f,
-        //         variants:
-        //           f.variants?.map((variant: TTAbleFiltersVariant) =>
-        //             variant.name === option
-        //               ? { ...variant, state: !variant.state }
-        //               : { ...variant, state: false }
-        //           ) || [],
-        //       }
-        //     : f
-        // );
-
-        // const multipleFilter = updatedFiltersMultiple.find(
-        //   (f) => f.name === filterName.name
-        // );
-
-        // if (multipleFilter?.name.toLowerCase() === "strategy") {
-        //   const strategy =
-        //     multipleFilter?.variants &&
-        //     multipleFilter?.variants.find((variant) => variant.state);
-        //   strategy
-        //     ? params.set("strategy", strategy.name)
-        //     : params.delete("strategy");
-        // }
-
-        // setFilters(updatedFiltersMultiple);
-        // break;
         case "sample":
           updatedFilters = filters.map((f) =>
             f.name === filterName.name
@@ -372,79 +344,145 @@ const Filters: React.FC<IProps> = memo(
               </div>
 
               <div className="flex flex-col gap-3 p-4">
-                {filters.map((filter) => (
-                  <div
-                    key={filter.name}
-                    className="flex items-center justify-between gap-2"
-                  >
-                    <p className="text-[14px] leading-5 font-medium">
-                      {filter.name}
-                    </p>
-                    {filter.type === "single" ? (
-                      <Checkbox
-                        checked={filter.state}
-                        onChange={() => activeFiltersHandler(filter)}
-                      />
-                    ) : filter.type === "sample" ? (
-                      <div className="flex gap-2 bg-[#18191c] border border-[#232429] rounded-lg text-[14px] leading-4">
-                        <button
-                          onClick={() => activeFiltersHandler(filter, "All")}
-                          className={`px-3 py-1 rounded ${
-                            !filter.state
-                              ? "bg-[#232429] border border-[#232429]"
-                              : "text-[#97979A]"
-                          }`}
-                        >
-                          All
-                        </button>
-                        <button
-                          onClick={() => activeFiltersHandler(filter)}
-                          className={`px-3 py-1 rounded ${
-                            filter.state
-                              ? "bg-[#232429] border border-[#232429]"
-                              : "text-[#97979A]"
-                          }`}
-                        >
-                          {filter.name}
-                        </button>
-                      </div>
-                    ) : filter.type === "dropdown" ? (
-                      <div className="flex flex-col gap-1 text-[14px] leading-4 max-h-[70px] overflow-y-auto">
-                        {filter.variants?.map((variant) => (
-                          <label
-                            key={variant.name}
-                            className="inline-flex items-center gap-2"
-                          >
-                            <Checkbox
-                              checked={variant.state}
-                              onChange={() =>
-                                activeFiltersHandler(filter, variant.name)
+                {filters
+                  .sort(
+                    (a, b) =>
+                      mobileOrder.indexOf(a.name) - mobileOrder.indexOf(b.name)
+                  )
+                  .map((filter) => {
+                    const fitlerName =
+                      filter.name === "Active" ? "Status" : filter.name;
+                    return (
+                      <div
+                        key={fitlerName}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <p className="text-[14px] leading-5 font-medium">
+                          {fitlerName}
+                        </p>
+                        {filter.type === "single" ? (
+                          <Toggler
+                            checked={filter.state}
+                            onChange={() => activeFiltersHandler(filter)}
+                          />
+                        ) : filter.type === "sample" ? (
+                          <div className="flex bg-[#18191c] border border-[#232429] rounded-lg text-[14px] leading-4">
+                            <button
+                              onClick={() =>
+                                activeFiltersHandler(filter, "All")
                               }
-                            />
-                            <span>{variant.title}</span>
-                          </label>
-                        ))}
+                              className={`px-3 py-1 rounded ${
+                                !filter.state
+                                  ? "bg-[#232429] border border-[#232429]"
+                                  : "text-[#97979A]"
+                              }`}
+                            >
+                              All
+                            </button>
+                            <button
+                              onClick={() => activeFiltersHandler(filter)}
+                              className={`px-3 py-1 rounded ${
+                                filter.state
+                                  ? "bg-[#232429] border border-[#232429]"
+                                  : "text-[#97979A]"
+                              }`}
+                            >
+                              {filter.name}
+                            </button>
+                          </div>
+                        ) : filter.type === "dropdown" ? (
+                          <div className="relative select-none w-[160px]">
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDropDownSelector((prevState) => !prevState);
+                              }}
+                              data-testid="strategyFilterDropdown"
+                              className="flex items-center justify-between gap-2 px-3 py-1 h-[32px] bg-[#1D1E23] border border-[#35363B] rounded-lg cursor-pointer"
+                            >
+                              <p className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px] leading-6 font-medium">
+                                <span className="text-[#97979A]">
+                                  {filter.name}:{" "}
+                                </span>
+                                <span>{activeStrategies}</span>
+                              </p>
+                              <img
+                                className={cn(
+                                  "transition delay-[50ms] w-4 h-4",
+                                  dropDownSelector
+                                    ? "rotate-[180deg]"
+                                    : "rotate-[0deg]"
+                                )}
+                                src="/arrow-down.svg"
+                                alt="arrowDown"
+                              />
+                            </div>
+                            <div
+                              ref={dropDownRef}
+                              className={cn(
+                                "bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg w-full z-20 mt-2 hide-scrollbar max-h-[100px] overflow-y-auto",
+                                dropDownSelector
+                                  ? "absolute transition delay-[50ms]"
+                                  : "hidden"
+                              )}
+                            >
+                              <div className="flex flex-col items-start">
+                                {filter.variants?.map(
+                                  (variant: TTAbleFiltersVariant) => (
+                                    <div
+                                      key={variant.name}
+                                      onClick={() =>
+                                        activeFiltersHandler(
+                                          filter,
+                                          variant.name
+                                        )
+                                      }
+                                      className={cn(
+                                        "p-[6px] cursor-pointer w-full flex items-center gap-2"
+                                      )}
+                                      data-testid="strategy"
+                                      title={variant.title}
+                                    >
+                                      <Checkbox
+                                        checked={variant.state}
+                                        onChange={() =>
+                                          activeFiltersHandler(
+                                            filter,
+                                            variant.name
+                                          )
+                                        }
+                                      />
+                                      <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+                                        {variant.title}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
 
-              <div
-                className={cn(
-                  "flex justify-between items-center px-4 pb-4",
-                  !allParams && "hidden"
-                )}
-              >
+              <div className="flex justify-between items-center px-4 pb-4">
                 <button
-                  onClick={resetTable}
-                  className="text-[#816FEA] text-[14px] leading-5 font-semibold"
+                  onClick={() => allParams && resetTable()}
+                  className={cn(
+                    "text-[#816FEA] text-[14px] leading-5 font-semibold",
+                    !allParams && "opacity-50"
+                  )}
                 >
                   Clear all
                 </button>
                 <button
-                  onClick={() => setModal(false)}
-                  className="text-[14px] leading-5 font-semibold px-4 py-3 bg-[#816FEA] rounded-lg"
+                  onClick={() => allParams && setModal(false)}
+                  className={cn(
+                    "text-[14px] leading-5 font-semibold px-4 py-3 bg-[#816FEA] rounded-lg",
+                    !allParams && "opacity-50"
+                  )}
                 >
                   View results
                 </button>

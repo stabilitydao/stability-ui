@@ -46,7 +46,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   return (
     <a
-      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg w-full md:w-[258px] overflow-hidden"
+      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden"
       data-testid="vault"
       href={link}
     >

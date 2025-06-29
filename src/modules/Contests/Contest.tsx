@@ -4,7 +4,9 @@ import axios from "axios";
 
 import { useStore } from "@nanostores/react";
 
-import { HeadingText, TableColumnSort, FullPageLoader, Pagination } from "@ui";
+import { HeadingText, FullPageLoader, Pagination } from "@ui";
+
+import { Timer, ContestColumn } from "./components";
 
 import {
   getShortAddress,
@@ -14,8 +16,6 @@ import {
   getTokenData,
   formatNumber,
 } from "@utils";
-
-import { Timer } from "./components";
 
 import { LEADERBOARD_TABLE, PAGINATION_LIMIT } from "@constants";
 
@@ -86,7 +86,7 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
         />
       )}
 
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between flex-col xl:flex-row gap-5">
         <div className="flex flex-col gap-4">
           <h2 className="page-title__font text-start">{contest.name}</h2>
           <h3 className="text-[#97979a] page-description__font">
@@ -360,82 +360,13 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
         <Timer start={contest.start} end={contest.end} />
       </div>
 
-      {/* <div className="mt-5 w-full text-center">
-        <HeadingText text="Leaderboard" scale={2} styles="mb-5" />
-        {isActiveContest ? (
-          <div>
-            {tableData.length ? (
-              <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px]">
-                <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
-                  <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                    <tr className="text-[12px] uppercase">
-                      {tableStates.map((value: TTableColumn, index: number) => (
-                        <TableColumnSort
-                          key={value.name + index}
-                          index={index}
-                          value={value.name}
-                          sort={sortTable}
-                          table={tableStates}
-                          setTable={setTableStates}
-                          tableData={tableData}
-                          setTableData={setTableData}
-                        />
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="text-[14px]">
-                    {!!tableData.length &&
-                      tableData.map(({ rank, address, deposit, earned }) => (
-                        <tr
-                          key={address}
-                          className="h-[48px] hover:bg-accent-950"
-                        >
-                          <td
-                            className={`px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10 ${$account?.toLowerCase() === address ? "underline" : ""}`}
-                          >
-                            {rank}
-                          </td>
-
-                          <td
-                            className="px-4 py-3 text-center"
-                            style={{ fontFamily: "monospace" }}
-                          >
-                            {getShortAddress(address, 6, 4)}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {earned <= 0.01
-                              ? earned.toFixed(4)
-                              : earned.toFixed(2)}
-                          </td>
-                          <td className="text-center px-4 py-3">
-                            {deposit <= 0.01
-                              ? deposit.toFixed(4)
-                              : deposit.toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <FullPageLoader />
-            )}
-          </div>
-        ) : (
-          <HeadingText
-            text="The leaderboard table will appear after the contest has started."
-            scale={3}
-          />
-        )}
-      </div> */}
-
       <div className="flex flex-col gap-4 mt-10">
         <span className="text-[24px] leading-8 font-semibold">Leaderboard</span>
 
         <div className="pb-5">
           <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
             {tableStates.map((value: TTableColumn, index: number) => (
-              <TableColumnSort
+              <ContestColumn
                 key={value.name + index}
                 index={index}
                 value={value.name}

@@ -13,6 +13,7 @@ import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
 import { CountersBlockCompact } from "./CountersBlockCompact";
 import { Checkbox } from "./Checkbox";
+import { Toggler } from "./Toggler";
 import { HeadingText } from "./HeadingText";
 import { FieldValue } from "./FieldValue";
 import { TableColumnSort } from "./TableColumnSort";
@@ -41,6 +42,7 @@ import {
 
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
+import { ContestsTable } from "./Tables/Contests";
 
 import { DisplayType } from "./DisplayType";
 
@@ -66,6 +68,7 @@ export {
   ColorIndicator,
   CountersBlockCompact,
   Checkbox,
+  Toggler,
   HeadingText,
   FieldValue,
   TableColumnSort,
@@ -87,4 +90,5 @@ export {
   FiltersIcon,
   ArrowRightIcon,
   TextSkeleton,
+  ContestsTable,
 };

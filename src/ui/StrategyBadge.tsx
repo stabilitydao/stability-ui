@@ -10,6 +10,8 @@ interface IProps {
 }
 
 const StrategyBadge: React.FC<IProps> = ({ info, specific }) => {
+  specific = specific ?? "";
+
   const matchedAddress = STABILITY_AAVE_POOLS.find((addr) =>
     specific.includes(addr)
   );
