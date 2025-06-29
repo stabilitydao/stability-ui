@@ -50,7 +50,7 @@ const Timer: React.FC<IProps> = ({ start, end }) => {
   const formattedTime = formatTime(timeLeft);
 
   return (
-    <div className="flex flex-col items-center gap-3 px-[34px] py-5 bg-[#151618] border border-[#23252A] rounded-lg">
+    <div className="flex flex-col items-center gap-3 px-[12px] md:px-[34px] py-2 md:py-5 bg-[#151618] border border-[#23252A] rounded-lg">
       <h3 className="text-[#97979A] text-[14px] leading-5">
         {status === "beforeStart" ? "STARTS" : "ENDS"} IN
       </h3>
@@ -61,7 +61,7 @@ const Timer: React.FC<IProps> = ({ start, end }) => {
             className="flex flex-col items-center justify-center px-4 py-2 bg-[#101012] rounded-lg border border-[#23252A] font-medium"
           >
             <span
-              className="text-[32px] leading-10"
+              className="text-[20px] md:text-[32px] leading-5 md:leading-10"
               style={{ fontFamily: "monospace" }}
             >
               {unit.value.toString().padStart(2, "0")}

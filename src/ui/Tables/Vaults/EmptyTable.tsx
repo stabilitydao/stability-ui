@@ -44,7 +44,7 @@ const EmptyTable: React.FC<IProps> = ({ isUserVaults, display }) => {
             <span className="text-[16px] leading-6 font-semibold">
               No results found
             </span>
-            <span className="text-[14px] leading-5 font-medium text-[#97979A]">
+            <span className="text-[14px] leading-5 font-medium text-[#97979A] text-center">
               Try clearing your filters or changing your search term
             </span>
           </div>

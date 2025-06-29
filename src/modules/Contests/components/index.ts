@@ -1,3 +1,4 @@
 import { Timer } from "./Timer";
+import { ContestColumn } from "./ContestColumn";
 
-export { Timer };
+export { Timer, ContestColumn };
