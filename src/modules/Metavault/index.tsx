@@ -502,7 +502,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
             <div className="flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">APR</p>
+                <p className="leading-5 text-[#97979A] font-medium">APR 24H</p>
                 <p className="text-end font-semibold">
                   {formatNumber(localMetaVault?.APR, "formatAPR")}%
                 </p>

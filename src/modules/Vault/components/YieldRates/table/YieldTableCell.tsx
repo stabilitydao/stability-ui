@@ -14,7 +14,7 @@ const YieldTableCell: React.FC<IProps> = memo(
     return (
       <div
         {...(!!testID && { "data-testid": testID })}
-        className={cn("text-right w-[20%]", customClassName)}
+        className={cn("text-right w-1/4 md:w-[20%]", customClassName)}
       >
         {isSharePrice ? `${data}%` : "-"}
       </div>

@@ -945,7 +945,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 }
               }
 
-              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+              totalAPR = Number(metaVault.APR24h) + merklAPR + gemsAPR;
 
               return {
                 ...metaVault,

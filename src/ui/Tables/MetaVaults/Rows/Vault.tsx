@@ -48,6 +48,10 @@ const Vault: React.FC<IProps> = ({
   const isDimmed =
     activeVault?.isHovered && activeVault.address !== vault.address;
 
+  const protocol = !vault?.isMetaVault
+    ? vault?.strategyInfo?.protocols[0]
+    : null;
+
   return (
     <div className={cn("border-t border-[#23252A]")}>
       <a
@@ -82,16 +86,26 @@ const Vault: React.FC<IProps> = ({
                   alt="logo"
                 />
               ) : (
-                vault.assets.map((asset, index) => (
-                  <img
-                    src={asset?.logo}
-                    alt={asset?.symbol}
-                    className={`w-8 h-8 rounded-full flex-shrink-0 ${
-                      !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
-                    }`}
-                    key={asset?.logo + index}
-                  />
-                ))
+                <div className="flex items-center">
+                  {vault.assets.map((asset, index) => (
+                    <img
+                      src={asset?.logo}
+                      alt={asset?.symbol}
+                      className={`w-8 h-8 rounded-full flex-shrink-0 ${
+                        !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
+                      }`}
+                      key={asset?.logo + index}
+                    />
+                  ))}
+                  {protocol && (
+                    <img
+                      src={protocol?.logoSrc}
+                      alt={protocol?.name}
+                      title={protocol?.name}
+                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
+                    />
+                  )}
+                </div>
               )}
             </div>
             <span

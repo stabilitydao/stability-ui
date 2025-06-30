@@ -11,10 +11,7 @@ interface IProps {
 const VaultBar: React.FC<IProps> = memo(({ vault }) => {
   return (
     <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap font-manrope">
-      <h1
-        data-testid="vaultSymbol"
-        className="text-[40px] leading-[48px] font-semibold"
-      >
+      <h1 data-testid="vaultSymbol" className="page-title__font">
         {VAULTS_WITH_NAME[vault.address] || vault.name}
       </h1>
       {!!vault?.risk?.isRektStrategy && (

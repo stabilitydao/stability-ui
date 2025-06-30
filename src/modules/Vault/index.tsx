@@ -54,7 +54,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
 
   return vault && localVault ? (
     <WagmiLayout>
-      <main className="w-full mx-auto font-manrope flex gap-6">
+      <div className="w-full mx-auto font-manrope flex gap-6">
         <div>
           <VaultBar vault={localVault} />
           <div className="flex items-center justigy-center w-full flex-col xl:flex-row">
@@ -109,7 +109,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           <InvestForm network={network} vault={localVault} />
           <Contracts vault={localVault} network={network} />
         </div>
-      </main>
+      </div>
     </WagmiLayout>
   ) : (
     <div>

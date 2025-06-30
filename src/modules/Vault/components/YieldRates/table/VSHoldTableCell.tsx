@@ -15,7 +15,7 @@ const VSHoldTableCell: React.FC<IProps> = memo(
       <div
         {...(!!testID && { "data-testid": testID })}
         className={cn(
-          "text-right w-[17.5%]",
+          "text-right w-1/5 md:w-[17.5%]",
           isVsActive && `${vsHold > 0 ? "text-success-400" : "text-error-400"}`,
           customClassName
         )}

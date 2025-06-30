@@ -531,14 +531,14 @@ const HistoricalRate: React.FC<IProps> = memo(
     }, []);
 
     return (
-      <div className=" mt-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+      <div className="mt-6">
+        <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 md:gap-0 gap-3">
           <HeadingText text="Historical Rate" scale={2} />
           {activeChart && (
             <div className="flex items-center font-semibold relative text-[14px] leading-5 gap-2">
               <p
                 className={cn(
-                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
                   activeChart.name === "APR"
                     ? "text-white border !border-[#2C2E33] bg-[#22242A]"
                     : "text-[#97979A] border !border-[#23252A]"
@@ -549,7 +549,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               </p>
               <p
                 className={cn(
-                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
                   activeChart.name === "vsHodl"
                     ? "text-white border !border-[#2C2E33] bg-[#22242A]"
                     : "text-[#97979A] border !border-[#23252A]"
@@ -560,7 +560,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               </p>
               <p
                 className={cn(
-                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
                   activeChart.name === "TVL"
                     ? "text-white border !border-[#2C2E33] bg-[#22242A]"
                     : "text-[#97979A] border !border-[#23252A]"
@@ -571,7 +571,7 @@ const HistoricalRate: React.FC<IProps> = memo(
               </p>
               <p
                 className={cn(
-                  "whitespace-nowrap cursor-pointer z-20 text-center px-4 py-2 rounded-lg",
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
                   activeChart.name === "sharePrice"
                     ? "text-white border !border-[#2C2E33] bg-[#22242A]"
                     : "text-[#97979A] border !border-[#23252A]"

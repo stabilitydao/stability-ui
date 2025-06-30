@@ -63,14 +63,14 @@ const APRtimeSwitcher: React.FC<IProps> = ({ withText = false }) => {
   }, [dropDownRef]);
 
   return (
-    <div className="relative select-none switcher font-manrope font-semibold w-[170px]">
+    <div className="relative select-none switcher font-manrope font-semibold w-[100px] md:w-[170px]">
       <div
         onClick={(e) => {
           e.stopPropagation();
           setDropDownSelector((prevState) => !prevState);
         }}
         data-testid="APRTimeSwitcher"
-        className="flex items-center justify-between gap-3 px-5 py-3 cursor-pointer border border-[#23252A] rounded-lg"
+        className="flex items-center justify-between gap-2 px-3 py-1 md:gap-3 md:px-5 md:py-3 cursor-pointer border border-[#35363B] md:border-[#23252A] rounded-lg bg-[#1D1E23] md:bg-transparent"
       >
         <p className="text-[16px]">
           {withText ? <span className="text-[#97979a]">Period: </span> : ""}
