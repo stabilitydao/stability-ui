@@ -18,7 +18,7 @@ const HeadingText: React.FC<IProps> = ({ text, scale, styles = "" }) => {
   return React.createElement(
     tag,
     {
-      className: `font-manrope font-bold text-neutral-50 ${textSize[scale]} ${styles}`,
+      className: `font-manrope font-bold text-neutral-50 ${textSize[scale]} ${styles} text-left md:text-center`,
     },
     text
   );
