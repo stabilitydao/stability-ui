@@ -221,8 +221,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           const strategy = v.strategy;
 
           const isSiloMatch =
-            protocol.name === "Silo V2" &&
-            (strategy === "Silo Managed Farm" || strategy === "Silo Farm");
+            protocol.name === "Silo V2" && strategy.includes("Silo");
 
           const isStrategyMatch = protocol.name.includes(strategy);
 
