@@ -215,23 +215,21 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       let allocation = 0;
 
       cleanedVaults.forEach((vault) => {
-        if (vault?.isMetaVault) {
-          vault.vaults.forEach((v) => {
-            if (
-              protocol?.name.includes(v.strategy) ||
-              (protocol?.name === "Silo V2" &&
-                v.strategy === "Silo Managed Farm")
-            ) {
-              allocation += Number(v.tvl);
-            }
-          });
-        } else if (
-          protocol?.name.includes(vault.strategy) ||
-          (protocol?.name === "Silo V2" &&
-            vault.strategy === "Silo Managed Farm")
-        ) {
-          allocation += Number(vault.tvl);
-        }
+        const vaultsToCheck = vault?.isMetaVault ? vault.vaults : [vault];
+
+        vaultsToCheck.forEach((v) => {
+          const strategy = v.strategy;
+
+          const isSiloMatch =
+            protocol.name === "Silo V2" &&
+            (strategy === "Silo Managed Farm" || strategy === "Silo Farm");
+
+          const isStrategyMatch = protocol.name.includes(strategy);
+
+          if (isSiloMatch || isStrategyMatch) {
+            allocation += Number(v.tvl || 0);
+          }
+        });
       });
 
       return { ...protocol, allocation };
