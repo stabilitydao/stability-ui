@@ -9,7 +9,7 @@ import {
 
 import { cn, formatNumber } from "@utils";
 
-import { VAULTS_WITH_NAME } from "@constants";
+import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
 
 import { TVault, TAPRModal } from "@types";
 
@@ -48,9 +48,13 @@ const Vault: React.FC<IProps> = ({
   const isDimmed =
     activeVault?.isHovered && activeVault.address !== vault.address;
 
-  const protocol = !vault?.isMetaVault
+  const rawProtocol = !vault?.isMetaVault
     ? vault?.strategyInfo?.protocols[0]
     : null;
+
+  const protocol = rawProtocol?.name?.includes("Aave")
+    ? PROTOCOLS.stability
+    : rawProtocol;
 
   return (
     <div className={cn("border-t border-[#23252A]")}>
