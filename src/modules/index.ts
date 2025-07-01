@@ -13,6 +13,7 @@ import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
+import { AddPools } from "./Platform/components/Swapper/AddPools";
 import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
@@ -46,6 +47,7 @@ export {
   SonicVaults,
   XSTBL,
   Swapper,
+  AddPools,
   Dashboard,
   LeveragedFarming,
   Metavaults,

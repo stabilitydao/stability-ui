@@ -1,0 +1,10 @@
+---
+import {AddPools} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Add Pools">
+    <div class="platform max-w-[1200px]">
+        <AddPools client:only="react" />
+    </div>
+</Layout>

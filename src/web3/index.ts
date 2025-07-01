@@ -28,6 +28,7 @@ import IXStakingABI from "./abi/IXStakingABI.ts";
 import IXSTBLABI from "./abi/IXSTBLABI.ts";
 import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
+import SwapperABI from "./abi/SwapperABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -167,4 +168,5 @@ export {
   SALE_CONTRACT,
   IMetaVaultABI,
   WrappedMetaVaultABI,
+  SwapperABI,
 };
