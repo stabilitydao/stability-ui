@@ -366,10 +366,10 @@ const Swapper = (): JSX.Element => {
             </div>
 
             <a
-              className="bg-accent-500 hover:bg-accent-600 mt-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
-              href="/add-pools"
-              target="_blank"
+              className="bg-accent-500 hover:bg-accent-600 my-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
+              href="/swapper/add-pools"
               title="Go to add pools page"
+              key="/swapper/add-pools"
             >
               Add Pools
             </a>
