@@ -86,7 +86,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
   const getVaultAPRs = (vault: TVault) => {
     if (vault.isMetaVault) {
       return {
-        APR: Number(vault?.APR ?? 0).toFixed(2),
+        APR: Number(vault?.totalAPR ?? 0).toFixed(2),
       };
     }
 

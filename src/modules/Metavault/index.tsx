@@ -323,10 +323,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 <TextSkeleton lineHeight={24} width={80} />
               ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
-                  {["metaUSD", "metaS"].includes(localMetaVault.symbol)
-                    ? formatNumber(localMetaVault?.totalAPR, "formatAPR")
-                    : formatNumber(localMetaVault?.APR, "formatAPR")}
-                  %
+                  {formatNumber(localMetaVault?.totalAPR, "formatAPR")}%
                 </span>
               )}
             </div>
