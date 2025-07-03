@@ -298,7 +298,7 @@ const LENDING_MARKETS = {
   "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
     {
       logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png",
-      symbol: "Silo wmetaS - S market",
+      symbol: "Silo wmetaS - S",
       link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
     },
 
