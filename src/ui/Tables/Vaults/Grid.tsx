@@ -36,7 +36,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         pool: vault?.pool,
       }
     : {
-        APR: vault?.APR,
+        APR: vault?.APR24h,
         merklAPR: vault?.merklAPR,
         gemsAPR: vault?.gemsAPR,
         totalAPR: vault?.totalAPR,

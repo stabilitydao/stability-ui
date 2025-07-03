@@ -6,7 +6,7 @@ import { formatNumber } from "@utils";
 
 import { SILO_POINTS } from "@constants";
 
-import { TVault } from "@types";
+import { TVault, TAPRModal } from "@types";
 
 interface IProps {
   APRs: {
@@ -18,12 +18,28 @@ interface IProps {
     gemsAPR: string;
   };
   vault: TVault;
+  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const Row: React.FC<IProps> = ({ APRs, vault }) => {
+const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
   const [expandedData, setExpandedData] = useState(false);
 
   const link = `/vaults/vault/${vault.network}/${vault.address}`;
+
+  const modalData = {
+    earningData: vault.earningData,
+    daily: vault.daily,
+    lastHardWork: vault.lastHardWork,
+    symbol: vault?.risk?.symbol as string,
+    state: true,
+    type: "vault",
+    pool: vault?.pool,
+  };
+
+  const currentLtv = vault?.leverageLending?.ltv.toFixed() ?? 0;
+  const maxLtv = vault?.leverageLending?.maxLtv.toFixed() ?? 0;
+
+  const lendingPlatform = vault.strategyInfo.protocols[0].name;
 
   return (
     <div className="border border-[#23252A] border-b-0">
@@ -38,7 +54,7 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
           }
         }}
       >
-        <div className="flex items-center w-full xl:w-[25%] justify-between gap-3 px-4">
+        <div className="flex items-center w-full lg:w-[25%] justify-between gap-3 px-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center">
               {vault.assets.map((asset, index) => (
@@ -57,7 +73,7 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-1">
+          <div className="flex lg:hidden xl:flex items-center justify-center gap-1">
             {!vault.symbol.includes("PT-") && (
               <div
                 title="Sonic Activity Points"
@@ -67,9 +83,9 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
                   <img
                     src="/sonic.png"
                     alt="sonic"
-                    className="w-4 h-4 rounded-full"
+                    className="w-3 h-3 rounded-full"
                   />
-                  <span className="text-[12px]">
+                  <span className="text-[10px]">
                     x{vault.sonicActivePoints}
                   </span>
                 </div>
@@ -84,9 +100,9 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
                   <img
                     src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
                     alt="silo"
-                    className="w-4 h-4 rounded-full"
+                    className="w-3 h-3 rounded-full"
                   />
-                  <span className="text-[12px]">
+                  <span className="text-[10px]">
                     {SILO_POINTS[vault.address as keyof typeof SILO_POINTS]}
                   </span>
                 </div>
@@ -102,52 +118,85 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
                   <img
                     src="/rings.png"
                     alt="rings"
-                    className="w-4 h-4 rounded-full"
+                    className="w-3 h-3 rounded-full"
                   />
-                  <span className="text-[12px]">x{vault.ringsPoints}</span>
+                  <span className="text-[10px]">x{vault.ringsPoints}</span>
                 </div>
               </div>
             )}
-            <div className="block xl:hidden ml-2">
+            <div className="block lg:hidden ml-2">
               <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
             </div>
           </div>
         </div>
-
-        <div className="px-4 w-[15%] hidden xl:block">
+        <div className="px-4 w-[15%] hidden lg:block">
           <div className="px-2 py-1 rounded text-[12px] leading-4 text-[#97979A] bg-[#151618] border border-[#23252A]">
-            Aave
+            {lendingPlatform}
           </div>
         </div>
-        <div className="px-4 w-[15%] hidden xl:block text-[16px] leading-5 text-start">
-          3.5x
+        <div className="px-4 w-[15%] hidden lg:block text-[16px] leading-5 text-end">
+          {vault?.leverage}x
         </div>
-        <div className="px-4 w-[15%] hidden xl:block text-[16px] leading-5 text-end">
-          65% / 80%
+        <div className="px-4 w-[15%] hidden lg:block text-[16px] leading-5 text-end">
+          {currentLtv}% / {maxLtv}%
         </div>
-        <div className="px-4 w-[10%] hidden xl:block text-[16px] leading-5 text-start">
-          APR
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setModalState(modalData);
+          }}
+          className="px-4 w-[10%] hidden lg:block text-[16px] leading-5 text-end tooltip cursor-help"
+        >
+          <div
+            className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
+              vault?.risk?.isRektStrategy ? "text-[#818181]" : "text-[#eaecef]"
+            }`}
+          >
+            <div className="flex flex-col justify-end">
+              <p className="text-[16px]">
+                {formatNumber(APRs.APR, "formatAPR")}%
+              </p>
+              {!!vault?.liveAPR && (
+                <p className="text-[14px] text-[#97979A]">
+                  live. {vault?.liveAPR?.toFixed(2)}%
+                </p>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="px-4 w-[10%] hidden xl:block text-[16px] leading-5 text-start">
+        <div className="px-4 w-[10%] hidden lg:block text-[16px] leading-5 text-end">
           {formatNumber(vault.tvl, "abbreviate")}
         </div>
-        <div className="px-4 w-[10%] hidden xl:block text-[16px] leading-5 text-start">
+        <div className="px-4 w-[10%] hidden lg:block text-[16px] leading-5 text-end">
           ${formatNumber(vault.balanceInUSD, "format")}
         </div>
       </a>
       {expandedData ? (
-        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] xl:hidden">
-          {!vault?.isMetaVault && (
-            <div className="flex items-center justify-between w-full">
-              <span className="text-[#909193] text-[14px] leading-5 font-medium">
-                Strategy
-              </span>
-              <StrategyBadge
-                info={vault.strategyInfo}
-                specific={vault.strategySpecific}
-              />
+        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] lg:hidden">
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Lending Platform
+            </span>
+            <div className="px-2 py-1 rounded text-[12px] leading-4 text-[#97979A] bg-[#151618] border border-[#23252A]">
+              {lendingPlatform}
             </div>
-          )}
+          </div>
+
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Leverage
+            </span>
+            <span className="text-[16px]">{vault?.leverage}x</span>
+          </div>
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              LTV / Max LTV
+            </span>
+            <span className="text-[16px]">
+              {currentLtv}% / {maxLtv}%
+            </span>
+          </div>
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
               APR
@@ -175,7 +224,7 @@ const Row: React.FC<IProps> = ({ APRs, vault }) => {
           </div>
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Balance
+              Deposit
             </span>
             <span className="text-[16px]">
               ${formatNumber(vault.balanceInUSD, "format")}

@@ -9,13 +9,13 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Name: "w-[25%]",
-    "Lending Platform": "w-[15%]",
-    Leverage: "w-[15%]",
-    "LTV / Max LTV": "w-[15%] justify-end",
-    APR: "w-[10%]",
-    TVL: "w-[10%]",
-    Deposit: "w-[10%]",
+    Name: "w-[25%] hidden lg:flex",
+    "Lending Platform": "w-[15%] hidden lg:flex",
+    Leverage: "w-1/4 lg:w-[15%] lg:justify-end",
+    "LTV / Max LTV": "w-[15%] hidden lg:flex justify-end",
+    APR: "w-1/4 lg:w-[10%] justify-center lg:justify-end",
+    TVL: "w-1/4 lg:w-[10%] justify-center lg:justify-end",
+    Deposit: "w-1/4 lg:w-[10%] justify-end",
   };
 
   const tabController = () => {

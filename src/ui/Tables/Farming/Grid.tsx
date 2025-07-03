@@ -22,6 +22,11 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
 
   const link = `/vaults/vault/${vault.network}/${vault.address}`;
 
+  const currentLtv = vault?.leverageLending?.ltv.toFixed() ?? 0;
+  const maxLtv = vault?.leverageLending?.maxLtv.toFixed() ?? 0;
+
+  const lendingPlatform = vault.strategyInfo.protocols[0].name;
+
   return (
     <a
       className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden"
@@ -31,24 +36,16 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
-            {vault?.isMetaVault ? (
+            {vault.assets.map((asset, index) => (
               <img
-                className="w-10 h-10 rounded-full flex-shrink-0"
-                src={`/features/${vault.symbol}.png`}
-                alt={vault.symbol}
+                src={asset?.logo}
+                alt={asset?.symbol}
+                className={`w-10 h-10 rounded-full ${
+                  !index && vault.assets.length > 1 && "mr-[-16px] z-[5]"
+                }`}
+                key={asset?.logo + index}
               />
-            ) : (
-              vault.assets.map((asset, index) => (
-                <img
-                  src={asset?.logo}
-                  alt={asset?.symbol}
-                  className={`w-10 h-10 rounded-full ${
-                    !index && vault.assets.length > 1 && "mr-[-16px] z-[5]"
-                  }`}
-                  key={asset?.logo + index}
-                />
-              ))
-            )}
+            ))}
           </div>
 
           <div className="flex flex-col items-start gap-1">
@@ -65,15 +62,21 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {!vault?.isMetaVault && (
-            <div className="flex items-center justify-between">
-              <span className="text-[#97979A] text-[14px]">Strategy</span>
-              <StrategyBadge
-                info={vault.strategyInfo}
-                specific={vault.strategySpecific}
-              />
-            </div>
-          )}
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">Lending Platform</span>
+            <span className="font-bold">{lendingPlatform}</span>
+          </div>
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">Leverage</span>
+            <span className="font-bold">{vault?.leverage}x</span>
+          </div>
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">LTV / Max LTV</span>
+            <span className="font-bold">
+              {currentLtv}% / {maxLtv}%
+            </span>
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
@@ -103,7 +106,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
             </span>
           </div>
           <div className="flex items-center justify-between text-[14px]">
-            <span className="text-[#97979A]">Balance</span>
+            <span className="text-[#97979A]">Deposit</span>
             <p className="font-bold">
               ${formatNumber(vault.balanceInUSD, "format")}
             </p>
