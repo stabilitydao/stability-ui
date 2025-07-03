@@ -67,9 +67,9 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
 
   return (
     <div>
-      <HeadingText text="Vault" scale={2} styles="text-left mb-4" />
+      <HeadingText text="Vault" scale={2} styles="text-left mb-3 md:mb-4" />
 
-      <div className="flex flex-col items-start gap-4 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+      <div className="flex flex-col items-start gap-3 md:gap-4 p-4 md:p-6 bg-[#101012] rounded-lg border border-[#23252A]">
         <div className="flex flex-col gap-4">
           <p data-testid="vaultType" className="text-[16px]">
             <VaultType greater={true} type={vault?.type} />
@@ -82,7 +82,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 justify-between items-start w-full">
+        <div className="flex justify-between items-start w-full">
           <div>
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               Vault Status
@@ -92,7 +92,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
               <span data-testid="vaultStatus">{vault?.status}</span>
             </div>
           </div>
-          <div className="sm:w-1/2">
+          <div className="w-1/2">
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               Gas Reserve
             </p>
@@ -104,7 +104,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
+        <div className="flex items-start justify-between w-full">
           <div className="flex flex-col">
             <div
               data-testid="vaultLastHardWork"
@@ -116,7 +116,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
               <TimeDifferenceIndicator unix={vault?.lastHardWork} />
             </div>
           </div>
-          <div className="sm:w-1/2">
+          <div className="w-1/2">
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               Hard Work on Deposit
             </p>
@@ -128,7 +128,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
             </p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-5 sm:gap-0 items-start justify-between w-full">
+        <div className="flex items-start justify-between w-full">
           <div>
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               Created
@@ -140,7 +140,7 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
               {created?.time}
             </p>
           </div>
-          <div className="sm:w-1/2">
+          <div className="w-1/2">
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">
               NFT Token ID
             </p>
@@ -178,10 +178,9 @@ const VaultInfo: React.FC<IProps> = memo(({ network, vault }) => {
                 `${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`
               )
             }
-            className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
+            className="w-full text-[16px] bg-[#5E6AD2] font-semibold justify-center py-3 rounded-lg"
           >
-            <span>Add to MetaMask </span>{" "}
-            <img src="/metamask.svg" alt="metamask" />
+            Add to wallet
           </button>
         )}
       </div>

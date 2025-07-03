@@ -1,28 +1,23 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-
-// import { formatUnits} from "viem";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { isMobile } from "react-device-detect";
-
-// import { deployments } from "@stabilitydao/stability";
-
 import { APRModal } from "./components/modals/APRModal";
+import { MetaAPRModal } from "./components/modals/MetaAPRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
-import { Pagination } from "./components/Pagination";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
-import { NetworkFilters } from "./components/NetworksFilter";
+
+import { chains } from "@stabilitydao/stability";
 
 import {
-  TimeDifferenceIndicator,
   FullPageLoader,
   ErrorMessage,
-  RiskIndicator,
+  APRtimeSwitcher,
+  Pagination,
+  VaultsTable,
+  DisplayType,
 } from "@ui";
 
 import {
@@ -31,82 +26,51 @@ import {
   aprFilter,
   connected,
   error,
-  visible,
-  // platformVersions,
-  // currentChainID,
-  // assetsPrices,
+  metaVaults,
 } from "@store";
 
-import { toVault, initFilters } from "./functions";
+import { initFilters } from "./functions";
 
-import {
-  formatNumber,
-  formatFromBigInt,
-  getTimeDifference,
-  dataSorter,
-  // getDate,
-  // getTokenData,
-} from "@utils";
+import { formatFromBigInt, dataSorter, debounce, cn } from "@utils";
 
 import {
   TABLE,
   TABLE_FILTERS,
   PAGINATION_LIMIT,
   STABLECOINS,
-  CHAINS,
-  // WBTC,
-  // WETH,
-  // WMATIC,
+  DEFAULT_TABLE_PARAMS,
 } from "@constants";
 
-// import { platforms, PlatformABI } from "@web3";
+import { DisplayTypes } from "@types";
 
 import type {
   TVault,
   TTableColumn,
-  THoldData,
-  // TPendingPlatformUpgrade,
-  // TAddress,
-  // TUpgradesTable,
   TEarningData,
   TVaults,
   TAPRPeriod,
+  TTableActiveParams,
+  TVSHoldModalState,
 } from "@types";
 
-// type TToken = {
-//   logo: string;
-//   price: string;
-// };
-
-type TVSHoldModalState = {
-  assetsVsHold: THoldData[];
-  lifetimeVsHold: number;
-  vsHoldAPR: number;
-  created: number;
-  state: boolean;
-  isVsActive: boolean;
-};
-
 const Vaults = (): JSX.Element => {
-  const { open } = useWeb3Modal();
-
   const $vaults = useStore(vaults);
+  const $metaVaults = useStore(metaVaults);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
   const $connected = useStore(connected);
 
   const $error = useStore(error);
-  const $visible = useStore(visible);
-  // const $publicClient = useStore(publicClient);
-  // const $platformVersions = useStore(platformVersions);
-  // const $currentChainID = useStore(currentChainID);
-  // const $assetsPrices = useStore(assetsPrices);
-
-  // const [tokens, setTokens] = useState<TToken[]>([]);
 
   const newUrl = new URL(window.location.href);
   const params = new URLSearchParams(newUrl.search);
+
+  const [activeTableParams, setActiveTableParams] =
+    useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
+
+  const [allParams, setAllParams] = useState<number>(0);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
   let urlTab = 1;
 
@@ -123,14 +87,22 @@ const Vaults = (): JSX.Element => {
       ({ name }) => name.toUpperCase() === paramName.toUpperCase()
     );
 
+    const URLParamType = paramType === "desc" ? "descendentic" : "ascendentic";
+
     if (indexOfState != -1) {
-      urlTableStates[indexOfState].sortType = paramType;
+      urlTableStates[indexOfState].sortType = URLParamType;
+
+      if (!activeTableParams.sort) {
+        setActiveTableParams((prev) => ({ ...prev, sort: 1 }));
+      }
     }
   }
 
   const search: React.RefObject<HTMLInputElement> = useRef(null);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
+  const [localMetaVaults, setLocalMetaVaults] = useState([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -150,27 +122,55 @@ const Vaults = (): JSX.Element => {
     isVsActive: false,
   });
 
-  // const [platformUpdates, setPlatformUpdates] =
-  //   useState<TPendingPlatformUpgrade>();
-
-  // const [lockTime, setLockTime] = useState({ start: "", end: "" });
-  // const [upgradesTable, setUpgradesTable] = useState<TUpgradesTable[]>([]);
-
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [currentTab, setCurrentTab] = useState(urlTab);
 
-  const [tableStates, setTableStates] = useState(TABLE);
+  const [tableStates, setTableStates] = useState(urlTableStates);
   const [tableFilters, setTableFilters] = useState(TABLE_FILTERS);
-  const [activeNetworks, setActiveNetworks] = useState(CHAINS);
+  const [displayType, setDisplayType] = useState<DisplayTypes>(
+    DisplayTypes.Rows
+  );
+  const [activeNetworks, setActiveNetworks] = useState([
+    {
+      name: chains["146"].name,
+      id: "146",
+      logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
+      explorer: "https://sonicscan.org/address/",
+      nativeCurrency: "S",
+      active: true, // main page active networks
+    },
+  ]);
 
-  const lastTabIndex = currentTab * PAGINATION_LIMIT;
-  const firstTabIndex = lastTabIndex - PAGINATION_LIMIT;
+  const lastTabIndex = currentTab * pagination;
+  const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
   const userVaultsCondition =
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
+
+  const handleSearch = (value: string) => {
+    if (search?.current) {
+      search.current.value = value;
+
+      tableHandler();
+      setSearchHistory([]);
+    }
+  };
+
+  const clearSearchHistory = (history: string[]) => {
+    if (history.length === searchHistory.length) {
+      localStorage.setItem("searchHistory", JSON.stringify([]));
+      setSearchHistory([]);
+    } else {
+      const updatedHistory = searchHistory.filter(
+        (item) => !history.includes(item)
+      );
+      localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+      setSearchHistory(updatedHistory);
+    }
+  };
 
   const activeNetworksHandler = async (chainIDs: string[]) => {
     let updatedNetworks = activeNetworks.map((network) =>
@@ -217,100 +217,80 @@ const Vaults = (): JSX.Element => {
     setActiveNetworks(updatedNetworks);
   };
 
-  // const fetchPlatformUpdates = async () => {
-  //   try {
-  //     const pendingPlatformUpgrade: any = await $publicClient?.readContract({
-  //       address: platforms[$currentChainID],
-  //       abi: PlatformABI,
-  //       functionName: "pendingPlatformUpgrade",
-  //     });
-  //     let upgrated = [];
-  //     if (pendingPlatformUpgrade?.proxies.length) {
-  //       const promises = pendingPlatformUpgrade.proxies.map(
-  //         async (proxy: TAddress, index: number) => {
-  //           const moduleContracts = Object.keys(deployments[$currentChainID]);
-  //           const upgratedData = await Promise.all(
-  //             moduleContracts.map(async (moduleContract: string) => {
-  //               //Can't use CoreContracts type
-  //               //@ts-ignore
-  //               const address = deployments[$currentChainID][moduleContract];
-  //               if (proxy === address) {
-  //                 const oldImplementation = await $publicClient?.readContract({
-  //                   address: address,
-  //                   abi: [
-  //                     {
-  //                       inputs: [],
-  //                       name: "implementation",
-  //                       outputs: [
-  //                         {
-  //                           internalType: "address",
-  //                           name: "",
-  //                           type: "address",
-  //                         },
-  //                       ],
-  //                       stateMutability: "view",
-  //                       type: "function",
-  //                     },
-  //                   ],
-  //                   functionName: "implementation",
-  //                 });
-  //                 const oldImplementationVersion =
-  //                   await $publicClient?.readContract({
-  //                     address: oldImplementation,
-  //                     abi: PlatformABI,
-  //                     functionName: "VERSION",
-  //                   });
-  //                 const newImplementationVersion =
-  //                   await $publicClient?.readContract({
-  //                     address: pendingPlatformUpgrade.newImplementations[index],
-  //                     abi: PlatformABI,
-  //                     functionName: "VERSION",
-  //                   });
-  //                 return {
-  //                   contract: moduleContract,
-  //                   oldVersion: oldImplementationVersion,
-  //                   newVersion: newImplementationVersion,
-  //                   proxy: proxy,
-  //                   oldImplementation: oldImplementation,
-  //                   newImplementation:
-  //                     pendingPlatformUpgrade.newImplementations[index],
-  //                 };
-  //               }
-  //             })
-  //           );
-  //           return upgratedData.filter((data) => data !== undefined);
-  //         }
-  //       );
-  //       upgrated = (await Promise.all(promises)).flat();
-  //     }
+  const resetTable = () => {
+    // search
+    if (search?.current) {
+      search.current.value = "";
+    }
 
-  //     /////***** TIME CHECK  *****/////
-  //     const lockTime: any = await $publicClient?.readContract({
-  //       address: platforms[$currentChainID],
-  //       abi: PlatformABI,
-  //       functionName: "TIME_LOCK",
-  //     });
-  //     const platformUpgradeTimelock: any = await $publicClient?.readContract({
-  //       address: platforms[$currentChainID],
-  //       abi: PlatformABI,
-  //       functionName: "platformUpgradeTimelock",
-  //     });
-  //     if (lockTime && platformUpgradeTimelock) {
-  //       setLockTime({
-  //         start: getDate(Number(platformUpgradeTimelock - lockTime)),
-  //         end: getDate(Number(platformUpgradeTimelock)),
-  //       });
-  //     }
-  //     /////***** SET DATA  *****/////
-  //     setUpgradesTable(upgrated);
-  //     setPlatformUpdates(pendingPlatformUpgrade);
-  //   } catch (error) {
-  //     console.error("Error fetching platform updates:", error);
-  //   }
-  // };
+    // sort
+    const _tableStates = tableStates.map((state) => ({
+      ...state,
+      sortType: "none",
+    }));
+    setTableStates(_tableStates);
 
-  const tableHandler = (table: TTableColumn[] = tableStates) => {
+    //filters
+    const _tableFilters = tableFilters.map((filter) => {
+      if (filter.variants) {
+        const variants = filter.variants.map((variant) => ({
+          ...variant,
+          state: false,
+        }));
+        return {
+          ...filter,
+          variants,
+        };
+      } else if (filter.name === "Active") {
+        return { ...filter, state: true };
+      } else {
+        return { ...filter, state: false };
+      }
+    });
+    setTableFilters(_tableFilters);
+
+    // ui
+    setActiveTableParams(DEFAULT_TABLE_PARAMS);
+    setAllParams(0);
+
+    // path
+    window.history.replaceState(null, "", window.location.pathname);
+
+    // table reset
+    tableHandler(_tableStates, DEFAULT_TABLE_PARAMS);
+  };
+
+  const updateHistorySearch = useCallback(
+    debounce((value: string) => {
+      if (!value) return;
+
+      const history = JSON.parse(
+        localStorage.getItem("searchHistory") as string
+      );
+
+      if (Array.isArray(history) && history.includes(value)) return;
+
+      let newValues = history ? [...history, value] : [value];
+
+      if (newValues.length > 5) {
+        newValues.shift();
+      }
+
+      localStorage.setItem("searchHistory", JSON.stringify(newValues));
+    }, 3000),
+    []
+  );
+
+  const tableHandler = (
+    table: TTableColumn[] = tableStates,
+    tableParams = activeTableParams
+  ) => {
+    if (!$vaults) return;
+
     const searchValue: string = String(search?.current?.value.toLowerCase());
+
+    //@ts-ignore
+    updateHistorySearch(searchValue);
 
     let activeNetworksVaults: { [key: string]: TVault[] } = {};
 
@@ -329,14 +309,21 @@ const Vaults = (): JSX.Element => {
       return acc;
     }, {});
 
-    let sortedVaults = Object.values(mixedVaults)
+    const allVaults = [
+      ...(localMetaVaults || []),
+      ...Object.values(mixedVaults || []),
+    ];
+
+    let sortedVaults = allVaults
       .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
       .map((vault) => {
-        const balance = formatFromBigInt(vault.balance, 18);
+        const balance = formatFromBigInt(vault.balance ?? 0, 18);
 
         return {
           ...vault,
-          balanceInUSD: balance * Number(vault.shareprice),
+          balanceInUSD: vault?.isMetaVault
+            ? balance * Number(vault.sharePrice)
+            : balance * Number(vault.shareprice),
         };
       });
 
@@ -395,7 +382,7 @@ const Vaults = (): JSX.Element => {
 
             if (strategiesToFilter.length) {
               sortedVaults = sortedVaults.filter((vault: TVault) =>
-                strategiesToFilter.includes(vault.strategyInfo.shortId)
+                strategiesToFilter.includes(vault?.strategyInfo?.shortId)
               );
             }
           }
@@ -405,18 +392,22 @@ const Vaults = (): JSX.Element => {
           break;
       }
     });
+
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
         if (state.keyName === "earningData") {
-          sortedVaults = [...sortedVaults].sort((a, b) =>
-            dataSorter(
-              a.earningData.apr[$aprFilter],
-              b.earningData.apr[$aprFilter],
-              state.dataType,
-              state.sortType
-            )
-          );
+          sortedVaults = [...sortedVaults].sort((a, b) => {
+            const aAPR = a?.isMetaVault
+              ? Number(a.totalAPR ?? 0)
+              : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
+
+            const bAPR = b?.isMetaVault
+              ? Number(b.totalAPR ?? 0)
+              : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
+
+            return dataSorter(aAPR, bAPR, state.dataType, state.sortType);
+          });
         } else {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
@@ -429,15 +420,16 @@ const Vaults = (): JSX.Element => {
         }
       }
     });
+
     //search
     sortedVaults = sortedVaults.filter(
       (vault: TVault) =>
-        vault.symbol.toLowerCase().includes(searchValue) ||
-        vault.assetsSymbol.toLowerCase().includes(searchValue)
+        vault?.symbol.toLowerCase().includes(searchValue) ||
+        vault?.assetsSymbol.toLowerCase().includes(searchValue)
     );
     // pagination upd
     if (currentTab != 1) {
-      const disponibleTabs = Math.ceil(sortedVaults.length / PAGINATION_LIMIT);
+      const disponibleTabs = Math.ceil(sortedVaults.length / pagination);
 
       if (disponibleTabs < currentTab) {
         setCurrentTab(1);
@@ -445,69 +437,77 @@ const Vaults = (): JSX.Element => {
       }
     }
 
+    //active table params(search-sort-filter)
+    let _activeTableParams = tableParams;
+
+    if (!!searchValue && !_activeTableParams.search) {
+      _activeTableParams = { ..._activeTableParams, search: 1 };
+    } else if (!searchValue && !!_activeTableParams.search) {
+      _activeTableParams = { ..._activeTableParams, search: 0 };
+    }
+
+    const isSort = table.some((state) => state.sortType != "none");
+
+    if (isSort && !_activeTableParams.sort) {
+      _activeTableParams = { ..._activeTableParams, sort: 1 };
+    } else if (!isSort && !!_activeTableParams.sort) {
+      _activeTableParams = { ..._activeTableParams, sort: 0 };
+    }
+
+    // search history
+    const history = JSON.parse(localStorage.getItem("searchHistory") as string);
+
+    const historyData: string[] = [];
+    if (Array.isArray(history) && searchValue) {
+      for (const historyValue of history) {
+        if (historyValue.includes(searchValue)) {
+          historyData.push(historyValue);
+        }
+      }
+    }
+
+    setActiveTableParams(_activeTableParams);
     setFilteredVaults(sortedVaults);
     setTableStates(table);
+    setSearchHistory(historyData);
   };
 
   const initVaults = async () => {
-    if ($vaults) {
-      const mixedVaults: TVaults = Object.values($vaults).reduce<TVaults>(
-        (acc, value) => {
-          return { ...acc, ...(value as TVaults) };
-        },
-        {}
-      );
+    if ($vaults && $metaVaults) {
+      const allVaults = [
+        ...($metaVaults["146"] || []),
+        ...Object.values($vaults[146] || []),
+      ];
 
-      const vaults: TVault[] = Object.values(mixedVaults)
-        .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
+      const vaults: TVault[] = allVaults
+        .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
-          const balance = formatFromBigInt(vault.balance, 18);
+          const tVault = vault as TVault;
+          const balance = formatFromBigInt(tVault.balance ?? 0, 18);
 
           return {
-            ...vault,
-            balanceInUSD: balance * Number(vault.shareprice),
+            ...tVault,
+            balanceInUSD: balance * Number(tVault.shareprice),
           };
         });
 
-      initFilters(vaults, tableFilters, setTableFilters, activeNetworksHandler);
+      initFilters(
+        vaults,
+        tableFilters,
+        setTableFilters,
+        activeNetworksHandler,
+        setActiveTableParams
+      );
+
       setLocalVaults(vaults);
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
-      /////***** AFTER PAGE LOADING *****/ /////
-      // if (!upgradesTable.length) {
-      //   fetchPlatformUpdates();
-      // }
+
+      /*** Meta Vaults ***/
+      setLocalMetaVaults($metaVaults["146"]);
     }
   };
-  // useEffect(() => {
-  //   if ($assetsPrices) {
-  //     const BTC_LOGO = getTokenData(WBTC[0])?.logoURI as string;
-  //     const ETH_LOGO = getTokenData(WETH[0])?.logoURI as string;
-  //     const MATIC_LOGO = getTokenData(WMATIC[0])?.logoURI as string;
-
-  //     const BTC_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WBTC[0]], 18),
-  //       "formatWithoutDecimalPart"
-  //     ) as string;
-
-  //     const ETH_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WETH[0]], 18),
-  //       "formatWithoutDecimalPart"
-  //     ) as string;
-
-  //     const MATIC_PRICE = formatNumber(
-  //       formatUnits($assetsPrices[WMATIC[0]], 18),
-  //       "format"
-  //     ) as string;
-
-  //     setTokens([
-  //       { logo: BTC_LOGO, price: BTC_PRICE },
-  //       { logo: ETH_LOGO, price: ETH_PRICE },
-  //       { logo: MATIC_LOGO, price: MATIC_PRICE },
-  //     ]);
-  //   }
-  // }, [$assetsPrices]);
 
   useEffect(() => {
     tableHandler();
@@ -516,6 +516,17 @@ const Vaults = (): JSX.Element => {
   useEffect(() => {
     initVaults();
   }, [$vaults, $isVaultsLoaded]);
+
+  useEffect(() => {
+    const _allParams = Object.values(activeTableParams).reduce(
+      (acc, cur) => (acc += cur),
+      0
+    );
+
+    if (allParams != _allParams) {
+      setAllParams(_allParams);
+    }
+  }, [activeTableParams]);
 
   const isLoading = useMemo(() => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;
@@ -528,496 +539,168 @@ const Vaults = (): JSX.Element => {
           isLoading ? "pointer-events-none" : "pointer-events-auto"
         }`}
       >
-        <ErrorMessage type={$error.type} isAlert={true} />
+        <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
+
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="page-title__font text-start mb-2 md:mb-5">Vaults</h2>
+            <h3 className="text-[#97979a] page-description__font">
+              Aggregates every active strategy across chains and protocols.
+              <br className="hidden md:block" />
+              Explore, compare, and deposit into vaults optimized for yield,
+              <br className="hidden md:block" />
+              auto-compounding, and multi-protocol integration—all
+            </h3>
+          </div>
+          <div className="md:block hidden">
+            <APRtimeSwitcher withText={true} />
+          </div>
+        </div>
         <Portfolio vaults={localVaults} />
-        <NetworkFilters
-          activeNetworks={activeNetworks}
-          activeNetworksHandler={activeNetworksHandler}
-        />
-        <div className="flex items-center gap-2 flex-col lg:flex-row font-semibold text-[14px]">
-          <label className="relative block w-full">
-            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <img
-                src="/search.svg"
-                alt="Search"
-                className="w-4 h-4 text-neutral-500"
+
+        <div className="flex items-center xl:justify-between gap-2 mt-6 md:mt-10 mb-4">
+          <div className="max-w-[240px] w-full relative text-[16px]">
+            <label className="relative block">
+              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <img
+                  src="/search.svg"
+                  alt="Search"
+                  className="w-5 h-5 text-[#97979A]"
+                />
+              </span>
+              <input
+                type="text"
+                className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-10"
+                placeholder="Search asset"
+                ref={search}
+                onChange={() => tableHandler()}
               />
-            </span>
-            <input
-              type="text"
-              className="mt-1 lg:mt-0 w-full bg-accent-900 hover:border-accent-500 hover:bg-accent-800 outline-none py-[3px] rounded-2xl border-[2px] border-accent-800 focus:border-accent-500 focus:text-neutral-50 text-neutral-500 transition-all duration-300 h-10 pl-10"
-              placeholder="Search"
-              ref={search}
-              onChange={() => tableHandler()}
-            />
-          </label>
-          <Filters filters={tableFilters} setFilters={setTableFilters} />
+
+              <span
+                onClick={() => handleSearch("")}
+                className={cn(
+                  "absolute inset-y-0 right-4 flex items-center cursor-pointer",
+                  !search?.current?.value && "hidden"
+                )}
+              >
+                <img src="/icons/circle-xmark.png" alt="xmark" />
+              </span>
+            </label>
+            {!!searchHistory.length && (
+              <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[10] p-[6px]">
+                <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
+                  Recent searches
+                </span>
+                {searchHistory.map((text, index) => (
+                  <div
+                    key={text + index}
+                    className={cn(
+                      "cursor-pointer flex items-center justify-between"
+                    )}
+                  >
+                    <span
+                      className="text-ellipsis whitespace-nowrap overflow-hidden text-[14px] leading-5 font-medium py-[6px] pl-[6px]"
+                      onClick={() => handleSearch(text)}
+                    >
+                      {text}
+                    </span>
+                    <img
+                      className="py-[6px] pr-[6px]"
+                      onClick={() => clearSearchHistory([text])}
+                      src="/icons/xmark.svg"
+                      alt="xmark"
+                    />
+                  </div>
+                ))}
+                <button
+                  className="text-[#A193F2] text-[12px] leading-[14px] font-medium p-[6px] w-full text-start"
+                  onClick={() => clearSearchHistory(searchHistory)}
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
+          </div>
+
+          <Filters
+            filters={tableFilters}
+            setFilters={setTableFilters}
+            allParams={allParams}
+            setTableParams={setActiveTableParams}
+            resetTable={resetTable}
+          />
+
+          <DisplayType
+            type={displayType}
+            setType={setDisplayType}
+            pagination={pagination}
+            setPagination={setPagination}
+          />
         </div>
       </div>
 
-      <div className="overflow-x-auto min-[1020px]:overflow-x-visible min-[1130px]:min-w-[1095px] min-[1440px]:min-w-[1338px]">
-        <table className="table table-auto w-full select-none mb-9 min-w-[730px] md:min-w-full">
-          <thead className="bg-accent-950">
-            <tr className="text-[12px] uppercase">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <ColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  table={tableStates}
-                  sort={tableHandler}
-                />
-              ))}
-            </tr>
-          </thead>
-          <tbody className="font-manrope font-semibold text-[14px]">
-            {isLoading ? (
-              <tr className="relative h-[80px]">
-                <td className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
-                  <FullPageLoader />
-                </td>
-              </tr>
-            ) : localVaults?.length ? (
-              <>
-                {currentTabVaults?.length ? (
-                  currentTabVaults.map((vault: TVault, index: number) => {
-                    const network = CHAINS.find(
-                      (chain) => chain.id === vault.network
-                    );
-
-                    const aprValue = vault?.earningData?.apr[$aprFilter];
-
-                    const apyValue = vault.earningData.apy[$aprFilter];
-
-                    const swapFeesAPRValue =
-                      vault.earningData.poolSwapFeesAPR[$aprFilter];
-
-                    const strategyAPRValue =
-                      vault.earningData.farmAPR[$aprFilter];
-
-                    const dailyAPRValue = (
-                      Number(vault?.earningData?.apr[$aprFilter]) / 365
-                    ).toFixed(2);
-
-                    return (
-                      <tr
-                        key={vault.name + index}
-                        className="text-center min-[1020px]:hover:bg-accent-950 cursor-pointer h-[48px] font-medium relative"
-                        onClick={() => toVault(vault.network, vault.address)}
-                        data-testid="vault"
-                      >
-                        <td className="min-[1020px]:px-2 min-[1130px]:px-3 py-2 text-center sticky min-[1020px]:relative left-0 min-[1020px]:table-cell bg-accent-950 min-[1020px]:bg-transparent z-10">
-                          <div className="flex items-center min-[1020px]:ml-0 ml-[18px]">
-                            {/* {vault?.risk?.isRektStrategy ? (
-                                <div
-                                  className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
-                                  title={vault?.risk?.isRektStrategy as string}
-                                ></div>
-                              ) : (
-                                <VaultState status={vault.status} />
-                              )} */}
-                            <div className="relative mr-[6px] hidden min-[1020px]:block">
-                              <img
-                                src={network?.logoURI}
-                                alt={network?.name}
-                                className="h-4 w-4 rounded-full absolute left-[-15%] top-[-15%]"
-                              />
-                              <img
-                                src={`https://api.stabilitydao.org/vault/${vault.network}/${vault.address}/logo.svg`}
-                                alt="logo"
-                                className="w-6 h-6 rounded-full"
-                              />
-                            </div>
-
-                            <div className="max-w-[150px] min-[1020px]:max-w-[250px] flex items-start flex-col text-[#eaecef]">
-                              <p
-                                title={vault.name}
-                                className={`whitespace-nowrap text-[12px] md:text-[14px] ${
-                                  vault?.risk?.isRektStrategy
-                                    ? "text-[#818181]"
-                                    : "text-[#fff]"
-                                }`}
-                                style={{ color: vault.strategyInfo.color }}
-                              >
-                                {vault.symbol}
-                              </p>
-                              <p className="min-[1130px]:hidden text-[#848e9c]">
-                                {vault.strategyInfo.shortId}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 table-cell">
-                          <div className="flex items-center">
-                            <div className="flex items-center w-[52px] justify-center">
-                              {vault.assets.map((asset, index) => (
-                                <img
-                                  src={asset.logo}
-                                  alt={asset.symbol}
-                                  className={`w-6 h-6 rounded-full ${
-                                    !index &&
-                                    vault.assets.length > 1 &&
-                                    "mr-[-10px] z-[5]"
-                                  }`}
-                                  key={asset.logo + index}
-                                />
-                              ))}
-                            </div>
-                            <span>{vault.assetsSymbol}</span>
-                          </div>
-                        </td>
-                        {/* <td className="px-2 min-[1130px]:px-1 py-2 table-cell w-[50px]">
-                          <div className="flex items-center justify-center">
-                            {vault?.risk?.isRektStrategy ? (
-                              <div
-                                className="h-5 w-5 md:w-3 md:h-3 rounded-full mr-2 bg-[#EE6A63]"
-                                title={vault?.risk?.isRektStrategy as string}
-                              ></div>
-                            ) : (
-                              <VaultState status={vault.status} />
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-1 py-2 hidden xl:table-cell w-[90px]">
-                          <VaultType type={vault.type} />
-                        </td> */}
-                        <td className="pl-2 py-2 hidden min-[1340px]:table-cell whitespace-nowrap">
-                          <div className="flex items-center border-0 rounded-[8px] pl-0 py-1 border-[#935ec2]">
-                            {vault.strategyInfo && (
-                              <>
-                                <span
-                                  className={`px-2 rounded-[10px] hidden min-[1020px]:flex h-8 items-center ${
-                                    (vault.strategySpecific &&
-                                      vault.strategyInfo.shortId != "Y") ||
-                                    vault.strategyInfo.protocols.length > 2
-                                      ? "min-w-[100px] w-[170px]"
-                                      : ""
-                                  }`}
-                                >
-                                  <span
-                                    className={`flex ${
-                                      vault.yearnProtocols.length ||
-                                      vault.strategyInfo.shortId === "CF"
-                                        ? ""
-                                        : "min-w-[50px]"
-                                    }`}
-                                  >
-                                    {vault.strategyInfo.protocols.map(
-                                      (protocol, index) => (
-                                        <img
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                          key={protocol.logoSrc + String(index)}
-                                          src={protocol.logoSrc}
-                                          alt={protocol.name}
-                                          title={protocol.name}
-                                          style={{
-                                            zIndex:
-                                              vault.strategyInfo.protocols
-                                                .length - index,
-                                          }}
-                                        />
-                                      )
-                                    )}
-                                  </span>
-                                  {vault.yearnProtocols.length ? (
-                                    <div className="flex">
-                                      {vault.yearnProtocols.map((protocol) => (
-                                        <img
-                                          key={protocol.link}
-                                          src={protocol.link}
-                                          alt={protocol.title}
-                                          title={protocol.title}
-                                          className="h-6 w-6 rounded-full mx-[2px]"
-                                        />
-                                      ))}
-                                    </div>
-                                  ) : vault.strategySpecific ? (
-                                    <span
-                                      className={`font-bold rounded-[4px] text-[#b6bdd7] hidden min-[1130px]:inline ${
-                                        vault.strategySpecific.length > 10
-                                          ? "lowercase  text-[9px] pl-[6px] whitespace-pre-wrap max-w-[70px] text-left"
-                                          : "uppercase  text-[9px] px-[6px]"
-                                      }`}
-                                    >
-                                      {vault.strategySpecific}
-                                    </span>
-                                  ) : (
-                                    ""
-                                  )}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                        <td
-                          onClick={(e) => {
-                            if (isMobile) {
-                              e.stopPropagation();
-                              setAprModal({
-                                earningData: vault.earningData,
-                                daily: vault.daily,
-                                lastHardWork: vault.lastHardWork,
-                                symbol: vault?.risk?.symbol as string,
-                                state: true,
-                                pool: vault?.pool,
-                              });
-                            }
-                          }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                        >
-                          <div
-                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault?.risk?.isRektStrategy
-                                ? "text-[#818181]"
-                                : "text-[#eaecef]"
-                            }`}
-                          >
-                            <p className="text-end">{aprValue}%</p>
-                          </div>
-                          <div className="visible__tooltip">
-                            <div className="flex items-start flex-col gap-4">
-                              <div className="flex flex-col gap-1 w-full">
-                                {!!vault?.risk?.isRektStrategy && (
-                                  <div className="flex flex-col items-center gap-2 mb-[10px]">
-                                    <h3 className="text-[#f52a11] font-bold">
-                                      {vault?.risk?.symbol} VAULT
-                                    </h3>
-                                    <p className="text-[12px] text-start">
-                                      Rekt vault regularly incurs losses,
-                                      potentially leading to rapid USD value
-                                      decline, with returns insufficient to
-                                      offset the losses.
-                                    </p>
-                                  </div>
-                                )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APY</p>
-                                  <p className="text-end">{apyValue}%</p>
-                                </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Total APR</p>
-                                  <p className="text-end">{aprValue}%</p>
-                                </div>
-
-                                {vault?.earningData?.poolSwapFeesAPR.daily !=
-                                  "-" &&
-                                  vault?.pool && (
-                                    <div className="font-bold flex items-center justify-between">
-                                      <p>Pool swap fees APR</p>
-                                      <p className="text-end">
-                                        {swapFeesAPRValue}%
-                                      </p>
-                                    </div>
-                                  )}
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Strategy APR</p>
-                                  <p className="text-end">
-                                    {strategyAPRValue}%
-                                  </p>
-                                </div>
-                                <div className="font-bold flex items-center justify-between">
-                                  <p>Daily</p>
-                                  <p className="text-end">{dailyAPRValue}%</p>
-                                </div>
-                              </div>
-                              <div className="flex items-center justify-between w-full">
-                                <p>Last Hard Work</p>
-                                <TimeDifferenceIndicator
-                                  unix={vault.lastHardWork}
-                                />
-                              </div>
-                            </div>
-                            <i></i>
-                          </div>
-                        </td>
-                        <td
-                          onClick={(e) => {
-                            if (isMobile) {
-                              e.stopPropagation();
-                              setVsHoldModal({
-                                assetsVsHold: vault.assetsVsHold as THoldData[],
-                                lifetimeVsHold: vault.lifetimeVsHold,
-                                vsHoldAPR: vault.vsHoldAPR,
-                                created: getTimeDifference(vault.created)?.days,
-                                state: true,
-                                isVsActive: vault.isVsActive,
-                              });
-                            }
-                          }}
-                          className="px-2 min-[1130px]:px-3 py-2 tooltip cursor-help"
-                        >
-                          <p
-                            className={`whitespace-nowrap w-full text-end flex items-center justify-end gap-[2px] ${
-                              vault.vsHoldAPR < 0 &&
-                              getTimeDifference(vault.created).days >= 3 &&
-                              "text-[#eb7979]"
-                            }`}
-                          >
-                            {getTimeDifference(vault.created).days >= 3
-                              ? `${vault.vsHoldAPR}%`
-                              : "-"}
-                          </p>
-
-                          <div className="visible__tooltip !w-[450px]">
-                            <table className="table table-auto w-full rounded-lg">
-                              <thead className="bg-[#0b0e11]">
-                                <tr className="text-[16px] text-[#8f8f8f] uppercase">
-                                  <th></th>
-                                  <th>
-                                    {getTimeDifference(vault.created).days} days
-                                  </th>
-                                  <th className="text-right">est Annual</th>
-                                </tr>
-                              </thead>
-                              <tbody data-testid="vsHoldAPRTable">
-                                <tr className="hover:bg-[#2B3139]">
-                                  <td className="text-left">VAULT VS HODL</td>
-
-                                  {vault.isVsActive ? (
-                                    <td
-                                      className={`text-right ${
-                                        vault.lifetimeVsHold < 0 &&
-                                        "text-[#eb7979]"
-                                      }`}
-                                    >
-                                      {vault.lifetimeVsHold}%
-                                    </td>
-                                  ) : (
-                                    <td className="text-right">-</td>
-                                  )}
-
-                                  {vault.isVsActive ? (
-                                    <td
-                                      className={`text-right ${
-                                        vault.vsHoldAPR < 0 && "text-[#eb7979]"
-                                      }`}
-                                    >
-                                      {vault.vsHoldAPR}%
-                                    </td>
-                                  ) : (
-                                    <td className="text-right">-</td>
-                                  )}
-                                </tr>
-
-                                {vault.assetsVsHold.map(
-                                  (aprsData: THoldData, index: number) => (
-                                    <tr
-                                      key={aprsData?.symbol + index}
-                                      className="hover:bg-[#2B3139]"
-                                    >
-                                      <td className="text-left">
-                                        VAULT VS {aprsData?.symbol} HODL
-                                      </td>
-
-                                      {vault.isVsActive ? (
-                                        <td
-                                          className={`text-right ${
-                                            Number(aprsData.latestAPR) < 0 &&
-                                            "text-[#eb7979]"
-                                          }`}
-                                        >
-                                          {aprsData.latestAPR}%
-                                        </td>
-                                      ) : (
-                                        <td className="text-right">-</td>
-                                      )}
-
-                                      {vault.isVsActive ? (
-                                        <td
-                                          className={`text-right ${
-                                            Number(aprsData.latestAPR) < 0 &&
-                                            "text-[#eb7979]"
-                                          }`}
-                                        >
-                                          {aprsData.APR}%
-                                        </td>
-                                      ) : (
-                                        <td className="text-right">-</td>
-                                      )}
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
-                            <i></i>
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 whitespace-nowrap">
-                          <div className="flex items-center justify-center">
-                            <RiskIndicator
-                              riskSymbol={
-                                vault?.risk?.isRektStrategy
-                                  ? vault?.risk?.symbol
-                                  : (vault.strategyInfo.il?.title as string)
-                              }
-                            />
-                          </div>
-                        </td>
-                        <td className="px-2 min-[1130px]:px-4 py-2 text-right">
-                          {formatNumber(vault.tvl, "abbreviate")}
-                        </td>
-                        <td className="pr-2 md:pr-3 min-[1130px]:pr-5 py-2 text-right">
-                          <p className={`${!$visible && "blur select-none"}`}>
-                            {$visible
-                              ? `$${formatNumber(vault.balanceInUSD, "format")}`
-                              : "$000"}
-                          </p>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr className="text-start h-[60px] font-medium">
-                    {userVaultsCondition ? (
-                      <td>
-                        <p className="text-[18px]">
-                          You haven't connected your wallet.
-                        </p>
-                        <p>Connect to view your vaults.</p>
-                        <button
-                          className="bg-[#30127f] text-[#fcf3f6] py-0.5 px-4 rounded-md min-w-[120px] mt-2"
-                          onClick={() => open()}
-                        >
-                          Connect Wallet
-                        </button>
-                      </td>
-                    ) : (
-                      <td>
-                        <p className="text-[18px]">No results found.</p>
-                        <p>
-                          Try clearing your filters or changing your search
-                          term.
-                        </p>
-                      </td>
-                    )}
-                  </tr>
-                )}
-              </>
-            ) : (
-              <tr className="text-start h-[60px] font-medium">
-                <td>No vaults</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="pb-5">
+        <div
+          className={cn(
+            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
+            displayType === "grid" && "hidden"
+          )}
+        >
+          {tableStates.map((value: TTableColumn, index: number) => (
+            <ColumnSort
+              key={value.name + index}
+              index={index}
+              value={value.name}
+              table={tableStates}
+              sort={tableHandler}
+            />
+          ))}
+        </div>
+        <div>
+          {isLoading ? (
+            <div
+              className={cn(
+                "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
+                displayType === "grid" && "rounded-lg border-b"
+              )}
+            >
+              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
+                <FullPageLoader />
+              </div>
+            </div>
+          ) : localVaults?.length ? (
+            <VaultsTable
+              vaults={currentTabVaults}
+              display={displayType}
+              isUserVaults={!!userVaultsCondition}
+              period={$aprFilter}
+              setModalState={setAprModal}
+            />
+          ) : (
+            <div className="text-start h-[60px] font-medium">No vaults</div>
+          )}
+        </div>
+        <Pagination
+          pagination={pagination}
+          data={filteredVaults}
+          tab={currentTab}
+          display={displayType}
+          setTab={setCurrentTab}
+          setPagination={setPagination}
+        />
       </div>
 
-      <Pagination
-        data={filteredVaults}
-        tab={currentTab}
-        setTab={setCurrentTab}
-      />
-      {aprModal.state && (
+      {aprModal.state && aprModal.type === "vault" && (
         <APRModal state={aprModal} setModalState={setAprModal} />
       )}
+
+      {aprModal.state && aprModal.type === "metaVault" && (
+        <MetaAPRModal state={aprModal} setModalState={setAprModal} />
+      )}
+
       {vsHoldModal.state && (
         <VSHoldModal state={vsHoldModal} setModalState={setVsHoldModal} />
       )}
-      {/* <a href="/factory">
-        <button className="bg-button px-3 py-2 rounded-md text-[14px] mt-3">
-          Create vault
-        </button>
-      </a> */}
     </>
   );
 };

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon } from "@ui";
+import { Prices, NavIcon, Socials } from "@ui";
 
 import { cn, formatNumber } from "@utils";
 
@@ -150,17 +150,7 @@ const Menu = (): JSX.Element => {
                     Term of Use
                   </a>
                 </div> */}
-                <div className="flex items-center gap-4 p-4">
-                  <a href="https://x.com/stabilitydao" target="_blank">
-                    <img src="/socials/x.png" alt="X" />
-                  </a>
-                  <a
-                    href="https://discord.com/invite/R3nnetWzC9"
-                    target="_blank"
-                  >
-                    <img src="/socials/discord.png" alt="Discord" />
-                  </a>
-                </div>
+                <Socials />
               </div>
             </div>
           </motion.nav>

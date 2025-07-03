@@ -1,6 +1,6 @@
 ---
 import Layout from '@layouts/Layout.astro';
-import {SonicVaults} from "@modules"
+import {Vaults} from "@modules"
 ---
 
 <Layout title="Vaults"
@@ -9,5 +9,5 @@ import {SonicVaults} from "@modules"
   metaUrl="https://stability.farm/vaults"
   metaDescription="Deploy assets in Stability vaults, optimize your yield strategies and maximize profit."
 >
-  <SonicVaults client:only="react"/>
+  <Vaults client:only="react"/>
 </Layout>

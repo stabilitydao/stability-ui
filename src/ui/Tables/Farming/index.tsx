@@ -4,25 +4,16 @@ import { Row } from "./Row";
 
 import { cn } from "@utils";
 
-import { TVault, TAPRModal, TAPRPeriod, DisplayTypes } from "@types";
+import { TVault, DisplayTypes } from "@types";
 
 interface IProps {
   vaults: TVault[];
   display: DisplayTypes;
-  isUserVaults: boolean;
-  period: TAPRPeriod;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const VaultsTable: React.FC<IProps> = ({
-  vaults,
-  display,
-  isUserVaults,
-  period,
-  setModalState,
-}) => {
+const FarmingTable: React.FC<IProps> = ({ vaults, display }) => {
   if (!vaults?.length) {
-    return <EmptyTable isUserVaults={isUserVaults} display={display} />;
+    return <EmptyTable display={display} />;
   }
 
   return (
@@ -36,19 +27,19 @@ const VaultsTable: React.FC<IProps> = ({
       {vaults.map((vault: TVault, index: number) => {
         const aprValue = vault?.isMetaVault
           ? Number(vault?.totalAPR)
-          : Number(vault?.earningData?.apr[period]);
+          : Number(vault?.earningData?.apr.latest);
 
-        const apyValue = vault?.earningData?.apy[period];
+        const apyValue = vault?.earningData?.apy.latest;
 
-        const swapFeesAPRValue = vault?.earningData?.poolSwapFeesAPR[period];
+        const swapFeesAPRValue = vault?.earningData?.poolSwapFeesAPR.latest;
 
-        const strategyAPRValue = vault?.earningData?.farmAPR[period];
+        const strategyAPRValue = vault?.earningData?.farmAPR.latest;
 
         const dailyAPRValue = (
-          Number(vault?.earningData?.apr[period]) / 365
+          Number(vault?.earningData?.apr.latest) / 365
         ).toFixed(2);
 
-        const gemsAprValue = Number(vault?.earningData?.gemsAPR[period]);
+        const gemsAprValue = Number(vault?.earningData?.gemsAPR.latest);
 
         const APR_DATA = {
           APR: aprValue.toFixed(2),
@@ -65,7 +56,6 @@ const VaultsTable: React.FC<IProps> = ({
               key={`grid/${vault.name + index}`}
               APRs={APR_DATA}
               vault={vault}
-              setModalState={setModalState}
             />
           );
         }
@@ -75,7 +65,6 @@ const VaultsTable: React.FC<IProps> = ({
             key={`row/${vault.name + index}`}
             APRs={APR_DATA}
             vault={vault}
-            setModalState={setModalState}
           />
         );
       })}
@@ -83,4 +72,4 @@ const VaultsTable: React.FC<IProps> = ({
   );
 };
 
-export { VaultsTable };
+export { FarmingTable };

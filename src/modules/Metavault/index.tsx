@@ -480,9 +480,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
-          {metavault === "0x1111111199558661bf7ff27b4f1623dc6b91aa3e" && (
-            <LendingMarkets />
-          )}
+          <LendingMarkets metavault={metavault} />
         </div>
       </div>
       {modal && (
@@ -501,7 +499,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <div className="flex items-center justify-between">
                 <p className="leading-5 text-[#97979A] font-medium">APR 24H</p>
                 <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.APR, "formatAPR")}%
+                  {formatNumber(localMetaVault?.APR24h, "formatAPR")}%
                 </p>
               </div>
               <a

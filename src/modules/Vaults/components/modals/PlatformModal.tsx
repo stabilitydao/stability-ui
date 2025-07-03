@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import { deployments } from "@stabilitydao/stability";
+import {deployments, seeds} from "@stabilitydao/stability";
 
 import { PROTOCOLS, CHAINS } from "@constants";
 
@@ -272,7 +272,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
               <span className="text-[#848E9C]">API</span>
               {/* <span>{$apiData?.about}</span> */}
               <a
-                href="https://api.stabilitydao.org"
+                href={seeds[0]}
                 target="_blank"
                 className="flex items-center gap-1 hover:bg-[#2a2c49]"
               >

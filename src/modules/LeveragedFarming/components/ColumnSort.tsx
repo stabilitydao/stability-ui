@@ -9,11 +9,13 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Assets: "w-1/5 xl:w-[30%] hidden md:flex",
-    Strategy: "w-1/4 md:w-1/5 xl:w-[17.5%]",
-    APR: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
-    TVL: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
-    Balance: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
+    Name: "w-[25%]",
+    "Lending Platform": "w-[15%]",
+    Leverage: "w-[15%]",
+    "LTV / Max LTV": "w-[15%] justify-end",
+    APR: "w-[10%]",
+    TVL: "w-[10%]",
+    Deposit: "w-[10%]",
   };
 
   const tabController = () => {
@@ -64,7 +66,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <div
       onClick={tabController}
-      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-4 py-2 whitespace-nowrap ${styles[value] || "text-center"}`}
+      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-4 py-2 ${styles[value] || "text-center"}`}
       data-testid="sort"
     >
       <p

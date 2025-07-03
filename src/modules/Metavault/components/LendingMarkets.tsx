@@ -1,39 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, memo } from "react";
 
 import { ArrowIcon } from "@ui";
 
 import { cn } from "@utils";
 
-import type { TMarketInfo } from "@types";
+import { LENDING_MARKETS } from "@constants";
 
-const LendingMarkets = (): JSX.Element => {
-  const [markets, setMarkets] = useState<TMarketInfo[]>([]);
+import { TAddress } from "@types";
+
+interface IProps {
+  metavault: TAddress;
+}
+
+const LendingMarkets: React.FC<IProps> = memo(({ metavault }) => {
+  const key = metavault as keyof typeof LENDING_MARKETS;
+
+  if (!LENDING_MARKETS[key]) return null;
+
   const [expandedData, setExpandedData] = useState(true);
-
-  useEffect(() => {
-    try {
-      const marketsInfo = [
-        {
-          logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-          symbol: "Silo wmetaUSD - USDC",
-          link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
-        },
-        {
-          logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-          symbol: "Silo wmetaUSD - scUSD",
-          link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
-        },
-        {
-          logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
-          symbol: "Enclabs wmetaUSD",
-          link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",
-        },
-      ];
-      setMarkets(marketsInfo);
-    } catch (error) {
-      console.error("Failed to set lending markets data:", error);
-    }
-  }, []);
 
   return (
     <div className="w-full">
@@ -50,12 +34,12 @@ const LendingMarkets = (): JSX.Element => {
         </div>
       </div>
       {expandedData &&
-        markets.map(({ logo, symbol, link }, index: number) => (
+        LENDING_MARKETS[key].map(({ logo, symbol, link }, index: number) => (
           <a
             key={link + index}
             className={cn(
               "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012] cursor-pointer",
-              markets.length - 1 === index && "rounded-b-lg"
+              LENDING_MARKETS[key].length - 1 === index && "rounded-b-lg"
             )}
             href={link}
             target="_blank"
@@ -76,6 +60,6 @@ const LendingMarkets = (): JSX.Element => {
         ))}
     </div>
   );
-};
+});
 
 export { LendingMarkets };

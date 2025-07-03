@@ -78,9 +78,9 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
     setPoolAssets(assetsWithPercents);
   }, [vault, $assetsPrices]);
   return (
-    <>
+    <div>
       <HeadingText text="Liquidity Pool" scale={2} styles="text-left mb-4" />
-      <div className="flex flex-col items-start gap-6 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+      <div className="flex flex-col items-start gap-6 p-4 md:p-6 bg-[#101012] rounded-lg border border-[#23252A]">
         <div className="flex items-center gap-4">
           <img
             data-testid="poolLogo"
@@ -106,22 +106,32 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
 
         <div className="flex items-start gap-10 flex-wrap">
           <div className="flex flex-col gap-4">
-            <FieldValue
-              name="TVL"
-              value={
-                vault.pool.tvl
+            <div
+              data-testid="poolTVL"
+              className="flex justify-between w-full md:justify-normal items-start flex-col gap-1"
+            >
+              <div className="flex uppercase text-[12px] leading-3 text-neutral-500">
+                TVL
+              </div>
+              <div className="flex items-center text-[16px] md:text-[18px] font-semibold whitespace-nowrap">
+                {vault.pool.tvl
                   ? formatNumber(Number(vault.pool.tvl), "abbreviate")
-                  : 0
-              }
-              testId="poolTVL"
-            />
+                  : 0}
+              </div>
+            </div>
 
             {!!vault.pool.fee && (
-              <FieldValue
-                name="Fee"
-                value={`${vault.pool.fee}%`}
-                testId="poolFee"
-              />
+              <div
+                data-testid="poolFee"
+                className="flex justify-between w-full md:justify-normal items-start flex-col gap-1"
+              >
+                <div className="flex uppercase text-[12px] leading-3 text-neutral-500">
+                  Fee
+                </div>
+                <div className="flex items-center text-[16px] md:text-[18px] font-semibold whitespace-nowrap">
+                  {vault.pool.fee}%
+                </div>
+              </div>
             )}
           </div>
           <div className="flex flex-col gap-4">
@@ -130,14 +140,14 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
                 <div
                   key={poolAsset.amount + index}
                   data-testid="poolAsset"
-                  className="h-[36px] md:h-[64px] flex flex-row items-center justify-between w-full md:justify-normal md:items-start md:flex-col"
+                  className="flex justify-between w-full md:justify-normal items-start flex-col gap-1"
                 >
-                  <div className="h-[12px] flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
+                  <div className="flex uppercase text-[12px] leading-3 text-neutral-500">
                     {poolAsset.symbol}
                   </div>
                   <div
                     data-testid={`poolAsset${index}`}
-                    className="h-[40px] flex items-center text-[18px] font-semibold whitespace-nowrap"
+                    className="flex items-center text-[16px] md:text-[18px] font-semibold whitespace-nowrap"
                   >
                     {formatNumber(poolAsset.amount, "format")} (
                     {poolAsset.percent.toFixed(2)}%)
@@ -149,7 +159,7 @@ const LiquidityPool: React.FC<IProps> = memo(({ network, vault }) => {
           {!!dexPool?.algo && <FieldValue name="ALGO" value={dexPool?.algo} />}
         </div>
       </div>
-    </>
+    </div>
   );
 });
 
