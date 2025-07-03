@@ -306,11 +306,15 @@ const LENDING_MARKETS = {
       symbol: "Silo wmetaS - S",
       link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
     },
-
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
       symbol: "Euler wmetaS",
       link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaS - wS (looper)",
+      link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
     },
   ],
 };
