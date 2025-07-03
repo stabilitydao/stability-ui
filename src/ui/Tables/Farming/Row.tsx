@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ArrowIcon, StrategyBadge, ArrowRightIcon } from "@ui";
+import { ArrowIcon, ArrowRightIcon } from "@ui";
 
 import { formatNumber } from "@utils";
 

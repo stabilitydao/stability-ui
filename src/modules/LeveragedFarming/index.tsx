@@ -35,7 +35,6 @@ import { DisplayTypes } from "@types";
 import type {
   TVault,
   TTableColumn,
-  TVaults,
   TAPRPeriod,
   TTableActiveParams,
   TEarningData,
