@@ -263,7 +263,7 @@ const META_VAULTS_TYPE = {
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
-  // { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
   // { name: "ALM", path: "alm" },
   { name: "Users", path: "users" },

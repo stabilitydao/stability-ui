@@ -292,6 +292,8 @@ type TVault = {
   liveAPR: undefined | number;
   assetAPR: undefined | number;
 
+  leverage?: number;
+
   ///// meta vault
   isMetaVault?: boolean;
   proportions?: { current: number[]; target: number };
