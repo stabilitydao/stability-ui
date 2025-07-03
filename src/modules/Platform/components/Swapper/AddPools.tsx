@@ -355,7 +355,9 @@ const AddPools = (): JSX.Element => {
 
             {/* Main card */}
             <div className="w-full max-w-[1200px] xl:min-w-[1200px]">
-                <HeadingText text="Add Pools" scale={1} />
+                <div className="flex flex-row w-full justify-center">
+                    <HeadingText text="Add Pools" scale={1} />
+                </div>
 
                 <div className="mx-auto w-full max-w-[420px] rounded-2xl bg-accent-950 p-6 text-white shadow-xl">
                     {/* Pool address */}
@@ -441,13 +443,20 @@ const AddPools = (): JSX.Element => {
                     </div>
 
                     {/* Rewrite checkbox */}
-                    <div className="mt-6 flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            checked={rewrite}
-                            onChange={() => setRewrite((p) => !p)}
-                        />
-                        <label className="text-sm">Rewrite</label>
+                    <div className="mt-6 ">
+                        <p className="mb-2 text-xs text-neutral-400">
+                            Check this if you want to edit an existing pool.
+                        </p>
+
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                checked={rewrite}
+                                onChange={() => setRewrite((p) => !p)}
+                                id="rewrite-checkbox"
+                            />
+                            <label htmlFor="rewrite-checkbox" className="text-sm">Rewrite</label>
+                        </div>
                     </div>
 
                     {/* Simulation feedback */}
