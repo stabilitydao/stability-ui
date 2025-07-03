@@ -294,6 +294,11 @@ const LENDING_MARKETS = {
       symbol: "Euler wmetaUSD",
       link: "https://app.euler.finance/vault/0x6F11663766bB213003cD74EB09ff4c67145023c5?network=sonic",
     },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaUSD - USDC (looper)",
+      link: "https://app.euler.finance/positions/0x6F11663766bB213003cD74EB09ff4c67145023c5/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic&tab=multiply",
+    },
   ],
   "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
     {
@@ -301,11 +306,15 @@ const LENDING_MARKETS = {
       symbol: "Silo wmetaS - S",
       link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
     },
-
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
       symbol: "Euler wmetaS",
       link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaS - wS (looper)",
+      link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
     },
   ],
 };
