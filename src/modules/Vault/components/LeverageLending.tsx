@@ -33,8 +33,12 @@ const LeverageLending: React.FC<IProps> = memo(({ vault }) => {
 
   return (
     <div className="w-full md:w-1/2">
-      <HeadingText text="Leverage Lending" scale={2} styles="text-left mb-4" />
-      <div className="flex flex-col items-start gap-4 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+      <HeadingText
+        text="Leverage Lending"
+        scale={2}
+        styles="text-left mb-3 md:mb-4"
+      />
+      <div className="flex flex-col items-start gap-3 md:gap-4 p-4 md:p-6 bg-[#101012] rounded-lg border border-[#23252A]">
         <div className="flex gap-5 sm:gap-0 items-start justify-between w-full">
           <div>
             <p className="font-medium leading-5 text-[#97979A] text-[14px]">

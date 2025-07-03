@@ -533,7 +533,7 @@ const HistoricalRate: React.FC<IProps> = memo(
     return (
       <div className="mt-6">
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 md:gap-0 gap-3">
-          <HeadingText text="Historical Rate" scale={2} />
+          <HeadingText text="Historical Rate" scale={2} styles="text-left" />
           {activeChart && (
             <div className="flex items-center font-semibold relative text-[14px] leading-5 gap-2">
               <p

@@ -1,4 +1,9 @@
-import type { TVault, TTAbleFiltersVariant, TTableFilters } from "@types";
+import type {
+  TVault,
+  TTAbleFiltersVariant,
+  TTableFilters,
+  TTableActiveParams,
+} from "@types";
 
 /**
  * Initializes the filters for a table based on the vault data, URL parameters, and network selection
@@ -23,17 +28,20 @@ export const initFilters = (
   vaults: TVault[],
   tableFilters: TTableFilters[],
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
-  networksHandler: (chains: string[]) => void
+  networksHandler: (chains: string[]) => void,
+  setTableParams: React.Dispatch<React.SetStateAction<TTableActiveParams>>
 ): void => {
   const shortNames = Array.from(
     new Map(
-      vaults.map((vault) => [
-        vault.strategyInfo.shortId,
-        {
-          name: vault.strategyInfo.shortId,
-          title: vault.strategy,
-        },
-      ])
+      vaults
+        .filter((vault) => vault?.strategyInfo)
+        .map((vault) => [
+          vault.strategyInfo.shortId,
+          {
+            name: vault.strategyInfo.shortId,
+            title: vault.strategy,
+          },
+        ])
     ).values()
   );
 
@@ -81,7 +89,6 @@ export const initFilters = (
         : f;
     });
   }
-
   if (vaultsParam) {
     newFilters = newFilters.map((f) => {
       if (f.name.toLowerCase() === "my vaults") {
@@ -101,6 +108,26 @@ export const initFilters = (
       }
       return f;
     });
+  }
+
+  let activeFiltersCount = 0;
+
+  newFilters.forEach((filter) => {
+    if (filter.variants) {
+      filter.variants.forEach((variant) => {
+        if (variant.state) {
+          activeFiltersCount++;
+        }
+      });
+    } else if (!filter.state && filter.name === "Active") {
+      activeFiltersCount++;
+    } else if (filter.state && filter.name !== "Active") {
+      activeFiltersCount++;
+    }
+  });
+
+  if (activeFiltersCount) {
+    setTableParams((prev) => ({ ...prev, filters: activeFiltersCount }));
   }
 
   if (chainsParam.length) {

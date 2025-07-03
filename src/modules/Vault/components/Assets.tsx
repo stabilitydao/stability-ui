@@ -14,7 +14,13 @@ import { assetsPrices, connected, currentChainID } from "@store";
 
 import { StrategyABI, wagmiConfig } from "@web3";
 
-import { getTokenData, getDate, formatNumber, addAssetToWallet } from "@utils";
+import {
+  getTokenData,
+  getDate,
+  formatNumber,
+  addAssetToWallet,
+  cn,
+} from "@utils";
 
 import { CHAINLINK_STABLECOINS } from "@constants";
 
@@ -200,107 +206,108 @@ const Assets: React.FC<IProps> = memo(
 
     return (
       <div className="md:p-3 mt-5">
-        <HeadingText
-          text="Assets"
-          scale={2}
-          styles="text-left md:ml-4 md:mb-0 mb-2"
-        />
-        {isPieChart && (
-          <div className="flex justify-center items-center gap-5 mb-5">
-            {investedData && <Chart data={investedData} />}
+        <HeadingText text="Assets" scale={2} styles="text-left mb-3" />
+        <div className="bg-[#101012] border border-[#23252A] rounded-lg">
+          {isPieChart && (
+            <div className="flex justify-center items-center gap-5 p-4 md:p-6 border-b border-[#23252A]">
+              {investedData && <Chart data={investedData} />}
 
-            <div className="flex flex-col items-center gap-5">
-              {investedData &&
-                investedData.map((data: TPieChartData, index: number) => {
-                  return (
-                    <div
-                      className="flex items-center gap-2"
-                      key={data?.color + index}
-                    >
+              <div className="flex flex-col items-center gap-5">
+                {investedData &&
+                  investedData.map((data: TPieChartData, index: number) => {
+                    return (
                       <div
-                        style={{ background: data.color }}
-                        className="w-2 h-8 rounded-md"
-                      ></div>
-                      <img
-                        className="w-[30px] rounded-full"
-                        src={data.logo}
-                        alt={data.symbol}
-                      />
-                      <p className="text-[18px] text-[#8D8E96]">
-                        {data?.percent.toFixed(2)}%
-                      </p>
-                    </div>
-                  );
-                })}
+                        className="flex items-center gap-2"
+                        key={data?.color + index}
+                      >
+                        <div
+                          style={{ background: data.color }}
+                          className="w-2 h-8 rounded-md"
+                        ></div>
+                        <img
+                          className="w-[30px] rounded-full"
+                          src={data.logo}
+                          alt={data.symbol}
+                        />
+                        <p className="text-[18px] text-[#8D8E96]">
+                          {data?.percent.toFixed(2)}%
+                        </p>
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+          <div className="flex flex-col md:flex-row w-full">
+            {investedData &&
+              investedData.map((asset: TPieChartData, index: number) => {
+                const assetData: TToken | undefined = getTokenData(
+                  asset.address
+                );
 
-        <div className="flex flex-col md:flex-row gap-5 w-full mb-4">
-          {investedData &&
-            investedData.map((asset: TPieChartData, index: number) => {
-              const assetData: TToken | undefined = getTokenData(asset.address);
+                if (!assetData?.address) return;
 
-              if (!assetData?.address) return;
+                const tokenAssets = getAsset(
+                  network,
+                  assetData?.address as TAddress
+                );
 
-              const tokenAssets = getAsset(
-                network,
-                assetData?.address as TAddress
-              );
+                const priceOnCreation = formatUnits(onCreationPrice[index], 18);
 
-              const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+                const price: number = $assetsPrices[network][asset?.address]
+                  ? Number($assetsPrices[network][asset?.address]?.price)
+                  : 0;
 
-              const price: number = $assetsPrices[network][asset?.address]
-                ? Number($assetsPrices[network][asset?.address]?.price)
-                : 0;
+                const creationDate = getDate(Number(created));
 
-              const creationDate = getDate(Number(created));
+                /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
+                const oracleLink =
+                  CHAINLINK_STABLECOINS[
+                    assetData?.symbol as keyof typeof CHAINLINK_STABLECOINS
+                  ];
 
-              /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
-              const oracleLink =
-                CHAINLINK_STABLECOINS[
-                  assetData?.symbol as keyof typeof CHAINLINK_STABLECOINS
-                ];
-
-              return (
-                assetData && (
-                  <article
-                    className="rounded-md p-3 flex flex-col justify-between gap-3 w-full md:w-1/2"
-                    key={asset.address + index}
-                  >
-                    <div className="flex w-full flex-col gap-3">
-                      <div className="flex w-full justify-between items-center flex-wrap">
-                        <div className="inline-flex items-center mb-2">
-                          <img
-                            data-testid={`assetLogo${index}`}
-                            className="rounded-full w-[30px] m-auto mr-2"
-                            src={assetData.logoURI}
-                          />
-                          <span
-                            data-testid={`assetTicker${index}`}
-                            className="mr-5 font-bold text-[18px]"
-                          >
-                            {assetData.symbol}
-                          </span>
-                          <span
-                            data-testid={`assetName${index}`}
-                            className="text-[18px]"
-                          >
-                            {assetData.name}
-                          </span>
-                        </div>
-                        {tokenAssets?.website && (
-                          <div className="rounded-md bg-[#404353] flex justify-center p-1 h-8 text-[16px] mb-2">
+                return (
+                  assetData && (
+                    <div
+                      className={cn(
+                        "rounded-md p-4 md:p-6 flex flex-col justify-between gap-4 w-full md:w-1/2",
+                        !index && "border-b md:border-r border-[#23252A]"
+                      )}
+                      key={asset.address + index}
+                    >
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="flex w-full justify-between items-center flex-wrap">
+                          <div className="flex items-center gap-4">
+                            <img
+                              data-testid={`assetLogo${index}`}
+                              className="rounded-full w-10 h-10"
+                              src={assetData.logoURI}
+                            />
+                            <div className="flex flex-col gap-1">
+                              <span
+                                data-testid={`assetTicker${index}`}
+                                className="font-semibold text-[16px] leading-5"
+                              >
+                                {assetData.symbol}
+                              </span>
+                              <span
+                                data-testid={`assetName${index}`}
+                                className="text-[#97979A] text-[14px] leading-4 font-medium"
+                              >
+                                {assetData.name}
+                              </span>
+                            </div>
+                          </div>
+                          {tokenAssets?.website && (
                             <a
                               data-testid={`assetWebsite${index}`}
-                              className="flex items-center"
+                              className="rounded-lg bg-[#5E6AD2] flex items-center justify-center gap-1 text-[12px] leading-4 font-semibold px-3 py-2"
                               href={tokenAssets?.website}
                               target="_blank"
                             >
                               Website
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-external-link ms-1"
                                 width="20"
                                 height="20"
                                 viewBox="0 0 24 24"
@@ -320,91 +327,100 @@ const Assets: React.FC<IProps> = memo(
                                 <path d="M15 4h5v5"></path>
                               </svg>
                             </a>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex w-full">
-                        {!!price && (
-                          <div className="w-1/2">
-                            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                              PRICE
-                            </p>
-                            <p
-                              data-testid={`assetPrice${index}`}
-                              className="text-[16px] mt-1"
-                            >
-                              ${formatNumber(price, "smallNumbers")}
-                            </p>
-                          </div>
-                        )}
-                        {priceOnCreation && (
-                          <div className="w-1/2">
-                            <p className="uppercase text-[13px] leading-3 text-[#8D8E96]">
-                              PRICE AT CREATION
-                            </p>
-                            <p
-                              data-testid={`assetPriceOnCreation${index}`}
-                              className="text-[16px] mt-1"
-                            >
-                              ${formatNumber(priceOnCreation, "smallNumbers")} (
-                              {creationDate})
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                      {assetData?.tags && (
-                        <div className="flex items-center gap-3 flex-wrap">
-                          {assetData.tags.map((tag: string, index: number) => (
-                            <p
-                              className="text-[14px] px-2  rounded-lg border-[2px] bg-[#486556] border-[#488B57] uppercase"
-                              key={tag + index}
-                            >
-                              {tag}
-                            </p>
-                          ))}
+                          )}
                         </div>
-                      )}
-                      {oracleLink && (
-                        <a
-                          data-testid={`trustedToken${index}`}
-                          className="w-[200px]"
-                          href={oracleLink}
-                          target="_blank"
+                        <div className="flex w-full">
+                          {!!price && (
+                            <div className="w-1/2">
+                              <p className="text-[#6A6B6F] text-[14px] leading-5 font-medium">
+                                Price
+                              </p>
+                              <p
+                                data-testid={`assetPrice${index}`}
+                                className="text-[18px] leading-6 font-semibold"
+                              >
+                                ${formatNumber(price, "smallNumbers")}
+                              </p>
+                            </div>
+                          )}
+                          {priceOnCreation && (
+                            <div className="w-1/2">
+                              <p className="text-[#6A6B6F] text-[14px] leading-5 font-medium">
+                                Price at creation
+                              </p>
+                              <p
+                                data-testid={`assetPriceOnCreation${index}`}
+                                className="leading-6 font-semibold whitespace-nowrap"
+                              >
+                                <span className="text-[18px]">
+                                  $
+                                  {formatNumber(
+                                    priceOnCreation,
+                                    "smallNumbers"
+                                  )}
+                                </span>
+                                <span className="text-[14px]">
+                                  ({creationDate})
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        {assetData?.tags && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {assetData.tags.map(
+                              (tag: string, index: number) => (
+                                <p
+                                  className="text-[14px] px-2 py-1 rounded border bg-[#202A21] border-[#008B46] uppercase text-[#2BB656]"
+                                  key={tag + index}
+                                >
+                                  {tag}
+                                </p>
+                              )
+                            )}
+                          </div>
+                        )}
+                        {oracleLink && (
+                          <a
+                            data-testid={`trustedToken${index}`}
+                            className="w-[200px]"
+                            href={oracleLink}
+                            target="_blank"
+                          >
+                            <img
+                              src="https://chain.link/badge-market-data-black"
+                              alt="market data secured with chainlink"
+                            />
+                          </a>
+                        )}
+                        <p
+                          data-testid={`tokenDescription${index}`}
+                          className="text-[#6A6B6F] text-[14px] leading-5 font-medium"
                         >
-                          <img
-                            src="https://chain.link/badge-market-data-black"
-                            alt="market data secured with chainlink"
-                          />
-                        </a>
+                          {tokenAssets?.description}
+                        </p>
+                      </div>
+                      {isAddToWallet && (
+                        <button
+                          onClick={() =>
+                            addAssetToWallet(
+                              client,
+                              asset?.address,
+                              asset?.decimals,
+                              asset?.symbol,
+                              asset?.logo
+                            )
+                          }
+                          className="w-full text-[16px] bg-[#5E6AD2] font-semibold justify-center py-3 rounded-lg"
+                        >
+                          Add to wallet
+                        </button>
                       )}
-                      <p
-                        data-testid={`tokenDescription${index}`}
-                        className="text-[16px]"
-                      >
-                        {tokenAssets?.description}
-                      </p>
                     </div>
-                    {isAddToWallet && (
-                      <button
-                        onClick={() =>
-                          addAssetToWallet(
-                            client,
-                            asset?.address,
-                            asset?.decimals,
-                            asset?.symbol,
-                            asset?.logo
-                          )
-                        }
-                        className="px-3 py-2 bg-[#262830] rounded-md text-[16px] cursor-pointer w-[200px] flex items-center justify-center gap-2"
-                      >
-                        <span>Add to MetaMask </span>{" "}
-                        <img src="/metamask.svg" alt="metamask" />
-                      </button>
-                    )}
-                  </article>
-                )
-              );
-            })}
+                  )
+                );
+              })}
+          </div>
         </div>
       </div>
     );

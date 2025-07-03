@@ -169,17 +169,6 @@ const SonicPointsButton = (): JSX.Element => {
             </div>
 
             <div
-              className="flex flex-col items-center gap-1 py-1 px-2 bg-[#40331a] border border-[#FFA500] rounded-lg cursor-pointer"
-              onClick={() => playAudio("pp", 0.3)}
-            >
-              <span className="text-[14px] leading-4">
-                {user.passivePoints}
-              </span>
-              <span className="text-[#97979A] text-[12px] leading-[14px]">
-                Passive Points
-              </span>
-            </div>
-            <div
               className="flex flex-col items-center gap-1 py-1 px-2 bg-[#233729] border border-[#48C05C] rounded-lg cursor-pointer"
               onClick={() => playAudio("ap", 0.3)}
             >

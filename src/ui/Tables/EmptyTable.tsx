@@ -5,11 +5,11 @@ import { cn } from "@utils";
 import { DisplayTypes } from "@types";
 
 interface IProps {
-  isUserVaults: boolean;
+  isUserVaults?: boolean;
   display: DisplayTypes;
 }
 
-const EmptyTable: React.FC<IProps> = ({ isUserVaults, display }) => {
+const EmptyTable: React.FC<IProps> = ({ isUserVaults = false, display }) => {
   const { open } = useWeb3Modal();
 
   return (

@@ -43,10 +43,13 @@ import {
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
+import { FarmingTable } from "./Tables/Farming";
 
 import { DisplayType } from "./DisplayType";
 
 import { ActionButton } from "./ActionButton";
+
+import { Socials } from "./Socials";
 
 export {
   Toast,
@@ -91,4 +94,6 @@ export {
   ArrowRightIcon,
   TextSkeleton,
   ContestsTable,
+  FarmingTable,
+  Socials,
 };

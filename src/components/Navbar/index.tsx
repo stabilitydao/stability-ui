@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon } from "@ui";
+import { Prices, NavIcon, Socials } from "@ui";
 
 import { cn, formatNumber } from "@utils";
 
@@ -141,17 +141,7 @@ const Navbar = (): JSX.Element => {
                 <a href="#" className="px-4 py-2">
                   Terms of Use
                 </a> */}
-                <div className="flex items-center gap-4 p-4 pb-0">
-                  <a href="https://x.com/stabilitydao" target="_blank">
-                    <img src="/socials/x.png" alt="Stability X" />
-                  </a>
-                  <a
-                    href="https://discord.com/invite/R3nnetWzC9"
-                    target="_blank"
-                  >
-                    <img src="/socials/discord.png" alt="Stability Discord" />
-                  </a>
-                </div>
+                <Socials styles="pb-0" />
               </div>
             </div>
           </div>

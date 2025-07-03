@@ -7,7 +7,11 @@ const TABLE_FILTERS: TTableFilters[] = [
   { name: "Active", type: "sample", state: true },
 ];
 
-const SONIC_TABLE: TTableColumn[] = [
+const FARMING_TABLE_FILTERS: TTableFilters[] = [
+  { name: "Strategies", type: "dropdown", state: true },
+];
+
+const TABLE: TTableColumn[] = [
   {
     name: "Assets",
     keyName: "assetsSymbol",
@@ -27,47 +31,6 @@ const SONIC_TABLE: TTableColumn[] = [
     dataType: "number",
   },
 
-  { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
-  {
-    name: "Balance",
-    keyName: "balanceInUSD",
-    sortType: "none",
-    dataType: "number",
-  },
-];
-
-const TABLE: TTableColumn[] = [
-  { name: "Symbol", keyName: "symbol", sortType: "none", dataType: "string" },
-  {
-    name: "Assets",
-    keyName: "assetsSymbol",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Strategy",
-    keyName: "strategy",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
-    name: "Income APR",
-    keyName: "earningData",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "VS HODL APR",
-    keyName: "vsHoldAPR",
-    sortType: "none",
-    dataType: "number",
-  },
-  {
-    name: "RISK",
-    keyName: "il",
-    sortType: "none",
-    dataType: "number",
-  },
   { name: "TVL", keyName: "tvl", sortType: "none", dataType: "number" },
   {
     name: "Balance",
@@ -430,6 +393,46 @@ const DEFAULT_TABLE_PARAMS = {
   filters: 0,
 };
 
+const LEVERAGE_FARMING_TABLE: TTableColumn[] = [
+  {
+    name: "Name",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+  },
+  {
+    name: "Lending Platform",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+  },
+  { name: "Leverage", keyName: "", sortType: "none", dataType: "number" },
+  {
+    name: "LTV / Max LTV",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "APR",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "TVL",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Deposit",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -440,10 +443,11 @@ export {
   USERS_TABLE,
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
-  SONIC_TABLE,
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
   METAVAULT_TABLE,
   PROTOCOLS_TABLE,
+  LEVERAGE_FARMING_TABLE,
+  FARMING_TABLE_FILTERS,
 };

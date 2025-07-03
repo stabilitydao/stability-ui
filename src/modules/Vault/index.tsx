@@ -86,16 +86,16 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
             </div>
           </div>
           {isLeverageLending && <LeverageLending vault={localVault} />}
-          <div className="my-8 flex flex-col lg:flex-row gap-5 w-full">
-            <div className="w-full lg:w-1/2">
+          {(localVault.assets.length > 1 && localVault?.pool?.tvl) || isALM ? (
+            <div className="my-6 flex flex-col gap-6 w-full">
               {localVault.assets.length > 1 && localVault?.pool?.tvl && (
                 <LiquidityPool network={network} vault={localVault} />
               )}
-            </div>
-            <div className="w-full lg:w-1/2">
+
               {isALM && <UnderlyingALM network={network} vault={localVault} />}
             </div>
-          </div>
+          ) : null}
+
           <Assets
             network={network}
             assets={localVault?.assets}
