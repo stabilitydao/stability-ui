@@ -21,7 +21,9 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display, setModalState }) => {
     <div
       key={display}
       className={cn(
-        display === "grid" &&
+        display === DisplayTypes.Rows &&
+          "overflow-x-auto lg:overflow-x-visible hide-scrollbar",
+        display === DisplayTypes.Grid &&
           "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
       )}
     >
@@ -49,7 +51,7 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display, setModalState }) => {
           gemsAPR: gemsAprValue.toFixed(2),
         };
 
-        if (display === "grid") {
+        if (display === DisplayTypes.Grid) {
           return (
             <Grid
               key={`grid/${vault.name + index}`}

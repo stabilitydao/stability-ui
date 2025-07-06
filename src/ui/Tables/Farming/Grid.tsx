@@ -21,8 +21,8 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
 
   const link = `/vaults/vault/${vault.network}/${vault.address}`;
 
-  const currentLtv = vault?.leverageLending?.ltv.toFixed() ?? 0;
-  const maxLtv = vault?.leverageLending?.maxLtv.toFixed() ?? 0;
+  const currentLtv = vault?.leverageLending?.ltv.toFixed(2) ?? 0;
+  const maxLtv = vault?.leverageLending?.maxLtv.toFixed(2) ?? 0;
 
   const lendingPlatform = vault.strategyInfo.protocols[0].name;
 
@@ -71,7 +71,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
           </div>
           <div className="flex items-center justify-between text-[14px]">
             <span className="text-[#97979A]">LTV / Max LTV</span>
-            <span className="font-bold">
+            <span className="font-bold text-[12px]">
               {currentLtv}% / {maxLtv}%
             </span>
           </div>

@@ -407,22 +407,25 @@ const LeveragedFarming = (): JSX.Element => {
       </div>
 
       <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
-        <div
-          className={cn(
-            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
-            displayType === "grid" && "hidden"
-          )}
-        >
-          {tableStates.map((value: TTableColumn, index: number) => (
-            <ColumnSort
-              key={value.name + index}
-              index={index}
-              value={value.name}
-              table={tableStates}
-              sort={tableHandler}
-            />
-          ))}
+        <div className="overflow-x-auto lg:overflow-x-visible hide-scrollbar">
+          <div
+            className={cn(
+              "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[960px] lg:w-full",
+              displayType === "grid" && "hidden"
+            )}
+          >
+            {tableStates.map((value: TTableColumn, index: number) => (
+              <ColumnSort
+                key={value.name + index}
+                index={index}
+                value={value.name}
+                table={tableStates}
+                sort={tableHandler}
+              />
+            ))}
+          </div>
         </div>
+
         <div>
           {isLoading ? (
             <div
