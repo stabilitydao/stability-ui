@@ -4,14 +4,15 @@ import { Row } from "./Row";
 
 import { cn } from "@utils";
 
-import { TVault, DisplayTypes } from "@types";
+import { TVault, DisplayTypes, TAPRModal } from "@types";
 
 interface IProps {
   vaults: TVault[];
   display: DisplayTypes;
+  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const FarmingTable: React.FC<IProps> = ({ vaults, display }) => {
+const FarmingTable: React.FC<IProps> = ({ vaults, display, setModalState }) => {
   if (!vaults?.length) {
     return <EmptyTable display={display} />;
   }
@@ -20,14 +21,12 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display }) => {
     <div
       key={display}
       className={cn(
-        display === "grid" &&
+        display === DisplayTypes.Grid &&
           "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
       )}
     >
       {vaults.map((vault: TVault, index: number) => {
-        const aprValue = vault?.isMetaVault
-          ? Number(vault?.totalAPR)
-          : Number(vault?.earningData?.apr.latest);
+        const aprValue = Number(vault?.earningData?.apr.latest);
 
         const apyValue = vault?.earningData?.apy.latest;
 
@@ -50,7 +49,7 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display }) => {
           gemsAPR: gemsAprValue.toFixed(2),
         };
 
-        if (display === "grid") {
+        if (display === DisplayTypes.Grid) {
           return (
             <Grid
               key={`grid/${vault.name + index}`}
@@ -65,6 +64,7 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display }) => {
             key={`row/${vault.name + index}`}
             APRs={APR_DATA}
             vault={vault}
+            setModalState={setModalState}
           />
         );
       })}

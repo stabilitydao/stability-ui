@@ -169,36 +169,7 @@ const Filters: React.FC<IProps> = memo(
       <div className="flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold flex-shrink-0">
         {filters.map((filter: TTableFilters) => (
           <div data-testid="filter" key={filter.name}>
-            {filter.type === "single" ? (
-              <label className="inline-flex items-center cursor-pointer bg-transparent h-[48px] border border-[#23252A] rounded-lg">
-                <div className="flex items-center gap-3 py-[13px] px-5">
-                  <Checkbox
-                    checked={filter.state}
-                    onChange={() => activeFiltersHandler(filter)}
-                  />
-                  <span>{filter.name}</span>
-                </div>
-              </label>
-            ) : filter.type === "multiple" ? (
-              <div
-                key={filter.name}
-                className="w-[160px] flex items-center bg-button rounded-md"
-              >
-                {filter.variants?.map((variant: TTAbleFiltersVariant) => (
-                  <p
-                    key={variant.name}
-                    onClick={() => activeFiltersHandler(filter, variant.name)}
-                    className={`px-2 py-1 cursor-pointer ${
-                      variant.state
-                        ? "opacity-100"
-                        : "opacity-70 hover:opacity-80"
-                    }`}
-                  >
-                    {variant.name}
-                  </p>
-                ))}
-              </div>
-            ) : filter.type === "dropdown" ? (
+            {filter.type === "dropdown" ? (
               <div className="relative select-none w-[200px]">
                 <div
                   onClick={(e) => {
@@ -257,37 +228,7 @@ const Filters: React.FC<IProps> = memo(
                   </div>
                 </div>
               </div>
-            ) : (
-              filter.type === "sample" && (
-                <div
-                  key={filter.name}
-                  className="flex items-center justify-center bg-transparent border border-[#23252A] h-[48px] rounded-lg"
-                >
-                  <div className="flex items-center justify-center p-2">
-                    <p
-                      onClick={() => activeFiltersHandler(filter, "All")}
-                      className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
-                        !filter.state
-                          ? "bg-[#22242A] border border-[#2C2E33]"
-                          : "text-[#97979A]" //hover
-                      }`}
-                    >
-                      All
-                    </p>
-                    <p
-                      onClick={() => activeFiltersHandler(filter)}
-                      className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
-                        filter.state
-                          ? "bg-[#22242A] border border-[#2C2E33]"
-                          : "text-[#97979A]" //hover
-                      }`}
-                    >
-                      {filter.name}
-                    </p>
-                  </div>
-                </div>
-              )
-            )}
+            ) : null}
           </div>
         ))}
       </div>

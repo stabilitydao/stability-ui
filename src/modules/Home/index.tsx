@@ -43,7 +43,7 @@ const Home = (): JSX.Element => {
               solution
               <br className="hidden md:block" /> based on AI.
             </p>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 flex-wrap md:flex-nowrap">
               <a
                 className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
                 href="/metavaults"
@@ -55,6 +55,12 @@ const Home = (): JSX.Element => {
                 href="/vaults"
               >
                 Vaults
+              </a>
+              <a
+                className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
+                href="/leveraged-farming"
+              >
+                Leveraged Farming
               </a>
             </div>
           </div>

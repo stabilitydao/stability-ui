@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { APRModal } from "./components/modals/APRModal";
 import { MetaAPRModal } from "./components/modals/MetaAPRModal";
 import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
@@ -18,6 +17,7 @@ import {
   Pagination,
   VaultsTable,
   DisplayType,
+  APRModal,
 } from "@ui";
 
 import {

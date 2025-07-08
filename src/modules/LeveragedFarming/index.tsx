@@ -13,6 +13,7 @@ import {
   Pagination,
   FarmingTable,
   DisplayType,
+  APRModal,
 } from "@ui";
 
 import { vaults, isVaultsLoaded, aprFilter, error, metaVaults } from "@store";
@@ -34,9 +35,9 @@ import { DisplayTypes } from "@types";
 import type {
   TVault,
   TTableColumn,
-  TVaults,
   TAPRPeriod,
   TTableActiveParams,
+  TEarningData,
 } from "@types";
 
 const LeveragedFarming = (): JSX.Element => {
@@ -56,6 +57,15 @@ const LeveragedFarming = (): JSX.Element => {
 
   const [allParams, setAllParams] = useState<number>(0);
   const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
+
+  const [aprModal, setAprModal] = useState({
+    earningData: {} as TEarningData,
+    daily: 0,
+    lastHardWork: "0",
+    symbol: "",
+    state: false,
+    pool: {},
+  });
 
   let urlTab = 1;
 
@@ -168,18 +178,7 @@ const LeveragedFarming = (): JSX.Element => {
       }
     });
 
-    const mixedVaults: TVaults = Object.values(
-      activeNetworksVaults
-    ).reduce<TVaults>((acc, value) => {
-      if (typeof value === "object" && !Array.isArray(value)) {
-        return { ...acc, ...(value as TVaults) };
-      }
-      return acc;
-    }, {});
-
-    const allVaults = Object.values(mixedVaults) || [];
-
-    let sortedVaults = allVaults
+    let sortedVaults = localVaults
       .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
       .map((vault) => {
         const balance = formatFromBigInt(vault.balance ?? 0, 18);
@@ -317,14 +316,19 @@ const LeveragedFarming = (): JSX.Element => {
       const allVaults = Object.values($vaults[146]) || [];
 
       const vaults: TVault[] = allVaults
-        .filter((vault) => vault?.leverageLending)
+        .filter((vault) => vault.leverageLending)
         .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
           const tVault = vault as TVault;
           const balance = formatFromBigInt(tVault.balance ?? 0, 18);
 
+          const leverage = Number(
+            (1 / (1 - vault?.leverageLending?.maxLtv / 100)).toFixed(1)
+          );
+
           return {
             ...tVault,
+            leverage,
             balanceInUSD: balance * Number(tVault.shareprice),
           };
         });
@@ -402,41 +406,48 @@ const LeveragedFarming = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="pb-5 min-w-full xl:min-w-[1200px]">
-        <div
-          className={cn(
-            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
-            displayType === "grid" && "hidden"
-          )}
-        >
-          {tableStates.map((value: TTableColumn, index: number) => (
-            <ColumnSort
-              key={value.name + index}
-              index={index}
-              value={value.name}
-              table={tableStates}
-              sort={tableHandler}
-            />
-          ))}
-        </div>
-        <div>
-          {isLoading ? (
-            <div
-              className={cn(
-                "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
-                displayType === "grid" && "rounded-lg border-b"
-              )}
-            >
-              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                <FullPageLoader />
+      <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
+        <div className="overflow-x-auto lg:overflow-x-visible hide-scrollbar overflow-y-hidden">
+          <div
+            className={cn(
+              "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[762px] md:w-[960px] lg:w-full",
+              displayType === "grid" && "hidden"
+            )}
+          >
+            {tableStates.map((value: TTableColumn, index: number) => (
+              <ColumnSort
+                key={value.name + index}
+                index={index}
+                value={value.name}
+                table={tableStates}
+                sort={tableHandler}
+              />
+            ))}
+          </div>
+          <div>
+            {isLoading ? (
+              <div
+                className={cn(
+                  "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
+                  displayType === "grid" && "rounded-lg border-b"
+                )}
+              >
+                <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
+                  <FullPageLoader />
+                </div>
               </div>
-            </div>
-          ) : localVaults?.length ? (
-            <FarmingTable vaults={currentTabVaults} display={displayType} />
-          ) : (
-            <div className="text-start h-[60px] font-medium">No vaults</div>
-          )}
+            ) : localVaults?.length ? (
+              <FarmingTable
+                vaults={currentTabVaults}
+                display={displayType}
+                setModalState={setAprModal}
+              />
+            ) : (
+              <div className="text-start h-[60px] font-medium">No vaults</div>
+            )}
+          </div>
         </div>
+
         <Pagination
           pagination={pagination}
           data={filteredVaults}
@@ -446,6 +457,9 @@ const LeveragedFarming = (): JSX.Element => {
           setPagination={setPagination}
         />
       </div>
+      {aprModal.state && aprModal.type === "vault" && (
+        <APRModal state={aprModal} setModalState={setAprModal} />
+      )}
     </>
   );
 };
