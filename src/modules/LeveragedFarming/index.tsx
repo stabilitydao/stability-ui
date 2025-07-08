@@ -424,30 +424,30 @@ const LeveragedFarming = (): JSX.Element => {
               />
             ))}
           </div>
+          <div>
+            {isLoading ? (
+              <div
+                className={cn(
+                  "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
+                  displayType === "grid" && "rounded-lg border-b"
+                )}
+              >
+                <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
+                  <FullPageLoader />
+                </div>
+              </div>
+            ) : localVaults?.length ? (
+              <FarmingTable
+                vaults={currentTabVaults}
+                display={displayType}
+                setModalState={setAprModal}
+              />
+            ) : (
+              <div className="text-start h-[60px] font-medium">No vaults</div>
+            )}
+          </div>
         </div>
 
-        <div>
-          {isLoading ? (
-            <div
-              className={cn(
-                "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
-                displayType === "grid" && "rounded-lg border-b"
-              )}
-            >
-              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                <FullPageLoader />
-              </div>
-            </div>
-          ) : localVaults?.length ? (
-            <FarmingTable
-              vaults={currentTabVaults}
-              display={displayType}
-              setModalState={setAprModal}
-            />
-          ) : (
-            <div className="text-start h-[60px] font-medium">No vaults</div>
-          )}
-        </div>
         <Pagination
           pagination={pagination}
           data={filteredVaults}

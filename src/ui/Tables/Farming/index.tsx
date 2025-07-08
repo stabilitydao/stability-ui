@@ -21,8 +21,6 @@ const FarmingTable: React.FC<IProps> = ({ vaults, display, setModalState }) => {
     <div
       key={display}
       className={cn(
-        display === DisplayTypes.Rows &&
-          "overflow-x-auto lg:overflow-x-visible hide-scrollbar",
         display === DisplayTypes.Grid &&
           "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
       )}
