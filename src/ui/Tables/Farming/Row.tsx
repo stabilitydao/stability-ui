@@ -37,11 +37,11 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   return (
     <a
-      className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[822px] md:w-[960px] lg:w-full"
+      className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[762px] md:w-[960px] lg:w-full"
       data-testid="vault"
       href={link}
     >
-      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center !w-[150px] md:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex items-center justify-center">
             {vault.assets.map((asset, index) => (
@@ -111,12 +111,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           )}
         </div>
       </div>
-      <div className="px-2 md:px-4 w-[120px] md:w-[15%]">
+      <div className="px-2 md:px-4 w-[80px] md:w-[15%]">
         <div className="px-2 py-1 rounded text-[12px] leading-4 text-[#97979A] bg-[#151618] border border-[#23252A]">
           {lendingPlatform}
         </div>
       </div>
-      <div className="px-2 md:px-4 w-[120px] md:w-[15%] text-[16px] leading-5 text-end">
+      <div className="px-2 md:px-4 w-[98px] md:w-[15%] text-[16px] leading-5 text-end">
         {vault?.leverage}x
       </div>
       <div className="px-2 md:px-4 w-[120px] md:w-[20%] lg:w-[15%] text-[12px] xl:text-[14px] leading-5 text-end">
