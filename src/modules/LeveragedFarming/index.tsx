@@ -410,7 +410,7 @@ const LeveragedFarming = (): JSX.Element => {
         <div className="overflow-x-auto lg:overflow-x-visible hide-scrollbar">
           <div
             className={cn(
-              "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[960px] lg:w-full",
+              "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[822px] md:w-[960px] lg:w-full",
               displayType === "grid" && "hidden"
             )}
           >

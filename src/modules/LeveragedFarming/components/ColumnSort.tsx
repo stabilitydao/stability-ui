@@ -9,13 +9,13 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Name: "sticky left-0 z-10 lg:relative w-[15%] lg:w-[25%] bg-[#151618] lg:bg-transparent",
-    "Lending Platform": "w-[15%]",
-    Leverage: "w-[15%] justify-end",
-    "LTV / Max LTV": "w-[20%] lg:w-[15%] justify-end",
-    APR: "w-[15%] lg:w-[10%] justify-end",
-    TVL: "w-[10%] lg:justify-end",
-    Deposit: "w-[10%] justify-end",
+    Name: "sticky left-0 z-10 lg:relative w-[150px] md:w-[15%] lg:w-[25%] bg-[#151618] lg:bg-transparent",
+    "Lending Platform": "w-[120px] md:w-[15%]",
+    Leverage: "w-[120px] md:w-[15%] justify-end",
+    "LTV / Max LTV": "w-[120px] md:w-[20%] lg:w-[15%] justify-end",
+    APR: "w-[100px] md:w-[15%] lg:w-[10%] justify-end",
+    TVL: "w-[100px] md:w-[10%] justify-end md:justify-start lg:justify-end",
+    Deposit: "w-[100px] md:w-[10%] justify-end",
   };
 
   const tabController = () => {
@@ -66,7 +66,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <div
       onClick={tabController}
-      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-4 py-2 ${styles[value] || "text-center"}`}
+      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-2 md:px-4 py-2 ${styles[value] || "text-center"}`}
       data-testid="sort"
     >
       <p

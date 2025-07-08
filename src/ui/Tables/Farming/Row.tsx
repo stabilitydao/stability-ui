@@ -1,5 +1,3 @@
-import { ArrowIcon, ArrowRightIcon } from "@ui";
-
 import { formatNumber } from "@utils";
 
 import { SILO_POINTS } from "@constants";
@@ -39,25 +37,25 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   return (
     <a
-      className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[960px] lg:w-full"
+      className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center border border-[#23252A] border-b-0 w-[822px] md:w-[960px] lg:w-full"
       data-testid="vault"
       href={link}
     >
-      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[15%] md:w-[25%] justify-between gap-3 px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
-        <div className="flex items-center gap-3">
+      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center !w-[150px] md:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+        <div className="flex items-center gap-2 md:gap-3">
           <div className="flex items-center justify-center">
             {vault.assets.map((asset, index) => (
               <img
                 src={asset?.logo}
                 alt={asset?.symbol}
-                className={`w-8 h-8 rounded-full ${
+                className={`w-5 h-5 md:w-8 md:h-8 rounded-full ${
                   !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
                 }`}
                 key={asset?.logo + index}
               />
             ))}
           </div>
-          <span className="font-semibold text-[16px] max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
+          <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[80px] lg:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
             {vault.assetsSymbol}
           </span>
         </div>
@@ -113,16 +111,15 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           )}
         </div>
       </div>
-
-      <div className="px-4 w-[15%]">
+      <div className="px-2 md:px-4 w-[120px] md:w-[15%]">
         <div className="px-2 py-1 rounded text-[12px] leading-4 text-[#97979A] bg-[#151618] border border-[#23252A]">
           {lendingPlatform}
         </div>
       </div>
-      <div className="px-4 w-[15%] text-[16px] leading-5 text-end">
+      <div className="px-2 md:px-4 w-[120px] md:w-[15%] text-[16px] leading-5 text-end">
         {vault?.leverage}x
       </div>
-      <div className="px-4 w-[20%] lg:w-[15%] text-[12px] xl:text-[14px] leading-5 text-end">
+      <div className="px-2 md:px-4 w-[120px] md:w-[20%] lg:w-[15%] text-[12px] xl:text-[14px] leading-5 text-end">
         {currentLtv}% / {maxLtv}%
       </div>
       <div
@@ -131,7 +128,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           e.preventDefault();
           setModalState(modalData);
         }}
-        className="px-4 w-[15%] lg:w-[10%] text-[16px] leading-5 text-end tooltip cursor-help"
+        className="px-4 w-[100px] md:w-[15%] lg:w-[10%] text-[16px] leading-5 text-end tooltip cursor-help"
       >
         <div
           className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
@@ -150,10 +147,10 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
       </div>
-      <div className="px-4 w-[10%] text-[16px] leading-5 text-end">
+      <div className="px-2 md:px-4 w-[100px] md:w-[10%] text-[16px] leading-5 text-end">
         {formatNumber(vault.tvl, "abbreviate")}
       </div>
-      <div className="px-4 w-[10%] text-[16px] leading-5 text-end">
+      <div className="px-2 md:px-4 w-[100px] md:w-[10%] text-[16px] leading-5 text-end">
         ${formatNumber(vault.balanceInUSD, "format")}
       </div>
     </a>
