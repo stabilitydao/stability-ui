@@ -715,6 +715,8 @@ type TStakeDashboardData = {
   pendingRevenueInSTBL: number;
   APR: number;
   timestamp: number;
+  lendingFeesXSTBL: number;
+  lendingFeesUSD: number;
 };
 
 type TVestPeriod = {

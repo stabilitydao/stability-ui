@@ -276,10 +276,9 @@ const Stake = (): JSX.Element => {
   const getData = async () => {
     try {
       setIsLoaded(false);
+
       const SECONDS_IN_WEEK = 7 * 24 * 60 * 60;
-
       const SECONDS_IN_YEAR = 365 * 24 * 60 * 60;
-
       const currentTimestamp = Math.floor(Date.now() / 1000);
 
       const _balances = { xstbl: "0", stakedXSTBL: "0", earned: "0" };
@@ -297,39 +296,65 @@ const Stake = (): JSX.Element => {
         pendingRevenueInSTBL: 0,
         APR: 0,
         timestamp: 0,
+        lendingFeesXSTBL: 0,
+        lendingFeesUSD: 0,
       };
 
-      const _totalStaked = await sonicClient.readContract({
-        address: STAKING_CONTRACT,
-        abi: IXStakingABI,
-        functionName: "totalSupply",
-      });
+      let _totalStaked = BigInt(0);
+      let pendingRebase = BigInt(0);
+      let pendingRevenue = BigInt(0);
+      let lendingPendingRevenue = BigInt(0);
 
-      const pendingRebase = await sonicClient.readContract({
-        address: STABILITY_TOKENS[146].xstbl.address as TAddress,
-        abi: IXSTBLABI,
-        functionName: "pendingRebase",
-      });
-
-      const pendingRevenue = await sonicClient.readContract({
-        address: REVENUE_ROUTER_CONTRACT,
-        abi: IRevenueRouterABI,
-        functionName: "pendingRevenue",
-      });
-
-      let parsedTotal = Number(formatUnits(_totalStaked as bigint, 18));
-
-      let parsedPendingRebase = Number(
-        formatUnits(pendingRebase as bigint, 18)
-      );
-
-      let parsedPendingRevenue = Number(
-        formatUnits(pendingRevenue as bigint, 18)
-      );
-
-      if (parsedTotal) {
-        _dashboardData.totalStaked = parsedTotal;
+      try {
+        _totalStaked = (await sonicClient.readContract({
+          address: STAKING_CONTRACT,
+          abi: IXStakingABI,
+          functionName: "totalSupply",
+        })) as bigint;
+      } catch (err) {
+        console.error("Error: totalSupply", err);
       }
+
+      try {
+        pendingRebase = (await sonicClient.readContract({
+          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+          abi: IXSTBLABI,
+          functionName: "pendingRebase",
+        })) as bigint;
+      } catch (err) {
+        console.error("Error: pendingRebase", err);
+      }
+
+      try {
+        pendingRevenue = (await sonicClient.readContract({
+          address: REVENUE_ROUTER_CONTRACT,
+          abi: IRevenueRouterABI,
+          functionName: "pendingRevenue",
+        })) as bigint;
+      } catch (err) {
+        console.error("Error: pendingRevenue", err);
+      }
+
+      try {
+        lendingPendingRevenue = (await sonicClient.readContract({
+          address: REVENUE_ROUTER_CONTRACT,
+          abi: IRevenueRouterABI,
+          functionName: "pendingRevenue",
+          args: [BigInt(0)],
+        })) as bigint;
+      } catch (err) {
+        console.error("Error: lendingPendingRevenue", err);
+      }
+
+      const parsedTotal = Number(formatUnits(_totalStaked, 18));
+      const parsedPendingRebase = Number(formatUnits(pendingRebase, 18));
+      const parsedPendingRevenue = Number(formatUnits(pendingRevenue, 18));
+
+      const parsedLendingPendingRevenue = Number(
+        formatUnits(lendingPendingRevenue, 18)
+      );
+
+      _dashboardData.totalStaked = parsedTotal;
 
       const stblPrice =
         Number(
@@ -347,114 +372,129 @@ const Stake = (): JSX.Element => {
 
         if (parsedPendingRebase) {
           allIncome += parsedPendingRebase;
-
           _dashboardData.pendingRebase = parsedPendingRebase * stblPrice;
           _dashboardData.pendingRebaseInSTBL = parsedPendingRebase;
         }
 
+        if (parsedLendingPendingRevenue >= 0) {
+          allIncome += parsedLendingPendingRevenue;
+
+          _dashboardData.lendingFeesUSD =
+            (parsedLendingPendingRevenue +
+              parsedPendingRebase +
+              parsedPendingRevenue) *
+            stblPrice;
+          _dashboardData.lendingFeesXSTBL =
+            parsedLendingPendingRevenue +
+            parsedPendingRebase +
+            parsedPendingRevenue;
+        }
+
         if (parsedPendingRevenue) {
           allIncome += parsedPendingRevenue;
-
           _dashboardData.pendingRevenue = parsedPendingRevenue * stblPrice;
           _dashboardData.pendingRevenueInSTBL = parsedPendingRevenue;
 
           const timePassed =
             currentTimestamp - (_dashboardData.timestamp - SECONDS_IN_WEEK);
-
           _dashboardData.APR =
             (allIncome / parsedTotal) * (SECONDS_IN_YEAR / timePassed) * 100;
         }
       }
 
       if ($account) {
-        const XSTBLBalance = await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
-          abi: ERC20ABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
+        try {
+          const XSTBLBalance = await sonicClient.readContract({
+            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+            abi: ERC20ABI,
+            functionName: "balanceOf",
+            args: [$account],
+          });
 
-        const stakedSTBLBalance = await sonicClient.readContract({
-          address: STAKING_CONTRACT as TAddress,
-          abi: IXStakingABI,
-          functionName: "balanceOf",
-          args: [$account as TAddress],
-        });
-
-        const stakedSTBLAllowance = await sonicClient.readContract({
-          address: STABILITY_TOKENS[146].xstbl.address as TAddress,
-          abi: ERC20ABI,
-          functionName: "allowance",
-          args: [$account as TAddress, STAKING_CONTRACT as TAddress],
-        });
-
-        const earned = (await sonicClient.readContract({
-          address: STAKING_CONTRACT as TAddress,
-          abi: IXStakingABI,
-          functionName: "earned",
-          args: [$account as TAddress],
-        })) as bigint;
-
-        let parsedBalance = formatUnits(
-          XSTBLBalance,
-          STABILITY_TOKENS[146].xstbl.decimals
-        );
-
-        let parsedEarned = formatUnits(
-          earned,
-          STABILITY_TOKENS[146].xstbl.decimals
-        );
-
-        let parsedStakedBalance = formatUnits(
-          stakedSTBLBalance as bigint,
-          STABILITY_TOKENS[146].xstbl.decimals
-        );
-
-        let parsedAllowance = Number(
-          formatUnits(stakedSTBLAllowance, STABILITY_TOKENS[146].xstbl.decimals)
-        );
-
-        if (parsedBalance) {
-          _balances.xstbl = parsedBalance;
+          _balances.xstbl = formatUnits(
+            XSTBLBalance,
+            STABILITY_TOKENS[146].xstbl.decimals
+          );
+        } catch (err) {
+          console.error("Error: XSTBL balance", err);
         }
 
-        if (parsedEarned) {
-          _balances.earned = parsedEarned;
+        try {
+          const stakedSTBLBalance = await sonicClient.readContract({
+            address: STAKING_CONTRACT,
+            abi: IXStakingABI,
+            functionName: "balanceOf",
+            args: [$account],
+          });
 
-          setIsClaimable(!!Number(parsedEarned));
-        }
+          const parsedStaked = formatUnits(
+            stakedSTBLBalance as bigint,
+            STABILITY_TOKENS[146].xstbl.decimals
+          );
 
-        if (parsedStakedBalance) {
-          _balances.stakedXSTBL = parsedStakedBalance;
-
-          _dashboardData.userStaked = Number(parsedStakedBalance);
-          _dashboardData.userStakedInUSD =
-            Number(parsedStakedBalance) * stblPrice;
-
+          _balances.stakedXSTBL = parsedStaked;
+          _dashboardData.userStaked = Number(parsedStaked);
+          _dashboardData.userStakedInUSD = Number(parsedStaked) * stblPrice;
           _dashboardData.estimatedProfit =
-            (allIncome * Number(parsedStakedBalance)) / parsedTotal;
-
+            (allIncome * Number(parsedStaked)) / parsedTotal;
           _dashboardData.estimatedProfitInUSD =
             _dashboardData.estimatedProfit * stblPrice;
+        } catch (err) {
+          console.error("Error: stakedSTBLBalance", err);
         }
 
-        if (parsedAllowance) {
+        try {
+          const earned = await sonicClient.readContract({
+            address: STAKING_CONTRACT,
+            abi: IXStakingABI,
+            functionName: "earned",
+            args: [$account],
+          });
+
+          const parsedEarned = formatUnits(
+            earned,
+            STABILITY_TOKENS[146].xstbl.decimals
+          );
+          _balances.earned = parsedEarned;
+          setIsClaimable(!!Number(parsedEarned));
+        } catch (err) {
+          console.error("Error: earned", err);
+        }
+
+        try {
+          const stakedSTBLAllowance = await sonicClient.readContract({
+            address: STABILITY_TOKENS[146].xstbl.address as TAddress,
+            abi: ERC20ABI,
+            functionName: "allowance",
+            args: [$account, STAKING_CONTRACT],
+          });
+
+          const parsedAllowance = Number(
+            formatUnits(
+              stakedSTBLAllowance,
+              STABILITY_TOKENS[146].xstbl.decimals
+            )
+          );
+
           setAllowance(parsedAllowance);
+        } catch (err) {
+          console.error("Error: allowance", err);
         }
-
-        setBalances(_balances);
       }
 
+      setBalances(_balances);
       setDashboardData(_dashboardData);
-
       setIsLoaded(true);
-    } catch (error) {
-      console.error("Get STBL balance error:", error);
+    } catch (err) {
+      console.error("getData error:", err);
+      setIsLoaded(true);
     }
   };
 
   useEffect(() => {
-    getData();
+    if (Object.keys($assetsPrices).length) {
+      getData();
+    }
   }, [$account, $lastTx, $assetsPrices]);
 
   return (
