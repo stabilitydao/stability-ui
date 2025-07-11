@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
+import axios from "axios";
 
 import { ContestsOverview, Rewards } from "./components";
 
@@ -16,7 +17,7 @@ import { findAllValidPeriods } from "./functions";
 
 import { account, apiData } from "@store";
 
-import { contests } from "@stabilitydao/stability";
+import { contests, seeds } from "@stabilitydao/stability";
 
 import { USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
@@ -59,6 +60,8 @@ const Users = (): JSX.Element => {
   const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
 
+  const [points, setPoints] = useState({});
+
   const handleActiveContest = (type: string) => {
     setActiveContest(type);
 
@@ -85,9 +88,24 @@ const Users = (): JSX.Element => {
               0
             )
           : 0,
+        points: points?.[data?.address as keyof typeof points] ?? 0,
       }));
 
       setTableData(contestData);
+    }
+  };
+
+  const getPoints = async () => {
+    try {
+      const req = await axios.get(`${seeds[0]}/rewards/points`);
+
+      if (req.data) {
+        const response = req.data;
+
+        setPoints(response);
+      }
+    } catch (error) {
+      console.log("Get points error:", error);
     }
   };
 
@@ -106,7 +124,11 @@ const Users = (): JSX.Element => {
 
   useEffect(() => {
     initTableData();
-  }, [activeContest, allContests]);
+  }, [activeContest, allContests, points]);
+
+  useEffect(() => {
+    getPoints();
+  }, []);
 
   return (
     <div className="flex flex-col flex-wrap min-w-[full]  md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
@@ -224,20 +246,23 @@ const Users = (): JSX.Element => {
                       {user.rank}
                     </div>
                     <div
-                      className={`px-2 md:px-4 w-1/4 md:w-[20%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
+                      className={`px-2 md:px-4 w-1/4 md:w-[10%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                       style={{ fontFamily: "monospace" }}
                     >
                       {getShortAddress(user.address, 6, 4)}
                     </div>
-                    <div className="px-2 md:px-4 w-[25%] text-end">
+                    <div className="px-2 md:px-4 w-[20%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="px-2 md:px-4 w-[25%] text-end">
+                    <div className="hidden md:block px-2 md:px-4 w-[20%] text-end">
                       {user.metaVaultsEarned > 0
                         ? user.metaVaultsEarned.toFixed(2)
                         : null}
+                    </div>
+                    <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
+                      {user.points ? user.points.toFixed(2) : ""}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
                       {user.deposit

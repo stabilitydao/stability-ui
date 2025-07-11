@@ -64,7 +64,10 @@ const Rewards = (): JSX.Element => {
       );
 
       const totalGems1 = formerContests.reduce((acc, cur) => {
-        const reward = cur.rewards?.find(({ type }) => type === "Gems1");
+        const reward = Array.isArray(cur.rewards)
+          ? cur.rewards?.find(({ type }) => type === "Gems1")
+          : 0;
+
         return acc + (reward ? reward.totalReward : 0);
       }, 0);
 
