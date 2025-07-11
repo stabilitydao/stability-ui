@@ -42,16 +42,25 @@ const PlatformUpgrade = (): JSX.Element => {
       if (pendingPlatformUpgrade?.proxies.length) {
         const promises = pendingPlatformUpgrade.proxies.map(
           async (proxy: TAddress, index: number) => {
-            const moduleContracts = Object.keys(
+            const coreContracts = Object.keys(
               deployments[$currentChainID].core
             );
 
+            const tokenomicsContracts = Object.keys(
+              deployments[$currentChainID].tokenomics
+            );
+
+            const allContracts = [...coreContracts, ...tokenomicsContracts];
+
             const upgratedData = await Promise.all(
-              moduleContracts.map(async (moduleContract: string) => {
+              allContracts.map(async (moduleContract: string) => {
                 //Can't use CoreContracts type
                 //@ts-ignore
                 const address =
-                  deployments[$currentChainID].core[moduleContract];
+                  deployments?.[$currentChainID]?.core?.[moduleContract] ??
+                  deployments?.[$currentChainID]?.tokenomics?.[moduleContract];
+
+                if (!address) return;
 
                 if (proxy.toLowerCase() === address.toLowerCase()) {
                   const oldImplementation = await $publicClient?.readContract({
