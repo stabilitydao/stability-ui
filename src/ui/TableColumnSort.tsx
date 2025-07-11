@@ -30,17 +30,18 @@ const TableColumnSort: React.FC<TProps> = ({
 }) => {
   const styles: Record<string, string> = {
     Rank: "hidden md:flex w-[10%] justify-start",
-    Address: "w-[20%] hidden md:flex justify-start",
-    Earned: "w-[30%] md:w-[25%] justify-start md:justify-end px-2 md:px-4",
-    Deposit: "w-[30%] md:w-[20%] justify-end px-2 md:px-4",
+    Address: "w-[10%] hidden md:flex justify-start",
+    Earned: "w-1/3 md:w-[20%] justify-start md:justify-end px-2 md:px-4",
+    Deposit: "w-1/3 md:w-[20%] justify-end px-2 md:px-4",
     Status: "hidden lg:flex w-[10%] justify-start",
     Name: "w-[20%] justify-start",
     Dates: "hidden lg:flex w-[20%] justify-start",
     Task: "hidden lg:flex w-[20%] justify-end",
     Rewards: "w-full lg:w-[20%] justify-end",
     Quest: "hidden lg:flex w-[10%] justify-end",
+    Points: "w-1/3 md:w-[20%] justify-end",
     "Earned in Metavaults":
-      "w-[40%] md:w-[25%] justify-center md:justify-end px-2 md:px-4",
+      "hidden md:flex w-[40%] md:w-[20%] justify-center md:justify-end px-2 md:px-4",
   };
 
   const tabController = () => {
