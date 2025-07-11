@@ -97,7 +97,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
                     onClick={(e) => {
                       e.preventDefault();
                       setModal({
-                        APR: metaVault?.APR24h,
+                        APR: metaVault?.APRWeekly,
                         merklAPR: metaVault?.merklAPR,
                         gemsAPR: metaVault?.gemsAPR,
                         totalAPR: metaVault?.totalAPR,

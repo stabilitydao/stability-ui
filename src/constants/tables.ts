@@ -190,6 +190,12 @@ const USERS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
+    name: "Points",
+    keyName: "points",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
     name: "Deposit",
     keyName: "deposit",
     sortType: "none",
