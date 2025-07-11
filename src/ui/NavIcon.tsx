@@ -28,7 +28,7 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <MetavaultsIcon color={color} />;
     case "alm":
       return <ALMIcon color={color} />;
-    case "users":
+    case "leaderboard":
       return <UsersIcon color={color} />;
     case "xstbl":
       return <XSTBLIcon color={color} />;

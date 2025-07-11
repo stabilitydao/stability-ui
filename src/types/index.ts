@@ -370,7 +370,6 @@ type TLeaderboard = {
       earned: number;
     };
   };
-  metaVaultsEarned: number;
 };
 
 type TTAbleFiltersVariant = {

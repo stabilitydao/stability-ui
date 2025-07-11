@@ -29,7 +29,7 @@ import type { TTableColumn, TLeaderboard } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 
-const Users = (): JSX.Element => {
+const Leaderboard = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
 
@@ -82,12 +82,6 @@ const Users = (): JSX.Element => {
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,
-        metaVaultsEarned: data?.metaVaults
-          ? Object.values(data?.metaVaults).reduce(
-              (acc, cur) => (acc += cur.earned),
-              0
-            )
-          : 0,
         points: points?.[data?.address as keyof typeof points] ?? 0,
       }));
 
@@ -256,11 +250,6 @@ const Users = (): JSX.Element => {
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="hidden md:block px-2 md:px-4 w-[20%] text-end">
-                      {user.metaVaultsEarned > 0
-                        ? user.metaVaultsEarned.toFixed(2)
-                        : null}
-                    </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
                       {user.points ? user.points.toFixed(2) : ""}
                     </div>
@@ -294,4 +283,4 @@ const Users = (): JSX.Element => {
   );
 };
 
-export { Users };
+export { Leaderboard };
