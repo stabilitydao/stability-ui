@@ -168,14 +168,8 @@ const Dashboard = (): JSX.Element => {
           allIncome += parsedLendingPendingRevenue;
 
           _dashboardData.lendingFeesUSD =
-            (parsedLendingPendingRevenue +
-              parsedPendingRebase +
-              parsedPendingRevenue) *
-            stblPrice;
-          _dashboardData.lendingFeesXSTBL =
-            parsedLendingPendingRevenue +
-            parsedPendingRebase +
-            parsedPendingRevenue;
+            parsedLendingPendingRevenue * stblPrice;
+          _dashboardData.lendingFeesXSTBL = parsedLendingPendingRevenue;
         }
 
         if (parsedPendingRevenue) {
