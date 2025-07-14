@@ -9,9 +9,7 @@ import { writeContract } from "@wagmi/core";
 
 import { IMetaVaultABI, wagmiConfig } from "@web3";
 
-import { getMetaVaultProportions } from "../Metavault/functions/getMetaVaultProportions";
-
-import type { TAddress } from "@types";
+import { VAULTS_WITH_NAME } from "@constants";
 
 const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
@@ -109,7 +107,9 @@ const VaultManager = (): JSX.Element => {
               className="flex flex-col gap-2 border-b border-[#23252A] pb-4 mb-4"
             >
               <div className="flex items-center justify-between">
-                <span>{proportion.symbol}</span>
+                <span>
+                  {VAULTS_WITH_NAME[proportion.address] ?? proportion.symbol}
+                </span>
                 <span>
                   {proportion.currentProportions}% /{" "}
                   {proportion.targetProportions}%
