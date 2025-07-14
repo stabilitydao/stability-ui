@@ -31,7 +31,8 @@ const VaultManager = (): JSX.Element => {
 
   const setProportion = async () => {
     try {
-      const bitIntValues = Object.values(values).map((v) => parseUnits(v, 18));
+      console.log(Object.values(values));
+      const bitIntValues = Object.values(values).map((v) => parseUnits(v, 16));
 
       const _action = await writeContract(wagmiConfig, {
         address: currentMetaVault.address,
