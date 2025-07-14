@@ -701,7 +701,7 @@ type TTableActiveParams = {
   filters: number;
 };
 
-type TStakeDashboardData = {
+type TStakeDashboard = {
   totalStaked: number;
   totalStakedInUSD: number;
   userStaked: number;
@@ -829,7 +829,7 @@ export type {
   TOptionInfo,
   TVSHoldModalState,
   TTableActiveParams,
-  TStakeDashboardData,
+  TStakeDashboard,
   TVestPeriod,
   TMarketPrice,
   TMarketPrices,

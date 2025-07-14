@@ -8,6 +8,7 @@ import {
   VestedExit,
   InstantExit,
   Stake,
+  Dashboard,
 } from "./components";
 
 import { cn } from "@utils";
@@ -28,6 +29,7 @@ const XSTBL = (): JSX.Element => {
             flexible or fixed-term staking options
           </h3>
         </div>
+        <Dashboard />
         <div className="bg-[#1C1D1F] p-[6px] rounded-lg border border-[#383B42] lg:hidden flex flex-col gap-1 text-[14px] leading-5 font-medium">
           <div
             onClick={() => setActiveForm("stake")}
