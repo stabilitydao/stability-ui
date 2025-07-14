@@ -10,12 +10,13 @@ import {
   USERS_TABLE,
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
-  SONIC_TABLE,
   DEFAULT_TABLE_PARAMS,
   POOL_TABLE,
   BC_POOL_TABLE,
   METAVAULT_TABLE,
   PROTOCOLS_TABLE,
+  LEVERAGE_FARMING_TABLE,
+  FARMING_TABLE_FILTERS,
 } from "./tables";
 
 import {
@@ -248,7 +249,7 @@ const VAULTS_WITH_NAME = {
   "0xa70f074ee09df3c0ab7e9eb0c058941ff65b8efe": "Valmore S",
   "0xf6fc4ea6c1e6dcb68c5ffab82f6c0ad2d4c94df9": "Valmore",
   "0x8913582701b7c80e883f9e352c1653a16769b173": "xUSD silo",
-  "0x9443c25624c8ab74fade003bc76d2ac35244b925": "Green House",
+  "0x9443c25624c8ab74fade003bc76d2ac35244b925": "Greenhouse",
 };
 
 const META_VAULTS_TYPE = {
@@ -262,13 +263,83 @@ const META_VAULTS_TYPE = {
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
-  // { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
   // { name: "ALM", path: "alm" },
   { name: "Users", path: "users" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
   // { name: "Platform", path: "platform" },
+];
+
+const LENDING_MARKETS = {
+  "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
+      symbol: "Silo wmetaUSD - USDC",
+      link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
+      symbol: "Silo wmetaUSD - scUSD",
+      link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
+      symbol: "Enclabs wmetaUSD",
+      link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaUSD",
+      link: "https://app.euler.finance/vault/0x6F11663766bB213003cD74EB09ff4c67145023c5?network=sonic",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaUSD - USDC (looper)",
+      link: "https://app.euler.finance/positions/0x6F11663766bB213003cD74EB09ff4c67145023c5/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic&tab=multiply",
+    },
+  ],
+  "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
+    {
+      logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png",
+      symbol: "Silo wmetaS - S",
+      link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaS",
+      link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
+    },
+    {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+      symbol: "Euler wmetaS - wS (looper)",
+      link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
+    },
+  ],
+};
+
+const SOCIALS = [
+  {
+    name: "Stability X",
+    logo: "/socials/x.png",
+    link: "https://x.com/stabilitydao",
+  },
+  {
+    name: "Stability Discord",
+    logo: "/socials/discord.png",
+    link: "https://discord.com/invite/R3nnetWzC9",
+  },
+  {
+    name: "Stability Github",
+    logo: "/socials/github.png",
+    link: "https://github.com/stabilitydao",
+  },
+  {
+    name: "Stability Telegram",
+    logo: "/socials/telegram.png",
+    link: "https://t.me/stabilitydao",
+  },
 ];
 
 export {
@@ -306,7 +377,6 @@ export {
   CONTESTS_TABLE,
   LEADERBOARD_TABLE,
   CHAINS_CONFIRMATIONS,
-  SONIC_TABLE,
   POOL_TABLE,
   BC_POOL_TABLE,
   DEFAULT_TABLE_PARAMS,
@@ -319,4 +389,8 @@ export {
   STABILITY_AAVE_POOLS,
   METAVAULT_TABLE,
   PROTOCOLS_TABLE,
+  LEVERAGE_FARMING_TABLE,
+  FARMING_TABLE_FILTERS,
+  SOCIALS,
+  LENDING_MARKETS,
 };

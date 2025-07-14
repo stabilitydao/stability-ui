@@ -1,5 +1,4 @@
 import { Toast } from "./Toast";
-import { TextModal } from "./Modals/TextModal";
 import { APRtimeSwitcher } from "./APRtimeSwitcher";
 import { ErrorMessage } from "./ErrorMessage";
 import { FeeAPRModal } from "./FeeAPRModal";
@@ -43,10 +42,16 @@ import {
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
+import { FarmingTable } from "./Tables/Farming";
+
+import { TextModal } from "./Modals/TextModal";
+import { APRModal } from "./Modals/APRModal";
 
 import { DisplayType } from "./DisplayType";
 
 import { ActionButton } from "./ActionButton";
+
+import { Socials } from "./Socials";
 
 export {
   Toast,
@@ -91,4 +96,7 @@ export {
   ArrowRightIcon,
   TextSkeleton,
   ContestsTable,
+  FarmingTable,
+  Socials,
+  APRModal,
 };

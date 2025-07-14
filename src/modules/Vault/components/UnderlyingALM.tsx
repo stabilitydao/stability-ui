@@ -244,10 +244,10 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
   }, [vault, $assetsPrices]);
 
   return (
-    <>
+    <div>
       <HeadingText text="Underlying ALM" scale={2} styles="text-left mb-4" />
 
-      <div className="flex flex-col items-start gap-6 p-6 bg-[#101012] rounded-lg border border-[#23252A]">
+      <div className="flex flex-col items-start gap-6 p-4 md:p-6 bg-[#101012] rounded-lg border border-[#23252A]">
         <div className="flex items-center gap-4">
           <img
             src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${vault.alm.protocol}.svg`}
@@ -385,7 +385,7 @@ const UnderlyingALM: React.FC<IProps> = memo(({ network, vault }) => {
           </table>
         </div> */}
       </div>
-    </>
+    </div>
   );
 });
 

@@ -323,10 +323,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 <TextSkeleton lineHeight={24} width={80} />
               ) : (
                 <span className="font-semibold text-[18px] leading-6 text-[#48c05c]">
-                  {["metaUSD", "metaS"].includes(localMetaVault.symbol)
-                    ? formatNumber(localMetaVault?.totalAPR, "formatAPR")
-                    : formatNumber(localMetaVault?.APR, "formatAPR")}
-                  %
+                  {formatNumber(localMetaVault?.totalAPR, "formatAPR")}%
                 </span>
               )}
             </div>
@@ -480,9 +477,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
-          {metavault === "0x1111111199558661bf7ff27b4f1623dc6b91aa3e" && (
-            <LendingMarkets />
-          )}
+          <LendingMarkets metavault={metavault} />
         </div>
       </div>
       {modal && (
@@ -499,9 +494,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
             <div className="flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">APR 24H</p>
+                <p className="leading-5 text-[#97979A] font-medium">APR Week</p>
                 <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.APR, "formatAPR")}%
+                  {formatNumber(localMetaVault?.weeklyAPR, "formatAPR")}%
                 </p>
               </div>
               <a

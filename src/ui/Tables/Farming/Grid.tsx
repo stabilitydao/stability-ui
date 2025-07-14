@@ -1,9 +1,8 @@
 import { RewardsCarousel } from "../../RewardsCarousel";
-import { StrategyBadge } from "../../StrategyBadge";
 
 import { formatNumber } from "@utils";
 
-import { TVault, TAPRModal } from "@types";
+import { TVault } from "@types";
 
 interface IProps {
   APRs: {
@@ -15,34 +14,17 @@ interface IProps {
     gemsAPR: string;
   };
   vault: TVault;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
 }
 
-const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
+const Grid: React.FC<IProps> = ({ APRs, vault }) => {
   const POINTS = { sonic: vault.sonicActivePoints, rings: vault.ringsPoints };
 
-  const link = vault?.isMetaVault
-    ? `/metavaults/metavault/${vault.address}`
-    : `/vaults/vault/${vault.network}/${vault.address}`;
+  const link = `/vaults/vault/${vault.network}/${vault.address}`;
 
-  const modalData = !vault?.isMetaVault
-    ? {
-        earningData: vault.earningData,
-        daily: vault.daily,
-        lastHardWork: vault.lastHardWork,
-        symbol: vault?.risk?.symbol as string,
-        state: true,
-        type: "vault",
-        pool: vault?.pool,
-      }
-    : {
-        APR: vault?.APRWeekly,
-        merklAPR: vault?.merklAPR,
-        gemsAPR: vault?.gemsAPR,
-        totalAPR: vault?.totalAPR,
-        state: true,
-        type: "metaVault",
-      };
+  const currentLtv = vault?.leverageLending?.ltv.toFixed(2) ?? 0;
+  const maxLtv = vault?.leverageLending?.maxLtv.toFixed(2) ?? 0;
+
+  const lendingPlatform = vault.strategyInfo.protocols[0].name;
 
   return (
     <a
@@ -53,24 +35,16 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
-            {vault?.isMetaVault ? (
+            {vault.assets.map((asset, index) => (
               <img
-                className="w-10 h-10 rounded-full flex-shrink-0"
-                src={`/features/${vault.symbol}.png`}
-                alt={vault.symbol}
+                src={asset?.logo}
+                alt={asset?.symbol}
+                className={`w-10 h-10 rounded-full ${
+                  !index && vault.assets.length > 1 && "mr-[-16px] z-[5]"
+                }`}
+                key={asset?.logo + index}
               />
-            ) : (
-              vault.assets.map((asset, index) => (
-                <img
-                  src={asset?.logo}
-                  alt={asset?.symbol}
-                  className={`w-10 h-10 rounded-full ${
-                    !index && vault.assets.length > 1 && "mr-[-16px] z-[5]"
-                  }`}
-                  key={asset?.logo + index}
-                />
-              ))
-            )}
+            ))}
           </div>
 
           <div className="flex flex-col items-start gap-1">
@@ -87,22 +61,27 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {!vault?.isMetaVault && (
-            <div className="flex items-center justify-between">
-              <span className="text-[#97979A] text-[14px]">Strategy</span>
-              <StrategyBadge
-                info={vault.strategyInfo}
-                specific={vault.strategySpecific}
-              />
-            </div>
-          )}
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">Lending Platform</span>
+            <span className="font-bold">{lendingPlatform}</span>
+          </div>
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">Leverage</span>
+            <span className="font-bold">{vault?.leverage}x</span>
+          </div>
+          <div className="flex items-center justify-between text-[14px]">
+            <span className="text-[#97979A]">LTV / Max LTV</span>
+            <span className="font-bold text-[12px]">
+              {currentLtv}% / {maxLtv}%
+            </span>
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                setModalState(modalData);
               }}
               className="cursor-help"
             >
@@ -126,7 +105,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </span>
           </div>
           <div className="flex items-center justify-between text-[14px]">
-            <span className="text-[#97979A]">Balance</span>
+            <span className="text-[#97979A]">Deposit</span>
             <p className="font-bold">
               ${formatNumber(vault.balanceInUSD, "format")}
             </p>

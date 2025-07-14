@@ -17,7 +17,6 @@ import { AddPools } from "./Platform/components/Swapper/AddPools";
 import { Users } from "./Users";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
-import { SonicVaults } from "./SonicVaults";
 import { XSTBL } from "./XSTBL";
 import { Dashboard } from "./Dashboard";
 import { LeveragedFarming } from "./LeveragedFarming";
@@ -44,7 +43,6 @@ export {
   Contests,
   Contest,
   Home,
-  SonicVaults,
   XSTBL,
   Swapper,
   AddPools,

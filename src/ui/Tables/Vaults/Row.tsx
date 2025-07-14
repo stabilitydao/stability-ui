@@ -43,7 +43,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         pool: vault?.pool,
       }
     : {
-        APR: vault?.APR,
+        APR: vault?.APRWeekly,
         merklAPR: vault?.merklAPR,
         gemsAPR: vault?.gemsAPR,
         totalAPR: vault?.totalAPR,
