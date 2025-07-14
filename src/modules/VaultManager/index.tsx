@@ -9,6 +9,10 @@ import { writeContract } from "@wagmi/core";
 
 import { IMetaVaultABI, wagmiConfig } from "@web3";
 
+import { getMetaVaultProportions } from "../Metavault/functions/getMetaVaultProportions";
+
+import type { TAddress } from "@types";
+
 const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
@@ -43,14 +47,25 @@ const VaultManager = (): JSX.Element => {
     }
   };
 
-  useEffect(() => {
-    if ($metaVaults[146] && $vaults[146]) {
+  const getData = async () => {
+    try {
       const _metaVaultsWithProportions = $metaVaults[146].map((mv) => {
         const proportions = Object.entries(mv.vaultProportions).map(
           ([address, obj]) => {
-            const symbol = $vaults[146][address]?.symbol;
+            const symbol =
+              $vaults[146][address]?.symbol ??
+              $metaVaults[146].find((_mv) => _mv.address === address)?.symbol;
 
-            return { address, symbol, ...obj };
+            const newObj = {
+              currentProportions: (
+                Number(obj.currentProportions) * 100
+              ).toFixed(2),
+              targetProportions: (Number(obj.targetProportions) * 100).toFixed(
+                2
+              ),
+            };
+
+            return { address, symbol, ...newObj };
           }
         );
 
@@ -59,6 +74,14 @@ const VaultManager = (): JSX.Element => {
 
       setActiveMetaVaults(_metaVaultsWithProportions);
       setCurrentMetaVault(_metaVaultsWithProportions[0]);
+    } catch (error) {
+      console.log("Get data error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if ($metaVaults[146] && $vaults[146]) {
+      getData();
     }
   }, [$metaVaults]);
   return (
@@ -88,8 +111,8 @@ const VaultManager = (): JSX.Element => {
               <div className="flex items-center justify-between">
                 <span>{proportion.symbol}</span>
                 <span>
-                  {proportion.currentProportions} /{" "}
-                  {proportion.targetProportions}
+                  {proportion.currentProportions}% /{" "}
+                  {proportion.targetProportions}%
                 </span>
               </div>
 
