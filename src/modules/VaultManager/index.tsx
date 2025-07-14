@@ -10,6 +10,7 @@ import { writeContract } from "@wagmi/core";
 import { IMetaVaultABI, wagmiConfig } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
+import { parseUnits } from "viem";
 
 const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
@@ -30,7 +31,7 @@ const VaultManager = (): JSX.Element => {
 
   const setProportion = async () => {
     try {
-      const bitIntValues = Object.values(values).map((v) => BigInt(v));
+      const bitIntValues = Object.values(values).map((v) => parseUnits(v, 18));
 
       const _action = await writeContract(wagmiConfig, {
         address: currentMetaVault.address,
