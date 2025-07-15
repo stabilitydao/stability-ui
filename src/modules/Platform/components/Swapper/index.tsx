@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
-import { TableColumnSort, HeadingText, FullPageLoader } from "@ui";
+import { HeadingText, FullPageLoader } from "@ui";
 
-import { sortTable, getShortAddress } from "@utils";
+import { getShortAddress } from "@utils";
 
 import { BC_POOL_TABLE, POOL_TABLE } from "@constants";
 
@@ -116,8 +116,10 @@ const TxStatusModal = ({
 };
 
 const Swapper = (): JSX.Element => {
-  const [poolTableStates, setPoolTableStates] = useState(POOL_TABLE);
-  const [BCPoolTableStates, setBCPoolTableStates] = useState(BC_POOL_TABLE);
+  // const [poolTableStates, setPoolTableStates] = useState(POOL_TABLE);
+  // const [BCPoolTableStates, setBCPoolTableStates] = useState(BC_POOL_TABLE);
+  const poolTableStates = POOL_TABLE;
+  const BCPoolTableStates = BC_POOL_TABLE;
 
   const [poolTableData, setPoolTableData] = useState<TPoolTable[]>([]);
   const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);

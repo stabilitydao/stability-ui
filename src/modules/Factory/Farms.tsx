@@ -149,7 +149,7 @@ const Farms = (): JSX.Element => {
 
     /* ───────── UI / modal state ───────── */
     const [simulationStatus, setSimulationStatus] = useState<"idle" | "loading" | "success" | "fail">("idle");
-    const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+    // const [gasEstimate, setGasEstimate] = useState<string | null>(null);
     const [txStatus, setTxStatus] = useState<TxStatus>("idle");
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
@@ -239,7 +239,7 @@ const Farms = (): JSX.Element => {
             });
 
             const gasWithBuffer = (est * 11n) / 10n; // +10 %
-            setGasEstimate(est.toString());
+            // setGasEstimate(est.toString());
             setSimulationStatus("success");
 
             /* ───────── wallet approval ───────── */
