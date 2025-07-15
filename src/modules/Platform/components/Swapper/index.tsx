@@ -116,8 +116,6 @@ const TxStatusModal = ({
 };
 
 const Swapper = (): JSX.Element => {
-  // const [poolTableStates, setPoolTableStates] = useState(POOL_TABLE);
-  // const [BCPoolTableStates, setBCPoolTableStates] = useState(BC_POOL_TABLE);
   const poolTableStates = POOL_TABLE;
   const BCPoolTableStates = BC_POOL_TABLE;
 
@@ -291,7 +289,6 @@ const Swapper = (): JSX.Element => {
                     {poolTableStates.map((value: TTableColumn, index: number) => (
                       <th key={value.name + index} className="px-4 py-3">{value.name}</th>
                     ))}
-                    <th className="px-4 py-3">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="text-[14px]">
@@ -363,7 +360,6 @@ const Swapper = (): JSX.Element => {
               className="bg-accent-500 hover:bg-accent-600 my-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
               href="/swapper/add-pools"
               title="Go to add pools page"
-              key="/swapper/add-pools"
             >
               Add Pools
             </a>
