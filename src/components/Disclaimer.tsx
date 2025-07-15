@@ -36,7 +36,7 @@ const Disclaimer = (): JSX.Element | null => {
               protocol. <br />
               <br />
               By accessing or using this decentralized finance (DeFi) and yield
-              farming protocol ("the Protocol"), you acknowledge and agree to
+              farming protocol ("Stability DAO"), you acknowledge and agree to
               the following terms:
             </p>
             <p className="flex flex-col gap-2">
@@ -44,9 +44,9 @@ const Disclaimer = (): JSX.Element | null => {
                 No Financial Advice
               </span>
               <span>
-                The Protocol does not provide investment, financial, legal, or
-                tax advice. All information and materials provided are for
-                general informational purposes only. You should conduct your own
+                Stability DAO does not provide financial, legal, or tax advice.
+                All information and materials provided are for general
+                informational purposes only. You should conduct your own
                 research and consult with professional advisors before making
                 any financial decisions.
               </span>
@@ -57,7 +57,7 @@ const Disclaimer = (): JSX.Element | null => {
               </span>
               <span>
                 You are solely responsible for evaluating and bearing the risks
-                associated with the use of the Protocol. This includes but is
+                associated with the use of Stability DAO. This includes but is
                 not limited to risks of loss of funds, impermanent loss, smart
                 contract vulnerabilities, liquidation, market volatility, and
                 other technical or economic risks inherent to DeFi ecosystems.
@@ -68,11 +68,11 @@ const Disclaimer = (): JSX.Element | null => {
                 No Guarantees or Warranties
               </span>
               <span>
-                The Protocol is provided "as is" and "as available" without
+                Stability DAO is provided "as is" and "as available" without
                 warranties of any kind, either expressed or implied. We do not
                 guarantee the security, reliability, performance, or accuracy of
-                the Protocol. Interacting with smart contracts carries risk, and
-                you assume full responsibility for any outcomes.
+                Stability DAO. Interacting with smart contracts carries risk,
+                and you assume full responsibility for any outcomes.
               </span>
             </p>
             <p className="flex flex-col gap-2">
@@ -80,7 +80,7 @@ const Disclaimer = (): JSX.Element | null => {
                 Smart Contract Risk
               </span>
               <span>
-                The Protocol relies on smart contracts deployed on public
+                Stability DAO relies on smart contracts deployed on public
                 blockchains. These contracts are subject to potential bugs,
                 exploits, or vulnerabilities. Even if contracts have been
                 audited, there is no guarantee that they are completely free of
@@ -94,7 +94,7 @@ const Disclaimer = (): JSX.Element | null => {
               <span>
                 The regulatory status of DeFi protocols and tokens remains
                 uncertain in many jurisdictions. It is your responsibility to
-                ensure that your use of the Protocol is compliant with the laws
+                ensure that your use of Stability DAO is compliant with the laws
                 and regulations applicable to you.
               </span>
             </p>
@@ -104,11 +104,11 @@ const Disclaimer = (): JSX.Element | null => {
               </span>
               <span>
                 To the maximum extent permitted by law, the creators,
-                developers, contributors, and affiliates of the Protocol shall
+                developers, contributors, and affiliates of Stability DAO shall
                 not be held liable for any direct, indirect, incidental,
                 special, consequential, or exemplary damages—including loss of
                 funds, data, or profits—arising out of or in connection with
-                your use of or inability to use the Protocol.
+                your use of or inability to use Stability DAO.
               </span>
             </p>
             <p className="flex flex-col gap-2">
@@ -116,15 +116,16 @@ const Disclaimer = (): JSX.Element | null => {
                 Use at Your Own Risk
               </span>
               <span>
-                Use at Your Own Risk By using the Protocol, you acknowledge that
-                you fully understand the risks involved and agree to assume full
-                responsibility for any and all consequences, including potential
-                loss of funds. You use this Protocol entirely at your own risk.
+                Use at Your Own Risk By using Stability DAO, you acknowledge
+                that you fully understand the risks involved and agree to assume
+                full responsibility for any and all consequences, including
+                potential loss of funds. You use this Protocol entirely at your
+                own risk.
               </span>
             </p>
             <p>
               If you do not agree with any part of this disclaimer, do not use
-              the Protocol.
+              Stability DAO.
             </p>
           </div>
           <button
