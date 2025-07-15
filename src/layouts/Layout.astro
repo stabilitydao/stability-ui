@@ -4,7 +4,8 @@ import App from "./App";
 
 import { Header} from "@components/Header"
 import { Navbar } from "@components/Navbar";
-import {Menu} from "@components/Menu"
+import { Menu } from "@components/Menu"
+import { Disclaimer } from "@components/Disclaimer";
 
 interface IProps {
   title: string;
@@ -75,6 +76,7 @@ const {
 					<slot />
 				</main>
 			</div>
+			<Disclaimer client:only="react"/>
 		</div>
     </App>
   </body>
@@ -100,11 +102,11 @@ const {
 	}
 
 	::-webkit-scrollbar-track {
-		background-color: #0b0b0b;
+		background-color: #26272A;
 	}
 
 	::-webkit-scrollbar-thumb {
-		background-color: #101012;
+		background-color: #46484C;
 		border-radius: 8px;
 	}
 

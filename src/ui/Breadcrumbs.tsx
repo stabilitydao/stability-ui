@@ -29,11 +29,11 @@ const Breadcrumbs = (): JSX.Element => {
     if (pathFromConst) {
       add(pathFromConst.name, currentPath);
     } else if (currentPath === "contests") {
-      add("Users", "users");
+      add("Leaderboard", "leaderboard");
       add("Contests", "contests");
     } else if (main === "contests" && rest.length === 1) {
       const contest = contests[rest[0]];
-      add("Users", "users");
+      add("Leaderboard", "leaderboard");
       add("Contests", "contests");
       add(contest?.name || "Unknown Contest");
     } else if (currentPath === "platform") {
