@@ -29,6 +29,7 @@ import { cn } from "./functions/cn";
 import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
+import { copyAddress } from "./functions/copyAddress";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -67,4 +68,5 @@ export {
   useModalClickOutside,
   getTransactionReceipt,
   enrichAndResolveMetaVaults,
+  copyAddress,
 };

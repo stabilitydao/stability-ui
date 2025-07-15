@@ -184,12 +184,6 @@ const USERS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "Earned in Metavaults",
-    keyName: "metaVaultsEarned",
-    sortType: "descendentic",
-    dataType: "number",
-  },
-  {
     name: "Points",
     keyName: "points",
     sortType: "descendentic",
