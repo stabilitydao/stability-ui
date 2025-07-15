@@ -480,6 +480,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           <LendingMarkets metavault={metavault} />
         </div>
       </div>
+
       {modal && (
         <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
           <div
@@ -496,7 +497,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <div className="flex items-center justify-between">
                 <p className="leading-5 text-[#97979A] font-medium">APR Week</p>
                 <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.weeklyAPR, "formatAPR")}%
+                  {formatNumber(localMetaVault?.APRWeekly, "formatAPR")}%
                 </p>
               </div>
               <a
