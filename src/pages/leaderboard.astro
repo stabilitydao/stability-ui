@@ -1,14 +1,14 @@
 ---
-import {Users} from '@modules';
+import {Leaderboard} from '@modules';
 import Layout from '@layouts/Layout.astro';
 ---
 
 
-<Layout title="Users" 
-  img="/ogs/users.png"
-  metaTitle="Users"
-  metaUrl="https://stability.farm/users"
+<Layout title="Leaderboard" 
+  img="/ogs/leaderboard.png"
+  metaTitle="Leaderboard"
+  metaUrl="https://stability.farm/leaderboard"
   metaDescription="Track your rank, earnings, and participate in Stability yield contests. Stay updated on leaderboard positions and rewards."
 >
-    <Users client:only="react" />
+    <Leaderboard client:only="react" />
 </Layout>

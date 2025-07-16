@@ -17,6 +17,7 @@ import {
   formatTimestampToDate,
   cn,
   formatNumber,
+  copyAddress,
 } from "@utils";
 
 import { findAllValidPeriods } from "./functions";
@@ -35,12 +36,10 @@ import type { TTableColumn, TLeaderboard } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 
-const Users = (): JSX.Element => {
+const Leaderboard = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
 
-  // const activeContestInfo = contests?.[currentPeriod];
-  // const pastContestInfo = contests?.[previousPeriod];
   const { currentPeriod, previousPeriod, nextPeriod } =
     findAllValidPeriods(contests);
 
@@ -263,25 +262,27 @@ const Users = (): JSX.Element => {
                       {user.rank}
                     </div>
                     <div
-                      className={`px-2 md:px-4 w-1/4 md:w-[10%] text-start ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
+                      className={`group px-2 md:px-4 w-1/4 md:w-[22.5%] text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                       style={{ fontFamily: "monospace" }}
+                      title={user.address}
+                      onClick={() => copyAddress(user.address)}
                     >
                       {getShortAddress(user.address, 6, 4)}
+                      <img
+                        className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        src="/icons/copy.png"
+                        alt="Copy icon"
+                      />
                     </div>
-                    <div className="px-2 md:px-4 w-[20%] text-end">
+                    <div className="px-2 md:px-4 w-[22.5%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="hidden md:block px-2 md:px-4 w-[20%] text-end">
-                      {user.metaVaultsEarned > 0
-                        ? user.metaVaultsEarned.toFixed(2)
-                        : null}
-                    </div>
-                    <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
+                    <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.points ? user.points.toFixed(2) : ""}
                     </div>
-                    <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
+                    <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.deposit
                         ? (Math.round(user.deposit * 100) / 100).toFixed(2)
                         : ""}
@@ -311,4 +312,4 @@ const Users = (): JSX.Element => {
   );
 };
 
-export { Users };
+export { Leaderboard };
