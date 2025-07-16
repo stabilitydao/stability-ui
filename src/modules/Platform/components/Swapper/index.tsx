@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
-import { TableColumnSort, HeadingText, FullPageLoader } from "@ui";
+import { HeadingText, FullPageLoader } from "@ui";
 
-import { sortTable, getShortAddress } from "@utils";
+import { getShortAddress } from "@utils";
 
 import { BC_POOL_TABLE, POOL_TABLE } from "@constants";
 
@@ -116,8 +116,8 @@ const TxStatusModal = ({
 };
 
 const Swapper = (): JSX.Element => {
-  const [poolTableStates, setPoolTableStates] = useState(POOL_TABLE);
-  const [BCPoolTableStates, setBCPoolTableStates] = useState(BC_POOL_TABLE);
+  const poolTableStates = POOL_TABLE;
+  const BCPoolTableStates = BC_POOL_TABLE;
 
   const [poolTableData, setPoolTableData] = useState<TPoolTable[]>([]);
   const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);
@@ -285,18 +285,9 @@ const Swapper = (): JSX.Element => {
             <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
               <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
                 <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                  <tr className="text-[12px] font-bold uppercase">
+                  <tr className="text-[12px] font-bold uppercase text-center">
                     {poolTableStates.map((value: TTableColumn, index: number) => (
-                      <TableColumnSort
-                        key={value.name + index}
-                        index={index}
-                        value={value.name}
-                        sort={sortTable}
-                        table={poolTableStates}
-                        setTable={setPoolTableStates}
-                        tableData={poolTableData}
-                        setTableData={setPoolTableData}
-                      />
+                      <th key={value.name + index} className="px-4 py-3">{value.name}</th>
                     ))}
                   </tr>
                 </thead>
@@ -366,9 +357,8 @@ const Swapper = (): JSX.Element => {
             </div>
 
             <a
-              className="bg-accent-500 hover:bg-accent-600 mt-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
-              href="/add-pools"
-              target="_blank"
+              className="bg-accent-500 hover:bg-accent-600 my-6 px-3 py-3 rounded-xl flex items-center w-max font-bold text-sm"
+              href="/swapper/add-pools"
               title="Go to add pools page"
             >
               Add Pools
@@ -378,19 +368,10 @@ const Swapper = (): JSX.Element => {
             <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
               <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
                 <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                  <tr className="text-[12px] font-bold uppercase">
+                  <tr className="text-[12px] font-bold uppercase text-center">
                     {BCPoolTableStates.map(
                       (value: TTableColumn, index: number) => (
-                        <TableColumnSort
-                          key={value.name + index * 10}
-                          index={index}
-                          value={value.name}
-                          sort={sortTable}
-                          table={BCPoolTableStates}
-                          setTable={setBCPoolTableStates}
-                          tableData={BCPoolTableData}
-                          setTableData={setBCPoolTableData}
-                        />
+                        <th key={value.name + index * 10} className="px-4 py-3">{value.name}</th>
                       )
                     )}
                   </tr>
