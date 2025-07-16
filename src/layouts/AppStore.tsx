@@ -915,7 +915,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           const APIMetaVaultsData = Object.values(
             stabilityAPIData?.metaVaults?.[chain.id] as Vaults
           );
-
+          console.log(stabilityAPIData?.metaVaults?.[chain.id]);
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
               let merklAPR = 0;
@@ -945,10 +945,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 }
               }
 
-              totalAPR = Number(metaVault.APRWeekly) + merklAPR + gemsAPR;
+              const APRWeekly =
+                metaVault.symbol === "metaUSD"
+                  ? stabilityAPIData?.metaVaults?.[chain.id][
+                      "0x22222222780038f8817b3de825a070225e6d9874"
+                    ].APRWeekly
+                  : metaVault.APRWeekly;
+
+              totalAPR = Number(APRWeekly) + merklAPR + gemsAPR;
 
               return {
                 ...metaVault,
+                APRWeekly,
                 status: "Active",
                 isMetaVault: true,
                 deposited: formatUnits(
