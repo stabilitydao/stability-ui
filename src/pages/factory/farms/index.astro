@@ -1,0 +1,10 @@
+---
+import {Farms} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Farms">
+    <div class="platform max-w-[1200px]">
+        <Farms client:only="react" />
+    </div>
+</Layout>

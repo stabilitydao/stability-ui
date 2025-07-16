@@ -75,6 +75,10 @@ const Breadcrumbs = (): JSX.Element => {
       add("Platform", "platform");
       add("Swapper", "swapper");
       add("Add Pools");
+    } else if (main === "factory" && rest[0] === "farms") {
+      add("Platform", "platform");
+      add("Factory", "factory");
+      add("Farms");
     } else if (["assets", "swapper", "factory"].includes(main)) {
       add("Platform", "platform");
       add(main.charAt(0).toUpperCase() + main.slice(1));
