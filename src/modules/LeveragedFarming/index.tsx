@@ -407,7 +407,7 @@ const LeveragedFarming = (): JSX.Element => {
       </div>
 
       <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
-        <div className="overflow-x-auto lg:overflow-x-visible hide-scrollbar overflow-y-hidden">
+        <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible hide-scrollbar lg:overflow-y-hidden">
           <div
             className={cn(
               "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[762px] md:w-[960px] lg:w-full",
