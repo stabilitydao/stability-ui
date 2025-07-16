@@ -7,7 +7,7 @@ import {
   XSTBLIcon,
   AgentsIcon,
   PlatformIcon,
-  LeaderboardIcon,
+  UsersIcon,
 } from "./Icons";
 
 interface IProps {
@@ -29,7 +29,7 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
     case "alm":
       return <ALMIcon color={color} />;
     case "leaderboard":
-      return <LeaderboardIcon color={color} />;
+      return <UsersIcon color={color} />;
     case "xstbl":
       return <XSTBLIcon color={color} />;
     case "agents":

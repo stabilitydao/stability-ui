@@ -87,12 +87,6 @@ const Leaderboard = (): JSX.Element => {
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,
-        metaVaultsEarned: data?.metaVaults
-          ? Object.values(data?.metaVaults).reduce(
-              (acc, cur) => (acc += cur.earned),
-              0
-            )
-          : 0,
         points: points?.[data?.address as keyof typeof points] ?? 0,
       }));
 
@@ -279,7 +273,7 @@ const Leaderboard = (): JSX.Element => {
                         ? user.earned.toFixed(4)
                         : user.earned.toFixed(2)}
                     </div>
-                    <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
+                    <div className="px-2 md:px-4 w-1/4 md:w-[20%] text-end">
                       {user.points ? user.points.toFixed(2) : ""}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
