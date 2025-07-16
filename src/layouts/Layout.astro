@@ -4,7 +4,8 @@ import App from "./App";
 
 import { Header} from "@components/Header"
 import { Navbar } from "@components/Navbar";
-import {Menu} from "@components/Menu"
+import { Menu } from "@components/Menu"
+import { Disclaimer } from "@components/Disclaimer";
 
 interface IProps {
   title: string;
@@ -75,6 +76,7 @@ const {
 					<slot />
 				</main>
 			</div>
+			<Disclaimer client:only="react"/>
 		</div>
     </App>
   </body>
