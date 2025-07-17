@@ -291,6 +291,13 @@ const POOL_TABLE: TTableColumn[] = [
     dataType: "",
     unsortable: true,
   },
+  {
+    name: "ACTIONS",
+    keyName: "actions",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
 ];
 const BC_POOL_TABLE: TTableColumn[] = [
   {

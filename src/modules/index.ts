@@ -1,5 +1,6 @@
 import { Home } from "./Home";
 import { Factory } from "./Factory";
+import { Farms } from "./Factory/Farms";
 import { Vaults } from "./Vaults";
 import { Vault } from "./Vault";
 import { Platform } from "./Platform";
@@ -28,6 +29,7 @@ import { VaultManager } from "./VaultManager";
 
 export {
   Factory,
+  Farms,
   Vaults,
   Vault,
   Platform,
