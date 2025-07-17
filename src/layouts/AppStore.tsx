@@ -915,7 +915,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           const APIMetaVaultsData = Object.values(
             stabilityAPIData?.metaVaults?.[chain.id] as Vaults
           );
-          console.log(stabilityAPIData?.metaVaults?.[chain.id]);
+
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
               let merklAPR = 0;
