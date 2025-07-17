@@ -740,4 +740,11 @@ export default [
     name: "WaitAFewBlocks",
     inputs: [],
   },
+  {
+    type: "function",
+    name: "setLastBlockDefenseDisabled",
+    inputs: [{ name: "isDisabled", type: "bool", internalType: "bool" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
 ] as const;
