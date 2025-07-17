@@ -7,7 +7,7 @@ import {
   XSTBLIcon,
   AgentsIcon,
   PlatformIcon,
-  UsersIcon,
+  LeaderboardIcon,
 } from "./Icons";
 
 interface IProps {
