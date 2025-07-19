@@ -575,6 +575,10 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
       const { wrap, unwrap } = getWrappingPairs(metaVault, assetsForDeposit);
 
+      const withdraw = getTokenData(
+        assetsForWithdraw[0].toLowerCase()
+      ) as TTokenData;
+
       if (!$account) return;
 
       const [
@@ -619,7 +623,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
       const metaVaultFormatted = formatUnits(metaVaultBalance, 18);
       const unwrapDecimals =
-        metaVault.symbol !== "metaUSD" ? activeAsset.withdraw.decimals : 18;
+        metaVault.symbol !== "metaUSD" ? withdraw.decimals : 18;
 
       assetsForWithdraw.forEach((address) => {
         const key = address.toLowerCase();
@@ -662,9 +666,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
       setActiveAsset({
         deposit: getTokenData(assetsForDeposit[0].toLowerCase()) as TTokenData,
-        withdraw: getTokenData(
-          assetsForWithdraw[0].toLowerCase()
-        ) as TTokenData,
+        withdraw,
         wrap,
         unwrap,
       });

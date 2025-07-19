@@ -269,7 +269,6 @@ const PATHS = [
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
-  // { name: "Platform", path: "platform" },
 ];
 
 const LENDING_MARKETS = {

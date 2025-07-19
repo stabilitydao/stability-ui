@@ -9,6 +9,8 @@ import { WagmiLayout } from "@layouts";
 
 import { BuildForm } from "./BuildForm";
 
+import { VaultManager } from "./VaultManager";
+
 import {
   platforms,
   PlatformABI,
@@ -314,6 +316,8 @@ const Factory = (): JSX.Element => {
 
   return (
     <WagmiLayout>
+      <VaultManager />
+
       {isCorrectNetwork ? (
         <div className="flex flex-col items-center">
           <h2 className="text-[22px] mb-3">Compounding vault</h2>

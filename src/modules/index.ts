@@ -25,7 +25,6 @@ import { Metavaults } from "./Metavaults";
 import { ALM } from "./ALM";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
-import { VaultManager } from "./VaultManager";
 
 export {
   Factory,
@@ -55,5 +54,4 @@ export {
   ALM,
   Agents,
   Metavault,
-  VaultManager,
 };
