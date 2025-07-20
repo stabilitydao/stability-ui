@@ -28,9 +28,9 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
         let TVL = "0";
         if (metaVault.deposited) {
           if (["metaS", "metawS"].includes(metaVault?.symbol)) {
-            TVL = `${String(formatNumber(metaVault.deposited, "abbreviate")).slice(1)} S`;
+            TVL = `${String(formatNumber(metaVault.tvl, "abbreviate")).slice(1)} S`;
           } else {
-            TVL = formatNumber(metaVault.deposited, "abbreviate") as string;
+            TVL = formatNumber(metaVault.tvl, "abbreviate") as string;
           }
         }
 
