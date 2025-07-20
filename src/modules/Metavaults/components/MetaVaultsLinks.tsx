@@ -26,12 +26,8 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
     <div className="flex items-center flex-wrap gap-3 md:gap-[25px]">
       {metaVaults.map((metaVault) => {
         let TVL = "0";
-        if (metaVault.deposited) {
-          if (["metaS", "metawS"].includes(metaVault?.symbol)) {
-            TVL = `${String(formatNumber(metaVault.tvl, "abbreviate")).slice(1)} S`;
-          } else {
-            TVL = formatNumber(metaVault.tvl, "abbreviate") as string;
-          }
+        if (metaVault.tvl) {
+          TVL = formatNumber(metaVault.tvl, "abbreviate") as string;
         }
 
         return (

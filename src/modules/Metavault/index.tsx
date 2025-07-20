@@ -265,11 +265,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const TVL = useMemo(() => {
     if (localMetaVault.tvl) {
-      if (["metaS", "metawS"].includes(localMetaVault?.symbol)) {
-        return `${String(formatNumber(localMetaVault.tvl, "abbreviate"))?.slice(1)} S`;
-      } else {
-        return formatNumber(localMetaVault.tvl, "abbreviate");
-      }
+      return formatNumber(localMetaVault.tvl, "abbreviate");
     }
   }, [localMetaVault]);
 
