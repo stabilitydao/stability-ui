@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import { metaVaults, platformsData, vaults } from "@store";
 import { cn } from "@utils";
 
-import { writeContract } from "@wagmi/core";
+import { writeContract, simulateContract } from "@wagmi/core";
 
 import {
   IMetaVaultABI,
@@ -18,6 +18,18 @@ import {
 
 import { VAULTS_WITH_NAME } from "@constants";
 import { getAddress, parseUnits } from "viem";
+
+import type { TAddress } from "@types";
+
+interface EditFarm {
+  status: bigint;
+  pool: TAddress;
+  strategyLogicId: string;
+  rewardAssets: TAddress[];
+  addresses: TAddress[];
+  nums: bigint[];
+  ticks: number[];
+}
 
 const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
@@ -42,6 +54,8 @@ const VaultManager = (): JSX.Element => {
   const [currentType, setCurrentType] = useState("Silo");
 
   const factoryAddress = $platformsData[146]?.factory;
+  const FARMS_FACTORY_ADDRESS: TAddress =
+    "0xc184a3ECcA684F2621c903A7943D85fA42F56671";
 
   const [vaultInitAddressesInput, setVaultInitAddressesInput] = useState("");
   const [vaultInitNumsInput, setVaultInitNumsInput] = useState("");
@@ -74,6 +88,23 @@ const VaultManager = (): JSX.Element => {
     .split(",")
     .map((n) => parseInt(n.trim()))
     .filter((n) => !isNaN(n));
+
+  const [editFarm, setEditFarm] = useState<EditFarm>({
+    status: 0n,
+    pool: "",
+    strategyLogicId: "",
+    rewardAssets: [],
+    addresses: [],
+    nums: [],
+    ticks: [],
+  });
+
+  const handleFarmInputChange = <K extends keyof EditFarm>(
+    key: K,
+    value: EditFarm[K]
+  ) => {
+    setEditFarm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleInputChange = (address, event) => {
     setValues((prev) => ({
@@ -176,6 +207,20 @@ const VaultManager = (): JSX.Element => {
     }
   };
 
+  const addFarm = async () => {
+    try {
+      const hash = await writeContract(wagmiConfig, {
+        address: FARMS_FACTORY_ADDRESS,
+        abi: FactoryABI,
+        functionName: "addFarms",
+        args: [[editFarm]],
+      });
+      console.log(hash);
+    } catch (err) {
+      console.error("Transaction error", err);
+    }
+  };
+
   const getData = async () => {
     try {
       const _metaVaultsWithProportions = $metaVaults[146].map((mv) => {
@@ -242,6 +287,17 @@ const VaultManager = (): JSX.Element => {
           <span
             className={cn(
               "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              activeSection != "farm"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("farm")}
+          >
+            Add Farm
+          </span>
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
               activeSection != "deploy"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -252,7 +308,7 @@ const VaultManager = (): JSX.Element => {
           </span>
         </div>
 
-        {activeSection != "deploy" ? (
+        {!["deploy", "farm"].includes(activeSection) ? (
           <div className="flex items-center gap-2">
             {activeMetaVaults.map((metaVault) => (
               <p
@@ -269,7 +325,7 @@ const VaultManager = (): JSX.Element => {
               </p>
             ))}
           </div>
-        ) : (
+        ) : activeSection === "deploy" ? (
           <div className="flex items-center gap-2">
             {Object.keys(vaultTypes).map((type) => (
               <p
@@ -286,7 +342,7 @@ const VaultManager = (): JSX.Element => {
               </p>
             ))}
           </div>
-        )}
+        ) : null}
 
         {activeSection === "vaults" && (
           <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
@@ -301,7 +357,7 @@ const VaultManager = (): JSX.Element => {
           </label>
         )}
 
-        {activeSection != "deploy" && (
+        {!["deploy", "farm"].includes(activeSection) && (
           <div>
             {currentMetaVault?.proportions?.map((proportion) => (
               <div
@@ -332,6 +388,98 @@ const VaultManager = (): JSX.Element => {
           </div>
         )}
 
+        {activeSection === "farm" && (
+          <div className="grid gap-3 mb-4">
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Status
+              <input
+                value={editFarm.status.toString()}
+                onChange={(e) =>
+                  handleFarmInputChange("status", BigInt(e.target.value))
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Pool Address
+              <input
+                value={editFarm.pool}
+                onChange={(e) =>
+                  handleFarmInputChange("pool", e.target.value as TAddress)
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Strategy Logic ID
+              <input
+                value={editFarm.strategyLogicId}
+                onChange={(e) =>
+                  handleFarmInputChange("strategyLogicId", e.target.value)
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Reward Assets (comma-separated)
+              <input
+                value={editFarm.rewardAssets.join(",")}
+                onChange={(e) =>
+                  handleFarmInputChange(
+                    "rewardAssets",
+                    e.target.value.split(",").map((s) => s.trim()) as TAddress[]
+                  )
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Addresses (comma-separated)
+              <input
+                value={editFarm.addresses.join(",")}
+                onChange={(e) =>
+                  handleFarmInputChange(
+                    "addresses",
+                    e.target.value.split(",").map((s) => s.trim()) as TAddress[]
+                  )
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Nums (comma-separated)
+              <input
+                value={editFarm.nums.map((n) => n.toString()).join(",")}
+                onChange={(e) =>
+                  handleFarmInputChange(
+                    "nums",
+                    e.target.value.split(",").map((n) => BigInt(n.trim()))
+                  )
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              Ticks (comma-separated)
+              <input
+                value={editFarm.ticks.join(",")}
+                onChange={(e) =>
+                  handleFarmInputChange(
+                    "ticks",
+                    e.target.value
+                      .split(",")
+                      .map((n) => parseInt(n.trim()))
+                      .filter((n) => !isNaN(n))
+                  )
+                }
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+          </div>
+        )}
+
         {activeSection === "vaults" && (
           <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
             New Vault Proportion
@@ -348,7 +496,7 @@ const VaultManager = (): JSX.Element => {
         {activeSection === "deploy" && (
           <div className="flex flex-col gap-2">
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              vaultInitAddresses
+              Vault Init Addresses (comma-separated)
               <input
                 type="text"
                 placeholder="0x,0x,0x"
@@ -358,7 +506,7 @@ const VaultManager = (): JSX.Element => {
               />
             </label>
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              vaultInitNums
+              Vault Init Nums (comma-separated)
               <input
                 type="text"
                 placeholder="0,0,0"
@@ -369,7 +517,7 @@ const VaultManager = (): JSX.Element => {
             </label>
 
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              strategyInitAddresses
+              Strategy Init Addresses (comma-separated)
               <input
                 type="text"
                 placeholder="0x,0x,0x"
@@ -380,7 +528,7 @@ const VaultManager = (): JSX.Element => {
             </label>
 
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              strategyInitNums
+              Strategy Init Nums (comma-separated)
               <input
                 type="text"
                 placeholder="0,0,0"
@@ -391,7 +539,7 @@ const VaultManager = (): JSX.Element => {
             </label>
 
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              strategyInitTicks
+              Strategy Init Ticks (comma-separated)
               <input
                 type="text"
                 placeholder="0,0,0"
@@ -422,6 +570,16 @@ const VaultManager = (): JSX.Element => {
             onClick={addVault}
           >
             Add Vault
+          </button>
+        ) : activeSection === "farm" ? (
+          <button
+            className={cn(
+              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
+            )}
+            type="button"
+            onClick={addFarm}
+          >
+            Add Farm
           </button>
         ) : (
           <button

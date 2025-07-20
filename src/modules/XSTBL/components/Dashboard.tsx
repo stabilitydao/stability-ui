@@ -260,7 +260,7 @@ const Dashboard = (): JSX.Element => {
         <div className="flex-1 flex items-center justify-center bg-[#101012] border border-[#23252A] rounded-lg">
           <div className="flex flex-col items-center justify-center py-6">
             <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-              Total xSTBL
+              Total staked
             </span>
             {isLoaded ? (
               <div className="flex flex-col items-center">
@@ -403,7 +403,7 @@ const Dashboard = (): JSX.Element => {
             </div>
             <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
               <span className="text-[18px] leading-6 font-semibold">
-                PWP Rewards
+                PVP Rewards
               </span>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between gap-1 text-[16px] leading-6 font-medium">
