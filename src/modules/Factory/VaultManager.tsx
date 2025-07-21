@@ -134,32 +134,32 @@ const VaultManager = (): JSX.Element => {
     try {
       const vaultAddress = getAddress(vaultInput);
 
-      const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
-        address: vaultAddress,
-        abi: VaultABI,
-        functionName: "setDoHardWorkOnDeposit",
-        args: [false],
-      });
+      // const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
+      //   address: vaultAddress,
+      //   abi: VaultABI,
+      //   functionName: "setDoHardWorkOnDeposit",
+      //   args: [false],
+      // });
 
-      console.log(setDoHardWorkOnDeposit);
+      // console.log(setDoHardWorkOnDeposit);
 
-      const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
-        address: vaultAddress,
-        abi: VaultABI,
-        functionName: "setLastBlockDefenseDisabled",
-        args: [true],
-      });
+      // const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
+      //   address: vaultAddress,
+      //   abi: VaultABI,
+      //   functionName: "setLastBlockDefenseDisabled",
+      //   args: [true],
+      // });
 
-      console.log(setLastBlockDefenseDisabled);
+      // console.log(setLastBlockDefenseDisabled);
 
-      const setCustomVaultFee = await writeContract(wagmiConfig, {
-        address: platforms[146],
-        abi: PlatformABI,
-        functionName: "setCustomVaultFee",
-        args: [vaultAddress, BigInt(20000)],
-      });
+      // const setCustomVaultFee = await writeContract(wagmiConfig, {
+      //   address: platforms[146],
+      //   abi: PlatformABI,
+      //   functionName: "setCustomVaultFee",
+      //   args: [vaultAddress, BigInt(20000)],
+      // });
 
-      console.log(setCustomVaultFee);
+      // console.log(setCustomVaultFee);
 
       const _newVaultes = Object.values(values).push(newProportionInput);
 
