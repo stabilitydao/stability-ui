@@ -134,9 +134,9 @@ const VaultManager = (): JSX.Element => {
     try {
       const vaultAddress = getAddress(vaultInput);
 
-      const _newVaultes = Object.values(values).push(newProportionInput);
+      const _newValues = [...Object.values(values), newProportionInput];
 
-      const bitIntValues = Object.values(_newVaultes).map((v) =>
+      const bitIntValues = Object.values(_newValues).map((v) =>
         parseUnits(v, 16)
       );
 
