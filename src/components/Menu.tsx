@@ -165,7 +165,7 @@ const Menu = (): JSX.Element => {
                   <a
                     href="/platform"
                     title="Platform"
-                    className="w-full flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium"
+                    className="w-1/2 flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium"
                   >
                     <span className="text-[#97979A]">Platform</span>
                     <span className="text-white">
