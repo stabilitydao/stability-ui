@@ -3,6 +3,8 @@ import { StrategyBadge } from "../../StrategyBadge";
 
 import { formatNumber } from "@utils";
 
+import { VAULTS_WITH_NAME } from "@constants";
+
 import { TVault, TAPRModal } from "@types";
 
 interface IProps {
@@ -75,7 +77,9 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
           <div className="flex flex-col items-start gap-1">
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.isMetaVault ? vault.symbol : vault.assetsSymbol}
+              {vault?.isMetaVault
+                ? vault.symbol
+                : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
             {!vault?.isMetaVault && (
               <RewardsCarousel
