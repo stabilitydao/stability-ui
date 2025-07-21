@@ -4,7 +4,7 @@ import { ArrowIcon, StrategyBadge, ArrowRightIcon } from "@ui";
 
 import { formatNumber } from "@utils";
 
-import { SILO_POINTS } from "@constants";
+import { SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
 
 import { TVault, TAPRModal } from "@types";
 
@@ -87,7 +87,9 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               )}
             </div>
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.isMetaVault ? vault.symbol : vault.assetsSymbol}
+              {vault?.isMetaVault
+                ? vault.symbol
+                : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
           </div>
 
