@@ -166,7 +166,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     if ($connected) {
       const balance = Number(
         Object.values(balances?.[actionType])[0]?.balance
-      ).toFixed(5);
+      ).toFixed(2);
 
       handleInputChange({
         target: {
