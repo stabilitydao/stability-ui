@@ -74,6 +74,9 @@ const Menu = (): JSX.Element => {
     [$apiData]
   );
 
+  const isAlert = $apiData?.network.status == 'Alert'
+  const isOk = $apiData?.network.status == 'OK'
+
   return (
     <div className="block md:hidden">
       <AnimatePresence>
@@ -109,7 +112,7 @@ const Menu = (): JSX.Element => {
               </div>
 
               <div className="flex flex-col gap-2">
-                {PATHS.map(({ name, path }) => (
+                {PATHS.map(({name, path}) => (
                   <div
                     key={name}
                     className={cn(
@@ -129,20 +132,32 @@ const Menu = (): JSX.Element => {
                       >
                         {name}
                       </span>
-                      <NavIcon path={path} isActive={activePath === path} />
+                      <NavIcon path={path} isActive={activePath === path}/>
                     </a>
                   </div>
                 ))}
               </div>
 
-              <Prices isMobile={true} />
+              <Prices isMobile={true}/>
 
-              {TVL ? (
-                <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
-                  <span className="text-[#97979A]">AUM</span>
-                  <span className="text-white">{TVL}</span>
-                </div>
-              ) : null}
+              <div className="flex gap-4">
+                {TVL ? (
+                  <div
+                    className="w-2/3 flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
+                    <span className="text-[#97979A]">AUM</span>
+                    <span className="text-white">{TVL}</span>
+                  </div>
+                ) : null}
+
+                <a
+                  href="/platform"
+                  title="Platform"
+                  className="w-1/3 flex items-center justify-center gap-[10px] py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium"
+                >
+                  <span className="text-[#97979A]">Platform</span>
+                  <span className="text-white"><span className="inline-flex w-[10px] h-[10px] rounded-full" style={{backgroundColor: isAlert ? '#ff8d00' : isOk ? '#00ff00' : '#444444'}}></span></span>
+                </a>
+              </div>
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">
                 {/* <div className="flex items-center">
@@ -153,7 +168,7 @@ const Menu = (): JSX.Element => {
                     Term of Use
                   </a>
                 </div> */}
-                <Socials />
+                <Socials/>
               </div>
             </div>
           </motion.nav>
@@ -163,4 +178,4 @@ const Menu = (): JSX.Element => {
   );
 };
 
-export { Menu };
+export {Menu};
