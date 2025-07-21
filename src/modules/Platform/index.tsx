@@ -169,13 +169,13 @@ const Platform = (): JSX.Element => {
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
-      <div className="flex w-full bg-[#242429] h-[100px] justify-center">
+      <div className="flex flex-col w-full items-center">
         <div className="flex text-[14px] h-[30px] items-center">
-          <span className="bg-gray-700 px-[10px]">status</span>
+          <span className="bg-gray-700 px-[10px]">Platform status</span>
           <span className="font-bold px-[10px]" style={{backgroundColor: isAlert ? '#ff8d00' : isOk ? '#1f851f' : '#444444'}}>{$apiData?.network.status}</span>
         </div>
         {isAlert && (
-          <div>{''}</div>
+          <div className="flex">{Object.keys($apiData?.network.healthCheckReview?.alerts).map(a => $apiData?.network.healthCheckReview?.alerts[a])}</div>
         )}
       </div>
 
