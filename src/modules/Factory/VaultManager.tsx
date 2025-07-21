@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import { metaVaults, platformsData, vaults } from "@store";
 import { cn } from "@utils";
 
-import { writeContract, simulateContract } from "@wagmi/core";
+import { writeContract } from "@wagmi/core";
 
 import {
   IMetaVaultABI,
