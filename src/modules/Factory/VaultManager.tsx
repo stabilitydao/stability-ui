@@ -166,7 +166,7 @@ const VaultManager = (): JSX.Element => {
       const bitIntValues = Object.values(_newVaultes).map((v) =>
         parseUnits(v, 16)
       );
-
+      console.log([vaultAddress, bitIntValues]);
       const _addVault = await writeContract(wagmiConfig, {
         address: currentMetaVault.address,
         abi: IMetaVaultABI,
