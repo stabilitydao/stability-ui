@@ -23,7 +23,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
 
   const [prices, setPrices] = useState<[string, TMarketPrice][]>([]);
   const [width, setWidth] = useState(0);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if ($marketPrices) {
