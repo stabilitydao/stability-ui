@@ -142,7 +142,7 @@ const Factory = (): JSX.Element => {
           whatToBuild[i].push(..._whatToBuild[i]);
         }
       } while (from < wtbLength);
-      console.log(whatToBuild);
+
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[2].length; i++) {
           const initParams: TInitParams = {
