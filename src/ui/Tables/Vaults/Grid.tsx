@@ -19,7 +19,10 @@ interface IProps {
 }
 
 const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  const POINTS = { sonic: vault.sonicActivePoints, rings: vault.ringsPoints };
+  const POINTS = {
+    sonic: vault.sonicActivePoints || vault.sonicPoints,
+    rings: vault.ringsPoints,
+  };
 
   const link = vault?.isMetaVault
     ? `/metavaults/metavault/${vault.address}`
@@ -77,13 +80,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
               {vault?.isMetaVault ? vault.symbol : vault.assetsSymbol}
             </span>
-            {!vault?.isMetaVault && (
-              <RewardsCarousel
-                address={vault.address}
-                symbol={vault.symbol}
-                points={POINTS}
-              />
-            )}
+            <RewardsCarousel address={vault.address} points={POINTS} />
           </div>
         </div>
         <div className="flex flex-col gap-2">

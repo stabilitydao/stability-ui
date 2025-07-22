@@ -134,29 +134,6 @@ const VaultManager = (): JSX.Element => {
     try {
       const vaultAddress = getAddress(vaultInput);
 
-      const _newValues = [...Object.values(values), newProportionInput];
-
-      const bitIntValues = Object.values(_newValues).map((v) =>
-        parseUnits(v, 16)
-      );
-
-      const _addVault = await writeContract(wagmiConfig, {
-        address: currentMetaVault.address,
-        abi: IMetaVaultABI,
-        functionName: "addVault",
-        args: [vaultAddress, bitIntValues],
-      });
-
-      console.log(_addVault);
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
-  const deployVault = async () => {
-    try {
-      const vaultAddress = getAddress(vaultInput);
-
       const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
         address: vaultAddress,
         abi: VaultABI,
@@ -184,6 +161,27 @@ const VaultManager = (): JSX.Element => {
 
       console.log(setCustomVaultFee);
 
+      const _newValues = [...Object.values(values), newProportionInput];
+
+      const bitIntValues = Object.values(_newValues).map((v) =>
+        parseUnits(v, 16)
+      );
+
+      const _addVault = await writeContract(wagmiConfig, {
+        address: currentMetaVault.address,
+        abi: IMetaVaultABI,
+        functionName: "addVault",
+        args: [vaultAddress, bitIntValues],
+      });
+
+      console.log(_addVault);
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
+  const deployVault = async () => {
+    try {
       const args = [
         vaultTypes[currentType].vaultType,
         vaultTypes[currentType].strategyId,
