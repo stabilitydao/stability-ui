@@ -94,7 +94,8 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
 
           <div className="flex items-center justify-center gap-1">
-            {!vault.symbol.includes("PT-") && !vault?.isMetaVault && (
+            {((!vault.symbol.includes("PT-") && vault?.sonicActivePoints) ||
+              !!vault?.sonicPoints) && (
               <div
                 title="Sonic Activity Points"
                 className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -105,32 +106,35 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                     alt="sonic"
                     className="w-4 h-4 rounded-full"
                   />
+                  {vault?.sonicPoints ? (
+                    <span className="text-[12px]">x{vault?.sonicPoints}</span>
+                  ) : (
+                    <span className="text-[12px]">
+                      x{vault.sonicActivePoints}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            {SILO_POINTS[vault.address as keyof typeof SILO_POINTS] && (
+              <div
+                title="Silo Points per $ / day"
+                className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
+              >
+                <div className="flex items-center gap-1 px-2">
+                  <img
+                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
+                    alt="silo"
+                    className="w-4 h-4 rounded-full"
+                  />
                   <span className="text-[12px]">
-                    x{vault.sonicActivePoints}
+                    {SILO_POINTS[vault.address as keyof typeof SILO_POINTS]}
                   </span>
                 </div>
               </div>
             )}
-            {SILO_POINTS[vault.address as keyof typeof SILO_POINTS] &&
-              !vault?.isMetaVault && (
-                <div
-                  title="Silo Points per $ / day"
-                  className="rounded-[4px] border border-[#FFA500] bg-[#36280f] h-6 flex items-center justify-center"
-                >
-                  <div className="flex items-center gap-1 px-2">
-                    <img
-                      src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png"
-                      alt="silo"
-                      className="w-4 h-4 rounded-full"
-                    />
-                    <span className="text-[12px]">
-                      {SILO_POINTS[vault.address as keyof typeof SILO_POINTS]}
-                    </span>
-                  </div>
-                </div>
-              )}
 
-            {!!vault.ringsPoints && !vault?.isMetaVault && (
+            {!!vault.ringsPoints && (
               <div
                 title="Rings Points"
                 className="rounded-[4px] border border-[#5E6AD2] bg-[#1C1E31] h-6 flex items-center justify-center"

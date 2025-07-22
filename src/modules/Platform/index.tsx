@@ -164,11 +164,22 @@ const Platform = (): JSX.Element => {
     }
   }, [$apiData]);
 
+  const isAlert = $apiData?.network.status == 'Alert'
+  const isOk = $apiData?.network.status == 'OK'
+
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
-      <h1 className="mb-0 text-[40px] font-bold">Platform</h1>
+      <div className="flex flex-col w-full items-center">
+        <div className="flex text-[14px] h-[30px] items-center">
+          <span className="bg-gray-700 px-[10px]">Platform status</span>
+          <span className="font-bold px-[10px]" style={{backgroundColor: isAlert ? '#ff8d00' : isOk ? '#1f851f' : '#444444'}}>{$apiData?.network.status}</span>
+        </div>
+        {isAlert && (
+          <div className="flex">{Object.keys($apiData?.network.healthCheckReview?.alerts).map(a => $apiData?.network.healthCheckReview?.alerts[a])}</div>
+        )}
+      </div>
 
-      <div className="px-6">
+      <div className="px-6 hidden">
         <div className="flex p-[16px] gap-[8px] bg-accent-950 rounded-[10px] w-full">
           <svg
             className="mt-[2px]"

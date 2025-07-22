@@ -24,7 +24,7 @@ const StrategyBadge: React.FC<IProps> = ({ info, specific }) => {
       ? "MEV Capital"
       : specific.includes("0xeeb1..cb6c")
         ? "Re7 Labs"
-        : specific;
+        : specific.replace(/0x[a-fA-F0-9]{4}\.\.[a-fA-F0-9]{4}/g, "");
 
   return (
     <div className="flex items-center text-[12px]">

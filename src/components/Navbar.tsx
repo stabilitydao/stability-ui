@@ -75,6 +75,13 @@ const Navbar = (): JSX.Element => {
     [$apiData]
   );
 
+  const statusColor =
+    $apiData?.network.status == "Alert"
+      ? "#ff8d00"
+      : $apiData?.network.status == "OK"
+        ? "#00ff00"
+        : "#444444";
+
   return (
     <div className="hidden md:block">
       <AnimatePresence>
@@ -129,14 +136,43 @@ const Navbar = (): JSX.Element => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-[25px]">
+            <div className="flex flex-col gap-2">
               <Prices />
-              {TVL ? (
-                <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
-                  <span className="text-[#97979A]">AUM</span>
-                  <span className="text-white">{TVL}</span>
+              <a
+                href="https://stability.market/"
+                target="_blank"
+                className="border border-[#23252A] rounded-lg"
+              >
+                <div className="flex items-center justify-between gap-2 px-4 h-10">
+                  <span className="text-[#A3A4A6] text-[14px] leading-4 font-medium">
+                    Market
+                  </span>
+                  <img src="/icons/external_link.svg" alt="External link" />
                 </div>
-              ) : null}
+              </a>
+              <div className="flex gap-2">
+                {TVL ? (
+                  <div className="w-2/3 flex items-center justify-between h-10 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
+                    <span className="text-[#A3A4A6]">AUM</span>
+                    <span className="text-white">{TVL}</span>
+                  </div>
+                ) : null}
+                <a
+                  href="/platform"
+                  title="Platform"
+                  className="w-1/3 flex items-center justify-center gap-[6px] h-10 px-4 border border-[#23252A] rounded-lg text-[12px] leading-3 font-medium"
+                >
+                  <span className="text-[#97979A] uppercase">
+                    <img src="/logo.svg" alt="Stability" className="w-4 h-4" />
+                  </span>
+                  <span className="text-white">
+                    <span
+                      className="inline-flex w-[10px] h-[10px] rounded-full"
+                      style={{ backgroundColor: statusColor }}
+                    ></span>
+                  </span>
+                </a>
+              </div>
               <div className="text-[#97979A] flex flex-col">
                 {/* <a href="#" className="px-4 py-2">
                   Privacy Policy

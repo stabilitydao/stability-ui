@@ -87,12 +87,6 @@ const Leaderboard = (): JSX.Element => {
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
         rank: index + 1,
-        metaVaultsEarned: data?.metaVaults
-          ? Object.values(data?.metaVaults).reduce(
-              (acc, cur) => (acc += cur.earned),
-              0
-            )
-          : 0,
         points: points?.[data?.address as keyof typeof points] ?? 0,
       }));
 

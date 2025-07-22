@@ -13,7 +13,7 @@
 | [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                      |
 | --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                      |
 | **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts   |
-| [**Users**](https://stability.farm/users)                                                                           | Development       | Users portal: active contests, leaderboard, etc |
+| [**Leaderboard**](https://stability.farm/leaderboard)                                                               | Development       | Users portal: active contests, leaderboard, etc |
 | --- [**Contests**](https://stability.farm/contests)                                                                 |                   | All yield contests                              |
 | --- --- [**Contest**](https://stability.farm/contests/d1)                                                           |                   | Contest page                                    |
 | **DAO**                                                                                                             |                   | Self-developing DAO portal                      |
