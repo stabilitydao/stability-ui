@@ -51,13 +51,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
               {vault?.isMetaVault ? vault.symbol : vault.assetsSymbol}
             </span>
-            {!vault?.isMetaVault && (
-              <RewardsCarousel
-                address={vault.address}
-                symbol={vault.symbol}
-                points={POINTS}
-              />
-            )}
+            <RewardsCarousel address={vault.address} points={POINTS} />
           </div>
         </div>
         <div className="flex flex-col gap-2">

@@ -74,6 +74,9 @@ const Menu = (): JSX.Element => {
     [$apiData]
   );
 
+  const isAlert = $apiData?.network.status == "Alert";
+  const isOk = $apiData?.network.status == "OK";
+
   return (
     <div className="block md:hidden">
       <AnimatePresence>
@@ -123,7 +126,7 @@ const Menu = (): JSX.Element => {
                     >
                       <span
                         className={cn(
-                          "text-[#97979A]",
+                          "text-[#97979A] text-[16px] leading-4 font-medium",
                           activePath === path && "text-white"
                         )}
                       >
@@ -137,12 +140,49 @@ const Menu = (): JSX.Element => {
 
               <Prices isMobile={true} />
 
-              {TVL ? (
-                <div className="flex items-center justify-between py-2 px-4 bg-[#1D1E23] border border-[#35363B] rounded-lg text-[14px] leading-5 font-medium">
-                  <span className="text-[#97979A]">AUM</span>
-                  <span className="text-white">{TVL}</span>
+              <div className="flex flex-col gap-2">
+                <a
+                  href="https://stability.market/"
+                  target="_blank"
+                  className="border border-[#23252A] rounded-lg"
+                >
+                  <div className="flex items-center justify-between gap-2 px-4 h-10">
+                    <span className="text-[#A3A4A6] text-[14px] leading-4 font-medium">
+                      Market
+                    </span>
+                    <img src="/icons/external_link.svg" alt="External link" />
+                  </div>
+                </a>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex gap-4 w-1/2">
+                    {TVL ? (
+                      <div className="w-full flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
+                        <span className="text-[#A3A4A6]">AUM</span>
+                        <span className="text-white">{TVL}</span>
+                      </div>
+                    ) : null}
+                  </div>
+                  <a
+                    href="/platform"
+                    title="Platform"
+                    className="w-1/2 flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium"
+                  >
+                    <span className="text-[#97979A]">Platform</span>
+                    <span className="text-white">
+                      <span
+                        className="inline-flex w-[10px] h-[10px] rounded-full"
+                        style={{
+                          backgroundColor: isAlert
+                            ? "#ff8d00"
+                            : isOk
+                              ? "#00ff00"
+                              : "#444444",
+                        }}
+                      ></span>
+                    </span>
+                  </a>
                 </div>
-              ) : null}
+              </div>
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">
                 {/* <div className="flex items-center">

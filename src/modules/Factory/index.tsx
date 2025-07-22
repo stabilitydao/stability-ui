@@ -9,6 +9,8 @@ import { WagmiLayout } from "@layouts";
 
 import { BuildForm } from "./BuildForm";
 
+import { VaultManager } from "./VaultManager";
+
 import {
   platforms,
   PlatformABI,
@@ -111,13 +113,36 @@ const Factory = (): JSX.Element => {
     if ($publicClient && $platformsData[$currentChainID] && isCorrectNetwork) {
       const variants: TBuildVariant[] = [];
 
-      const whatToBuild = await _publicClient.readContract({
-        address: frontendContracts[$currentChainID],
-        functionName: "whatToBuild",
-        abi: IFrontendABI,
-        args: [BigInt(0), BigInt(50)],
-      });
+      const STEP = 2;
 
+      let whatToBuild: any[] = [];
+      let wtbLength = 0;
+      let from = 0;
+
+      do {
+        const _whatToBuild = await _publicClient.readContract({
+          address: frontendContracts[$currentChainID],
+          functionName: "whatToBuild",
+          abi: IFrontendABI,
+          args: [BigInt(from), BigInt(STEP)],
+        });
+
+        from += STEP;
+
+        if (!wtbLength) {
+          wtbLength = Number(_whatToBuild[0]);
+          whatToBuild[0] = _whatToBuild[0];
+
+          for (let i = 1; i < _whatToBuild.length; i++) {
+            whatToBuild[i] = [];
+          }
+        }
+
+        for (let i = 1; i < _whatToBuild.length; i++) {
+          whatToBuild[i].push(..._whatToBuild[i]);
+        }
+      } while (from < wtbLength);
+      console.log(whatToBuild);
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[2].length; i++) {
           const initParams: TInitParams = {
@@ -291,6 +316,8 @@ const Factory = (): JSX.Element => {
 
   return (
     <WagmiLayout>
+      <VaultManager />
+
       {isCorrectNetwork ? (
         <div className="flex flex-col items-center">
           <h2 className="text-[22px] mb-3">Compounding vault</h2>

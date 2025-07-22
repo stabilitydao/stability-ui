@@ -49,9 +49,9 @@ const Timer: React.FC<IProps> = ({ end, withText = true }) => {
   const formattedTime = formatTime(timeLeft);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       {withText && (
-        <h3 className="text-[#97979A] text-[14px] leading-5">
+        <h3 className="text-[#7C7E81] text-[16px] leading-5">
           {status === "beforeStart" ? "Starts" : "Distributed"} in
         </h3>
       )}
@@ -60,10 +60,10 @@ const Timer: React.FC<IProps> = ({ end, withText = true }) => {
         {formattedTime.map((unit) => (
           <div
             key={unit.label}
-            className="flex flex-col items-center justify-center w-8 h-8 md:w-12 md:h-12 bg-[#101012] rounded-lg border border-[#23252A] font-medium"
+            className="flex flex-col items-center justify-center w-8 h-8 md:w-12 md:h-12 bg-[#18191C] rounded-lg border border-[#232429] font-medium"
           >
             <span
-              className="text-[12px] leading-3 md:text-[18px] md:leading-6"
+              className="text-[12px] leading-3 md:text-[16px] md:leading-5 font-medium"
               style={{ fontFamily: "monospace" }}
             >
               {unit.value.toString().padStart(2, "0")}

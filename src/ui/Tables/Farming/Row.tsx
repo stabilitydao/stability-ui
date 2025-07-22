@@ -41,7 +41,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       data-testid="vault"
       href={link}
     >
-      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+      <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] lg:w-[25%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
         <div className="flex items-center gap-2 md:gap-3">
           <div className="flex items-center justify-center">
             {vault.assets.map((asset, index) => (

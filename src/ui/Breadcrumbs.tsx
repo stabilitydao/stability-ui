@@ -71,6 +71,14 @@ const Breadcrumbs = (): JSX.Element => {
         const short = `${rest[0].slice(0, 4)}...${rest[0].slice(-4)}`;
         add(`Node ${short}`);
       }
+    } else if (main === "swapper" && rest[0] === "add-pools") {
+      add("Platform", "platform");
+      add("Swapper", "swapper");
+      add("Add Pools");
+    } else if (main === "factory" && rest[0] === "farms") {
+      add("Platform", "platform");
+      add("Factory", "factory");
+      add("Farms");
     } else if (["assets", "swapper", "factory"].includes(main)) {
       add("Platform", "platform");
       add(main.charAt(0).toUpperCase() + main.slice(1));

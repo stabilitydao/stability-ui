@@ -8,13 +8,11 @@ import { TAddress } from "@types";
 
 interface IProps {
   address: TAddress;
-  symbol: string;
   points: { sonic: number | undefined; rings: number | undefined };
 }
 
-const RewardsCarousel: React.FC<IProps> = ({ address, symbol, points }) => {
+const RewardsCarousel: React.FC<IProps> = ({ address, points }) => {
   const [hovered, setHovered] = useState(false);
-
   return (
     <div className="relative w-full overflow-hidden">
       <motion.div
@@ -28,7 +26,7 @@ const RewardsCarousel: React.FC<IProps> = ({ address, symbol, points }) => {
           repeat: 0,
         }}
       >
-        {!symbol.includes("PT-") && (
+        {!!points.sonic && (
           <div
             title="Sonic Activity Points"
             className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"

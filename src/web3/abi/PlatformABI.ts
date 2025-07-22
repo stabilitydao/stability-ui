@@ -1953,4 +1953,14 @@ export default [
     stateMutability: "view",
     type: "function",
   },
+  {
+    type: "function",
+    name: "setCustomVaultFee",
+    inputs: [
+      { name: "vault", type: "address", internalType: "address" },
+      { name: "platformFee", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
 ];

@@ -370,7 +370,6 @@ type TLeaderboard = {
       earned: number;
     };
   };
-  metaVaultsEarned: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -702,7 +701,7 @@ type TTableActiveParams = {
   filters: number;
 };
 
-type TStakeDashboardData = {
+type TStakeDashboard = {
   totalStaked: number;
   totalStakedInUSD: number;
   userStaked: number;
@@ -715,6 +714,8 @@ type TStakeDashboardData = {
   pendingRevenueInSTBL: number;
   APR: number;
   timestamp: number;
+  lendingFeesXSTBL: number;
+  lendingFeesUSD: number;
 };
 
 type TVestPeriod = {
@@ -828,7 +829,7 @@ export type {
   TOptionInfo,
   TVSHoldModalState,
   TTableActiveParams,
-  TStakeDashboardData,
+  TStakeDashboard,
   TVestPeriod,
   TMarketPrice,
   TMarketPrices,

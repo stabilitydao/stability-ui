@@ -170,17 +170,17 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
               )}
             >
               <div className="px-4 w-[60%] flex items-center gap-2 whitespace-nowrap">
-                <div data-testid="contractsLogo">
+                <div className="flex" data-testid="contractsLogo">
                   {logo === "proportions" ? (
                     <img
                       src={`${seeds[0]}/vault/${vault.network}/${vault.address}/logo.svg`}
                       alt="logo"
-                      className="w-8 h-8 rounded-full"
+                      className="w-8 h-8 shrink-0 rounded-full"
                     />
                   ) : (
                     <img
                       className={cn(
-                        "w-8 h-8",
+                        "w-8 h-8 shrink-0",
                         type != "Strategy" && "rounded-full"
                       )}
                       src={logo}
