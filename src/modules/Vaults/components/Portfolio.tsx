@@ -70,12 +70,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
           ? Number(v.APR)
           : Number(v?.earningData?.apr?.[$aprFilter]);
 
-        let vaultBalance = Number(formatUnits(BigInt(v.balance), 18));
-        let vaultSharePrice = Number(v.shareprice);
-
-        const balance = v?.isMetaVault
-          ? vaultBalance
-          : vaultBalance * vaultSharePrice;
+        const balance = Number(v.balanceInUSD);
 
         deposited += balance;
         monthly += ((apr / 100) * balance) / 12;

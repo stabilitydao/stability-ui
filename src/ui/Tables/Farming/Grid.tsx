@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const Grid: React.FC<IProps> = ({ APRs, vault }) => {
-  const POINTS = { sonic: vault.sonicActivePoints, rings: vault.ringsPoints };
+  const POINTS = { sonic: vault.sonicPoints, rings: vault.ringsPoints };
 
   const link = `/vaults/vault/${vault.network}/${vault.address}`;
 

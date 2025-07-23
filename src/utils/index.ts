@@ -30,6 +30,7 @@ import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
 import { copyAddress } from "./functions/copyAddress";
+import { exactToFixed } from "./functions/exactToFixed";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -69,4 +70,5 @@ export {
   getTransactionReceipt,
   enrichAndResolveMetaVaults,
   copyAddress,
+  exactToFixed,
 };

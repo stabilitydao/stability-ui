@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { ethers } from "ethers";
-
 import { metaVaults, platformsData, vaults } from "@store";
 import { cn } from "@utils";
 
@@ -23,12 +21,6 @@ import { getAddress, parseUnits } from "viem";
 
 import type { TAddress } from "@types";
 
-import Safe from "@safe-global/protocol-kit";
-import SafeApiKit from "@safe-global/api-kit";
-import { EthersAdapter } from "@safe-global/safe-ethers-lib";
-
-import { useWalletClient } from "wagmi";
-
 interface EditFarm {
   status: bigint;
   pool: TAddress;
@@ -43,8 +35,6 @@ const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $platformsData = useStore(platformsData);
-
-  const { data: walletClient } = useWalletClient();
 
   const [activeMetaVaults, setActiveMetaVaults] = useState([]);
 
@@ -140,158 +130,53 @@ const VaultManager = (): JSX.Element => {
     }
   };
 
-  const proposeVaultBatchToSafeOnSonic = async ({
-    vaultAddress,
-    platforms,
-    currentMetaVault,
-    values,
-    newProportionInput,
-    safeAddress,
-    signer,
-  }: {
-    vaultAddress: string;
-    platforms: Record<number, string>;
-    currentMetaVault: { address: string };
-    values: Record<string, string>;
-    newProportionInput: string;
-    safeAddress: string;
-    signer: ethers.Signer;
-  }) => {
-    const ethAdapter = new EthersAdapter({ ethers, signerOrProvider: signer });
-    const safeSdk = await Safe.create({ ethAdapter, safeAddress });
-
-    const apiKit = new SafeApiKit({
-      txServiceUrl: "https://safe-transaction-sonic.safe.global",
-      ethAdapter,
-    });
-
-    const ifaceVault = new ethers.utils.Interface(VaultABI);
-    const ifacePlatform = new ethers.utils.Interface(PlatformABI);
-    const ifaceMetaVault = new ethers.utils.Interface(IMetaVaultABI);
-
-    const allValues = [...Object.values(values), newProportionInput];
-    const bitIntValues = allValues.map((v) => parseUnits(v, 16));
-
-    const txs = [
-      {
-        to: vaultAddress,
-        data: ifaceVault.encodeFunctionData("setDoHardWorkOnDeposit", [false]),
-        value: "0",
-      },
-      {
-        to: vaultAddress,
-        data: ifaceVault.encodeFunctionData("setLastBlockDefenseDisabled", [
-          true,
-        ]),
-        value: "0",
-      },
-      {
-        to: platforms[146],
-        data: ifacePlatform.encodeFunctionData("setCustomVaultFee", [
-          vaultAddress,
-          BigInt(20000),
-        ]),
-        value: "0",
-      },
-      {
-        to: currentMetaVault.address,
-        data: ifaceMetaVault.encodeFunctionData("addVault", [
-          vaultAddress,
-          bitIntValues,
-        ]),
-        value: "0",
-      },
-    ];
-
-    const safeTransaction = await safeSdk.createTransaction({
-      safeTransactionData: txs,
-    });
-    const safeTxHash = await safeSdk.getTransactionHash(safeTransaction);
-    const senderAddress = await signer.getAddress();
-    const signature = await safeSdk.signTransactionHash(safeTxHash);
-
-    await apiKit.proposeTransaction({
-      safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash,
-      senderAddress,
-      senderSignature: signature,
-    });
-
-    console.log("Transaction proposed to Safe");
-  };
-
-  // const addVault = async () => {
-  //   try {
-  //     const vaultAddress = getAddress(vaultInput);
-
-  //     const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
-  //       address: vaultAddress,
-  //       abi: VaultABI,
-  //       functionName: "setDoHardWorkOnDeposit",
-  //       args: [false],
-  //     });
-
-  //     console.log(setDoHardWorkOnDeposit);
-
-  //     const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
-  //       address: vaultAddress,
-  //       abi: VaultABI,
-  //       functionName: "setLastBlockDefenseDisabled",
-  //       args: [true],
-  //     });
-
-  //     console.log(setLastBlockDefenseDisabled);
-
-  //     const setCustomVaultFee = await writeContract(wagmiConfig, {
-  //       address: platforms[146],
-  //       abi: PlatformABI,
-  //       functionName: "setCustomVaultFee",
-  //       args: [vaultAddress, BigInt(20000)],
-  //     });
-
-  //     console.log(setCustomVaultFee);
-
-  //     const _newValues = [...Object.values(values), newProportionInput];
-
-  //     const bitIntValues = Object.values(_newValues).map((v) =>
-  //       parseUnits(v, 16)
-  //     );
-
-  //     const _addVault = await writeContract(wagmiConfig, {
-  //       address: currentMetaVault.address,
-  //       abi: IMetaVaultABI,
-  //       functionName: "addVault",
-  //       args: [vaultAddress, bitIntValues],
-  //     });
-
-  //     console.log(_addVault);
-  //   } catch (error) {
-  //     console.log("Error:", error);
-  //   }
-  // };
-
   const addVault = async () => {
     try {
-      if (!walletClient) throw new Error("No wallet client");
-
       const vaultAddress = getAddress(vaultInput);
 
-      const signer = new ethers.providers.Web3Provider(
-        walletClient
-      ).getSigner();
-
-      await proposeVaultBatchToSafeOnSonic({
-        vaultAddress,
-        platforms,
-        currentMetaVault,
-        values,
-        newProportionInput,
-        safeAddress: "0xF564EBaC1182578398E94868bea1AbA6ba339652",
-        signer,
+      const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
+        address: vaultAddress,
+        abi: VaultABI,
+        functionName: "setDoHardWorkOnDeposit",
+        args: [false],
       });
+
+      console.log(setDoHardWorkOnDeposit);
+
+      const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
+        address: vaultAddress,
+        abi: VaultABI,
+        functionName: "setLastBlockDefenseDisabled",
+        args: [true],
+      });
+
+      console.log(setLastBlockDefenseDisabled);
+
+      const setCustomVaultFee = await writeContract(wagmiConfig, {
+        address: platforms[146],
+        abi: PlatformABI,
+        functionName: "setCustomVaultFee",
+        args: [vaultAddress, BigInt(20000)],
+      });
+
+      console.log(setCustomVaultFee);
+
+      const _newValues = [...Object.values(values), newProportionInput];
+
+      const bitIntValues = Object.values(_newValues).map((v) =>
+        parseUnits(v, 16)
+      );
+
+      const _addVault = await writeContract(wagmiConfig, {
+        address: currentMetaVault.address,
+        abi: IMetaVaultABI,
+        functionName: "addVault",
+        args: [vaultAddress, bitIntValues],
+      });
+
+      console.log(_addVault);
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error:", error);
     }
   };
 

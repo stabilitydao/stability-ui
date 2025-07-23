@@ -314,18 +314,9 @@ const Vaults = (): JSX.Element => {
       ...Object.values(mixedVaults || []),
     ];
 
-    let sortedVaults = allVaults
-      .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
-      .map((vault) => {
-        const balance = formatFromBigInt(vault.balance ?? 0, 18);
-
-        return {
-          ...vault,
-          balanceInUSD: vault?.isMetaVault
-            ? balance * Number(vault.sharePrice)
-            : balance * Number(vault.shareprice),
-        };
-      });
+    let sortedVaults = allVaults.sort(
+      (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
+    );
 
     //filter
     tableFilters.forEach((f) => {
@@ -479,17 +470,9 @@ const Vaults = (): JSX.Element => {
         ...Object.values($vaults[146] || []),
       ];
 
-      const vaults: TVault[] = allVaults
-        .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
-        .map((vault) => {
-          const tVault = vault as TVault;
-          const balance = formatFromBigInt(tVault.balance ?? 0, 18);
-
-          return {
-            ...tVault,
-            balanceInUSD: balance * Number(tVault.shareprice),
-          };
-        });
+      const vaults: TVault[] = allVaults.sort(
+        (a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl)
+      );
 
       initFilters(
         vaults,

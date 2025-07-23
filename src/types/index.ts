@@ -286,7 +286,7 @@ type TVault = {
   isVsActive: boolean;
   yearnProtocols: TYearnProtocol[];
   network: string;
-  sonicActivePoints: undefined | number;
+  sonicPoints: undefined | number;
   ringsPoints: undefined | number;
   leverageLending?: TLeverageLendingData;
   liveAPR: undefined | number;

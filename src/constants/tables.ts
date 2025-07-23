@@ -358,18 +358,6 @@ const METAVAULT_TABLE: TTableColumn[] = [
     dataType: "",
     unsortable: true,
   },
-  // {
-  //   name: "TVL",
-  //   keyName: "tvl",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
-  // {
-  //   name: "Deposit",
-  //   keyName: "balanceInUSD",
-  //   sortType: "none",
-  //   dataType: "number",
-  // },
 ];
 
 const PROTOCOLS_TABLE: TTableColumn[] = [
