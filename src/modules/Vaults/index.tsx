@@ -587,7 +587,7 @@ const Vaults = (): JSX.Element => {
               </span>
             </label>
             {!!searchHistory.length && (
-              <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[10] p-[6px]">
+              <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[15] p-[6px]">
                 <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
                   Recent searches
                 </span>
@@ -639,47 +639,68 @@ const Vaults = (): JSX.Element => {
         </div>
       </div>
 
-      <div className="pb-5">
+      <div
+        className={cn(
+          "pb-5",
+          displayType === DisplayTypes.Rows &&
+            "min-w-full lg:min-w-[960px] xl:min-w-[1200px]"
+        )}
+      >
         <div
           className={cn(
-            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
-            displayType === "grid" && "hidden"
+            displayType === DisplayTypes.Rows &&
+              "overflow-x-auto scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012]"
           )}
         >
-          {tableStates.map((value: TTableColumn, index: number) => (
-            <ColumnSort
-              key={value.name + index}
-              index={index}
-              value={value.name}
-              table={tableStates}
-              sort={tableHandler}
-            />
-          ))}
-        </div>
-        <div>
-          {isLoading ? (
+          <div
+            className={cn(
+              displayType === DisplayTypes.Rows &&
+                "min-w-[600px] md:min-w-[960px] lg:min-w-full"
+            )}
+          >
             <div
               className={cn(
-                "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
-                displayType === "grid" && "rounded-lg border-b"
+                "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
+                displayType === DisplayTypes.Grid && "hidden"
               )}
             >
-              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                <FullPageLoader />
-              </div>
+              {tableStates.map((value, index) => (
+                <ColumnSort
+                  key={value.name + index}
+                  index={index}
+                  value={value.name}
+                  table={tableStates}
+                  sort={tableHandler}
+                />
+              ))}
             </div>
-          ) : localVaults?.length ? (
-            <VaultsTable
-              vaults={currentTabVaults}
-              display={displayType}
-              isUserVaults={!!userVaultsCondition}
-              period={$aprFilter}
-              setModalState={setAprModal}
-            />
-          ) : (
-            <div className="text-start h-[60px] font-medium">No vaults</div>
-          )}
+            <div>
+              {isLoading ? (
+                <div
+                  className={cn(
+                    "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
+                    displayType === "grid" && "rounded-lg border-b"
+                  )}
+                >
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <FullPageLoader />
+                  </div>
+                </div>
+              ) : localVaults?.length ? (
+                <VaultsTable
+                  vaults={currentTabVaults}
+                  display={displayType}
+                  isUserVaults={!!userVaultsCondition}
+                  period={$aprFilter}
+                  setModalState={setAprModal}
+                />
+              ) : (
+                <div className="text-start h-[60px] font-medium">No vaults</div>
+              )}
+            </div>
+          </div>
         </div>
+
         <Pagination
           pagination={pagination}
           data={filteredVaults}

@@ -1,6 +1,4 @@
-import { useState } from "react";
-
-import { ArrowIcon, StrategyBadge, ArrowRightIcon } from "@ui";
+import { StrategyBadge } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -22,8 +20,6 @@ interface IProps {
 }
 
 const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  const [expandedData, setExpandedData] = useState(false);
-
   // const isSTBLVault =
   //   Array.isArray(vault?.assets) &&
   //   vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
@@ -57,19 +53,13 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center"
         data-testid="vault"
         href={link}
-        onClick={(e) => {
-          if (window.innerWidth <= 1280) {
-            e.preventDefault();
-            setExpandedData((prev) => !prev);
-          }
-        }}
       >
-        <div className="flex items-center w-full xl:w-[30%] justify-between px-4">
-          <div className="flex items-center gap-3">
+        <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[30%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+          <div className="flex items-center gap-2 md:gap-3">
             <div className="flex items-center justify-center">
               {vault?.isMetaVault ? (
                 <img
-                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  className="md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0"
                   src={`/features/${vault.symbol}.png`}
                   alt="logo"
                 />
@@ -78,7 +68,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   <img
                     src={asset?.logo}
                     alt={asset?.symbol}
-                    className={`w-8 h-8 rounded-full ${
+                    className={`md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0 ${
                       !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
                     }`}
                     key={asset?.logo + index}
@@ -86,14 +76,14 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                 ))
               )}
             </div>
-            <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
+            <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
               {vault?.isMetaVault
                 ? vault.symbol
                 : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-1">
+          <div className="hidden lg:flex items-center justify-center gap-1">
             {((!vault.symbol.includes("PT-") && vault?.sonicActivePoints) ||
               !!vault?.sonicPoints) && (
               <div
@@ -149,12 +139,9 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                 </div>
               </div>
             )}
-            <div className="block xl:hidden ml-2">
-              <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
-            </div>
           </div>
         </div>
-        <div className="px-4 w-[17.5%] hidden xl:block">
+        <div className="px-2 md:px-4 w-[150px] md:w-[17.5%]">
           {!vault?.isMetaVault ? (
             <StrategyBadge
               info={vault.strategyInfo}
@@ -168,7 +155,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             e.preventDefault();
             setModalState(modalData);
           }}
-          className="px-4 w-[17.5%] hidden xl:block tooltip cursor-help"
+          className="px-2 md:px-4 w-[100px] md:w-[17.5%] tooltip cursor-help"
         >
           <div
             className={`whitespace-nowrap w-full text-end flex items-center justify-end ${
@@ -191,68 +178,13 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </div>
           </div>
         </div>
-        <div className="px-4 text-right text-[16px] w-[17.5%] hidden xl:block">
+        <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
           {formatNumber(vault.tvl, "abbreviate")}
         </div>
-        <div className="px-4 text-right text-[16px] w-[17.5%] hidden xl:block">
+        <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
           <p>${formatNumber(vault.balanceInUSD, "format")}</p>
         </div>
       </a>
-      {expandedData ? (
-        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] xl:hidden">
-          {!vault?.isMetaVault && (
-            <div className="flex items-center justify-between w-full">
-              <span className="text-[#909193] text-[14px] leading-5 font-medium">
-                Strategy
-              </span>
-              <StrategyBadge
-                info={vault.strategyInfo}
-                specific={vault.strategySpecific}
-              />
-            </div>
-          )}
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              APR
-            </span>
-            <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
-              <div className="flex flex-col justify-end">
-                <p className="text-[16px]">
-                  {formatNumber(APRs.APR, "formatAPR")}%
-                </p>
-                {!!vault?.liveAPR && (
-                  <p className="text-[14px] text-[#97979A]">
-                    live. {vault?.liveAPR?.toFixed(2)}%
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              TVL
-            </span>
-            <span className="text-[16px]">
-              {formatNumber(vault.tvl, "abbreviate")}
-            </span>
-          </div>
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[#909193] text-[14px] leading-5 font-medium">
-              Balance
-            </span>
-            <span className="text-[16px]">
-              ${formatNumber(vault.balanceInUSD, "format")}
-            </span>
-          </div>
-          <a
-            href={link}
-            className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
-          >
-            {vault?.isMetaVault ? "View Meta Vault" : "View Vault"}
-            <ArrowRightIcon />
-          </a>
-        </div>
-      ) : null}
     </div>
   );
 };
