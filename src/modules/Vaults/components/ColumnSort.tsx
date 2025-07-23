@@ -9,11 +9,12 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Assets: "w-1/5 xl:w-[30%] hidden md:flex",
-    Strategy: "w-1/4 md:w-1/5 xl:w-[17.5%]",
-    APR: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
-    TVL: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
-    Balance: "w-1/4 md:w-1/5 xl:w-[17.5%] justify-center xl:justify-end",
+    Assets:
+      "sticky left-0 z-10 lg:relative w-[150px] md:w-[30%] bg-[#151618] lg:bg-transparent",
+    Strategy: "w-[150px] md:w-[17.5%]",
+    APR: "w-[100px] md:w-[17.5%] justify-end",
+    TVL: "w-[100px] md:w-[17.5%] justify-end",
+    Balance: "w-[100px] md:w-[17.5%] justify-end",
   };
 
   const tabController = () => {
@@ -64,7 +65,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <div
       onClick={tabController}
-      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-4 py-2 whitespace-nowrap ${styles[value] || "text-center"}`}
+      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-2 md:px-4 py-2 whitespace-nowrap ${styles[value] || "text-center"}`}
       data-testid="sort"
     >
       <p
