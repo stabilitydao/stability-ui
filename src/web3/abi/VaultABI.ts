@@ -741,6 +741,19 @@ export default [
     inputs: [],
   },
   {
+    inputs: [],
+    name: "lastBlockDefenseDisabled",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     type: "function",
     name: "setLastBlockDefenseDisabled",
     inputs: [{ name: "isDisabled", type: "bool", internalType: "bool" }],

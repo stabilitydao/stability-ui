@@ -17,7 +17,8 @@ import {
 } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
-import { getAddress, parseUnits } from "viem";
+import { getAddress, parseUnits, createPublicClient, http } from "viem";
+import { sonic } from "viem/chains";
 
 import type { TAddress } from "@types";
 
@@ -35,6 +36,13 @@ const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $platformsData = useStore(platformsData);
+
+  const _publicClient = createPublicClient({
+    chain: sonic,
+    transport: http(
+      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+    ),
+  });
 
   const [activeMetaVaults, setActiveMetaVaults] = useState([]);
 
@@ -63,6 +71,13 @@ const VaultManager = (): JSX.Element => {
     useState("");
   const [strategyInitNumsInput, setStrategyInitNumsInput] = useState("");
   const [strategyInitTicksInput, setStrategyInitTicksInput] = useState("");
+
+  const [addVaultData, setAddVaultData] = useState({
+    isActive: false,
+    isDoHardWorkOnDeposit: true,
+    isVaultLastBlockDefenseDisabled: false,
+    customVaultFee: 0,
+  });
 
   const vaultInitAddresses = vaultInitAddressesInput
     .split(",")
@@ -134,32 +149,64 @@ const VaultManager = (): JSX.Element => {
     try {
       const vaultAddress = getAddress(vaultInput);
 
-      const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
+      const vaultHardWorkOnDeposit = await _publicClient?.readContract({
         address: vaultAddress,
         abi: VaultABI,
-        functionName: "setDoHardWorkOnDeposit",
-        args: [false],
+        functionName: "doHardWorkOnDeposit",
       });
 
-      console.log(setDoHardWorkOnDeposit);
-
-      const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
+      const vaultLastBlockDefenseDisabled = await _publicClient?.readContract({
         address: vaultAddress,
         abi: VaultABI,
-        functionName: "setLastBlockDefenseDisabled",
-        args: [true],
+        functionName: "lastBlockDefenseDisabled",
       });
 
-      console.log(setLastBlockDefenseDisabled);
-
-      const setCustomVaultFee = await writeContract(wagmiConfig, {
+      const vaultCustomFee = await _publicClient?.readContract({
         address: platforms[146],
         abi: PlatformABI,
-        functionName: "setCustomVaultFee",
-        args: [vaultAddress, BigInt(20000)],
+        functionName: "getCustomVaultFee",
+        args: [vaultAddress],
       });
 
-      console.log(setCustomVaultFee);
+      setAddVaultData({
+        isActive: true,
+        isDoHardWorkOnDeposit: vaultHardWorkOnDeposit,
+        isVaultLastBlockDefenseDisabled: vaultLastBlockDefenseDisabled,
+        customVaultFee: Number(vaultCustomFee),
+      });
+
+      if (vaultHardWorkOnDeposit) {
+        const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
+          address: vaultAddress,
+          abi: VaultABI,
+          functionName: "setDoHardWorkOnDeposit",
+          args: [false],
+        });
+
+        console.log(setDoHardWorkOnDeposit);
+      }
+
+      if (!vaultLastBlockDefenseDisabled) {
+        const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
+          address: vaultAddress,
+          abi: VaultABI,
+          functionName: "setLastBlockDefenseDisabled",
+          args: [true],
+        });
+
+        console.log(setLastBlockDefenseDisabled);
+      }
+
+      if (vaultCustomFee != BigInt(20000)) {
+        const setCustomVaultFee = await writeContract(wagmiConfig, {
+          address: platforms[146],
+          abi: PlatformABI,
+          functionName: "setCustomVaultFee",
+          args: [vaultAddress, BigInt(20000)],
+        });
+
+        console.log(setCustomVaultFee);
+      }
 
       const _newValues = [...Object.values(values), newProportionInput];
 
@@ -257,6 +304,7 @@ const VaultManager = (): JSX.Element => {
     setValues({});
     setNewProportionInput("");
     setVaultInput("");
+    setAddVaultData({ ...addVaultData, isActive: false });
   }, [activeSection, currentMetaVault]);
 
   useEffect(() => {
@@ -598,6 +646,32 @@ const VaultManager = (): JSX.Element => {
           >
             Deploy Vault
           </button>
+        )}
+
+        {addVaultData.isActive && (
+          <div className="flex flex-col items-center gap-5">
+            <span>Add Vault Data</span>
+            <div className="flex flex-col items-center gap-2">
+              <span>
+                Is Vault Hard Work On Deposit:{" "}
+                {addVaultData.isDoHardWorkOnDeposit
+                  ? "yes(need tx)"
+                  : "no(already executed)"}
+              </span>
+              <span>
+                Is Vault Last Block Defense Disabled:{" "}
+                {addVaultData.isVaultLastBlockDefenseDisabled
+                  ? "no(already executed)"
+                  : "yes(need tx)"}
+              </span>
+              <span>
+                Is Correct Current Custom Fee:{" "}
+                {addVaultData.customVaultFee != 20000
+                  ? `no(need tx, current fee: ${addVaultData.customVaultFee})`
+                  : `yes (already executed), current fee: ${addVaultData.customVaultFee}`}
+              </span>
+            </div>
+          </div>
         )}
       </div>
     </div>

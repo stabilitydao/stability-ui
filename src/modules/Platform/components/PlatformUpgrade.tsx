@@ -54,10 +54,15 @@ const PlatformUpgrade = (): JSX.Element => {
               deployments[$currentChainID]?.ammAdapters
             );
 
+            const peripheryContracts = Object.keys(
+              deployments[$currentChainID]?.periphery
+            );
+
             const allContracts = [
               ...coreContracts,
               ...tokenomicsContracts,
               ...ammAdaptersContracts,
+              ...peripheryContracts,
             ];
 
             const upgratedData = await Promise.all(
@@ -69,7 +74,8 @@ const PlatformUpgrade = (): JSX.Element => {
                   deployments?.[$currentChainID]?.tokenomics?.[
                     moduleContract
                   ] ??
-                  deployments[$currentChainID]?.ammAdapters[moduleContract];
+                  deployments[$currentChainID]?.ammAdapters[moduleContract] ??
+                  deployments[$currentChainID]?.periphery[moduleContract];
 
                 if (!address) return;
 
