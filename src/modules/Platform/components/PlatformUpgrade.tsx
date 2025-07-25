@@ -36,7 +36,7 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });
-      console.log(pendingPlatformUpgrade);
+
       let upgrated = [];
 
       if (pendingPlatformUpgrade?.proxies.length) {
@@ -54,7 +54,6 @@ const PlatformUpgrade = (): JSX.Element => {
               deployments[$currentChainID]?.ammAdapters
             );
 
-            console.log(ammAdaptersContracts);
             const allContracts = [
               ...coreContracts,
               ...tokenomicsContracts,
