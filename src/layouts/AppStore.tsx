@@ -989,6 +989,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 ...metaVault,
                 status: "Active",
                 isMetaVault: true,
+                balanceInUSD: 0,
                 deposited: formatUnits(
                   metaVault.deposited,
                   isSMetaVault ? 18 : 6
