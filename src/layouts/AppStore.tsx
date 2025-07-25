@@ -789,13 +789,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const platformData: TPlatformData = {};
     const assetBalances: { [key: string]: TBalances } = {};
     const vaultsData: TVaultDataKey = {};
-    const prices: TMarketPrices = {};
+    const _marketPrices: TMarketPrices = {};
 
     /***** PRICES *****/
     if (stabilityAPIData.prices) {
       Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
         const isIntegerPrice = ["BTC", "ETH"].includes(key);
-        prices[key] = {
+        _marketPrices[key] = {
           ...value,
           price: isIntegerPrice
             ? Math.round(parseFloat(value.price)).toString()
@@ -803,7 +803,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         };
       });
 
-      marketPrices.set(prices);
+      marketPrices.set(_marketPrices);
     }
 
     /***** VAULTS *****/
@@ -1029,7 +1029,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                     );
 
                     const price = isSMetaVault
-                      ? Number(prices?.S?.price ?? 1)
+                      ? Number(_marketPrices?.S?.price ?? 1)
                       : 1;
 
                     balanceInUSD = formattedBalance * price;
