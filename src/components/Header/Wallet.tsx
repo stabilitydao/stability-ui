@@ -123,6 +123,7 @@ const Wallet = (): JSX.Element => {
       setTimeout(insertAssets, 1000);
     }
   };
+
   const initProfile = async () => {
     if (!$assetsBalances[$currentChainID]) return; // dublicated for TS
     let profileBalance = 0;
@@ -180,6 +181,7 @@ const Wallet = (): JSX.Element => {
       initProfile();
     }
   }, [$assetsBalances, $account]);
+
   useEffect(() => {
     if (connector) {
       const connectorIdToImage = {

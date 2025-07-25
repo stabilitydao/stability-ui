@@ -322,19 +322,24 @@ const Filters: React.FC<IProps> = memo(
         </div>
         <div
           className={cn(
-            "border border-[#35363b] bg-[#1d1e23] rounded-lg cursor-pointer block xl:hidden ml-auto"
+            "border border-[#35363b] bg-[#1d1e23] rounded-lg cursor-pointer block xl:hidden ml-auto relative"
           )}
           onClick={() => setModal(true)}
         >
           <div className="p-3">
             <FiltersIcon isActive={true} />
           </div>
+          {!!allParams && (
+            <span className="bg-[#816FEA] rounded-md w-[20px] text-center absolute right-[-10px] top-[-10px]">
+              {allParams}
+            </span>
+          )}
         </div>
         {modal && (
           <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center xl:hidden">
             <div
               ref={modalRef}
-              className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
+              className="relative w-[90%] max-w-[400px] max-h-[80vh] bg-[#111114] border border-[#232429] rounded-lg"
             >
               <div className="flex justify-between items-center p-4 border-b border-[#232429]">
                 <h2 className="text-[18px] leading-6 font-semibold">Filters</h2>
@@ -391,7 +396,7 @@ const Filters: React.FC<IProps> = memo(
                             </button>
                           </div>
                         ) : filter.type === "dropdown" ? (
-                          <div className="relative select-none w-[160px]">
+                          <div className="relative select-none w-full">
                             <div
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -400,11 +405,13 @@ const Filters: React.FC<IProps> = memo(
                               data-testid="strategyFilterDropdown"
                               className="flex items-center justify-between gap-2 px-3 py-1 h-[32px] bg-[#1D1E23] border border-[#35363B] rounded-lg cursor-pointer"
                             >
-                              <p className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px] leading-6 font-medium">
-                                <span className="text-[#97979A]">
+                              <p className="flex items-center overflow-hidden text-ellipsis whitespace-nowrap text-[16px] leading-6 font-medium w-full">
+                                <span className="text-[#97979A] flex-shrink-0">
                                   {filter.name}:{" "}
                                 </span>
-                                <span>{activeStrategies}</span>
+                                <span className="inline-block max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                  {activeStrategies}
+                                </span>
                               </p>
                               <img
                                 className={cn(
@@ -417,12 +424,13 @@ const Filters: React.FC<IProps> = memo(
                                 alt="arrowDown"
                               />
                             </div>
+
                             <div
                               ref={dropDownRef}
                               className={cn(
-                                "bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg w-full z-20 mt-2 hide-scrollbar max-h-[100px] overflow-y-auto",
+                                "absolute left-0 right-0 bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg z-20 mt-2 hide-scrollbar max-h-[40vh] overflow-y-auto",
                                 dropDownSelector
-                                  ? "absolute transition delay-[50ms]"
+                                  ? "block transition delay-[50ms]"
                                   : "hidden"
                               )}
                             >
@@ -437,9 +445,7 @@ const Filters: React.FC<IProps> = memo(
                                           variant.name
                                         )
                                       }
-                                      className={cn(
-                                        "p-[6px] cursor-pointer w-full flex items-center gap-2"
-                                      )}
+                                      className="p-[6px] cursor-pointer w-full flex items-center gap-2"
                                       data-testid="strategy"
                                       title={variant.title}
                                     >

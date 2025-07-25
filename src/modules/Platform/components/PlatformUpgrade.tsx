@@ -36,7 +36,7 @@ const PlatformUpgrade = (): JSX.Element => {
         abi: PlatformABI,
         functionName: "pendingPlatformUpgrade",
       });
-
+      console.log(pendingPlatformUpgrade);
       let upgrated = [];
 
       if (pendingPlatformUpgrade?.proxies.length) {
@@ -50,7 +50,16 @@ const PlatformUpgrade = (): JSX.Element => {
               deployments[$currentChainID].tokenomics
             );
 
-            const allContracts = [...coreContracts, ...tokenomicsContracts];
+            const ammAdaptersContracts = Object.keys(
+              deployments[$currentChainID]?.ammAdapters
+            );
+
+            console.log(ammAdaptersContracts);
+            const allContracts = [
+              ...coreContracts,
+              ...tokenomicsContracts,
+              ...ammAdaptersContracts,
+            ];
 
             const upgratedData = await Promise.all(
               allContracts.map(async (moduleContract: string) => {
@@ -58,7 +67,10 @@ const PlatformUpgrade = (): JSX.Element => {
                 //@ts-ignore
                 const address =
                   deployments?.[$currentChainID]?.core?.[moduleContract] ??
-                  deployments?.[$currentChainID]?.tokenomics?.[moduleContract];
+                  deployments?.[$currentChainID]?.tokenomics?.[
+                    moduleContract
+                  ] ??
+                  deployments[$currentChainID]?.ammAdapters[moduleContract];
 
                 if (!address) return;
 
