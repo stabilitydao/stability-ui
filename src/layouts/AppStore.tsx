@@ -76,7 +76,7 @@ import type {
   THoldData,
   TYearnProtocol,
   TVaults,
-  // TMultichainPrices,
+  TMultichainPrices,
   TAPIData,
   TPriceInfo,
   TVaultDataKey,
@@ -110,7 +110,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
-  // let prices: TMultichainPrices = {};
+  let prices: TMultichainPrices = {};
 
   let stabilityAPIData: TAPIData = {};
 
