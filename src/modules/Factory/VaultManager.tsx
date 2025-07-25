@@ -75,7 +75,7 @@ const VaultManager = (): JSX.Element => {
   const [addVaultData, setAddVaultData] = useState({
     isActive: false,
     isDoHardWorkOnDeposit: true,
-    isVaultLastBlockDefenseDisabled: true,
+    isVaultLastBlockDefenseDisabled: false,
     customVaultFee: 0,
   });
 
@@ -186,7 +186,7 @@ const VaultManager = (): JSX.Element => {
         console.log(setDoHardWorkOnDeposit);
       }
 
-      if (vaultLastBlockDefenseDisabled) {
+      if (!vaultLastBlockDefenseDisabled) {
         const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
           address: vaultAddress,
           abi: VaultABI,
@@ -661,8 +661,8 @@ const VaultManager = (): JSX.Element => {
               <span>
                 Is Vault Last Block Defense Disabled:{" "}
                 {addVaultData.isVaultLastBlockDefenseDisabled
-                  ? "yes(need tx)"
-                  : "no(already executed)"}
+                  ? "no(already executed)"
+                  : "yes(need tx)"}
               </span>
               <span>
                 Is Correct Current Custom Fee:{" "}
