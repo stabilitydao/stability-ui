@@ -22,7 +22,7 @@ interface IProps {
 
 const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
   const POINTS = {
-    sonic: vault.sonicActivePoints || vault.sonicPoints,
+    sonic: vault.sonicPoints,
     rings: vault.ringsPoints,
   };
 

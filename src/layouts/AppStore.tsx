@@ -76,7 +76,7 @@ import type {
   THoldData,
   TYearnProtocol,
   TVaults,
-  TMultichainPrices,
+  // TMultichainPrices,
   TAPIData,
   TPriceInfo,
   TVaultDataKey,
@@ -85,13 +85,14 @@ import type {
   TBalances,
   TTokens,
   TMetaVault,
+  TMarketPrices,
   // TAsset,
 } from "@types";
 
 import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
-  const { address, isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
 
   const { chain } = useAccount();
 
@@ -109,7 +110,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
-  let prices: TMultichainPrices = {};
+  // let prices: TMultichainPrices = {};
 
   let stabilityAPIData: TAPIData = {};
 
@@ -629,7 +630,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         };
 
         /***** SONIC ACTIVE POINTS *****/
-        let sonicActivePoints: undefined | number = undefined;
+        let sonicPoints: undefined | number = undefined;
         let ringsPoints: undefined | number = undefined;
 
         let liveAPR: undefined | number = undefined;
@@ -639,14 +640,14 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           // Points
           switch (vault?.address?.toLowerCase()) {
             case "0x4422117b942f4a87261c52348c36aefb0dcddb1a":
-              sonicActivePoints = 72;
+              sonicPoints = 72;
               break;
             case "0x908db38302177901b10ffa74fa80adaeb0351ff1":
-              sonicActivePoints = 108;
+              sonicPoints = 108;
               ringsPoints = 18;
               break;
             case "0x46bc0f0073ff1a6281d401cdc6cd56cec0495047":
-              sonicActivePoints = 48;
+              sonicPoints = 48;
               ringsPoints = 9;
               break;
             default:
@@ -679,7 +680,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
               }
 
-              sonicActivePoints = Number(points.toFixed(1));
+              sonicPoints = Number(points.toFixed(1));
               break;
           }
           // Leverage lending live APR & asset APR
@@ -767,7 +768,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             isVsActive,
             yearnProtocols,
             network: chainID,
-            sonicActivePoints,
+            sonicPoints,
             ringsPoints,
             leverageLending: vault?.leverageLending,
             liveAPR,
@@ -788,6 +789,22 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const platformData: TPlatformData = {};
     const assetBalances: { [key: string]: TBalances } = {};
     const vaultsData: TVaultDataKey = {};
+    const prices: TMarketPrices = {};
+
+    /***** PRICES *****/
+    if (stabilityAPIData.prices) {
+      Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
+        const isIntegerPrice = ["BTC", "ETH"].includes(key);
+        prices[key] = {
+          ...value,
+          price: isIntegerPrice
+            ? Math.round(parseFloat(value.price)).toString()
+            : value.price,
+        };
+      });
+
+      marketPrices.set(prices);
+    }
 
     /***** VAULTS *****/
     await Promise.all(
@@ -872,23 +889,40 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   const vaultsPromise = await Promise.all(
                     vaultsAddresses.map(
                       async (vault: string, index: number) => {
-                        if (localVaults[chain.id][vault.toLowerCase()]) {
+                        const vaultKey = vault.toLowerCase();
+                        const vaultData = localVaults[chain.id][vaultKey];
+
+                        const balance = vaultsBalances?.[index];
+
+                        if (vaultData && balance !== undefined) {
+                          const sharePrice = Number(vaultData.shareprice ?? 0);
+                          const formattedBalance = Number(
+                            formatUnits(BigInt(balance), 18)
+                          );
+                          const balanceInUSD = formattedBalance * sharePrice;
+
                           return {
-                            [vault.toLowerCase()]: {
-                              ...localVaults[chain.id][vault.toLowerCase()],
-                              balance: vaultsBalances?.[index],
+                            [vaultKey]: {
+                              ...vaultData,
+                              balance,
+                              balanceInUSD,
                             },
                           };
                         }
+
+                        return null;
                       }
                     )
                   );
 
-                  localVaults[chain.id] = vaultsPromise.reduce(
-                    (acc, curr) => ({ ...acc, ...curr }),
-                    {}
-                  ) as TVaults;
+                  localVaults[chain.id] = vaultsPromise
+                    .filter(Boolean)
+                    .reduce(
+                      (acc, curr) => ({ ...acc, ...curr }),
+                      {}
+                    ) as TVaults;
                 }
+
                 isVaultsLoaded.set(true);
               }
             } catch (txError: any) {
@@ -918,6 +952,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
+              const isSMetaVault = ["metaS", "metawS"].includes(
+                metaVault?.symbol
+              );
+
               let merklAPR = 0;
 
               let totalAPR = 0;
@@ -939,9 +977,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 merklAPR = Number(metaVault.merklAPR);
 
                 if (metaVault.symbol === "metaUSD") {
-                  sonicPoints = 12;
+                  sonicPoints = 10;
                 } else {
-                  sonicPoints = 8;
+                  sonicPoints = 12;
                 }
               }
 
@@ -953,7 +991,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 isMetaVault: true,
                 deposited: formatUnits(
                   metaVault.deposited,
-                  ["metaS", "metawS"].includes(metaVault?.symbol) ? 18 : 6
+                  isSMetaVault ? 18 : 6
                 ),
                 gemsAPR,
                 merklAPR,
@@ -973,6 +1011,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               try {
                 const balances = await Promise.all(
                   localMetaVaults[chain.id].map(async (mv) => {
+                    const isSMetaVault = ["metaS", "metawS"].includes(
+                      mv?.symbol
+                    );
+
+                    let balanceInUSD = 0;
+
                     const metaVaultBalance = (await localClient.readContract({
                       address: mv.address,
                       abi: IMetaVaultABI,
@@ -980,9 +1024,20 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                       args: [address as TAddress],
                     })) as bigint;
 
+                    const formattedBalance = Number(
+                      formatUnits(BigInt(metaVaultBalance), 18)
+                    );
+
+                    const price = isSMetaVault
+                      ? Number(prices?.S?.price ?? 1)
+                      : 1;
+
+                    balanceInUSD = formattedBalance * price;
+
                     return {
                       ...mv,
                       balance: metaVaultBalance,
+                      balanceInUSD,
                     };
                   })
                 );
@@ -1002,24 +1057,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         }
       )
     );
-
-    if (stabilityAPIData.prices) {
-      const formattedPrices = Object.entries(stabilityAPIData.prices).reduce(
-        (acc, [key, value]) => {
-          const isIntegerPrice = ["BTC", "ETH"].includes(key);
-          acc[key] = {
-            ...value,
-            price: isIntegerPrice
-              ? Math.round(parseFloat(value.price)).toString()
-              : value.price,
-          };
-          return acc;
-        },
-        {}
-      );
-
-      marketPrices.set(formattedPrices);
-    }
 
     isWeb3Load.set(false);
     assetsBalances.set(assetBalances);

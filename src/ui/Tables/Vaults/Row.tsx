@@ -84,8 +84,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
 
           <div className="hidden lg:flex items-center justify-center gap-1">
-            {((!vault.symbol.includes("PT-") && vault?.sonicActivePoints) ||
-              !!vault?.sonicPoints) && (
+            {!vault.symbol.includes("PT-") && !!vault?.sonicPoints && (
               <div
                 title="Sonic Activity Points"
                 className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -96,13 +95,8 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                     alt="sonic"
                     className="w-4 h-4 rounded-full"
                   />
-                  {vault?.sonicPoints ? (
-                    <span className="text-[12px]">x{vault?.sonicPoints}</span>
-                  ) : (
-                    <span className="text-[12px]">
-                      x{vault.sonicActivePoints}
-                    </span>
-                  )}
+
+                  <span className="text-[12px]">x{vault?.sonicPoints}</span>
                 </div>
               </div>
             )}

@@ -72,7 +72,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   alt="sonic"
                   className="w-3 h-3 rounded-full"
                 />
-                <span className="text-[10px]">x{vault.sonicActivePoints}</span>
+                <span className="text-[10px]">x{vault.sonicPoints}</span>
               </div>
             </div>
           )}

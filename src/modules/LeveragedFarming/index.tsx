@@ -20,7 +20,7 @@ import { vaults, isVaultsLoaded, aprFilter, error, metaVaults } from "@store";
 
 import { initFilters } from "./functions";
 
-import { formatFromBigInt, dataSorter, cn } from "@utils";
+import { dataSorter, cn } from "@utils";
 
 import {
   FARMING_TABLE_FILTERS,
@@ -178,18 +178,9 @@ const LeveragedFarming = (): JSX.Element => {
       }
     });
 
-    let sortedVaults = localVaults
-      .sort((a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl))
-      .map((vault) => {
-        const balance = formatFromBigInt(vault.balance ?? 0, 18);
-
-        return {
-          ...vault,
-          balanceInUSD: vault?.isMetaVault
-            ? balance
-            : balance * Number(vault.shareprice),
-        };
-      });
+    let sortedVaults = localVaults.sort(
+      (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
+    );
 
     //filter
     tableFilters.forEach((f) => {
@@ -320,7 +311,6 @@ const LeveragedFarming = (): JSX.Element => {
         .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
           const tVault = vault as TVault;
-          const balance = formatFromBigInt(tVault.balance ?? 0, 18);
 
           const leverage = Number(
             (1 / (1 - vault?.leverageLending?.maxLtv / 100)).toFixed(1)
@@ -329,7 +319,6 @@ const LeveragedFarming = (): JSX.Element => {
           return {
             ...tVault,
             leverage,
-            balanceInUSD: balance * Number(tVault.shareprice),
           };
         });
 

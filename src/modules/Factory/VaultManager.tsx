@@ -254,10 +254,17 @@ const VaultManager = (): JSX.Element => {
   };
 
   useEffect(() => {
+    setValues({});
+    setNewProportionInput("");
+    setVaultInput("");
+  }, [activeSection, currentMetaVault]);
+
+  useEffect(() => {
     if ($metaVaults[146] && $vaults[146]) {
       getData();
     }
   }, [$metaVaults]);
+
   return (
     <div className="flex flex-col max-w-[1200px] w-full">
       <div className="bg-[#18191C] border border-[#232429] rounded-lg p-4 flex flex-col gap-4 w-[800px]">

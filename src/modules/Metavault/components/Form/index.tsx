@@ -13,7 +13,13 @@ import { TokensDisplay } from "./TokensDisplay";
 
 import { ActionButton } from "@ui";
 
-import { getTokenData, getTransactionReceipt, formatNumber, cn } from "@utils";
+import {
+  getTokenData,
+  getTransactionReceipt,
+  formatNumber,
+  cn,
+  exactToFixed,
+} from "@utils";
 
 import { getWrappingPairs } from "../../functions/getWrappingPairs";
 
@@ -164,9 +170,10 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   const handleMaxInputChange = () => {
     if ($connected) {
-      const balance = Number(
-        Object.values(balances?.[actionType])[0]?.balance
-      ).toFixed(2);
+      const balance = exactToFixed(
+        Object.values(balances?.[actionType])[0]?.balance,
+        2
+      );
 
       handleInputChange({
         target: {
