@@ -31,7 +31,7 @@ import {
 
 import { initFilters } from "./functions";
 
-import { formatFromBigInt, dataSorter, debounce, cn } from "@utils";
+import { dataSorter, debounce, cn } from "@utils";
 
 import {
   TABLE,

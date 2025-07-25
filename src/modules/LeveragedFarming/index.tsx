@@ -20,7 +20,7 @@ import { vaults, isVaultsLoaded, aprFilter, error, metaVaults } from "@store";
 
 import { initFilters } from "./functions";
 
-import { formatFromBigInt, dataSorter, cn } from "@utils";
+import { dataSorter, cn } from "@utils";
 
 import {
   FARMING_TABLE_FILTERS,

@@ -1,7 +1,6 @@
 import { memo, useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
-import { formatUnits } from "viem";
 
 import { PlatformModal } from "./modals/PlatformModal";
 
