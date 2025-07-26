@@ -327,13 +327,8 @@ const Filters: React.FC<IProps> = memo(
           onClick={() => setModal(true)}
         >
           <div className="p-3">
-            <FiltersIcon isActive={true} />
+            <FiltersIcon isActive={!!allParams} />
           </div>
-          {!!allParams && (
-            <span className="bg-[#816FEA] rounded-md w-[20px] text-center absolute right-[-10px] top-[-10px]">
-              {allParams}
-            </span>
-          )}
         </div>
         {modal && (
           <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center xl:hidden">

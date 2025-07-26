@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials } from "@ui";
+import { Prices, NavIcon, Socials, TextSkeleton } from "@ui";
 
 import { cn, formatNumber } from "@utils";
 
@@ -151,12 +151,14 @@ const Navbar = (): JSX.Element => {
                 </div>
               </a>
               <div className="flex gap-2">
-                {TVL ? (
-                  <div className="w-2/3 flex items-center justify-between h-10 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
-                    <span className="text-[#A3A4A6]">AUM</span>
+                <div className="w-2/3 flex items-center justify-between h-10 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
+                  <span className="text-[#A3A4A6]">AUM</span>
+                  {!!TVL ? (
                     <span className="text-white">{TVL}</span>
-                  </div>
-                ) : null}
+                  ) : (
+                    <TextSkeleton lineHeight={16} width={50} />
+                  )}
+                </div>
                 <a
                   href="/platform"
                   title="Platform"
