@@ -219,7 +219,7 @@ const SonicPointsButton = (): JSX.Element => {
               <img src="/logo.svg" alt="Stability" className="w-4 h-4" />
               <div className="flex flex-col gap-1">
                 <span className="text-[#97979A] text-[12px] leading-[14px]">
-                  Stability App
+                  Stability Silo Points
                 </span>
                 <p className="text-[14px] leading-4">
                   {user.stabilitySiloPoints}
