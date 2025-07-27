@@ -137,7 +137,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
   };
 
   const getAllowance = async (token: string, spender: string) =>
-    sonicClient.readContract({
+    await sonicClient.readContract({
       address: token as TAddress,
       abi: ERC20ABI,
       functionName: "allowance",
@@ -506,7 +506,14 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
     try {
       setNeedConfirm(true);
 
-      const params = [shares, $account, $account];
+      const assets = (await sonicClient.readContract({
+        address: activeAsset.unwrap.address,
+        abi: WrappedMetaVaultABI,
+        functionName: "convertToAssets",
+        args: [shares],
+      })) as bigint;
+
+      const params = [assets, $account, $account];
 
       const gasLimit = await getGasLimit(
         activeAsset.unwrap.address,
