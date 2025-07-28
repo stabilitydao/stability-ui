@@ -157,7 +157,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     );
 
     const vaults = await Promise.all(
-      metaVault.endVaults.map(async (entry, index: number) => {
+      metaVault.endVaults.map(async (entry) => {
         const isMeta = entry.isMetaVault;
         const vaultAddr = isMeta ? entry.metaVault : entry.vault;
 
