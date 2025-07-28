@@ -101,14 +101,22 @@ const Vault: React.FC<IProps> = ({
                       key={asset?.logo + index}
                     />
                   ))}
-                  {protocol && (
+                  {vault.address ===
+                  "0x7bcec157a1d10f00391e9e782de5998fabcc1aa7" ? (
+                    <img
+                      src="/features/credix.svg"
+                      alt="Credix"
+                      title="Credix"
+                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
+                    />
+                  ) : protocol ? (
                     <img
                       src={protocol?.logoSrc}
                       alt={protocol?.name}
                       title={protocol?.name}
                       className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
                     />
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
