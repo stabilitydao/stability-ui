@@ -161,8 +161,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         const isMeta = entry.isMetaVault;
         const vaultAddr = isMeta ? entry.metaVault : entry.vault;
 
-        const current = proportions.current[index];
-        const target = proportions.target[index];
+        const vaultProportion = proportions[vaultAddr.toLowerCase()];
+
+        const current = vaultProportion?.current ?? 0;
+        const target = vaultProportion?.target ?? 0;
 
         if (current <= 0.1 && !target) return null;
 
@@ -173,18 +175,19 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
           if (!subMetaVault) return null;
 
-          const { current: subCurrent, target: subTarget } =
-            await getMetaVaultProportions(vaultAddr as TAddress);
+          const subProportions = await getMetaVaultProportions(
+            vaultAddr as TAddress
+          );
 
           const vaultsData = entry.vaults
-            .map((address: TAddress, i: number) => {
-              const vault = $vaults[chainId][address];
+            .map((address: TAddress) => {
+              const addr = address.toLowerCase();
+              const vault = $vaults[chainId][addr];
+              const subProp = subProportions[addr] ?? { current: 0, target: 0 };
+
               return {
                 ...vault,
-                proportions: {
-                  current: subCurrent[i],
-                  target: subTarget[i],
-                },
+                proportions: subProp,
                 APR: vault.earningData.apr.latest,
               };
             })
@@ -442,6 +445,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 />
               ))}
             </div>
+
             <div>
               {isLoading ? (
                 <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">

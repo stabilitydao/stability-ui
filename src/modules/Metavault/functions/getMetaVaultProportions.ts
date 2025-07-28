@@ -4,10 +4,17 @@ import { sonicClient, IMetaVaultABI } from "@web3";
 
 import type { TAddress } from "@types";
 
+type VaultProportions = Record<string, { current: number; target: number }>;
+
 export const getMetaVaultProportions = async (
   address: TAddress
-): Promise<{ current: number[]; target: number[] }> => {
-  const [current, target] = await Promise.all([
+): Promise<VaultProportions> => {
+  const [vaults, current, target] = await Promise.all([
+    sonicClient.readContract({
+      address,
+      abi: IMetaVaultABI,
+      functionName: "vaults",
+    }),
     sonicClient.readContract({
       address,
       abi: IMetaVaultABI,
@@ -20,12 +27,11 @@ export const getMetaVaultProportions = async (
     }),
   ]);
 
-  return {
-    current: current.map(
-      (proportion: bigint) => Number(formatUnits(proportion, 18)) * 100
-    ),
-    target: target.map(
-      (proportion: bigint) => Number(formatUnits(proportion, 18)) * 100
-    ),
-  };
+  return vaults.reduce((acc, vault: TAddress, index: number) => {
+    acc[vault.toLowerCase()] = {
+      current: Number(formatUnits(current[index], 18)) * 100,
+      target: Number(formatUnits(target[index], 18)) * 100,
+    };
+    return acc;
+  }, {} as VaultProportions);
 };
