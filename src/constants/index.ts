@@ -282,6 +282,11 @@ const PATHS = [
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
     {
+      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
+      symbol: "Stability wmetaUSD",
+      link: "https://stability.market/?market=wmetaUSD",
+    },
+    {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
       symbol: "Silo wmetaUSD - USDC",
       link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
