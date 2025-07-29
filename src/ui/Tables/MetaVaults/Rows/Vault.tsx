@@ -104,7 +104,7 @@ const Vault: React.FC<IProps> = ({
                   {vault.address ===
                   "0x7bcec157a1d10f00391e9e782de5998fabcc1aa7" ? (
                     <img
-                      src="/features/credix.svg"
+                      src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/credix.svg"
                       alt="Credix"
                       title="Credix"
                       className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
