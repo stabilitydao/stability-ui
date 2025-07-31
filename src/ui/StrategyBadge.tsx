@@ -53,6 +53,13 @@ const StrategyBadge: React.FC<IProps> = ({ info, specific }) => {
                   alt="Stability"
                   title="Stability"
                 />
+              ) : info.id === "Compound" ? (
+                <img
+                  className="h-6 w-6 mx-[2px]"
+                  src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg"
+                  alt="Enclabs"
+                  title="Enclabs"
+                />
               ) : (
                 info.protocols.map((protocol, index) => (
                   <div
