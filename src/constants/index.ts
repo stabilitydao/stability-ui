@@ -258,6 +258,9 @@ const VAULTS_WITH_NAME = {
   "0xd248c4b6ec709feed32851a9f883afeac294ad30": "SIlo USDC 34",
   "0x38274302e0dd5779b4e0a3e401023cfb48ff5c23": "Silo USDC 36",
   "0x449bf92ec47985c452081ecf5e89aa7075b6e8b2": "Greenhouse S",
+  "0xefdf0f2b8d056009bd50125b76567110ad52ec91": "Enclabs USDC",
+  "0xc7efc499c2fed657251455443cd0767607e8e45e": "Enclabs wS",
+  "0x396ebcaa1005a5bf1829cba82e853a5ea51ab937": "Enclabs scUSD",
 };
 
 const META_VAULTS_TYPE = {
