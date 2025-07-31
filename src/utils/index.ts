@@ -35,6 +35,7 @@ import { exactToFixed } from "./functions/exactToFixed";
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
+import { useUrlHistory } from "./hooks/useUrlHistory";
 
 export {
   getTokenData,
@@ -71,4 +72,5 @@ export {
   enrichAndResolveMetaVaults,
   copyAddress,
   exactToFixed,
+  useUrlHistory,
 };

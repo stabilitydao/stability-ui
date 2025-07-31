@@ -307,7 +307,7 @@ const LeveragedFarming = (): JSX.Element => {
       const allVaults = Object.values($vaults[146]) || [];
 
       const vaults: TVault[] = allVaults
-        .filter((vault) => vault.leverageLending)
+        .filter((vault) => vault?.leverageLending)
         .sort((a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl))
         .map((vault) => {
           const tVault = vault as TVault;
