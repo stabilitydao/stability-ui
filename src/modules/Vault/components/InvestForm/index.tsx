@@ -189,7 +189,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
   const isIchiProtocol =
     vault?.alm?.protocol === "Ichi" ||
-    vault.strategyInfo.protocols[0].name === "Ichi";
+    vault?.strategyInfo?.protocols[0]?.name === "Ichi";
 
   const isSiloStrategies = ["SiAL", "SiL", "SiF"].includes(
     vault.strategyInfo.shortId
