@@ -723,6 +723,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             name: vault.name,
             symbol: vault.symbol,
             created: vaultCreated,
+            launchDate: vault.launchDate,
             assetsPricesOnCreation: vault.assetsPricesOnCreation,
             type: vault.vaultType,
             strategy: vault.strategyId,

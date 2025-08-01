@@ -8,8 +8,6 @@ import { CONTESTS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { contests } from "@stabilitydao/stability";
 
-import { DisplayTypes } from "@types";
-
 import type { TTableColumn, IExtendedYieldContest } from "@types";
 
 const CONTESTS_FILTERS = ["All", "Ongoing", "Future", "Ended"];
@@ -148,7 +146,6 @@ const Contests = (): JSX.Element => {
             pagination={pagination}
             data={filteredTableData}
             tab={currentTab}
-            display={DisplayTypes.Rows}
             setTab={setCurrentTab}
             setPagination={setPagination}
           />

@@ -247,6 +247,7 @@ type TVault = {
   name: string;
   symbol: string;
   created: string;
+  launchDate: string;
   assetsPricesOnCreation: string[];
   type: string;
   strategy: string;

@@ -30,8 +30,6 @@ import { USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { TABLE_TYPES } from "./constants";
 
-import { DisplayTypes } from "@types";
-
 import type { TTableColumn, TLeaderboard } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
@@ -296,7 +294,6 @@ const Leaderboard = (): JSX.Element => {
             pagination={pagination}
             data={tableData}
             tab={currentTab}
-            display={DisplayTypes.Rows}
             setTab={setCurrentTab}
             setPagination={setPagination}
           />
