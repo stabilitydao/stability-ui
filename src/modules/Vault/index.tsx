@@ -99,7 +99,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           <Assets
             network={network}
             assets={localVault?.assets}
-            created={localVault.created}
+            launched={localVault.launchDate}
             pricesOnCreation={localVault.assetsPricesOnCreation}
             strategy={localVault?.strategyAddress}
           />

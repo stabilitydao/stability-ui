@@ -391,6 +391,7 @@ const LeveragedFarming = (): JSX.Element => {
             setType={setDisplayType}
             pagination={pagination}
             setPagination={setPagination}
+            setTab={setCurrentTab}
           />
         </div>
       </div>
