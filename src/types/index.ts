@@ -664,8 +664,8 @@ type TAPIData = {
       };
     };
   };
-  rewards: { gemsAprMultiplier: number };
-  prices: TMarketPrices;
+  rewards?: { gemsAprMultiplier: number };
+  prices?: TMarketPrices;
   error?: string;
 };
 

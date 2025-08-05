@@ -4,7 +4,7 @@ import { formatNumber } from "@utils";
 
 import { SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
 
-import { TVault, TAPRModal } from "@types";
+import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {
   APRs: {
@@ -25,12 +25,12 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
   //   vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
 
   const link =
-    vault?.type != "Vault"
-      ? `/metavaults/metavault/${vault.address}`
-      : `/vaults/vault/${vault.network}/${vault.address}`;
+    vault?.type === VaultTypes.Vault
+      ? `/vaults/vault/${vault.network}/${vault.address}`
+      : `/metavaults/metavault/${vault.address}`;
 
   const modalData =
-    vault?.type === "Vault"
+    vault?.type === VaultTypes.Vault
       ? {
           earningData: vault.earningData,
           daily: vault.daily,
@@ -59,7 +59,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
         <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[30%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
           <div className="flex items-center gap-2 md:gap-3">
             <div className="flex items-center justify-center">
-              {vault?.type != "Vault" ? (
+              {vault?.type != VaultTypes.Vault ? (
                 <img
                   className="md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0"
                   src={`/features/${vault.symbol}.png`}
@@ -79,7 +79,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               )}
             </div>
             <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.type != "Vault"
+              {vault?.type != VaultTypes.Vault
                 ? vault.symbol
                 : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
@@ -138,7 +138,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="px-2 md:px-4 w-[150px] md:w-[17.5%]">
-          {vault?.type === "Vault" ? (
+          {vault?.type === VaultTypes.Vault ? (
             <StrategyBadge
               info={vault.strategyInfo}
               specific={vault.strategySpecific}
@@ -161,7 +161,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             <div className="flex flex-col justify-end">
               <p className="text-[16px]">
                 {formatNumber(
-                  vault?.type != "Vault" ? vault.totalAPR : APRs.APR,
+                  vault?.type != VaultTypes.Vault ? vault?.totalAPR : APRs.APR,
                   "formatAPR"
                 )}
                 %

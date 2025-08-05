@@ -271,28 +271,26 @@ const VaultManager = (): JSX.Element => {
   const getData = async () => {
     try {
       const _metaVaultsWithProportions = $metaVaults[146].map((mv) => {
-        const proportions = Object.entries(mv.vaultProportions).map(
-          ([address, obj]) => {
-            const symbol =
-              $vaults[146][address]?.symbol ??
-              $metaVaults[146].find((_mv) => _mv.address === address)?.symbol;
+        const proportions = mv.vaultsData.map((data) => {
+          const symbol =
+            $vaults[146][data.address]?.symbol ??
+            $metaVaults[146].find((_mv) => _mv.address === data.address)
+              ?.symbol;
 
-            const newObj = {
-              currentProportions: (
-                Number(obj.currentProportions) * 100
-              ).toFixed(2),
-              targetProportions: (Number(obj.targetProportions) * 100).toFixed(
-                2
-              ),
-            };
+          const newObj = {
+            currentProportions: (
+              Number(data.proportions.current) * 100
+            ).toFixed(2),
+            targetProportions: (Number(data.proportions.target) * 100).toFixed(
+              2
+            ),
+          };
 
-            return { address, symbol, ...newObj };
-          }
-        );
+          return { address: data.address, symbol, ...newObj };
+        });
 
         return { ...mv, proportions };
       });
-
       setActiveMetaVaults(_metaVaultsWithProportions);
       setCurrentMetaVault(_metaVaultsWithProportions[0]);
     } catch (error) {

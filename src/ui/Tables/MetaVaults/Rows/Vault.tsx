@@ -11,7 +11,7 @@ import { cn, formatNumber } from "@utils";
 
 import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
 
-import { TVault, TAPRModal } from "@types";
+import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {
   APRs: {
@@ -42,7 +42,7 @@ const Vault: React.FC<IProps> = ({
     vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
 
   const symbol =
-    vault.type === "Vault"
+    vault.type === VaultTypes.Vault
       ? VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol
       : vault.symbol;
 
@@ -50,7 +50,7 @@ const Vault: React.FC<IProps> = ({
     activeVault?.isHovered && activeVault.address !== vault.address;
 
   const rawProtocol =
-    vault.type === "Vault" ? vault?.strategyInfo?.protocols[0] : null;
+    vault.type === VaultTypes.Vault ? vault?.strategyInfo?.protocols[0] : null;
 
   const protocol = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
@@ -64,7 +64,7 @@ const Vault: React.FC<IProps> = ({
           isDimmed ? "opacity-30" : "opacity-100"
         )}
         href={
-          vault.type === "Vault"
+          vault.type === VaultTypes.Vault
             ? `/vaults/vault/${vault.network}/${vault.address}`
             : `/metavaults/metavault/${vault.address}`
         }
@@ -83,7 +83,7 @@ const Vault: React.FC<IProps> = ({
             )}
           >
             <div className="flex items-center justify-center">
-              {vault.type === "Vault" ? (
+              {vault.type === VaultTypes.Vault ? (
                 <div className="flex items-center">
                   {vault.assets.map((asset, index) => (
                     <img
@@ -95,22 +95,13 @@ const Vault: React.FC<IProps> = ({
                       key={asset?.logo + index}
                     />
                   ))}
-                  {vault.address ===
-                  "0x7bcec157a1d10f00391e9e782de5998fabcc1aa7" ? (
-                    <img
-                      src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/credix.svg"
-                      alt="Credix"
-                      title="Credix"
-                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
-                    />
-                  ) : protocol ? (
-                    <img
-                      src={protocol?.logoSrc}
-                      alt={protocol?.name}
-                      title={protocol?.name}
-                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
-                    />
-                  ) : null}
+
+                  <img
+                    src={protocol?.logoSrc}
+                    alt={protocol?.name}
+                    title={protocol?.name}
+                    className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
+                  />
                 </div>
               ) : (
                 <img
@@ -150,7 +141,7 @@ const Vault: React.FC<IProps> = ({
           }}
           className={cn(
             "px-4 w-[20%] hidden min-[860px]:block",
-            vault.type === "Vault" && "tooltip cursor-help"
+            vault.type === VaultTypes.Vault && "tooltip cursor-help"
           )}
         >
           <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
@@ -167,7 +158,7 @@ const Vault: React.FC<IProps> = ({
           </div>
           <div
             className={cn(
-              vault.type === "Vault" ? "visible__tooltip" : "hidden"
+              vault.type === VaultTypes.Vault ? "visible__tooltip" : "hidden"
             )}
           >
             <div className="flex items-start flex-col gap-2">
@@ -301,13 +292,13 @@ const Vault: React.FC<IProps> = ({
 
           <a
             href={
-              vault.type === "Vault"
+              vault.type === VaultTypes.Vault
                 ? `/vaults/vault/${vault.network}/${vault.address}`
                 : `/metavaults/metavault/${vault.address}`
             }
             className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
           >
-            {vault.type === "Vault" ? "View Vault" : "View Meta Vault"}
+            {vault.type === VaultTypes.Vault ? "View Vault" : "View Meta Vault"}
             <ArrowRightIcon />
           </a>
         </div>

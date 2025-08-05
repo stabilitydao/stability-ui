@@ -5,7 +5,7 @@ import { formatNumber } from "@utils";
 
 import { VAULTS_WITH_NAME } from "@constants";
 
-import { TVault, TAPRModal } from "@types";
+import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {
   APRs: {
@@ -27,12 +27,12 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
   };
 
   const link =
-    vault?.type != "Vault"
-      ? `/metavaults/metavault/${vault.address}`
-      : `/vaults/vault/${vault.network}/${vault.address}`;
+    vault?.type === VaultTypes.Vault
+      ? `/vaults/vault/${vault.network}/${vault.address}`
+      : `/metavaults/metavault/${vault.address}`;
 
   const modalData =
-    vault?.type === "Vault"
+    vault?.type === VaultTypes.Vault
       ? {
           earningData: vault.earningData,
           daily: vault.daily,
@@ -60,7 +60,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
-            {vault?.type != "Vault" ? (
+            {vault?.type != VaultTypes.Vault ? (
               <img
                 className="w-10 h-10 rounded-full flex-shrink-0"
                 src={`/features/${vault.symbol}.png`}
@@ -82,7 +82,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
           <div className="flex flex-col items-start gap-1">
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.type != "Vault"
+              {vault?.type != VaultTypes.Vault
                 ? vault.symbol
                 : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
@@ -90,7 +90,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {vault?.type === "Vault" && (
+          {vault?.type === VaultTypes.Vault && (
             <div className="flex items-center justify-between">
               <span className="text-[#97979A] text-[14px]">Strategy</span>
               <StrategyBadge

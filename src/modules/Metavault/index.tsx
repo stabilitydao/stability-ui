@@ -22,14 +22,14 @@ import {
 
 import { deployments } from "@stabilitydao/stability";
 
-import { MetaVaultTableTypes } from "@types";
-
-import type {
+import {
   TAddress,
   TTableColumn,
   TVault,
   TEarningData,
   TMetaVault,
+  MetaVaultTableTypes,
+  VaultTypes,
 } from "@types";
 
 interface IProps {
@@ -154,15 +154,15 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
-        const isMetaVault = entry.type != "Vault";
+        const isMetaVault = entry.type != VaultTypes.Vault;
 
         const vaultAddr = entry.address;
 
         const vaultProportion = entry.proportions;
 
-        const current = vaultProportion?.current * 100 ?? 0;
+        const current = vaultProportion?.current * 100;
 
-        const target = vaultProportion?.target * 100 ?? 0;
+        const target = vaultProportion?.target * 100;
 
         if (current <= 0.1 && !target) return null;
 
@@ -213,15 +213,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       let allocation = 0;
 
       cleanedVaults.forEach((vault) => {
-        const vaultsToCheck = vault?.type != "Vault" ? vault.vaults : [vault];
+        const vaultsToCheck =
+          vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
 
         vaultsToCheck.forEach((v) => {
           const strategy = v.strategy;
 
           const isSiloMatch =
-            protocol.name === "Silo V2" && strategy.includes("Silo");
+            protocol?.name === "Silo V2" && strategy.includes("Silo");
 
-          const isStrategyMatch = protocol.name.includes(strategy);
+          const isStrategyMatch = protocol?.name.includes(strategy);
 
           if (isSiloMatch || isStrategyMatch) {
             allocation += Number(v.tvl || 0);
@@ -237,10 +238,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       0
     );
 
-    const allocationsWithPercent = protocolsAllocation.map((p) => ({
-      ...p,
-      value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
-    }));
+    const allocationsWithPercent = protocolsAllocation
+      .map((p) => ({
+        ...p,
+        value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
 
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);

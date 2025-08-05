@@ -2,7 +2,7 @@ import { RewardsCarousel } from "../../RewardsCarousel";
 
 import { formatNumber } from "@utils";
 
-import { TVault } from "@types";
+import { TVault, VaultTypes } from "@types";
 
 interface IProps {
   APRs: {
@@ -49,7 +49,9 @@ const Grid: React.FC<IProps> = ({ APRs, vault }) => {
 
           <div className="flex flex-col items-start gap-1">
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.type != "Vault" ? vault.symbol : vault.assetsSymbol}
+              {vault?.type != VaultTypes.Vault
+                ? vault.symbol
+                : vault.assetsSymbol}
             </span>
             <RewardsCarousel address={vault.address} points={POINTS} />
           </div>
