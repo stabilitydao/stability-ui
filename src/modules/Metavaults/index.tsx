@@ -8,9 +8,9 @@ import { MetaVaultsLinks } from "./components/MetaVaultsLinks";
 
 import { useModalClickOutside, formatNumber } from "@utils";
 
-import { META_VAULTS_TYPE } from "@constants";
-
 import { metaVaults } from "@store";
+
+import { VaultTypes } from "@types";
 
 export type TModal = {
   APR: string;
@@ -36,11 +36,8 @@ const Metavaults = (): JSX.Element => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const initMetavaults = async () => {
-    // todo: change only to vault type
     const onlyMetaVaults = $metaVaults["146"].filter(
-      ({ symbol }: { symbol: string }) =>
-        META_VAULTS_TYPE[symbol as keyof typeof META_VAULTS_TYPE] ===
-        "metaVault"
+      ({ type }: { type: string }) => type === VaultTypes.MetaVault
     );
 
     setLocalMetaVaults(onlyMetaVaults);

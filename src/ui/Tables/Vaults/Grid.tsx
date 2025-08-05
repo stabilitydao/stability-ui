@@ -26,28 +26,30 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     rings: vault.ringsPoints,
   };
 
-  const link = vault?.isMetaVault
-    ? `/metavaults/metavault/${vault.address}`
-    : `/vaults/vault/${vault.network}/${vault.address}`;
+  const link =
+    vault?.type != "Vault"
+      ? `/metavaults/metavault/${vault.address}`
+      : `/vaults/vault/${vault.network}/${vault.address}`;
 
-  const modalData = !vault?.isMetaVault
-    ? {
-        earningData: vault.earningData,
-        daily: vault.daily,
-        lastHardWork: vault.lastHardWork,
-        symbol: vault?.risk?.symbol as string,
-        state: true,
-        type: "vault",
-        pool: vault?.pool,
-      }
-    : {
-        APR: vault?.APR,
-        merklAPR: vault?.merklAPR,
-        gemsAPR: vault?.gemsAPR,
-        totalAPR: vault?.totalAPR,
-        state: true,
-        type: "metaVault",
-      };
+  const modalData =
+    vault?.type === "Vault"
+      ? {
+          earningData: vault.earningData,
+          daily: vault.daily,
+          lastHardWork: vault.lastHardWork,
+          symbol: vault?.risk?.symbol as string,
+          state: true,
+          type: "vault",
+          pool: vault?.pool,
+        }
+      : {
+          APR: vault?.APR,
+          merklAPR: vault?.merklAPR,
+          gemsAPR: vault?.gemsAPR,
+          totalAPR: vault?.totalAPR,
+          state: true,
+          type: "metaVault",
+        };
 
   return (
     <a
@@ -58,7 +60,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
-            {vault?.isMetaVault ? (
+            {vault?.type != "Vault" ? (
               <img
                 className="w-10 h-10 rounded-full flex-shrink-0"
                 src={`/features/${vault.symbol}.png`}
@@ -80,7 +82,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
           <div className="flex flex-col items-start gap-1">
             <span className="font-semibold text-[16px] max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-              {vault?.isMetaVault
+              {vault?.type != "Vault"
                 ? vault.symbol
                 : (VAULTS_WITH_NAME[vault.address] ?? vault.assetsSymbol)}
             </span>
@@ -88,7 +90,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {!vault?.isMetaVault && (
+          {vault?.type === "Vault" && (
             <div className="flex items-center justify-between">
               <span className="text-[#97979A] text-[14px]">Strategy</span>
               <StrategyBadge

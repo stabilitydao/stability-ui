@@ -23,7 +23,7 @@ import {
 
 import { getWrappingPairs } from "../../functions/getWrappingPairs";
 
-import { DEFAULT_TRANSACTION_SETTINGS, META_VAULTS_TYPE } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import {
   IMetaVaultABI,
@@ -41,7 +41,13 @@ import {
   lastTx,
 } from "@store";
 
-import { TransactionTypes, TAddress, TMetaVault, TTokenData } from "@types";
+import {
+  TransactionTypes,
+  TAddress,
+  TMetaVault,
+  TTokenData,
+  VaultTypes,
+} from "@types";
 
 interface IProps {
   metaVault: TMetaVault;
@@ -652,7 +658,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       const unwrapKey = unwrap.address;
 
       newBalances.wrap[wrapKey] =
-        META_VAULTS_TYPE[metaVault.symbol] === "multiVault"
+        metaVault.type === VaultTypes.MultiVault
           ? Object.values(newBalances.deposit)[0]
           : {
               bigIntBalance: metaVaultBalance,
@@ -707,7 +713,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <TokensDisplay
           actionType={actionType}
-          symbol={metaVault.symbol}
+          type={metaVault.type}
           activeAsset={activeAsset}
         />
 

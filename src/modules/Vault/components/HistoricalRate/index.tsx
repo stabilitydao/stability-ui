@@ -24,12 +24,10 @@ interface IProps {
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
-type TActiveChart =
-  | {
-      name: string;
-      data: [];
-    }
-  | undefined;
+type TActiveChart = {
+  name: string;
+  data: [];
+};
 
 const HistoricalRate: React.FC<IProps> = memo(
   ({ network, address, created, vaultStrategy, lastHardWork }) => {
@@ -53,7 +51,10 @@ const HistoricalRate: React.FC<IProps> = memo(
     const daysFromLastHardWork = getTimeDifference(lastHardWork).days;
 
     const [chartData, setChartData] = useState<TChartData[]>([]);
-    const [activeChart, setActiveChart] = useState<TActiveChart>();
+    const [activeChart, setActiveChart] = useState<TActiveChart>({
+      name: "",
+      data: [],
+    });
     const [timeline, setTimeline] = useState<TSegment>(
       timelineSegments.WEEK as TSegment
     );
@@ -588,14 +589,14 @@ const HistoricalRate: React.FC<IProps> = memo(
             <div
               className={cn(
                 "bg-[#101012] border border-[#23252A] rounded-lg pr-6 py-6",
-                ["TVL", "sharePrice"].includes(activeChart?.name) && "pl-6"
+                ["TVL", "sharePrice"].includes(activeChart.name) && "pl-6"
               )}
             >
-              {activeChart ? (
+              {activeChart.name !== "" ? (
                 <>
-                  {activeChart.name === "APR" ? (
+                  {activeChart?.name === "APR" ? (
                     <ChartBar chart={activeChart} APRType={APRType} />
-                  ) : activeChart.name === "vsHodl" ? (
+                  ) : activeChart?.name === "vsHodl" ? (
                     <ChartBar chart={activeChart} APRType={"VS HODL APR"} />
                   ) : (
                     <Chart chart={activeChart} />

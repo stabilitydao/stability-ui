@@ -141,7 +141,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
             <div className="w-1/3">
               <FieldValue
                 name="Vault type"
-                value={<VaultType type={vault.type} greater={!isMobile} />}
+                value={<VaultType type={vault.vaultType} greater={!isMobile} />}
                 testId="infoBarVaultType"
               />
             </div>

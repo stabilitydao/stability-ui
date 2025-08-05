@@ -34,9 +34,10 @@ const VaultsTable: React.FC<IProps> = ({
       )}
     >
       {vaults.map((vault: TVault, index: number) => {
-        const aprValue = vault?.isMetaVault
-          ? Number(vault?.totalAPR)
-          : Number(vault?.earningData?.apr[period]);
+        const aprValue =
+          vault?.type != "Vault"
+            ? Number(vault?.totalAPR)
+            : Number(vault?.earningData?.apr[period]);
 
         const apyValue = vault?.earningData?.apy[period];
 

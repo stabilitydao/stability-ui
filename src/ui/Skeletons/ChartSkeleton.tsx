@@ -2,9 +2,11 @@ const ChartSkeleton = (): JSX.Element => {
   return (
     <svg
       width="100%"
-      height="260px"
+      height="100%"
       viewBox="0 0 1800 400"
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg"
+      className="w-full h-full pl-5"
     >
       <rect
         x="0"
@@ -12,8 +14,8 @@ const ChartSkeleton = (): JSX.Element => {
         rx="10"
         ry="10"
         width="100%"
-        height="360px"
-        fill="#a995ff"
+        height="100%"
+        fill="#1B1D21"
       />
       <rect
         x="0"
@@ -21,8 +23,8 @@ const ChartSkeleton = (): JSX.Element => {
         rx="10"
         ry="10"
         width="100%"
-        height="360px"
-        fill="#15113A"
+        height="100%"
+        fill="#1B1D21"
       >
         <animate
           attributeName="opacity"

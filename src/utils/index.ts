@@ -28,7 +28,6 @@ import { playAudio } from "./functions/playAudio";
 import { cn } from "./functions/cn";
 import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
-import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
 
@@ -68,7 +67,6 @@ export {
   useClickOutside,
   useModalClickOutside,
   getTransactionReceipt,
-  enrichAndResolveMetaVaults,
   copyAddress,
   exactToFixed,
 };

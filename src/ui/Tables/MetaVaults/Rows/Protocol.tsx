@@ -37,18 +37,17 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
               <img
                 className="w-8 h-8 rounded-full flex-shrink-0"
                 src={
-                  protocol.name === "Aave V3"
-                    ? "/logo_dark.png"
-                    : protocol.logoSrc
+                  protocol.name === "Aave" ? "/logo_dark.png" : protocol.logoSrc
                 }
                 alt="logo"
               />
             </div>
+
             <span
               className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] min-[860px]:max-w-full"
-              title={protocol.name === "Aave V3" ? "Stability" : protocol.name}
+              title={protocol.name === "Aave" ? "Stability" : protocol.name}
             >
-              {protocol.name === "Aave V3" ? "Stability" : protocol.name}
+              {protocol.name === "Aave" ? "Stability" : protocol.name}
             </span>
           </div>
 

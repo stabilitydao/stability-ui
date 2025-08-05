@@ -11,8 +11,6 @@ import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
 import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
 
-import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
-
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
 import {
@@ -150,44 +148,43 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     if (!metaVault) return;
 
-    const proportions = await getMetaVaultProportions(metavault);
-
     const protocols = ["Stability", ...metaVault.protocols].map((name) =>
-      Object.values(PROTOCOLS).find((p) => p.name === name)
+      Object.values(PROTOCOLS).find((p) => name.includes(p.name))
     );
 
     const vaults = await Promise.all(
-      metaVault.endVaults.map(async (entry) => {
-        const isMeta = entry.isMetaVault;
-        const vaultAddr = isMeta ? entry.metaVault : entry.vault;
+      metaVault.vaultsData.map(async (entry) => {
+        const isMetaVault = entry.type != "Vault";
 
-        const vaultProportion = proportions[vaultAddr.toLowerCase()];
+        const vaultAddr = entry.address;
 
-        const current = vaultProportion?.current ?? 0;
-        const target = vaultProportion?.target ?? 0;
+        const vaultProportion = entry.proportions;
+
+        const current = vaultProportion?.current * 100 ?? 0;
+
+        const target = vaultProportion?.target * 100 ?? 0;
 
         if (current <= 0.1 && !target) return null;
 
-        if (isMeta) {
+        if (isMetaVault) {
           const subMetaVault = metaVaultList.find(
             (v: TVault) => v.address === vaultAddr
           );
 
           if (!subMetaVault) return null;
 
-          const subProportions = await getMetaVaultProportions(
-            vaultAddr as TAddress
-          );
-
           const vaultsData = entry.vaults
-            .map((address: TAddress) => {
-              const addr = address.toLowerCase();
+            .map((v) => {
+              const addr = v.address.toLowerCase();
               const vault = $vaults[chainId][addr];
-              const subProp = subProportions[addr] ?? { current: 0, target: 0 };
+              const subProp = v.proportions;
 
               return {
                 ...vault,
-                proportions: subProp,
+                proportions: {
+                  current: subProp.current * 100,
+                  target: subProp.target * 100,
+                },
                 APR: vault.earningData.apr.latest,
               };
             })
@@ -197,7 +194,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             ...subMetaVault,
             proportions: { current, target },
             vaults: vaultsData,
-            isMetaVault: true,
           };
         }
 
@@ -207,7 +203,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           ...vault,
           APR: vault.earningData.apr.latest,
           proportions: { current, target },
-          isMetaVault: false,
         };
       })
     );
@@ -218,7 +213,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       let allocation = 0;
 
       cleanedVaults.forEach((vault) => {
-        const vaultsToCheck = vault?.isMetaVault ? vault.vaults : [vault];
+        const vaultsToCheck = vault?.type != "Vault" ? vault.vaults : [vault];
 
         vaultsToCheck.forEach((v) => {
           const strategy = v.strategy;

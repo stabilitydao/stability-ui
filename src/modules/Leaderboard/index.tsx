@@ -116,7 +116,11 @@ const Leaderboard = (): JSX.Element => {
   );
 
   const totalPoints: number = useMemo(
-    () => Object.values(points).reduce((acc, cur) => (acc += cur), 0) as number,
+    () =>
+      Object.values(points).reduce(
+        (acc: number, cur) => (acc += cur as number),
+        0
+      ) as number,
     [points]
   );
 

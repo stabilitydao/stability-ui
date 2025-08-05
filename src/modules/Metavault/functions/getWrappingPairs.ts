@@ -1,16 +1,12 @@
 import { getTokenData } from "@utils";
 
-import { META_VAULTS_TYPE } from "@constants";
-
-import type { TMetaVault, TTokenData, TAddress } from "@types";
+import { TMetaVault, TTokenData, TAddress, VaultTypes } from "@types";
 
 export const getWrappingPairs = (
   vault: TMetaVault,
   assetsForDeposit: TAddress[]
 ): TTokenData => {
-  const type = META_VAULTS_TYPE?.[vault?.symbol];
-
-  if (type === "multiVault") {
+  if (vault.type === VaultTypes.MultiVault) {
     const wrap = getTokenData(assetsForDeposit?.[0].toLowerCase());
 
     const unwrapMap: Record<string, TTokenData> = {

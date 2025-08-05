@@ -270,8 +270,9 @@ const Assets: React.FC<IProps> = memo(
                   assetData && (
                     <div
                       className={cn(
-                        "rounded-md p-4 md:p-6 flex flex-col justify-between gap-4 w-full md:w-1/2",
-                        !index && "border-b md:border-r border-[#23252A]"
+                        "p-4 md:p-6 flex flex-col justify-between gap-4 w-full md:w-1/2",
+                        !index &&
+                          "border-b md:border-b-0 md:border-r border-[#23252A]"
                       )}
                       key={asset.address + index}
                     >

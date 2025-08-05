@@ -61,7 +61,6 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
-  enrichAndResolveMetaVaults,
 } from "@utils";
 
 import {
@@ -725,7 +724,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             created: vaultCreated,
             launchDate: vault.launchDate,
             assetsPricesOnCreation: vault.assetsPricesOnCreation,
-            type: vault.vaultType,
+            type: vault.type,
+            vaultType: vault.vaultType,
             strategy: vault.strategyId,
             shareprice,
             sharePriceLast,
@@ -989,7 +989,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               return {
                 ...metaVault,
                 status: "Active",
-                isMetaVault: true,
                 balanceInUSD: 0,
                 deposited: formatUnits(
                   metaVault.deposited,
@@ -1002,10 +1001,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               };
             });
 
-            localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
-              localVaults[chain.id],
-              _metaVaults
-            );
+            localMetaVaults[chain.id] = _metaVaults;
 
             if (isConnected) {
               let localClient = web3clients[chain.id] ?? web3clients["146"];

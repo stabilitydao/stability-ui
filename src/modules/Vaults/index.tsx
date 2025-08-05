@@ -389,13 +389,15 @@ const Vaults = (): JSX.Element => {
       if (state.sortType !== "none") {
         if (state.keyName === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) => {
-            const aAPR = a?.isMetaVault
-              ? Number(a.totalAPR ?? 0)
-              : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
+            const aAPR =
+              a?.type != "Vault"
+                ? Number(a.totalAPR ?? 0)
+                : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
 
-            const bAPR = b?.isMetaVault
-              ? Number(b.totalAPR ?? 0)
-              : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
+            const bAPR =
+              b?.type != "Vault"
+                ? Number(b.totalAPR ?? 0)
+                : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
 
             return dataSorter(aAPR, bAPR, state.dataType, state.sortType);
           });

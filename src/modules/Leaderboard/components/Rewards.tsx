@@ -269,7 +269,7 @@ const Rewards = (): JSX.Element => {
 
       {!!contestsToClaim.length && (
         <button
-          className="text-[16px] leading-5 font-semibold py-4 px-6 bg-[#5E6AD2] rounded-lg self-start"
+          className="text-[16px] leading-5 font-semibold py-4 px-6 bg-[#5E6AD2] rounded-lg self-start w-full"
           onClick={claim}
         >
           Claim
