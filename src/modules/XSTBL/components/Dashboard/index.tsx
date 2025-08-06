@@ -6,9 +6,11 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 
 import { formatUnits } from "viem";
 
+import { Chart } from "./Chart";
+
 import { TextSkeleton, Skeleton } from "@ui";
 
-import { Timer } from "../ui";
+import { Timer } from "../../ui";
 
 import { formatNumber } from "@utils";
 
@@ -27,8 +29,6 @@ import {
 import type { TStakeDashboard, TAddress } from "@types";
 
 const Dashboard = (): JSX.Element => {
-  const showChart = false;
-
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
@@ -331,11 +331,7 @@ const Dashboard = (): JSX.Element => {
           )}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
-              showChart ? "lg:col-span-2" : "lg:col-span-3"
-            }`}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:col-span-2">
             <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
               <span className="text-[18px] leading-6 font-semibold">
                 Vault fees
@@ -455,11 +451,7 @@ const Dashboard = (): JSX.Element => {
             </div>
           </div>
 
-          {showChart && (
-            <div className="bg-[#101012] rounded-lg p-4 flex items-center justify-center">
-              <h3>Chart</h3>
-            </div>
-          )}
+          <Chart />
         </div>
       </div>
     </div>
