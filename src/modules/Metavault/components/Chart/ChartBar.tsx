@@ -18,10 +18,9 @@ interface IProps {
     name: string;
     data: [];
   };
-  APRType: string;
 }
 
-const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
+const ChartBar: React.FC<IProps> = ({ chart }) => {
   const WIDTH = 500;
   let min = 0;
 
@@ -68,7 +67,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           }}
         />
 
-        <Tooltip content={<ChartTooltip type="APR" APRType={APRType} />} />
+        <Tooltip content={<ChartTooltip type="APR" />} />
 
         <Bar dataKey={chart.name} stackId="bar">
           {chart.data.map((_: TChartData, index: number) => (

@@ -607,6 +607,11 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
+type TActiveChart = {
+  name: string;
+  data: [];
+};
+
 //// EVENTS
 
 type TError = {
@@ -758,6 +763,13 @@ export enum VaultTypes {
   MultiVault = "MultiVault",
 }
 
+export enum TimelineTypes {
+  Day = "DAY",
+  Week = "WEEK",
+  Month = "MONTH",
+  Year = "YEAR",
+}
+
 export type {
   TPlatformData,
   TInitParams,
@@ -844,4 +856,5 @@ export type {
   TMetaVaults,
   TEndMetaVaults,
   TMarketInfo,
+  TActiveChart,
 };

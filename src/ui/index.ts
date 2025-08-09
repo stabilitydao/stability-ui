@@ -53,6 +53,8 @@ import { ActionButton } from "./ActionButton";
 
 import { Socials } from "./Socials";
 
+import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
+
 export {
   Toast,
   TextModal,
@@ -99,4 +101,7 @@ export {
   FarmingTable,
   Socials,
   APRModal,
+  AxisTick,
+  ChartTooltip,
+  ChartTimelineSwitcher,
 };

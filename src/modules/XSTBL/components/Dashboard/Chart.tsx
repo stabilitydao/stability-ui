@@ -13,104 +13,77 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import { AxisTick, ChartTooltip } from "@ui";
+
 import { formatNumber } from "@utils";
 
-import type { TChartPayload } from "@types";
+import { MONTHS } from "@constants";
 
-const CustomizedAxisTick = ({
-  x,
-  y,
-  payload,
-  fontSize,
-}: {
-  x: number;
-  y: number;
-  payload: TChartPayload;
-  fontSize: number;
-}) => {
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={10}
-        textAnchor="middle"
-        fill="#8d8e96"
-        fontSize={fontSize}
-      >
-        {payload.value}
-      </text>
-    </g>
-  );
-};
-const CustomTooltip = ({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: TChartPayload[];
-}) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-[#1c1c23] text-[#fff] rounded-md text-[14px]">
-        <div className="px-5 py-3">
-          <p>xSTBL: {formatNumber(payload[0].payload.value, "abbreviate")}</p>
-          <p>Date: {payload[0].payload.timestamp}</p>
-        </div>
-      </div>
-    );
-  }
+type ChartDataPoint = {
+  timestamp: string;
+  value: number;
+  date: string;
 };
 
 const Chart = (): JSX.Element => {
-  const WIDTH = 500;
-
   const $apiData = useStore(apiData);
-
+  const [data, setData] = useState<ChartDataPoint[]>([]);
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(100);
 
-  const [data, setData] = useState<{ timestamp: string; value: string }[]>([]);
-
-  const initChart = () => {
-    if (Object.entries($apiData?.revenueChart).length) {
-      const _data = Object.entries($apiData.revenueChart).map(
-        ([timestamp, value]) => {
-          const date = new Date(Number(timestamp) * 1000);
-
-          const day = date.getDate();
-          const month = date.getMonth() + 1;
-          const formattedDate = `${day.toString().padStart(2, "0")}.${month
-            .toString()
-            .padStart(2, "0")}`;
-
-          return { timestamp: formattedDate, value };
-        }
-      );
-
-      let min: number = Math.min(..._data.map((item) => Number(item.value)));
-      let max: number = Math.max(..._data.map((item) => Number(item.value)));
-
-      let difference = (max - min) / 10;
-
-      min = Number((min - difference).toFixed(4));
-      max = Number((max + difference).toFixed(4));
-
-      if (min < 0) min = 0;
-
-      setMinValue(min);
-      setMaxValue(max);
-      setData(_data);
-    }
-  };
-
   useEffect(() => {
-    initChart();
-  }, []);
+    const chart = $apiData?.revenueChart;
+    if (!chart || !Object.keys(chart).length) return;
+
+    const _data = Object.entries(chart).map(([timestamp, value]) => {
+      const dateObj = new Date(Number(timestamp) * 1000);
+      const day = dateObj.getDate().toString().padStart(2, "0");
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+      const formattedDate = `${day}.${month}`;
+
+      const monthName = MONTHS[dateObj.getMonth()];
+      const formattedTime = `${monthName} ${day}, ${dateObj.getFullYear()} ${dateObj.toLocaleString(
+        "en-US",
+        { hour: "numeric", minute: "numeric", hour12: true }
+      )}`;
+
+      return {
+        timestamp: formattedDate,
+        value: Number(value),
+        date: formattedTime,
+      };
+    });
+
+    if (!_data.length) return;
+
+    const values = _data.map((d) => d.value);
+
+    const min = Math.max(
+      0,
+      Number(
+        (
+          Math.min(...values) -
+          (Math.max(...values) - Math.min(...values)) / 10
+        ).toFixed(4)
+      )
+    );
+
+    const max = Number(
+      (
+        Math.max(...values) +
+        (Math.max(...values) - Math.min(...values)) / 10
+      ).toFixed(4)
+    );
+
+    setData(_data);
+    setMinValue(min);
+    setMaxValue(max);
+  }, [$apiData]);
+
   return (
-    <div className="bg-[#101012] rounded-xl border border-[#23252A] min-h-[150px] md:min-h-full">
+    <div className="bg-[#101012] rounded-xl border border-[#23252A] min-h-[150px] md:min-h-full max-h-[300px]">
       <ResponsiveContainer width="100%" height="100%" className="p-4">
-        <AreaChart width={WIDTH} height={260} data={data} margin={{ left: 0 }}>
+        <AreaChart width={500} height={260} data={data} margin={{ left: 0 }}>
           <defs>
             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
               <stop offset={0} stopColor="#1A2A84" stopOpacity={1} />
@@ -126,7 +99,7 @@ const Chart = (): JSX.Element => {
             dataKey="timestamp"
             tickLine={false}
             tick={({ x, y, payload }) => (
-              <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
+              <AxisTick x={x} y={y} payload={payload} fontSize={12} />
             )}
             style={{ fill: "#97979A" }}
           />
@@ -144,7 +117,7 @@ const Chart = (): JSX.Element => {
             }}
             mirror={true}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<ChartTooltip type="xSTBL" />} />
           <Area
             type="monotone"
             dataKey="value"

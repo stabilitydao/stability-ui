@@ -330,8 +330,8 @@ const Dashboard = (): JSX.Element => {
             <Skeleton height={48} width={130} />
           )}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:col-span-2">
+        <div className="grid grid-cols-1 min-[1080px]:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
               <span className="text-[18px] leading-6 font-semibold">
                 Vault fees

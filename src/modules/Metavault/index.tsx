@@ -6,6 +6,7 @@ import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
 import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
+import { Chart } from "./components/Chart";
 
 import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
@@ -470,6 +471,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               setPagination={setPagination}
             />
           </div>
+          <Chart symbol={symbol as string} />
         </div>
 
         <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
