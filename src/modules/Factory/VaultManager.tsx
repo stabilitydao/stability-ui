@@ -17,8 +17,11 @@ import {
 } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
-import { getAddress, parseUnits, createPublicClient, http } from "viem";
+import { getAddress, parseUnits, createPublicClient, http, zeroAddress } from "viem";
 import { sonic } from "viem/chains";
+
+import { strategies /*, tokenlist */ } from "@stabilitydao/stability";
+import { Checkbox } from "@ui";
 
 import type { TAddress } from "@types";
 
@@ -106,7 +109,7 @@ const VaultManager = (): JSX.Element => {
 
   const [editFarm, setEditFarm] = useState<EditFarm>({
     status: 0n,
-    pool: "",
+    pool: zeroAddress,
     strategyLogicId: "",
     rewardAssets: [],
     addresses: [],
@@ -298,6 +301,24 @@ const VaultManager = (): JSX.Element => {
     }
   };
 
+  // Add farm: improvements
+  const statusOptions = [
+    { value: 0, label: "0 - ok" },
+    { value: 1, label: "1 - no rewards" },
+    { value: 2, label: "2 - deprecated" },
+    { value: 5, label: "5 - unbacked underlying" },
+  ];
+
+  const [isLPStrategy, setIsLPStrategy] = useState(false);
+
+  const liveFarmingStrategies = Object.values(strategies).filter(
+    (strategy) =>
+      strategy.state === "LIVE" &&
+      strategy.baseStrategies.some((b) => b === "Farming")
+  );
+  // TODO: remove coonsole.logs
+  console.log("strategies:", strategies.SF);
+
   useEffect(() => {
     setValues({});
     setNewProportionInput("");
@@ -445,33 +466,56 @@ const VaultManager = (): JSX.Element => {
           <div className="grid gap-3 mb-4">
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
               Status
-              <input
+              <select
                 value={editFarm.status.toString()}
                 onChange={(e) =>
                   handleFarmInputChange("status", BigInt(e.target.value))
                 }
-                className="bg-transparent text-2xl font-semibold outline-none w-full"
-              />
+                className="bg-[#1B1D21] text-2xl font-semibold outline-none transition-all w-full"
+              >
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
-            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              Pool Address
-              <input
-                value={editFarm.pool}
+            <label className="bg-[#1B1D21] p-4 rounded-lg flex items-center gap-2 border border-[#23252A]">
+              <Checkbox
+                checked={isLPStrategy}
                 onChange={(e) =>
-                  handleFarmInputChange("pool", e.target.value as TAddress)
+                  setIsLPStrategy(e.target.checked)
                 }
-                className="bg-transparent text-2xl font-semibold outline-none w-full"
               />
+              <span>LP Strategy</span>
             </label>
+            {isLPStrategy && (
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+                Pool Address
+                <input
+                  value={editFarm.pool}
+                  onChange={(e) =>
+                    handleFarmInputChange("pool", e.target.value as TAddress)
+                  }
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            )}
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
               Strategy Logic ID
-              <input
+              <select
                 value={editFarm.strategyLogicId}
                 onChange={(e) =>
                   handleFarmInputChange("strategyLogicId", e.target.value)
                 }
-                className="bg-transparent text-2xl font-semibold outline-none w-full"
-              />
+                className="bg-[#1B1D21] text-2xl font-semibold outline-none transition-all w-full"
+              >
+                {liveFarmingStrategies.map((option) => (
+                  <option key={option.shortId} value={option.id}>
+                    {option.id}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
