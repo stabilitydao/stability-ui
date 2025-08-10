@@ -20,8 +20,9 @@ import { VAULTS_WITH_NAME } from "@constants";
 import { getAddress, parseUnits, createPublicClient, http, zeroAddress } from "viem";
 import { sonic } from "viem/chains";
 
-import { strategies /*, tokenlist */ } from "@stabilitydao/stability";
+import { strategies } from "@stabilitydao/stability";
 import { Checkbox } from "@ui";
+import { TokenSelectorModal, Token } from "@components/TokenSelectorModal";
 
 import type { TAddress } from "@types";
 
@@ -316,8 +317,31 @@ const VaultManager = (): JSX.Element => {
       strategy.state === "LIVE" &&
       strategy.baseStrategies.some((b) => b === "Farming")
   );
-  // TODO: remove coonsole.logs
-  console.log("strategies:", strategies.SF);
+
+  const [showTokenModal, setShowTokenModal] = useState(false);
+  const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
+
+  const addToken = (token: Token) => {
+    if (!rewardAssets.find((t: Token) => t.address === token.address)) {
+      const newAssets = [...rewardAssets, token];
+      setRewardAssets(newAssets);
+
+      handleFarmInputChange(
+        "rewardAssets",
+        newAssets.map((t) => t.address) as TAddress[]
+      );
+    }
+  };
+
+  const removeToken = (tokenAddress: string) => {
+    const newAssets = rewardAssets.filter((t: Token) => t.address !== tokenAddress);
+    setRewardAssets(newAssets);
+
+    handleFarmInputChange(
+      "rewardAssets",
+      newAssets.map((t) => t.address) as TAddress[]
+    );
+  };
 
   useEffect(() => {
     setValues({});
@@ -334,6 +358,13 @@ const VaultManager = (): JSX.Element => {
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full">
+      <TokenSelectorModal
+        open={showTokenModal}
+        onClose={() => setShowTokenModal(false)}
+        onSelect={(token) => {
+          addToken(token);
+        }}
+      />
       <div className="bg-[#18191C] border border-[#232429] rounded-lg p-4 flex flex-col gap-4 w-[800px]">
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
           <span
@@ -518,19 +549,45 @@ const VaultManager = (): JSX.Element => {
               </select>
             </label>
 
-            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-              Reward Assets (comma-separated)
-              <input
-                value={editFarm.rewardAssets.join(",")}
-                onChange={(e) =>
-                  handleFarmInputChange(
-                    "rewardAssets",
-                    e.target.value.split(",").map((s) => s.trim()) as TAddress[]
-                  )
-                }
-                className="bg-transparent text-2xl font-semibold outline-none w-full"
-              />
-            </label>
+            <div className="bg-[#1B1D21] p-4 rounded-lg border border-[#23252A]">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-white">Reward Assets</span>
+                <button
+                  onClick={() => setShowTokenModal(true)}
+                  className="flex items-center gap-2 px-3 py-1 bg-[#2A2C31] text-white rounded-md hover:bg-[#35373C] transition-colors border border-[#3A3C41]"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span className="text-sm">Add Asset</span>
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {rewardAssets.map((token: Token) => (
+                  <div
+                    key={token.address}
+                    className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
+                  >
+                    <img src={token.logoURI} alt={token.symbol} className="w-5 h-5 rounded-full" />
+                    <span className="text-sm font-medium">{token.symbol}</span>
+                    <button
+                      onClick={() => removeToken(token.address)}
+                      className="text-gray-400 hover:text-red-400 transition-colors duration-150"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
               Addresses (comma-separated)
