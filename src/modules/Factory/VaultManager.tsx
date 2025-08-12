@@ -17,12 +17,12 @@ import {
 } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
-import { getAddress, parseUnits, createPublicClient, http, zeroAddress } from "viem";
+import { getAddress, parseUnits, createPublicClient, http, zeroAddress, Hash, TransactionReceipt } from "viem";
 import { sonic } from "viem/chains";
 
 import { strategies } from "@stabilitydao/stability";
 import { Checkbox } from "@ui";
-import { TokenSelectorModal, Token } from "@components/TokenSelectorModal";
+import { TokenSelectorModal, Token, TxStatusModal, TxStatus } from "@components/TokenSelectorModal";
 
 import type { TAddress } from "@types";
 
@@ -260,6 +260,10 @@ const VaultManager = (): JSX.Element => {
 
   const addFarm = async () => {
     try {
+      resetTxState();
+      setShowTxModal(true);
+      setTxStatus("wallet");
+
       const hash = await writeContract(wagmiConfig, {
         address: FARMS_FACTORY_ADDRESS,
         abi: FactoryABI,
@@ -267,8 +271,24 @@ const VaultManager = (): JSX.Element => {
         args: [[editFarm]],
       });
       console.log(hash);
+
+      setTxHash(hash);
+      setTxStatus("pending");
+
+      const receipt: TransactionReceipt =
+        await _publicClient.waitForTransactionReceipt({ hash });
+      if (receipt.status === "success") {
+        setTxStatus("success");
+      } else {
+        setTxStatus("error");
+        setTxError("Transaction reverted");
+      }
     } catch (err) {
       console.error("Transaction error", err);
+      setTxStatus("error");
+      setTxError(
+        err instanceof Error ? err.message : "Unexpected error. Check console."
+      );
     }
   };
 
@@ -320,6 +340,18 @@ const VaultManager = (): JSX.Element => {
 
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
+  const [txStatus, setTxStatus] = useState<TxStatus>("idle");
+  const [txHash, setTxHash] = useState<Hash | null>(null);
+  const [txError, setTxError] = useState<string | null>(null);
+  const [showTxModal, setShowTxModal] = useState(false);
+
+  /* ───────── helpers ───────── */
+  const resetTxState = () => {
+    setTxStatus("idle");
+    setTxHash(null);
+    setTxError(null);
+    setShowTxModal(false)
+  };
 
   const addToken = (token: Token) => {
     if (!rewardAssets.find((t: Token) => t.address === token.address)) {
@@ -364,6 +396,13 @@ const VaultManager = (): JSX.Element => {
         onSelect={(token) => {
           addToken(token);
         }}
+      />
+      <TxStatusModal
+        open={showTxModal}
+        status={txStatus}
+        hash={txHash}
+        error={txError}
+        onClose={resetTxState}
       />
       <div className="bg-[#18191C] border border-[#232429] rounded-lg p-4 flex flex-col gap-4 w-[800px]">
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">

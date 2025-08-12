@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { tokenlist as tokenlistAll } from "@stabilitydao/stability";
+import type { Hash } from "viem";
 
-export const shorten = (addr: string) => `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+export const shorten = (addr: string): string => `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 
 export type ModalProps = {
     open: boolean;
@@ -9,9 +10,9 @@ export type ModalProps = {
     children: React.ReactNode;
 };
 
-export const Modal = ({ open, onClose, children }: ModalProps) =>
+export const Modal = ({ open, onClose, children }: ModalProps): JSX.Element | null =>
     open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm mt-28">
             <div className="relative w-full max-w-lg rounded-lg bg-[#111114] border border-[#232429] p-6 shadow-2xl">
                 <button
                     onClick={onClose}
@@ -38,7 +39,7 @@ export const TokenSelectorModal = ({
     open,
     onClose,
     onSelect,
-}: TokenSelectorModalProps) => {
+}: TokenSelectorModalProps): JSX.Element => {
     const [query, setQuery] = useState("");
 
     type AssetPriceEntry = {
@@ -111,6 +112,82 @@ export const TokenSelectorModal = ({
                     <p className="text-center text-sm text-[#97979A]">No results</p>
                 )}
             </div>
+        </Modal>
+    );
+};
+
+export type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
+
+export type TxStatusModalProps = {
+    open: boolean;
+    status: TxStatus;
+    hash?: Hash | null;
+    error?: string | null;
+    onClose: () => void;
+};
+
+export const TxStatusModal = ({
+    open,
+    status,
+    hash,
+    error,
+    onClose,
+}: TxStatusModalProps): JSX.Element | null => {
+    if (status === "idle") return null;
+
+    const content: JSX.Element = (() => {
+        switch (status) {
+            case "wallet":
+                return (
+                    <div className="py-5">
+                        Please confirm the transaction in your wallet…
+                    </div>
+                );
+            case "pending":
+                return (
+                    <>
+                        <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
+                        {hash && (
+                            <a
+                                href={`https://sonicscan.org/tx/${hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[#97979A]"
+                            >
+                                View on explorer
+                            </a>
+                        )}
+                    </>
+                );
+            case "success":
+                return (
+                    <>
+                        <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
+                        {hash && (
+                            <a
+                                href={`https://sonicscan.org/tx/${hash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[#97979A]"
+                            >
+                                View on explorer
+                            </a>
+                        )}
+                    </>
+                );
+            case "error":
+                return (
+                    <>
+                        <p className="mb-2 text-red-400">❌ Transaction failed.</p>
+                        {error && <pre className="max-w-full whitespace-pre-wrap break-all text-xs">{error}</pre>}
+                    </>
+                );
+        }
+    })();
+
+    return (
+        <Modal open={open} onClose={onClose}>
+            <div className="space-y-2 text-neutral-50">{content}</div>
         </Modal>
     );
 };
