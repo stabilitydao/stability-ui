@@ -204,7 +204,14 @@ const Farms = (): JSX.Element => {
         setIsAdding(true);
     };
 
-    const handleInputChange = (field: keyof Farm, value: any) => {
+    // TODO remove
+    
+    // const handleInputChange = (field: keyof Farm, value: any) => {
+    //     if (!editFarm) return;
+    //     setEditFarm({ ...editFarm, [field]: value });
+    // };
+
+    const handleInputChange = <K extends keyof Farm>(field: K, value: Farm[K]) => {
         if (!editFarm) return;
         setEditFarm({ ...editFarm, [field]: value });
     };

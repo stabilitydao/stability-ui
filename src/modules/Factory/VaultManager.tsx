@@ -21,7 +21,7 @@ import { getAddress, parseUnits, createPublicClient, http, zeroAddress, Hash, Tr
 import { sonic } from "viem/chains";
 
 import { strategies } from "@stabilitydao/stability";
-import { Checkbox } from "@ui";
+import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
 import { TokenSelectorModal, Token, TxStatusModal, TxStatus } from "@components/TokenSelectorModal";
 
 import type { TAddress } from "@types";
@@ -324,10 +324,10 @@ const VaultManager = (): JSX.Element => {
 
   // Add farm: improvements
   const statusOptions = [
-    { value: 0, label: "0 - ok" },
-    { value: 1, label: "1 - no rewards" },
-    { value: 2, label: "2 - deprecated" },
-    { value: 5, label: "5 - unbacked underlying" },
+    { value: 0, label: "ok" },
+    { value: 1, label: "no rewards" },
+    { value: 2, label: "deprecated" },
+    { value: 5, label: "unbacked underlying" },
   ];
 
   const [isLPStrategy, setIsLPStrategy] = useState(false);
@@ -337,6 +337,10 @@ const VaultManager = (): JSX.Element => {
       strategy.state === "LIVE" &&
       strategy.baseStrategies.some((b) => b === "Farming")
   );
+
+  function getStrategyById(id: string) {
+    return liveFarmingStrategies.find(strategy => strategy.id === id);
+  }
 
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
@@ -545,19 +549,10 @@ const VaultManager = (): JSX.Element => {
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {option.label.toUpperCase()}
                   </option>
                 ))}
               </select>
-            </label>
-            <label className="bg-[#1B1D21] p-4 rounded-lg flex items-center gap-2 border border-[#23252A]">
-              <Checkbox
-                checked={isLPStrategy}
-                onChange={(e) =>
-                  setIsLPStrategy(e.target.checked)
-                }
-              />
-              <span>LP Strategy</span>
             </label>
             {isLPStrategy && (
               <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
@@ -575,9 +570,13 @@ const VaultManager = (): JSX.Element => {
               Strategy Logic ID
               <select
                 value={editFarm.strategyLogicId}
-                onChange={(e) =>
-                  handleFarmInputChange("strategyLogicId", e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  handleFarmInputChange("strategyLogicId", value);
+                  setIsLPStrategy(
+                    getStrategyById(value)?.baseStrategies.includes(BaseStrategy.LP) ?? false
+                  );
+                }}
                 className="bg-[#1B1D21] text-2xl font-semibold outline-none transition-all w-full"
               >
                 {liveFarmingStrategies.map((option) => (
