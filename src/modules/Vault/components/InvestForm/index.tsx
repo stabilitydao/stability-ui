@@ -2192,7 +2192,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const zapSoon = false; //vault?.strategyInfo?.shortId === "ISF";
 
   return (
-    <div className="bg-[#111114] relative rounded-lg w-full h-[462px] md:w-[420px] font-manrope">
+    <div className="bg-[#101012] border border-[#23252A] p-6 relative rounded-lg w-full h-[462px] md:w-[420px] font-manrope">
       <TabSwitcher
         activeTab={tab}
         setActiveTab={setTab}
@@ -2202,22 +2202,22 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       <form
         autoComplete="off"
-        className="w-full p-6 flex flex-col gap-[10px] min-w-full md:min-w-[420px]"
+        className="w-full py-6 flex flex-col gap-[10px] min-w-full"
       >
-        <div className="flex items-center justify-between gap-2 md:justify-normal md:gap-4 relative pb-[12px] max-w-full">
+        <div className="flex items-end justify-between gap-2 md:justify-normal relative pb-[12px] max-w-full">
           {optionTokens && (
             <div
-              className="relative select-none w-full max-w-[320px] md:w-[290px] text-neutral-50 text-[14px]"
+              className="relative select-none w-full max-w-[320px] text-[#909193] text-[14px]"
               ref={tokenSelectorRef}
             >
-              <div className="flex uppercase text-[12px] leading-3 text-neutral-500 mb-0 md:mb-0">
+              <div className="flex text-[12px] leading-3 mb-1">
                 Select token
               </div>
               <div
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-2 rounded-lg px-4 h-[36px] my-[2px] bg-[#1b1d21] text-[14px] md:text-[16px] cursor-pointer max-w-[320px]"
+                className="flex items-center justify-between gap-2 rounded-lg px-3 h-10 bg-[#1b1e23] border border-[#35363B] text-[14px] md:text-[16px] cursor-pointer max-w-[320px]"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -2226,14 +2226,14 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                         (logo: string, index: number) => (
                           <img
                             key={`activeOption-${index}-${logo}`}
-                            className={`w-6 h-6 ${logo.slice(-14) == "beethovenx.png" ? "" : "rounded-full"}`}
+                            className={`w-[18px] h-[18px] ${logo.slice(-14) == "beethovenx.png" ? "" : "rounded-full"}`}
                             src={logo}
                             alt="logo"
                           />
                         )
                       )}
                   </div>
-                  <p className="whitespace-nowrap">
+                  <p className="whitespace-nowrap text-white">
                     {activeOptionToken?.symbol}
                   </p>
                 </div>
@@ -2247,7 +2247,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </div>
 
               <div
-                className={`bg-[#1b1d21] mt-2 rounded-lg w-full z-30 text-[12px] md:text-[14px] ${
+                className={`bg-[#1c1d1f] border border-[#383B42] mt-2 rounded-lg w-full z-30 text-[12px] md:text-[14px] ${
                   tokenSelector ? "absolute transition delay-[50ms]" : "hidden"
                 } `}
               >
@@ -2357,29 +2357,35 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           )}
 
           {$connected && (
-            <div className="flex items-center gap-5 pt-[12px]">
-              <img
-                className={`${
-                  isRefresh
-                    ? "cursor-pointer opacity-100"
-                    : "cursor-default opacity-30"
-                } transition-transform duration-500`}
-                style={{ transform: `rotate(${rotation}deg)` }}
+            <div className="flex items-center gap-2">
+              <div
+                className="h-10 w-10 flex items-center justify-center bg-[#1D1E23] rounded-lg border border-[#35363B] cursor-pointer"
                 onClick={refreshData}
-                src="/refresh.svg"
-                alt="refresh"
-                title="refresh"
-              />
+              >
+                <img
+                  className={`${
+                    isRefresh ? "opacity-100" : "opacity-30"
+                  } transition-transform duration-500`}
+                  style={{ transform: `rotate(${rotation}deg)` }}
+                  src="/icons/refresh.svg"
+                  alt="refresh"
+                  title="refresh"
+                />
+              </div>
 
-              <img
-                className={`settingsModal cursor-pointer transition-transform transform ${
-                  settingsModal ? "rotate-180" : "rotate-0"
-                }`}
+              <div
+                className="settingsModal h-10 w-10 flex items-center justify-center bg-[#1D1E23] rounded-lg border border-[#35363B] cursor-pointer"
                 onClick={() => setSettingsModal((prev) => !prev)}
-                src="/settings.svg"
-                alt="settings"
-                title="settings"
-              />
+              >
+                <img
+                  className={`settingsModal transition-transform transform ${
+                    settingsModal ? "rotate-180" : "rotate-0"
+                  }`}
+                  src="/icons/settings.svg"
+                  alt="settings"
+                  title="settings"
+                />
+              </div>
             </div>
           )}
 

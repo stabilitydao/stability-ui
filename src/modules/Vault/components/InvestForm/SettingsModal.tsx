@@ -51,12 +51,12 @@ const SettingsModal: React.FC<IProps> = ({
   return (
     <div
       ref={modalRef}
-      className="bg-[#111114] absolute w-[250px] min-h-[150px] z-20 top-[50px] right-0 rounded-md text-[18px]"
+      className=" bg-[#1c1d1f] border border-[#383B42] absolute w-[250px] min-h-[150px] z-20 top-[60px] right-0 rounded-md text-[18px]"
     >
-      <div className="p-3 flex flex-col items-start gap-4">
+      <div className="p-3 flex flex-col items-start gap-2">
         <div>
-          <p className="uppercase text-[12px] leading-3 text-neutral-500 mb-2">
-            SLIPPAGE (%)
+          <p className="text-[12px] leading-3 text-[#909193] mb-1">
+            Slippage (%)
           </p>
           <div className="flex items-center gap-2">
             <input
@@ -85,9 +85,7 @@ const SettingsModal: React.FC<IProps> = ({
           </div>
         </div>
         <div>
-          <p className="uppercase text-[12px] leading-3 text-neutral-500 mb-2">
-            APPROVES
-          </p>
+          <p className="text-[12px] leading-3 text-[#909193] mb-1">Approves</p>
           <div className="flex items-center gap-2">
             {TRANSACTION_SETTINGS.approves.map((value) => (
               <div
@@ -105,8 +103,8 @@ const SettingsModal: React.FC<IProps> = ({
           </div>
         </div>
         <div>
-          <p className="uppercase text-[12px] leading-3 text-neutral-500 mb-2">
-            GAS LIMIT MULTIPLIER
+          <p className="text-[12px] leading-3 text-[#909193] mb-1">
+            Gas Limit Multiplier
           </p>
           <div className="flex items-center gap-2">
             {TRANSACTION_SETTINGS.gasLimits.map((value) => (

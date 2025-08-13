@@ -130,13 +130,13 @@ const VaultManager = (): JSX.Element => {
 
   const setProportion = async () => {
     try {
-      const bitIntValues = Object.values(values).map((v) => parseUnits(v, 16));
+      const bigIntValues = Object.values(values).map((v) => parseUnits(v, 16));
 
       const _action = await writeContract(wagmiConfig, {
         address: currentMetaVault.address,
         abi: IMetaVaultABI,
         functionName: "setTargetProportions",
-        args: [bitIntValues],
+        args: [bigIntValues],
       });
 
       console.log(_action);
@@ -299,7 +299,18 @@ const VaultManager = (): JSX.Element => {
   };
 
   useEffect(() => {
-    setValues({});
+    if (currentMetaVault?.vaultsData) {
+      const zeroValues = currentMetaVault.vaultsData.reduce(
+        (acc, { address }) => {
+          acc[address] = "0";
+          return acc;
+        },
+        {}
+      );
+
+      setValues(zeroValues);
+    }
+
     setNewProportionInput("");
     setVaultInput("");
     setAddVaultData({ ...addVaultData, isActive: false });

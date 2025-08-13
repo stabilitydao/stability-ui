@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { AxisTick, ChartTooltip } from "@ui";
+import { AxisTick, ChartTooltip, ChartSkeleton } from "@ui";
 
 import { formatNumber } from "@utils";
 
@@ -82,55 +82,59 @@ const Chart = (): JSX.Element => {
 
   return (
     <div className="bg-[#101012] rounded-xl border border-[#23252A] min-h-[150px] md:min-h-full max-h-[300px]">
-      <ResponsiveContainer width="100%" height="100%" className="p-4">
-        <AreaChart width={500} height={260} data={data} margin={{ left: 0 }}>
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset={0} stopColor="#1A2A84" stopOpacity={1} />
-              <stop offset={1} stopColor="#0c0c1b" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            strokeDasharray="5 5"
-            stroke="#23252a"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="timestamp"
-            tickLine={false}
-            tick={({ x, y, payload }) => (
-              <AxisTick x={x} y={y} payload={payload} fontSize={12} />
-            )}
-            style={{ fill: "#97979A" }}
-          />
-          <YAxis
-            domain={[minValue, maxValue]}
-            tickFormatter={(value) =>
-              value === 0 ? "" : `${formatNumber(value, "chartAbbreviate")}`
-            }
-            width={10}
-            tickLine={false}
-            axisLine={false}
-            style={{
-              fill: "#97979A",
-              fontSize: "12px",
-            }}
-            mirror={true}
-          />
-          <Tooltip content={<ChartTooltip type="xSTBL" />} />
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke="#5E6AD2"
-            strokeWidth="2"
-            fill="url(#colorUv)"
-            points={data.map((entry) => ({
-              x: entry?.timestamp,
-              y: entry?.value,
-            }))}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {!!data.length ? (
+        <ResponsiveContainer width="100%" height="100%" className="p-4">
+          <AreaChart width={500} height={260} data={data} margin={{ left: 0 }}>
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset={0} stopColor="#1A2A84" stopOpacity={1} />
+                <stop offset={1} stopColor="#0c0c1b" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              strokeDasharray="5 5"
+              stroke="#23252a"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="timestamp"
+              tickLine={false}
+              tick={({ x, y, payload }) => (
+                <AxisTick x={x} y={y} payload={payload} fontSize={12} />
+              )}
+              style={{ fill: "#97979A" }}
+            />
+            <YAxis
+              domain={[minValue, maxValue]}
+              tickFormatter={(value) =>
+                value === 0 ? "" : `${formatNumber(value, "chartAbbreviate")}`
+              }
+              width={10}
+              tickLine={false}
+              axisLine={false}
+              style={{
+                fill: "#97979A",
+                fontSize: "12px",
+              }}
+              mirror={true}
+            />
+            <Tooltip content={<ChartTooltip type="xSTBL" />} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#5E6AD2"
+              strokeWidth="2"
+              fill="url(#colorUv)"
+              points={data.map((entry) => ({
+                x: entry?.timestamp,
+                y: entry?.value,
+              }))}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : (
+        <ChartSkeleton />
+      )}
     </div>
   );
 };

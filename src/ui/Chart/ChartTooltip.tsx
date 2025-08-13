@@ -28,7 +28,7 @@ const ChartTooltip = ({
       case "APR":
         return (
           <p>
-            {APRType ?? "APR"}: ${payload[0].value}%
+            {APRType ?? "APR"}: {payload[0].value}%
           </p>
         );
       case "xSTBL":

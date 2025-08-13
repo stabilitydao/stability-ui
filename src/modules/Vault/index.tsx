@@ -15,7 +15,7 @@ import { UnderlyingALM } from "./components/UnderlyingALM";
 import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, FullPageLoader, ErrorMessage } from "@ui";
+import { FullPageLoader, ErrorMessage } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -59,8 +59,6 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           <VaultBar vault={localVault} />
           <div className="flex items-center justigy-center w-full flex-col xl:flex-row">
             <InfoBar network={network} vault={localVault} />
-
-            <Toast network={network} />
 
             <div className="flex flex-col gap-5 xl:hidden my-5 w-full">
               <InvestForm network={network} vault={localVault} />

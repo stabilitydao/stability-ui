@@ -6,6 +6,7 @@ import { Header} from "@components/Header"
 import { Navbar } from "@components/Navbar";
 import { Menu } from "@components/Menu"
 import { Disclaimer } from "@components/Disclaimer";
+import { Toast } from "../ui/Toast"
 
 interface IProps {
   title: string;
@@ -77,6 +78,7 @@ const {
 				</main>
 			</div>
 			<Disclaimer client:only="react"/>
+			<Toast client:only="react" />
 		</div>
     </App>
   </body>
