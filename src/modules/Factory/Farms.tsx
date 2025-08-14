@@ -159,8 +159,7 @@ const Farms = (): JSX.Element => {
         setTxStatus("idle");
         setTxHash(null);
         setTxError(null);
-        setShowModal(false); // Close edit modal before showing TxStatus
-        setShowModal(false); // Close modal when tx modal closes
+        setShowModal(false);
     };
 
     const tokenlist = tokenlistAll.tokens.filter((token) => token.chainId === 146);
@@ -203,13 +202,6 @@ const Farms = (): JSX.Element => {
         setShowModal(true);
         setIsAdding(true);
     };
-
-    // TODO remove
-    
-    // const handleInputChange = (field: keyof Farm, value: any) => {
-    //     if (!editFarm) return;
-    //     setEditFarm({ ...editFarm, [field]: value });
-    // };
 
     const handleInputChange = <K extends keyof Farm>(field: K, value: Farm[K]) => {
         if (!editFarm) return;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { metaVaults, platformsData, vaults } from "@store";
+import { metaVaults, platformsData, vaults, account } from "@store";
 import { cn } from "@utils";
 
 import { writeContract } from "@wagmi/core";
@@ -40,6 +40,7 @@ const VaultManager = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $platformsData = useStore(platformsData);
+  const $account = useStore(account);
 
   const _publicClient = createPublicClient({
     chain: sonic,
@@ -264,6 +265,27 @@ const VaultManager = (): JSX.Element => {
       setShowTxModal(true);
       setTxStatus("wallet");
 
+      // Simulation
+      try {
+        await _publicClient.simulateContract({
+          address: FARMS_FACTORY_ADDRESS,
+          abi: FactoryABI,
+          functionName: "addFarms",
+          args: [[editFarm]],
+          account: $account as TAddress,
+        });
+      } catch (simErr) {
+        console.error("Simulation failed", simErr);
+        setTxStatus("error");
+        setTxError(
+          simErr instanceof Error
+            ? simErr.message
+            : "Simulation failed: possible revert or bad parameters."
+        );
+        return;
+      }
+
+      // Actual transaction (only runs if simulation succeeded)
       const hash = await writeContract(wagmiConfig, {
         address: FARMS_FACTORY_ADDRESS,
         abi: FactoryABI,
@@ -349,12 +371,11 @@ const VaultManager = (): JSX.Element => {
   const [txError, setTxError] = useState<string | null>(null);
   const [showTxModal, setShowTxModal] = useState(false);
 
-  /* ───────── helpers ───────── */
   const resetTxState = () => {
     setTxStatus("idle");
     setTxHash(null);
     setTxError(null);
-    setShowTxModal(false)
+    setShowTxModal(false);
   };
 
   const addToken = (token: Token) => {
@@ -545,7 +566,7 @@ const VaultManager = (): JSX.Element => {
                 onChange={(e) =>
                   handleFarmInputChange("status", BigInt(e.target.value))
                 }
-                className="bg-[#1B1D21] text-2xl font-semibold outline-none transition-all w-full"
+                className="bg-[#1B1D21] text-xl font-semibold outline-none transition-all w-full"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -577,7 +598,7 @@ const VaultManager = (): JSX.Element => {
                     getStrategyById(value)?.baseStrategies.includes(BaseStrategy.LP) ?? false
                   );
                 }}
-                className="bg-[#1B1D21] text-2xl font-semibold outline-none transition-all w-full"
+                className="bg-[#1B1D21] text-xl font-semibold outline-none transition-all w-full"
               >
                 {liveFarmingStrategies.map((option) => (
                   <option key={option.shortId} value={option.id}>

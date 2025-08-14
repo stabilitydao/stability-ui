@@ -13,7 +13,7 @@ export type ModalProps = {
 export const Modal = ({ open, onClose, children }: ModalProps): JSX.Element | null =>
     open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm mt-28">
-            <div className="relative w-full max-w-lg rounded-lg bg-[#111114] border border-[#232429] p-6 shadow-2xl">
+            <div className="relative w-full max-w-lg rounded-2xl bg-[#111114] border border-[#232429] p-6 shadow-2xl">
                 <button
                     onClick={onClose}
                     className="absolute right-4 top-4 text-4xl leading-none text-white hover:scale-110 transition"
