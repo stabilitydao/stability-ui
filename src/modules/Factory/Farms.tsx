@@ -499,7 +499,7 @@ const Farms = (): JSX.Element => {
                                         {rewardAssets.map((token: Token) => (
                                             <div
                                                 key={token.address}
-                                                className="flex items-center bg-blue-600 rounded-full px-3 py-1 gap-2 text-white"
+                                                className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
                                             >
                                                 <img src={token.logoURI} alt={token.symbol} className="w-5 h-5 rounded-full" />
                                                 <span className="text-sm font-medium">{token.symbol}</span>
