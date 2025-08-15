@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { HeadingText, FullPageLoader } from "@ui";
-import type { Address, Hash, TransactionReceipt } from "viem";
+import { Address, Hash, TransactionReceipt, zeroAddress } from "viem";
 import { getShortAddress } from "@utils";
 import { useStore } from "@nanostores/react";
 import { readContract, writeContract, waitForTransactionReceipt, simulateContract } from "@wagmi/core";
@@ -9,6 +9,9 @@ import { wagmiConfig, FactoryABI } from "@web3";
 import { connected, account, publicClient } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+import { strategies } from "@stabilitydao/stability";
+import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
+import { TokenSelectorModal, Token, TxStatusModal, TxStatus } from "@components/TokenSelectorModal";
 
 type Farm = {
     status: bigint;
@@ -24,7 +27,7 @@ const FARMS_FACTORY_ADDRESS: Address = "0xc184a3ECcA684F2621c903A7943D85fA42F566
 
 const defaultFarm: Farm = {
     status: 0n,
-    pool: "0x0000000000000000000000000000000000000000",
+    pool: zeroAddress,
     strategyLogicId: "",
     rewardAssets: [],
     addresses: [],
@@ -36,101 +39,101 @@ const defaultFarm: Farm = {
 /* Helper UI components – no external UI libraries required                */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-type ModalProps = {
-    open: boolean;
-    onClose: () => void;
-    children: React.ReactNode;
-};
-/** Generic centre‑screen modal */
-const Modal = ({ open, onClose, children }: ModalProps) =>
-    open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
-                <button
-                    onClick={onClose}
-                    className="absolute right-4 top-4 text-4xl leading-none transition hover:scale-110"
-                    aria-label="Close modal"
-                >
-                    &times;
-                </button>
-                {children}
-            </div>
-        </div>
-    ) : null;
+// type ModalProps = {
+//     open: boolean;
+//     onClose: () => void;
+//     children: React.ReactNode;
+// };
+// /** Generic centre‑screen modal */
+// const Modal = ({ open, onClose, children }: ModalProps) =>
+//     open ? (
+//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+//             <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
+//                 <button
+//                     onClick={onClose}
+//                     className="absolute right-4 top-4 text-4xl leading-none transition hover:scale-110"
+//                     aria-label="Close modal"
+//                 >
+//                     &times;
+//                 </button>
+//                 {children}
+//             </div>
+//         </div>
+//     ) : null;
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Transaction‑status modal                                                 */
-/* ────────────────────────────────────────────────────────────────────────── */
+// /* ────────────────────────────────────────────────────────────────────────── */
+// /* Transaction‑status modal                                                 */
+// /* ────────────────────────────────────────────────────────────────────────── */
 
-type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
+// type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
 
-type TxStatusModalProps = {
-    status: TxStatus;
-    hash?: Hash | null;
-    error?: string | null;
-    onClose: () => void;
-};
+// type TxStatusModalProps = {
+//     status: TxStatus;
+//     hash?: Hash | null;
+//     error?: string | null;
+//     onClose: () => void;
+// };
 
-const TxStatusModal = ({
-    status,
-    hash,
-    error,
-    onClose,
-}: TxStatusModalProps) => {
-    if (status === "idle") return null;
+// const TxStatusModal = ({
+//     status,
+//     hash,
+//     error,
+//     onClose,
+// }: TxStatusModalProps) => {
+//     if (status === "idle") return null;
 
-    const content = (() => {
-        switch (status) {
-            case "wallet":
-                return "Please confirm the transaction in your wallet…";
-            case "pending":
-                return (
-                    <>
-                        <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
-                        {hash && (
-                            <a
-                                href={`https://sonicscan.org/tx/${hash}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-accent-400 underline"
-                            >
-                                View on explorer
-                            </a>
-                        )}
-                    </>
-                );
-            case "success":
-                return (
-                    <>
-                        <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
-                        {hash && (
-                            <a
-                                href={`https://sonicscan.org/tx/${hash}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-accent-400 underline"
-                            >
-                                View on explorer
-                            </a>
-                        )}
-                    </>
-                );
-            case "error":
-                return (
-                    <>
-                        <p className="mb-2 text-red-400">❌ Transaction failed.</p>
-                        {error && <pre className="max-w-full whitespace-pre-wrap break-all text-xs">{error}</pre>}
-                    </>
-                );
-        }
-    })();
+//     const content = (() => {
+//         switch (status) {
+//             case "wallet":
+//                 return "Please confirm the transaction in your wallet…";
+//             case "pending":
+//                 return (
+//                     <>
+//                         <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
+//                         {hash && (
+//                             <a
+//                                 href={`https://sonicscan.org/tx/${hash}`}
+//                                 target="_blank"
+//                                 rel="noreferrer"
+//                                 className="text-accent-400 underline"
+//                             >
+//                                 View on explorer
+//                             </a>
+//                         )}
+//                     </>
+//                 );
+//             case "success":
+//                 return (
+//                     <>
+//                         <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
+//                         {hash && (
+//                             <a
+//                                 href={`https://sonicscan.org/tx/${hash}`}
+//                                 target="_blank"
+//                                 rel="noreferrer"
+//                                 className="text-accent-400 underline"
+//                             >
+//                                 View on explorer
+//                             </a>
+//                         )}
+//                     </>
+//                 );
+//             case "error":
+//                 return (
+//                     <>
+//                         <p className="mb-2 text-red-400">❌ Transaction failed.</p>
+//                         {error && <pre className="max-w-full whitespace-pre-wrap break-all text-xs">{error}</pre>}
+//                     </>
+//                 );
+//         }
+//     })();
 
-    return (
-        <Modal open onClose={onClose}>
-            <div className="space-y-2 text-neutral-50">{content}</div>
-        </Modal>
-    );
-};
+//     return (
+//         <Modal open onClose={onClose}>
+//             <div className="space-y-2 text-neutral-50">{content}</div>
+//         </Modal>
+//     );
+// };
 
 const Farms = (): JSX.Element => {
     /* ───────── stores / wallet ───────── */
@@ -160,6 +163,7 @@ const Farms = (): JSX.Element => {
         setTxHash(null);
         setTxError(null);
         setShowModal(false);
+        setShowTxModal(false);
     };
 
     const tokenlist = tokenlistAll.tokens.filter((token) => token.chainId === 146);
@@ -185,11 +189,65 @@ const Farms = (): JSX.Element => {
         }
     };
 
+    // Add farm: improvements
+    const statusOptions = [
+        { value: 0, label: "ok" },
+        { value: 1, label: "no rewards" },
+        { value: 2, label: "deprecated" },
+        { value: 5, label: "unbacked underlying" },
+    ];
+
+    const [isLPStrategy, setIsLPStrategy] = useState(false);
+
+    const liveFarmingStrategies = Object.values(strategies).filter(
+        (strategy) =>
+            strategy.state === "LIVE" &&
+            strategy.baseStrategies.some((b) => b === "Farming")
+    );
+
+    function getStrategyById(id: string) {
+        return liveFarmingStrategies.find(strategy => strategy.id === id);
+    }
+
+    const [showTokenModal, setShowTokenModal] = useState(false);
+    const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
+    const [showTxModal, setShowTxModal] = useState(false);
+
+    const addToken = (token: Token) => {
+        if (!rewardAssets.find((t: Token) => t.address === token.address)) {
+            const newAssets = [...rewardAssets, token];
+            setRewardAssets(newAssets);
+
+            handleInputChange(
+                "rewardAssets",
+                newAssets.map((t) => t.address) as Address[]
+            );
+        }
+    };
+
+    const removeToken = (tokenAddress: string) => {
+        const newAssets = rewardAssets.filter((t: Token) => t.address !== tokenAddress);
+        setRewardAssets(newAssets);
+
+        handleInputChange(
+            "rewardAssets",
+            newAssets.map((t) => t.address) as Address[]
+        );
+    };
+
+    function getTokensFromAddresses(addresses: string[]): Token[] {
+        return addresses
+            .map((addr) => tokenlist.find((token) => token.address.toLowerCase() === addr.toLowerCase()))
+            .filter((t): t is Token => t !== undefined);
+    }
+
     useEffect(() => {
         fetchFarms();
     }, []);
 
     const openEditModal = (farm: Farm, index: number) => {
+        const rewards = getTokensFromAddresses(farm.rewardAssets);
+        setRewardAssets(rewards);
         setEditFarm(farm);
         setEditIndex(index);
         setShowModal(true);
@@ -216,6 +274,7 @@ const Farms = (): JSX.Element => {
             return;
         }
 
+        setShowTxModal(true);
         setTxStatus("pending");
 
         try {
@@ -285,6 +344,7 @@ const Farms = (): JSX.Element => {
     return (
         <>
             <TxStatusModal
+                open={showTxModal}
                 status={txStatus}
                 hash={txHash}
                 error={txError}
@@ -361,11 +421,11 @@ const Farms = (): JSX.Element => {
                 {/* Modal */}
                 {showModal && editFarm && (
                     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-accent-900 p-6 rounded-xl max-w-[600px] w-full">
+                        <div className="bg-white dark:bg-accent-900 p-6 rounded-xl max-w-[600px] w-full mt-20">
                             <h2 className="text-xl font-semibold mb-4">{isAdding ? "Add Farm" : "Edit Farm"}</h2>
 
                             {/* Form Inputs */}
-                            <div className="grid gap-3 mb-4">
+                            {/* <div className="grid gap-3 mb-4">
                                 <input
                                     placeholder="Status"
                                     value={editFarm.status.toString()}
@@ -408,7 +468,149 @@ const Farms = (): JSX.Element => {
                                     onChange={(e) => handleInputChange("ticks", e.target.value.split(",").map(Number))}
                                     className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
                                 />
+                            </div> */}
+
+                            <div className="grid gap-3 mb-4">
+                                <label className="flex flex-row gap-4 items-center w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    Status:
+                                    <select
+                                        value={editFarm.status.toString()}
+                                        onChange={(e) =>
+                                            handleInputChange("status", BigInt(e.target.value))
+                                        }
+                                        className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
+                                    >
+                                        {statusOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label.toUpperCase()}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                {isLPStrategy && (
+                                    <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                        Pool Address
+                                        <input
+                                            value={editFarm.pool}
+                                            onChange={(e) =>
+                                                handleInputChange("pool", e.target.value as Address)
+                                            }
+                                            className="bg-transparent text-2xl font-semibold outline-none w-full"
+                                        />
+                                    </label>
+                                )}
+                                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    Strategy Logic ID
+                                    <select
+                                        value={editFarm.strategyLogicId}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            handleInputChange("strategyLogicId", value);
+                                            setIsLPStrategy(
+                                                getStrategyById(value)?.baseStrategies.includes(BaseStrategy.LP) ?? false
+                                            );
+                                        }}
+                                        className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
+                                    >
+                                        {liveFarmingStrategies.map((option) => (
+                                            <option key={option.shortId} value={option.id}>
+                                                {option.id}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+
+                                <div className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-2 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-white">Reward Assets</span>
+                                        <button
+                                            onClick={() => setShowTokenModal(true)}
+                                            className="flex items-center gap-2 px-3 py-1 bg-[#2A2C31] text-white rounded-md hover:bg-[#35373C] transition-colors border border-[#3A3C41]"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={2}
+                                                stroke="currentColor"
+                                                className="w-5 h-5"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            <span className="text-sm">Add Asset</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {rewardAssets.map((token: Token) => (
+                                            <div
+                                                key={token.address}
+                                                className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
+                                            >
+                                                <img src={token.logoURI} alt={token.symbol} className="w-5 h-5 rounded-full" />
+                                                <span className="text-sm font-medium">{token.symbol}</span>
+                                                <button
+                                                    onClick={() => removeToken(token.address)}
+                                                    className="text-gray-400 hover:text-red-400 transition-colors duration-150"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    Addresses (comma-separated)
+                                    <input
+                                        value={editFarm.addresses.join(",")}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "addresses",
+                                                e.target.value.split(",").map((s) => s.trim()) as Address[]
+                                            )
+                                        }
+                                        className="bg-transparent text-lg font-semibold outline-none w-full"
+                                    />
+                                </label>
+                                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    Nums (comma-separated)
+                                    <input
+                                        value={editFarm.nums.map((n) => n.toString()).join(",")}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "nums",
+                                                e.target.value.split(",").map((n) => BigInt(n.trim()))
+                                            )
+                                        }
+                                        className="bg-transparent text-lg font-semibold outline-none w-full"
+                                    />
+                                </label>
+                                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                    Ticks (comma-separated)
+                                    <input
+                                        value={editFarm.ticks.join(",")}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "ticks",
+                                                e.target.value
+                                                    .split(",")
+                                                    .map((n) => parseInt(n.trim()))
+                                                    .filter((n) => !isNaN(n))
+                                            )
+                                        }
+                                        className="bg-transparent text-lg font-semibold outline-none w-full"
+                                    />
+                                </label>
                             </div>
+
+                            <TokenSelectorModal
+                                open={showTokenModal}
+                                onClose={() => setShowTokenModal(false)}
+                                onSelect={(token) => {
+                                    addToken(token);
+                                }}
+                            />
 
                             {txStatus === "pending" && <p className="text-yellow-500">Transaction pending...</p>}
                             {txStatus === "success" && (
@@ -428,13 +630,13 @@ const Farms = (): JSX.Element => {
                                 <p className="text-red-500">Transaction failed. Check console for details.</p>
                             )}
 
-                            <div className="flex justify-end gap-3 mt-4">
-                                <button onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded">
+                            <div className="flex justify-end gap-3">
+                                <button onClick={closeModal} className="px-3 py-1 bg-gray-300 rounded">
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSubmit}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                                     disabled={simulationStatus === "loading" || txStatus === "wallet" || txStatus === "pending"}
                                 >
                                     Submit
