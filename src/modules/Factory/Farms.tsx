@@ -424,52 +424,6 @@ const Farms = (): JSX.Element => {
                         <div className="bg-white dark:bg-accent-900 p-6 rounded-xl max-w-[600px] w-full mt-20">
                             <h2 className="text-xl font-semibold mb-4">{isAdding ? "Add Farm" : "Edit Farm"}</h2>
 
-                            {/* Form Inputs */}
-                            {/* <div className="grid gap-3 mb-4">
-                                <input
-                                    placeholder="Status"
-                                    value={editFarm.status.toString()}
-                                    onChange={(e) => handleInputChange("status", BigInt(e.target.value))}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Pool Address"
-                                    value={editFarm.pool}
-                                    onChange={(e) => handleInputChange("pool", e.target.value as Address)}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Strategy Logic ID"
-                                    value={editFarm.strategyLogicId}
-                                    onChange={(e) => handleInputChange("strategyLogicId", e.target.value)}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Reward Assets (comma-separated)"
-                                    value={editFarm.rewardAssets.join(",")}
-                                    onChange={(e) => handleInputChange("rewardAssets", e.target.value.split(",").map((s) => s.trim()) as Address[])}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Addresses (comma-separated)"
-                                    value={editFarm.addresses.join(",")}
-                                    onChange={(e) => handleInputChange("addresses", e.target.value.split(",") as Address[])}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Nums (comma-separated)"
-                                    value={editFarm.nums.join(",")}
-                                    onChange={(e) => handleInputChange("nums", e.target.value.split(",").map((n) => BigInt(n)))}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                                <input
-                                    placeholder="Ticks (comma-separated)"
-                                    value={editFarm.ticks.join(",")}
-                                    onChange={(e) => handleInputChange("ticks", e.target.value.split(",").map(Number))}
-                                    className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                                />
-                            </div> */}
-
                             <div className="grid gap-3 mb-4">
                                 <label className="flex flex-row gap-4 items-center w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                                     Status:
@@ -525,7 +479,7 @@ const Farms = (): JSX.Element => {
                                         <span className="text-white">Reward Assets</span>
                                         <button
                                             onClick={() => setShowTokenModal(true)}
-                                            className="flex items-center gap-2 px-3 py-1 bg-[#2A2C31] text-white rounded-md hover:bg-[#35373C] transition-colors border border-[#3A3C41]"
+                                            className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -545,7 +499,7 @@ const Farms = (): JSX.Element => {
                                         {rewardAssets.map((token: Token) => (
                                             <div
                                                 key={token.address}
-                                                className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
+                                                className="flex items-center bg-blue-600 rounded-full px-3 py-1 gap-2 text-white"
                                             >
                                                 <img src={token.logoURI} alt={token.symbol} className="w-5 h-5 rounded-full" />
                                                 <span className="text-sm font-medium">{token.symbol}</span>
