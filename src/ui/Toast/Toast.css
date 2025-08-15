@@ -10,7 +10,7 @@
   border-radius: 12px;
   overflow: hidden;
   opacity: 0;
-  animation: fadeInOut 10000s linear forwards;
+  animation: fadeInOut 10s linear forwards;
 }
 .capitalize-first::first-letter {
   text-transform: uppercase;

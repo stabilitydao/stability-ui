@@ -2217,7 +2217,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                 onClick={() => {
                   setTokenSelector((prevState) => !prevState);
                 }}
-                className="flex items-center justify-between gap-2 rounded-lg px-3 h-10 bg-[#1b1e23] border border-[#35363B] text-[14px] md:text-[16px] cursor-pointer max-w-[320px]"
+                className="flex items-center justify-between gap-2 rounded-lg px-3 h-10 bg-[#1B1D21] border border-[#23252A] text-[14px] md:text-[16px] cursor-pointer max-w-[320px]"
               >
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -2249,7 +2249,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               <div
                 className={`bg-[#1c1d1f] border border-[#383B42] mt-2 rounded-lg w-full z-30 text-[12px] md:text-[14px] ${
                   tokenSelector ? "absolute transition delay-[50ms]" : "hidden"
-                } `}
+                }`}
               >
                 <div
                   onClick={() => {
@@ -2359,7 +2359,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           {$connected && (
             <div className="flex items-center gap-2">
               <div
-                className="h-10 w-10 flex items-center justify-center bg-[#1D1E23] rounded-lg border border-[#35363B] cursor-pointer"
+                className="h-10 w-10 flex items-center justify-center rounded-lg border border-[#23252A] cursor-pointer"
                 onClick={refreshData}
               >
                 <img
@@ -2374,7 +2374,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               </div>
 
               <div
-                className="settingsModal h-10 w-10 flex items-center justify-center bg-[#1D1E23] rounded-lg border border-[#35363B] cursor-pointer"
+                className="settingsModal h-10 w-10 flex items-center justify-center rounded-lg border border-[#23252A] cursor-pointer"
                 onClick={() => setSettingsModal((prev) => !prev)}
               >
                 <img
