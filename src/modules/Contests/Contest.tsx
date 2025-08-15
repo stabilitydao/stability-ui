@@ -23,8 +23,6 @@ import { contests, seeds } from "@stabilitydao/stability";
 
 import { account } from "@store";
 
-import { DisplayTypes } from "@types";
-
 import type { TTableColumn, TLeaderboard } from "@types";
 
 interface IProps {
@@ -420,7 +418,6 @@ const Contest: React.FC<IProps> = ({ contestId }) => {
             pagination={pagination}
             data={tableData}
             tab={currentTab}
-            display={DisplayTypes.Rows}
             setTab={setCurrentTab}
             setPagination={setPagination}
           />

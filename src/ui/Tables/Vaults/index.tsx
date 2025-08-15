@@ -4,7 +4,13 @@ import { Row } from "./Row";
 
 import { cn } from "@utils";
 
-import { TVault, TAPRModal, TAPRPeriod, DisplayTypes } from "@types";
+import {
+  TVault,
+  TAPRModal,
+  TAPRPeriod,
+  DisplayTypes,
+  VaultTypes,
+} from "@types";
 
 interface IProps {
   vaults: TVault[];
@@ -34,9 +40,10 @@ const VaultsTable: React.FC<IProps> = ({
       )}
     >
       {vaults.map((vault: TVault, index: number) => {
-        const aprValue = vault?.isMetaVault
-          ? Number(vault?.totalAPR)
-          : Number(vault?.earningData?.apr[period]);
+        const aprValue =
+          vault?.type != VaultTypes.Vault
+            ? Number(vault?.totalAPR)
+            : Number(vault?.earningData?.apr[period]);
 
         const apyValue = vault?.earningData?.apy[period];
 

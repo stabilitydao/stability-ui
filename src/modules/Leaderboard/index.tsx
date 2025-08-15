@@ -30,8 +30,6 @@ import { USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { TABLE_TYPES } from "./constants";
 
-import { DisplayTypes } from "@types";
-
 import type { TTableColumn, TLeaderboard } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
@@ -118,7 +116,11 @@ const Leaderboard = (): JSX.Element => {
   );
 
   const totalPoints: number = useMemo(
-    () => Object.values(points).reduce((acc, cur) => (acc += cur), 0) as number,
+    () =>
+      Object.values(points).reduce(
+        (acc: number, cur) => (acc += cur as number),
+        0
+      ) as number,
     [points]
   );
 
@@ -296,7 +298,6 @@ const Leaderboard = (): JSX.Element => {
             pagination={pagination}
             data={tableData}
             tab={currentTab}
-            display={DisplayTypes.Rows}
             setTab={setCurrentTab}
             setPagination={setPagination}
           />

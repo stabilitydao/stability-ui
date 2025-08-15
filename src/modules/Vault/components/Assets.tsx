@@ -35,7 +35,7 @@ import type {
 interface IProps {
   network: string;
   assets: TAsset[];
-  created: string;
+  launched: string;
   pricesOnCreation: string[];
   strategy: TAddress;
 }
@@ -93,7 +93,7 @@ const Chart = ({ data }: { data: TPieChartData[] }) => {
 };
 
 const Assets: React.FC<IProps> = memo(
-  ({ network, assets, created, pricesOnCreation, strategy }) => {
+  ({ network, assets, launched, pricesOnCreation, strategy }) => {
     const $assetsPrices = useStore(assetsPrices);
     const $connected = useStore(connected);
     const $currentChainID = useStore(currentChainID);
@@ -252,13 +252,13 @@ const Assets: React.FC<IProps> = memo(
                   assetData?.address as TAddress
                 );
 
-                const priceOnCreation = formatUnits(onCreationPrice[index], 18);
+                const priceOnLaunch = formatUnits(onCreationPrice[index], 18);
 
                 const price: number = $assetsPrices[network][asset?.address]
                   ? Number($assetsPrices[network][asset?.address]?.price)
                   : 0;
 
-                const creationDate = getDate(Number(created));
+                const creationDate = getDate(Number(launched));
 
                 /////***** CHAINLINK PRICE FEEDS (if stablecoin) *****/////
                 const oracleLink =
@@ -270,8 +270,9 @@ const Assets: React.FC<IProps> = memo(
                   assetData && (
                     <div
                       className={cn(
-                        "rounded-md p-4 md:p-6 flex flex-col justify-between gap-4 w-full md:w-1/2",
-                        !index && "border-b md:border-r border-[#23252A]"
+                        "p-4 md:p-6 flex flex-col justify-between gap-4 w-full md:w-1/2",
+                        !index &&
+                          "border-b md:border-b-0 md:border-r border-[#23252A]"
                       )}
                       key={asset.address + index}
                     >
@@ -343,21 +344,17 @@ const Assets: React.FC<IProps> = memo(
                               </p>
                             </div>
                           )}
-                          {priceOnCreation && (
+                          {priceOnLaunch && (
                             <div className="w-1/2">
                               <p className="text-[#6A6B6F] text-[14px] leading-5 font-medium">
-                                Price at creation
+                                Price on launch
                               </p>
                               <p
                                 data-testid={`assetPriceOnCreation${index}`}
                                 className="leading-6 font-semibold whitespace-nowrap"
                               >
                                 <span className="text-[18px]">
-                                  $
-                                  {formatNumber(
-                                    priceOnCreation,
-                                    "smallNumbers"
-                                  )}
+                                  ${formatNumber(priceOnLaunch, "smallNumbers")}
                                 </span>
                                 <span className="text-[14px]">
                                   ({creationDate})

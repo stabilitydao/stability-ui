@@ -11,6 +11,7 @@ interface IProps {
   setType: (type: DisplayTypes) => void;
   pagination: number;
   setPagination: (number: number) => void;
+  setTab: (number: number) => void;
 }
 
 const DisplayType: React.FC<IProps> = ({
@@ -18,6 +19,7 @@ const DisplayType: React.FC<IProps> = ({
   setType,
   pagination,
   setPagination,
+  setTab,
 }) => {
   const handleDisplayTypes = (display: DisplayTypes) => {
     const index = PAGINATIONS_VARIANTS[
@@ -25,6 +27,7 @@ const DisplayType: React.FC<IProps> = ({
     ].findIndex((number) => number === pagination);
 
     setType(display);
+    setTab(1);
     setPagination(PAGINATIONS_VARIANTS[display][index]);
   };
 

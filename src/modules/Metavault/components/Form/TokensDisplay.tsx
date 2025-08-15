@@ -1,12 +1,10 @@
 import type React from "react";
 
-import { META_VAULTS_TYPE } from "@constants";
-
-import { TransactionTypes, TTokenData } from "@types";
+import { TransactionTypes, TTokenData, VaultTypes } from "@types";
 
 interface IProps {
   actionType: TransactionTypes;
-  symbol: string;
+  type: VaultTypes;
   activeAsset: {
     deposit: TTokenData;
     withdraw: TTokenData;
@@ -15,18 +13,13 @@ interface IProps {
   };
 }
 
-const TokensDisplay: React.FC<IProps> = ({
-  actionType,
-  symbol,
-  activeAsset,
-}) => {
+const TokensDisplay: React.FC<IProps> = ({ actionType, type, activeAsset }) => {
   const currentToken = activeAsset?.[actionType];
 
   const isFeatureIcon =
     ([TransactionTypes.Wrap, TransactionTypes.Unwrap].includes(actionType) &&
-      META_VAULTS_TYPE[symbol] === "metaVault") ||
-    (actionType === TransactionTypes.Unwrap &&
-      META_VAULTS_TYPE[symbol] === "multiVault");
+      type === VaultTypes.MetaVault) ||
+    (actionType === TransactionTypes.Unwrap && type === VaultTypes.MultiVault);
 
   const iconSrc = isFeatureIcon
     ? `/features/${currentToken.symbol}.png`

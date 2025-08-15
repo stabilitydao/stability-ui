@@ -30,14 +30,14 @@ import {
   LEVERAGE_FARMING_TABLE,
 } from "@constants";
 
-import { DisplayTypes } from "@types";
-
-import type {
+import {
   TVault,
   TTableColumn,
   TAPRPeriod,
   TTableActiveParams,
   TEarningData,
+  DisplayTypes,
+  VaultTypes,
 } from "@types";
 
 const LeveragedFarming = (): JSX.Element => {
@@ -253,13 +253,15 @@ const LeveragedFarming = (): JSX.Element => {
       if (state.sortType !== "none") {
         if (state.keyName === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) => {
-            const aAPR = a?.isMetaVault
-              ? Number(a.totalAPR ?? 0)
-              : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
+            const aAPR =
+              a?.type != VaultTypes.Vault
+                ? Number(a?.totalAPR ?? 0)
+                : Number(a.earningData?.apr?.[$aprFilter] ?? 0);
 
-            const bAPR = b?.isMetaVault
-              ? Number(b.totalAPR ?? 0)
-              : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
+            const bAPR =
+              b?.type != VaultTypes.Vault
+                ? Number(b?.totalAPR ?? 0)
+                : Number(b.earningData?.apr?.[$aprFilter] ?? 0);
 
             return dataSorter(aAPR, bAPR, state.dataType, state.sortType);
           });
@@ -391,6 +393,7 @@ const LeveragedFarming = (): JSX.Element => {
             setType={setDisplayType}
             pagination={pagination}
             setPagination={setPagination}
+            setTab={setCurrentTab}
           />
         </div>
       </div>

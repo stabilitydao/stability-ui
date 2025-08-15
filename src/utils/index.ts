@@ -28,14 +28,12 @@ import { playAudio } from "./functions/playAudio";
 import { cn } from "./functions/cn";
 import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
-import { enrichAndResolveMetaVaults } from "./functions/enrichAndResolveMetaVaults";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
-import { useUrlHistory } from "./hooks/useUrlHistory";
 
 export {
   getTokenData,
@@ -69,8 +67,6 @@ export {
   useClickOutside,
   useModalClickOutside,
   getTransactionReceipt,
-  enrichAndResolveMetaVaults,
   copyAddress,
   exactToFixed,
-  useUrlHistory,
 };

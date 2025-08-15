@@ -22,7 +22,7 @@ interface IProps {
   };
 }
 
-const Chart: React.FC<IProps> = ({ chart }) => {
+const LineChart: React.FC<IProps> = ({ chart }) => {
   const WIDTH = 500;
 
   const [minValue, setMinValue] = useState(0);
@@ -80,11 +80,7 @@ const Chart: React.FC<IProps> = ({ chart }) => {
           style={{ fill: "#97979A" }}
         />
         <YAxis
-          domain={
-            chart.name === "sharePrice"
-              ? [minValue, maxValue]
-              : [minValue, "auto"]
-          }
+          domain={[minValue, maxValue]}
           tickFormatter={(value) =>
             value === 0 ? "" : `${formatNumber(value, "chartAbbreviate")}`
           }
@@ -114,4 +110,4 @@ const Chart: React.FC<IProps> = ({ chart }) => {
   );
 };
 
-export { Chart };
+export { LineChart };

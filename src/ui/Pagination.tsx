@@ -57,10 +57,6 @@ const Pagination: React.FC<IProps> = memo(
       window.history.pushState({}, "", newUrl.toString());
     }, [tab]);
 
-    useEffect(() => {
-      setTab(1);
-    }, [display]);
-
     useClickOutside(itemsDropDownRef, () => setIsItemsDropDown(false));
     useClickOutside(pagesDropDownRef, () => setIsPagesDropDown(false));
 

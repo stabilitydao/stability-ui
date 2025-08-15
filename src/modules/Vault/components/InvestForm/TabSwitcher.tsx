@@ -1,5 +1,7 @@
 import type React from "react";
 
+import { cn } from "@utils";
+
 import { TABS } from "../../constants";
 
 interface IProps {
@@ -16,13 +18,16 @@ const TabSwitcher: React.FC<IProps> = ({
   resetOptions,
 }) => {
   return (
-    <div className="flex border border-[#2C2E33] rounded-lg">
+    <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full">
       {TABS.map((tab: string) => (
-        <button
+        <span
           key={tab}
-          className={`h-[52px] text-neutral-50 font-semibold text-[14px] cursor-pointer w-full bg-[#18191c] ${
-            activeTab === tab && "bg-[#232429]"
-          }`}
+          className={cn(
+            "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+            activeTab === tab
+              ? "bg-[#232429] border border-[#2C2E33]"
+              : "text-[#6A6B6F] cursor-pointer"
+          )}
           onClick={() => {
             setActiveTab(tab);
             resetInputs();
@@ -30,7 +35,7 @@ const TabSwitcher: React.FC<IProps> = ({
           }}
         >
           {tab}
-        </button>
+        </span>
       ))}
     </div>
   );

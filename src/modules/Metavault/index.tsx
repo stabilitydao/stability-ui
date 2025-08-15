@@ -6,12 +6,11 @@ import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
 import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
+import { Chart } from "./components/Chart";
 
 import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
 import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
-
-import { getMetaVaultProportions } from "./functions/getMetaVaultProportions";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -24,14 +23,14 @@ import {
 
 import { deployments } from "@stabilitydao/stability";
 
-import { MetaVaultTableTypes } from "@types";
-
-import type {
+import {
   TAddress,
   TTableColumn,
   TVault,
   TEarningData,
   TMetaVault,
+  MetaVaultTableTypes,
+  VaultTypes,
 } from "@types";
 
 interface IProps {
@@ -150,44 +149,43 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     if (!metaVault) return;
 
-    const proportions = await getMetaVaultProportions(metavault);
-
     const protocols = ["Stability", ...metaVault.protocols].map((name) =>
-      Object.values(PROTOCOLS).find((p) => p.name === name)
+      Object.values(PROTOCOLS).find((p) => name.includes(p.name))
     );
 
     const vaults = await Promise.all(
-      metaVault.endVaults.map(async (entry) => {
-        const isMeta = entry.isMetaVault;
-        const vaultAddr = isMeta ? entry.metaVault : entry.vault;
+      metaVault.vaultsData.map(async (entry) => {
+        const isMetaVault = entry.type != VaultTypes.Vault;
 
-        const vaultProportion = proportions[vaultAddr.toLowerCase()];
+        const vaultAddr = entry.address;
 
-        const current = vaultProportion?.current ?? 0;
-        const target = vaultProportion?.target ?? 0;
+        const vaultProportion = entry.proportions;
+
+        const current = vaultProportion?.current * 100;
+
+        const target = vaultProportion?.target * 100;
 
         if (current <= 0.1 && !target) return null;
 
-        if (isMeta) {
+        if (isMetaVault) {
           const subMetaVault = metaVaultList.find(
             (v: TVault) => v.address === vaultAddr
           );
 
           if (!subMetaVault) return null;
 
-          const subProportions = await getMetaVaultProportions(
-            vaultAddr as TAddress
-          );
-
           const vaultsData = entry.vaults
-            .map((address: TAddress) => {
-              const addr = address.toLowerCase();
+            .map((v) => {
+              const addr = v.address.toLowerCase();
               const vault = $vaults[chainId][addr];
-              const subProp = subProportions[addr] ?? { current: 0, target: 0 };
+              const subProp = v.proportions;
 
               return {
                 ...vault,
-                proportions: subProp,
+                proportions: {
+                  current: subProp.current * 100,
+                  target: subProp.target * 100,
+                },
                 APR: vault.earningData.apr.latest,
               };
             })
@@ -197,7 +195,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             ...subMetaVault,
             proportions: { current, target },
             vaults: vaultsData,
-            isMetaVault: true,
           };
         }
 
@@ -207,7 +204,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           ...vault,
           APR: vault.earningData.apr.latest,
           proportions: { current, target },
-          isMetaVault: false,
         };
       })
     );
@@ -218,15 +214,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       let allocation = 0;
 
       cleanedVaults.forEach((vault) => {
-        const vaultsToCheck = vault?.isMetaVault ? vault.vaults : [vault];
+        const vaultsToCheck =
+          vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
 
         vaultsToCheck.forEach((v) => {
           const strategy = v.strategy;
 
           const isSiloMatch =
-            protocol.name === "Silo V2" && strategy.includes("Silo");
+            protocol?.name === "Silo V2" && strategy.includes("Silo");
 
-          const isStrategyMatch = protocol.name.includes(strategy);
+          const isStrategyMatch = protocol?.name.includes(strategy);
 
           if (isSiloMatch || isStrategyMatch) {
             allocation += Number(v.tvl || 0);
@@ -242,10 +239,12 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       0
     );
 
-    const allocationsWithPercent = protocolsAllocation.map((p) => ({
-      ...p,
-      value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
-    }));
+    const allocationsWithPercent = protocolsAllocation
+      .map((p) => ({
+        ...p,
+        value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
+      }))
+      .sort((a, b) => b.value - a.value);
 
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
@@ -472,6 +471,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               setPagination={setPagination}
             />
           </div>
+          <Chart symbol={symbol as string} />
         </div>
 
         <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">

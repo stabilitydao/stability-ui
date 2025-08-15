@@ -7,7 +7,13 @@ import { cn } from "@utils";
 
 import { strategies } from "@stabilitydao/stability";
 
-import { TVault, TAPRModal, MetaVaultTableTypes, IProtocol } from "@types";
+import {
+  TVault,
+  TAPRModal,
+  MetaVaultTableTypes,
+  IProtocol,
+  VaultTypes,
+} from "@types";
 
 interface IProps {
   tableType: MetaVaultTableTypes;
@@ -51,10 +57,10 @@ const MetaVaultsTable: React.FC<IProps> = ({
             isHovered: false,
           };
 
-          if (vault.isMetaVault) {
+          if (vault.type != VaultTypes.Vault) {
             const currentAllocation = vault.proportions?.current ?? 0;
 
-            return vault.vaults.map((subVault) => ({
+            return vault?.vaults.map((subVault) => ({
               address: subVault.address,
               symbol: subVault.symbol,
               color: subVault.strategyInfo?.color ?? "#ccc",
@@ -84,7 +90,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
   }, [vaults, protocols, tableType, strategies]);
 
   const getVaultAPRs = (vault: TVault) => {
-    if (vault.isMetaVault) {
+    if (vault.type != VaultTypes.Vault) {
       return {
         APR: Number(vault?.totalAPR ?? 0).toFixed(2),
       };
@@ -126,39 +132,38 @@ const MetaVaultsTable: React.FC<IProps> = ({
       <div className="flex flex-col w-full min-h-full border-x border-[#23252A]">
         {tableType === MetaVaultTableTypes.Destinations
           ? vaults.map((vault: TVault, index: number) => {
-              if (vault?.isMetaVault) {
+              if (vault.type === VaultTypes.Vault) {
                 return (
-                  <div key={`row/${vault.name + index}`}>
-                    <Vault
-                      APRs={getVaultAPRs(vault)}
-                      vault={vault}
-                      activeVault={activeSection}
-                      setModalState={setModalState}
-                    />
-                    {vault?.vaults?.map((endVault) => {
-                      return (
-                        <Vault
-                          key={`row/${endVault.name + index}`}
-                          APRs={getVaultAPRs(endVault)}
-                          vault={endVault}
-                          activeVault={activeSection}
-                          setModalState={setModalState}
-                          inserted={true}
-                        />
-                      );
-                    })}
-                  </div>
+                  <Vault
+                    key={`row/${vault.name + index}`}
+                    APRs={getVaultAPRs(vault)}
+                    vault={vault}
+                    activeVault={activeSection}
+                    setModalState={setModalState}
+                  />
                 );
               }
-
               return (
-                <Vault
-                  key={`row/${vault.name + index}`}
-                  APRs={getVaultAPRs(vault)}
-                  vault={vault}
-                  activeVault={activeSection}
-                  setModalState={setModalState}
-                />
+                <div key={`row/${vault.name + index}`}>
+                  <Vault
+                    APRs={getVaultAPRs(vault)}
+                    vault={vault}
+                    activeVault={activeSection}
+                    setModalState={setModalState}
+                  />
+                  {vault?.vaults?.map((endVault) => {
+                    return (
+                      <Vault
+                        key={`row/${endVault.name + index}`}
+                        APRs={getVaultAPRs(endVault)}
+                        vault={endVault}
+                        activeVault={activeSection}
+                        setModalState={setModalState}
+                        inserted={true}
+                      />
+                    );
+                  })}
+                </div>
               );
             })
           : protocols.map((protocol: IProtocol, index: number) => (

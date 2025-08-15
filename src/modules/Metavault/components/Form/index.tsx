@@ -19,11 +19,12 @@ import {
   formatNumber,
   cn,
   exactToFixed,
+  setLocalStoreHash,
 } from "@utils";
 
 import { getWrappingPairs } from "../../functions/getWrappingPairs";
 
-import { DEFAULT_TRANSACTION_SETTINGS, META_VAULTS_TYPE } from "@constants";
+import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import {
   IMetaVaultABI,
@@ -41,7 +42,13 @@ import {
   lastTx,
 } from "@store";
 
-import { TransactionTypes, TAddress, TMetaVault, TTokenData } from "@types";
+import {
+  TransactionTypes,
+  TAddress,
+  TMetaVault,
+  TTokenData,
+  VaultTypes,
+} from "@types";
 
 interface IProps {
   metaVault: TMetaVault;
@@ -358,7 +365,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
     const _value = parseUnits(String(amount), decimals);
 
-    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+    const shares = parseUnits(String(amount - (amount * 10) / 100), decimals); // 10 = slippage
 
     try {
       setNeedConfirm(true);
@@ -388,6 +395,23 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
       const transaction = await getTransactionReceipt(_action);
 
+      const txTokens = {
+        [activeAsset.deposit.address]: {
+          amount: amount,
+          symbol: activeAsset.deposit.symbol,
+          logo: activeAsset.deposit.logoURI,
+        },
+      };
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: _action,
+        status: transaction?.status || "reverted",
+        type: "deposit",
+        vault: metaVault.address,
+        tokens: txTokens,
+      });
+
       if (transaction?.status === "success") {
         lastTx.set(transaction?.transactionHash);
 
@@ -411,7 +435,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
     const _value = parseUnits(String(amount), 18);
 
-    const shares = parseUnits(String(amount - (amount * 5) / 100), decimals); // 5 = slippage
+    const shares = parseUnits(String(amount - (amount * 10) / 100), decimals); // 10 = slippage
 
     try {
       setNeedConfirm(true);
@@ -435,6 +459,23 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       setNeedConfirm(false);
 
       const transaction = await getTransactionReceipt(_action);
+
+      const txTokens = {
+        [activeAsset.withdraw.address]: {
+          amount: amount,
+          symbol: activeAsset.withdraw.symbol,
+          logo: activeAsset.withdraw.logoURI,
+        },
+      };
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: _action,
+        status: transaction?.status || "reverted",
+        type: "withdraw",
+        vault: metaVault.address,
+        tokens: txTokens,
+      });
 
       if (transaction?.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -480,6 +521,23 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       setNeedConfirm(false);
 
       const transaction = await getTransactionReceipt(_action);
+
+      const txTokens = {
+        [activeAsset.wrap.address]: {
+          amount: shares,
+          symbol: activeAsset.wrap.symbol,
+          logo: activeAsset.wrap.logoURI,
+        },
+      };
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: _action,
+        status: transaction?.status || "reverted",
+        type: "wrap",
+        vault: metaVault.address,
+        tokens: txTokens,
+      });
 
       if (transaction?.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -532,6 +590,23 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       setNeedConfirm(false);
 
       const transaction = await getTransactionReceipt(_action);
+
+      const txTokens = {
+        [activeAsset.unwrap.address]: {
+          amount: shares,
+          symbol: activeAsset.unwrap.symbol,
+          logo: activeAsset.unwrap.logoURI,
+        },
+      };
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: _action,
+        status: transaction?.status || "reverted",
+        type: "unwrap",
+        vault: metaVault.address,
+        tokens: txTokens,
+      });
 
       if (transaction?.status === "success") {
         lastTx.set(transaction?.transactionHash);
@@ -652,7 +727,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       const unwrapKey = unwrap.address;
 
       newBalances.wrap[wrapKey] =
-        META_VAULTS_TYPE[metaVault.symbol] === "multiVault"
+        metaVault.type === VaultTypes.MultiVault
           ? Object.values(newBalances.deposit)[0]
           : {
               bigIntBalance: metaVaultBalance,
@@ -707,7 +782,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <TokensDisplay
           actionType={actionType}
-          symbol={metaVault.symbol}
+          type={metaVault.type}
           activeAsset={activeAsset}
         />
 

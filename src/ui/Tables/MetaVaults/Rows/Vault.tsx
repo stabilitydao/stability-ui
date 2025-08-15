@@ -11,7 +11,7 @@ import { cn, formatNumber } from "@utils";
 
 import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
 
-import { TVault, TAPRModal } from "@types";
+import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {
   APRs: {
@@ -41,16 +41,16 @@ const Vault: React.FC<IProps> = ({
     Array.isArray(vault?.assets) &&
     vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
 
-  const symbol = vault?.isMetaVault
-    ? vault.symbol
-    : VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol;
+  const symbol =
+    vault.type === VaultTypes.Vault
+      ? VAULTS_WITH_NAME[vault.address] || vault.assetsSymbol
+      : vault.symbol;
 
   const isDimmed =
     activeVault?.isHovered && activeVault.address !== vault.address;
 
-  const rawProtocol = !vault?.isMetaVault
-    ? vault?.strategyInfo?.protocols[0]
-    : null;
+  const rawProtocol =
+    vault.type === VaultTypes.Vault ? vault?.strategyInfo?.protocols[0] : null;
 
   const protocol = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
@@ -64,9 +64,9 @@ const Vault: React.FC<IProps> = ({
           isDimmed ? "opacity-30" : "opacity-100"
         )}
         href={
-          vault?.isMetaVault
-            ? `/metavaults/metavault/${vault.address}`
-            : `/vaults/vault/${vault.network}/${vault.address}`
+          vault.type === VaultTypes.Vault
+            ? `/vaults/vault/${vault.network}/${vault.address}`
+            : `/metavaults/metavault/${vault.address}`
         }
         onClick={(e) => {
           if (window.innerWidth <= 860) {
@@ -83,13 +83,7 @@ const Vault: React.FC<IProps> = ({
             )}
           >
             <div className="flex items-center justify-center">
-              {vault?.isMetaVault ? (
-                <img
-                  className="w-8 h-8 rounded-full flex-shrink-0"
-                  src={`/features/${vault.symbol}.png`}
-                  alt="logo"
-                />
-              ) : (
+              {vault.type === VaultTypes.Vault ? (
                 <div className="flex items-center">
                   {vault.assets.map((asset, index) => (
                     <img
@@ -101,23 +95,20 @@ const Vault: React.FC<IProps> = ({
                       key={asset?.logo + index}
                     />
                   ))}
-                  {vault.address ===
-                  "0x7bcec157a1d10f00391e9e782de5998fabcc1aa7" ? (
-                    <img
-                      src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/credix.svg"
-                      alt="Credix"
-                      title="Credix"
-                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
-                    />
-                  ) : protocol ? (
-                    <img
-                      src={protocol?.logoSrc}
-                      alt={protocol?.name}
-                      title={protocol?.name}
-                      className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
-                    />
-                  ) : null}
+
+                  <img
+                    src={protocol?.logoSrc}
+                    alt={protocol?.name}
+                    title={protocol?.name}
+                    className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
+                  />
                 </div>
+              ) : (
+                <img
+                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  src={`/features/${vault.symbol}.png`}
+                  alt="logo"
+                />
               )}
             </div>
             <span
@@ -136,7 +127,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           onClick={(e) => {
-            if (window.innerHeight <= 860 && !vault?.isMetaVault) {
+            if (window.innerHeight <= 860 && vault.type === "Vault") {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,
@@ -150,7 +141,7 @@ const Vault: React.FC<IProps> = ({
           }}
           className={cn(
             "px-4 w-[20%] hidden min-[860px]:block",
-            !vault?.isMetaVault && "tooltip cursor-help"
+            vault.type === VaultTypes.Vault && "tooltip cursor-help"
           )}
         >
           <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
@@ -166,7 +157,9 @@ const Vault: React.FC<IProps> = ({
             </div>
           </div>
           <div
-            className={cn(!vault?.isMetaVault ? "visible__tooltip" : "hidden")}
+            className={cn(
+              vault.type === VaultTypes.Vault ? "visible__tooltip" : "hidden"
+            )}
           >
             <div className="flex items-start flex-col gap-2">
               <div className="flex flex-col gap-1 w-full">
@@ -256,7 +249,7 @@ const Vault: React.FC<IProps> = ({
       </a>
       {expandedData ? (
         <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] min-[860px]:hidden">
-          {!vault?.isMetaVault && (
+          {vault.type === "Vault" && (
             <div className="flex items-center justify-between w-full">
               <span className="text-[#909193] text-[14px] leading-5 font-medium">
                 Strategy
@@ -299,13 +292,13 @@ const Vault: React.FC<IProps> = ({
 
           <a
             href={
-              vault?.isMetaVault
-                ? `/metavaults/metavault/${vault.address}`
-                : `/vaults/vault/${vault.network}/${vault.address}`
+              vault.type === VaultTypes.Vault
+                ? `/vaults/vault/${vault.network}/${vault.address}`
+                : `/metavaults/metavault/${vault.address}`
             }
             className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
           >
-            {vault?.isMetaVault ? "View Meta Vault" : "View Vault"}
+            {vault.type === VaultTypes.Vault ? "View Vault" : "View Meta Vault"}
             <ArrowRightIcon />
           </a>
         </div>

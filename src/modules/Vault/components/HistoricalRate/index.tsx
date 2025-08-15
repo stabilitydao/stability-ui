@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import { Chart } from "./Chart";
 import { ChartBar } from "./ChartBar";
 
-import { ChartSkeleton, HeadingText } from "@ui";
+import { ChartSkeleton, HeadingText, ChartTimelineSwitcher } from "@ui";
 
 import { formatFromBigInt, getTimeDifference, cn } from "@utils";
 
@@ -13,7 +13,7 @@ import { GRAPH_ENDPOINTS } from "src/constants/env";
 
 import { MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
-import type { TAddress, TChartData } from "@types";
+import { TAddress, TChartData, TActiveChart, TimelineTypes } from "@types";
 
 interface IProps {
   network: string;
@@ -23,13 +23,6 @@ interface IProps {
   lastHardWork: number;
 }
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
-
-type TActiveChart =
-  | {
-      name: string;
-      data: [];
-    }
-  | undefined;
 
 const HistoricalRate: React.FC<IProps> = memo(
   ({ network, address, created, vaultStrategy, lastHardWork }) => {
@@ -43,20 +36,14 @@ const HistoricalRate: React.FC<IProps> = memo(
 
     const isLaverageStrategy = vaultStrategy.toLowerCase().includes("silo");
 
-    const timelineSegments = {
-      DAY: "DAY",
-      WEEK: "WEEK",
-      MONTH: "MONTH",
-      YEAR: "YEAR",
-    };
-
     const daysFromLastHardWork = getTimeDifference(lastHardWork).days;
 
     const [chartData, setChartData] = useState<TChartData[]>([]);
-    const [activeChart, setActiveChart] = useState<TActiveChart>();
-    const [timeline, setTimeline] = useState<TSegment>(
-      timelineSegments.WEEK as TSegment
-    );
+    const [activeChart, setActiveChart] = useState<TActiveChart>({
+      name: "",
+      data: [],
+    });
+    const [timeline, setTimeline] = useState<TSegment>(TimelineTypes.Week);
     const [isData, setIsData] = useState(true);
     const [graphError, setGraphError] = useState({
       isError: false,
@@ -534,7 +521,7 @@ const HistoricalRate: React.FC<IProps> = memo(
       <div className="mt-6">
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 md:gap-0 gap-3">
           <HeadingText text="Historical Rate" scale={2} styles="text-left" />
-          {activeChart && (
+          {!!activeChart.name && (
             <div className="flex items-center font-semibold relative text-[14px] leading-5 gap-2">
               <p
                 className={cn(
@@ -587,15 +574,15 @@ const HistoricalRate: React.FC<IProps> = memo(
           <>
             <div
               className={cn(
-                "bg-[#101012] border border-[#23252A] rounded-lg pr-6 py-6",
-                ["TVL", "sharePrice"].includes(activeChart?.name) && "pl-6"
+                "bg-[#101012] border border-[#23252A] rounded-lg pr-6 py-6 mb-4",
+                ["TVL", "sharePrice"].includes(activeChart.name) && "pl-6"
               )}
             >
-              {activeChart ? (
+              {activeChart.name !== "" ? (
                 <>
-                  {activeChart.name === "APR" ? (
+                  {activeChart?.name === "APR" ? (
                     <ChartBar chart={activeChart} APRType={APRType} />
-                  ) : activeChart.name === "vsHodl" ? (
+                  ) : activeChart?.name === "vsHodl" ? (
                     <ChartBar chart={activeChart} APRType={"VS HODL APR"} />
                   ) : (
                     <Chart chart={activeChart} />
@@ -606,47 +593,11 @@ const HistoricalRate: React.FC<IProps> = memo(
               )}
             </div>
 
-            {activeChart && (
-              <div className="flex items-center justify-end mt-4 ">
-                <div className="flex items-center p-2 bg-transparent border border-[#23252A] h-[48px] rounded-lg select-none text-[16px] font-semibold">
-                  <p
-                    onClick={() =>
-                      timelineHandler(timelineSegments.WEEK as TSegment)
-                    }
-                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
-                      timeline === "WEEK"
-                        ? "bg-[#22242A] border border-[#2C2E33]"
-                        : "text-[#97979A]" //hover
-                    }`}
-                  >
-                    Week
-                  </p>
-                  <p
-                    onClick={() =>
-                      timelineHandler(timelineSegments.MONTH as TSegment)
-                    }
-                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
-                      timeline === "MONTH"
-                        ? "bg-[#22242A] border border-[#2C2E33]"
-                        : "text-[#97979A]" //hover
-                    }`}
-                  >
-                    Month
-                  </p>
-                  <p
-                    onClick={() =>
-                      timelineHandler(timelineSegments.YEAR as TSegment)
-                    }
-                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
-                      timeline === "YEAR"
-                        ? "bg-[#22242A] border border-[#2C2E33]"
-                        : "text-[#97979A]" //hover
-                    }`}
-                  >
-                    All
-                  </p>
-                </div>
-              </div>
+            {!!activeChart.name && (
+              <ChartTimelineSwitcher
+                timeline={timeline}
+                onChange={timelineHandler}
+              />
             )}
           </>
         ) : (

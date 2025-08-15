@@ -15,7 +15,7 @@ import { UnderlyingALM } from "./components/UnderlyingALM";
 import { LeverageLending } from "./components/LeverageLending";
 
 import { WagmiLayout } from "@layouts";
-import { Toast, FullPageLoader, ErrorMessage } from "@ui";
+import { FullPageLoader, ErrorMessage } from "@ui";
 
 import { vaultData, vaults, error } from "@store";
 
@@ -60,11 +60,11 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           <div className="flex items-center justigy-center w-full flex-col xl:flex-row">
             <InfoBar network={network} vault={localVault} />
 
-            <Toast network={network} />
-
             <div className="flex flex-col gap-5 xl:hidden my-5 w-full">
               <InvestForm network={network} vault={localVault} />
-              <Contracts vault={localVault} network={network} />
+              <div className="hidden lg:flex">
+                <Contracts vault={localVault} network={network} />
+              </div>
             </div>
           </div>
           <HistoricalRate
@@ -76,6 +76,10 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           />
 
           <YieldRates vault={localVault} />
+
+          <div className="flex lg:hidden">
+            <Contracts vault={localVault} network={network} />
+          </div>
 
           <div className="flex md:flex-nowrap flex-wrap gap-6 w-full my-6">
             <div className="w-full xl:w-1/2">
@@ -99,7 +103,7 @@ const Vault: React.FC<IProps> = ({ network, vault }) => {
           <Assets
             network={network}
             assets={localVault?.assets}
-            created={localVault.created}
+            launched={localVault.launchDate}
             pricesOnCreation={localVault.assetsPricesOnCreation}
             strategy={localVault?.strategyAddress}
           />

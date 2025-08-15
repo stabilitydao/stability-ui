@@ -263,14 +263,6 @@ const VAULTS_WITH_NAME = {
   "0x396ebcaa1005a5bf1829cba82e853a5ea51ab937": "Enclabs scUSD",
 };
 
-const META_VAULTS_TYPE = {
-  metaUSD: "metaVault",
-  metaUSDC: "multiVault",
-  metascUSD: "multiVault",
-  metawS: "multiVault",
-  metaS: "metaVault",
-};
-
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
@@ -398,7 +390,6 @@ export {
   SILO_POINTS,
   STABILITY_TOKENS,
   PATHS,
-  META_VAULTS_TYPE,
   VAULTS_WITH_NAME,
   STABILITY_STRATEGY_LABELS,
   STABILITY_AAVE_POOLS,

@@ -246,9 +246,11 @@ type TVault = {
   address: TAddress;
   name: string;
   symbol: string;
+  type: VaultTypes;
   created: string;
+  launchDate: string;
   assetsPricesOnCreation: string[];
-  type: string;
+  vaultType: string;
   strategy: string;
   shareprice: string;
   sharePriceLast: string;
@@ -295,8 +297,7 @@ type TVault = {
   leverage?: number;
 
   ///// meta vault
-  isMetaVault?: boolean;
-  proportions?: { current: number[]; target: number };
+  proportions?: { current: number; target: number };
   vaults?: TVault[];
 };
 
@@ -304,6 +305,7 @@ type TMetaVault = {
   address: TAddress;
   symbol: string;
   name: string;
+  type: VaultTypes;
   APR: string;
   totalAPR: string;
   merklAPR: string;
@@ -321,7 +323,6 @@ type TMetaVault = {
 };
 
 type TEndMetaVaults = {
-  isMetaVault: boolean;
   metaVault?: TAddress;
   vault?: TAddress;
   vaults?: TAddress[];
@@ -606,6 +607,11 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
+type TActiveChart = {
+  name: string;
+  data: [];
+};
+
 //// EVENTS
 
 type TError = {
@@ -663,8 +669,8 @@ type TAPIData = {
       };
     };
   };
-  rewards: { gemsAprMultiplier: number };
-  prices: TMarketPrices;
+  rewards?: { gemsAprMultiplier: number };
+  prices?: TMarketPrices;
   error?: string;
 };
 
@@ -749,6 +755,19 @@ export enum TransactionTypes {
   Withdraw = "withdraw",
   Wrap = "wrap",
   Unwrap = "unwrap",
+}
+
+export enum VaultTypes {
+  Vault = "Vault",
+  MetaVault = "MetaVault",
+  MultiVault = "MultiVault",
+}
+
+export enum TimelineTypes {
+  Day = "DAY",
+  Week = "WEEK",
+  Month = "MONTH",
+  Year = "YEAR",
 }
 
 export type {
@@ -837,4 +856,5 @@ export type {
   TMetaVaults,
   TEndMetaVaults,
   TMarketInfo,
+  TActiveChart,
 };

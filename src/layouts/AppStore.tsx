@@ -61,7 +61,6 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
-  enrichAndResolveMetaVaults,
 } from "@utils";
 
 import {
@@ -387,15 +386,15 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           gemsAPR = {
             latest: String(
               Number(APRArray.latest) *
-                stabilityAPIData.rewards.gemsAprMultiplier
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
             ),
             daily: String(
               Number(APRArray.daily) *
-                stabilityAPIData.rewards.gemsAprMultiplier
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
             ),
             weekly: String(
               Number(APRArray.weekly) *
-                stabilityAPIData.rewards.gemsAprMultiplier
+                Number(stabilityAPIData?.rewards?.gemsAprMultiplier)
             ),
           };
 
@@ -675,7 +674,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               }
 
               if (scProportionIndex !== -1) {
-                const scProportion = assetsProportions[scProportionIndex];
+                const scProportion =
+                  assetsProportions?.[scProportionIndex] ?? 0;
 
                 ringsPoints = Number(((scProportion / 100) * 1.5).toFixed(2));
               }
@@ -703,7 +703,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           } else if (vault?.leverageLending && vault?.assets?.length === 1) {
             const LLAssets = stabilityAPIData?.underlyings?.[146];
 
-            const assetAPRData = LLAssets?.[vault?.assets?.[0]];
+            const assetAPRData =
+              LLAssets?.[vault?.assets?.[0] as keyof typeof LLAssets];
 
             if (assetAPRData) {
               const supplyAPR = vault?.leverageLending?.supplyApr ?? 0;
@@ -723,8 +724,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             name: vault.name,
             symbol: vault.symbol,
             created: vaultCreated,
+            launchDate: vault.launchDate,
             assetsPricesOnCreation: vault.assetsPricesOnCreation,
-            type: vault.vaultType,
+            type: vault.type,
+            vaultType: vault.vaultType,
             strategy: vault.strategyId,
             shareprice,
             sharePriceLast,
@@ -976,7 +979,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
                 merklAPR = Number(metaVault.merklAPR);
 
-                if (metaVault.symbol === "metaUSD") {
+                if (metaVault?.symbol === "metaUSD") {
                   sonicPoints = 10;
                 } else {
                   sonicPoints = 12;
@@ -988,7 +991,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               return {
                 ...metaVault,
                 status: "Active",
-                isMetaVault: true,
                 balanceInUSD: 0,
                 deposited: formatUnits(
                   metaVault.deposited,
@@ -1001,10 +1003,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               };
             });
 
-            localMetaVaults[chain.id] = enrichAndResolveMetaVaults(
-              localVaults[chain.id],
-              _metaVaults
-            );
+            localMetaVaults[chain.id] = _metaVaults;
 
             if (isConnected) {
               let localClient = web3clients[chain.id] ?? web3clients["146"];

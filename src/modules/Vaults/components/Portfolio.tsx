@@ -65,9 +65,10 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
 
     vaults.forEach((v) => {
       if (v.balance) {
-        let apr = v?.isMetaVault
-          ? Number(v.APR)
-          : Number(v?.earningData?.apr?.[$aprFilter]);
+        let apr =
+          v?.type != "Vault"
+            ? Number(v.APR)
+            : Number(v?.earningData?.apr?.[$aprFilter]);
 
         const balance = Number(v.balanceInUSD);
 
