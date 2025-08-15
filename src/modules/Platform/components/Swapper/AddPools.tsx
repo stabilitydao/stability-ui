@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { HeadingText } from "@ui";
+import { HeadingText, Checkbox } from "@ui";
 import type { TAddress } from "@types";
 import type { Address, Hash, TransactionReceipt } from "viem";
 
@@ -448,15 +448,13 @@ const AddPools = (): JSX.Element => {
                             Check this if you want to edit an existing pool.
                         </p>
 
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
+                        <label className="flex items-center gap-2">
+                            <Checkbox
                                 checked={rewrite}
                                 onChange={() => setRewrite((p) => !p)}
-                                id="rewrite-checkbox"
                             />
-                            <label htmlFor="rewrite-checkbox" className="text-sm">Rewrite</label>
-                        </div>
+                            <span className="text-sm">Rewrite</span>
+                        </label>
                     </div>
 
                     {/* Simulation feedback */}
