@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { HeadingText, FullPageLoader } from "@ui";
-import { Address, createPublicClient, Hash, http, TransactionReceipt, zeroAddress } from "viem";
+import { Address, createPublicClient, Hash, http, TransactionReceipt, zeroAddress, formatUnits } from "viem";
 import { getShortAddress } from "@utils";
 import { useStore } from "@nanostores/react";
 import { readContract, writeContract, waitForTransactionReceipt, simulateContract } from "@wagmi/core";
@@ -60,7 +60,7 @@ const Farms = (): JSX.Element => {
 
     /* ───────── UI / modal state ───────── */
     const [simulationStatus, setSimulationStatus] = useState<"idle" | "loading" | "success" | "fail">("idle");
-    const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+    const [gasEstimate, setGasEstimate] = useState<bigint | null>(null);
     const [txStatus, setTxStatus] = useState<TxStatus>("idle");
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
@@ -163,7 +163,9 @@ const Farms = (): JSX.Element => {
                     args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
                     account: $account as Address,
                 });
-                setGasEstimate(est.toString());
+                const gasPrice = await _publicClient.getGasPrice();
+                const totalFee = est * gasPrice;
+                setGasEstimate(totalFee);
             } catch (err) {
                 console.error("Gas estimate failed", err);
                 setGasEstimate(null);
@@ -172,7 +174,7 @@ const Farms = (): JSX.Element => {
 
         if (showModal) {
             updateGasEstimate();
-            interval = setInterval(updateGasEstimate, 10000);
+            interval = setInterval(updateGasEstimate, 15000);
         }
 
         return () => {
@@ -227,7 +229,7 @@ const Farms = (): JSX.Element => {
                     functionName: isAdding ? "addFarms" : "updateFarm",
                     args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
                     account: $account as Address,
-                    ...(gasEstimate && { gas: BigInt(gasEstimate) }),
+                    ...(gasEstimate && { gas: gasEstimate }),
                 });
                 setSimulationStatus("success");
             } catch (simErr) {
@@ -251,7 +253,7 @@ const Farms = (): JSX.Element => {
                 abi: FactoryABI,
                 functionName: isAdding ? "addFarms" : "updateFarm",
                 args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-                ...(gasEstimate && { gas: BigInt(gasEstimate) }),
+                ...(gasEstimate && { gas: gasEstimate }),
             });
             setTxHash(hash);
             setTxStatus("pending");
@@ -510,7 +512,7 @@ const Farms = (): JSX.Element => {
                             <div className="flex flex-row justify-between items-center">
                                 <div className="bg-[#61697114] px-1.5 py-1 border border-solid border-[#7B8187] rounded-xl text-[#7B8187] flex flex-row items-center gap-2 text-sm select-none">
                                     <FaGasPump />
-                                    <span>{gasEstimate ?? "0.00"}</span>
+                                    <span>{gasEstimate ? formatUnits(gasEstimate, 18) : "0.00"}</span>
                                 </div>
 
                                 <div className="flex justify-end gap-3">

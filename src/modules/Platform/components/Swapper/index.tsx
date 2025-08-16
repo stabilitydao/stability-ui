@@ -234,7 +234,6 @@ const Swapper = (): JSX.Element => {
         args,
         account: $account as TAddress,
       });
-      const gasWithBuffer = (est * 102n) / 100n; // +2 %
       setSimulationStatus("success");
 
       /* ───────── wallet approval ───────── */
@@ -246,7 +245,7 @@ const Swapper = (): JSX.Element => {
         abi: SwapperABI,
         functionName,
         args,
-        gas: gasWithBuffer,
+        gas: est,
       });
       setTxHash(hash);
       setTxStatus("pending");

@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HeadingText, Checkbox } from "@ui";
 import type { TAddress } from "@types";
-import { createPublicClient, http, type Address, type Hash, type TransactionReceipt } from "viem";
+import { createPublicClient, http, type Address, type Hash, type TransactionReceipt, formatUnits } from "viem";
 
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
@@ -11,6 +11,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WagmiLayout from "@layouts/WagmiLayout";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { sonic } from "viem/chains";
+import { FaGasPump } from "react-icons/fa";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
@@ -232,7 +233,7 @@ const AddPools = (): JSX.Element => {
     const [simulationStatus, setSimulationStatus] = useState<
         "idle" | "loading" | "success" | "fail"
     >("idle");
-    const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+    const [gasEstimate, setGasEstimate] = useState<bigint | null>(null);
     const [txStatus, setTxStatus] = useState<TxStatus>("idle");
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
@@ -281,17 +282,6 @@ const AddPools = (): JSX.Element => {
                 args,
                 account: $account as TAddress,
             });
-
-            /* ───────── estimate gas ───────── */
-            const est = await _publicClient.estimateContractGas({
-                address: contractAddress,
-                abi: SwapperABI,
-                functionName,
-                args,
-                account: $account as TAddress,
-            });
-            const gasWithBuffer = (est * 12n) / 10n; // +20 %
-            setGasEstimate(est.toString());
             setSimulationStatus("success");
 
             /* ───────── wallet approval ───────── */
@@ -303,7 +293,7 @@ const AddPools = (): JSX.Element => {
                 abi: SwapperABI,
                 functionName,
                 args,
-                gas: gasWithBuffer,
+                ...(gasEstimate && { gas: gasEstimate }),
             });
             setTxHash(hash);
             setTxStatus("pending");
@@ -326,6 +316,51 @@ const AddPools = (): JSX.Element => {
             );
         }
     };
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        async function updateGasEstimate() {
+            if (!poolAddress || !selectedAdapter || !finalTokenIn || !finalTokenOut || !$account) return;
+
+            try {
+                const est = await _publicClient.estimateContractGas({
+                    address: "0xe52Fcf607A8328106723804De1ef65Da512771Be",
+                    abi: SwapperABI,
+                    functionName: "addPools",
+                    args: [
+                        [
+                            {
+                                pool: poolAddress as Address,
+                                ammAdapter: selectedAdapter as Address,
+                                tokenIn: finalTokenIn as Address,
+                                tokenOut: finalTokenOut as Address,
+                            },
+                        ],
+                        rewrite,
+                    ] as const,
+                    account: $account as TAddress,
+                });
+                const gasPrice = await _publicClient.getGasPrice();
+                const totalFee = est * gasPrice;
+                setGasEstimate(totalFee);
+            } catch (err) {
+                console.error("Gas estimate failed", err);
+                setGasEstimate(null);
+            }
+        }
+
+        // run immediately
+        updateGasEstimate();
+
+        // refresh every 15 seconds
+        interval = setInterval(updateGasEstimate, 15000);
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [poolAddress, selectedAdapter, finalTokenIn, finalTokenOut, rewrite, $account]);
+
 
     /* ────────────────────────────────────────────────────────────────────── */
     /* UI                                                                    */
@@ -455,13 +490,20 @@ const AddPools = (): JSX.Element => {
                             Check this if you want to edit an existing pool.
                         </p>
 
-                        <label className="flex items-center gap-2">
-                            <Checkbox
-                                checked={rewrite}
-                                onChange={() => setRewrite((p) => !p)}
-                            />
-                            <span className="text-sm">Rewrite</span>
-                        </label>
+                        <div className="flex flex-row items-center w-full justify-between">
+                            <label className="flex items-center gap-2">
+                                <Checkbox
+                                    checked={rewrite}
+                                    onChange={() => setRewrite((p) => !p)}
+                                />
+                                <span className="text-sm">Rewrite</span>
+                            </label>
+
+                            <div className="bg-[#61697114] px-1.5 py-1 border border-solid border-[#7B8187] rounded-xl text-[#7B8187] flex flex-row items-center gap-2 text-sm select-none">
+                                <FaGasPump />
+                                <span>{gasEstimate ? formatUnits(gasEstimate, 18) : "0.00"}</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Simulation feedback */}
@@ -469,7 +511,7 @@ const AddPools = (): JSX.Element => {
                         {simulationStatus === "loading" && <span>🔄 Simulating transaction…</span>}
                         {simulationStatus === "success" && (
                             <span className="text-green-400">
-                                ✅ Simulation successful. Gas &approx; {gasEstimate}
+                                ✅ Simulation successful. Gas &approx; {gasEstimate ? formatUnits(gasEstimate, 18) : "0.00"}
                             </span>
                         )}
                         {simulationStatus === "fail" && (
