@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 
 import { HeadingText, FullPageLoader } from "@ui";
-import { Address, Hash, TransactionReceipt, zeroAddress } from "viem";
+import { Address, createPublicClient, Hash, http, TransactionReceipt, zeroAddress } from "viem";
 import { getShortAddress } from "@utils";
 import { useStore } from "@nanostores/react";
 import { readContract, writeContract, waitForTransactionReceipt, simulateContract } from "@wagmi/core";
 import { wagmiConfig, FactoryABI } from "@web3";
-import { connected, account, publicClient } from "@store";
+import { connected, account } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { strategies } from "@stabilitydao/stability";
 import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
 import { TokenSelectorModal, Token, TxStatusModal, TxStatus } from "@components/TokenSelectorModal";
+import { FaGasPump } from "react-icons/fa";
+import { sonic } from "viem/chains";
 
 type Farm = {
     status: bigint;
@@ -35,112 +37,18 @@ const defaultFarm: Farm = {
     ticks: [],
 };
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Helper UI components – no external UI libraries required                */
-/* ────────────────────────────────────────────────────────────────────────── */
-
-// type ModalProps = {
-//     open: boolean;
-//     onClose: () => void;
-//     children: React.ReactNode;
-// };
-// /** Generic centre‑screen modal */
-// const Modal = ({ open, onClose, children }: ModalProps) =>
-//     open ? (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-//             <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
-//                 <button
-//                     onClick={onClose}
-//                     className="absolute right-4 top-4 text-4xl leading-none transition hover:scale-110"
-//                     aria-label="Close modal"
-//                 >
-//                     &times;
-//                 </button>
-//                 {children}
-//             </div>
-//         </div>
-//     ) : null;
-
-// /* ────────────────────────────────────────────────────────────────────────── */
-// /* Transaction‑status modal                                                 */
-// /* ────────────────────────────────────────────────────────────────────────── */
-
-// type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
-
-// type TxStatusModalProps = {
-//     status: TxStatus;
-//     hash?: Hash | null;
-//     error?: string | null;
-//     onClose: () => void;
-// };
-
-// const TxStatusModal = ({
-//     status,
-//     hash,
-//     error,
-//     onClose,
-// }: TxStatusModalProps) => {
-//     if (status === "idle") return null;
-
-//     const content = (() => {
-//         switch (status) {
-//             case "wallet":
-//                 return "Please confirm the transaction in your wallet…";
-//             case "pending":
-//                 return (
-//                     <>
-//                         <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
-//                         {hash && (
-//                             <a
-//                                 href={`https://sonicscan.org/tx/${hash}`}
-//                                 target="_blank"
-//                                 rel="noreferrer"
-//                                 className="text-accent-400 underline"
-//                             >
-//                                 View on explorer
-//                             </a>
-//                         )}
-//                     </>
-//                 );
-//             case "success":
-//                 return (
-//                     <>
-//                         <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
-//                         {hash && (
-//                             <a
-//                                 href={`https://sonicscan.org/tx/${hash}`}
-//                                 target="_blank"
-//                                 rel="noreferrer"
-//                                 className="text-accent-400 underline"
-//                             >
-//                                 View on explorer
-//                             </a>
-//                         )}
-//                     </>
-//                 );
-//             case "error":
-//                 return (
-//                     <>
-//                         <p className="mb-2 text-red-400">❌ Transaction failed.</p>
-//                         {error && <pre className="max-w-full whitespace-pre-wrap break-all text-xs">{error}</pre>}
-//                     </>
-//                 );
-//         }
-//     })();
-
-//     return (
-//         <Modal open onClose={onClose}>
-//             <div className="space-y-2 text-neutral-50">{content}</div>
-//         </Modal>
-//     );
-// };
-
 const Farms = (): JSX.Element => {
     /* ───────── stores / wallet ───────── */
     const { open: openConnect } = useWeb3Modal();
     const $connected = useStore(connected);
-    const $publicClient = useStore(publicClient);
     const $account = useStore(account);
+
+    const _publicClient = createPublicClient({
+        chain: sonic,
+        transport: http(
+            import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+        ),
+    });
 
     const [farms, setFarms] = useState<Farm[] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -152,7 +60,7 @@ const Farms = (): JSX.Element => {
 
     /* ───────── UI / modal state ───────── */
     const [simulationStatus, setSimulationStatus] = useState<"idle" | "loading" | "success" | "fail">("idle");
-    // const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+    const [gasEstimate, setGasEstimate] = useState<string | null>(null);
     const [txStatus, setTxStatus] = useState<TxStatus>("idle");
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
@@ -242,6 +150,38 @@ const Farms = (): JSX.Element => {
     }
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        async function updateGasEstimate() {
+            if (!editFarm || (!$account && isAdding)) return;
+
+            try {
+                const est = await _publicClient.estimateContractGas({
+                    address: FARMS_FACTORY_ADDRESS,
+                    abi: FactoryABI,
+                    functionName: isAdding ? "addFarms" : "updateFarm",
+                    args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+                    account: $account as Address,
+                });
+                setGasEstimate(est.toString());
+            } catch (err) {
+                console.error("Gas estimate failed", err);
+                setGasEstimate(null);
+            }
+        }
+
+        if (showModal) {
+            updateGasEstimate();
+            interval = setInterval(updateGasEstimate, 10000);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [showModal, editFarm, editIndex, isAdding, $account]);
+
+
+    useEffect(() => {
         fetchFarms();
     }, []);
 
@@ -267,38 +207,40 @@ const Farms = (): JSX.Element => {
     };
 
     const handleSubmit = async () => {
-        resetTxState();
-
-        if (!editFarm || (!isAdding && (editIndex === null || editIndex === undefined))) {
-            setSimulationStatus("fail");
-            return;
-        }
-
-        setShowTxModal(true);
-        setTxStatus("pending");
-
         try {
+            resetTxState();
+
+            if (!editFarm || (!isAdding && (editIndex === null || editIndex === undefined))) {
+                setSimulationStatus("fail");
+                return;
+            }
+
+            setShowTxModal(true);
+            setTxStatus("pending");
+
             /* ───────── simulate ───────── */
-            setSimulationStatus("loading");
-            await simulateContract(wagmiConfig, {
-                address: FARMS_FACTORY_ADDRESS,
-                abi: FactoryABI,
-                functionName: isAdding ? "addFarms" : "updateFarm",
-                args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-            });
-
-            /* ───────── estimate gas ───────── */
-            const est = await $publicClient.estimateContractGas({
-                address: FARMS_FACTORY_ADDRESS,
-                abi: FactoryABI,
-                functionName: isAdding ? "addFarms" : "updateFarm",
-                args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-                account: $account as Address,
-            });
-
-            const gasWithBuffer = (est * 11n) / 10n; // +10 %
-            // setGasEstimate(est.toString());
-            setSimulationStatus("success");
+            try {
+                setSimulationStatus("loading");
+                await simulateContract(wagmiConfig, {
+                    address: FARMS_FACTORY_ADDRESS,
+                    abi: FactoryABI,
+                    functionName: isAdding ? "addFarms" : "updateFarm",
+                    args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+                    account: $account as Address,
+                    ...(gasEstimate && { gas: BigInt(gasEstimate) }),
+                });
+                setSimulationStatus("success");
+            } catch (simErr) {
+                console.error("Simulation failed", simErr);
+                setTxStatus("error");
+                setTxError(
+                    simErr instanceof Error
+                        ? simErr.message
+                        : "Simulation failed: possible revert or bad parameters."
+                );
+                setSimulationStatus("fail");
+                return;
+            }
 
             /* ───────── wallet approval ───────── */
             setTxStatus("wallet");
@@ -309,7 +251,7 @@ const Farms = (): JSX.Element => {
                 abi: FactoryABI,
                 functionName: isAdding ? "addFarms" : "updateFarm",
                 args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-                gas: gasWithBuffer,
+                ...(gasEstimate && { gas: BigInt(gasEstimate) }),
             });
             setTxHash(hash);
             setTxStatus("pending");
@@ -327,7 +269,6 @@ const Farms = (): JSX.Element => {
             console.error("Transaction error", err);
             setTxStatus("error");
             setTxError(err instanceof Error ? err.message : "Unexpected error. Check console.");
-            setSimulationStatus("fail");
         }
     };
 
@@ -566,35 +507,24 @@ const Farms = (): JSX.Element => {
                                 }}
                             />
 
-                            {txStatus === "pending" && <p className="text-yellow-500">Transaction pending...</p>}
-                            {txStatus === "success" && (
-                                <p className="text-green-500">
-                                    Success! TX Hash:{" "}
-                                    <a
-                                        href={`https://sonicscan.org/tx/${txHash}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="underline"
-                                    >
-                                        {txHash?.slice(0, 10)}...
-                                    </a>
-                                </p>
-                            )}
-                            {txStatus === "error" && (
-                                <p className="text-red-500">Transaction failed. Check console for details.</p>
-                            )}
+                            <div className="flex flex-row justify-between items-center">
+                                <div className="bg-[#61697114] px-1.5 py-1 border border-solid border-[#7B8187] rounded-xl text-[#7B8187] flex flex-row items-center gap-2 text-sm select-none">
+                                    <FaGasPump />
+                                    <span>{gasEstimate ?? "0.00"}</span>
+                                </div>
 
-                            <div className="flex justify-end gap-3">
-                                <button onClick={closeModal} className="px-3 py-1 bg-gray-300 rounded">
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSubmit}
-                                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                    disabled={simulationStatus === "loading" || txStatus === "wallet" || txStatus === "pending"}
-                                >
-                                    Submit
-                                </button>
+                                <div className="flex justify-end gap-3">
+                                    <button onClick={closeModal} className="px-3 py-1 bg-gray-500 rounded">
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSubmit}
+                                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                        disabled={simulationStatus === "loading" || txStatus === "wallet" || txStatus === "pending"}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,15 +1,16 @@
 import { useMemo, useState } from "react";
 import { HeadingText, Checkbox } from "@ui";
 import type { TAddress } from "@types";
-import type { Address, Hash, TransactionReceipt } from "viem";
+import { createPublicClient, http, type Address, type Hash, type TransactionReceipt } from "viem";
 
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
 import { wagmiConfig, SwapperABI } from "@web3";
-import { connected, account, publicClient } from "@store";
+import { connected, account } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WagmiLayout from "@layouts/WagmiLayout";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+import { sonic } from "viem/chains";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
@@ -205,8 +206,14 @@ const AddPools = (): JSX.Element => {
     /* ───────── stores / wallet ───────── */
     const { open: openConnect } = useWeb3Modal();
     const $connected = useStore(connected);
-    const $publicClient = useStore(publicClient);
     const $account = useStore(account);
+
+    const _publicClient = createPublicClient({
+        chain: sonic,
+        transport: http(
+            import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+        ),
+    });
 
     /* ───────── form state ───────── */
     const [poolAddress, setPoolAddress] = useState("");
@@ -267,7 +274,7 @@ const AddPools = (): JSX.Element => {
         try {
             /* ───────── simulate ───────── */
             setSimulationStatus("loading");
-            await $publicClient.simulateContract({
+            await _publicClient.simulateContract({
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
@@ -276,7 +283,7 @@ const AddPools = (): JSX.Element => {
             });
 
             /* ───────── estimate gas ───────── */
-            const est = await $publicClient.estimateContractGas({
+            const est = await _publicClient.estimateContractGas({
                 address: contractAddress,
                 abi: SwapperABI,
                 functionName,
@@ -303,7 +310,7 @@ const AddPools = (): JSX.Element => {
 
             /* ───────── wait for confirmation ───────── */
             const receipt: TransactionReceipt =
-                await $publicClient.waitForTransactionReceipt({ hash });
+                await _publicClient.waitForTransactionReceipt({ hash });
             if (receipt.status === "success") {
                 setTxStatus("success");
             } else {

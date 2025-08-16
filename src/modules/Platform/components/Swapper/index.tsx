@@ -12,13 +12,14 @@ import { GRAPH_ENDPOINTS } from "src/constants/env";
 
 import type { TAddress, TTableColumn, TPoolTable } from "@types";
 
-import type { Address, Hash, TransactionReceipt } from "viem";
+import { createPublicClient, http, type Address, type Hash, type TransactionReceipt } from "viem";
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
 import { wagmiConfig, SwapperABI } from "@web3";
-import { connected, account, publicClient } from "@store";
+import { connected, account } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+import { sonic } from "viem/chains";
 
 type ModalProps = {
   open: boolean;
@@ -178,8 +179,14 @@ const Swapper = (): JSX.Element => {
   /* ───────── stores / wallet ───────── */
   const { open: openConnect } = useWeb3Modal();
   const $connected = useStore(connected);
-  const $publicClient = useStore(publicClient);
   const $account = useStore(account);
+
+  const _publicClient = createPublicClient({
+    chain: sonic,
+    transport: http(
+      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
+    ),
+  });
 
   /* ───────── UI / modal state ───────── */
   const [simulationStatus, setSimulationStatus] = useState<
@@ -211,7 +218,7 @@ const Swapper = (): JSX.Element => {
     try {
       /* ───────── simulate ───────── */
       setSimulationStatus("loading");
-      await $publicClient.simulateContract({
+      await _publicClient.simulateContract({
         address: contractAddress,
         abi: SwapperABI,
         functionName,
@@ -220,14 +227,14 @@ const Swapper = (): JSX.Element => {
       });
 
       /* ───────── estimate gas ───────── */
-      const est = await $publicClient.estimateContractGas({
+      const est = await _publicClient.estimateContractGas({
         address: contractAddress,
         abi: SwapperABI,
         functionName,
         args,
         account: $account as TAddress,
       });
-      const gasWithBuffer = (est * 12n) / 10n; // +20 %
+      const gasWithBuffer = (est * 102n) / 100n; // +2 %
       setSimulationStatus("success");
 
       /* ───────── wallet approval ───────── */
@@ -246,7 +253,7 @@ const Swapper = (): JSX.Element => {
 
       /* ───────── wait for confirmation ───────── */
       const receipt: TransactionReceipt =
-        await $publicClient.waitForTransactionReceipt({ hash });
+        await _publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status === "success") {
         setTxStatus("success");
       } else {
