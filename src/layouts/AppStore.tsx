@@ -925,8 +925,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                       {}
                     ) as TVaults;
                 }
-
-                isVaultsLoaded.set(true);
               }
             } catch (txError: any) {
               console.log("BLOCKCHAIN ERROR:", txError);
@@ -938,6 +936,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               });
             }
           }
+
+          isVaultsLoaded.set(true);
         }
       })
     );
