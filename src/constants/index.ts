@@ -39,6 +39,8 @@ import {
   STABILITY_TOKENS,
 } from "./tokens";
 
+import { IProtocol } from "@types";
+
 const APRsType = ["latest", "24h", "week"];
 
 const STABLECOINS = [
@@ -189,25 +191,24 @@ const DEFAULT_TRANSACTION_SETTINGS = {
 };
 
 const PROTOCOLS = Object.entries(integrations).reduce<
-  Record<string, { name: string; logoSrc: string }>
->((acc, [integrationKey, value]) => {
-  if (!acc[integrationKey]) {
-    acc[integrationKey] = {
-      name: value.name,
-      logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${value.img}`,
+  Record<string, IProtocol>
+>((acc, [integrationKey, integration]) => {
+  const addProtocol = (key: string, data: any, fallbackImg: string) => {
+    if (acc[key]) return;
+
+    acc[key] = {
+      name: data.name,
+      logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${data.img ?? fallbackImg}`,
+      audits: data.audits ?? [],
+      creationDate: data.creationDate ?? 0,
     };
-  }
+  };
 
-  Object.entries(value.protocols).forEach(([key, val]) => {
-    const name = val.name;
-    let logoSrc = `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${val.img ?? value.img}`;
+  addProtocol(integrationKey, integration, integration.img);
 
-    if (!acc[key])
-      acc[key] = {
-        name,
-        logoSrc,
-      };
-  });
+  Object.entries(integration.protocols ?? {}).forEach(([key, val]) =>
+    addProtocol(key, val, integration.img)
+  );
 
   return acc;
 }, {});

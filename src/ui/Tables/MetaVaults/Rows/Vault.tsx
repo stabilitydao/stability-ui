@@ -127,7 +127,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           onClick={(e) => {
-            if (window.innerHeight <= 860 && vault.type === "Vault") {
+            if (window.innerHeight <= 860 && vault.type === VaultTypes.Vault) {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,

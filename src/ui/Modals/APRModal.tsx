@@ -21,7 +21,7 @@ const APRModal: React.FC<IProps> = ({ state, setModalState }) => {
   const $aprFilter = useStore(aprFilter);
 
   const totalAPYValue = state?.earningData?.apy[$aprFilter] || "0";
-  console.log(state);
+
   const totalAPRValue = state?.earningData?.apr[$aprFilter];
 
   const swapFeesAPRValue = state.earningData.poolSwapFeesAPR[$aprFilter];

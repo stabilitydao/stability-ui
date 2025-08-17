@@ -11,6 +11,8 @@ import { cn } from "@utils";
 
 import { MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
+import { seeds } from "@stabilitydao/stability";
+
 import { TActiveChart, TimelineTypes, TChartData } from "@types";
 
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
@@ -245,9 +247,7 @@ const Chart = ({ symbol }: { symbol: string }): JSX.Element => {
 
   const getData = async () => {
     try {
-      const req = await axios.get(
-        `https://api.stabilitydao.org/metavault/${symbol}/chart`
-      );
+      const req = await axios.get(`${seeds[0]}/metavault/${symbol}/chart`);
 
       const res = req.data;
 

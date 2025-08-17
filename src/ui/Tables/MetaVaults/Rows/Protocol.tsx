@@ -4,14 +4,19 @@ import { ArrowIcon } from "@ui";
 
 import { cn, formatNumber } from "@utils";
 
-import { IProtocol } from "@types";
+import { IProtocol, IProtocolModal } from "@types";
 
 interface IProps {
   protocol: IProtocol;
   activeProtocol: any;
+  setModalState: React.Dispatch<React.SetStateAction<IProtocolModal>>;
 }
 
-const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
+const Protocol: React.FC<IProps> = ({
+  protocol,
+  activeProtocol,
+  setModalState,
+}) => {
   const [expandedData, setExpandedData] = useState(false);
 
   const isDimmed =
@@ -31,13 +36,15 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
           }
         }}
       >
-        <div className="flex items-center w-full min-[860px]:w-[50%] justify-between px-4">
+        <div className="flex items-center w-full min-[860px]:w-[40%] justify-between px-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center">
               <img
                 className="w-8 h-8 rounded-full flex-shrink-0"
                 src={
-                  protocol.name === "Aave" ? "/logo_dark.png" : protocol.logoSrc
+                  protocol.name.includes("Aave")
+                    ? "/logo_dark.png"
+                    : protocol.logoSrc
                 }
                 alt="logo"
               />
@@ -45,9 +52,11 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
 
             <span
               className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] min-[860px]:max-w-full"
-              title={protocol.name === "Aave" ? "Stability" : protocol.name}
+              title={
+                protocol.name.includes("Aave") ? "Stability" : protocol.name
+              }
             >
-              {protocol.name === "Aave" ? "Stability" : protocol.name}
+              {protocol.name.includes("Aave") ? "Stability" : protocol.name}
             </span>
           </div>
 
@@ -56,6 +65,18 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
               <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
             </div>
           </div>
+        </div>
+        <div
+          onClick={() => {
+            setModalState({ ...protocol, state: true });
+          }}
+          className={cn(
+            "w-[10%] px-4 hidden min-[860px]:flex items-center gap-1 text-[16px]",
+            !protocol?.audits.length ? "opacity-0" : "cursor-help"
+          )}
+        >
+          <img src="/icons/question_mark.svg" alt="question_mark" />{" "}
+          <span className="text-start">{protocol?.audits.length}</span>
         </div>
         <div className="px-4 w-[20%] hidden min-[860px]:block">
           <span className="text-[16px] whitespace-nowrap text-end">
@@ -75,6 +96,21 @@ const Protocol: React.FC<IProps> = ({ protocol, activeProtocol }) => {
             <span className="text-[16px] whitespace-nowrap text-end">
               {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
             </span>
+          </div>
+
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Audits
+            </span>
+            <div
+              className="flex items-center cursor-help text-[16px] whitespace-nowrap text-end"
+              onClick={() => {
+                setModalState({ ...protocol, state: true });
+              }}
+            >
+              <img src="/icons/question_mark.svg" alt="question_mark" />
+              <span className="text-start">{protocol?.audits.length}</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-between w-full">
