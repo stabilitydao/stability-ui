@@ -51,16 +51,6 @@ const getContractDataWithPagination = async (
   start: number
 ): Promise<TFrontendContractData> => {
   try {
-    console.log({
-      address: contractAddress,
-      abi: IFrontendABI,
-      functionName: functionName,
-      args: [
-        userAddress as TAddress,
-        BigInt(start),
-        BigInt(CONTRACT_PAGINATION),
-      ],
-    });
     let data = await client?.readContract({
       address: contractAddress,
       abi: IFrontendABI,

@@ -840,8 +840,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         if (APIVaultsData.length) {
           await setVaultsData(APIVaultsData, prices?.[chain.id], chain.id);
           /////***** SET USER BALANCES *****/////
-          if (false) {
-            //isConnected
+          if (isConnected) {
             isWeb3Load.set(true);
 
             let localClient = web3clients[chain.id] ?? web3clients["146"];
@@ -855,7 +854,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   address as TAddress,
                   0
                 );
-              console.log("contractAssetsBalances", contractAssetsBalances);
+
               const contractVaultsBalances =
                 await getContractDataWithPagination(
                   localClient,
@@ -864,7 +863,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   address as TAddress,
                   0
                 );
-              console.log("contractVaultsBalances", contractVaultsBalances);
+
               if (
                 contractVaultsBalances.length === 4 &&
                 contractAssetsBalances.length === 4
@@ -926,8 +925,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                       {}
                     ) as TVaults;
                 }
-
-                isVaultsLoaded.set(true);
               }
             } catch (txError: any) {
               console.log("BLOCKCHAIN ERROR:", txError);
@@ -939,6 +936,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               });
             }
           }
+
+          isVaultsLoaded.set(true);
         }
       })
     );
@@ -1006,8 +1005,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
             localMetaVaults[chain.id] = _metaVaults;
 
-            if (false) {
-              //isConnected
+            if (isConnected) {
               let localClient = web3clients[chain.id] ?? web3clients["146"];
 
               try {
