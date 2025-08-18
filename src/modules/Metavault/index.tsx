@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -8,9 +8,12 @@ import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
 import { Chart } from "./components/Chart";
 
+import { Modal } from "./components/Modals/Modal";
+import { ProtocolModal } from "./components/Modals/ProtocolModal";
+
 import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
-import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
+import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -32,6 +35,7 @@ import {
   MetaVaultTableTypes,
   VaultTypes,
   IProtocolModal,
+  IProtocol,
 } from "@types";
 
 interface IProps {
@@ -39,10 +43,6 @@ interface IProps {
 }
 
 const Metavault: React.FC<IProps> = ({ metavault }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  const protocolModalRef = useRef<HTMLDivElement>(null);
-
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
@@ -50,10 +50,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
-  const [localProtocols, setLocalProtocols] = useState([]);
+  const [localProtocols, setLocalProtocols] = useState<IProtocol[]>([]);
 
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
-  const [filteredProtocols, setFilteredProtocols] = useState([]);
+  const [filteredProtocols, setFilteredProtocols] = useState<IProtocol[]>([]);
 
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
@@ -299,12 +299,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
-  useModalClickOutside(modalRef, () => setModal((prev) => !prev));
-
-  useModalClickOutside(protocolModalRef, () =>
-    setProtocolModal((prev) => ({ ...prev, state: false }))
-  );
-
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
@@ -506,103 +500,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         </div>
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div
-            ref={modalRef}
-            className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
-          >
-            <div className="flex justify-between items-center p-4 border-b border-[#232429]">
-              <h2 className="text-[18px] leading-6 font-semibold">Total APR</h2>
-              <button onClick={() => setModal(false)}>
-                <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3 p-4">
-              <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">APR</p>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.APR, "formatAPR")}%
-                </p>
-              </div>
-              <a
-                className="flex items-center justify-between"
-                href="https://app.merkl.xyz/users/"
-                target="_blank"
-              >
-                <div className="flex items-center gap-2">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    Merkl APR
-                  </p>
-                  <img
-                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg"
-                    alt="Merkl"
-                    className="w-6 h-6"
-                  />
-                </div>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.merklAPR, "formatAPR")}%
-                </p>
-              </a>
-
-              {!!localMetaVault?.gemsAPR && (
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    sGEM1 APR
-                  </p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(localMetaVault?.gemsAPR, "formatAPR")}%
-                  </p>
-                </div>
-              )}
-              <div className="flex items-center justify-between text-[#2BB656]">
-                <p className="leading-5 font-medium">Total APR</p>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.totalAPR, "formatAPR")}%
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {modal && <Modal metaVault={localMetaVault} setModal={setModal} />}
 
       {protocolModal.state && (
-        <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div
-            ref={protocolModalRef}
-            className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
-          >
-            <div className="flex justify-between items-center p-4 border-b border-[#232429]">
-              <h2 className="text-[18px] leading-6 font-semibold">Audits</h2>
-              <button
-                onClick={() =>
-                  setProtocolModal({ ...protocolModal, state: false })
-                }
-              >
-                <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3 p-4 text-[12px]">
-              {!!protocolModal?.audits.length
-                ? protocolModal?.audits.map(({ name, url }) => (
-                    <a
-                      key={name + url}
-                      href={url}
-                      target="_blank"
-                      className="text-[#97979A] flex items-center gap-1"
-                    >
-                      <img
-                        src="/icons/link.png"
-                        alt="link"
-                        className="w-3 h-3"
-                      />
-                      <span>{name}</span>
-                    </a>
-                  ))
-                : null}
-            </div>
-          </div>
-        </div>
+        <ProtocolModal modal={protocolModal} setModal={setProtocolModal} />
       )}
     </div>
   );
