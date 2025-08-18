@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { ArrowIcon } from "@ui";
 
-import { cn, formatNumber } from "@utils";
+import { cn, formatNumber, getTimeDifference } from "@utils";
 
 import { IProtocol, IProtocolModal } from "@types";
 
@@ -18,6 +18,8 @@ const Protocol: React.FC<IProps> = ({
   setModalState,
 }) => {
   const [expandedData, setExpandedData] = useState(false);
+
+  const lifetime = getTimeDifference(protocol.creationDate, true);
 
   const isDimmed =
     activeProtocol?.isHovered && activeProtocol.name !== protocol.name;
@@ -78,12 +80,18 @@ const Protocol: React.FC<IProps> = ({
           <img src="/icons/question_mark.svg" alt="question_mark" />{" "}
           <span className="text-start">{protocol?.audits.length}</span>
         </div>
+        <div className="w-[10%] px-4 hidden min-[860px]:flex items-center gap-1 text-[14px]">
+          {!!lifetime?.years && (
+            <span className="text-start">{lifetime?.years}y</span>
+          )}
+          <span className="text-start">{lifetime?.days}d</span>
+        </div>
         <div className="px-4 w-[20%] hidden min-[860px]:block">
           <span className="text-[16px] whitespace-nowrap text-end">
             {formatNumber(protocol?.allocation ?? 0, "abbreviate")?.slice(1)}
           </span>
         </div>
-        <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
+        <div className="px-4 text-right text-[16px] w-[20%] hidden min-[860px]:block">
           <span>{protocol?.value?.toFixed(2)}%</span>
         </div>
       </div>
@@ -110,6 +118,18 @@ const Protocol: React.FC<IProps> = ({
             >
               <img src="/icons/question_mark.svg" alt="question_mark" />
               <span className="text-start">{protocol?.audits.length}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Lifetime
+            </span>
+            <div className="flex items-center cursor-help text-[16px] whitespace-nowrap text-end gap-1">
+              {!!lifetime?.years && (
+                <span className="text-start">{lifetime?.years}y</span>
+              )}
+              <span className="text-start">{lifetime?.days}d</span>
             </div>
           </div>
 
