@@ -233,7 +233,7 @@ const Swapper = (): JSX.Element => {
 
   const handleRemovePool = async (tokenIn: Address) => {
     try {
-      const confirmed = window.confirm(`Are you sure you want to delete this pool?\nThis cannot be undone.`);
+      const confirmed = window.confirm(`Are you sure you want to delete this pool?\nThis action cannot be undone.`);
       if (!confirmed) return;
 
       resetTxState();
