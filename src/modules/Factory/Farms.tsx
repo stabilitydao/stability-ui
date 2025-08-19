@@ -103,6 +103,8 @@ const Farms = (): JSX.Element => {
             strategy.baseStrategies.some((b) => b === "Farming")
     );
 
+    console.log("strategies:", strategies);
+
     function getStrategyById(id: string) {
         return liveFarmingStrategies.find(strategy => strategy.id === id);
     }
