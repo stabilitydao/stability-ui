@@ -13,22 +13,13 @@ import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { sonic } from "viem/chains";
 import { FaGasPump } from "react-icons/fa";
 
-/* ------------------------------------------------------------------ */
-/* Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
 const shorten = (addr: string) => `${addr.slice(0, 6)}…${addr.slice(-4)}`;
-
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Helper UI components – no external UI libraries required                */
-/* ────────────────────────────────────────────────────────────────────────── */
 
 type ModalProps = {
     open: boolean;
     onClose: () => void;
     children: React.ReactNode;
 };
-/** Generic centre‑screen modal */
 const Modal = ({ open, onClose, children }: ModalProps) =>
     open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">

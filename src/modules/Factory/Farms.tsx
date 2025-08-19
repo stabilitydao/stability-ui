@@ -65,15 +65,6 @@ const Farms = (): JSX.Element => {
     const [txHash, setTxHash] = useState<Hash | null>(null);
     const [txError, setTxError] = useState<string | null>(null);
 
-    const resetTxState = () => {
-        setSimulationStatus("idle");
-        setTxStatus("idle");
-        setTxHash(null);
-        setTxError(null);
-        setShowModal(false);
-        setShowTxModal(false);
-    };
-
     const tokenlist = tokenlistAll.tokens.filter((token) => token.chainId === 146);
 
     function findTokenByAddress(address: string) {
@@ -97,7 +88,6 @@ const Farms = (): JSX.Element => {
         }
     };
 
-    // Add farm: improvements
     const statusOptions = [
         { value: 0, label: "ok" },
         { value: 1, label: "no rewards" },
@@ -153,7 +143,7 @@ const Farms = (): JSX.Element => {
         let interval: NodeJS.Timeout;
 
         async function updateGasEstimate() {
-            if (!editFarm || (!$account && isAdding)) return;
+            if (!editFarm || !$account) return;
 
             try {
                 const est = await _publicClient.estimateContractGas({
@@ -208,6 +198,27 @@ const Farms = (): JSX.Element => {
         setEditFarm({ ...editFarm, [field]: value });
     };
 
+    const resetTxState = () => {
+        setSimulationStatus("idle");
+        setTxStatus("idle");
+        setTxHash(null);
+        setTxError(null);
+        setShowModal(false);
+        setShowTxModal(false);
+    };
+
+    const closeModal = () => {
+        setSimulationStatus("idle");
+        setTxStatus("idle");
+        setTxHash(null);
+        setTxError(null);
+        setEditFarm(null);
+        setEditIndex(null);
+        setRewardAssets([]);
+        setShowModal(false);
+        setShowTxModal(false);
+    };
+
     const handleSubmit = async () => {
         try {
             resetTxState();
@@ -220,7 +231,6 @@ const Farms = (): JSX.Element => {
             setShowTxModal(true);
             setTxStatus("pending");
 
-            /* ───────── simulate ───────── */
             try {
                 setSimulationStatus("loading");
                 await simulateContract(wagmiConfig, {
@@ -244,10 +254,8 @@ const Farms = (): JSX.Element => {
                 return;
             }
 
-            /* ───────── wallet approval ───────── */
             setTxStatus("wallet");
 
-            /* ───────── send tx ───────── */
             const hash = await writeContract(wagmiConfig, {
                 address: FARMS_FACTORY_ADDRESS,
                 abi: FactoryABI,
@@ -258,7 +266,6 @@ const Farms = (): JSX.Element => {
             setTxHash(hash);
             setTxStatus("pending");
 
-            /* ───────── wait for confirmation ───────── */
             const receipt: TransactionReceipt = await waitForTransactionReceipt(wagmiConfig, { hash: hash });
             if (receipt.status === "success") {
                 setTxStatus("success");
@@ -274,14 +281,6 @@ const Farms = (): JSX.Element => {
         }
     };
 
-    const closeModal = () => {
-        setShowModal(false);
-        setTxStatus("idle");
-        setTxHash(null);
-        setEditFarm(null);
-        setEditIndex(null);
-    };
-
     if (loading || farms === null) return <FullPageLoader />;
 
     return (
@@ -291,7 +290,7 @@ const Farms = (): JSX.Element => {
                 status={txStatus}
                 hash={txHash}
                 error={txError}
-                onClose={resetTxState}
+                onClose={closeModal}
             />
             <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
                 <HeadingText text="Farms" scale={1} />
@@ -363,12 +362,12 @@ const Farms = (): JSX.Element => {
 
                 {/* Modal */}
                 {showModal && editFarm && (
-                    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-                        <div className="bg-white dark:bg-accent-900 p-6 rounded-xl max-w-[600px] w-full mt-20">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+                        <div className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl">
                             <h2 className="text-xl font-semibold mb-4">{isAdding ? "Add Farm" : "Edit Farm"}</h2>
 
-                            <div className="grid gap-3 mb-4">
-                                <label className="flex flex-row gap-4 items-center w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                            <div className="grid gap-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+                                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                                     Status:
                                     <select
                                         value={editFarm.status.toString()}
