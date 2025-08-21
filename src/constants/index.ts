@@ -39,6 +39,8 @@ import {
   STABILITY_TOKENS,
 } from "./tokens";
 
+import { VAULTS_META_TITLES } from "./meta";
+
 import { IProtocol } from "@types";
 
 const APRsType = ["latest", "24h", "week"];
@@ -400,4 +402,5 @@ export {
   FARMING_TABLE_FILTERS,
   SOCIALS,
   LENDING_MARKETS,
+  VAULTS_META_TITLES,
 };

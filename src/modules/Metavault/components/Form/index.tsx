@@ -136,11 +136,11 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
       if (gasLimit) {
         return gasLimit;
       }
-
-      return BigInt(10000);
     } catch (error) {
       console.error("Failed to get gasLimit", error);
     }
+
+    return BigInt(10000);
   };
 
   const getAllowance = async (token: string, spender: string) =>

@@ -24,7 +24,7 @@ import {
   PROTOCOLS_TABLE,
 } from "@constants";
 
-import { deployments } from "@stabilitydao/stability";
+import { deployments, integrations } from "@stabilitydao/stability";
 
 import {
   TAddress,
@@ -250,7 +250,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           });
         });
 
-        return { ...protocol, allocation };
+        let creationDate = protocol?.creationDate ?? 0;
+
+        if (protocol?.name.includes("Aave")) {
+          creationDate =
+            integrations.stability.protocols.stabilityMarket.creationDate;
+        }
+
+        return { ...protocol, allocation, creationDate };
       })
       .filter((protocol) => !!protocol.allocation);
 
