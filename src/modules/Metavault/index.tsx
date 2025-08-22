@@ -79,7 +79,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     allocation: 0,
     creationDate: 0,
     audits: [],
+    accidents: [],
     state: false,
+    type: "",
   });
 
   const [modal, setModal] = useState<boolean>(false);

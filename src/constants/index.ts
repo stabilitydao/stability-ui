@@ -202,6 +202,7 @@ const PROTOCOLS = Object.entries(integrations).reduce<
       name: data.name,
       logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${data.img ?? fallbackImg}`,
       audits: data.audits ?? [],
+      accidents: data.accidents ?? [],
       creationDate: data.creationDate ?? 0,
     };
   };

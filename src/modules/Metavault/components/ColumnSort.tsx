@@ -10,12 +10,13 @@ type TProps = {
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
     Name: "w-1/2",
-    Protocol: "w-1/2 md:w-[40%]",
+    Protocol: "w-1/2 md:w-[30%]",
     APR: "w-1/2 md:w-[20%] justify-end",
     Allocation: "w-1/2 md:w-[20%] justify-end",
     "Allocation (current / target)": "hidden md:flex md:w-[30%] justify-end",
     Proportion: "hidden md:flex md:w-[20%] justify-end",
     Audits: "hidden md:flex w-[10%] justify-start",
+    Accidents: "hidden md:flex w-[10%] justify-start",
     Lifetime: "hidden md:flex w-[10%] justify-start",
   };
 
