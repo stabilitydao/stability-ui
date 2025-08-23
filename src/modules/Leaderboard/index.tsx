@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import axios from "axios";
 
-import { ContestsOverview, Rewards } from "./components";
+import { Rewards } from "./components";
 
 import {
   ArrowRightIcon,
@@ -37,21 +37,20 @@ import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 const Leaderboard = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
+  // nextPeriod
+  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
 
-  const { currentPeriod, previousPeriod, nextPeriod } =
-    findAllValidPeriods(contests);
-
-  const periodsData = [
-    {
-      id: previousPeriod || "",
-      ...contests[previousPeriod as keyof YieldContest],
-    },
-    {
-      id: currentPeriod || "",
-      ...contests[currentPeriod as keyof YieldContest],
-    },
-    { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
-  ];
+  // const periodsData = [
+  //   {
+  //     id: previousPeriod || "",
+  //     ...contests[previousPeriod as keyof YieldContest],
+  //   },
+  //   {
+  //     id: currentPeriod || "",
+  //     ...contests[currentPeriod as keyof YieldContest],
+  //   },
+  //   { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
+  // ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
