@@ -318,7 +318,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
               across protocols automatically <br className="xl:block hidden" />{" "}
-              rebalanced for maximum returns on sonic
+              rebalanced for maximum returns on Sonic
             </h3>
           </div>
           <div className="flex items-center flex-wrap md:gap-6">
