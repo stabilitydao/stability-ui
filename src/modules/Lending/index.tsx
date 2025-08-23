@@ -47,7 +47,7 @@
 //   VaultTypes,
 // } from "@types";
 
-const Markets = (): JSX.Element => {
+const Lending = (): JSX.Element => {
   // const $vaults = useStore(vaults);
   // const $metaVaults = useStore(metaVaults);
   // const $markets = useStore(markets);
@@ -375,12 +375,9 @@ const Markets = (): JSX.Element => {
       >
         <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
 
-        <h2 className="page-title__font text-start mb-2 md:mb-5">Markets</h2>
+        <h2 className="page-title__font text-start mb-2 md:mb-5">Lending</h2>
         <h3 className="text-[#97979a] page-description__font">
-          Enables users to amplify yield by borrowing assets and farming with{" "}
-          <br className="hidden md:block" /> higher capital exposure. Maximize
-          returns through strategic leverage <br className="hidden md:block" />{" "}
-          while managing risk with real-time metrics and automated position
+         Non-custodial on-chain isolated lending markets
         </h3>
 
         {/* <div className="flex items-center justify-between gap-2 mt-6 md:mt-10 mb-4">
@@ -457,4 +454,4 @@ const Markets = (): JSX.Element => {
   );
 };
 
-export { Markets };
+export { Lending };

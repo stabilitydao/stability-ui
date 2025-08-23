@@ -272,7 +272,7 @@ const PATHS = [
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
-  // { name: "Markets", path: "markets" },
+  // { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
@@ -286,7 +286,7 @@ const ROUTES = {
     "leveraged-farming",
     "alm",
     "agents",
-    "markets",
+    "lending",
   ],
   platform: [
     "platform",
