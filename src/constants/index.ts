@@ -297,6 +297,7 @@ const ROUTES = {
     "factory",
     "network",
     "swapper",
+    "metavaults-management",
   ],
 };
 

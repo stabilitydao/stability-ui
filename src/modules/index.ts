@@ -26,6 +26,7 @@ import { ALM } from "./ALM";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
 import { Markets } from "./Markets";
+import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
 
 export {
   Factory,
@@ -56,4 +57,5 @@ export {
   Agents,
   Metavault,
   Markets,
+  MetavaultsManagement,
 };
