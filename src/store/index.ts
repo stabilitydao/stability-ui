@@ -56,6 +56,7 @@ const currentChainID = atom("146");
 
 const vaults = deepMap<any>(false);
 const metaVaults = deepMap<any>(false);
+const markets = deepMap<any>(false);
 
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
@@ -101,4 +102,5 @@ export {
   metaVaults,
   marketPrices,
   isNavbar,
+  markets,
 };

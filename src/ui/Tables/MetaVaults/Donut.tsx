@@ -16,11 +16,13 @@ const Donut: React.FC<IProps> = ({ data, activeSection, setActiveSection }) => {
 
   const logoSrc =
     activeSection?.img ||
-    (activeSection.name === "Aave" ? "/logo_dark.png" : activeSection.logoSrc);
+    (activeSection?.name?.includes("Aave")
+      ? "/logo_dark.png"
+      : activeSection?.logoSrc);
 
   const symbol =
     activeSection?.symbol ||
-    (activeSection.name === "Aave" ? "Stability" : activeSection.name);
+    (activeSection?.name?.includes("Aave") ? "Stability" : activeSection.name);
 
   const percentage = activeSection?.value?.toFixed(2);
 

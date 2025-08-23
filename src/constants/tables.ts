@@ -369,6 +369,27 @@ const PROTOCOLS_TABLE: TTableColumn[] = [
     unsortable: true,
   },
   {
+    name: "Lifetime",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Audits",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Accidents",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
     name: "Allocation",
     keyName: "allocation",
     sortType: "none",

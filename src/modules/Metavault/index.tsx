@@ -1,16 +1,19 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
 import { ColumnSort } from "./components/ColumnSort";
-import { LendingMarkets } from "./components/LendingMarkets";
+// import { LendingMarkets } from "./components/LendingMarkets";
 import { Contracts } from "./components/Contracts";
 import { Chart } from "./components/Chart";
 
+import { Modal } from "./components/Modals/Modal";
+import { ProtocolModal } from "./components/Modals/ProtocolModal";
+
 import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
 
-import { cn, formatNumber, dataSorter, useModalClickOutside } from "@utils";
+import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -21,7 +24,7 @@ import {
   PROTOCOLS_TABLE,
 } from "@constants";
 
-import { deployments } from "@stabilitydao/stability";
+import { deployments, integrations } from "@stabilitydao/stability";
 
 import {
   TAddress,
@@ -31,6 +34,8 @@ import {
   TMetaVault,
   MetaVaultTableTypes,
   VaultTypes,
+  IProtocolModal,
+  IProtocol,
 } from "@types";
 
 interface IProps {
@@ -38,8 +43,6 @@ interface IProps {
 }
 
 const Metavault: React.FC<IProps> = ({ metavault }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
@@ -47,10 +50,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
-  const [localProtocols, setLocalProtocols] = useState([]);
+  const [localProtocols, setLocalProtocols] = useState<IProtocol[]>([]);
 
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
-  const [filteredProtocols, setFilteredProtocols] = useState([]);
+  const [filteredProtocols, setFilteredProtocols] = useState<IProtocol[]>([]);
 
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
@@ -67,6 +70,18 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     symbol: "",
     state: false,
     pool: {},
+  });
+
+  const [protocolModal, setProtocolModal] = useState<IProtocolModal>({
+    name: "",
+    logoSrc: "",
+    value: 0,
+    allocation: 0,
+    creationDate: 0,
+    audits: [],
+    accidents: [],
+    state: false,
+    type: "",
   });
 
   const [modal, setModal] = useState<boolean>(false);
@@ -150,7 +165,11 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     if (!metaVault) return;
 
     const protocols = ["Stability", ...metaVault.protocols].map((name) =>
-      Object.values(PROTOCOLS).find((p) => name.includes(p.name))
+      Object.values(PROTOCOLS).find(
+        (p) =>
+          p.name.replace(" ", "").toLowerCase() ===
+          name.replace(" ", "").toLowerCase()
+      )
     );
 
     const vaults = await Promise.all(
@@ -210,29 +229,39 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     const cleanedVaults = vaults.filter(Boolean);
 
-    const protocolsAllocation = protocols.slice(1).map((protocol) => {
-      let allocation = 0;
+    const protocolsAllocation = protocols
+      .slice(1)
+      .map((protocol) => {
+        let allocation = 0;
 
-      cleanedVaults.forEach((vault) => {
-        const vaultsToCheck =
-          vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
+        cleanedVaults.forEach((vault) => {
+          const vaultsToCheck =
+            vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
 
-        vaultsToCheck.forEach((v) => {
-          const strategy = v.strategy;
+          vaultsToCheck.forEach((v) => {
+            const strategy = v.strategy;
 
-          const isSiloMatch =
-            protocol?.name === "Silo V2" && strategy.includes("Silo");
+            const isSiloMatch =
+              protocol?.name === "Silo V2" && strategy.includes("Silo");
 
-          const isStrategyMatch = protocol?.name.includes(strategy);
+            const isStrategyMatch = protocol?.name.includes(strategy);
 
-          if (isSiloMatch || isStrategyMatch) {
-            allocation += Number(v.tvl || 0);
-          }
+            if (isSiloMatch || isStrategyMatch) {
+              allocation += Number(v.tvl || 0);
+            }
+          });
         });
-      });
 
-      return { ...protocol, allocation };
-    });
+        let creationDate = protocol?.creationDate ?? 0;
+
+        if (protocol?.name.includes("Aave")) {
+          creationDate =
+            integrations.stability.protocols.stabilityMarket.creationDate;
+        }
+
+        return { ...protocol, allocation, creationDate };
+      })
+      .filter((protocol) => !!protocol.allocation);
 
     const totalAllocation = protocolsAllocation.reduce(
       (sum, p) => sum + p.allocation,
@@ -279,8 +308,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const firstTabIndex = lastTabIndex - pagination;
   const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
 
-  useModalClickOutside(modalRef, () => setModal((prev) => !prev));
-
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
@@ -291,7 +318,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
               across protocols automatically <br className="xl:block hidden" />{" "}
-              rebalanced for maximum returns on sonic
+              rebalanced for maximum returns on Sonic
             </h3>
           </div>
           <div className="flex items-center flex-wrap md:gap-6">
@@ -457,7 +484,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                   tableType={tableType}
                   vaults={currentTabVaults}
                   protocols={filteredProtocols}
-                  setModalState={setAprModal}
+                  setAPRModalState={setAprModal}
+                  setProtocolModalState={setProtocolModal}
                 />
               ) : (
                 <div className="text-start h-[60px] font-medium">No vaults</div>
@@ -477,68 +505,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
-          <LendingMarkets metavault={metavault} />
+          {/* <LendingMarkets metavault={metavault} /> */}
         </div>
       </div>
 
-      {modal && (
-        <div className="fixed inset-0 z-[1400] bg-black/60 backdrop-blur-sm flex items-center justify-center">
-          <div
-            ref={modalRef}
-            className="relative w-[90%] max-w-[400px] max-h-[80vh] overflow-y-auto bg-[#111114] border border-[#232429] rounded-lg"
-          >
-            <div className="flex justify-between items-center p-4 border-b border-[#232429]">
-              <h2 className="text-[18px] leading-6 font-semibold">Total APR</h2>
-              <button onClick={() => setModal(false)}>
-                <img src="/icons/xmark.svg" alt="close" className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3 p-4">
-              <div className="flex items-center justify-between">
-                <p className="leading-5 text-[#97979A] font-medium">APR</p>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.APR, "formatAPR")}%
-                </p>
-              </div>
-              <a
-                className="flex items-center justify-between"
-                href="https://app.merkl.xyz/users/"
-                target="_blank"
-              >
-                <div className="flex items-center gap-2">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    Merkl APR
-                  </p>
-                  <img
-                    src="https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Merkl.svg"
-                    alt="Merkl"
-                    className="w-6 h-6"
-                  />
-                </div>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.merklAPR, "formatAPR")}%
-                </p>
-              </a>
+      {modal && <Modal metaVault={localMetaVault} setModal={setModal} />}
 
-              {!!localMetaVault?.gemsAPR && (
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    sGEM1 APR
-                  </p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(localMetaVault?.gemsAPR, "formatAPR")}%
-                  </p>
-                </div>
-              )}
-              <div className="flex items-center justify-between text-[#2BB656]">
-                <p className="leading-5 font-medium">Total APR</p>
-                <p className="text-end font-semibold">
-                  {formatNumber(localMetaVault?.totalAPR, "formatAPR")}%
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      {protocolModal.state && (
+        <ProtocolModal modal={protocolModal} setModal={setProtocolModal} />
       )}
     </div>
   );

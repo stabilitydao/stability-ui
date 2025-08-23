@@ -18,6 +18,14 @@ interface IProtocol {
   logoSrc: string;
   value?: number;
   allocation?: number;
+  creationDate: number;
+  audits: { name: string; url: string }[];
+  accidents: { date: number; url: string; name: string }[];
+}
+
+interface IProtocolModal extends IProtocol {
+  state: boolean;
+  type: string;
 }
 
 interface IStrategyInfo {
@@ -857,4 +865,5 @@ export type {
   TEndMetaVaults,
   TMarketInfo,
   TActiveChart,
+  IProtocolModal,
 };

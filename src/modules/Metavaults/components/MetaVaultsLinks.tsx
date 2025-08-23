@@ -76,7 +76,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
                       ? "Stablecoins"
                       : metaVault?.symbol?.slice(4)}{" "}
                     deployed across protocols automatically rebalanced for
-                    maximum returns on sonic
+                    maximum returns on Sonic
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-2 flex-wrap md:flex-nowrap">

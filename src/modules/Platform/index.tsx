@@ -24,7 +24,7 @@ import { apiData, platformVersions } from "@store";
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 import packageJson from "../../../package.json";
-import {NodeState} from "@stabilitydao/stability/out/api.types";
+import { NodeState } from "@stabilitydao/stability/out/api.types";
 
 const Platform = (): JSX.Element => {
   const $currentChainID = "146";
@@ -108,10 +108,17 @@ const Platform = (): JSX.Element => {
   const networksInfo = [
     {
       name: "Nodes online",
-      value: Object.keys($apiData?.network.nodes || []).filter(machingId => {
-        const nodeState = $apiData?.network.nodes[machingId] as unknown as NodeState|undefined
-        return !!(nodeState?.lastSeen && ((new Date()).getTime() / 1000) - nodeState.lastSeen < 180)
-      }).length.toString(),
+      value: Object.keys($apiData?.network.nodes || [])
+        .filter((machingId) => {
+          const nodeState = $apiData?.network.nodes[machingId] as unknown as
+            | NodeState
+            | undefined;
+          return !!(
+            nodeState?.lastSeen &&
+            new Date().getTime() / 1000 - nodeState.lastSeen < 180
+          );
+        })
+        .length.toString(),
       color: "#2D67FB",
     },
     { name: "Seed nodes", value: seeds.length.toString(), color: "#4FAE2D" },
@@ -164,18 +171,51 @@ const Platform = (): JSX.Element => {
     }
   }, [$apiData]);
 
-  const isAlert = $apiData?.network.status == 'Alert'
-  const isOk = $apiData?.network.status == 'OK'
+  const isAlert = $apiData?.network.status == "Alert";
+  const isOk = $apiData?.network.status == "OK";
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
       <div className="flex flex-col w-full items-center">
         <div className="flex text-[14px] h-[30px] items-center">
           <span className="bg-gray-700 px-[10px]">Platform status</span>
-          <span className="font-bold px-[10px]" style={{backgroundColor: isAlert ? '#ff8d00' : isOk ? '#1f851f' : '#444444'}}>{$apiData?.network.status}</span>
+          <span
+            className="font-bold px-[10px]"
+            style={{
+              backgroundColor: isAlert
+                ? "#ff8d00"
+                : isOk
+                  ? "#1f851f"
+                  : "#444444",
+            }}
+          >
+            {$apiData?.network.status}
+          </span>
         </div>
+
         {isAlert && (
-          <div className="flex">{Object.keys($apiData?.network.healthCheckReview?.alerts).map(a => $apiData?.network.healthCheckReview?.alerts[a])}</div>
+          <div className="flex flex-col gap-3">
+            {Object.entries(
+              $apiData?.network.healthCheckReview?.alerts || {}
+            ).map(([key, value], index) => (
+              <div
+                key={index}
+                className="p-3 bg-[#111114] border border-[#232429] rounded-lg"
+              >
+                <p className="font-semibold">{key}</p>
+
+                {typeof value === "object" && value !== null ? (
+                  <div className="ml-3">
+                    <pre className="bg-gray-800 text-green-400 p-2 rounded-lg">
+                      <code>{JSON.stringify(value, null, 2)}</code>
+                    </pre>
+                  </div>
+                ) : (
+                  <p>{String(value)}</p>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -275,7 +315,6 @@ const Platform = (): JSX.Element => {
           linkTitle="Go to Factory"
           counters={factoryInfo}
         />
-
       </div>
 
       <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>

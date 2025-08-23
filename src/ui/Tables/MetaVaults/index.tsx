@@ -13,20 +13,23 @@ import {
   MetaVaultTableTypes,
   IProtocol,
   VaultTypes,
+  IProtocolModal,
 } from "@types";
 
 interface IProps {
   tableType: MetaVaultTableTypes;
   vaults: TVault[];
   protocols: IProtocol[];
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setAPRModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setProtocolModalState: React.Dispatch<React.SetStateAction<IProtocolModal>>;
 }
 
 const MetaVaultsTable: React.FC<IProps> = ({
   tableType,
   vaults,
   protocols,
-  setModalState,
+  setAPRModalState,
+  setProtocolModalState,
 }) => {
   const [activeSection, setActiveSection] = useState({});
 
@@ -139,7 +142,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
-                    setModalState={setModalState}
+                    setModalState={setAPRModalState}
                   />
                 );
               }
@@ -149,7 +152,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
-                    setModalState={setModalState}
+                    setModalState={setAPRModalState}
                   />
                   {vault?.vaults?.map((endVault) => {
                     return (
@@ -158,7 +161,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                         APRs={getVaultAPRs(endVault)}
                         vault={endVault}
                         activeVault={activeSection}
-                        setModalState={setModalState}
+                        setModalState={setAPRModalState}
                         inserted={true}
                       />
                     );
@@ -171,6 +174,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                 key={`row/${protocol.name + index}`}
                 protocol={protocol}
                 activeProtocol={activeSection}
+                setModalState={setProtocolModalState}
               />
             ))}
       </div>

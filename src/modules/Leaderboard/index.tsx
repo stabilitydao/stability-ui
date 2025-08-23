@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import axios from "axios";
 
-import { ContestsOverview, Rewards } from "./components";
+import { Rewards } from "./components";
 
 import {
   ArrowRightIcon,
@@ -37,21 +37,20 @@ import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 const Leaderboard = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
+  // nextPeriod
+  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
 
-  const { currentPeriod, previousPeriod, nextPeriod } =
-    findAllValidPeriods(contests);
-
-  const periodsData = [
-    {
-      id: previousPeriod || "",
-      ...contests[previousPeriod as keyof YieldContest],
-    },
-    {
-      id: currentPeriod || "",
-      ...contests[currentPeriod as keyof YieldContest],
-    },
-    { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
-  ];
+  // const periodsData = [
+  //   {
+  //     id: previousPeriod || "",
+  //     ...contests[previousPeriod as keyof YieldContest],
+  //   },
+  //   {
+  //     id: currentPeriod || "",
+  //     ...contests[currentPeriod as keyof YieldContest],
+  //   },
+  //   { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
+  // ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -156,7 +155,7 @@ const Leaderboard = (): JSX.Element => {
         <Rewards />
       </div>
 
-      <div className="mt-10 mb-6 flex flex-col gap-4">
+      {/* <div className="mt-10 mb-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="text-[24px] leading-8 font-semibold">Contests</span>
           <a
@@ -168,9 +167,9 @@ const Leaderboard = (): JSX.Element => {
           </a>
         </div>
         <ContestsOverview periodsData={periodsData} />
-      </div>
+      </div> */}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-10">
         <div className="flex items-center justify-between">
           <span className="text-[24px] leading-8 font-semibold">
             Leaderboards
@@ -301,6 +300,14 @@ const Leaderboard = (): JSX.Element => {
             setTab={setCurrentTab}
             setPagination={setPagination}
           />
+          <a
+            className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 mt-5"
+            href="/contests"
+          >
+            All yield contests
+            {/* View all contests */}
+            <ArrowRightIcon color={"#5E6AD2"} />
+          </a>
         </div>
       </div>
     </div>
