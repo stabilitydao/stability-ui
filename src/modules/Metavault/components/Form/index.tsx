@@ -365,7 +365,7 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
     const _value = parseUnits(String(amount), decimals);
 
-    const shares = parseUnits(String(amount - (amount * 10) / 100), decimals); // 10 = slippage
+    const shares = parseUnits(String(amount - (amount * 10) / 100), 18); // 10 = slippage
 
     try {
       setNeedConfirm(true);
