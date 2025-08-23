@@ -82,6 +82,10 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (["assets", "swapper", "factory"].includes(main)) {
       add("Platform", "platform");
       add(main.charAt(0).toUpperCase() + main.slice(1));
+    } else if (main === "metavaults-management") {
+      add("Platform", "platform");
+      add("Factory", "factory");
+      add("Metavaults Management");
     } else if (
       main === "metavaults" &&
       rest[0] === "metavault" &&
