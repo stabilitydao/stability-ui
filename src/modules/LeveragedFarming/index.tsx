@@ -16,7 +16,7 @@ import {
   APRModal,
 } from "@ui";
 
-import { vaults, isVaultsLoaded, aprFilter, error, metaVaults } from "@store";
+import { vaults, isVaultsLoaded, aprFilter, error } from "@store";
 
 import { initFilters } from "./functions";
 
@@ -42,7 +42,6 @@ import {
 
 const LeveragedFarming = (): JSX.Element => {
   const $vaults = useStore(vaults);
-  const $metaVaults = useStore(metaVaults);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
@@ -305,7 +304,7 @@ const LeveragedFarming = (): JSX.Element => {
   };
 
   const initVaults = async () => {
-    if ($vaults && $metaVaults) {
+    if ($vaults) {
       const allVaults = Object.values($vaults[146]) || [];
 
       const vaults: TVault[] = allVaults

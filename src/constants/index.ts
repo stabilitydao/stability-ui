@@ -272,11 +272,33 @@ const PATHS = [
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
+  { name: "Markets", path: "markets" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
 ];
+
+const ROUTES = {
+  basic: [
+    "xstbl",
+    "dashboard",
+    "leveraged-farming",
+    "alm",
+    "agents",
+    "markets",
+  ],
+  platform: [
+    "platform",
+    "strategies",
+    "chains",
+    "integrations",
+    "assets",
+    "factory",
+    "network",
+    "swapper",
+  ],
+};
 
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
@@ -404,4 +426,5 @@ export {
   SOCIALS,
   LENDING_MARKETS,
   VAULTS_META_TITLES,
+  ROUTES,
 };

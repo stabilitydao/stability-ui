@@ -41,6 +41,7 @@ import {
   vaultData,
   metaVaults,
   marketPrices,
+  markets,
 } from "@store";
 
 import {
@@ -1063,6 +1064,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     vaultData.set(vaultsData);
     vaults.set(localVaults);
     metaVaults.set(localMetaVaults);
+    markets.set(stabilityAPIData.markets);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);
