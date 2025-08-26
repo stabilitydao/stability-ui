@@ -457,6 +457,47 @@ const LEVERAGE_FARMING_TABLE: TTableColumn[] = [
   },
 ];
 
+const MARKET_TABLE: TTableColumn[] = [
+  {
+    name: "Market",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Asset",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Supply APR",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Borrow APR",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Supply TVL",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Borrow TVL",
+    keyName: "",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -474,4 +515,5 @@ export {
   PROTOCOLS_TABLE,
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
+  MARKET_TABLE,
 };

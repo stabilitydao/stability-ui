@@ -325,7 +325,10 @@ const MetavaultsManagement = (): JSX.Element => {
                   placeholder="0"
                   value={values[proportion.address] || ""}
                   onChange={(e) => handleInputChange(proportion.address, e)}
-                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                  className={cn(
+                    "bg-transparent text-2xl font-semibold outline-none w-full",
+                    !Number(values[proportion.address]) && "text-[#97979A]"
+                  )}
                 />
               </label>
             </div>
