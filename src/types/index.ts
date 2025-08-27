@@ -383,7 +383,7 @@ type TLeaderboard = {
 
 type TTAbleFiltersVariant = {
   name: string;
-  title: string;
+  title?: string;
   state: boolean;
 };
 
@@ -747,6 +747,27 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
+type TMarketAsset = {
+  address: TAddress;
+  borrowAPR: string;
+  borrowCap: string;
+  borrowTVL: string;
+  cap: string;
+  name: string;
+  price: string;
+  supplyAPR: string;
+  supplyTVL: string;
+};
+
+type TMarket = {
+  name: string;
+  assets: TMarketAsset[];
+  supplyAPR?: number;
+  borrowAPR?: number;
+  supplyTVL?: number;
+  borrowTVL?: number;
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -866,4 +887,6 @@ export type {
   TMarketInfo,
   TActiveChart,
   IProtocolModal,
+  TMarket,
+  TMarketAsset,
 };

@@ -1,63 +1,14 @@
-import { RewardsCarousel } from "../../RewardsCarousel";
-import { StrategyBadge } from "../../StrategyBadge";
-
-import { formatNumber } from "@utils";
-
-import { VAULTS_WITH_NAME } from "@constants";
-
-import { TVault, TAPRModal, VaultTypes } from "@types";
+import { TMarket } from "@types";
 
 interface IProps {
-  APRs: {
-    APR: string;
-    APY: string;
-    swapFees: string;
-    strategyAPR: string;
-    dailyAPR: string;
-    gemsAPR: string;
-  };
-  vault: TVault;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  market: TMarket;
 }
 
-const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  const POINTS = {
-    sonic: vault.sonicPoints,
-    rings: vault.ringsPoints,
-  };
-
-  const link =
-    vault?.type === VaultTypes.Vault
-      ? `/vaults/vault/${vault.network}/${vault.address}`
-      : `/metavaults/metavault/${vault.address}`;
-
-  const modalData =
-    vault?.type === VaultTypes.Vault
-      ? {
-          earningData: vault.earningData,
-          daily: vault.daily,
-          lastHardWork: vault.lastHardWork,
-          symbol: vault?.risk?.symbol as string,
-          state: true,
-          type: "vault",
-          pool: vault?.pool,
-        }
-      : {
-          APR: vault?.APR,
-          merklAPR: vault?.merklAPR,
-          gemsAPR: vault?.gemsAPR,
-          totalAPR: vault?.totalAPR,
-          state: true,
-          type: "metaVault",
-        };
-
+const Grid: React.FC<IProps> = ({ market }) => {
   return (
-    <a
-      className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden"
-      data-testid="vault"
-      href={link}
-    >
-      <div className="p-6 flex flex-col gap-6">
+    <div className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden">
+      {market.name}
+      {/* <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center flex-shrink-0">
             {vault?.type != VaultTypes.Vault ? (
@@ -135,8 +86,8 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             </p>
           </div>
         </div>
-      </div>
-    </a>
+      </div> */}
+    </div>
   );
 };
 

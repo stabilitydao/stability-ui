@@ -42,6 +42,7 @@ import {
   metaVaults,
   marketPrices,
   markets,
+  isMarketsLoaded,
 } from "@store";
 
 import {
@@ -795,6 +796,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const vaultsData: TVaultDataKey = {};
     const _marketPrices: TMarketPrices = {};
 
+    /***** MARKETS *****/
+    markets.set(stabilityAPIData.markets);
+    isMarketsLoaded.set(true);
+
     /***** PRICES *****/
     if (stabilityAPIData.prices) {
       Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
@@ -1064,7 +1069,6 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     vaultData.set(vaultsData);
     vaults.set(localVaults);
     metaVaults.set(localMetaVaults);
-    markets.set(stabilityAPIData.markets);
     tokens.set(vaultsTokens);
     platformsData.set(platformData);
     platformVersions.set(versions);

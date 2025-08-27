@@ -103,6 +103,11 @@ const Breadcrumbs = (): JSX.Element => {
 
       add("Meta Vaults", "metavaults");
       add(symbol);
+    } else if (main === "lending" && rest.length === 2) {
+      const [, , marketName] = currentPath.split("/");
+
+      add("Lending", "lending");
+      add(`${marketName} Market`);
     }
 
     setPaths(crumbs);

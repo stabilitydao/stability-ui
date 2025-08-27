@@ -43,6 +43,8 @@ const Navbar = (): JSX.Element => {
       setActivePath("leaderboard");
     } else if (currentPath.includes("metavaults")) {
       setActivePath("metavaults");
+    } else if (currentPath.includes("lending")) {
+      setActivePath("lending");
     } else if (isBasicPage) {
       setActivePath(currentPath);
     }

@@ -1,54 +1,36 @@
-// import { EmptyTable } from "../EmptyTable";
-// import { Grid } from "./Grid";
+import { EmptyTable } from "../EmptyTable";
+import { Grid } from "./Grid";
 import { Row } from "./Row";
 
+import { cn } from "@utils";
+
+import { DisplayTypes, TMarket } from "@types";
+
 interface IProps {
-  markets: any;
-  //   display: DisplayTypes;
-  //   isUserVaults: boolean;
-  //   period: TAPRPeriod;
-  //   setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  markets: TMarket[];
+  display: DisplayTypes;
 }
 
-const MarketsTable: React.FC<IProps> = ({
-  markets,
-  //   display,
-  //   isUserVaults,
-  //   period,
-  //   setModalState,
-}) => {
-  //   if (!vaults?.length) {
-  //     return <EmptyTable isUserVaults={isUserVaults} display={display} />;
-  //   }
+const MarketsTable: React.FC<IProps> = ({ markets, display }) => {
+  if (!markets?.length) {
+    return <EmptyTable isUserVaults={false} display={display} />;
+  }
 
   return (
     <div
-      // key={display}
-      // className={cn(
-      //   display === "grid" &&
-      //     "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
-      // )}
-      className="flex flex-col gap-2"
+      key={display}
+      className={cn(
+        display === "grid"
+          ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
+          : "flex flex-col gap-2"
+      )}
     >
-      {markets.map((market: any, index: number) => {
-        // if (display === "grid") {
-        //   return (
-        //     <Grid
-        //       key={`grid/${vault.name + index}`}
-        //       APRs={APR_DATA}
-        //       vault={vault}
-        //       setModalState={setModalState}
-        //     />
-        //   );
-        // }
+      {markets.map((market: TMarket, index: number) => {
+        if (display === "grid") {
+          return <Grid key={`grid/${market.name + index}`} market={market} />;
+        }
 
-        return (
-          <Row
-            key={`row/${market.name + index}`}
-            market={market}
-            // setModalState={setModalState}
-          />
-        );
+        return <Row key={`row/${market.name + index}`} market={market} />;
       })}
     </div>
   );

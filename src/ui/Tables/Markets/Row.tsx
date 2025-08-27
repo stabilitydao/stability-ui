@@ -1,23 +1,15 @@
 import { formatNumber, getTokenData } from "@utils";
 
+import { TMarket, TMarketAsset } from "@types";
+
 interface IProps {
-  market: any;
-  // setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  market: TMarket;
 }
 
 const Row: React.FC<IProps> = ({ market }) => {
-  // const isSTBLVault =
-  //   Array.isArray(vault?.assets) &&
-  //   vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
-
-  // const link =
-  //   vault?.type === VaultTypes.Vault
-  //     ? `/vaults/vault/${vault.network}/${vault.address}`
-  //     : `/metavaults/metavault/${vault.address}`;
-
   return (
-    <div className="border border-[#23252A]">
-      {market.assets.map((asset) => {
+    <a className="border border-[#23252A]" href={`/lending/146/${market.name}`}>
+      {market.assets.map((asset: TMarketAsset) => {
         const assetData = getTokenData(asset.address);
 
         return (
@@ -55,7 +47,7 @@ const Row: React.FC<IProps> = ({ market }) => {
           </div>
         );
       })}
-    </div>
+    </a>
   );
 };
 
