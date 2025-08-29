@@ -5,17 +5,17 @@ import { useStore } from "@nanostores/react";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 
-import { FullPageLoader, ErrorMessage, MarketsTable, DisplayType } from "@ui";
+import { FullPageLoader, ErrorMessage, MarketsTable } from "@ui";
 
 import { error, markets, isMarketsLoaded } from "@store";
 
 import { initFilters } from "./functions";
 
-import { dataSorter, cn } from "@utils";
+import { dataSorter } from "@utils";
 
 import { CHAINS, MARKET_TABLE, MARKET_TABLE_FILTERS } from "@constants";
 
-import { TTableColumn, DisplayTypes, TMarket, TMarketAsset } from "@types";
+import { TTableColumn, TMarket, TMarketAsset } from "@types";
 
 const Lending = (): JSX.Element => {
   const $isMarketsLoaded = useStore(isMarketsLoaded);
@@ -47,10 +47,6 @@ const Lending = (): JSX.Element => {
 
   const [tableStates, setTableStates] = useState(MARKET_TABLE);
   const [tableFilters, setTableFilters] = useState(MARKET_TABLE_FILTERS);
-
-  const [displayType, setDisplayType] = useState<DisplayTypes>(
-    DisplayTypes.Rows
-  );
 
   const [activeNetworks, setActiveNetworks] = useState(
     CHAINS.filter(({ active }) => active)
@@ -164,39 +160,42 @@ const Lending = (): JSX.Element => {
 
   const initMarkets = async () => {
     if ($markets) {
-      const allMarkets = Object.entries($markets[146]).map(([name, assets]) => {
-        const formattedAssets = Object.entries(assets)
-          .map(([address, data]) => ({
-            address,
-            ...data,
-          }))
-          .sort(
-            (a: TMarketAsset, b: TMarketAsset) =>
-              Number(b.supplyTVL) - Number(a.supplyTVL)
+      const allMarkets = activeNetworks.flatMap((network) =>
+        Object.entries($markets[network.id]).map(([name, assets]) => {
+          const formattedAssets = Object.entries(assets)
+            .map(([address, data]) => ({
+              address,
+              ...data,
+            }))
+            .sort(
+              (a: TMarketAsset, b: TMarketAsset) =>
+                Number(b.supplyTVL) - Number(a.supplyTVL)
+            );
+
+          const supplyAPR = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.supplyAPR) || 0)
+          );
+          const borrowAPR = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.borrowAPR) || 0)
+          );
+          const supplyTVL = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.supplyTVL) || 0)
+          );
+          const borrowTVL = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.borrowTVL) || 0)
           );
 
-        const supplyAPR = Math.max(
-          ...formattedAssets.map((asset) => Number(asset.supplyAPR) || 0)
-        );
-        const borrowAPR = Math.max(
-          ...formattedAssets.map((asset) => Number(asset.borrowAPR) || 0)
-        );
-        const supplyTVL = Math.max(
-          ...formattedAssets.map((asset) => Number(asset.supplyTVL) || 0)
-        );
-        const borrowTVL = Math.max(
-          ...formattedAssets.map((asset) => Number(asset.borrowTVL) || 0)
-        );
-
-        return {
-          name,
-          assets: formattedAssets,
-          supplyAPR,
-          borrowAPR,
-          supplyTVL,
-          borrowTVL,
-        };
-      });
+          return {
+            name,
+            assets: formattedAssets,
+            supplyAPR,
+            borrowAPR,
+            supplyTVL,
+            borrowTVL,
+            network,
+          };
+        })
+      );
 
       initFilters(
         allMarkets,
@@ -204,6 +203,7 @@ const Lending = (): JSX.Element => {
         setTableFilters,
         activeNetworksHandler
       );
+
       setLocalMarkets(allMarkets);
       setFilteredMarkets(allMarkets);
       setIsLocalMarketsLoaded(true);
@@ -238,17 +238,11 @@ const Lending = (): JSX.Element => {
 
         <div className="flex items-center justify-between gap-2 mt-6 md:mt-10 mb-4">
           <Filters filters={tableFilters} setFilters={setTableFilters} />
-          <DisplayType type={displayType} setType={setDisplayType} />
         </div>
       </div>
       <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
         <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">
-          <div
-            className={cn(
-              "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[762px] md:w-[960px] lg:w-full",
-              displayType === "grid" && "hidden"
-            )}
-          >
+          <div className="flex items-center bg-[#151618] border border-[#23252A] rounded-lg h-[48px] w-[1050px] md:w-full mb-4">
             {tableStates.map((value: TTableColumn, index: number) => (
               <ColumnSort
                 key={value.name + index}
@@ -261,18 +255,13 @@ const Lending = (): JSX.Element => {
           </div>
           <div>
             {isLoading ? (
-              <div
-                className={cn(
-                  "relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]",
-                  displayType === "grid" && "rounded-lg border-b"
-                )}
-              >
+              <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
                 <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
                   <FullPageLoader />
                 </div>
               </div>
             ) : localMarkets?.length ? (
-              <MarketsTable markets={filteredMarkets} display={displayType} />
+              <MarketsTable markets={filteredMarkets} />
             ) : (
               <div className="text-start h-[60px] font-medium">No markets</div>
             )}

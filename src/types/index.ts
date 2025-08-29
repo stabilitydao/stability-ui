@@ -709,6 +709,15 @@ type TVSHoldModalState = {
   isVsActive: boolean;
 };
 
+type TNetwork = {
+  name: string;
+  id: string;
+  logoURI: string;
+  explorer: string;
+  nativeCurrency: string;
+  active: boolean;
+};
+
 type TTableActiveParams = {
   search: number;
   sort: number;
@@ -762,6 +771,7 @@ type TMarketAsset = {
 type TMarket = {
   name: string;
   assets: TMarketAsset[];
+  network: TNetwork;
   supplyAPR?: number;
   borrowAPR?: number;
   supplyTVL?: number;
@@ -889,4 +899,5 @@ export type {
   IProtocolModal,
   TMarket,
   TMarketAsset,
+  TNetwork,
 };

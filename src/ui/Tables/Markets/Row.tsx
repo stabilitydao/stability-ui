@@ -1,4 +1,4 @@
-import { formatNumber, getTokenData } from "@utils";
+import { cn, formatNumber, getTokenData } from "@utils";
 
 import { TMarket, TMarketAsset } from "@types";
 
@@ -8,41 +8,62 @@ interface IProps {
 
 const Row: React.FC<IProps> = ({ market }) => {
   return (
-    <a className="border border-[#23252A]" href={`/lending/146/${market.name}`}>
-      {market.assets.map((asset: TMarketAsset) => {
+    <a
+      className="border border-[#23252A] rounded-lg min-w-max md:min-w-full"
+      href={`/lending/146/${market.name}`}
+    >
+      {market.assets.map((asset: TMarketAsset, index: number) => {
         const assetData = getTokenData(asset.address);
 
         return (
           <div
             key={market.name + asset.address}
-            className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center"
+            className={cn(
+              "text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center",
+              market.assets.length - 1 != index && "border-b border-b-[#23252A]"
+            )}
           >
-            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[15%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
-              <div className="flex items-center gap-2 md:gap-3">
-                <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
-                  {market.name}
-                </span>
-              </div>
+            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+              {!index ? (
+                <div className="flex items-center gap-3">
+                  <img
+                    src={market.network.logoURI}
+                    alt={market.network.name}
+                    className="w-6 h-6 rounded-full"
+                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-[14px] leading-5">
+                      {market.network.name}
+                    </span>
+                    <span className="bg-[#252528] border border-[#58595D] h-5 rounded-[4px] py-0.5 px-2 text-[12px] leading-4 font-medium">
+                      {market.network.id}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
             </div>
-            <div className="px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2">
+            <div className="px-2 md:px-4 text-left text-[16px] w-[150px] md:w-[15%] flex items-center gap-2">
               <img
                 src={assetData?.logoURI}
                 alt={assetData?.symbol}
-                className="w-4 h-4 rounded-full"
+                className="w-6 h-6 rounded-full"
               />
               <span>{assetData?.symbol}</span>
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
               {formatNumber(asset.supplyAPR, "format")}%
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
               {formatNumber(asset.borrowAPR, "format")}%
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
               {formatNumber(asset.supplyTVL, "abbreviate")}
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[17.5%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
               {formatNumber(asset.borrowTVL, "abbreviate")}
+            </div>
+            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
+              13% / 13%
             </div>
           </div>
         );

@@ -492,7 +492,13 @@ const MARKET_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "Borrow TVL",
+    name: "Available to borrow",
+    keyName: "borrowTVL",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "maxLTV / LT",
     keyName: "borrowTVL",
     sortType: "none",
     dataType: "number",
