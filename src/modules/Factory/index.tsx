@@ -11,6 +11,8 @@ import { BuildForm } from "./BuildForm";
 
 import { VaultManager } from "./VaultManager";
 
+import { ArrowRightIcon } from "@ui";
+
 import {
   platforms,
   PlatformABI,
@@ -317,7 +319,13 @@ const Factory = (): JSX.Element => {
   return (
     <WagmiLayout>
       <VaultManager />
-
+      <a
+        className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 my-5"
+        href="/metavaults-management"
+      >
+        Metavaults Management
+        <ArrowRightIcon color={"#5E6AD2"} />
+      </a>
       {isCorrectNetwork ? (
         <div className="flex flex-col items-center">
           <h2 className="text-[22px] mb-3">Compounding vault</h2>

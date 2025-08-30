@@ -37,6 +37,7 @@ const marketPrices = atom<TMarketPrices>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
+const isMarketsLoaded = atom<boolean>(false);
 
 const tokens = atom<TTokens>({});
 
@@ -103,4 +104,5 @@ export {
   marketPrices,
   isNavbar,
   markets,
+  isMarketsLoaded,
 };

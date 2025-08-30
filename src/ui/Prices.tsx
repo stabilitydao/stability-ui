@@ -113,7 +113,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                     )}
                   >
                     {data.priceChange > 0 ? "+" : ""}
-                    {data.priceChange}%
+                    {data.priceChange ?? 0}%
                   </span>
                 </div>
               </motion.div>
@@ -175,7 +175,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                       )}
                     >
                       {data.priceChange > 0 ? "+" : ""}
-                      {data.priceChange}%
+                      {data.priceChange ?? 0}%
                     </span>
                   </div>
                 </div>

@@ -383,7 +383,7 @@ type TLeaderboard = {
 
 type TTAbleFiltersVariant = {
   name: string;
-  title: string;
+  title?: string;
   state: boolean;
 };
 
@@ -709,6 +709,15 @@ type TVSHoldModalState = {
   isVsActive: boolean;
 };
 
+type TNetwork = {
+  name: string;
+  id: string;
+  logoURI: string;
+  explorer: string;
+  nativeCurrency: string;
+  active: boolean;
+};
+
 type TTableActiveParams = {
   search: number;
   sort: number;
@@ -746,6 +755,28 @@ type TMarketPrice = {
 };
 
 type TMarketPrices = Record<string, TMarketPrice>;
+
+type TMarketAsset = {
+  address: TAddress;
+  borrowAPR: string;
+  borrowCap: string;
+  borrowTVL: string;
+  cap: string;
+  name: string;
+  price: string;
+  supplyAPR: string;
+  supplyTVL: string;
+};
+
+type TMarket = {
+  name: string;
+  assets: TMarketAsset[];
+  network: TNetwork;
+  supplyAPR?: number;
+  borrowAPR?: number;
+  supplyTVL?: number;
+  borrowTVL?: number;
+};
 
 // enums
 export enum DisplayTypes {
@@ -866,4 +897,7 @@ export type {
   TMarketInfo,
   TActiveChart,
   IProtocolModal,
+  TMarket,
+  TMarketAsset,
+  TNetwork,
 };

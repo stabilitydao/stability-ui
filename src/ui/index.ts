@@ -43,6 +43,7 @@ import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
 import { FarmingTable } from "./Tables/Farming";
+import { MarketsTable } from "./Tables/Markets";
 
 import { TextModal } from "./Modals/TextModal";
 import { APRModal } from "./Modals/APRModal";
@@ -104,4 +105,5 @@ export {
   AxisTick,
   ChartTooltip,
   ChartTimelineSwitcher,
+  MarketsTable,
 };

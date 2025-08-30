@@ -82,6 +82,10 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (["assets", "swapper", "factory"].includes(main)) {
       add("Platform", "platform");
       add(main.charAt(0).toUpperCase() + main.slice(1));
+    } else if (main === "metavaults-management") {
+      add("Platform", "platform");
+      add("Factory", "factory");
+      add("Metavaults Management");
     } else if (
       main === "metavaults" &&
       rest[0] === "metavault" &&
@@ -99,6 +103,11 @@ const Breadcrumbs = (): JSX.Element => {
 
       add("Meta Vaults", "metavaults");
       add(symbol);
+    } else if (main === "lending" && rest.length === 2) {
+      const [, , marketName] = currentPath.split("/");
+
+      add("Lending", "lending");
+      add(`${marketName} Market`);
     }
 
     setPaths(crumbs);

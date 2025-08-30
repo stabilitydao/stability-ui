@@ -17,6 +17,8 @@ import {
   PROTOCOLS_TABLE,
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
+  MARKET_TABLE,
+  MARKET_TABLE_FILTERS,
 } from "./tables";
 
 import {
@@ -158,7 +160,7 @@ const CHAINS = [
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["137"].img}`,
     explorer: "https://polygonscan.com/address/",
     nativeCurrency: "POL",
-    active: true, // main page active networks
+    active: false, // main page active networks
   },
   // {
   //   name: chains["8453"].name,
@@ -272,7 +274,7 @@ const PATHS = [
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
-  // { name: "Markets", path: "markets" },
+  // { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
@@ -286,7 +288,7 @@ const ROUTES = {
     "leveraged-farming",
     "alm",
     "agents",
-    "markets",
+    "lending",
   ],
   platform: [
     "platform",
@@ -297,6 +299,7 @@ const ROUTES = {
     "factory",
     "network",
     "swapper",
+    "metavaults-management",
   ],
 };
 
@@ -427,4 +430,6 @@ export {
   LENDING_MARKETS,
   VAULTS_META_TITLES,
   ROUTES,
+  MARKET_TABLE,
+  MARKET_TABLE_FILTERS,
 };

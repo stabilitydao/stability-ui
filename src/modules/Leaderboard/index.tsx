@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import axios from "axios";
 
-import { Rewards } from "./components";
+import { Rewards, ClaimSiloPoints } from "./components";
 
 import {
   ArrowRightIcon,
@@ -150,6 +150,7 @@ const Leaderboard = (): JSX.Element => {
             <br className="hidden lg:block" /> through smart yield farming
             strategies
           </h3>
+          <ClaimSiloPoints />
         </div>
 
         <Rewards />

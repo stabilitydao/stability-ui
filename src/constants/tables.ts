@@ -11,6 +11,10 @@ const FARMING_TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
 ];
 
+const MARKET_TABLE_FILTERS: TTableFilters[] = [
+  { name: "Markets", type: "dropdown", state: true },
+];
+
 const TABLE: TTableColumn[] = [
   {
     name: "Assets",
@@ -114,6 +118,7 @@ const ASSETS_TABLE: TTableColumn[] = [
     unsortable: true,
   },
 ];
+
 const INTEGRATIONS_TABLE: TTableColumn[] = [
   {
     name: "Organization",
@@ -135,6 +140,7 @@ const INTEGRATIONS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
 ];
+
 const STRATEGIES_TABLE: TTableColumn[] = [
   {
     name: "Id",
@@ -299,6 +305,7 @@ const POOL_TABLE: TTableColumn[] = [
     unsortable: true,
   },
 ];
+
 const BC_POOL_TABLE: TTableColumn[] = [
   {
     name: "ID",
@@ -403,12 +410,6 @@ const PROTOCOLS_TABLE: TTableColumn[] = [
   },
 ];
 
-const DEFAULT_TABLE_PARAMS = {
-  search: 0,
-  sort: 0,
-  filters: 0,
-};
-
 const LEVERAGE_FARMING_TABLE: TTableColumn[] = [
   {
     name: "Name",
@@ -457,6 +458,59 @@ const LEVERAGE_FARMING_TABLE: TTableColumn[] = [
   },
 ];
 
+const MARKET_TABLE: TTableColumn[] = [
+  {
+    name: "Network",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Asset",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Supply APR",
+    keyName: "supplyAPR",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Borrow APR",
+    keyName: "borrowAPR",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Supply TVL",
+    keyName: "supplyTVL",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Available to borrow",
+    keyName: "borrowTVL",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "maxLTV / LT",
+    keyName: "borrowTVL",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+const DEFAULT_TABLE_PARAMS = {
+  search: 0,
+  sort: 0,
+  filters: 0,
+};
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -474,4 +528,6 @@ export {
   PROTOCOLS_TABLE,
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
+  MARKET_TABLE,
+  MARKET_TABLE_FILTERS,
 };

@@ -1,0 +1,13 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Lending} from "@modules"
+---
+
+<Layout title="Lending"
+  img="/ogs/pages/lending.png"
+  metaTitle="Lending"
+  metaUrl="https://stability.farm/lending"
+  metaDescription="Non-custodial on-chain isolated lending markets"
+>
+  <Lending client:only="react"/>
+</Layout>
