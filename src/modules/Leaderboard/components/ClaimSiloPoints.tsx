@@ -104,7 +104,7 @@ const ClaimSiloPoints = (): JSX.Element => {
           className="text-[16px] leading-5 font-semibold py-4 px-6 bg-[#5E6AD2] rounded-lg self-start"
           onClick={claim}
         >
-          Claim Silo Points
+          Claim wS of Silo Points
         </button>
       )}
     </>
