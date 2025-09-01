@@ -499,7 +499,7 @@ const MARKET_TABLE: TTableColumn[] = [
   },
   {
     name: "maxLTV / LT",
-    keyName: "borrowTVL",
+    keyName: "LTV",
     sortType: "none",
     dataType: "number",
   },

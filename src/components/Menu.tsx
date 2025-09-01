@@ -37,7 +37,8 @@ const Menu = (): JSX.Element => {
       setActivePath("platform");
     } else if (
       currentPath === "leaderboard" ||
-      currentPath.includes("contests")
+      currentPath.includes("contests") ||
+      currentPath.includes("season-1")
     ) {
       setActivePath("leaderboard");
     } else if (currentPath.includes("metavaults")) {

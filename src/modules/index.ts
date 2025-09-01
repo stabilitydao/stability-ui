@@ -16,6 +16,7 @@ import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
 import { AddPools } from "./Platform/components/Swapper/AddPools";
 import { Leaderboard } from "./Leaderboard";
+import { Season1 } from "./Leaderboard/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { XSTBL } from "./XSTBL";
@@ -60,4 +61,5 @@ export {
   Lending,
   MetavaultsManagement,
   Market,
+  Season1,
 };

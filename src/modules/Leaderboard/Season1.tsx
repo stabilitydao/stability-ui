@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import axios from "axios";
 
-import { ClaimSiloPoints } from "./components";
+import { Rewards, ClaimSiloPoints } from "./components";
 
 import {
   ArrowRightIcon,
@@ -34,11 +34,23 @@ import type { TTableColumn, TLeaderboard } from "@types";
 
 import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 
-const Leaderboard = (): JSX.Element => {
+const Season1 = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
-
+  // nextPeriod
   const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
+
+  // const periodsData = [
+  //   {
+  //     id: previousPeriod || "",
+  //     ...contests[previousPeriod as keyof YieldContest],
+  //   },
+  //   {
+  //     id: currentPeriod || "",
+  //     ...contests[currentPeriod as keyof YieldContest],
+  //   },
+  //   { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
+  // ];
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -127,18 +139,37 @@ const Leaderboard = (): JSX.Element => {
     <div className="flex flex-col flex-wrap min-w-[full]  md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
       <div className="flex items-center justify-between gap-[28px] flex-col xl:flex-row">
         <div className="flex flex-col items-start gap-4">
-          <h2 className="page-title__font text-start">Top Users</h2>
+          <h2 className="page-title__font text-start">
+            Top Users <br /> & sGEM1 Rewards
+          </h2>
           <h3 className="text-[#97979a] page-description__font">
-            Track user performance across yield vaults.{" "}
-            <br className="hidden lg:block" /> Earn points by participating,
-            ranking on the leaderboard, <br className="hidden lg:block" /> and
-            unlocking exclusive airdrop benefits{" "}
+            Track user performance across yield vaults, contests, and{" "}
+            <br className="hidden lg:block" /> sGEM1 rewards. Earn points by
+            participating, ranking on the <br className="hidden lg:block" />{" "}
+            leaderboard, and unlocking exclusive airdrop benefits{" "}
             <br className="hidden lg:block" /> through smart yield farming
             strategies
           </h3>
           <ClaimSiloPoints />
         </div>
+
+        <Rewards />
       </div>
+
+      {/* <div className="mt-10 mb-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[24px] leading-8 font-semibold">Contests</span>
+          <a
+            className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-center gap-2"
+            href="/contests"
+          >
+            View all contests
+            <ArrowRightIcon color={"#5E6AD2"} />
+          </a>
+        </div>
+        <ContestsOverview periodsData={periodsData} />
+      </div> */}
+
       <div className="flex flex-col gap-4 mt-10">
         <div className="flex items-center justify-between">
           <span className="text-[24px] leading-8 font-semibold">
@@ -272,9 +303,9 @@ const Leaderboard = (): JSX.Element => {
           />
           <a
             className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 mt-5"
-            href="/leaderboard/season-1"
+            href="/contests"
           >
-            Season 1
+            All yield contests
             <ArrowRightIcon color={"#5E6AD2"} />
           </a>
         </div>
@@ -283,4 +314,4 @@ const Leaderboard = (): JSX.Element => {
   );
 };
 
-export { Leaderboard };
+export { Season1 };
