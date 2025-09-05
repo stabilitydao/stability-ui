@@ -24,7 +24,7 @@ const ChartTooltip = ({
       case "TVL":
         return <p>TVL: {formatNumber(payload[0].value, "abbreviate")}</p>;
       case "sharePrice":
-        return <p>Price: ${formatNumber(payload[0].value, "format")}</p>;
+        return <p>Price: ${Number(payload[0].value).toFixed(4)}</p>;
       case "APR":
         return (
           <p>

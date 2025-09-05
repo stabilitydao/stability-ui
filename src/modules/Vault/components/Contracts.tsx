@@ -2,7 +2,7 @@ import { memo, useState, useEffect, useMemo } from "react";
 
 import { getAddress } from "viem";
 
-import { ArrowIcon } from "@ui";
+import { HeadingText, ArrowIcon } from "@ui";
 
 import { cn } from "@utils";
 
@@ -146,6 +146,11 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
 
   return (
     <div className="w-full">
+      <HeadingText
+        text="Contracts"
+        scale={2}
+        styles="text-left mb-4 block lg:hidden"
+      />
       <div
         className={cn(
           "flex items-center bg-[#151618] border border-[#23252A] text-[#97979A] text-[14px] leading-5 h-[48px] rounded-t-lg overflow-hidden cursor-pointer",
@@ -153,7 +158,10 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
         )}
         onClick={() => setExpandedData((prev) => !prev)}
       >
-        <div className="px-4 flex items-center gap-2 w-[40%] cursor-pointer">
+        <div className="px-4 lg:hidden flex items-center gap-2 w-[40%] cursor-pointer">
+          Name
+        </div>
+        <div className="px-4 lg:flex hidden items-center gap-2 w-[40%] cursor-pointer">
           Contracts{" "}
           <ArrowIcon isActive={false} rotate={expandedData ? 180 : 0} />
         </div>

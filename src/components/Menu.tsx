@@ -147,7 +147,7 @@ const Menu = (): JSX.Element => {
                           ? "#ff8d00"
                           : isOk
                             ? "#00ff00"
-                            : "#444444",
+                            : "#1B1D21",
                       }}
                     ></span>
                   </span>

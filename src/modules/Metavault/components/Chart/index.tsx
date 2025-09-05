@@ -299,7 +299,7 @@ const Chart = ({ symbol }: { symbol: string }): JSX.Element => {
             )}
             onClick={() => chartHandler("APR")}
           >
-            APR
+            Native APR
           </span>
           <span
             className={cn(
@@ -321,7 +321,7 @@ const Chart = ({ symbol }: { symbol: string }): JSX.Element => {
             )}
             onClick={() => chartHandler("sharePrice")}
           >
-            Price
+            {symbol} Price
           </span>
         </div>
       </div>

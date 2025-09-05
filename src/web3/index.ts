@@ -22,7 +22,6 @@ import ICHIABI from "./abi/ICHIABI.ts";
 import PriceReaderABI from "./abi/PriceReaderABI.ts";
 import IFrontendABI from "./abi/IFrontendABI.ts";
 import IMerkleDistributor from "./abi/IMerkleDistributor.ts";
-import SaleABI from "./abi/SaleABI.ts";
 import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
 import IXStakingABI from "./abi/IXStakingABI.ts";
 import IXSTBLABI from "./abi/IXSTBLABI.ts";
@@ -86,8 +85,6 @@ const ichiFactories: { [key: string]: TAddress } = {
 const sGEM1 = deployments[146].tokenomics.gem1;
 
 const merkleDistributor = deployments[146].tokenomics.merkleDistributor;
-
-const SALE_CONTRACT = "0x0a02be0de3dd109b1abf4c197f0b58a3bb68ea1f";
 
 const metadata = {
   name: "Stability",
@@ -164,8 +161,6 @@ export {
   sonicClient,
   baseClient,
   web3clients,
-  SaleABI,
-  SALE_CONTRACT,
   IMetaVaultABI,
   WrappedMetaVaultABI,
   SwapperABI,
