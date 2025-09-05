@@ -254,12 +254,16 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
         let creationDate = protocol?.creationDate ?? 0;
 
+        let audits = protocol?.audits ?? [];
+
         if (protocol?.name.includes("Aave")) {
           creationDate =
             integrations.stability.protocols.stabilityMarket.creationDate;
+
+          audits = integrations.stability.protocols.stabilityMarket.audits;
         }
 
-        return { ...protocol, allocation, creationDate };
+        return { ...protocol, allocation, creationDate, audits };
       })
       .filter((protocol) => !!protocol.allocation);
 

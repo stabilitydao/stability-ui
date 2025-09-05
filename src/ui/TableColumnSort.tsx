@@ -42,6 +42,9 @@ const TableColumnSort: React.FC<TProps> = ({
     Points: "w-1/3 md:w-[22.5%] justify-center md:justify-end",
     "Earned in Metavaults":
       "hidden md:flex w-[40%] md:w-[20%] justify-center md:justify-end px-2 md:px-4",
+    ID: "flex w-[10%] justify-start px-2 md:px-4",
+    Chain: "flex w-[30%] md:w-[25%] justify-start px-2 md:px-4",
+    TVL: "flex w-[15%] justify-start px-2 md:px-4",
   };
 
   const tabController = () => {

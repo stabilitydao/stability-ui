@@ -37,7 +37,8 @@ const Menu = (): JSX.Element => {
       setActivePath("platform");
     } else if (
       currentPath === "leaderboard" ||
-      currentPath.includes("contests")
+      currentPath.includes("contests") ||
+      currentPath.includes("season-1")
     ) {
       setActivePath("leaderboard");
     } else if (currentPath.includes("metavaults")) {
@@ -146,7 +147,7 @@ const Menu = (): JSX.Element => {
                           ? "#ff8d00"
                           : isOk
                             ? "#00ff00"
-                            : "#444444",
+                            : "#1B1D21",
                       }}
                     ></span>
                   </span>

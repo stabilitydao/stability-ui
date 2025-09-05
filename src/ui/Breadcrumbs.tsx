@@ -31,6 +31,9 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (currentPath === "contests") {
       add("Leaderboard", "leaderboard");
       add("Contests", "contests");
+    } else if (rest[0] === "season-1") {
+      add("Leaderboard", "leaderboard");
+      add("Season 1", "season-1");
     } else if (main === "contests" && rest.length === 1) {
       const contest = contests[rest[0]];
       add("Leaderboard", "leaderboard");

@@ -766,6 +766,8 @@ type TMarketAsset = {
   price: string;
   supplyAPR: string;
   supplyTVL: string;
+  maxLtv: string;
+  liquidationThreshold: string;
 };
 
 type TMarket = {

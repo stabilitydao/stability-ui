@@ -42,7 +42,7 @@ const Row: React.FC<IProps> = ({ market }) => {
                 </div>
               ) : null}
             </div>
-            <div className="px-2 md:px-4 text-left text-[16px] w-[150px] md:w-[15%] flex items-center gap-2">
+            <div className="px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2">
               <img
                 src={assetData?.logoURI}
                 alt={assetData?.symbol}
@@ -50,20 +50,20 @@ const Row: React.FC<IProps> = ({ market }) => {
               />
               <span>{assetData?.symbol}</span>
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
               {formatNumber(asset.supplyAPR, "format")}%
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
               {formatNumber(asset.borrowAPR, "format")}%
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
+            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
               {formatNumber(asset.supplyTVL, "abbreviate")}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
               {formatNumber(asset.borrowTVL, "abbreviate")}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
-              13% / 13%
+              {asset.maxLtv}% / {asset.liquidationThreshold}%
             </div>
           </div>
         );
