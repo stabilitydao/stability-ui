@@ -155,22 +155,6 @@ const SILO_POINTS = {
 
 const CHAINS = [
   {
-    name: chains["137"].name,
-    id: "137",
-    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["137"].img}`,
-    explorer: "https://polygonscan.com/address/",
-    nativeCurrency: "POL",
-    active: false, // main page active networks
-  },
-  // {
-  //   name: chains["8453"].name,
-  //   id: "8453",
-  //   logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
-  //   explorer: "https://basescan.org/address/",
-  //   nativeCurrency: "ETH",
-  //   active: true, // main page active networks
-  // },
-  {
     name: chains["146"].name,
     id: "146",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
@@ -178,12 +162,19 @@ const CHAINS = [
     nativeCurrency: "S",
     active: true, // main page active networks
   },
+  {
+    name: chains["43114"].name,
+    id: "43114",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["43114"].img}`,
+    explorer: "https://snowtrace.io/address/",
+    nativeCurrency: "AVAX",
+    active: true, // main page active networks
+  },
 ];
 
 const CHAINS_CONFIRMATIONS = {
-  "137": 3,
-  "146": 3,
   "8453": 3,
+  "43114": 3,
 };
 
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];

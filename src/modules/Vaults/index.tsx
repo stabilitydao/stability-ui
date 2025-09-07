@@ -7,8 +7,7 @@ import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
-
-import { chains } from "@stabilitydao/stability";
+// import { NetworksFilter } from "./components/NetworksFilter";
 
 import {
   FullPageLoader,
@@ -39,6 +38,7 @@ import {
   PAGINATION_LIMIT,
   STABLECOINS,
   DEFAULT_TABLE_PARAMS,
+  CHAINS,
 } from "@constants";
 
 import {
@@ -131,16 +131,9 @@ const Vaults = (): JSX.Element => {
   const [displayType, setDisplayType] = useState<DisplayTypes>(
     DisplayTypes.Rows
   );
-  const [activeNetworks, setActiveNetworks] = useState([
-    {
-      name: chains["146"].name,
-      id: "146",
-      logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
-      explorer: "https://sonicscan.org/address/",
-      nativeCurrency: "S",
-      active: true, // main page active networks
-    },
-  ]);
+  const [activeNetworks, setActiveNetworks] = useState(
+    CHAINS.filter(({ active }) => active)
+  );
 
   const lastTabIndex = currentTab * pagination;
   const firstTabIndex = lastTabIndex - pagination;
@@ -334,19 +327,6 @@ const Vaults = (): JSX.Element => {
               return STABLECOINS.includes(vault?.assets[0]?.address);
             });
           }
-          break;
-        case "multiple":
-          // if (!f.variants) break;
-          // if (f.name === "Strategy") {
-          //   const strategyName = f.variants.find(
-          //     (variant: TTAbleFiltersVariant) => variant.state
-          //   )?.name;
-          //   if (strategyName) {
-          //     sortedVaults = sortedVaults.filter(
-          //       (vault: TVault) => vault.strategyInfo.shortId === strategyName
-          //     );
-          //   }
-          // }
           break;
         case "sample":
           if (f.name === "My vaults") {
@@ -543,6 +523,11 @@ const Vaults = (): JSX.Element => {
         </div>
         <Portfolio vaults={localVaults} />
 
+        {/* <NetworksFilter
+          activeNetworks={activeNetworks}
+          activeNetworksHandler={activeNetworksHandler}
+        /> */}
+
         <div className="flex items-center xl:justify-between gap-2 mt-6 md:mt-10 mb-4">
           <div className="max-w-[240px] w-full relative text-[16px]">
             <label className="relative block">
@@ -615,13 +600,7 @@ const Vaults = (): JSX.Element => {
             resetTable={resetTable}
           />
 
-          <DisplayType
-            type={displayType}
-            setType={setDisplayType}
-            pagination={pagination}
-            setPagination={setPagination}
-            setTab={setCurrentTab}
-          />
+          <DisplayType type={displayType} setType={setDisplayType} />
         </div>
       </div>
 

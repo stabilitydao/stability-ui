@@ -124,7 +124,7 @@ const Leaderboard = (): JSX.Element => {
   }, []);
 
   return (
-    <div className="flex flex-col flex-wrap min-w-[full]  md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
+    <div className="flex flex-col flex-wrap min-w-[full] md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
       <div className="flex items-center justify-between gap-[28px] flex-col xl:flex-row">
         <div className="flex flex-col items-start gap-4">
           <h2 className="page-title__font text-start">Top Users</h2>

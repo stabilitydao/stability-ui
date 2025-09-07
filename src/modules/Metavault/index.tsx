@@ -252,6 +252,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           });
         });
 
+        if (protocol?.name.includes("Compound")) {
+          protocol = PROTOCOLS.enclabs;
+        }
+
         let creationDate = protocol?.creationDate ?? 0;
 
         let audits = protocol?.audits ?? [];
@@ -279,11 +283,15 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       }))
       .sort((a, b) => b.value - a.value);
 
+    const checkedProtocols = protocols.map((protocol) =>
+      protocol?.name.includes("Compound") ? PROTOCOLS.enclabs : protocol
+    );
+
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
     setLocalProtocols(allocationsWithPercent);
     setFilteredProtocols(allocationsWithPercent);
-    setLocalMetaVault({ ...metaVault, protocols });
+    setLocalMetaVault({ ...metaVault, protocols: checkedProtocols });
     setIsLocalVaultsLoaded(true);
   };
 

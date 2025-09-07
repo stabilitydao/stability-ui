@@ -54,7 +54,9 @@ const Vault: React.FC<IProps> = ({
 
   const protocol = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
-    : rawProtocol;
+    : rawProtocol?.name?.includes("Compound")
+      ? PROTOCOLS.enclabs
+      : rawProtocol;
 
   return (
     <div className={cn("border-t border-[#23252A]")}>

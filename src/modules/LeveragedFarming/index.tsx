@@ -5,8 +5,6 @@ import { useStore } from "@nanostores/react";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 
-import { chains } from "@stabilitydao/stability";
-
 import {
   FullPageLoader,
   ErrorMessage,
@@ -28,6 +26,7 @@ import {
   STABLECOINS,
   DEFAULT_TABLE_PARAMS,
   LEVERAGE_FARMING_TABLE,
+  CHAINS,
 } from "@constants";
 
 import {
@@ -103,16 +102,9 @@ const LeveragedFarming = (): JSX.Element => {
   const [displayType, setDisplayType] = useState<DisplayTypes>(
     DisplayTypes.Rows
   );
-  const [activeNetworks, setActiveNetworks] = useState([
-    {
-      name: chains["146"].name,
-      id: "146",
-      logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
-      explorer: "https://sonicscan.org/address/",
-      nativeCurrency: "S",
-      active: true, // main page active networks
-    },
-  ]);
+  const [activeNetworks, setActiveNetworks] = useState(
+    CHAINS.filter(({ active }) => active)
+  );
 
   const lastTabIndex = currentTab * pagination;
   const firstTabIndex = lastTabIndex - pagination;
@@ -387,13 +379,7 @@ const LeveragedFarming = (): JSX.Element => {
             setTableParams={setActiveTableParams}
           />
 
-          <DisplayType
-            type={displayType}
-            setType={setDisplayType}
-            pagination={pagination}
-            setPagination={setPagination}
-            setTab={setCurrentTab}
-          />
+          <DisplayType type={displayType} setType={setDisplayType} />
         </div>
       </div>
 

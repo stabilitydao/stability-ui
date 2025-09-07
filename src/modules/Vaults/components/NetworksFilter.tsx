@@ -7,7 +7,7 @@ interface IProps {
   activeNetworksHandler: (chains: string[]) => void;
 }
 
-const NetworkFilters: React.FC<IProps> = memo(
+const NetworksFilter: React.FC<IProps> = memo(
   ({ activeNetworks, activeNetworksHandler }) => {
     return (
       <div className="flex items-center gap-2 mb-4 min-[1020px]:mb-0">
@@ -51,4 +51,4 @@ const NetworkFilters: React.FC<IProps> = memo(
   }
 );
 
-export { NetworkFilters };
+export { NetworksFilter };

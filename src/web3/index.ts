@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http, createPublicClient } from "viem";
 
-import { base, polygon, sonic } from "viem/chains";
+import { avalanche, sonic } from "viem/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -35,7 +35,6 @@ const CONTRACT_PAGINATION = 20;
 
 const walletConnectProjectId = "12a65603dc5ad4317b3bc1be13138687";
 
-// 137 || 8453 || 146
 const platforms: { [key: string]: TAddress } = Object.entries(
   deployments
 ).reduce(
@@ -94,24 +93,14 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [polygon, base, sonic],
+  chains: [sonic, avalanche],
   projectId: walletConnectProjectId,
   metadata,
 });
 
 const walletClient = createWalletClient({
-  chain: polygon,
+  chain: sonic,
   transport: http(),
-});
-
-const maticClient = createPublicClient({
-  chain: polygon,
-  transport: http("https://polygon-rpc.com"),
-});
-
-const baseClient = createPublicClient({
-  chain: base,
-  transport: http("https://mainnet.base.org"),
 });
 
 const sonicClient = createPublicClient({
@@ -119,10 +108,14 @@ const sonicClient = createPublicClient({
   transport: http("https://sonic.drpc.org"), //import.meta.env.PUBLIC_SONIC_RPC
 });
 
+const avalancheClient = createPublicClient({
+  chain: avalanche,
+  transport: http("https://avalanche.public-rpc.com"), //import.meta.env.PUBLIC_SONIC_RPC
+});
+
 const web3clients = {
-  "137": maticClient,
   "146": sonicClient,
-  "8453": baseClient,
+  "43114": avalancheClient,
 };
 
 export {
@@ -142,7 +135,6 @@ export {
   PlatformABI,
   StrategyABI,
   VaultABI,
-  polygon,
   wagmiConfig,
   IERC721Enumerable,
   ZapABI,
@@ -157,9 +149,8 @@ export {
   IXSTBLABI,
   sGEM1,
   merkleDistributor,
-  maticClient,
   sonicClient,
-  baseClient,
+  avalancheClient,
   web3clients,
   IMetaVaultABI,
   WrappedMetaVaultABI,
