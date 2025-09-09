@@ -10,24 +10,29 @@ interface IProps {
 const NetworksFilter: React.FC<IProps> = memo(
   ({ activeNetworks, activeNetworksHandler }) => {
     return (
-      <div className="flex items-center gap-2 mb-4 min-[1020px]:mb-0">
+      <div className="flex items-center gap-2 select-none">
         {activeNetworks.map((chain) => (
           <div
-            className={`h-10 w-10 flex items-center justify-center cursor-pointer rounded-[16px] hover:bg-accent-800 ${
+            className={`flex items-center justify-center cursor-pointer px-3 py-2 border rounded-lg ${
               chain.active
-                ? "bg-accent-900 border-accent-500 border-[1.5px]"
-                : "bg-accent-900"
+                ? "bg-[#22242A] border-[#35363B]"
+                : "border-[#23252A]"
             }`}
             key={chain.name + chain.id}
             title={chain.name}
             onClick={() => activeNetworksHandler([chain.id])}
             data-testid="network"
           >
-            <img
-              className="h-[16px] w-[16px] rounded-full"
-              src={chain.logoURI}
-              alt={chain.name}
-            />
+            <div className="flex items-center gap-2">
+              <img
+                className="h-5 w-5 rounded-full"
+                src={chain.logoURI}
+                alt={chain.name}
+              />
+              <span className="text-[14px] leading-5 font-medium">
+                {chain.name}
+              </span>
+            </div>
           </div>
         ))}
       </div>

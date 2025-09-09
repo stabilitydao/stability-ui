@@ -1,4 +1,8 @@
+import { useStore } from "@nanostores/react";
+
 import { formatNumber } from "@utils";
+
+import { marketPrices } from "@store";
 
 import type { TChartPayload } from "@types";
 
@@ -15,6 +19,8 @@ const ChartTooltip = ({
   APRType,
   type = "default",
 }: TProps): JSX.Element | null => {
+  const $marketPrices = useStore(marketPrices);
+
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload;
@@ -32,7 +38,16 @@ const ChartTooltip = ({
           </p>
         );
       case "xSTBL":
-        return <p>xSTBL: {formatNumber(data?.value, "abbreviate")}</p>;
+        return (
+          <p>
+            xSTBL: {formatNumber(data?.value, "format")} (
+            {formatNumber(
+              data?.value * Number($marketPrices.STBL.price),
+              "abbreviate"
+            )}
+            )
+          </p>
+        );
       default:
         return (
           <>

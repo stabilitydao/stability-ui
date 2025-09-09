@@ -7,7 +7,7 @@ import { VSHoldModal } from "./components/modals/VSHoldModal";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
-// import { NetworksFilter } from "./components/NetworksFilter";
+import { NetworksFilter } from "./components/NetworksFilter";
 
 import {
   FullPageLoader,
@@ -523,12 +523,12 @@ const Vaults = (): JSX.Element => {
         </div>
         <Portfolio vaults={localVaults} />
 
-        {/* <NetworksFilter
+        <NetworksFilter
           activeNetworks={activeNetworks}
           activeNetworksHandler={activeNetworksHandler}
-        /> */}
+        />
 
-        <div className="flex items-center xl:justify-between gap-2 mt-6 md:mt-10 mb-4">
+        <div className="flex items-center xl:justify-between gap-2 my-4">
           <div className="max-w-[240px] w-full relative text-[16px]">
             <label className="relative block">
               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">

@@ -120,7 +120,7 @@ const Portfolio: React.FC<IProps> = memo(({ vaults }) => {
   }, [$aprFilter, vaults]);
 
   return (
-    <div className="font-manrope mt-4 md:mt-10 bg-[#101012] border border-[#23252A] rounded-lg">
+    <div className="font-manrope mb-4 mt-4 md:mt-10 bg-[#101012] border border-[#23252A] rounded-lg">
       <div className="md:pt-6 md:pb-7 md:px-6 p-4">
         {/* <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

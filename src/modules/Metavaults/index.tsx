@@ -2,15 +2,18 @@ import { useState, useEffect, useRef } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { FullPageLoader } from "@ui";
-
 import { MetaVaultsLinks } from "./components/MetaVaultsLinks";
+import { Filters } from "./components/Filters";
+
+import { FullPageLoader } from "@ui";
 
 import { useModalClickOutside, formatNumber } from "@utils";
 
 import { metaVaults } from "@store";
 
-import { VaultTypes } from "@types";
+import { TMetaVault } from "@types";
+
+import { METAVAULTS_FILTERS } from "@constants";
 
 export type TModal = {
   APR: string;
@@ -23,7 +26,12 @@ export type TModal = {
 const Metavaults = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
 
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
   const [localMetaVaults, setLocalMetaVaults] = useState([]);
+
+  const [tableFilters, setTableFilters] = useState(METAVAULTS_FILTERS);
 
   const [modal, setModal] = useState<TModal>({
     APR: "0",
@@ -35,13 +43,53 @@ const Metavaults = (): JSX.Element => {
 
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const displayHandler = () => {
+    if (!$metaVaults) return;
+
+    let _localMetaVaults = $metaVaults["146"];
+
+    //filter
+    tableFilters.forEach((f) => {
+      if (!f.state) return;
+
+      switch (f.type) {
+        case "sample":
+          if (f.name === "Flagships") {
+            _localMetaVaults = _localMetaVaults.filter(
+              (metaVault: TMetaVault) => metaVault.symbol === "metaUSD"
+            );
+          }
+          break;
+        default:
+          console.error("NO FILTER CASE");
+          break;
+      }
+    });
+
+    setLocalMetaVaults(_localMetaVaults);
+  };
+
   const initMetavaults = async () => {
-    const onlyMetaVaults = $metaVaults["146"].filter(
-      ({ type }: { type: string }) => type === VaultTypes.MetaVault
+    let _metaVaults = $metaVaults["146"].sort((a: TMetaVault, b: TMetaVault) =>
+      a.address.localeCompare(b.address)
     );
 
-    setLocalMetaVaults(onlyMetaVaults);
+    if (params.get("scope") === "all") {
+      setTableFilters((prev) =>
+        prev.map((filter) => ({ ...filter, state: false }))
+      );
+    } else {
+      _metaVaults = _metaVaults.filter(
+        ({ symbol }: { symbol: string }) => symbol === "metaUSD"
+      );
+    }
+
+    setLocalMetaVaults(_metaVaults);
   };
+
+  useEffect(() => {
+    displayHandler();
+  }, [tableFilters]);
 
   useEffect(() => {
     if ($metaVaults && $metaVaults["146"].length) {
@@ -54,19 +102,21 @@ const Metavaults = (): JSX.Element => {
   );
 
   return (
-    <div className="mx-auto flex flex-col gap-6 md:gap-10 lg:min-w-[1000px]">
+    <div className="mx-auto flex flex-col gap-6 w-full md:gap-10 lg:min-w-[1000px]">
       <div>
         <h2 className="page-title__font text-start mb-2 md:mb-5">
           Meta Vaults
         </h2>
-        <h3 className="text-[#97979a] page-description__font">
+        <h3 className="text-[#97979a] page-description__font mb-2 md:mb-5">
           Metavaults are automated vaults that combine multiple DeFi protocols
           and assets <br className="hidden lg:block" /> into a single strategy
           while automatically rebalancing positions across
           <br className="hidden lg:block" /> integrated DeFi protocols and
           assets, maximizing returns
         </h3>
+        <Filters filters={tableFilters} setFilters={setTableFilters} />
       </div>
+
       <div className="pb-5">
         {!localMetaVaults.length ? (
           <div className="relative h-[80px]">

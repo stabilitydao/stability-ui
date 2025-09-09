@@ -511,6 +511,10 @@ const DEFAULT_TABLE_PARAMS = {
   filters: 0,
 };
 
+const METAVAULTS_FILTERS: TTableFilters[] = [
+  { name: "Flagships", type: "sample", state: true },
+];
+
 export {
   TABLE_FILTERS,
   TABLE,
@@ -530,4 +534,5 @@ export {
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
   MARKET_TABLE_FILTERS,
+  METAVAULTS_FILTERS,
 };
