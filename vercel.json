@@ -1,6 +1,6 @@
 {
   "functions": {
-    "render": {
+    "api/**/*.js": {
       "memory": 128,
       "maxDuration": 10
     }
