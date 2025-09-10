@@ -16,7 +16,7 @@
     "@astrojs/partytown": "^2.1.0",
     "@astrojs/react": "^3.0.3",
     "@astrojs/tailwind": "^5.0.2",
-    "@astrojs/vercel": "^8.2.7",
+    "@astrojs/vercel": "^5.1.0",
     "@nanostores/react": "^0.7.1",
     "@stabilitydao/stability": "=0.38.10",
     "@tanstack/query-sync-storage-persister": "^5.22.2",
