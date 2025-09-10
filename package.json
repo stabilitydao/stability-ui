@@ -66,8 +66,5 @@
     "tailwind-scrollbar": "^4.0.2",
     "typescript": "^5.5.3",
     "vitest": "^2.0.2"
-  },
-  "engines": {
-    "node": ">=22"
   }
 }
