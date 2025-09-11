@@ -23,7 +23,6 @@ import { dataSorter, cn } from "@utils";
 import {
   FARMING_TABLE_FILTERS,
   PAGINATION_LIMIT,
-  STABLECOINS,
   DEFAULT_TABLE_PARAMS,
   LEVERAGE_FARMING_TABLE,
   CHAINS,

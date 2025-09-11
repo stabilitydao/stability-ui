@@ -3,8 +3,6 @@ import { useState, useEffect, useMemo } from "react";
 import { Vault, Protocol } from "./Rows";
 import { Donut } from "./Donut";
 
-import { cn } from "@utils";
-
 import { strategies } from "@stabilitydao/stability";
 
 import {

@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { createPublicClient, formatUnits, http } from "viem";
-import { sonic } from "viem/chains";
+import { formatUnits } from "viem";
 //import { usePublicClient } from "wagmi";
 
 import { WagmiLayout } from "@layouts";
