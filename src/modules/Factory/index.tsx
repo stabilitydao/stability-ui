@@ -57,17 +57,6 @@ const Factory = (): JSX.Element => {
   const $connected = useStore(connected);
   const $currentChainID = useStore(currentChainID);
 
-  /*const _publicClient = usePublicClient({
-    chainId: Number($currentChainID),
-    config: wagmiConfig,
-  });*/
-  const _publicClient = createPublicClient({
-    chain: sonic,
-    transport: http(
-      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
-    ),
-  });
-
   const { open } = useWeb3Modal();
 
   const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
@@ -88,7 +77,7 @@ const Factory = (): JSX.Element => {
   const [buildingPrices, setBuildingPrices] = useState<TBuildingPrices>({});
 
   const getBuildingPrices = async () => {
-    const contractData = (await _publicClient?.readContract({
+    const contractData = (await $publicClient?.readContract({
       address: platforms[$currentChainID],
       abi: PlatformABI,
       functionName: "getData",
@@ -122,7 +111,7 @@ const Factory = (): JSX.Element => {
       let from = 0;
 
       do {
-        const _whatToBuild = await _publicClient.readContract({
+        const _whatToBuild = await $publicClient.readContract({
           address: frontendContracts[$currentChainID],
           functionName: "whatToBuild",
           abi: IFrontendABI,
