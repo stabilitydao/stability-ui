@@ -9,15 +9,19 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Name: "w-1/2",
-    Protocol: "w-1/2 md:w-[30%]",
-    APR: "w-1/2 md:w-[20%] justify-end",
-    Allocation: "w-1/2 md:w-[20%] justify-end",
-    "Allocation (current / target)": "hidden md:flex md:w-[30%] justify-end",
-    Proportion: "hidden md:flex md:w-[20%] justify-end",
-    Audits: "hidden md:flex w-[10%] justify-start",
-    Accidents: "hidden md:flex w-[10%] justify-start",
-    Lifetime: "hidden md:flex w-[10%] justify-start",
+    Name: "w-1/2 min-[860px]:w-[40%]",
+    Protocol: "w-1/2 min-[860px]:w-[30%]",
+    APR: "w-1/2 min-[860px]:w-[15%] justify-end",
+    Allocation:
+      table.length === 6
+        ? "w-1/2 min-[860px]:w-[20%] justify-end"
+        : "hidden min-[860px]:flex w-[15%] justify-end",
+    "Proportions (current / target)":
+      "hidden min-[860px]:flex w-[30%] justify-end",
+    Proportion: "hidden min-[860px]:flex md:w-[20%] justify-end",
+    Audits: "hidden min-[860px]:flex w-[10%] justify-start",
+    Accidents: "hidden min-[860px]:flex w-[10%] justify-start",
+    Lifetime: "hidden min-[860px]:flex w-[10%] justify-start",
   };
 
   const tabController = () => {

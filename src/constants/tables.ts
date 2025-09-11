@@ -360,7 +360,14 @@ const METAVAULT_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "Allocation (current / target)",
+    name: "Allocation",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Proportions (current / target)",
     keyName: "",
     sortType: "none",
     dataType: "",

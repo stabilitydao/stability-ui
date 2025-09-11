@@ -77,7 +77,7 @@ const Vault: React.FC<IProps> = ({
           }
         }}
       >
-        <div className="flex items-center w-full min-[860px]:w-[50%] justify-between px-4">
+        <div className="flex items-center w-full min-[860px]:w-[40%] justify-between px-4">
           <div
             className={cn(
               "flex items-center gap-3",
@@ -142,7 +142,7 @@ const Vault: React.FC<IProps> = ({
             }
           }}
           className={cn(
-            "px-4 w-[20%] hidden min-[860px]:block",
+            "px-4 w-[15%] hidden min-[860px]:block",
             vault.type === VaultTypes.Vault && "tooltip cursor-help"
           )}
         >
@@ -240,7 +240,15 @@ const Vault: React.FC<IProps> = ({
             <i></i>
           </div>
         </div>
-        <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
+        <div className="px-4 text-right text-[14px] w-[15%] hidden min-[860px]:block">
+          <span>
+            {formatNumber(
+              vault?.proportions?.allocation as number,
+              "abbreviate"
+            )?.slice(1)}
+          </span>
+        </div>
+        <div className="px-4 text-right text-[14px] w-[30%] hidden min-[860px]:block">
           {(vault?.proportions?.current || vault?.proportions?.target) && (
             <span>
               {Number(vault.proportions?.current).toFixed(2)}% /{" "}
@@ -291,6 +299,19 @@ const Vault: React.FC<IProps> = ({
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
               Allocation
+            </span>
+
+            <span className="text-[16px]">
+              {formatNumber(
+                vault?.proportions?.allocation as number,
+                "abbreviate"
+              )?.slice(1)}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Proportions
             </span>
             {(vault?.proportions?.current || vault?.proportions?.target) && (
               <span className="text-[16px]">

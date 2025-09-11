@@ -166,6 +166,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
         const target = vaultProportion?.target * 100;
 
+        const allocation = (Number(metaVault.tvl) / 100) * current;
+
         if (current <= 0.1 && !target) return null;
 
         if (isMetaVault) {
@@ -181,11 +183,17 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               const vault = $vaults[chainId][addr];
               const subProp = v.proportions;
 
+              const current = subProp.current * 100;
+              const target = subProp.target * 100;
+
+              const allocation = (Number(metaVault.tvl) / 100) * current;
+
               return {
                 ...vault,
                 proportions: {
-                  current: subProp.current * 100,
-                  target: subProp.target * 100,
+                  current,
+                  target,
+                  allocation,
                 },
                 APR: vault.earningData.apr.latest,
               };
@@ -194,7 +202,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
           return {
             ...subMetaVault,
-            proportions: { current, target },
+            proportions: { current, target, allocation: Number(metaVault.tvl) },
             vaults: vaultsData,
           };
         }
@@ -204,7 +212,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         return {
           ...vault,
           APR: vault.earningData.apr.latest,
-          proportions: { current, target },
+          proportions: { current, target, allocation },
         };
       })
     );
@@ -464,7 +472,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
             <div>
               {isLoading ? (
-                <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
+                <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border rounded-b-lg border-[#23252A]">
                   <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
                     <FullPageLoader />
                   </div>
@@ -485,7 +493,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           <Chart symbol={symbol as string} />
         </div>
 
-        <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
+        <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
           <Form metaVault={localMetaVault} />
           <Contracts metavault={metavault} />
           {/* <LendingMarkets metavault={metavault} /> */}

@@ -305,7 +305,7 @@ type TVault = {
   leverage?: number;
 
   ///// meta vault
-  proportions?: { current: number; target: number };
+  proportions?: { current: number; target: number; allocation: number };
   vaults?: TVault[];
 };
 

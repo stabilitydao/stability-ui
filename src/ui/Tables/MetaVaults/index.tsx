@@ -140,6 +140,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                   />
                 );
               }
+
               return (
                 <div key={`row/${vault.name + index}`}>
                   <Vault
