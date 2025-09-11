@@ -11,18 +11,13 @@ import { Chart } from "./components/Chart";
 import { Modal } from "./components/Modals/Modal";
 import { ProtocolModal } from "./components/Modals/ProtocolModal";
 
-import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
+import { FullPageLoader, MetaVaultsTable, TextSkeleton } from "@ui";
 
 import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
-import {
-  METAVAULT_TABLE,
-  PROTOCOLS,
-  PAGINATION_LIMIT,
-  PROTOCOLS_TABLE,
-} from "@constants";
+import { METAVAULT_TABLE, PROTOCOLS, PROTOCOLS_TABLE } from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
 
@@ -57,10 +52,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
-
-  const [currentTab, setCurrentTab] = useState(1);
-
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
 
   const [aprModal, setAprModal] = useState({
@@ -94,8 +85,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     } else if (type === MetaVaultTableTypes.Protocols) {
       setTableStates(PROTOCOLS_TABLE);
     }
-
-    setCurrentTab(1);
     setTableType(type);
   };
 
@@ -140,13 +129,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
       default:
         return;
-    }
-
-    if (currentTab !== 1 && sortedList.length) {
-      const totalTabs = Math.ceil(sortedList.length / pagination);
-      if (totalTabs < currentTab) {
-        setCurrentTab(1);
-      }
     }
 
     setTableStates(table);
@@ -316,10 +298,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     (mv) => mv.address.toLowerCase() === metavault
   )?.symbol;
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
@@ -436,7 +414,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
       <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
         <div className="flex flex-col gap-4 w-full xl:w-[850px]">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3">
             <span className="font-semibold text-[24px] leading-8 hidden md:block">
               Allocations
             </span>
@@ -494,7 +472,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               ) : localVaults?.length ? (
                 <MetaVaultsTable
                   tableType={tableType}
-                  vaults={currentTabVaults}
+                  vaults={filteredVaults}
                   protocols={filteredProtocols}
                   setAPRModalState={setAprModal}
                   setProtocolModalState={setProtocolModal}
@@ -503,13 +481,6 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 <div className="text-start h-[60px] font-medium">No vaults</div>
               )}
             </div>
-            <Pagination
-              pagination={pagination}
-              data={filteredVaults}
-              tab={currentTab}
-              setTab={setCurrentTab}
-              setPagination={setPagination}
-            />
           </div>
           <Chart symbol={symbol as string} />
         </div>

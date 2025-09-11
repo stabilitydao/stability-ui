@@ -120,11 +120,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
   }, [donutData]);
 
   return (
-    <div
-      className={cn(
-        "bg-[#101012] flex flex-col md:flex-row md:border-l border-[#23252A]"
-      )}
-    >
+    <div className="bg-[#101012] flex flex-col md:flex-row md:border-l border-b rounded-b-lg border-[#23252A]">
       <div className="md:sticky top-[80px] xl3:top-10 h-[220px] border-t border-x md:border-x-0 border-[#23252A] shrink-0">
         <Donut
           data={donutData}

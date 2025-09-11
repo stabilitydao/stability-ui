@@ -227,7 +227,7 @@ const Season1 = (): JSX.Element => {
             })}
           </div>
           <span className="text-[#97979A] text-[14px] leading-5 font-semibold">
-            Total points: {formatNumber(totalPoints, "format")}
+            Total points: {formatNumber(totalPoints, "abbreviate")?.slice(1)}
           </span>
         </div>
 
@@ -270,17 +270,22 @@ const Season1 = (): JSX.Element => {
                         alt="Copy icon"
                       />
                     </div>
-                    <div className="px-2 md:px-4 w-[22.5%] text-end">
+                    <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
-                        : user.earned.toFixed(2)}
+                        : formatNumber(user.earned.toFixed(), "format")}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
-                      {user.points ? user.points.toFixed(2) : ""}
+                      {user.points
+                        ? formatNumber(user.points, "abbreviate")
+                        : ""}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.deposit
-                        ? (Math.round(user.deposit * 100) / 100).toFixed(2)
+                        ? formatNumber(
+                            Math.round(user.deposit * 100) / 100,
+                            "format"
+                          )
                         : ""}
                     </div>
                   </div>

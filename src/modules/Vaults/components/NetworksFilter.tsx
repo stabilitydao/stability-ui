@@ -13,7 +13,7 @@ const NetworksFilter: React.FC<IProps> = memo(
       <div className="flex items-center gap-2 select-none">
         {activeNetworks.map((chain) => (
           <div
-            className={`flex items-center justify-center cursor-pointer px-3 py-2 border rounded-lg ${
+            className={`flex items-center justify-center cursor-pointer px-3 py-2 border h-[48px] rounded-lg ${
               chain.active
                 ? "bg-[#22242A] border-[#35363B]"
                 : "border-[#23252A]"

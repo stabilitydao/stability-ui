@@ -280,7 +280,7 @@ const Chart = ({ symbol }: { symbol: string }): JSX.Element => {
 
   return (
     <div className="flex flex-col gap-4 mt-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3">
         <span className="font-semibold text-[24px] leading-8 hidden md:block">
           Historical Rate
         </span>
@@ -321,7 +321,7 @@ const Chart = ({ symbol }: { symbol: string }): JSX.Element => {
             )}
             onClick={() => chartHandler("sharePrice")}
           >
-            {symbol} Price
+            {symbol === "metaUSD" ? "wmetaUSD" : symbol} Price
           </span>
         </div>
       </div>

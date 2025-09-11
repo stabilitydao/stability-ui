@@ -56,7 +56,7 @@ const ClaimSiloPoints = (): JSX.Element => {
           proofs: res.proof,
           claimed: claimed[0],
         };
-        console.log(data);
+
         setUserData(data);
       }
     } catch (err) {

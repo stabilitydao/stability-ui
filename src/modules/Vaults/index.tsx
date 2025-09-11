@@ -327,6 +327,11 @@ const Vaults = (): JSX.Element => {
               return STABLECOINS.includes(vault?.assets[0]?.address);
             });
           }
+          if (f.name === "Meta Vaults") {
+            sortedVaults = sortedVaults.filter(
+              (vault: TVault) => vault.type != "Vault"
+            );
+          }
           break;
         case "sample":
           if (f.name === "My vaults") {
@@ -522,14 +527,8 @@ const Vaults = (): JSX.Element => {
           </div>
         </div>
         <Portfolio vaults={localVaults} />
-
-        <NetworksFilter
-          activeNetworks={activeNetworks}
-          activeNetworksHandler={activeNetworksHandler}
-        />
-
-        <div className="flex items-center xl:justify-between gap-2 my-4">
-          <div className="max-w-[240px] w-full relative text-[16px]">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative text-[16px]">
             <label className="relative block">
               <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                 <img
@@ -591,7 +590,13 @@ const Vaults = (): JSX.Element => {
               </div>
             )}
           </div>
+          <NetworksFilter
+            activeNetworks={activeNetworks}
+            activeNetworksHandler={activeNetworksHandler}
+          />
+        </div>
 
+        <div className="flex items-center xl:justify-between gap-2 my-4">
           <Filters
             filters={tableFilters}
             setFilters={setTableFilters}

@@ -3,6 +3,7 @@ import type { TTableColumn, TTableFilters } from "@types";
 const TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
   { name: "Stablecoins", type: "single", state: false },
+  { name: "Meta Vaults", type: "single", state: false },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];

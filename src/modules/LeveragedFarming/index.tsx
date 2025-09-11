@@ -177,44 +177,6 @@ const LeveragedFarming = (): JSX.Element => {
     tableFilters.forEach((f) => {
       if (!f.state) return;
       switch (f.type) {
-        case "single":
-          if (f.name === "Stablecoins") {
-            sortedVaults = sortedVaults.filter((vault: TVault) => {
-              if (vault.assets.length > 1) {
-                return (
-                  STABLECOINS.includes(vault?.assets[0]?.address) &&
-                  STABLECOINS.includes(vault?.assets[1]?.address)
-                );
-              }
-              return STABLECOINS.includes(vault?.assets[0]?.address);
-            });
-          }
-          break;
-        case "multiple":
-          // if (!f.variants) break;
-          // if (f.name === "Strategy") {
-          //   const strategyName = f.variants.find(
-          //     (variant: TTAbleFiltersVariant) => variant.state
-          //   )?.name;
-          //   if (strategyName) {
-          //     sortedVaults = sortedVaults.filter(
-          //       (vault: TVault) => vault.strategyInfo.shortId === strategyName
-          //     );
-          //   }
-          // }
-          break;
-        case "sample":
-          if (f.name === "My vaults") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.balance
-            );
-          }
-          if (f.name === "Active") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.status === "Active"
-            );
-          }
-          break;
         case "dropdown":
           if (!f.variants) break;
           if (f.name === "Strategies") {
@@ -225,7 +187,6 @@ const LeveragedFarming = (): JSX.Element => {
               },
               []
             );
-
             if (strategiesToFilter.length) {
               sortedVaults = sortedVaults.filter((vault: TVault) =>
                 strategiesToFilter.includes(vault?.strategyInfo?.shortId)
