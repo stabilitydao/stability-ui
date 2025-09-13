@@ -13,7 +13,6 @@ import { ArrowRightIcon } from "@ui";
 import { frontendContracts, IFrontendABI } from "@web3";
 
 import {
-  platformsData,
   publicClient,
   lastTx,
   account,
@@ -27,7 +26,6 @@ import type { TInitParams, TBuildVariant } from "@types";
 
 const Factory = (): JSX.Element => {
   const $publicClient = useStore(publicClient);
-  const $platformsData = useStore(platformsData);
   const $account = useStore(account);
   const $connected = useStore(connected);
   const $currentChainID = useStore(currentChainID);
@@ -38,7 +36,7 @@ const Factory = (): JSX.Element => {
   const [buildIndex, setBuildIndex] = useState<number | undefined>();
 
   const getData = async () => {
-    if ($publicClient && $platformsData[$currentChainID] && isCorrectNetwork) {
+    if ($publicClient && isCorrectNetwork) {
       const variants: TBuildVariant[] = [];
 
       const STEP = 10;
@@ -123,7 +121,7 @@ const Factory = (): JSX.Element => {
 
   useEffect(() => {
     getData();
-  }, [$publicClient, $platformsData?.[$currentChainID]?.factory, lastTx.get()]);
+  }, [$publicClient, lastTx.get()]);
 
   const compoundingVaultsForBuilding = buildVariants.filter(
     (variant) => variant.vaultType === "Compounding"
@@ -193,7 +191,7 @@ const Factory = (): JSX.Element => {
             </div>
           )}
 
-          {$platformsData?.[$currentChainID] && buildIndex !== undefined && (
+          {buildIndex !== undefined && (
             <div
               className="overlay"
               onClick={() => {

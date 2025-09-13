@@ -289,23 +289,17 @@ const Vaults = (): JSX.Element => {
 
     activeNetworks.forEach((network) => {
       if (network.active) {
-        activeNetworksVaults[network.id] = $vaults[network.id];
+        const _vaults = $vaults?.[network.id]
+          ? Object.values($vaults?.[network.id])
+          : [];
+
+        const _metaVaults = $metaVaults?.[network.id] ?? [];
+
+        activeNetworksVaults[network.id] = [..._vaults, ..._metaVaults];
       }
     });
 
-    const mixedVaults: TVaults = Object.values(
-      activeNetworksVaults
-    ).reduce<TVaults>((acc, value) => {
-      if (typeof value === "object" && !Array.isArray(value)) {
-        return { ...acc, ...(value as TVaults) };
-      }
-      return acc;
-    }, {});
-
-    const allVaults = [
-      ...(localMetaVaults || []),
-      ...Object.values(mixedVaults || []),
-    ];
+    const allVaults = Object.values(activeNetworksVaults).flat();
 
     let sortedVaults = allVaults.sort(
       (a: TVault, b: TVault) => Number(b.tvl) - Number(a.tvl)
@@ -453,7 +447,7 @@ const Vaults = (): JSX.Element => {
   const initVaults = async () => {
     if ($vaults && $metaVaults) {
       const allVaults = [
-        ...($metaVaults["146"] || []),
+        ...($metaVaults[146] || []),
         ...Object.values($vaults[146] || []),
       ];
 
@@ -475,7 +469,7 @@ const Vaults = (): JSX.Element => {
       setIsLocalVaultsLoaded(true);
 
       /*** Meta Vaults ***/
-      setLocalMetaVaults($metaVaults["146"]);
+      setLocalMetaVaults($metaVaults[146]);
     }
   };
 
@@ -527,73 +521,73 @@ const Vaults = (): JSX.Element => {
           </div>
         </div>
         <Portfolio vaults={localVaults} />
-        <div className="flex items-center gap-2">
-          <div className="flex-1 relative text-[16px]">
-            <label className="relative block">
-              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                <img
-                  src="/search.svg"
-                  alt="Search"
-                  className="w-5 h-5 text-[#97979A]"
-                />
-              </span>
-              <input
-                type="text"
-                className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-10"
-                placeholder="Search asset"
-                ref={search}
-                onChange={() => tableHandler()}
-              />
 
-              <span
-                onClick={() => handleSearch("")}
-                className={cn(
-                  "absolute inset-y-0 right-4 flex items-center cursor-pointer",
-                  !search?.current?.value && "hidden"
-                )}
-              >
-                <img src="/icons/circle-xmark.png" alt="xmark" />
+        <NetworksFilter
+          activeNetworks={activeNetworks}
+          activeNetworksHandler={activeNetworksHandler}
+        />
+
+        <div className="relative text-[16px] mt-4">
+          <label className="relative block">
+            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <img
+                src="/search.svg"
+                alt="Search"
+                className="w-5 h-5 text-[#97979A]"
+              />
+            </span>
+            <input
+              type="text"
+              className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-10"
+              placeholder="Search asset"
+              ref={search}
+              onChange={() => tableHandler()}
+            />
+
+            <span
+              onClick={() => handleSearch("")}
+              className={cn(
+                "absolute inset-y-0 right-4 flex items-center cursor-pointer",
+                !search?.current?.value && "hidden"
+              )}
+            >
+              <img src="/icons/circle-xmark.png" alt="xmark" />
+            </span>
+          </label>
+          {!!searchHistory.length && (
+            <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[15] p-[6px]">
+              <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
+                Recent searches
               </span>
-            </label>
-            {!!searchHistory.length && (
-              <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[15] p-[6px]">
-                <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
-                  Recent searches
-                </span>
-                {searchHistory.map((text, index) => (
-                  <div
-                    key={text + index}
-                    className={cn(
-                      "cursor-pointer flex items-center justify-between"
-                    )}
-                  >
-                    <span
-                      className="text-ellipsis whitespace-nowrap overflow-hidden text-[14px] leading-5 font-medium py-[6px] pl-[6px]"
-                      onClick={() => handleSearch(text)}
-                    >
-                      {text}
-                    </span>
-                    <img
-                      className="py-[6px] pr-[6px]"
-                      onClick={() => clearSearchHistory([text])}
-                      src="/icons/xmark.svg"
-                      alt="xmark"
-                    />
-                  </div>
-                ))}
-                <button
-                  className="text-[#A193F2] text-[12px] leading-[14px] font-medium p-[6px] w-full text-start"
-                  onClick={() => clearSearchHistory(searchHistory)}
+              {searchHistory.map((text, index) => (
+                <div
+                  key={text + index}
+                  className={cn(
+                    "cursor-pointer flex items-center justify-between"
+                  )}
                 >
-                  Clear all
-                </button>
-              </div>
-            )}
-          </div>
-          <NetworksFilter
-            activeNetworks={activeNetworks}
-            activeNetworksHandler={activeNetworksHandler}
-          />
+                  <span
+                    className="text-ellipsis whitespace-nowrap overflow-hidden text-[14px] leading-5 font-medium py-[6px] pl-[6px]"
+                    onClick={() => handleSearch(text)}
+                  >
+                    {text}
+                  </span>
+                  <img
+                    className="py-[6px] pr-[6px]"
+                    onClick={() => clearSearchHistory([text])}
+                    src="/icons/xmark.svg"
+                    alt="xmark"
+                  />
+                </div>
+              ))}
+              <button
+                className="text-[#A193F2] text-[12px] leading-[14px] font-medium p-[6px] w-full text-start"
+                onClick={() => clearSearchHistory(searchHistory)}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center xl:justify-between gap-2 my-4">

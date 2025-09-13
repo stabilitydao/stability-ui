@@ -77,16 +77,6 @@ const factories: { [key: string]: TAddress } = Object.entries(
   {} as { [key: string]: TAddress }
 );
 
-const defiedgeFactories: { [key: string]: TAddress } = {
-  "137": "0x730d158D29165C55aBF368e9608Af160DD21Bd80",
-  "8453": "0xa631c80f5F4739565d8793cAB6fD08812cE3337D",
-};
-
-const ichiFactories: { [key: string]: TAddress } = {
-  quickSwap: "0x11700544C577Cb543a498B27B4F0f7018BDb6E8a",
-  retro: "0xb2f44D8545315cDd0bAaB4AC7233218b932a5dA7",
-};
-
 const sGEM1 = deployments[146].tokenomics.gem1;
 
 const merkleDistributor = deployments[146].tokenomics.merkleDistributor;
@@ -128,8 +118,6 @@ export {
   CONTRACT_PAGINATION,
   platforms,
   frontendContracts,
-  defiedgeFactories,
-  ichiFactories,
   walletConnectProjectId,
   walletClient,
   priceReaders,
