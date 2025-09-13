@@ -45,7 +45,6 @@ import {
   TVault,
   TTableColumn,
   TEarningData,
-  TVaults,
   TAPRPeriod,
   TTableActiveParams,
   TVSHoldModalState,
@@ -102,7 +101,6 @@ const Vaults = (): JSX.Element => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
-  const [localMetaVaults, setLocalMetaVaults] = useState([]);
   const [filteredVaults, setFilteredVaults] = useState<TVault[]>([]);
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -285,7 +283,7 @@ const Vaults = (): JSX.Element => {
     //@ts-ignore
     updateHistorySearch(searchValue);
 
-    let activeNetworksVaults: { [key: string]: TVault[] } = {};
+    const activeNetworksVaults: { [key: string]: TVault[] } = {};
 
     activeNetworks.forEach((network) => {
       if (network.active) {
@@ -446,10 +444,21 @@ const Vaults = (): JSX.Element => {
 
   const initVaults = async () => {
     if ($vaults && $metaVaults) {
-      const allVaults = [
-        ...($metaVaults[146] || []),
-        ...Object.values($vaults[146] || []),
-      ];
+      const activeNetworksVaults: { [key: string]: TVault[] } = {};
+
+      activeNetworks.forEach((network) => {
+        if (network.active) {
+          const _vaults = $vaults?.[network.id]
+            ? Object.values($vaults?.[network.id])
+            : [];
+
+          const _metaVaults = $metaVaults?.[network.id] ?? [];
+
+          activeNetworksVaults[network.id] = [..._vaults, ..._metaVaults];
+        }
+      });
+
+      const allVaults = Object.values(activeNetworksVaults).flat();
 
       const vaults: TVault[] = allVaults.sort(
         (a, b) => Number((b as TVault).tvl) - Number((a as TVault).tvl)
@@ -467,9 +476,6 @@ const Vaults = (): JSX.Element => {
 
       setFilteredVaults(vaults);
       setIsLocalVaultsLoaded(true);
-
-      /*** Meta Vaults ***/
-      setLocalMetaVaults($metaVaults[146]);
     }
   };
 
