@@ -105,10 +105,6 @@ type TInitParams = {
   initStrategyTicks: number[];
 };
 
-type TAllowedBBTokenVaults = {
-  [token: string]: number;
-};
-
 type TTokenData = {
   address: TAddress;
   name: string;
@@ -825,7 +821,6 @@ export enum TimelineTypes {
 export type {
   TPlatformData,
   TInitParams,
-  TAllowedBBTokenVaults,
   TTokenData,
   TVaults,
   TVaultData,
