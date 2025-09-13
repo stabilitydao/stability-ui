@@ -316,7 +316,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   )?.symbol;
 
   return (
-    <div className="mx-auto flex flex-col gap-6 pb-6">
+    <div className="mx-auto flex flex-col gap-6 pb-6 xl:min-w-[1230px]">
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
           <div className="flex flex-col gap-4">
@@ -468,7 +468,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       ) : (
         <div className="flex items-center justify-between">
           {activeSection === MetaVaultSectionTypes.Operations ? (
-            <div className="flex items-start gap-6 w-full">
+            <div className="flex items-start flex-col md:flex-row gap-6 w-full">
               <Form metaVault={localMetaVault} displayType={displayType} />
 
               <Contracts metavault={metavault} />
