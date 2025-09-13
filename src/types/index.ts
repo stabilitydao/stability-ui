@@ -82,19 +82,6 @@ type TTokens = {
   [chainId: string]: TAddress[];
 };
 
-type TPlatformGetData = [
-  string[],
-  string[],
-  string[],
-  string[],
-  string[],
-  bigint[],
-  string[],
-  boolean[],
-  string[],
-  string[],
-];
-
 type TFrontendBalances = [bigint, string[], bigint[], bigint[]];
 
 type TInitParams = {
@@ -417,10 +404,6 @@ type TBuildVariant = {
 };
 
 type TAddress = `0x${string}`;
-type TInputItem = {
-  inputValue: string | number;
-  valuePerDay: string;
-};
 
 type TYearnProtocol = { title: string; link: string };
 
@@ -835,7 +818,6 @@ export type {
   IProtocol,
   TMultichainPrices,
   IStrategyInfo,
-  TInputItem,
   TVaultsAddress,
   TVaultAllowance,
   TVaultInput,
@@ -865,7 +847,6 @@ export type {
   TPriceInfo,
   TAPIData,
   TEarningData,
-  TPlatformGetData,
   TChartPayload,
   TVaultDataKey,
   TFrontendBalances,
