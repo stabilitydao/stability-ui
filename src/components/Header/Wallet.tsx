@@ -15,7 +15,7 @@ import {
   currentChainID,
 } from "@store";
 
-import { IERC721Enumerable } from "@web3";
+import { ERC20ABI } from "@web3";
 
 import { cn, getTokenData } from "@utils";
 
@@ -43,7 +43,7 @@ const Wallet = (): JSX.Element => {
     try {
       const balance = (await $publicClient?.readContract({
         address: PM[0],
-        abi: IERC721Enumerable,
+        abi: ERC20ABI,
         functionName: "balanceOf",
         args: [$account as TAddress],
       })) as bigint;

@@ -8,18 +8,12 @@ import { deployments } from "@stabilitydao/stability";
 
 import ERC20ABI from "./abi/ERC20ABI.ts";
 import ERC20MetadataUpgradeableABI from "./abi/ERC20MetadataUpgradeableABI.ts";
-import ERC20DQMFABI from "./abi/ERC20DQMFABI.ts";
 import FactoryABI from "./abi/FactoryABI.ts";
-import IVaultManagerABI from "./abi/IVaultManagerABI.ts";
 import PlatformABI from "./abi/PlatformABI.ts";
 import StrategyABI from "./abi/StrategyABI.ts";
 import VaultABI from "./abi/VaultABI.ts";
-import IERC721Enumerable from "./abi/IERC721Enumerable.ts";
 import ZapABI from "./abi/ZapABI.ts";
-import DividendMinterABI from "./abi/DividendMinterABI.ts";
-import DividendTokenABI from "./abi/DividendTokenABI.ts";
 import ICHIABI from "./abi/ICHIABI.ts";
-import PriceReaderABI from "./abi/PriceReaderABI.ts";
 import IFrontendABI from "./abi/IFrontendABI.ts";
 import IMerkleDistributor from "./abi/IMerkleDistributor.ts";
 import IRevenueRouterABI from "./abi/IRevenueRouterABI.ts";
@@ -141,19 +135,13 @@ export {
   priceReaders,
   ERC20ABI,
   ERC20MetadataUpgradeableABI,
-  ERC20DQMFABI,
   FactoryABI,
-  IVaultManagerABI,
   PlatformABI,
   StrategyABI,
   VaultABI,
   wagmiConfig,
-  IERC721Enumerable,
   ZapABI,
-  DividendMinterABI,
-  DividendTokenABI,
   ICHIABI,
-  PriceReaderABI,
   IFrontendABI,
   IMerkleDistributor,
   IRevenueRouterABI,
