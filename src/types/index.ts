@@ -791,6 +791,17 @@ export enum MetaVaultTableTypes {
   Protocols = "protocols",
 }
 
+export enum MetaVaultDisplayTypes {
+  Lite = "lite",
+  Pro = "pro",
+}
+
+export enum MetaVaultSectionTypes {
+  Operations = "operations",
+  Allocations = "allocations",
+  Charts = "charts",
+}
+
 export enum TransactionTypes {
   Deposit = "deposit",
   Withdraw = "withdraw",

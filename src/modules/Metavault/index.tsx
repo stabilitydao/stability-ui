@@ -3,15 +3,18 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
-import { ColumnSort } from "./components/ColumnSort";
 // import { LendingMarkets } from "./components/LendingMarkets";
+import { Table } from "./components/Table";
 import { Contracts } from "./components/Contracts";
 import { Chart } from "./components/Chart";
+
+import { DisplayHandler } from "./components/DisplayHandler";
+import { SectionHandler } from "./components/SectionHandler";
 
 import { Modal } from "./components/Modals/Modal";
 import { ProtocolModal } from "./components/Modals/ProtocolModal";
 
-import { FullPageLoader, MetaVaultsTable, TextSkeleton } from "@ui";
+import { TextSkeleton } from "@ui";
 
 import { cn, formatNumber, dataSorter } from "@utils";
 
@@ -31,6 +34,8 @@ import {
   VaultTypes,
   IProtocolModal,
   IProtocol,
+  MetaVaultDisplayTypes,
+  MetaVaultSectionTypes,
 } from "@types";
 
 interface IProps {
@@ -53,6 +58,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
+  const [displayType, setDisplayType] = useState(MetaVaultDisplayTypes.Lite);
+  const [activeSection, setActiveSection] = useState(
+    MetaVaultSectionTypes.Operations
+  );
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -79,7 +88,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
-  const changeTable = (type: MetaVaultTableTypes) => {
+  const changeTables = (type: MetaVaultTableTypes) => {
     if (type === MetaVaultTableTypes.Destinations) {
       setTableStates(METAVAULT_TABLE);
     } else if (type === MetaVaultTableTypes.Protocols) {
@@ -310,8 +319,13 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     <div className="mx-auto flex flex-col gap-6 pb-6">
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
-          <div>
-            <h2 className="page-title__font text-start mb-4">{symbol}</h2>
+          <div className="flex flex-col gap-4">
+            <DisplayHandler
+              displayType={displayType}
+              setDisplayType={setDisplayType}
+            />
+
+            <h2 className="page-title__font text-start">{symbol}</h2>
 
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
@@ -420,85 +434,65 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         />
       </div>
 
-      <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
-        <div className="flex flex-col gap-4 w-full xl:w-[850px]">
-          <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3">
-            <span className="font-semibold text-[24px] leading-8 hidden md:block">
-              Allocations
-            </span>
-            <div className="flex items-center justify-between md:justify-end">
-              <span className="font-semibold text-[18px] leading-6 block md:hidden">
-                Allocations
-              </span>
-            </div>
-            <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
-              <span
-                className={cn(
-                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
-                  tableType != MetaVaultTableTypes.Destinations
-                    ? "text-[#6A6B6F] cursor-pointer"
-                    : "bg-[#232429] border border-[#2C2E33]"
-                )}
-                onClick={() => changeTable(MetaVaultTableTypes.Destinations)}
-              >
-                Destinations
-              </span>
-              <span
-                className={cn(
-                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
-                  tableType != MetaVaultTableTypes.Protocols
-                    ? "text-[#6A6B6F] cursor-pointer"
-                    : "bg-[#232429] border border-[#2C2E33]"
-                )}
-                onClick={() => changeTable(MetaVaultTableTypes.Protocols)}
-              >
-                Protocols
-              </span>
-            </div>
+      <SectionHandler
+        activeSection={activeSection}
+        displayType={displayType}
+        setActiveSection={setActiveSection}
+      />
+
+      {displayType === MetaVaultDisplayTypes.Lite ? (
+        <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
+          <div className="flex flex-col gap-4 w-full xl:w-[850px]">
+            <Table
+              tableType={tableType}
+              changeTables={changeTables}
+              tableStates={tableStates}
+              tableHandler={tableHandler}
+              isLoading={isLoading}
+              allVaults={localVaults}
+              vaults={filteredVaults}
+              protocols={filteredProtocols}
+              setAPRModal={setAprModal}
+              setProtocolModal={setProtocolModal}
+            />
+
+            <Chart symbol={symbol as string} />
           </div>
 
-          <div>
-            <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:pl-[220px]">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <ColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  table={tableStates}
-                  sort={tableHandler}
-                />
-              ))}
-            </div>
-
-            <div>
-              {isLoading ? (
-                <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border rounded-b-lg border-[#23252A]">
-                  <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                    <FullPageLoader />
-                  </div>
-                </div>
-              ) : localVaults?.length ? (
-                <MetaVaultsTable
-                  tableType={tableType}
-                  vaults={filteredVaults}
-                  protocols={filteredProtocols}
-                  setAPRModalState={setAprModal}
-                  setProtocolModalState={setProtocolModal}
-                />
-              ) : (
-                <div className="text-start h-[60px] font-medium">No vaults</div>
-              )}
-            </div>
+          <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
+            <Form metaVault={localMetaVault} displayType={displayType} />
+            <Contracts metavault={metavault} />
+            {/* <LendingMarkets metavault={metavault} /> */}
           </div>
-          <Chart symbol={symbol as string} />
         </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          {activeSection === MetaVaultSectionTypes.Operations ? (
+            <div className="flex items-start gap-6 w-full">
+              <Form metaVault={localMetaVault} displayType={displayType} />
 
-        <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
-          <Form metaVault={localMetaVault} />
-          <Contracts metavault={metavault} />
-          {/* <LendingMarkets metavault={metavault} /> */}
+              <Contracts metavault={metavault} />
+            </div>
+          ) : activeSection === MetaVaultSectionTypes.Allocations ? (
+            <Table
+              tableType={tableType}
+              changeTables={changeTables}
+              tableStates={tableStates}
+              tableHandler={tableHandler}
+              isLoading={isLoading}
+              allVaults={localVaults}
+              vaults={filteredVaults}
+              protocols={filteredProtocols}
+              setAPRModal={setAprModal}
+              setProtocolModal={setProtocolModal}
+            />
+          ) : (
+            <div className="w-full">
+              <Chart symbol={symbol as string} />
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {modal && <Modal metaVault={localMetaVault} setModal={setModal} />}
 

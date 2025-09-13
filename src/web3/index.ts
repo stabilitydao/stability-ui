@@ -71,6 +71,18 @@ const frontendContracts: { [key: string]: TAddress } = Object.entries(
   {} as { [key: string]: TAddress }
 );
 
+const factories: { [key: string]: TAddress } = Object.entries(
+  deployments
+).reduce(
+  (acc, [key, value]) => {
+    if (value?.core?.factory) {
+      acc[key] = value?.core?.factory;
+    }
+    return acc;
+  },
+  {} as { [key: string]: TAddress }
+);
+
 const defiedgeFactories: { [key: string]: TAddress } = {
   "137": "0x730d158D29165C55aBF368e9608Af160DD21Bd80",
   "8453": "0xa631c80f5F4739565d8793cAB6fD08812cE3337D",
@@ -155,4 +167,5 @@ export {
   IMetaVaultABI,
   WrappedMetaVaultABI,
   SwapperABI,
+  factories,
 };

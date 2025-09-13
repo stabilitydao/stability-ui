@@ -2,12 +2,12 @@ import { useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { platformsData } from "@store";
+import { currentChainID } from "@store";
 import { cn } from "@utils";
 
 import { writeContract } from "@wagmi/core";
 
-import { wagmiConfig, FactoryABI } from "@web3";
+import { wagmiConfig, FactoryABI, factories } from "@web3";
 
 import type { TAddress } from "@types";
 
@@ -22,7 +22,7 @@ interface EditFarm {
 }
 
 const VaultManager = (): JSX.Element => {
-  const $platformsData = useStore(platformsData);
+  const $currentChainID = useStore(currentChainID);
 
   const [activeSection, setActiveSection] = useState("farm");
 
@@ -32,10 +32,6 @@ const VaultManager = (): JSX.Element => {
   };
 
   const [currentType, setCurrentType] = useState("Silo");
-
-  const factoryAddress = $platformsData[146]?.factory;
-  const FARMS_FACTORY_ADDRESS: TAddress =
-    "0xc184a3ECcA684F2621c903A7943D85fA42F56671";
 
   const [vaultInitAddressesInput, setVaultInitAddressesInput] = useState("");
   const [vaultInitNumsInput, setVaultInitNumsInput] = useState("");
@@ -101,7 +97,7 @@ const VaultManager = (): JSX.Element => {
       console.log(args);
 
       const deployVaultAndStrategy = await writeContract(wagmiConfig, {
-        address: factoryAddress,
+        address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: "deployVaultAndStrategy",
         args: args,
@@ -116,7 +112,7 @@ const VaultManager = (): JSX.Element => {
   const addFarm = async () => {
     try {
       const hash = await writeContract(wagmiConfig, {
-        address: FARMS_FACTORY_ADDRESS,
+        address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: "addFarms",
         args: [[editFarm]],
