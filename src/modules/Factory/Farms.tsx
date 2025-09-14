@@ -262,6 +262,7 @@ const Farms = (): JSX.Element => {
 
       const { farmStruct, ...farm } = editFarm;
 
+      console.log(farmStruct);
       try {
         setSimulationStatus("loading");
         await simulateContract(wagmiConfig, {
@@ -324,7 +325,7 @@ const Farms = (): JSX.Element => {
       if (!editFarm || !$account) return;
 
       const { farmStruct, ...farm } = editFarm;
-
+      console.log(farmStruct);
       try {
         const est = await $publicClient.estimateContractGas({
           address: factories[$currentChainID],
