@@ -54,7 +54,9 @@ const Vault: React.FC<IProps> = ({
 
   const protocol = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
-    : rawProtocol;
+    : rawProtocol?.name?.includes("Compound")
+      ? PROTOCOLS.enclabs
+      : rawProtocol;
 
   return (
     <div className={cn("border-t border-[#23252A]")}>
@@ -75,7 +77,7 @@ const Vault: React.FC<IProps> = ({
           }
         }}
       >
-        <div className="flex items-center w-full min-[860px]:w-[50%] justify-between px-4">
+        <div className="flex items-center w-full min-[860px]:w-[40%] justify-between px-4">
           <div
             className={cn(
               "flex items-center gap-3",
@@ -127,7 +129,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           onClick={(e) => {
-            if (window.innerHeight <= 860 && vault.type === "Vault") {
+            if (window.innerHeight <= 860 && vault.type === VaultTypes.Vault) {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,
@@ -140,7 +142,7 @@ const Vault: React.FC<IProps> = ({
             }
           }}
           className={cn(
-            "px-4 w-[20%] hidden min-[860px]:block",
+            "px-4 w-[15%] hidden min-[860px]:block",
             vault.type === VaultTypes.Vault && "tooltip cursor-help"
           )}
         >
@@ -238,7 +240,15 @@ const Vault: React.FC<IProps> = ({
             <i></i>
           </div>
         </div>
-        <div className="px-4 text-right text-[16px] w-[30%] hidden min-[860px]:block">
+        <div className="px-4 text-right text-[14px] w-[15%] hidden min-[860px]:block">
+          <span>
+            {formatNumber(
+              vault?.proportions?.allocation as number,
+              "abbreviate"
+            )?.slice(1)}
+          </span>
+        </div>
+        <div className="px-4 text-right text-[14px] w-[30%] hidden min-[860px]:block">
           {(vault?.proportions?.current || vault?.proportions?.target) && (
             <span>
               {Number(vault.proportions?.current).toFixed(2)}% /{" "}
@@ -249,7 +259,7 @@ const Vault: React.FC<IProps> = ({
       </a>
       {expandedData ? (
         <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] min-[860px]:hidden">
-          {vault.type === "Vault" && (
+          {vault.type === VaultTypes.Vault && (
             <div className="flex items-center justify-between w-full">
               <span className="text-[#909193] text-[14px] leading-5 font-medium">
                 Strategy
@@ -277,10 +287,31 @@ const Vault: React.FC<IProps> = ({
               </div>
             </div>
           </div>
+          {vault.type === VaultTypes.Vault && (
+            <div className="flex items-center justify-between w-full">
+              <span className="text-[#909193] text-[14px] leading-5 font-medium">
+                Last Hard Work
+              </span>
+              <TimeDifferenceIndicator unix={vault.lastHardWork} />
+            </div>
+          )}
 
           <div className="flex items-center justify-between w-full">
             <span className="text-[#909193] text-[14px] leading-5 font-medium">
               Allocation
+            </span>
+
+            <span className="text-[16px]">
+              {formatNumber(
+                vault?.proportions?.allocation as number,
+                "abbreviate"
+              )?.slice(1)}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[#909193] text-[14px] leading-5 font-medium">
+              Proportions
             </span>
             {(vault?.proportions?.current || vault?.proportions?.target) && (
               <span className="text-[16px]">

@@ -3,8 +3,6 @@ import { useState, useEffect, useMemo } from "react";
 import { Vault, Protocol } from "./Rows";
 import { Donut } from "./Donut";
 
-import { cn } from "@utils";
-
 import { strategies } from "@stabilitydao/stability";
 
 import {
@@ -13,20 +11,23 @@ import {
   MetaVaultTableTypes,
   IProtocol,
   VaultTypes,
+  IProtocolModal,
 } from "@types";
 
 interface IProps {
   tableType: MetaVaultTableTypes;
   vaults: TVault[];
   protocols: IProtocol[];
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setAPRModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
+  setProtocolModalState: React.Dispatch<React.SetStateAction<IProtocolModal>>;
 }
 
 const MetaVaultsTable: React.FC<IProps> = ({
   tableType,
   vaults,
   protocols,
-  setModalState,
+  setAPRModalState,
+  setProtocolModalState,
 }) => {
   const [activeSection, setActiveSection] = useState({});
 
@@ -117,11 +118,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
   }, [donutData]);
 
   return (
-    <div
-      className={cn(
-        "bg-[#101012] flex flex-col md:flex-row md:border-l border-[#23252A]"
-      )}
-    >
+    <div className="bg-[#101012] flex flex-col md:flex-row md:border-l border-b rounded-b-lg border-[#23252A]">
       <div className="md:sticky top-[80px] xl3:top-10 h-[220px] border-t border-x md:border-x-0 border-[#23252A] shrink-0">
         <Donut
           data={donutData}
@@ -139,17 +136,18 @@ const MetaVaultsTable: React.FC<IProps> = ({
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
-                    setModalState={setModalState}
+                    setModalState={setAPRModalState}
                   />
                 );
               }
+
               return (
                 <div key={`row/${vault.name + index}`}>
                   <Vault
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
-                    setModalState={setModalState}
+                    setModalState={setAPRModalState}
                   />
                   {vault?.vaults?.map((endVault) => {
                     return (
@@ -158,7 +156,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                         APRs={getVaultAPRs(endVault)}
                         vault={endVault}
                         activeVault={activeSection}
-                        setModalState={setModalState}
+                        setModalState={setAPRModalState}
                         inserted={true}
                       />
                     );
@@ -171,6 +169,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                 key={`row/${protocol.name + index}`}
                 protocol={protocol}
                 activeProtocol={activeSection}
+                setModalState={setProtocolModalState}
               />
             ))}
       </div>

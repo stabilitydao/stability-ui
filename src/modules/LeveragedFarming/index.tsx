@@ -5,8 +5,6 @@ import { useStore } from "@nanostores/react";
 import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 
-import { chains } from "@stabilitydao/stability";
-
 import {
   FullPageLoader,
   ErrorMessage,
@@ -16,7 +14,7 @@ import {
   APRModal,
 } from "@ui";
 
-import { vaults, isVaultsLoaded, aprFilter, error, metaVaults } from "@store";
+import { vaults, isVaultsLoaded, aprFilter, error } from "@store";
 
 import { initFilters } from "./functions";
 
@@ -25,9 +23,9 @@ import { dataSorter, cn } from "@utils";
 import {
   FARMING_TABLE_FILTERS,
   PAGINATION_LIMIT,
-  STABLECOINS,
   DEFAULT_TABLE_PARAMS,
   LEVERAGE_FARMING_TABLE,
+  CHAINS,
 } from "@constants";
 
 import {
@@ -42,7 +40,6 @@ import {
 
 const LeveragedFarming = (): JSX.Element => {
   const $vaults = useStore(vaults);
-  const $metaVaults = useStore(metaVaults);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
   const $aprFilter: TAPRPeriod = useStore(aprFilter);
@@ -104,16 +101,9 @@ const LeveragedFarming = (): JSX.Element => {
   const [displayType, setDisplayType] = useState<DisplayTypes>(
     DisplayTypes.Rows
   );
-  const [activeNetworks, setActiveNetworks] = useState([
-    {
-      name: chains["146"].name,
-      id: "146",
-      logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
-      explorer: "https://sonicscan.org/address/",
-      nativeCurrency: "S",
-      active: true, // main page active networks
-    },
-  ]);
+  const [activeNetworks, setActiveNetworks] = useState(
+    CHAINS.filter(({ active }) => active)
+  );
 
   const lastTabIndex = currentTab * pagination;
   const firstTabIndex = lastTabIndex - pagination;
@@ -186,44 +176,6 @@ const LeveragedFarming = (): JSX.Element => {
     tableFilters.forEach((f) => {
       if (!f.state) return;
       switch (f.type) {
-        case "single":
-          if (f.name === "Stablecoins") {
-            sortedVaults = sortedVaults.filter((vault: TVault) => {
-              if (vault.assets.length > 1) {
-                return (
-                  STABLECOINS.includes(vault?.assets[0]?.address) &&
-                  STABLECOINS.includes(vault?.assets[1]?.address)
-                );
-              }
-              return STABLECOINS.includes(vault?.assets[0]?.address);
-            });
-          }
-          break;
-        case "multiple":
-          // if (!f.variants) break;
-          // if (f.name === "Strategy") {
-          //   const strategyName = f.variants.find(
-          //     (variant: TTAbleFiltersVariant) => variant.state
-          //   )?.name;
-          //   if (strategyName) {
-          //     sortedVaults = sortedVaults.filter(
-          //       (vault: TVault) => vault.strategyInfo.shortId === strategyName
-          //     );
-          //   }
-          // }
-          break;
-        case "sample":
-          if (f.name === "My vaults") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.balance
-            );
-          }
-          if (f.name === "Active") {
-            sortedVaults = sortedVaults.filter(
-              (vault: TVault) => vault.status === "Active"
-            );
-          }
-          break;
         case "dropdown":
           if (!f.variants) break;
           if (f.name === "Strategies") {
@@ -234,7 +186,6 @@ const LeveragedFarming = (): JSX.Element => {
               },
               []
             );
-
             if (strategiesToFilter.length) {
               sortedVaults = sortedVaults.filter((vault: TVault) =>
                 strategiesToFilter.includes(vault?.strategyInfo?.shortId)
@@ -305,7 +256,7 @@ const LeveragedFarming = (): JSX.Element => {
   };
 
   const initVaults = async () => {
-    if ($vaults && $metaVaults) {
+    if ($vaults) {
       const allVaults = Object.values($vaults[146]) || [];
 
       const vaults: TVault[] = allVaults
@@ -388,13 +339,7 @@ const LeveragedFarming = (): JSX.Element => {
             setTableParams={setActiveTableParams}
           />
 
-          <DisplayType
-            type={displayType}
-            setType={setDisplayType}
-            pagination={pagination}
-            setPagination={setPagination}
-            setTab={setCurrentTab}
-          />
+          <DisplayType type={displayType} setType={setDisplayType} />
         </div>
       </div>
 

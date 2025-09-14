@@ -12,6 +12,7 @@ import { GridIcon } from "./Grid";
 import { ArrowIcon } from "./Arrow";
 import { FiltersIcon } from "./Filters";
 import { ArrowRightIcon } from "./ArrowRight";
+import { LendingIcon } from "./Lending";
 
 export {
   DashboardIcon,
@@ -28,4 +29,5 @@ export {
   ArrowIcon,
   FiltersIcon,
   ArrowRightIcon,
+  LendingIcon,
 };

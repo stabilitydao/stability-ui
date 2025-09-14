@@ -37,6 +37,7 @@ const marketPrices = atom<TMarketPrices>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
+const isMarketsLoaded = atom<boolean>(false);
 
 const tokens = atom<TTokens>({});
 
@@ -56,6 +57,7 @@ const currentChainID = atom("146");
 
 const vaults = deepMap<any>(false);
 const metaVaults = deepMap<any>(false);
+const markets = deepMap<any>(false);
 
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
@@ -101,4 +103,6 @@ export {
   metaVaults,
   marketPrices,
   isNavbar,
+  markets,
+  isMarketsLoaded,
 };

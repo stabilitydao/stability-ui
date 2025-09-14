@@ -10,7 +10,7 @@ import { cn, formatNumber } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
-import { PATHS } from "@constants";
+import { PATHS, ROUTES } from "@constants";
 
 const Navbar = (): JSX.Element => {
   const pathname = window.location.pathname;
@@ -23,33 +23,14 @@ const Navbar = (): JSX.Element => {
   const [activePath, setActivePath] = useState("");
 
   useEffect(() => {
-    const platformPaths = [
-      "platform",
-      "strategies",
-      "chains",
-      "integrations",
-      "assets",
-      "factory",
-      "network",
-      "swapper",
-    ];
-
-    const basicPaths = [
-      "xstbl",
-      "dashboard",
-      "leveraged-farming",
-      "alm",
-      "agents",
-    ];
-
     const isPlatform =
-      platformPaths.some((path) => path === currentPath) ||
-      platformPaths.some((path) => currentPath.includes(path));
+      ROUTES.platform.some((path) => path === currentPath) ||
+      ROUTES.platform.some((path) => currentPath.includes(path));
 
     const isVaults =
       !currentPath.includes("metavaults") && currentPath.includes("vault");
 
-    const isBasicPage = basicPaths.includes(currentPath);
+    const isBasicPage = ROUTES.basic.includes(currentPath);
 
     if (isVaults) {
       setActivePath("vaults");
@@ -57,11 +38,14 @@ const Navbar = (): JSX.Element => {
       setActivePath("platform");
     } else if (
       currentPath === "leaderboard" ||
-      currentPath.includes("contests")
+      currentPath.includes("contests") ||
+      currentPath.includes("season-1")
     ) {
       setActivePath("leaderboard");
     } else if (currentPath.includes("metavaults")) {
       setActivePath("metavaults");
+    } else if (currentPath.includes("lending")) {
+      setActivePath("lending");
     } else if (isBasicPage) {
       setActivePath(currentPath);
     }
@@ -80,7 +64,7 @@ const Navbar = (): JSX.Element => {
       ? "#ff8d00"
       : $apiData?.network.status == "OK"
         ? "#00ff00"
-        : "#444444";
+        : "#1B1D21";
 
   return (
     <div className="hidden md:block">
@@ -138,18 +122,6 @@ const Navbar = (): JSX.Element => {
 
             <div className="flex flex-col gap-2">
               <Prices />
-              <a
-                href="https://stability.market/"
-                target="_blank"
-                className="border border-[#23252A] rounded-lg"
-              >
-                <div className="flex items-center justify-between gap-2 px-4 h-10">
-                  <span className="text-[#A3A4A6] text-[14px] leading-4 font-medium">
-                    Market
-                  </span>
-                  <img src="/icons/external_link.svg" alt="External link" />
-                </div>
-              </a>
               <div className="flex gap-2">
                 <div className="w-2/3 flex items-center justify-between h-10 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
                   <span className="text-[#A3A4A6]">AUM</span>

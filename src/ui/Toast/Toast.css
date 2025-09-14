@@ -1,12 +1,13 @@
 .toast {
-  @apply bg-button;
+  background-color: #111114;
+  border: 1px solid #232429;
   position: fixed;
   bottom: 10px;
   right: 10px;
-  width: 300px;
+  width: 30vw;
+  min-width: 250px;
   color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
   overflow: hidden;
   opacity: 0;
   animation: fadeInOut 10s linear forwards;

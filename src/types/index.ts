@@ -18,6 +18,14 @@ interface IProtocol {
   logoSrc: string;
   value?: number;
   allocation?: number;
+  creationDate: number;
+  audits: { name: string; url: string }[];
+  accidents: { date: number; url: string; name: string }[];
+}
+
+interface IProtocolModal extends IProtocol {
+  state: boolean;
+  type: string;
 }
 
 interface IStrategyInfo {
@@ -74,19 +82,6 @@ type TTokens = {
   [chainId: string]: TAddress[];
 };
 
-type TPlatformGetData = [
-  string[],
-  string[],
-  string[],
-  string[],
-  string[],
-  bigint[],
-  string[],
-  boolean[],
-  string[],
-  string[],
-];
-
 type TFrontendBalances = [bigint, string[], bigint[], bigint[]];
 
 type TInitParams = {
@@ -95,10 +90,6 @@ type TInitParams = {
   initStrategyAddresses: string[];
   initStrategyNums: bigint[];
   initStrategyTicks: number[];
-};
-
-type TAllowedBBTokenVaults = {
-  [token: string]: number;
 };
 
 type TTokenData = {
@@ -297,7 +288,7 @@ type TVault = {
   leverage?: number;
 
   ///// meta vault
-  proportions?: { current: number; target: number };
+  proportions?: { current: number; target: number; allocation: number };
   vaults?: TVault[];
 };
 
@@ -375,7 +366,7 @@ type TLeaderboard = {
 
 type TTAbleFiltersVariant = {
   name: string;
-  title: string;
+  title?: string;
   state: boolean;
 };
 
@@ -413,10 +404,6 @@ type TBuildVariant = {
 };
 
 type TAddress = `0x${string}`;
-type TInputItem = {
-  inputValue: string | number;
-  valuePerDay: string;
-};
 
 type TYearnProtocol = { title: string; link: string };
 
@@ -607,6 +594,11 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
+type TActiveChart = {
+  name: string;
+  data: [];
+};
+
 //// EVENTS
 
 type TError = {
@@ -696,6 +688,15 @@ type TVSHoldModalState = {
   isVsActive: boolean;
 };
 
+type TNetwork = {
+  name: string;
+  id: string;
+  logoURI: string;
+  explorer: string;
+  nativeCurrency: string;
+  active: boolean;
+};
+
 type TTableActiveParams = {
   search: number;
   sort: number;
@@ -734,6 +735,30 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
+type TMarketAsset = {
+  address: TAddress;
+  borrowAPR: string;
+  borrowCap: string;
+  borrowTVL: string;
+  cap: string;
+  name: string;
+  price: string;
+  supplyAPR: string;
+  supplyTVL: string;
+  maxLtv: string;
+  liquidationThreshold: string;
+};
+
+type TMarket = {
+  name: string;
+  assets: TMarketAsset[];
+  network: TNetwork;
+  supplyAPR?: number;
+  borrowAPR?: number;
+  supplyTVL?: number;
+  borrowTVL?: number;
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -743,6 +768,17 @@ export enum DisplayTypes {
 export enum MetaVaultTableTypes {
   Destinations = "destinations",
   Protocols = "protocols",
+}
+
+export enum MetaVaultDisplayTypes {
+  Lite = "lite",
+  Pro = "pro",
+}
+
+export enum MetaVaultSectionTypes {
+  Operations = "operations",
+  Allocations = "allocations",
+  Charts = "charts",
 }
 
 export enum TransactionTypes {
@@ -758,10 +794,16 @@ export enum VaultTypes {
   MultiVault = "MultiVault",
 }
 
+export enum TimelineTypes {
+  Day = "DAY",
+  Week = "WEEK",
+  Month = "MONTH",
+  Year = "YEAR",
+}
+
 export type {
   TPlatformData,
   TInitParams,
-  TAllowedBBTokenVaults,
   TTokenData,
   TVaults,
   TVaultData,
@@ -776,7 +818,6 @@ export type {
   IProtocol,
   TMultichainPrices,
   IStrategyInfo,
-  TInputItem,
   TVaultsAddress,
   TVaultAllowance,
   TVaultInput,
@@ -806,7 +847,6 @@ export type {
   TPriceInfo,
   TAPIData,
   TEarningData,
-  TPlatformGetData,
   TChartPayload,
   TVaultDataKey,
   TFrontendBalances,
@@ -844,4 +884,9 @@ export type {
   TMetaVaults,
   TEndMetaVaults,
   TMarketInfo,
+  TActiveChart,
+  IProtocolModal,
+  TMarket,
+  TMarketAsset,
+  TNetwork,
 };

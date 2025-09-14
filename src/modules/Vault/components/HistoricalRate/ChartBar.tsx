@@ -11,7 +11,7 @@ import {
   Cell,
 } from "recharts";
 
-import type { TChartPayload } from "@types";
+import { AxisTick, ChartTooltip } from "@ui";
 
 interface IProps {
   chart: {
@@ -20,53 +20,6 @@ interface IProps {
   };
   APRType: string;
 }
-
-const CustomizedAxisTick = ({
-  x,
-  y,
-  payload,
-  fontSize,
-}: {
-  x: number;
-  y: number;
-  payload: TChartPayload;
-  fontSize: number;
-}) => {
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={10}
-        textAnchor="middle"
-        fill="#8d8e96"
-        fontSize={fontSize}
-      >
-        {payload.value}
-      </text>
-    </g>
-  );
-};
-const CustomTooltip = ({
-  active,
-  payload,
-  APRType,
-}: {
-  active?: boolean;
-  payload?: TChartPayload[];
-  APRType: string;
-}) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-[#1c1c23] text-[#fff] rounded-md text-[14px]">
-        <div className="px-5 py-3">
-          <p>{payload[0].payload.date}</p>
-          <p>{`${APRType}: ${payload[0].value}%`}</p>
-        </div>
-      </div>
-    );
-  }
-};
 
 const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
   const WIDTH = 500;
@@ -99,7 +52,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           dataKey="timestamp"
           tickLine={false}
           tick={({ x, y, payload }) => (
-            <CustomizedAxisTick x={x} y={y} payload={payload} fontSize={12} />
+            <AxisTick x={x} y={y} payload={payload} fontSize={12} />
           )}
           style={{ fill: "#97979A" }}
         />
@@ -115,7 +68,7 @@ const ChartBar: React.FC<IProps> = ({ chart, APRType }) => {
           }}
         />
 
-        <Tooltip content={<CustomTooltip APRType={APRType} />} />
+        <Tooltip content={<ChartTooltip type="APR" APRType={APRType} />} />
 
         <Bar dataKey={chart.name} stackId="bar">
           {chart.data.map((_: TChartData, index: number) => (

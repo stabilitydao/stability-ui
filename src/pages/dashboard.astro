@@ -3,6 +3,11 @@ import Layout from '@layouts/Layout.astro';
 import {Dashboard} from "@modules"
 ---
 
-<Layout title="Dashboard">
+<Layout title="Dashboard"
+  img="/ogs/pages/dashboard.png"
+  metaTitle="Dashboard"
+  metaUrl="https://stability.farm/dashboard"
+  metaDescription="Deploy assets in Stability vaults, optimize your yield strategies and maximize profit."
+>
   <Dashboard client:only="react"/>
 </Layout>

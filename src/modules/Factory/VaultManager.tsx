@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -17,12 +17,25 @@ import {
 } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
-import { getAddress, parseUnits, createPublicClient, http, zeroAddress, Hash, TransactionReceipt } from "viem";
+import {
+  getAddress,
+  parseUnits,
+  createPublicClient,
+  http,
+  zeroAddress,
+  Hash,
+  TransactionReceipt,
+} from "viem";
 import { sonic } from "viem/chains";
 
 import { strategies } from "@stabilitydao/stability";
 import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
-import { TokenSelectorModal, Token, TxStatusModal, TxStatus } from "@components/TokenSelectorModal";
+import {
+  TokenSelectorModal,
+  Token,
+  TxStatusModal,
+  TxStatus,
+} from "@components/TokenSelectorModal";
 
 import type { TAddress } from "@types";
 
@@ -57,7 +70,7 @@ const VaultManager = (): JSX.Element => {
   const [vaultInput, setVaultInput] = useState("");
   const [newProportionInput, setNewProportionInput] = useState("");
 
-  const [activeSection, setActiveSection] = useState("vaults");
+  const [activeSection, setActiveSection] = useState("farm");
 
   const vaultTypes = {
     Aave: { vaultType: "Compounding", strategyId: "Aave" },
@@ -66,23 +79,12 @@ const VaultManager = (): JSX.Element => {
 
   const [currentType, setCurrentType] = useState("Silo");
 
-  const factoryAddress = $platformsData[146]?.factory;
-  const FARMS_FACTORY_ADDRESS: TAddress =
-    "0xc184a3ECcA684F2621c903A7943D85fA42F56671";
-
   const [vaultInitAddressesInput, setVaultInitAddressesInput] = useState("");
   const [vaultInitNumsInput, setVaultInitNumsInput] = useState("");
   const [strategyInitAddressesInput, setStrategyInitAddressesInput] =
     useState("");
   const [strategyInitNumsInput, setStrategyInitNumsInput] = useState("");
   const [strategyInitTicksInput, setStrategyInitTicksInput] = useState("");
-
-  const [addVaultData, setAddVaultData] = useState({
-    isActive: false,
-    isDoHardWorkOnDeposit: true,
-    isVaultLastBlockDefenseDisabled: false,
-    customVaultFee: 0,
-  });
 
   const vaultInitAddresses = vaultInitAddressesInput
     .split(",")
@@ -126,112 +128,6 @@ const VaultManager = (): JSX.Element => {
     setEditFarm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleInputChange = (address, event) => {
-    setValues((prev) => ({
-      ...prev,
-      [address]: event.target.value,
-    }));
-  };
-
-  const setProportion = async () => {
-    try {
-      const bitIntValues = Object.values(values).map((v) => parseUnits(v, 16));
-
-      const _action = await writeContract(wagmiConfig, {
-        address: currentMetaVault.address,
-        abi: IMetaVaultABI,
-        functionName: "setTargetProportions",
-        args: [bitIntValues],
-      });
-
-      console.log(_action);
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
-  const addVault = async () => {
-    try {
-      const vaultAddress = getAddress(vaultInput);
-
-      const vaultHardWorkOnDeposit = await _publicClient?.readContract({
-        address: vaultAddress,
-        abi: VaultABI,
-        functionName: "doHardWorkOnDeposit",
-      });
-
-      const vaultLastBlockDefenseDisabled = await _publicClient?.readContract({
-        address: vaultAddress,
-        abi: VaultABI,
-        functionName: "lastBlockDefenseDisabled",
-      });
-
-      const vaultCustomFee = await _publicClient?.readContract({
-        address: platforms[146],
-        abi: PlatformABI,
-        functionName: "getCustomVaultFee",
-        args: [vaultAddress],
-      });
-
-      setAddVaultData({
-        isActive: true,
-        isDoHardWorkOnDeposit: vaultHardWorkOnDeposit,
-        isVaultLastBlockDefenseDisabled: vaultLastBlockDefenseDisabled,
-        customVaultFee: Number(vaultCustomFee),
-      });
-
-      if (vaultHardWorkOnDeposit) {
-        const setDoHardWorkOnDeposit = await writeContract(wagmiConfig, {
-          address: vaultAddress,
-          abi: VaultABI,
-          functionName: "setDoHardWorkOnDeposit",
-          args: [false],
-        });
-
-        console.log(setDoHardWorkOnDeposit);
-      }
-
-      if (!vaultLastBlockDefenseDisabled) {
-        const setLastBlockDefenseDisabled = await writeContract(wagmiConfig, {
-          address: vaultAddress,
-          abi: VaultABI,
-          functionName: "setLastBlockDefenseDisabled",
-          args: [true],
-        });
-
-        console.log(setLastBlockDefenseDisabled);
-      }
-
-      if (vaultCustomFee != BigInt(20000)) {
-        const setCustomVaultFee = await writeContract(wagmiConfig, {
-          address: platforms[146],
-          abi: PlatformABI,
-          functionName: "setCustomVaultFee",
-          args: [vaultAddress, BigInt(20000)],
-        });
-
-        console.log(setCustomVaultFee);
-      }
-
-      const _newValues = [...Object.values(values), newProportionInput];
-
-      const bitIntValues = Object.values(_newValues).map((v) =>
-        parseUnits(v, 16)
-      );
-
-      const _addVault = await writeContract(wagmiConfig, {
-        address: currentMetaVault.address,
-        abi: IMetaVaultABI,
-        functionName: "addVault",
-        args: [vaultAddress, bitIntValues],
-      });
-
-      console.log(_addVault);
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
   const deployVault = async () => {
     try {
       const args = [
@@ -247,7 +143,7 @@ const VaultManager = (): JSX.Element => {
       console.log(args);
 
       const deployVaultAndStrategy = await writeContract(wagmiConfig, {
-        address: factoryAddress,
+        address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: "deployVaultAndStrategy",
         args: args,
@@ -287,7 +183,7 @@ const VaultManager = (): JSX.Element => {
 
       // Actual transaction (only runs if simulation succeeded)
       const hash = await writeContract(wagmiConfig, {
-        address: FARMS_FACTORY_ADDRESS,
+        address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: "addFarms",
         args: [[editFarm]],
@@ -361,7 +257,7 @@ const VaultManager = (): JSX.Element => {
   );
 
   function getStrategyById(id: string) {
-    return liveFarmingStrategies.find(strategy => strategy.id === id);
+    return liveFarmingStrategies.find((strategy) => strategy.id === id);
   }
 
   const [showTokenModal, setShowTokenModal] = useState(false);
@@ -391,7 +287,9 @@ const VaultManager = (): JSX.Element => {
   };
 
   const removeToken = (tokenAddress: string) => {
-    const newAssets = rewardAssets.filter((t: Token) => t.address !== tokenAddress);
+    const newAssets = rewardAssets.filter(
+      (t: Token) => t.address !== tokenAddress
+    );
     setRewardAssets(newAssets);
 
     handleFarmInputChange(
@@ -433,29 +331,7 @@ const VaultManager = (): JSX.Element => {
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
-              activeSection != "vaults"
-                ? "text-[#6A6B6F] cursor-pointer"
-                : "bg-[#232429] border border-[#2C2E33]"
-            )}
-            onClick={() => setActiveSection("vaults")}
-          >
-            Add Vault to MetaVault
-          </span>
-          <span
-            className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
-              activeSection != "proportions"
-                ? "text-[#6A6B6F] cursor-pointer"
-                : "bg-[#232429] border border-[#2C2E33]"
-            )}
-            onClick={() => setActiveSection("proportions")}
-          >
-            Change Proportions
-          </span>
-          <span
-            className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
               activeSection != "farm"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -466,7 +342,7 @@ const VaultManager = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
               activeSection != "deploy"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -477,24 +353,7 @@ const VaultManager = (): JSX.Element => {
           </span>
         </div>
 
-        {!["deploy", "farm"].includes(activeSection) ? (
-          <div className="flex items-center gap-2">
-            {activeMetaVaults.map((metaVault) => (
-              <p
-                key={metaVault.address}
-                className={cn(
-                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
-                  currentMetaVault?.address === metaVault?.address
-                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
-                    : "text-[#97979A] border !border-[#23252A]"
-                )}
-                onClick={() => setCurrentMetaVault(metaVault)}
-              >
-                {metaVault.symbol}
-              </p>
-            ))}
-          </div>
-        ) : activeSection === "deploy" ? (
+        {activeSection === "deploy" ? (
           <div className="flex items-center gap-2">
             {Object.keys(vaultTypes).map((type) => (
               <p
@@ -512,50 +371,6 @@ const VaultManager = (): JSX.Element => {
             ))}
           </div>
         ) : null}
-
-        {activeSection === "vaults" && (
-          <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-            Vault Address
-            <input
-              type="text"
-              placeholder="0"
-              value={vaultInput}
-              onChange={(e) => setVaultInput(e.target.value)}
-              className="bg-transparent text-2xl font-semibold outline-none w-full"
-            />
-          </label>
-        )}
-
-        {!["deploy", "farm"].includes(activeSection) && (
-          <div>
-            {currentMetaVault?.proportions?.map((proportion) => (
-              <div
-                key={proportion.address}
-                className="flex flex-col gap-2 mb-4"
-              >
-                <div className="flex items-center justify-between">
-                  <span>
-                    {VAULTS_WITH_NAME[proportion.address] ?? proportion.symbol}
-                  </span>
-                  <span>
-                    {proportion.currentProportions}% /{" "}
-                    {proportion.targetProportions}%
-                  </span>
-                </div>
-
-                <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-                  <input
-                    type="text"
-                    placeholder="0"
-                    value={values[proportion.address] || ""}
-                    onChange={(e) => handleInputChange(proportion.address, e)}
-                    className="bg-transparent text-2xl font-semibold outline-none w-full"
-                  />
-                </label>
-              </div>
-            ))}
-          </div>
-        )}
 
         {activeSection === "farm" && (
           <div className="grid gap-3 mb-4">
@@ -595,7 +410,9 @@ const VaultManager = (): JSX.Element => {
                   const value = e.target.value;
                   handleFarmInputChange("strategyLogicId", value);
                   setIsLPStrategy(
-                    getStrategyById(value)?.baseStrategies.includes(BaseStrategy.LP) ?? false
+                    getStrategyById(value)?.baseStrategies.includes(
+                      BaseStrategy.LP
+                    ) ?? false
                   );
                 }}
                 className="bg-[#1B1D21] text-xl font-semibold outline-none transition-all w-full"
@@ -623,7 +440,11 @@ const VaultManager = (): JSX.Element => {
                     stroke="currentColor"
                     className="w-5 h-5"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4v16m8-8H4"
+                    />
                   </svg>
                   <span className="text-sm">Add Asset</span>
                 </button>
@@ -635,7 +456,11 @@ const VaultManager = (): JSX.Element => {
                     key={token.address}
                     className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
                   >
-                    <img src={token.logoURI} alt={token.symbol} className="w-5 h-5 rounded-full" />
+                    <img
+                      src={token.logoURI}
+                      alt={token.symbol}
+                      className="w-5 h-5 rounded-full"
+                    />
                     <span className="text-sm font-medium">{token.symbol}</span>
                     <button
                       onClick={() => removeToken(token.address)}
@@ -691,19 +516,6 @@ const VaultManager = (): JSX.Element => {
               />
             </label>
           </div>
-        )}
-
-        {activeSection === "vaults" && (
-          <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-            New Vault Proportion
-            <input
-              type="text"
-              placeholder="0"
-              value={newProportionInput}
-              onChange={(e) => setNewProportionInput(e.target.value)}
-              className="bg-transparent text-2xl font-semibold outline-none w-full"
-            />
-          </label>
         )}
 
         {activeSection === "deploy" && (
@@ -764,27 +576,7 @@ const VaultManager = (): JSX.Element => {
           </div>
         )}
 
-        {activeSection === "proportions" ? (
-          <button
-            className={cn(
-              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
-            )}
-            type="button"
-            onClick={setProportion}
-          >
-            Set proportions
-          </button>
-        ) : activeSection === "vaults" ? (
-          <button
-            className={cn(
-              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
-            )}
-            type="button"
-            onClick={addVault}
-          >
-            Add Vault
-          </button>
-        ) : activeSection === "farm" ? (
+        {activeSection === "farm" ? (
           <button
             className={cn(
               "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
@@ -804,32 +596,6 @@ const VaultManager = (): JSX.Element => {
           >
             Deploy Vault
           </button>
-        )}
-
-        {addVaultData.isActive && (
-          <div className="flex flex-col items-center gap-5">
-            <span>Add Vault Data</span>
-            <div className="flex flex-col items-center gap-2">
-              <span>
-                Is Vault Hard Work On Deposit:{" "}
-                {addVaultData.isDoHardWorkOnDeposit
-                  ? "yes(need tx)"
-                  : "no(already executed)"}
-              </span>
-              <span>
-                Is Vault Last Block Defense Disabled:{" "}
-                {addVaultData.isVaultLastBlockDefenseDisabled
-                  ? "no(already executed)"
-                  : "yes(need tx)"}
-              </span>
-              <span>
-                Is Correct Current Custom Fee:{" "}
-                {addVaultData.customVaultFee != 20000
-                  ? `no(need tx, current fee: ${addVaultData.customVaultFee})`
-                  : `yes (already executed), current fee: ${addVaultData.customVaultFee}`}
-              </span>
-            </div>
-          </div>
         )}
       </div>
     </div>

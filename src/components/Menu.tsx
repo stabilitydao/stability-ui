@@ -10,7 +10,7 @@ import { cn, formatNumber } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
-import { PATHS } from "@constants";
+import { PATHS, ROUTES } from "@constants";
 
 const Menu = (): JSX.Element => {
   const pathname = window.location.pathname;
@@ -22,33 +22,14 @@ const Menu = (): JSX.Element => {
   const [activePath, setActivePath] = useState("");
 
   useEffect(() => {
-    const platformPaths = [
-      "platform",
-      "strategies",
-      "chains",
-      "integrations",
-      "assets",
-      "factory",
-      "network",
-      "swapper",
-    ];
-
-    const basicPaths = [
-      "xstbl",
-      "dashboard",
-      "leveraged-farming",
-      "alm",
-      "agents",
-    ];
-
     const isPlatform =
-      platformPaths.some((path) => path === currentPath) ||
-      platformPaths.some((path) => currentPath.includes(path));
+      ROUTES.platform.some((path) => path === currentPath) ||
+      ROUTES.platform.some((path) => currentPath.includes(path));
 
     const isVaults =
       !currentPath.includes("metavaults") && currentPath.includes("vault");
 
-    const isBasicPage = basicPaths.includes(currentPath);
+    const isBasicPage = ROUTES.basic.includes(currentPath);
 
     if (isVaults) {
       setActivePath("vaults");
@@ -56,11 +37,14 @@ const Menu = (): JSX.Element => {
       setActivePath("platform");
     } else if (
       currentPath === "leaderboard" ||
-      currentPath.includes("contests")
+      currentPath.includes("contests") ||
+      currentPath.includes("season-1")
     ) {
       setActivePath("leaderboard");
     } else if (currentPath.includes("metavaults")) {
       setActivePath("metavaults");
+    } else if (currentPath.includes("lending")) {
+      setActivePath("lending");
     } else if (isBasicPage) {
       setActivePath(currentPath);
     }
@@ -140,48 +124,34 @@ const Menu = (): JSX.Element => {
 
               <Prices isMobile={true} />
 
-              <div className="flex flex-col gap-2">
-                <a
-                  href="https://stability.market/"
-                  target="_blank"
-                  className="border border-[#23252A] rounded-lg"
-                >
-                  <div className="flex items-center justify-between gap-2 px-4 h-10">
-                    <span className="text-[#A3A4A6] text-[14px] leading-4 font-medium">
-                      Market
-                    </span>
-                    <img src="/icons/external_link.svg" alt="External link" />
-                  </div>
-                </a>
-                <div className="flex items-center gap-2 w-full">
-                  <div className="flex gap-4 w-1/2">
-                    {TVL ? (
-                      <div className="w-full flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
-                        <span className="text-[#A3A4A6]">AUM</span>
-                        <span className="text-white">{TVL}</span>
-                      </div>
-                    ) : null}
-                  </div>
-                  <a
-                    href="/platform"
-                    title="Platform"
-                    className="w-1/2 flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium"
-                  >
-                    <span className="text-[#97979A]">Platform</span>
-                    <span className="text-white">
-                      <span
-                        className="inline-flex w-[10px] h-[10px] rounded-full"
-                        style={{
-                          backgroundColor: isAlert
-                            ? "#ff8d00"
-                            : isOk
-                              ? "#00ff00"
-                              : "#444444",
-                        }}
-                      ></span>
-                    </span>
-                  </a>
+              <div className="flex items-center gap-2 w-full">
+                <div className="flex gap-4 w-1/2">
+                  {TVL ? (
+                    <div className="w-full flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
+                      <span className="text-[#A3A4A6]">AUM</span>
+                      <span className="text-white">{TVL}</span>
+                    </div>
+                  ) : null}
                 </div>
+                <a
+                  href="/platform"
+                  title="Platform"
+                  className="w-1/2 flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium"
+                >
+                  <span className="text-[#97979A]">Platform</span>
+                  <span className="text-white">
+                    <span
+                      className="inline-flex w-[10px] h-[10px] rounded-full"
+                      style={{
+                        backgroundColor: isAlert
+                          ? "#ff8d00"
+                          : isOk
+                            ? "#00ff00"
+                            : "#1B1D21",
+                      }}
+                    ></span>
+                  </span>
+                </a>
               </div>
 
               <div className="text-[#97979A] flex items-center justify-between text-sm">

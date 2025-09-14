@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 import axios from "axios";
 
-import { ContestsOverview, Rewards } from "./components";
+import { ClaimSiloPoints } from "./components";
 
 import {
   ArrowRightIcon,
@@ -11,51 +11,21 @@ import {
   Pagination,
 } from "@ui";
 
-import {
-  getShortAddress,
-  sortTable,
-  formatTimestampToDate,
-  cn,
-  formatNumber,
-  copyAddress,
-} from "@utils";
-
-import { findAllValidPeriods } from "./functions";
+import { getShortAddress, sortTable, formatNumber, copyAddress } from "@utils";
 
 import { account, apiData } from "@store";
 
-import { contests, seeds } from "@stabilitydao/stability";
+import { seeds } from "@stabilitydao/stability";
 
 import { USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
-import { TABLE_TYPES } from "./constants";
-
 import type { TTableColumn, TLeaderboard } from "@types";
 
-import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
+import type { ApiMainReply } from "@stabilitydao/stability";
 
 const Leaderboard = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
-
-  const { currentPeriod, previousPeriod, nextPeriod } =
-    findAllValidPeriods(contests);
-
-  const periodsData = [
-    {
-      id: previousPeriod || "",
-      ...contests[previousPeriod as keyof YieldContest],
-    },
-    {
-      id: currentPeriod || "",
-      ...contests[currentPeriod as keyof YieldContest],
-    },
-    { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
-  ];
-
-  const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
-
-  const [activeContestID, setActiveContestID] = useState(currentPeriod);
 
   const [tableStates, setTableStates] = useState(USERS_TABLE);
   const [tableData, setTableData] = useState<TLeaderboard[]>([]);
@@ -65,22 +35,10 @@ const Leaderboard = (): JSX.Element => {
 
   const [points, setPoints] = useState({});
 
-  const handleActiveContest = (type: string) => {
-    setActiveContest(type);
-
-    if (type === "ACTIVE") {
-      setActiveContestID(currentPeriod);
-    }
-
-    if (type === "PAST") {
-      setActiveContestID(previousPeriod);
-    }
-  };
-
   const initTableData = async () => {
-    if (!!allContests.ACTIVE?.length) {
+    if (!!$apiData?.leaderboards.absolute.length) {
       //@ts-ignore
-      let contestData = allContests[activeContest];
+      let contestData = $apiData?.leaderboards.absolute;
 
       contestData = contestData.map((data: TLeaderboard, index: number) => ({
         ...data,
@@ -106,15 +64,6 @@ const Leaderboard = (): JSX.Element => {
     }
   };
 
-  const allContests = useMemo(
-    () => ({
-      PAST: $apiData?.leaderboards?.[previousPeriod as keyof YieldContest],
-      ACTIVE: $apiData?.leaderboards?.[currentPeriod as keyof YieldContest],
-      ABSOLUTE: $apiData?.leaderboards.absolute,
-    }),
-    [$apiData?.leaderboards]
-  );
-
   const totalPoints: number = useMemo(
     () =>
       Object.values(points).reduce(
@@ -130,106 +79,32 @@ const Leaderboard = (): JSX.Element => {
 
   useEffect(() => {
     initTableData();
-  }, [activeContest, allContests, points]);
+  }, [points]);
 
   useEffect(() => {
     getPoints();
   }, []);
 
   return (
-    <div className="flex flex-col flex-wrap min-w-[full]  md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
-      <div className="flex items-center justify-between gap-[28px] flex-col xl:flex-row">
+    <div className="flex flex-col flex-wrap min-w-[full] md:min-w-[90vw] xl:min-w-[1200px] max-w-[1200px] w-full">
+      <div className="flex items-center justify-between gap-[28px]">
         <div className="flex flex-col items-start gap-4">
-          <h2 className="page-title__font text-start">
-            Top Users <br /> & sGEM1 Rewards
-          </h2>
+          <h2 className="page-title__font text-start">Top Users</h2>
           <h3 className="text-[#97979a] page-description__font">
-            Track user performance across yield vaults, contests, and{" "}
-            <br className="hidden lg:block" /> sGEM1 rewards. Earn points by
-            participating, ranking on the <br className="hidden lg:block" />{" "}
-            leaderboard, and unlocking exclusive airdrop benefits{" "}
+            Track user performance across yield vaults.{" "}
+            <br className="hidden lg:block" /> Earn points by participating,
+            ranking on the leaderboard, <br className="hidden lg:block" /> and
+            unlocking exclusive airdrop benefits{" "}
             <br className="hidden lg:block" /> through smart yield farming
             strategies
           </h3>
+          <ClaimSiloPoints />
         </div>
-
-        <Rewards />
       </div>
-
-      <div className="mt-10 mb-6 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[24px] leading-8 font-semibold">Contests</span>
-          <a
-            className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-center gap-2"
-            href="/contests"
-          >
-            View all contests
-            <ArrowRightIcon color={"#5E6AD2"} />
-          </a>
-        </div>
-        <ContestsOverview periodsData={periodsData} />
-      </div>
-
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[24px] leading-8 font-semibold">
-            Leaderboards
-          </span>
-          {activeContest != "ABSOLUTE" && (
-            <a
-              className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-center gap-2"
-              href={`/contests/${activeContestID}`}
-            >
-              View all leaders
-              <ArrowRightIcon color={"#5E6AD2"} />
-            </a>
-          )}
-        </div>
-        <div className="flex items-start md:items-center justify-between md:flex-row flex-col gap-4">
-          <div className="flex items-center gap-2 md:gap-4 text-[14px] leading-5 font-semibold">
-            {TABLE_TYPES.map((type: string) => {
-              const isActive = activeContest === type;
-              // @ts-ignore
-              const hasContestData = !!allContests[type]?.length;
-
-              let dateRange = type;
-
-              switch (type) {
-                case "PAST":
-                  if (previousPeriod) {
-                    dateRange = `${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[previousPeriod as keyof YieldContest].end)}`;
-                  }
-
-                  break;
-                case "ACTIVE":
-                  dateRange = `${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].start)} - ${formatTimestampToDate(contests[currentPeriod as keyof YieldContest].end)}`;
-                  break;
-
-                case "ABSOLUTE":
-                  dateRange = "Absolute";
-
-                default:
-                  break;
-              }
-              return (
-                <button
-                  key={type}
-                  className={cn(
-                    "h-10 px-4 border border-[#2C2E33] rounded-lg text-[#97979A] text-[10px] md:text-[14px]",
-                    hasContestData ? "cursor-pointer" : "opacity-50",
-                    isActive && "text-[#FFF] bg-[#22242A]"
-                  )}
-                  onClick={() => hasContestData && handleActiveContest(type)}
-                >
-                  {dateRange}
-                </button>
-              );
-            })}
-          </div>
-          <span className="text-[#97979A] text-[14px] leading-5 font-semibold">
-            Total points: {formatNumber(totalPoints, "format")}
-          </span>
-        </div>
+      <div className="flex flex-col gap-4 mt-10">
+        <span className="text-[#97979A] text-[14px] leading-5 font-semibold text-end">
+          Total points: {formatNumber(totalPoints, "abbreviate")?.slice(1)}
+        </span>
 
         <div className="pb-5">
           <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
@@ -270,17 +145,22 @@ const Leaderboard = (): JSX.Element => {
                         alt="Copy icon"
                       />
                     </div>
-                    <div className="px-2 md:px-4 w-[22.5%] text-end">
+                    <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.earned <= 0.01
                         ? user.earned.toFixed(4)
-                        : user.earned.toFixed(2)}
+                        : formatNumber(user.earned.toFixed(), "format")}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
-                      {user.points ? user.points.toFixed(2) : ""}
+                      {user.points
+                        ? formatNumber(user.points, "abbreviate")
+                        : ""}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.deposit
-                        ? (Math.round(user.deposit * 100) / 100).toFixed(2)
+                        ? formatNumber(
+                            Math.round(user.deposit * 100) / 100,
+                            "format"
+                          )
                         : ""}
                     </div>
                   </div>
@@ -301,6 +181,13 @@ const Leaderboard = (): JSX.Element => {
             setTab={setCurrentTab}
             setPagination={setPagination}
           />
+          <a
+            className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 mt-5"
+            href="/leaderboard/season-1"
+          >
+            Season 1
+            <ArrowRightIcon color={"#5E6AD2"} />
+          </a>
         </div>
       </div>
     </div>

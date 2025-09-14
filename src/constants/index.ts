@@ -17,6 +17,9 @@ import {
   PROTOCOLS_TABLE,
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
+  MARKET_TABLE,
+  MARKET_TABLE_FILTERS,
+  METAVAULTS_FILTERS,
 } from "./tables";
 
 import {
@@ -38,6 +41,10 @@ import {
   scUSD,
   STABILITY_TOKENS,
 } from "./tokens";
+
+import { VAULTS_META_TITLES } from "./meta";
+
+import { IProtocol } from "@types";
 
 const APRsType = ["latest", "24h", "week"];
 
@@ -149,22 +156,6 @@ const SILO_POINTS = {
 
 const CHAINS = [
   {
-    name: chains["137"].name,
-    id: "137",
-    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["137"].img}`,
-    explorer: "https://polygonscan.com/address/",
-    nativeCurrency: "POL",
-    active: true, // main page active networks
-  },
-  // {
-  //   name: chains["8453"].name,
-  //   id: "8453",
-  //   logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["8453"].img}`,
-  //   explorer: "https://basescan.org/address/",
-  //   nativeCurrency: "ETH",
-  //   active: true, // main page active networks
-  // },
-  {
     name: chains["146"].name,
     id: "146",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
@@ -172,12 +163,19 @@ const CHAINS = [
     nativeCurrency: "S",
     active: true, // main page active networks
   },
+  {
+    name: chains["43114"].name,
+    id: "43114",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["43114"].img}`,
+    explorer: "https://snowtrace.io/address/",
+    nativeCurrency: "AVAX",
+    active: true, // main page active networks
+  },
 ];
 
 const CHAINS_CONFIRMATIONS = {
-  "137": 3,
-  "146": 3,
   "8453": 3,
+  "43114": 3,
 };
 
 const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
@@ -189,25 +187,25 @@ const DEFAULT_TRANSACTION_SETTINGS = {
 };
 
 const PROTOCOLS = Object.entries(integrations).reduce<
-  Record<string, { name: string; logoSrc: string }>
->((acc, [integrationKey, value]) => {
-  if (!acc[integrationKey]) {
-    acc[integrationKey] = {
-      name: value.name,
-      logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${value.img}`,
+  Record<string, IProtocol>
+>((acc, [integrationKey, integration]) => {
+  const addProtocol = (key: string, data: any, fallbackImg: string) => {
+    if (acc[key]) return;
+
+    acc[key] = {
+      name: data.name,
+      logoSrc: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${data.img ?? fallbackImg}`,
+      audits: data.audits ?? [],
+      accidents: data.accidents ?? [],
+      creationDate: data.creationDate ?? 0,
     };
-  }
+  };
 
-  Object.entries(value.protocols).forEach(([key, val]) => {
-    const name = val.name;
-    let logoSrc = `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${val.img ?? value.img}`;
+  addProtocol(integrationKey, integration, integration.img);
 
-    if (!acc[key])
-      acc[key] = {
-        name,
-        logoSrc,
-      };
-  });
+  Object.entries(integration.protocols ?? {}).forEach(([key, val]) =>
+    addProtocol(key, val, integration.img)
+  );
 
   return acc;
 }, {});
@@ -268,11 +266,34 @@ const PATHS = [
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
+  // { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
 ];
+
+const ROUTES = {
+  basic: [
+    "xstbl",
+    "dashboard",
+    "leveraged-farming",
+    "alm",
+    "agents",
+    "lending",
+  ],
+  platform: [
+    "platform",
+    "strategies",
+    "chains",
+    "integrations",
+    "assets",
+    "factory",
+    "network",
+    "swapper",
+    "metavaults-management",
+  ],
+};
 
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
@@ -399,4 +420,9 @@ export {
   FARMING_TABLE_FILTERS,
   SOCIALS,
   LENDING_MARKETS,
+  VAULTS_META_TITLES,
+  ROUTES,
+  MARKET_TABLE,
+  MARKET_TABLE_FILTERS,
+  METAVAULTS_FILTERS,
 };

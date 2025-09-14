@@ -15,6 +15,7 @@ import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
 import { Leaderboard } from "./Leaderboard";
+import { Season1 } from "./Leaderboard/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { XSTBL } from "./XSTBL";
@@ -24,6 +25,9 @@ import { Metavaults } from "./Metavaults";
 import { ALM } from "./ALM";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
+import { Lending } from "./Lending";
+import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
+import { Market } from "./Market";
 
 export {
   Factory,
@@ -52,4 +56,8 @@ export {
   ALM,
   Agents,
   Metavault,
+  Lending,
+  MetavaultsManagement,
+  Market,
+  Season1,
 };

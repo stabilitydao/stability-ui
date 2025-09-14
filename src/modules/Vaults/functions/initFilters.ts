@@ -69,8 +69,10 @@ export const initFilters = (
   const chainsParam = searchParams.getAll("chain");
 
   if (tagsParam) {
+    const activeTags = tagsParam.split(",");
+
     newFilters = newFilters.map((f) =>
-      f.name.toLowerCase() === tagsParam ? { ...f, state: true } : f
+      activeTags.includes(f.name.toLowerCase()) ? { ...f, state: true } : f
     );
   }
 

@@ -43,6 +43,7 @@ import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
 import { FarmingTable } from "./Tables/Farming";
+import { MarketsTable } from "./Tables/Markets";
 
 import { TextModal } from "./Modals/TextModal";
 import { APRModal } from "./Modals/APRModal";
@@ -52,6 +53,8 @@ import { DisplayType } from "./DisplayType";
 import { ActionButton } from "./ActionButton";
 
 import { Socials } from "./Socials";
+
+import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
 
 export {
   Toast,
@@ -99,4 +102,8 @@ export {
   FarmingTable,
   Socials,
   APRModal,
+  AxisTick,
+  ChartTooltip,
+  ChartTimelineSwitcher,
+  MarketsTable,
 };

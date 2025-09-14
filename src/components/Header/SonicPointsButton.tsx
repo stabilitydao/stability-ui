@@ -10,7 +10,7 @@ import { account } from "@store";
 
 import { playAudio, formatNumber } from "@utils";
 
-import { seeds } from "@stabilitydao/stability";
+// import { seeds } from "@stabilitydao/stability";
 
 const SonicPointsButton = (): JSX.Element => {
   const $account = useStore(account);
@@ -25,25 +25,26 @@ const SonicPointsButton = (): JSX.Element => {
     passivePoints: "-",
     activityPoints: "-",
     ringsPoints: "-",
-    siloPoints: "-",
-    stabilitySiloPoints: "-",
-    allSiloPoints: "-",
+    // siloPoints: "-",
+    // stabilitySiloPoints: "-",
+    // allSiloPoints: "-",
     rank: "-",
   });
 
   const getUserData = async () => {
     try {
-      const [sonicResponse, ringsResponse, siloResponse] = await Promise.all([
+      // siloResponse
+      const [sonicResponse, ringsResponse] = await Promise.all([
         axios.get(
           `https://www.data-openblocklabs.com/sonic/user-points-stats?wallet_address=${$account}`
         ),
         axios.get(`https://points-api.rings.money/points/${$account}`),
-        axios.get(`${seeds[0]}/rewards/silo-points/${$account}`),
+        // axios.get(`${seeds[0]}/rewards/silo-points/${$account}`),
       ]);
 
       const sonicData = sonicResponse?.data;
       const ringsData = ringsResponse?.data;
-      const siloData = siloResponse?.data;
+      // const siloData = siloResponse?.data;
 
       const totalPoints = String(
         formatNumber(sonicData.sonic_points, "abbreviate")
@@ -64,27 +65,27 @@ const SonicPointsButton = (): JSX.Element => {
         )
       ).slice(1);
 
-      const siloPoints = String(
-        formatNumber(siloData?.siloPoints ?? 0, "abbreviate")
-      ).slice(1);
+      // const siloPoints = String(
+      //   formatNumber(siloData?.siloPoints ?? 0, "abbreviate")
+      // ).slice(1);
 
-      const stabilitySiloPoints = String(
-        formatNumber(siloData?.stabilitySiloPoints ?? 0, "abbreviate")
-      ).slice(1);
+      // const stabilitySiloPoints = String(
+      //   formatNumber(siloData?.stabilitySiloPoints ?? 0, "abbreviate")
+      // ).slice(1);
 
-      let _allSiloPoints: number = 0;
+      // let _allSiloPoints: number = 0;
 
-      if (siloData?.siloPoints) {
-        _allSiloPoints += siloData?.siloPoints;
-      }
+      // if (siloData?.siloPoints) {
+      //   _allSiloPoints += siloData?.siloPoints;
+      // }
 
-      if (siloData?.stabilitySiloPoints) {
-        _allSiloPoints += siloData?.stabilitySiloPoints;
-      }
+      // if (siloData?.stabilitySiloPoints) {
+      //   _allSiloPoints += siloData?.stabilitySiloPoints;
+      // }
 
-      const allSiloPoints = String(
-        formatNumber(_allSiloPoints, "abbreviate")
-      ).slice(1);
+      // const allSiloPoints = String(
+      //   formatNumber(_allSiloPoints, "abbreviate")
+      // ).slice(1);
 
       const rank = sonicData.rank;
 
@@ -93,9 +94,9 @@ const SonicPointsButton = (): JSX.Element => {
         passivePoints,
         activityPoints,
         ringsPoints,
-        siloPoints,
-        stabilitySiloPoints,
-        allSiloPoints,
+        // siloPoints,
+        // stabilitySiloPoints,
+        // allSiloPoints,
         rank,
       });
     } catch (error) {
@@ -198,7 +199,7 @@ const SonicPointsButton = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="h-[1px] bg-[#383B42] rounded-full my-2"></div>
+          {/* <div className="h-[1px] bg-[#383B42] rounded-full my-2"></div>
 
           <div className="flex flex-col gap-2 px-4">
             <div className="flex gap-2">
@@ -239,7 +240,7 @@ const SonicPointsButton = (): JSX.Element => {
                 <p className="text-[14px] leading-4">{user.siloPoints}</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

@@ -2,33 +2,16 @@ import { RowsIcon, GridIcon } from "./Icons";
 
 import { cn } from "@utils";
 
-import { PAGINATIONS_VARIANTS } from "@constants";
-
 import { DisplayTypes } from "@types";
 
 interface IProps {
   type: string;
   setType: (type: DisplayTypes) => void;
-  pagination: number;
-  setPagination: (number: number) => void;
-  setTab: (number: number) => void;
 }
 
-const DisplayType: React.FC<IProps> = ({
-  type,
-  setType,
-  pagination,
-  setPagination,
-  setTab,
-}) => {
+const DisplayType: React.FC<IProps> = ({ type, setType }) => {
   const handleDisplayTypes = (display: DisplayTypes) => {
-    const index = PAGINATIONS_VARIANTS[
-      type as keyof typeof PAGINATIONS_VARIANTS
-    ].findIndex((number) => number === pagination);
-
     setType(display);
-    setTab(1);
-    setPagination(PAGINATIONS_VARIANTS[display][index]);
   };
 
   return (
