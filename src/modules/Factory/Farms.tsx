@@ -1,37 +1,48 @@
 import { useEffect, useState } from "react";
 
 import { HeadingText, FullPageLoader } from "@ui";
+
 import {
   Address,
-  createPublicClient,
   Hash,
-  http,
   TransactionReceipt,
   zeroAddress,
   formatUnits,
 } from "viem";
+
 import { getShortAddress } from "@utils";
+
 import { useStore } from "@nanostores/react";
+
 import {
   readContract,
   writeContract,
   waitForTransactionReceipt,
   simulateContract,
 } from "@wagmi/core";
+
 import { wagmiConfig, FactoryABI } from "@web3";
-import { connected, account } from "@store";
+
+import { connected, account, currentChainID, publicClient } from "@store";
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+
 import { strategies } from "@stabilitydao/stability";
+
 import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
+
 import {
   TokenSelectorModal,
   Token,
   TxStatusModal,
   TxStatus,
 } from "@components/TokenSelectorModal";
+
 import { FaGasPump } from "react-icons/fa";
-import { sonic } from "viem/chains";
+
+import { factories } from "@web3";
 
 type Farm = {
   status: bigint;
@@ -58,13 +69,8 @@ const Farms = (): JSX.Element => {
   const { open: openConnect } = useWeb3Modal();
   const $connected = useStore(connected);
   const $account = useStore(account);
-
-  const _publicClient = createPublicClient({
-    chain: sonic,
-    transport: http(
-      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
-    ),
-  });
+  const $currentChainID = useStore(currentChainID);
+  const $publicClient = useStore(publicClient);
 
   const [farms, setFarms] = useState<Farm[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,7 +90,7 @@ const Farms = (): JSX.Element => {
   const [txError, setTxError] = useState<string | null>(null);
 
   const tokenlist = tokenlistAll.tokens.filter(
-    (token) => token.chainId === 146
+    (token) => token.chainId == $currentChainID
   );
 
   function findTokenByAddress(address: string) {
@@ -124,8 +130,6 @@ const Farms = (): JSX.Element => {
       strategy.state === "LIVE" &&
       strategy.baseStrategies.some((b) => b === "Farming")
   );
-
-  console.log("strategies:", strategies);
 
   function getStrategyById(id: string) {
     return liveFarmingStrategies.find((strategy) => strategy.id === id);
@@ -176,14 +180,14 @@ const Farms = (): JSX.Element => {
       if (!editFarm || !$account) return;
 
       try {
-        const est = await _publicClient.estimateContractGas({
-          address: FARMS_FACTORY_ADDRESS,
+        const est = await $publicClient.estimateContractGas({
+          address: factories[$currentChainID],
           abi: FactoryABI,
           functionName: isAdding ? "addFarms" : "updateFarm",
           args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
           account: $account as Address,
         });
-        const gasPrice = await _publicClient.getGasPrice();
+        const gasPrice = await $publicClient.getGasPrice();
         const totalFee = est * gasPrice;
         setGasEstimate(totalFee);
       } catch (err) {
@@ -269,7 +273,7 @@ const Farms = (): JSX.Element => {
       try {
         setSimulationStatus("loading");
         await simulateContract(wagmiConfig, {
-          address: FARMS_FACTORY_ADDRESS,
+          address: factories[$currentChainID],
           abi: FactoryABI,
           functionName: isAdding ? "addFarms" : "updateFarm",
           args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
@@ -292,7 +296,7 @@ const Farms = (): JSX.Element => {
       setTxStatus("wallet");
 
       const hash = await writeContract(wagmiConfig, {
-        address: FARMS_FACTORY_ADDRESS,
+        address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: isAdding ? "addFarms" : "updateFarm",
         args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
@@ -332,6 +336,7 @@ const Farms = (): JSX.Element => {
         error={txError}
         onClose={closeModal}
       />
+
       <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
         <HeadingText text="Farms" scale={1} />
 
