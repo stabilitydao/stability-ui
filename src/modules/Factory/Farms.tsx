@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-import { HeadingText, FullPageLoader } from "@ui";
+import {
+  HeadingText,
+  FullPageLoader,
+  TokenSelectorModal,
+  Token,
+  TxStatusModal,
+  TxStatus,
+} from "@ui";
 
 import {
   Address,
@@ -10,7 +17,7 @@ import {
   formatUnits,
 } from "viem";
 
-import { getShortAddress } from "@utils";
+import { getShortAddress, useModalClickOutside } from "@utils";
 
 import { useStore } from "@nanostores/react";
 
@@ -31,18 +38,11 @@ import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 import { strategies } from "@stabilitydao/stability";
 
-import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
-
-import {
-  TokenSelectorModal,
-  Token,
-  TxStatusModal,
-  TxStatus,
-} from "@components/TokenSelectorModal";
-
 import { FaGasPump } from "react-icons/fa";
 
 import { factories } from "@web3";
+
+import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
 
 type Farm = {
   status: bigint;
@@ -52,6 +52,11 @@ type Farm = {
   addresses: Address[];
   nums: bigint[];
   ticks: number[];
+  farmStruct?: {
+    addresses: string[];
+    nums: number[];
+    ticks: number[];
+  };
 };
 
 const defaultFarm: Farm = {
@@ -89,6 +94,10 @@ const Farms = (): JSX.Element => {
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [txError, setTxError] = useState<string | null>(null);
 
+  const [liveFarmingStrategies, setLiveFarmingStrategies] = useState([]);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const tokenlist = tokenlistAll.tokens.filter(
     (token) => token.chainId == $currentChainID
   );
@@ -124,16 +133,6 @@ const Farms = (): JSX.Element => {
   ];
 
   const [isLPStrategy, setIsLPStrategy] = useState(false);
-
-  const liveFarmingStrategies = Object.values(strategies).filter(
-    (strategy) =>
-      strategy.state === "LIVE" &&
-      strategy.baseStrategies.some((b) => b === "Farming")
-  );
-
-  function getStrategyById(id: string) {
-    return liveFarmingStrategies.find((strategy) => strategy.id === id);
-  }
 
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
@@ -173,57 +172,47 @@ const Farms = (): JSX.Element => {
       .filter((t): t is Token => t !== undefined);
   }
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    async function updateGasEstimate() {
-      if (!editFarm || !$account) return;
-
-      try {
-        const est = await $publicClient.estimateContractGas({
-          address: factories[$currentChainID],
-          abi: FactoryABI,
-          functionName: isAdding ? "addFarms" : "updateFarm",
-          args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-          account: $account as Address,
-        });
-        const gasPrice = await $publicClient.getGasPrice();
-        const totalFee = est * gasPrice;
-        setGasEstimate(totalFee);
-      } catch (err) {
-        console.error("Gas estimate failed", err);
-        setGasEstimate(null);
-      }
-    }
-
-    if (showModal) {
-      updateGasEstimate();
-      interval = setInterval(updateGasEstimate, 15000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [showModal, editFarm, editIndex, isAdding, $account]);
-
-  useEffect(() => {
-    fetchFarms();
-  }, []);
-
   const openEditModal = (farm: Farm, index: number) => {
+    const farmStruct = Object.values(strategies).find(
+      ({ id }) => id == farm.strategyLogicId
+    )?.farmStruct;
+
     const rewards = getTokensFromAddresses(farm.rewardAssets);
     setRewardAssets(rewards);
-    setEditFarm(farm);
+
+    setEditFarm(farmStruct ? { ...farm, farmStruct } : farm);
     setEditIndex(index);
     setShowModal(true);
     setIsAdding(false);
   };
 
   const openAddModal = () => {
-    setEditFarm(defaultFarm);
+    const farmStruct = liveFarmingStrategies[0]?.farmStruct;
+
+    setEditFarm(farmStruct ? { ...defaultFarm, farmStruct } : defaultFarm);
     setEditIndex(null);
     setShowModal(true);
     setIsAdding(true);
+  };
+
+  function getStrategyById(id: string) {
+    return liveFarmingStrategies.find((strategy) => strategy.id === id);
+  }
+
+  const changeStrategy = (strategyId: string) => {
+    const _farm = farms?.find(
+      ({ strategyLogicId }) => strategyLogicId == strategyId
+    );
+
+    const farmStruct = Object.values(strategies).find(
+      ({ id }) => id == strategyId
+    )?.farmStruct;
+
+    setIsLPStrategy(
+      getStrategyById(strategyId)?.baseStrategies.includes(BaseStrategy.LP) ??
+        false
+    );
+    setEditFarm(farmStruct ? { ..._farm, farmStruct } : _farm);
   };
 
   const handleInputChange = <K extends keyof Farm>(
@@ -231,6 +220,7 @@ const Farms = (): JSX.Element => {
     value: Farm[K]
   ) => {
     if (!editFarm) return;
+
     setEditFarm({ ...editFarm, [field]: value });
   };
 
@@ -270,13 +260,15 @@ const Farms = (): JSX.Element => {
       setShowTxModal(true);
       setTxStatus("pending");
 
+      const { farmStruct, ...farm } = editFarm;
+
       try {
         setSimulationStatus("loading");
         await simulateContract(wagmiConfig, {
           address: factories[$currentChainID],
           abi: FactoryABI,
           functionName: isAdding ? "addFarms" : "updateFarm",
-          args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+          args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
           account: $account as Address,
           ...(gasEstimate && { gas: gasEstimate }),
         });
@@ -299,7 +291,7 @@ const Farms = (): JSX.Element => {
         address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: isAdding ? "addFarms" : "updateFarm",
-        args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+        args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
         ...(gasEstimate && { gas: gasEstimate }),
       });
       setTxHash(hash);
@@ -324,6 +316,63 @@ const Farms = (): JSX.Element => {
       );
     }
   };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    async function updateGasEstimate() {
+      if (!editFarm || !$account) return;
+
+      const { farmStruct, ...farm } = editFarm;
+
+      try {
+        const est = await $publicClient.estimateContractGas({
+          address: factories[$currentChainID],
+          abi: FactoryABI,
+          functionName: isAdding ? "addFarms" : "updateFarm",
+          args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
+          account: $account as Address,
+        });
+        const gasPrice = await $publicClient.getGasPrice();
+        const totalFee = est * gasPrice;
+        setGasEstimate(totalFee);
+      } catch (err) {
+        console.error("Gas estimate failed", err);
+        setGasEstimate(null);
+      }
+    }
+
+    if (showModal) {
+      updateGasEstimate();
+      interval = setInterval(updateGasEstimate, 15000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [showModal, editFarm, editIndex, isAdding, $account]);
+
+  useEffect(() => {
+    if (farms) {
+      const activeChainStrategies = Array.from(
+        new Set(farms?.map(({ strategyLogicId }) => strategyLogicId))
+      );
+
+      const _liveFarmingStrategies = Object.values(strategies).filter(
+        (strategy) =>
+          strategy.baseStrategies.some((b) => b === "Farming") &&
+          activeChainStrategies.includes(strategy.id)
+      );
+
+      setLiveFarmingStrategies(_liveFarmingStrategies);
+    }
+  }, [farms]);
+
+  useEffect(() => {
+    fetchFarms();
+  }, []);
+
+  useModalClickOutside(modalRef, () => setShowModal((prev) => !prev));
 
   if (loading || farms === null) return <FullPageLoader />;
 
@@ -417,12 +466,15 @@ const Farms = (): JSX.Element => {
         {/* Modal */}
         {showModal && editFarm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-            <div className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl">
+            <div
+              ref={modalRef}
+              className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl"
+            >
               <h2 className="text-xl font-semibold mb-4">
                 {isAdding ? "Add Farm" : "Edit Farm"}
               </h2>
 
-              <div className="grid gap-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+              <div className="grid gap-3 mb-4 max-h-[70vh] overflow-y-auto pr-2">
                 <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                   Status:
                   <select
@@ -451,18 +503,17 @@ const Farms = (): JSX.Element => {
                     />
                   </label>
                 )}
+
                 <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                   Strategy Logic ID
                   <select
                     value={editFarm.strategyLogicId}
                     onChange={(e) => {
                       const value = e.target.value;
-                      handleInputChange("strategyLogicId", value);
-                      setIsLPStrategy(
-                        getStrategyById(value)?.baseStrategies.includes(
-                          BaseStrategy.LP
-                        ) ?? false
-                      );
+
+                      const type = isAdding ? "add" : "edit";
+
+                      changeStrategy(value, type);
                     }}
                     className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                   >
@@ -524,50 +575,149 @@ const Farms = (): JSX.Element => {
                   </div>
                 </div>
 
-                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
-                  Addresses (comma-separated)
-                  <input
-                    value={editFarm.addresses.join(",")}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "addresses",
-                        e.target.value
-                          .split(",")
-                          .map((s) => s.trim()) as Address[]
-                      )
-                    }
-                    className="bg-transparent text-lg font-semibold outline-none w-full"
-                  />
-                </label>
-                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
-                  Nums (comma-separated)
-                  <input
-                    value={editFarm.nums.map((n) => n.toString()).join(",")}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "nums",
-                        e.target.value.split(",").map((n) => BigInt(n.trim()))
-                      )
-                    }
-                    className="bg-transparent text-lg font-semibold outline-none w-full"
-                  />
-                </label>
-                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
-                  Ticks (comma-separated)
-                  <input
-                    value={editFarm.ticks.join(",")}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "ticks",
-                        e.target.value
-                          .split(",")
-                          .map((n) => parseInt(n.trim()))
-                          .filter((n) => !isNaN(n))
-                      )
-                    }
-                    className="bg-transparent text-lg font-semibold outline-none w-full"
-                  />
-                </label>
+                {editFarm?.farmStruct ? (
+                  <div>
+                    {editFarm?.farmStruct?.addresses?.length ? (
+                      <div>
+                        {editFarm?.farmStruct?.addresses.map(
+                          (addressTemplate, index) => (
+                            <div
+                              key={addressTemplate}
+                              className="flex flex-col gap-1"
+                            >
+                              {addressTemplate} address
+                              <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                                <input
+                                  value={editFarm.addresses[index] || ""}
+                                  onChange={(e) => {
+                                    const newAddresses = [
+                                      ...editFarm.addresses,
+                                    ];
+                                    newAddresses[index] =
+                                      e.target.value.trim() as Address;
+                                    handleInputChange(
+                                      "addresses",
+                                      newAddresses
+                                    );
+                                  }}
+                                  className="bg-transparent text-lg font-semibold outline-none w-full"
+                                />
+                              </label>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                    Addresses (comma-separated)
+                    <input
+                      value={editFarm.addresses.join(",")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "addresses",
+                          e.target.value
+                            .split(",")
+                            .map((s) => s.trim()) as Address[]
+                        )
+                      }
+                      className="bg-transparent text-lg font-semibold outline-none w-full"
+                    />
+                  </label>
+                )}
+
+                {editFarm?.farmStruct ? (
+                  <div>
+                    {editFarm?.farmStruct?.nums?.length ? (
+                      <div>
+                        {editFarm?.farmStruct?.nums.map((num, index) => (
+                          <div
+                            key={`formNum${num}`}
+                            className="flex flex-col gap-1"
+                          >
+                            {num} num
+                            <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                              <input
+                                value={editFarm.nums[index]?.toString() || ""}
+                                onChange={(e) => {
+                                  const newNums = [...editFarm.nums];
+                                  newNums[index] = BigInt(
+                                    e.target.value.trim() || "0"
+                                  );
+                                  handleInputChange("nums", newNums);
+                                }}
+                                className="bg-transparent text-lg font-semibold outline-none w-full"
+                              />
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                    Nums (comma-separated)
+                    <input
+                      value={editFarm.nums.map((n) => n.toString()).join(",")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "nums",
+                          e.target.value.split(",").map((n) => BigInt(n.trim()))
+                        )
+                      }
+                      className="bg-transparent text-lg font-semibold outline-none w-full"
+                    />
+                  </label>
+                )}
+
+                {editFarm?.farmStruct ? (
+                  <div>
+                    {editFarm?.farmStruct?.ticks?.length ? (
+                      <div>
+                        {editFarm?.farmStruct?.ticks.map((tick, index) => (
+                          <div
+                            key={`formTick${tick}`}
+                            className="flex flex-col gap-1"
+                          >
+                            {tick} tick
+                            <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                              <input
+                                value={editFarm.ticks[index]?.toString() || ""}
+                                onChange={(e) => {
+                                  const newTicks = [...editFarm.ticks];
+                                  const parsed = parseInt(
+                                    e.target.value.trim()
+                                  );
+                                  if (!isNaN(parsed)) newTicks[index] = parsed;
+                                  handleInputChange("ticks", newTicks);
+                                }}
+                                className="bg-transparent text-lg font-semibold outline-none w-full"
+                              />
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : (
+                  <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                    Ticks (comma-separated)
+                    <input
+                      value={editFarm.ticks.join(",")}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "ticks",
+                          e.target.value
+                            .split(",")
+                            .map((n) => parseInt(n.trim()))
+                            .filter((n) => !isNaN(n))
+                        )
+                      }
+                      className="bg-transparent text-lg font-semibold outline-none w-full"
+                    />
+                  </label>
+                )}
               </div>
 
               <TokenSelectorModal

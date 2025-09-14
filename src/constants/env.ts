@@ -13,6 +13,7 @@ const GRAPH_ENDPOINTS: { [key: string]: string } = {
     "[api-key]",
     import.meta.env.PUBLIC_GRAPH_API_KEY
   ),
+  43114: deployments[43114].subgraph,
 };
 
 export { GRAPH_ENDPOINTS };

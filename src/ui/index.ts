@@ -56,6 +56,21 @@ import { Socials } from "./Socials";
 
 import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
 
+//////// todo: delete
+
+import {
+  TokenSelectorModal,
+  TxStatusModal,
+  TxStatus,
+  Token,
+} from "./TokenSelectorModal";
+
+export type { TxStatus, Token };
+
+export { TokenSelectorModal, TxStatusModal };
+
+////////
+
 export {
   Toast,
   TextModal,
