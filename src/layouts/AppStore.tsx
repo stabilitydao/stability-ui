@@ -1103,6 +1103,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
       metaVaults.set({ "146": metaVaultsWithName });
     }
+
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
