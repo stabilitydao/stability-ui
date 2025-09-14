@@ -6,8 +6,6 @@ import { WagmiLayout } from "@layouts";
 
 import { BuildForm } from "./BuildForm";
 
-import { VaultManager } from "./VaultManager";
-
 import { ArrowRightIcon } from "@ui";
 
 import { frontendContracts, IFrontendABI } from "@web3";
@@ -134,12 +132,19 @@ const Factory = (): JSX.Element => {
 
   return (
     <WagmiLayout>
-      <VaultManager />
       <a
         className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 my-5"
         href="/metavaults-management"
       >
         Metavaults Management
+        <ArrowRightIcon color={"#5E6AD2"} />
+      </a>
+
+      <a
+        className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 my-5"
+        href="/factory/farms"
+      >
+        Farms
         <ArrowRightIcon color={"#5E6AD2"} />
       </a>
       {isCorrectNetwork ? (
