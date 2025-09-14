@@ -1,19 +1,46 @@
 import { useEffect, useState } from "react";
 
 import { HeadingText, FullPageLoader } from "@ui";
-import type { Address, Hash, TransactionReceipt } from "viem";
+
+import {
+  Address,
+  Hash,
+  TransactionReceipt,
+  zeroAddress,
+  formatUnits,
+} from "viem";
+
 import { getShortAddress } from "@utils";
+
 import { useStore } from "@nanostores/react";
+
 import {
   readContract,
   writeContract,
   waitForTransactionReceipt,
   simulateContract,
 } from "@wagmi/core";
+
 import { wagmiConfig, FactoryABI } from "@web3";
-import { connected, account, publicClient, currentChainID } from "@store";
+
+import { connected, account, currentChainID, publicClient } from "@store";
+
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
+
+import { strategies } from "@stabilitydao/stability";
+
+import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
+
+import {
+  TokenSelectorModal,
+  Token,
+  TxStatusModal,
+  TxStatus,
+} from "@components/TokenSelectorModal";
+
+import { FaGasPump } from "react-icons/fa";
 
 import { factories } from "@web3";
 
@@ -29,7 +56,7 @@ type Farm = {
 
 const defaultFarm: Farm = {
   status: 0n,
-  pool: "0x0000000000000000000000000000000000000000",
+  pool: zeroAddress,
   strategyLogicId: "",
   rewardAssets: [],
   addresses: [],
@@ -37,117 +64,13 @@ const defaultFarm: Farm = {
   ticks: [],
 };
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Helper UI components – no external UI libraries required                */
-/* ────────────────────────────────────────────────────────────────────────── */
-
-type ModalProps = {
-  open: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-};
-/** Generic centre‑screen modal */
-const Modal = ({ open, onClose, children }: ModalProps) =>
-  open ? (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg rounded-2xl bg-accent-950 p-6 shadow-2xl">
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 text-4xl leading-none transition hover:scale-110"
-          aria-label="Close modal"
-        >
-          &times;
-        </button>
-        {children}
-      </div>
-    </div>
-  ) : null;
-
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Transaction‑status modal                                                 */
-/* ────────────────────────────────────────────────────────────────────────── */
-
-type TxStatus = "idle" | "wallet" | "pending" | "success" | "error";
-
-type TxStatusModalProps = {
-  status: TxStatus;
-  hash?: Hash | null;
-  error?: string | null;
-  onClose: () => void;
-};
-
-const TxStatusModal = ({
-  status,
-  hash,
-  error,
-  onClose,
-}: TxStatusModalProps) => {
-  if (status === "idle") return null;
-
-  const content = (() => {
-    switch (status) {
-      case "wallet":
-        return "Please confirm the transaction in your wallet…";
-      case "pending":
-        return (
-          <>
-            <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
-            {hash && (
-              <a
-                href={`https://sonicscan.org/tx/${hash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-accent-400 underline"
-              >
-                View on explorer
-              </a>
-            )}
-          </>
-        );
-      case "success":
-        return (
-          <>
-            <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
-            {hash && (
-              <a
-                href={`https://sonicscan.org/tx/${hash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-accent-400 underline"
-              >
-                View on explorer
-              </a>
-            )}
-          </>
-        );
-      case "error":
-        return (
-          <>
-            <p className="mb-2 text-red-400">❌ Transaction failed.</p>
-            {error && (
-              <pre className="max-w-full whitespace-pre-wrap break-all text-xs">
-                {error}
-              </pre>
-            )}
-          </>
-        );
-    }
-  })();
-
-  return (
-    <Modal open onClose={onClose}>
-      <div className="space-y-2 text-neutral-50">{content}</div>
-    </Modal>
-  );
-};
-
 const Farms = (): JSX.Element => {
   /* ───────── stores / wallet ───────── */
   const { open: openConnect } = useWeb3Modal();
   const $connected = useStore(connected);
-  const $publicClient = useStore(publicClient);
   const $account = useStore(account);
   const $currentChainID = useStore(currentChainID);
+  const $publicClient = useStore(publicClient);
 
   const [farms, setFarms] = useState<Farm[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -161,22 +84,13 @@ const Farms = (): JSX.Element => {
   const [simulationStatus, setSimulationStatus] = useState<
     "idle" | "loading" | "success" | "fail"
   >("idle");
-  // const [gasEstimate, setGasEstimate] = useState<string | null>(null);
+  const [gasEstimate, setGasEstimate] = useState<bigint | null>(null);
   const [txStatus, setTxStatus] = useState<TxStatus>("idle");
   const [txHash, setTxHash] = useState<Hash | null>(null);
   const [txError, setTxError] = useState<string | null>(null);
 
-  const resetTxState = () => {
-    setSimulationStatus("idle");
-    setTxStatus("idle");
-    setTxHash(null);
-    setTxError(null);
-    setShowModal(false); // Close edit modal before showing TxStatus
-    setShowModal(false); // Close modal when tx modal closes
-  };
-
   const tokenlist = tokenlistAll.tokens.filter(
-    (token) => token.chainId === 146
+    (token) => token.chainId == $currentChainID
   );
 
   function findTokenByAddress(address: string) {
@@ -202,11 +116,103 @@ const Farms = (): JSX.Element => {
     }
   };
 
+  const statusOptions = [
+    { value: 0, label: "ok" },
+    { value: 1, label: "no rewards" },
+    { value: 2, label: "deprecated" },
+    { value: 5, label: "unbacked underlying" },
+  ];
+
+  const [isLPStrategy, setIsLPStrategy] = useState(false);
+
+  const liveFarmingStrategies = Object.values(strategies).filter(
+    (strategy) =>
+      strategy.state === "LIVE" &&
+      strategy.baseStrategies.some((b) => b === "Farming")
+  );
+
+  function getStrategyById(id: string) {
+    return liveFarmingStrategies.find((strategy) => strategy.id === id);
+  }
+
+  const [showTokenModal, setShowTokenModal] = useState(false);
+  const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
+  const [showTxModal, setShowTxModal] = useState(false);
+
+  const addToken = (token: Token) => {
+    if (!rewardAssets.find((t: Token) => t.address === token.address)) {
+      const newAssets = [...rewardAssets, token];
+      setRewardAssets(newAssets);
+
+      handleInputChange(
+        "rewardAssets",
+        newAssets.map((t) => t.address) as Address[]
+      );
+    }
+  };
+
+  const removeToken = (tokenAddress: string) => {
+    const newAssets = rewardAssets.filter(
+      (t: Token) => t.address !== tokenAddress
+    );
+    setRewardAssets(newAssets);
+
+    handleInputChange(
+      "rewardAssets",
+      newAssets.map((t) => t.address) as Address[]
+    );
+  };
+
+  function getTokensFromAddresses(addresses: string[]): Token[] {
+    return addresses
+      .map((addr) =>
+        tokenlist.find(
+          (token) => token.address.toLowerCase() === addr.toLowerCase()
+        )
+      )
+      .filter((t): t is Token => t !== undefined);
+  }
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    async function updateGasEstimate() {
+      if (!editFarm || !$account) return;
+
+      try {
+        const est = await $publicClient.estimateContractGas({
+          address: factories[$currentChainID],
+          abi: FactoryABI,
+          functionName: isAdding ? "addFarms" : "updateFarm",
+          args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+          account: $account as Address,
+        });
+        const gasPrice = await $publicClient.getGasPrice();
+        const totalFee = est * gasPrice;
+        setGasEstimate(totalFee);
+      } catch (err) {
+        console.error("Gas estimate failed", err);
+        setGasEstimate(null);
+      }
+    }
+
+    if (showModal) {
+      updateGasEstimate();
+      interval = setInterval(updateGasEstimate, 15000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [showModal, editFarm, editIndex, isAdding, $account]);
+
   useEffect(() => {
     fetchFarms();
   }, []);
 
   const openEditModal = (farm: Farm, index: number) => {
+    const rewards = getTokensFromAddresses(farm.rewardAssets);
+    setRewardAssets(rewards);
     setEditFarm(farm);
     setEditIndex(index);
     setShowModal(true);
@@ -220,62 +226,85 @@ const Farms = (): JSX.Element => {
     setIsAdding(true);
   };
 
-  const handleInputChange = (field: keyof Farm, value: any) => {
+  const handleInputChange = <K extends keyof Farm>(
+    field: K,
+    value: Farm[K]
+  ) => {
     if (!editFarm) return;
     setEditFarm({ ...editFarm, [field]: value });
   };
 
+  const resetTxState = () => {
+    setSimulationStatus("idle");
+    setTxStatus("idle");
+    setTxHash(null);
+    setTxError(null);
+    setShowModal(false);
+    setShowTxModal(false);
+  };
+
+  const closeModal = () => {
+    setSimulationStatus("idle");
+    setTxStatus("idle");
+    setTxHash(null);
+    setTxError(null);
+    setEditFarm(null);
+    setEditIndex(null);
+    setRewardAssets([]);
+    setShowModal(false);
+    setShowTxModal(false);
+  };
+
   const handleSubmit = async () => {
-    resetTxState();
-
-    if (
-      !editFarm ||
-      (!isAdding && (editIndex === null || editIndex === undefined))
-    ) {
-      setSimulationStatus("fail");
-      return;
-    }
-
-    setTxStatus("pending");
-
     try {
-      /* ───────── simulate ───────── */
-      setSimulationStatus("loading");
-      await simulateContract(wagmiConfig, {
-        address: factories[$currentChainID],
-        abi: FactoryABI,
-        functionName: isAdding ? "addFarms" : "updateFarm",
-        args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-      });
+      resetTxState();
 
-      /* ───────── estimate gas ───────── */
-      const est = await $publicClient.estimateContractGas({
-        address: factories[$currentChainID],
-        abi: FactoryABI,
-        functionName: isAdding ? "addFarms" : "updateFarm",
-        args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-        account: $account as Address,
-      });
+      if (
+        !editFarm ||
+        (!isAdding && (editIndex === null || editIndex === undefined))
+      ) {
+        setSimulationStatus("fail");
+        return;
+      }
 
-      const gasWithBuffer = (est * 11n) / 10n; // +10 %
-      // setGasEstimate(est.toString());
-      setSimulationStatus("success");
+      setShowTxModal(true);
+      setTxStatus("pending");
 
-      /* ───────── wallet approval ───────── */
+      try {
+        setSimulationStatus("loading");
+        await simulateContract(wagmiConfig, {
+          address: factories[$currentChainID],
+          abi: FactoryABI,
+          functionName: isAdding ? "addFarms" : "updateFarm",
+          args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
+          account: $account as Address,
+          ...(gasEstimate && { gas: gasEstimate }),
+        });
+        setSimulationStatus("success");
+      } catch (simErr) {
+        console.error("Simulation failed", simErr);
+        setTxStatus("error");
+        setTxError(
+          simErr instanceof Error
+            ? simErr.message
+            : "Simulation failed: possible revert or bad parameters."
+        );
+        setSimulationStatus("fail");
+        return;
+      }
+
       setTxStatus("wallet");
 
-      /* ───────── send tx ───────── */
       const hash = await writeContract(wagmiConfig, {
         address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: isAdding ? "addFarms" : "updateFarm",
         args: isAdding ? [[editFarm]] : [BigInt(editIndex!), editFarm],
-        gas: gasWithBuffer,
+        ...(gasEstimate && { gas: gasEstimate }),
       });
       setTxHash(hash);
       setTxStatus("pending");
 
-      /* ───────── wait for confirmation ───────── */
       const receipt: TransactionReceipt = await waitForTransactionReceipt(
         wagmiConfig,
         { hash: hash }
@@ -293,16 +322,7 @@ const Farms = (): JSX.Element => {
       setTxError(
         err instanceof Error ? err.message : "Unexpected error. Check console."
       );
-      setSimulationStatus("fail");
     }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setTxStatus("idle");
-    setTxHash(null);
-    setEditFarm(null);
-    setEditIndex(null);
   };
 
   if (loading || farms === null) return <FullPageLoader />;
@@ -310,11 +330,13 @@ const Farms = (): JSX.Element => {
   return (
     <>
       <TxStatusModal
+        open={showTxModal}
         status={txStatus}
         hash={txHash}
         error={txError}
-        onClose={resetTxState}
+        onClose={closeModal}
       />
+
       <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
         <HeadingText text="Farms" scale={1} />
 
@@ -394,126 +416,195 @@ const Farms = (): JSX.Element => {
 
         {/* Modal */}
         {showModal && editFarm && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-accent-900 p-6 rounded-xl max-w-[600px] w-full">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+            <div className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl">
               <h2 className="text-xl font-semibold mb-4">
                 {isAdding ? "Add Farm" : "Edit Farm"}
               </h2>
 
-              {/* Form Inputs */}
-              <div className="grid gap-3 mb-4">
-                <input
-                  placeholder="Status"
-                  value={editFarm.status.toString()}
-                  onChange={(e) =>
-                    handleInputChange("status", BigInt(e.target.value))
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Pool Address"
-                  value={editFarm.pool}
-                  onChange={(e) =>
-                    handleInputChange("pool", e.target.value as Address)
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Strategy Logic ID"
-                  value={editFarm.strategyLogicId}
-                  onChange={(e) =>
-                    handleInputChange("strategyLogicId", e.target.value)
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Reward Assets (comma-separated)"
-                  value={editFarm.rewardAssets.join(",")}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "rewardAssets",
-                      e.target.value
-                        .split(",")
-                        .map((s) => s.trim()) as Address[]
-                    )
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Addresses (comma-separated)"
-                  value={editFarm.addresses.join(",")}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "addresses",
-                      e.target.value.split(",") as Address[]
-                    )
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Nums (comma-separated)"
-                  value={editFarm.nums.join(",")}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "nums",
-                      e.target.value.split(",").map((n) => BigInt(n))
-                    )
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
-                <input
-                  placeholder="Ticks (comma-separated)"
-                  value={editFarm.ticks.join(",")}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "ticks",
-                      e.target.value.split(",").map(Number)
-                    )
-                  }
-                  className="w-full rounded-2xl border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all placeholder:text-neutral-500 hover:border-accent-500 hover:bg-accent-800 focus:border-accent-500"
-                />
+              <div className="grid gap-3 mb-4 max-h-[50vh] overflow-y-auto pr-2">
+                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  Status:
+                  <select
+                    value={editFarm.status.toString()}
+                    onChange={(e) =>
+                      handleInputChange("status", BigInt(e.target.value))
+                    }
+                    className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
+                  >
+                    {statusOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {isLPStrategy && (
+                  <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                    Pool Address
+                    <input
+                      value={editFarm.pool}
+                      onChange={(e) =>
+                        handleInputChange("pool", e.target.value as Address)
+                      }
+                      className="bg-transparent text-2xl font-semibold outline-none w-full"
+                    />
+                  </label>
+                )}
+                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  Strategy Logic ID
+                  <select
+                    value={editFarm.strategyLogicId}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleInputChange("strategyLogicId", value);
+                      setIsLPStrategy(
+                        getStrategyById(value)?.baseStrategies.includes(
+                          BaseStrategy.LP
+                        ) ?? false
+                      );
+                    }}
+                    className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
+                  >
+                    {liveFarmingStrategies.map((option) => (
+                      <option key={option.shortId} value={option.id}>
+                        {option.id}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-2 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-white">Reward Assets</span>
+                    <button
+                      onClick={() => setShowTokenModal(true)}
+                      className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      <span className="text-sm">Add Asset</span>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {rewardAssets.map((token: Token) => (
+                      <div
+                        key={token.address}
+                        className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
+                      >
+                        <img
+                          src={token.logoURI}
+                          alt={token.symbol}
+                          className="w-5 h-5 rounded-full"
+                        />
+                        <span className="text-sm font-medium">
+                          {token.symbol}
+                        </span>
+                        <button
+                          onClick={() => removeToken(token.address)}
+                          className="text-gray-400 hover:text-red-400 transition-colors duration-150"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  Addresses (comma-separated)
+                  <input
+                    value={editFarm.addresses.join(",")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "addresses",
+                        e.target.value
+                          .split(",")
+                          .map((s) => s.trim()) as Address[]
+                      )
+                    }
+                    className="bg-transparent text-lg font-semibold outline-none w-full"
+                  />
+                </label>
+                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  Nums (comma-separated)
+                  <input
+                    value={editFarm.nums.map((n) => n.toString()).join(",")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "nums",
+                        e.target.value.split(",").map((n) => BigInt(n.trim()))
+                      )
+                    }
+                    className="bg-transparent text-lg font-semibold outline-none w-full"
+                  />
+                </label>
+                <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
+                  Ticks (comma-separated)
+                  <input
+                    value={editFarm.ticks.join(",")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "ticks",
+                        e.target.value
+                          .split(",")
+                          .map((n) => parseInt(n.trim()))
+                          .filter((n) => !isNaN(n))
+                      )
+                    }
+                    className="bg-transparent text-lg font-semibold outline-none w-full"
+                  />
+                </label>
               </div>
 
-              {txStatus === "pending" && (
-                <p className="text-yellow-500">Transaction pending...</p>
-              )}
-              {txStatus === "success" && (
-                <p className="text-green-500">
-                  Success! TX Hash:{" "}
-                  <a
-                    href={`https://sonicscan.org/tx/${txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline"
-                  >
-                    {txHash?.slice(0, 10)}...
-                  </a>
-                </p>
-              )}
-              {txStatus === "error" && (
-                <p className="text-red-500">
-                  Transaction failed. Check console for details.
-                </p>
-              )}
+              <TokenSelectorModal
+                open={showTokenModal}
+                onClose={() => setShowTokenModal(false)}
+                onSelect={(token) => {
+                  addToken(token);
+                }}
+              />
 
-              <div className="flex justify-end gap-3 mt-4">
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-gray-300 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  disabled={
-                    simulationStatus === "loading" ||
-                    txStatus === "wallet" ||
-                    txStatus === "pending"
-                  }
-                >
-                  Submit
-                </button>
+              <div className="flex flex-row justify-between items-center">
+                <div className="bg-[#61697114] px-1.5 py-1 border border-solid border-[#7B8187] rounded-xl text-[#7B8187] flex flex-row items-center gap-2 text-sm select-none">
+                  <FaGasPump />
+                  <span>
+                    {gasEstimate ? formatUnits(gasEstimate, 18) : "0.00"}
+                  </span>
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={closeModal}
+                    className="px-3 py-1 bg-gray-500 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    disabled={
+                      simulationStatus === "loading" ||
+                      txStatus === "wallet" ||
+                      txStatus === "pending"
+                    }
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           </div>
