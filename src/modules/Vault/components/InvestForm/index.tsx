@@ -90,7 +90,7 @@ interface IProps {
 }
 
 const InvestForm: React.FC<IProps> = ({ network, vault }) => {
-  let _publicClient = web3clients[network] ?? web3clients["146"];
+  const _publicClient = web3clients[network];
 
   const { open } = useWeb3Modal();
 
@@ -102,7 +102,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
-
   const $transactionSettings = useStore(transactionSettings);
   const $platformsData: TPlatformData = useStore(platformsData);
   const $tokens = useStore(tokens);
@@ -317,7 +316,6 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     //   resetInputs();
     //   return;
     // }
-
     if (tab === "Deposit") {
       setInputs(
         (prevInputs: any) =>
@@ -1978,24 +1976,22 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               functionName: "previewDepositAssets",
               args: [assets, IQMFAmounts],
             });
+          } else if (["BSF", "BWF", "ASF"].includes(shortId)) {
+            previewDepositAssets = await _publicClient?.simulateContract({
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssetsWrite",
+              args: [defaultOption?.assetsArray as TAddress[], amounts],
+              account: $account as TAddress,
+            });
+            previewDepositAssets = previewDepositAssets.result;
           } else {
-            if (["BSF", "BWF", "ASF"].includes(shortId)) {
-              previewDepositAssets = await _publicClient?.simulateContract({
-                address: vault.address,
-                abi: VaultABI,
-                functionName: "previewDepositAssetsWrite",
-                args: [defaultOption?.assetsArray as TAddress[], amounts],
-                account: $account as TAddress,
-              });
-              previewDepositAssets = previewDepositAssets.result;
-            } else {
-              previewDepositAssets = await _publicClient?.readContract({
-                address: vault.address,
-                abi: VaultABI,
-                functionName: "previewDepositAssets",
-                args: [defaultOption?.assetsArray as TAddress[], amounts],
-              });
-            }
+            previewDepositAssets = await _publicClient?.readContract({
+              address: vault.address,
+              abi: VaultABI,
+              functionName: "previewDepositAssets",
+              args: [defaultOption?.assetsArray as TAddress[], amounts],
+            });
           }
 
           checkInputsAllowance(previewDepositAssets[0] as bigint[]);

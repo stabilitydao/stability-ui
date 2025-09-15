@@ -101,12 +101,12 @@ const walletClient = createWalletClient({
 
 const sonicClient = createPublicClient({
   chain: sonic,
-  transport: http("https://sonic.drpc.org"), //import.meta.env.PUBLIC_SONIC_RPC
+  transport: http("https://sonic.drpc.org"),
 });
 
 const avalancheClient = createPublicClient({
   chain: avalanche,
-  transport: http("https://avalanche.public-rpc.com"), //import.meta.env.PUBLIC_SONIC_RPC
+  transport: http("https://api.avax.network/ext/bc/C/rpc"), // https://avalanche-c-chain-rpc.publicnode.com
 });
 
 const web3clients = {

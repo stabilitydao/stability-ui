@@ -152,7 +152,7 @@ const Leaderboard = (): JSX.Element => {
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">
                       {user.points
-                        ? formatNumber(user.points, "abbreviate")
+                        ? formatNumber(user.points, "abbreviate")?.slice(1)
                         : ""}
                     </div>
                     <div className="px-2 md:px-4 w-1/4 md:w-[22.5%] text-end">

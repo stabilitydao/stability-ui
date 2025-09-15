@@ -849,7 +849,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           if (isConnected) {
             isWeb3Load.set(true);
 
-            let localClient = web3clients[chain.id] ?? web3clients["146"];
+            let localClient = web3clients[chain.id];
 
             try {
               const contractAssetsBalances =
