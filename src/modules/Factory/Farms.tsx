@@ -189,7 +189,15 @@ const Farms = (): JSX.Element => {
   const openAddModal = () => {
     const farmStruct = liveFarmingStrategies[0]?.farmStruct;
 
-    setEditFarm(farmStruct ? { ...defaultFarm, farmStruct } : defaultFarm);
+    setEditFarm(
+      farmStruct
+        ? {
+            ...defaultFarm,
+            farmStruct,
+            strategyLogicId: liveFarmingStrategies[0]?.id,
+          }
+        : { ...defaultFarm, strategyLogicId: liveFarmingStrategies[0]?.id }
+    );
     setEditIndex(null);
     setShowModal(true);
     setIsAdding(true);
