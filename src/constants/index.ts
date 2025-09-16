@@ -216,6 +216,8 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   [key: string]: string;
 } = {
   "0x1cd577ca15bcf35950a3bbfbd127a0835ff2f051": "MINIMAL",
+  "0x9040643a179157ea835706ee31c492680fb3ab3e": "K3",
+  "0x0e5b52afa8acda11f2996a2094afe73fd5503d81": "Re7",
 };
 
 const BIG_INT_VALUES = {

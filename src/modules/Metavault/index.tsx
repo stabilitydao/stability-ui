@@ -155,13 +155,15 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     if (!metaVault) return;
 
-    const protocols = ["Stability", ...metaVault.protocols].map((name) =>
-      Object.values(PROTOCOLS).find(
-        (p) =>
-          p.name.replace(" ", "").toLowerCase() ===
-          name.replace(" ", "").toLowerCase()
-      )
-    );
+    const protocols = ["Stability", ...metaVault.protocols]
+      .filter((name) => !name.toLowerCase().includes("aave"))
+      .map((name) =>
+        Object.values(PROTOCOLS).find(
+          (p) =>
+            p.name.replace(" ", "").toLowerCase() ===
+            name.replace(" ", "").toLowerCase()
+        )
+      );
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
@@ -320,12 +322,13 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
           <div className="flex flex-col gap-4">
-            <DisplayHandler
-              displayType={displayType}
-              setDisplayType={setDisplayType}
-            />
-
-            <h2 className="page-title__font text-start">{symbol}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="page-title__font text-start">{symbol}</h2>
+              <DisplayHandler
+                displayType={displayType}
+                setDisplayType={setDisplayType}
+              />
+            </div>
 
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
@@ -456,7 +459,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               setProtocolModal={setProtocolModal}
             />
 
-            <Chart symbol={symbol as string} />
+            <Chart symbol={symbol as string} display={displayType} />
           </div>
 
           <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
@@ -488,7 +491,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             />
           ) : (
             <div className="w-full">
-              <Chart symbol={symbol as string} />
+              <Chart symbol={symbol as string} display={displayType} />
             </div>
           )}
         </div>

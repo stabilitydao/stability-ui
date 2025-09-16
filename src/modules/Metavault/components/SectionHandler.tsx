@@ -50,7 +50,7 @@ const SectionHandler: React.FC<TProps> = ({
         )}
         onClick={() => setActiveSection(MetaVaultSectionTypes.Charts)}
       >
-        Historical Rate
+        Historical Rates
       </div>
     </div>
   );
