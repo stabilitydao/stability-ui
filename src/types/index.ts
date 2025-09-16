@@ -594,8 +594,10 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
+type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl";
+
 type TActiveChart = {
-  name: string;
+  name: TChartNames;
   data: [];
 };
 
@@ -889,4 +891,5 @@ export type {
   TMarket,
   TMarketAsset,
   TNetwork,
+  TChartNames,
 };
