@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { tokenlist as tokenlistAll } from "@stabilitydao/stability";
 import type { Hash } from "viem";
+import { useStore } from "@nanostores/react";
+import { currentChainID } from "@store";
 
 export const shorten = (addr: string): string =>
   `${addr.slice(0, 6)}…${addr.slice(-4)}`;
@@ -30,12 +32,6 @@ export const Modal = ({
     </div>
   ) : null;
 
-export const tokenlist = tokenlistAll.tokens.filter(
-  (token) => token.chainId === 146
-);
-
-export type Token = (typeof tokenlist)[number];
-
 export type TokenSelectorModalProps = {
   open: boolean;
   onClose: () => void;
@@ -49,6 +45,12 @@ export const TokenSelectorModal = ({
 }: TokenSelectorModalProps): JSX.Element => {
   const [query, setQuery] = useState("");
 
+  const $currentChainID = useStore(currentChainID);
+
+  const tokenlist = tokenlistAll.tokens.filter(
+    (token) => token.chainId == $currentChainID
+  );
+
   type AssetPriceEntry = {
     price: string;
     trusted: boolean;
@@ -61,7 +63,7 @@ export const TokenSelectorModal = ({
     (async () => {
       const response = await fetch("https://api.stability.farm");
       const data = await response.json();
-      const result = data.assetPrices?.[146] ?? null;
+      const result = data.assetPrices?.[$currentChainID] ?? null;
       setAssetPrices(result);
     })();
   }, []);
