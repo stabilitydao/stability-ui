@@ -521,8 +521,6 @@ const Farms = (): JSX.Element => {
                     onChange={(e) => {
                       const value = e.target.value;
 
-                      const type = isAdding ? "add" : "edit";
-
                       changeStrategy(value);
                     }}
                     className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
