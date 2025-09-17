@@ -213,9 +213,9 @@ const Farms = (): JSX.Element => {
   }
 
   const changeStrategy = (strategyId: string) => {
-    const _farm = farms?.find(
-      ({ strategyLogicId }) => strategyLogicId == strategyId
-    );
+    const _farm =
+      farms?.find(({ strategyLogicId }) => strategyLogicId == strategyId) ??
+      defaultFarm;
 
     const farmStruct = Object.values(strategies).find(
       ({ id }) => id == strategyId
@@ -599,7 +599,7 @@ const Farms = (): JSX.Element => {
                               {addressTemplate} address
                               <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                                 <input
-                                  value={editFarm?.addresses?.[index] || ""}
+                                  value={editFarm?.addresses?.[index]}
                                   onChange={(e) => {
                                     const newAddresses = [
                                       ...editFarm?.addresses,
