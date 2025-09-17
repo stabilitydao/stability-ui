@@ -42,7 +42,12 @@ import { FaGasPump } from "react-icons/fa";
 
 import { factories } from "@web3";
 
-import { BaseStrategy } from "@stabilitydao/stability/out/strategies";
+import {
+  BaseStrategy,
+  getChainStrategies,
+} from "@stabilitydao/stability/out/strategies";
+
+import { CHAINS } from "@constants";
 
 type Farm = {
   status: bigint;
@@ -334,6 +339,7 @@ const Farms = (): JSX.Element => {
 
       const { farmStruct, ...farm } = editFarm;
       console.log(farmStruct);
+
       try {
         const est = await $publicClient.estimateContractGas({
           address: factories[$currentChainID],
@@ -362,18 +368,14 @@ const Farms = (): JSX.Element => {
   }, [showModal, editFarm, editIndex, isAdding, $account]);
 
   useEffect(() => {
-    if (farms) {
-      const activeChainStrategies = Array.from(
-        new Set(farms?.map(({ strategyLogicId }) => strategyLogicId))
+    if (farms && $currentChainID) {
+      const chain = CHAINS.find(({ id }) => id == $currentChainID);
+
+      const _strategies = getChainStrategies(chain.name).filter((strategy) =>
+        strategy.baseStrategies.some((b) => b === "Farming")
       );
 
-      const _liveFarmingStrategies = Object.values(strategies).filter(
-        (strategy) =>
-          strategy.baseStrategies.some((b) => b === "Farming") &&
-          activeChainStrategies.includes(strategy.id)
-      );
-
-      setLiveFarmingStrategies(_liveFarmingStrategies);
+      setLiveFarmingStrategies(_strategies);
     }
   }, [farms]);
 
@@ -487,7 +489,7 @@ const Farms = (): JSX.Element => {
                 <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                   Status:
                   <select
-                    value={editFarm.status.toString()}
+                    value={editFarm?.status?.toString()}
                     onChange={(e) =>
                       handleInputChange("status", BigInt(e.target.value))
                     }
@@ -504,7 +506,7 @@ const Farms = (): JSX.Element => {
                   <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                     Pool Address
                     <input
-                      value={editFarm.pool}
+                      value={editFarm?.pool}
                       onChange={(e) =>
                         handleInputChange("pool", e.target.value as Address)
                       }
@@ -516,7 +518,7 @@ const Farms = (): JSX.Element => {
                 <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                   Strategy Logic ID
                   <select
-                    value={editFarm.strategyLogicId}
+                    value={editFarm?.strategyLogicId}
                     onChange={(e) => {
                       const value = e.target.value;
 
@@ -588,7 +590,7 @@ const Farms = (): JSX.Element => {
                   <div>
                     {editFarm?.farmStruct?.addresses?.length ? (
                       <div>
-                        {editFarm?.farmStruct?.addresses.map(
+                        {editFarm?.farmStruct?.addresses?.map(
                           (addressTemplate, index) => (
                             <div
                               key={addressTemplate}
@@ -597,10 +599,10 @@ const Farms = (): JSX.Element => {
                               {addressTemplate} address
                               <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                                 <input
-                                  value={editFarm.addresses[index] || ""}
+                                  value={editFarm?.addresses?.[index] || ""}
                                   onChange={(e) => {
                                     const newAddresses = [
-                                      ...editFarm.addresses,
+                                      ...editFarm?.addresses,
                                     ];
                                     newAddresses[index] =
                                       e.target.value.trim() as Address;
@@ -622,7 +624,7 @@ const Farms = (): JSX.Element => {
                   <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                     Addresses (comma-separated)
                     <input
-                      value={editFarm.addresses.join(",")}
+                      value={editFarm?.addresses?.join(",")}
                       onChange={(e) =>
                         handleInputChange(
                           "addresses",
@@ -640,7 +642,7 @@ const Farms = (): JSX.Element => {
                   <div>
                     {editFarm?.farmStruct?.nums?.length ? (
                       <div>
-                        {editFarm?.farmStruct?.nums.map((num, index) => (
+                        {editFarm?.farmStruct?.nums?.map((num, index) => (
                           <div
                             key={`formNum${num}`}
                             className="flex flex-col gap-1"
@@ -648,9 +650,9 @@ const Farms = (): JSX.Element => {
                             {num} num
                             <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                               <input
-                                value={editFarm.nums[index]?.toString() || ""}
+                                value={editFarm?.nums[index]?.toString() || ""}
                                 onChange={(e) => {
-                                  const newNums = [...editFarm.nums];
+                                  const newNums = [...editFarm?.nums];
                                   newNums[index] = BigInt(
                                     e.target.value.trim() || "0"
                                   );
@@ -668,7 +670,7 @@ const Farms = (): JSX.Element => {
                   <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                     Nums (comma-separated)
                     <input
-                      value={editFarm.nums.map((n) => n.toString()).join(",")}
+                      value={editFarm?.nums?.map((n) => n.toString()).join(",")}
                       onChange={(e) =>
                         handleInputChange(
                           "nums",
@@ -684,7 +686,7 @@ const Farms = (): JSX.Element => {
                   <div>
                     {editFarm?.farmStruct?.ticks?.length ? (
                       <div>
-                        {editFarm?.farmStruct?.ticks.map((tick, index) => (
+                        {editFarm?.farmStruct?.ticks?.map((tick, index) => (
                           <div
                             key={`formTick${tick}`}
                             className="flex flex-col gap-1"
@@ -692,9 +694,9 @@ const Farms = (): JSX.Element => {
                             {tick} tick
                             <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                               <input
-                                value={editFarm.ticks[index]?.toString() || ""}
+                                value={editFarm?.ticks[index]?.toString() || ""}
                                 onChange={(e) => {
-                                  const newTicks = [...editFarm.ticks];
+                                  const newTicks = [...editFarm?.ticks];
                                   const parsed = parseInt(
                                     e.target.value.trim()
                                   );
@@ -713,7 +715,7 @@ const Farms = (): JSX.Element => {
                   <label className="w-full rounded-lg border-[2px] border-accent-800 bg-accent-900 px-3 py-0.5 text-neutral-50 outline-none transition-all hover:border-accent-500 focus:border-accent-500">
                     Ticks (comma-separated)
                     <input
-                      value={editFarm.ticks.join(",")}
+                      value={editFarm?.ticks?.join(",")}
                       onChange={(e) =>
                         handleInputChange(
                           "ticks",
