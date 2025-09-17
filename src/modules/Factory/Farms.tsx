@@ -213,9 +213,9 @@ const Farms = (): JSX.Element => {
   }
 
   const changeStrategy = (strategyId: string) => {
-    const _farm =
-      farms?.find(({ strategyLogicId }) => strategyLogicId == strategyId) ??
-      defaultFarm;
+    const _farm = farms?.find(
+      ({ strategyLogicId }) => strategyLogicId == strategyId
+    ) ?? { ...defaultFarm, strategyLogicId: strategyId };
 
     const farmStruct = Object.values(strategies).find(
       ({ id }) => id == strategyId
@@ -274,7 +274,6 @@ const Farms = (): JSX.Element => {
       setTxStatus("pending");
 
       const { farmStruct, ...farm } = editFarm;
-
       console.log(farmStruct);
       try {
         setSimulationStatus("loading");
@@ -524,7 +523,7 @@ const Farms = (): JSX.Element => {
 
                       const type = isAdding ? "add" : "edit";
 
-                      changeStrategy(value, type);
+                      changeStrategy(value);
                     }}
                     className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                   >
