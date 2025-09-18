@@ -4,8 +4,6 @@ import { formatNumber } from "@utils";
 
 import { CHAINS, SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
 
-import { getStrategyProtocols } from "@stabilitydao/stability";
-
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {

@@ -18,12 +18,6 @@ const MARKET_TABLE_FILTERS: TTableFilters[] = [
 
 const TABLE: TTableColumn[] = [
   {
-    name: "Assets",
-    keyName: "assetsSymbol",
-    sortType: "none",
-    dataType: "string",
-  },
-  {
     name: "Strategy",
     keyName: "strategy",
     sortType: "none",

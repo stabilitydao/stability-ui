@@ -8,6 +8,7 @@ import { ColumnSort } from "./components/ColumnSort";
 import { Filters } from "./components/Filters";
 import { Portfolio } from "./components/Portfolio";
 import { NetworksFilter } from "./components/NetworksFilter";
+import { Search } from "./components/Search";
 
 import {
   FullPageLoader,
@@ -140,28 +141,6 @@ const Vaults = (): JSX.Element => {
   const userVaultsCondition =
     tableFilters.find((filter) => filter.name === "My vaults")?.state &&
     !$connected;
-
-  const handleSearch = (value: string) => {
-    if (search?.current) {
-      search.current.value = value;
-
-      tableHandler();
-      setSearchHistory([]);
-    }
-  };
-
-  const clearSearchHistory = (history: string[]) => {
-    if (history.length === searchHistory.length) {
-      localStorage.setItem("searchHistory", JSON.stringify([]));
-      setSearchHistory([]);
-    } else {
-      const updatedHistory = searchHistory.filter(
-        (item) => !history.includes(item)
-      );
-      localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
-      setSearchHistory(updatedHistory);
-    }
-  };
 
   const activeNetworksHandler = async (chainIDs: string[]) => {
     let updatedNetworks = activeNetworks.map((network) =>
@@ -533,69 +512,6 @@ const Vaults = (): JSX.Element => {
           activeNetworksHandler={activeNetworksHandler}
         />
 
-        <div className="relative text-[16px] mt-4">
-          <label className="relative block">
-            <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <img
-                src="/search.svg"
-                alt="Search"
-                className="w-5 h-5 text-[#97979A]"
-              />
-            </span>
-            <input
-              type="text"
-              className="text-[#97979A] w-full bg-transparent border border-[#23252A] rounded-lg transition-all duration-300 h-[48px] pl-[44px] pr-10"
-              placeholder="Search asset"
-              ref={search}
-              onChange={() => tableHandler()}
-            />
-
-            <span
-              onClick={() => handleSearch("")}
-              className={cn(
-                "absolute inset-y-0 right-4 flex items-center cursor-pointer",
-                !search?.current?.value && "hidden"
-              )}
-            >
-              <img src="/icons/circle-xmark.png" alt="xmark" />
-            </span>
-          </label>
-          {!!searchHistory.length && (
-            <div className="absolute left-0 mt-2 w-full bg-[#1C1D1F] border border-[#383B42] rounded-lg z-[15] p-[6px]">
-              <span className="text-[#97979A] text-[12px] leading-[14px] font-medium p-[6px]">
-                Recent searches
-              </span>
-              {searchHistory.map((text, index) => (
-                <div
-                  key={text + index}
-                  className={cn(
-                    "cursor-pointer flex items-center justify-between"
-                  )}
-                >
-                  <span
-                    className="text-ellipsis whitespace-nowrap overflow-hidden text-[14px] leading-5 font-medium py-[6px] pl-[6px]"
-                    onClick={() => handleSearch(text)}
-                  >
-                    {text}
-                  </span>
-                  <img
-                    className="py-[6px] pr-[6px]"
-                    onClick={() => clearSearchHistory([text])}
-                    src="/icons/xmark.svg"
-                    alt="xmark"
-                  />
-                </div>
-              ))}
-              <button
-                className="text-[#A193F2] text-[12px] leading-[14px] font-medium p-[6px] w-full text-start"
-                onClick={() => clearSearchHistory(searchHistory)}
-              >
-                Clear all
-              </button>
-            </div>
-          )}
-        </div>
-
         <div className="flex items-center xl:justify-between gap-2 my-4">
           <Filters
             filters={tableFilters}
@@ -634,6 +550,15 @@ const Vaults = (): JSX.Element => {
                 displayType === DisplayTypes.Grid && "hidden"
               )}
             >
+              <div className="flex items-center text-[12px] font-manrope font-semibold px-2 md:px-4 py-2 whitespace-nowrap sticky left-0 z-10 lg:relative w-[150px] md:w-[30%] bg-[#151618] lg:bg-transparent">
+                <Search
+                  search={search}
+                  searchHistory={searchHistory}
+                  setSearchHistory={setSearchHistory}
+                  tableHandler={tableHandler}
+                />
+              </div>
+
               {tableStates.map((value, index) => (
                 <ColumnSort
                   key={value.name + index}
