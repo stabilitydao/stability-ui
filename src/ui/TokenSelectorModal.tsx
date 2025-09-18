@@ -4,6 +4,7 @@ import type { Hash } from "viem";
 import { useModalClickOutside } from "@utils";
 import { useStore } from "@nanostores/react";
 import { currentChainID } from "@store";
+import { CHAINS } from "@constants";
 
 export const shorten = (addr: string): string =>
   `${addr.slice(0, 6)}…${addr.slice(-4)}`;
@@ -155,6 +156,13 @@ export const TxStatusModal = ({
 }: TxStatusModalProps): JSX.Element | null => {
   if (status === "idle") return null;
 
+  const $currentChainID = useStore(currentChainID);
+
+  const link = CHAINS.find(({ id }) => id == $currentChainID)?.explorer?.slice(
+    0,
+    -9
+  );
+
   const content: JSX.Element = (() => {
     switch (status) {
       case "wallet":
@@ -169,7 +177,7 @@ export const TxStatusModal = ({
             <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
             {hash && (
               <a
-                href={`https://sonicscan.org/tx/${hash}`}
+                href={`${link}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"
@@ -185,7 +193,7 @@ export const TxStatusModal = ({
             <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
             {hash && (
               <a
-                href={`https://sonicscan.org/tx/${hash}`}
+                href={`${link}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"

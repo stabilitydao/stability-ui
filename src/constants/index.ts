@@ -161,7 +161,8 @@ const CHAINS = [
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
     explorer: "https://sonicscan.org/address/",
     nativeCurrency: "S",
-    active: true, // main page active networks
+    color: "#000000",
+    active: true,
   },
   {
     name: chains["43114"].name,
@@ -169,7 +170,8 @@ const CHAINS = [
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["43114"].img}`,
     explorer: "https://snowtrace.io/address/",
     nativeCurrency: "AVAX",
-    active: true, // main page active networks
+    color: "#E84142",
+    active: true,
   },
 ];
 

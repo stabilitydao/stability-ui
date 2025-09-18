@@ -1006,6 +1006,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 merklAPR,
                 totalAPR,
                 sonicPoints,
+                network: key,
               };
             });
 

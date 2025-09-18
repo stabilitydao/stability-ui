@@ -311,6 +311,7 @@ type TMetaVault = {
   protocols?: { name: string; logoSrc: string }[];
   strategies?: string[];
   sonicPoints?: number;
+  network: string;
 };
 
 type TEndMetaVaults = {

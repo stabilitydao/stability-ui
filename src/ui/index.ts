@@ -23,6 +23,7 @@ import { ExplorerLink } from "./ExplorerLink";
 import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
+import { MetaVaultStrategies } from "./MetaVaultStrategies";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -62,10 +63,9 @@ import {
   TokenSelectorModal,
   TxStatusModal,
   TxStatus,
-  Token,
 } from "./TokenSelectorModal";
 
-export type { TxStatus, Token };
+export type { TxStatus };
 
 export { TokenSelectorModal, TxStatusModal };
 
@@ -121,4 +121,5 @@ export {
   ChartTooltip,
   ChartTimelineSwitcher,
   MarketsTable,
+  MetaVaultStrategies,
 };

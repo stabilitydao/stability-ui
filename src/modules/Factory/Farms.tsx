@@ -275,6 +275,7 @@ const Farms = (): JSX.Element => {
 
       const { farmStruct, ...farm } = editFarm;
       console.log(farmStruct);
+
       try {
         setSimulationStatus("loading");
         await simulateContract(wagmiConfig, {
@@ -283,7 +284,7 @@ const Farms = (): JSX.Element => {
           functionName: isAdding ? "addFarms" : "updateFarm",
           args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
           account: $account as Address,
-          ...(gasEstimate && { gas: gasEstimate }),
+          // ...(gasEstimate && { gas: gasEstimate }),
         });
         setSimulationStatus("success");
       } catch (simErr) {
@@ -305,7 +306,7 @@ const Farms = (): JSX.Element => {
         abi: FactoryABI,
         functionName: isAdding ? "addFarms" : "updateFarm",
         args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
-        ...(gasEstimate && { gas: gasEstimate }),
+        // ...(gasEstimate && { gas: gasEstimate }),
       });
       setTxHash(hash);
       setTxStatus("pending");
