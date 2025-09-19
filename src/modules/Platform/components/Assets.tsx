@@ -8,9 +8,9 @@ import { sortTable, formatNumber } from "@utils";
 
 import { TableColumnSort, HeadingText, Checkbox } from "@ui";
 
-import { assetsPrices } from "@store";
+import { assetsPrices, currentChainID } from "@store";
 
-import { ASSETS_TABLE } from "@constants";
+import { ASSETS_TABLE, CHAINS } from "@constants";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
@@ -18,12 +18,15 @@ import type { TTableColumn, TAssetData } from "@types";
 
 const Assets = (): JSX.Element => {
   const $assetsPrices = useStore(assetsPrices);
+  const $currentChainID = useStore(currentChainID);
 
   const [tableStates, setTableStates] = useState(ASSETS_TABLE);
   const [tableData, setTableData] = useState<TAssetData[]>([]);
   const [filteredTableData, setFilteredTableData] = useState<TAssetData[]>([]);
 
   const [isStablecoins, setIsStablecoins] = useState<boolean>(false);
+
+  const currentChain = CHAINS.find((item) => item.id === $currentChainID);
 
   const tableHandler = () => {
     let data = tableData;
@@ -54,7 +57,7 @@ const Assets = (): JSX.Element => {
       // todo get chainId from web3 state
 
       const tokenlistItems = tokenlist.tokens.filter(
-        (token) => token.chainId.toString() == "146"
+        (token) => token.chainId.toString() == $currentChainID
       );
 
       const assetsData: TAssetData[] = tokenlistItems.map((item) => {
@@ -91,7 +94,11 @@ const Assets = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <HeadingText text="Sonic Assets" scale={1} styles="mb-0" />
+      <HeadingText
+        text={`${currentChain?.name ?? ""} Assets`}
+        scale={1}
+        styles="mb-0"
+      />
 
       <div className="mb-4 flex justify-center">
         {tokenlist.name}{" "}

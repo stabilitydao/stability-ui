@@ -3,6 +3,7 @@ import type { TTableColumn, TTableFilters } from "@types";
 const TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
   { name: "Stablecoins", type: "single", state: false },
+  { name: "Meta Vaults", type: "single", state: false },
   { name: "My vaults", type: "sample", state: false },
   { name: "Active", type: "sample", state: true },
 ];
@@ -16,12 +17,6 @@ const MARKET_TABLE_FILTERS: TTableFilters[] = [
 ];
 
 const TABLE: TTableColumn[] = [
-  {
-    name: "Assets",
-    keyName: "assetsSymbol",
-    sortType: "none",
-    dataType: "string",
-  },
   {
     name: "Strategy",
     keyName: "strategy",
@@ -359,7 +354,14 @@ const METAVAULT_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
-    name: "Allocation (current / target)",
+    name: "Allocation",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Proportions (current / target)",
     keyName: "",
     sortType: "none",
     dataType: "",
@@ -499,7 +501,7 @@ const MARKET_TABLE: TTableColumn[] = [
   },
   {
     name: "maxLTV / LT",
-    keyName: "borrowTVL",
+    keyName: "LTV",
     sortType: "none",
     dataType: "number",
   },
@@ -510,6 +512,10 @@ const DEFAULT_TABLE_PARAMS = {
   sort: 0,
   filters: 0,
 };
+
+const METAVAULTS_FILTERS: TTableFilters[] = [
+  { name: "Flagships", type: "sample", state: true },
+];
 
 export {
   TABLE_FILTERS,
@@ -530,4 +536,5 @@ export {
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
   MARKET_TABLE_FILTERS,
+  METAVAULTS_FILTERS,
 };

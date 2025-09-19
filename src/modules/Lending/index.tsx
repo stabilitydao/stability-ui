@@ -160,18 +160,20 @@ const Lending = (): JSX.Element => {
 
   const initMarkets = async () => {
     if ($markets) {
+      console.log($markets);
       const allMarkets = activeNetworks.flatMap((network) =>
-        Object.entries($markets[network.id]).map(([name, assets]) => {
+        Object.entries($markets[network.id] ?? {}).map(([name, assets]) => {
           const formattedAssets = Object.entries(assets)
-            .map(([address, data]) => ({
-              address,
-              ...data,
-            }))
+            .map(([address, data]) => {
+              return {
+                address,
+                ...data,
+              };
+            })
             .sort(
               (a: TMarketAsset, b: TMarketAsset) =>
                 Number(b.supplyTVL) - Number(a.supplyTVL)
             );
-
           const supplyAPR = Math.max(
             ...formattedAssets.map((asset) => Number(asset.supplyAPR) || 0)
           );
@@ -185,6 +187,10 @@ const Lending = (): JSX.Element => {
             ...formattedAssets.map((asset) => Number(asset.borrowTVL) || 0)
           );
 
+          const LTV = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.maxLtv) || 0)
+          );
+
           return {
             name,
             assets: formattedAssets,
@@ -193,6 +199,7 @@ const Lending = (): JSX.Element => {
             supplyTVL,
             borrowTVL,
             network,
+            LTV,
           };
         })
       );
@@ -242,7 +249,7 @@ const Lending = (): JSX.Element => {
       </div>
       <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
         <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">
-          <div className="flex items-center bg-[#151618] border border-[#23252A] rounded-lg h-[48px] w-[1050px] md:w-full mb-4">
+          <div className="flex items-center bg-[#151618] border border-[#23252A] rounded-lg h-[48px] w-[850px] md:w-full mb-4">
             {tableStates.map((value: TTableColumn, index: number) => (
               <ColumnSort
                 key={value.name + index}
@@ -255,7 +262,7 @@ const Lending = (): JSX.Element => {
           </div>
           <div>
             {isLoading ? (
-              <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
+              <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border border-[#23252A] rounded-lg">
                 <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
                   <FullPageLoader />
                 </div>

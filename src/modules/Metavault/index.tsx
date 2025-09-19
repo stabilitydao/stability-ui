@@ -3,26 +3,27 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
-import { ColumnSort } from "./components/ColumnSort";
-// import { LendingMarkets } from "./components/LendingMarkets";
+import { LendingMarkets } from "./components/LendingMarkets";
+import { Table } from "./components/Table";
 import { Contracts } from "./components/Contracts";
 import { Chart } from "./components/Chart";
+
+import { DisplayHandler } from "./components/DisplayHandler";
+import { SectionHandler } from "./components/SectionHandler";
 
 import { Modal } from "./components/Modals/Modal";
 import { ProtocolModal } from "./components/Modals/ProtocolModal";
 
-import { FullPageLoader, Pagination, MetaVaultsTable, TextSkeleton } from "@ui";
+import { TextSkeleton } from "@ui";
+
+import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+import { updateQueryParams } from "./functions/updateQueryParams";
 
 import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
-import {
-  METAVAULT_TABLE,
-  PROTOCOLS,
-  PAGINATION_LIMIT,
-  PROTOCOLS_TABLE,
-} from "@constants";
+import { METAVAULT_TABLE, PROTOCOLS, PROTOCOLS_TABLE } from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
 
@@ -36,6 +37,8 @@ import {
   VaultTypes,
   IProtocolModal,
   IProtocol,
+  MetaVaultDisplayTypes,
+  MetaVaultSectionTypes,
 } from "@types";
 
 interface IProps {
@@ -47,6 +50,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
 
+  const { display, section } = getInitialStateFromUrl();
+
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
@@ -57,11 +62,9 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
-
-  const [currentTab, setCurrentTab] = useState(1);
-
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
+  const [displayType, setDisplayType] = useState(display);
+  const [activeSection, setActiveSection] = useState(section);
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -88,15 +91,30 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   const [tableStates, setTableStates] = useState(METAVAULT_TABLE);
 
-  const changeTable = (type: MetaVaultTableTypes) => {
+  const changeTables = (type: MetaVaultTableTypes) => {
     if (type === MetaVaultTableTypes.Destinations) {
       setTableStates(METAVAULT_TABLE);
     } else if (type === MetaVaultTableTypes.Protocols) {
       setTableStates(PROTOCOLS_TABLE);
     }
-
-    setCurrentTab(1);
     setTableType(type);
+
+    updateQueryParams({ table: type });
+  };
+
+  const changeDisplay = (type: MetaVaultDisplayTypes) => {
+    if (type === MetaVaultDisplayTypes.Pro) {
+      updateQueryParams({ display: type });
+    } else {
+      updateQueryParams({ display: null, section: null });
+    }
+
+    setDisplayType(type);
+  };
+
+  const changeSection = (section: MetaVaultSectionTypes) => {
+    updateQueryParams({ section });
+    setActiveSection(section);
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
@@ -142,17 +160,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         return;
     }
 
-    if (currentTab !== 1 && sortedList.length) {
-      const totalTabs = Math.ceil(sortedList.length / pagination);
-      if (totalTabs < currentTab) {
-        setCurrentTab(1);
-      }
-    }
-
     setTableStates(table);
   };
 
-  const init = async () => {
+  const initMetavault = async () => {
     const chainId = "146";
     const metaVaultList = $metaVaults[chainId];
 
@@ -164,13 +175,15 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
     if (!metaVault) return;
 
-    const protocols = ["Stability", ...metaVault.protocols].map((name) =>
-      Object.values(PROTOCOLS).find(
-        (p) =>
-          p.name.replace(" ", "").toLowerCase() ===
-          name.replace(" ", "").toLowerCase()
-      )
-    );
+    const protocols = ["Stability", ...metaVault.protocols]
+      .filter((name) => !name.toLowerCase().includes("aave"))
+      .map((name) =>
+        Object.values(PROTOCOLS).find(
+          (p) =>
+            p.name.replace(" ", "").toLowerCase() ===
+            name.replace(" ", "").toLowerCase()
+        )
+      );
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
@@ -183,6 +196,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         const current = vaultProportion?.current * 100;
 
         const target = vaultProportion?.target * 100;
+
+        const allocation = (Number(metaVault.tvl) / 100) * current;
 
         if (current <= 0.1 && !target) return null;
 
@@ -199,11 +214,17 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               const vault = $vaults[chainId][addr];
               const subProp = v.proportions;
 
+              const current = subProp.current * 100;
+              const target = subProp.target * 100;
+
+              const allocation = (Number(metaVault.tvl) / 100) * current;
+
               return {
                 ...vault,
                 proportions: {
-                  current: subProp.current * 100,
-                  target: subProp.target * 100,
+                  current,
+                  target,
+                  allocation,
                 },
                 APR: vault.earningData.apr.latest,
               };
@@ -212,7 +233,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
           return {
             ...subMetaVault,
-            proportions: { current, target },
+            proportions: { current, target, allocation: Number(metaVault.tvl) },
             vaults: vaultsData,
           };
         }
@@ -222,7 +243,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         return {
           ...vault,
           APR: vault.earningData.apr.latest,
-          proportions: { current, target },
+          proportions: { current, target, allocation },
         };
       })
     );
@@ -252,14 +273,22 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           });
         });
 
+        if (protocol?.name.includes("Compound")) {
+          protocol = PROTOCOLS.enclabs;
+        }
+
         let creationDate = protocol?.creationDate ?? 0;
+
+        let audits = protocol?.audits ?? [];
 
         if (protocol?.name.includes("Aave")) {
           creationDate =
             integrations.stability.protocols.stabilityMarket.creationDate;
+
+          audits = integrations.stability.protocols.stabilityMarket.audits;
         }
 
-        return { ...protocol, allocation, creationDate };
+        return { ...protocol, allocation, creationDate, audits };
       })
       .filter((protocol) => !!protocol.allocation);
 
@@ -275,17 +304,21 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       }))
       .sort((a, b) => b.value - a.value);
 
+    const checkedProtocols = protocols.map((protocol) =>
+      protocol?.name.includes("Compound") ? PROTOCOLS.enclabs : protocol
+    );
+
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
     setLocalProtocols(allocationsWithPercent);
     setFilteredProtocols(allocationsWithPercent);
-    setLocalMetaVault({ ...metaVault, protocols });
+    setLocalMetaVault({ ...metaVault, protocols: checkedProtocols });
     setIsLocalVaultsLoaded(true);
   };
 
   useEffect(() => {
     if ($isVaultsLoaded) {
-      init();
+      initMetavault();
       console.log(aprModal);
     }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
@@ -304,16 +337,18 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     (mv) => mv.address.toLowerCase() === metavault
   )?.symbol;
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabVaults = filteredVaults.slice(firstTabIndex, lastTabIndex);
-
   return (
-    <div className="mx-auto flex flex-col gap-6 pb-6">
+    <div className="mx-auto flex flex-col gap-6 pb-6 xl:min-w-[1230px]">
       <div className="flex items-start justify-between gap-6">
         <div className="flex flex-col gap-4 md:gap-10">
-          <div>
-            <h2 className="page-title__font text-start mb-4">{symbol}</h2>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <h2 className="page-title__font text-start">{symbol}</h2>
+              <DisplayHandler
+                displayType={displayType}
+                changeDisplay={changeDisplay}
+              />
+            </div>
 
             <h3 className="text-[#97979a] page-description__font">
               {symbol === "metaUSD" ? "Stablecoins" : symbol?.slice(4)} deployed
@@ -422,92 +457,68 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         />
       </div>
 
-      <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
-        <div className="flex flex-col gap-4 w-full xl:w-[850px]">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold text-[24px] leading-8 hidden md:block">
-              Allocations
-            </span>
-            <div className="flex items-center justify-between md:justify-end">
-              <span className="font-semibold text-[18px] leading-6 block md:hidden">
-                Allocations
-              </span>
-            </div>
-            <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
-              <span
-                className={cn(
-                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
-                  tableType != MetaVaultTableTypes.Destinations
-                    ? "text-[#6A6B6F] cursor-pointer"
-                    : "bg-[#232429] border border-[#2C2E33]"
-                )}
-                onClick={() => changeTable(MetaVaultTableTypes.Destinations)}
-              >
-                Destinations
-              </span>
-              <span
-                className={cn(
-                  "px-4 h-10 text-center rounded-lg flex items-center justify-center",
-                  tableType != MetaVaultTableTypes.Protocols
-                    ? "text-[#6A6B6F] cursor-pointer"
-                    : "bg-[#232429] border border-[#2C2E33]"
-                )}
-                onClick={() => changeTable(MetaVaultTableTypes.Protocols)}
-              >
-                Protocols
-              </span>
-            </div>
-          </div>
+      <SectionHandler
+        activeSection={activeSection}
+        displayType={displayType}
+        changeSection={changeSection}
+      />
 
-          <div>
-            <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:pl-[220px]">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <ColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  table={tableStates}
-                  sort={tableHandler}
-                />
-              ))}
-            </div>
-
-            <div>
-              {isLoading ? (
-                <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
-                  <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                    <FullPageLoader />
-                  </div>
-                </div>
-              ) : localVaults?.length ? (
-                <MetaVaultsTable
-                  tableType={tableType}
-                  vaults={currentTabVaults}
-                  protocols={filteredProtocols}
-                  setAPRModalState={setAprModal}
-                  setProtocolModalState={setProtocolModal}
-                />
-              ) : (
-                <div className="text-start h-[60px] font-medium">No vaults</div>
-              )}
-            </div>
-            <Pagination
-              pagination={pagination}
-              data={filteredVaults}
-              tab={currentTab}
-              setTab={setCurrentTab}
-              setPagination={setPagination}
+      {displayType === MetaVaultDisplayTypes.Lite ? (
+        <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
+          <div className="flex flex-col gap-4 w-full xl:w-[850px]">
+            <Table
+              tableType={tableType}
+              changeTables={changeTables}
+              tableStates={tableStates}
+              tableHandler={tableHandler}
+              isLoading={isLoading}
+              allVaults={localVaults}
+              vaults={filteredVaults}
+              protocols={filteredProtocols}
+              setAPRModal={setAprModal}
+              setProtocolModal={setProtocolModal}
             />
-          </div>
-          <Chart symbol={symbol as string} />
-        </div>
 
-        <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[64px]">
-          <Form metaVault={localMetaVault} />
-          <Contracts metavault={metavault} />
-          {/* <LendingMarkets metavault={metavault} /> */}
+            <Chart symbol={symbol as string} display={displayType} />
+          </div>
+
+          <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
+            <Form metaVault={localMetaVault} displayType={displayType} />
+            <Contracts metavault={metavault} />
+            <LendingMarkets metavault={metavault} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          {activeSection === MetaVaultSectionTypes.Operations ? (
+            <div className="flex items-start flex-col md:flex-row gap-6 w-full">
+              <Form metaVault={localMetaVault} displayType={displayType} />
+
+              <div className="w-full flex flex-col gap-6">
+                <Contracts metavault={metavault} />
+                <LendingMarkets metavault={metavault} />
+              </div>
+            </div>
+          ) : activeSection === MetaVaultSectionTypes.Allocations ? (
+            <Table
+              tableType={tableType}
+              changeTables={changeTables}
+              tableStates={tableStates}
+              tableHandler={tableHandler}
+              isLoading={isLoading}
+              allVaults={localVaults}
+              vaults={filteredVaults}
+              protocols={filteredProtocols}
+              setAPRModal={setAprModal}
+              setProtocolModal={setProtocolModal}
+            />
+          ) : (
+            <div className="w-full">
+              <Chart symbol={symbol as string} display={displayType} />
+            </div>
+          )}
+        </div>
+      )}
 
       {modal && <Modal metaVault={localMetaVault} setModal={setModal} />}
 

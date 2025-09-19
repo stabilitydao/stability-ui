@@ -7,6 +7,7 @@ const USDC: TAddress[] = [
   "0xaec9e50e3397f9ddc635c6c429c8c7eca418a143",
   "0xc518a88c67ceca8b3f24c4562cb71deeb2af86b7",
   "0x29219dd400f2bf60e5a23d13be72b486d4038894",
+  "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e",
 ];
 
 const scUSD: TAddress[] = ["0xd3dce716f3ef535c5ff8d041c1a41c3bd89b97ae"];
@@ -14,6 +15,7 @@ const scUSD: TAddress[] = ["0xd3dce716f3ef535c5ff8d041c1a41c3bd89b97ae"];
 const USDT: TAddress[] = [
   "0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
   "0xfde4c96c8593536e31f229ea8f37b2ada2699bb2",
+  "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7",
 ];
 const DAI: TAddress[] = [
   "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",

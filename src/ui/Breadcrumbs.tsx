@@ -31,6 +31,9 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (currentPath === "contests") {
       add("Leaderboard", "leaderboard");
       add("Contests", "contests");
+    } else if (rest[0] === "season-1") {
+      add("Leaderboard", "leaderboard");
+      add("Season 1", "season-1");
     } else if (main === "contests" && rest.length === 1) {
       const contest = contests[rest[0]];
       add("Leaderboard", "leaderboard");
@@ -71,10 +74,6 @@ const Breadcrumbs = (): JSX.Element => {
         const short = `${rest[0].slice(0, 4)}...${rest[0].slice(-4)}`;
         add(`Node ${short}`);
       }
-    } else if (main === "swapper" && rest[0] === "add-pools") {
-      add("Platform", "platform");
-      add("Swapper", "swapper");
-      add("Add Pools");
     } else if (main === "factory" && rest[0] === "farms") {
       add("Platform", "platform");
       add("Factory", "factory");

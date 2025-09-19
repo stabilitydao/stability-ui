@@ -23,6 +23,7 @@ import { ExplorerLink } from "./ExplorerLink";
 import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
+import { MetaVaultStrategies } from "./MetaVaultStrategies";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -55,6 +56,20 @@ import { ActionButton } from "./ActionButton";
 import { Socials } from "./Socials";
 
 import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
+
+//////// todo: delete
+
+import {
+  TokenSelectorModal,
+  TxStatusModal,
+  TxStatus,
+} from "./TokenSelectorModal";
+
+export type { TxStatus };
+
+export { TokenSelectorModal, TxStatusModal };
+
+////////
 
 export {
   Toast,
@@ -106,4 +121,5 @@ export {
   ChartTooltip,
   ChartTimelineSwitcher,
   MarketsTable,
+  MetaVaultStrategies,
 };

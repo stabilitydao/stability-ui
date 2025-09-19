@@ -1,8 +1,8 @@
-import { StrategyBadge } from "@ui";
+import { StrategyBadge, MetaVaultStrategies } from "@ui";
 
 import { formatNumber } from "@utils";
 
-import { SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
+import { CHAINS, SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
 
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
@@ -20,10 +20,6 @@ interface IProps {
 }
 
 const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  // const isSTBLVault =
-  //   Array.isArray(vault?.assets) &&
-  //   vault.assets.some((asset) => asset?.symbol && asset?.symbol === "STBL");
-
   const link =
     vault?.type === VaultTypes.Vault
       ? `/vaults/vault/${vault.network}/${vault.address}`
@@ -49,6 +45,8 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           type: "metaVault",
         };
 
+  const chainData = CHAINS.find(({ id }) => id == vault.network);
+
   return (
     <div className="border border-[#23252A] border-b-0">
       <a
@@ -58,7 +56,7 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
       >
         <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[30%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center relative">
               {vault?.type != VaultTypes.Vault ? (
                 <img
                   className="md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0"
@@ -66,17 +64,31 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                   alt="logo"
                 />
               ) : (
-                vault.assets.map((asset, index) => (
-                  <img
-                    src={asset?.logo}
-                    alt={asset?.symbol}
-                    className={`md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0 ${
-                      !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
-                    }`}
-                    key={asset?.logo + index}
-                  />
-                ))
+                <div className="flex items-center justify-center">
+                  {vault.assets.map((asset, index) => (
+                    <img
+                      src={asset?.logo}
+                      alt={asset?.symbol}
+                      className={`md:w-8 md:h-8 w-5 h-5 rounded-full flex-shrink-0 ${
+                        !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
+                      }`}
+                      key={asset?.logo + index}
+                    />
+                  ))}
+                </div>
               )}
+              {chainData ? (
+                <div
+                  className="w-3 h-3 md:w-4 md:h-4 flex items-center justify-center absolute bottom-0 right-0 rounded-md"
+                  style={{ backgroundColor: chainData.color }}
+                >
+                  <img
+                    src={chainData.logoURI}
+                    alt={chainData.name}
+                    className="md:w-3 md:h-3"
+                  />
+                </div>
+              ) : null}
             </div>
             <span className="font-semibold text-[16px] max-w-[100px] md:max-w-[130px] truncate overflow-hidden whitespace-nowrap">
               {vault?.type != VaultTypes.Vault
@@ -143,7 +155,9 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
               info={vault.strategyInfo}
               specific={vault.strategySpecific}
             />
-          ) : null}
+          ) : (
+            <MetaVaultStrategies strategies={vault?.strategies} />
+          )}
         </div>
         <div
           onClick={(e) => {

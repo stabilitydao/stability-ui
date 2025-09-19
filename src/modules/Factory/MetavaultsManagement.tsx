@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { metaVaults, vaults } from "@store";
+import { metaVaults, publicClient, vaults } from "@store";
 import { cn } from "@utils";
 
 import { writeContract } from "@wagmi/core";
@@ -19,20 +19,12 @@ import { VAULTS_WITH_NAME } from "@constants";
 
 import { TimeDifferenceIndicator } from "@ui";
 
-import { getAddress, parseUnits, createPublicClient, http } from "viem";
-
-import { sonic } from "viem/chains";
+import { getAddress, parseUnits } from "viem";
 
 const MetavaultsManagement = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
-
-  const _publicClient = createPublicClient({
-    chain: sonic,
-    transport: http(
-      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
-    ),
-  });
+  const $publicClient = useStore(publicClient);
 
   const [activeMetaVaults, setActiveMetaVaults] = useState([]);
 
@@ -81,19 +73,19 @@ const MetavaultsManagement = (): JSX.Element => {
     try {
       const vaultAddress = getAddress(vaultInput);
 
-      const vaultHardWorkOnDeposit = await _publicClient?.readContract({
+      const vaultHardWorkOnDeposit = await $publicClient?.readContract({
         address: vaultAddress,
         abi: VaultABI,
         functionName: "doHardWorkOnDeposit",
       });
 
-      const vaultLastBlockDefenseDisabled = await _publicClient?.readContract({
+      const vaultLastBlockDefenseDisabled = await $publicClient?.readContract({
         address: vaultAddress,
         abi: VaultABI,
         functionName: "lastBlockDefenseDisabled",
       });
 
-      const vaultCustomFee = await _publicClient?.readContract({
+      const vaultCustomFee = await $publicClient?.readContract({
         address: platforms[146],
         abi: PlatformABI,
         functionName: "getCustomVaultFee",

@@ -849,7 +849,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           if (isConnected) {
             isWeb3Load.set(true);
 
-            let localClient = web3clients[chain.id] ?? web3clients["146"];
+            let localClient = web3clients[chain.id];
 
             try {
               const contractAssetsBalances =
@@ -1006,6 +1006,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 merklAPR,
                 totalAPR,
                 sonicPoints,
+                network: key,
               };
             });
 
@@ -1103,6 +1104,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
       metaVaults.set({ "146": metaVaultsWithName });
     }
+
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 

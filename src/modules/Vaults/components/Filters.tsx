@@ -36,7 +36,13 @@ const Filters: React.FC<IProps> = memo(
 
     const modalRef = useRef<HTMLDivElement>(null);
 
-    const mobileOrder = ["Active", "My vaults", "Strategies", "Stablecoins"];
+    const mobileOrder = [
+      "Active",
+      "My vaults",
+      "Strategies",
+      "Stablecoins",
+      "Meta Vaults",
+    ];
 
     const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
       const filterName = filters.find((item) => item.name === filter.name);
@@ -51,10 +57,34 @@ const Filters: React.FC<IProps> = memo(
 
       switch (filter.type) {
         case "single":
+          const tags = params.get("tags")?.split(",") || [];
+
           if (filter.name.toLowerCase() === "stablecoins") {
-            !filter.state
-              ? params.set("tags", "stablecoins")
-              : params.delete("tags");
+            if (!filter.state) {
+              if (!tags.includes("stablecoins")) {
+                tags.push("stablecoins");
+              }
+            } else {
+              const idx = tags.indexOf("stablecoins");
+              if (idx > -1) tags.splice(idx, 1);
+            }
+          }
+
+          if (filter.name.toLowerCase() === "meta vaults") {
+            if (!filter.state) {
+              if (!tags.includes("meta vaults")) {
+                tags.push("meta vaults");
+              }
+            } else {
+              const idx = tags.indexOf("meta vaults");
+              if (idx > -1) tags.splice(idx, 1);
+            }
+          }
+
+          if (tags.length) {
+            params.set("tags", tags.join(","));
+          } else {
+            params.delete("tags");
           }
 
           updatedFilters = filters.map((f) =>

@@ -122,6 +122,9 @@ const VAULTS_META_TITLES = {
   "0x908db38302177901b10ffa74fa80adaeb0351ff1": "C-wstkscUSD-SAL",
   "0xedb99e4bc50039c29dd559c6098bfc21e6927aab": "C-wstkscUSDscUSD-ISF",
   "0xccfe327cbb12880aa26ea6bcd047ccf01e10a084": "C-wstkscUSDscUSD-ISF",
+  "0x8ce09c6b821502c6f321279a202d2f1f1ca6ef37": "C-USDC-SMFU4",
+  "0xf5f5855b3f3e56da34dc7d2f51b3032ee823cddc": "C-USDt-EMF",
+  "0x452c1de33fe2913805d0852b9021770b1e34ba5d": "C-USDC-EMF",
 };
 
 export { VAULTS_META_TITLES };

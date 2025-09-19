@@ -84,11 +84,11 @@ const StrategyBadge: React.FC<IProps> = ({ info, specific }) => {
             </span>
             {specific && (
               <span
-                className={`font-bold text-[#b6bdd7] inline ${
-                  strategySpecific.length > 10
-                    ? "lowercase text-[10px] pl-[12px] whitespace-pre-wrap max-w-[70px] text-left"
-                    : "uppercase text-[10px] pl-[12px]"
-                }`}
+                className={cn(
+                  "font-bold text-[#b6bdd7] inline text-[10px] pl-[12px]",
+                  strategySpecific.length > 10 &&
+                    "lowercase whitespace-pre-wrap max-w-[70px] text-left"
+                )}
               >
                 {strategySpecific}
               </span>

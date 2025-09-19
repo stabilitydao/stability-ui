@@ -23,5 +23,11 @@
     },
     "resolveJsonModule": true,
     "esModuleInterop": true
-  }
+  },
+  "include": [
+    "src",
+    ".astro/content.d.ts",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ]
 }

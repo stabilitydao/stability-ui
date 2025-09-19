@@ -82,19 +82,6 @@ type TTokens = {
   [chainId: string]: TAddress[];
 };
 
-type TPlatformGetData = [
-  string[],
-  string[],
-  string[],
-  string[],
-  string[],
-  bigint[],
-  string[],
-  boolean[],
-  string[],
-  string[],
-];
-
 type TFrontendBalances = [bigint, string[], bigint[], bigint[]];
 
 type TInitParams = {
@@ -103,10 +90,6 @@ type TInitParams = {
   initStrategyAddresses: string[];
   initStrategyNums: bigint[];
   initStrategyTicks: number[];
-};
-
-type TAllowedBBTokenVaults = {
-  [token: string]: number;
 };
 
 type TTokenData = {
@@ -305,7 +288,7 @@ type TVault = {
   leverage?: number;
 
   ///// meta vault
-  proportions?: { current: number; target: number };
+  proportions?: { current: number; target: number; allocation: number };
   vaults?: TVault[];
 };
 
@@ -328,6 +311,7 @@ type TMetaVault = {
   protocols?: { name: string; logoSrc: string }[];
   strategies?: string[];
   sonicPoints?: number;
+  network: string;
 };
 
 type TEndMetaVaults = {
@@ -421,10 +405,6 @@ type TBuildVariant = {
 };
 
 type TAddress = `0x${string}`;
-type TInputItem = {
-  inputValue: string | number;
-  valuePerDay: string;
-};
 
 type TYearnProtocol = { title: string; link: string };
 
@@ -615,8 +595,10 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
+type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl";
+
 type TActiveChart = {
-  name: string;
+  name: TChartNames;
   data: [];
 };
 
@@ -766,6 +748,8 @@ type TMarketAsset = {
   price: string;
   supplyAPR: string;
   supplyTVL: string;
+  maxLtv: string;
+  liquidationThreshold: string;
 };
 
 type TMarket = {
@@ -787,6 +771,17 @@ export enum DisplayTypes {
 export enum MetaVaultTableTypes {
   Destinations = "destinations",
   Protocols = "protocols",
+}
+
+export enum MetaVaultDisplayTypes {
+  Lite = "lite",
+  Pro = "pro",
+}
+
+export enum MetaVaultSectionTypes {
+  Operations = "operations",
+  Allocations = "allocations",
+  Charts = "charts",
 }
 
 export enum TransactionTypes {
@@ -812,7 +807,6 @@ export enum TimelineTypes {
 export type {
   TPlatformData,
   TInitParams,
-  TAllowedBBTokenVaults,
   TTokenData,
   TVaults,
   TVaultData,
@@ -827,7 +821,6 @@ export type {
   IProtocol,
   TMultichainPrices,
   IStrategyInfo,
-  TInputItem,
   TVaultsAddress,
   TVaultAllowance,
   TVaultInput,
@@ -857,7 +850,6 @@ export type {
   TPriceInfo,
   TAPIData,
   TEarningData,
-  TPlatformGetData,
   TChartPayload,
   TVaultDataKey,
   TFrontendBalances,
@@ -900,4 +892,5 @@ export type {
   TMarket,
   TMarketAsset,
   TNetwork,
+  TChartNames,
 };

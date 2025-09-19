@@ -48,13 +48,15 @@ import {
   TMetaVault,
   TTokenData,
   VaultTypes,
+  MetaVaultDisplayTypes,
 } from "@types";
 
 interface IProps {
   metaVault: TMetaVault;
+  displayType: MetaVaultDisplayTypes;
 }
 
-const Form: React.FC<IProps> = ({ metaVault }) => {
+const Form: React.FC<IProps> = ({ metaVault, displayType }) => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
@@ -778,7 +780,14 @@ const Form: React.FC<IProps> = ({ metaVault }) => {
 
   return (
     <WagmiLayout>
-      <div className="p-6 bg-[#101012] border border-[#23252A] rounded-lg self-start w-full xl:w-[352px]">
+      <div
+        className={cn(
+          "p-6 bg-[#101012] border border-[#23252A] rounded-lg self-start",
+          displayType === MetaVaultDisplayTypes.Lite
+            ? "w-full xl:w-[352px]"
+            : "w-full"
+        )}
+      >
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
         <TokensDisplay
           actionType={actionType}

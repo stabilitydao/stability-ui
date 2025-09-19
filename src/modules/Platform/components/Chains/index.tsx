@@ -253,129 +253,96 @@ const Chains = (): JSX.Element => {
         </label>
         {/* <RangeSlider range={range} setRange={setTVLRange} /> */}
       </div>
-      <div className="overflow-x-auto lg:overflow-x-visible lg:min-w-[1000px]">
-        <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[1000px] lg:min-w-full">
-          <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-            <tr className="text-[12px] uppercase">
-              {tableStates.map((value: TTableColumn, index: number) => (
-                <TableColumnSort
-                  key={value.name + index}
-                  index={index}
-                  value={value.name}
-                  sort={sortTable}
-                  table={tableStates}
-                  setTable={setTableStates}
-                  tableData={filteredTableData}
-                  setTableData={setFilteredTableData}
-                />
-              ))}
-            </tr>
-          </thead>
-          <tbody className="text-[14px]">
-            {isLoaded ? (
-              <>
-                {!!filteredTableData.length ? (
-                  filteredTableData.map(
-                    ({
-                      chainId,
-                      name,
-                      status,
-                      img,
-                      // chainLibGithubId,
-                      // multisig,
-                      tvl,
-                      protocols,
-                      bridges,
-                      assets,
-                      strategies,
-                    }) => (
-                      <tr
-                        onClick={() => toChain(chainId)}
-                        key={chainId}
-                        className="h-[48px] hover:bg-accent-950 cursor-pointer"
-                      >
-                        <td className="px-4 py-3 text-[15px] text-center font-bold sticky lg:relative left-0 lg:table-cell bg-accent-950 lg:bg-transparent z-10 xl:w-[150px]">
-                          {chainId}
-                        </td>
-                        <td className="px-4 py-3 text-center w-[180px] xl:w-[230px]">
-                          <div className="flex font-bold whitespace-nowrap items-center">
-                            {img && (
-                              <img
-                                src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
-                                alt={name}
-                                className="w-[24px] h-[24px] mr-2 rounded-full"
-                              />
-                            )}
-                            {name}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-[15px] text-left whitespace-nowrap w-[100px] xl:w-[120px]">
-                          {tvl ? formatNumber(tvl, "abbreviate") : ""}
-                        </td>
-                        {/* <td className="px-4 py-3 text-[12px]">
-                    <div className="flex">
-                      {multisig && <span>{getShortAddress(multisig)}</span>}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center">
-                      {chainLibGithubId && (
-                        <a
-                          className="inline-flex"
-                          href={`https://github.com/stabilitydao/stability-contracts/issues/${chainLibGithubId}`}
-                          target="_blank"
-                          title="Go to chain library issue page on Github"
-                          onClick={(event) => event.stopPropagation()}
-                        >
+      <div className="pb-5">
+        <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
+          {tableStates.map((value: TTableColumn, index: number) => (
+            <TableColumnSort
+              key={value.name + index}
+              index={index}
+              value={value.name}
+              sort={sortTable}
+              table={tableStates}
+              setTable={setTableStates}
+              tableData={filteredTableData}
+              setTableData={setFilteredTableData}
+            />
+          ))}
+        </div>
+
+        <div>
+          {isLoaded ? (
+            <>
+              {!!filteredTableData.length ? (
+                filteredTableData.map(
+                  ({
+                    chainId,
+                    name,
+                    status,
+                    img,
+                    // chainLibGithubId,
+                    // multisig,
+                    tvl,
+                    protocols,
+                    bridges,
+                    assets,
+                    strategies,
+                  }) => (
+                    <div
+                      key={chainId}
+                      onClick={() => toChain(chainId)}
+                      className="border border-[#23252A] border-b-0 bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5 cursor-pointer"
+                    >
+                      <div className="px-2 md:px-4 w-[10%] text-start font-bold text-[#97979A] hidden lg:block">
+                        {chainId}
+                      </div>
+                      <div className="px-2 md:px-4 w-[30%] md:w-[25%] text-start flex items-center font-bold whitespace-nowrap">
+                        {img && (
                           <img
-                            src="/icons/github.svg"
-                            alt="Github"
-                            className="w-[20px]"
+                            src={`https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${img}`}
+                            alt={name}
+                            className="w-[24px] h-[24px] mr-2 rounded-full"
                           />
-                        </a>
-                      )}
+                        )}
+                        {name}
+                      </div>
+                      <div className="px-2 md:px-4 w-[15%] text-start">
+                        {tvl ? formatNumber(tvl, "abbreviate") : ""}
+                      </div>
+                      <div className="px-2 md:px-4 w-[15%] flex justify-center">
+                        <ChainStatus status={status} />
+                      </div>
+                      <div className="px-2 md:px-4 w-[10%] text-center font-bold">
+                        {!!strategies && strategies}
+                      </div>
+                      <div className="px-2 md:px-4 w-[10%] text-center font-bold">
+                        {!!bridges && bridges}
+                      </div>
+                      <div className="px-2 md:px-4 w-[10%] text-center font-bold">
+                        {!!protocols && protocols}
+                      </div>
+                      <div className="px-2 md:px-4 w-[10%] text-center font-bold">
+                        {!!assets && assets}
+                      </div>
                     </div>
-                  </td> */}
-                        <td className="px-4 py-3 w-[200px] xl:w-[240px]">
-                          <div className="flex items-center justify-center">
-                            <ChainStatus status={status} />
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[110px] xl:w-[130px]">
-                          {!!strategies && strategies}
-                        </td>
-                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
-                          {!!bridges && bridges}
-                        </td>
-                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[120px] xl:w-[130px]">
-                          {!!protocols && protocols}
-                        </td>
-                        <td className="px-4 py-3 text-[15px] text-center font-bold w-[90px] xl:w-[100px]">
-                          {!!assets && assets}
-                        </td>
-                      </tr>
-                    )
                   )
-                ) : (
-                  <tr>
-                    <td>
-                      <p className="text-[18px]">No results found.</p>
-                      <p className="min-w-[200px]">
-                        Try clearing your filters or changing your search term.
-                      </p>
-                    </td>
-                  </tr>
-                )}
-              </>
-            ) : (
-              <tr className="relative h-[80px]">
-                <td className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%] mt-5">
-                  <FullPageLoader />
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                )
+              ) : (
+                <div>
+                  <p className="text-[18px]">No results found.</p>
+                  <p className="min-w-[200px]">
+                    Try clearing your filters or changing your search term.
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
+              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
+                <FullPageLoader />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
   const $isWeb3Load = useStore(isWeb3Load);
 
   return (
-    <div className="flex items-center flex-wrap gap-3 md:gap-[25px]">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-[25px]">
       {metaVaults.map((metaVault) => {
         let TVL = "0";
         if (metaVault.tvl) {

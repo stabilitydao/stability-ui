@@ -1,9 +1,10 @@
 import { RewardsCarousel } from "../../RewardsCarousel";
 import { StrategyBadge } from "../../StrategyBadge";
+import { MetaVaultStrategies } from "../../MetaVaultStrategies";
 
 import { formatNumber } from "@utils";
 
-import { VAULTS_WITH_NAME } from "@constants";
+import { VAULTS_WITH_NAME, CHAINS } from "@constants";
 
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
@@ -51,6 +52,8 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           type: "metaVault",
         };
 
+  const chainData = CHAINS.find(({ id }) => id == vault.network);
+
   return (
     <a
       className="bg-[#101012] cursor-pointer font-medium relative border border-[#23252A] rounded-lg overflow-hidden"
@@ -59,7 +62,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
     >
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center flex-shrink-0">
+          <div className="flex items-center justify-center flex-shrink-0 relative">
             {vault?.type != VaultTypes.Vault ? (
               <img
                 className="w-10 h-10 rounded-full flex-shrink-0"
@@ -78,6 +81,18 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                 />
               ))
             )}
+            {chainData ? (
+              <div
+                className="w-3 h-3 md:w-4 md:h-4 flex items-center justify-center absolute bottom-0 right-0 rounded-md"
+                style={{ backgroundColor: chainData.color }}
+              >
+                <img
+                  src={chainData.logoURI}
+                  alt={chainData.name}
+                  className="md:w-3 md:h-3"
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className="flex flex-col items-start gap-1">
@@ -90,15 +105,20 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {vault?.type === VaultTypes.Vault && (
-            <div className="flex items-center justify-between">
-              <span className="text-[#97979A] text-[14px]">Strategy</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[#97979A] text-[14px]">
+              {vault?.type === VaultTypes.Vault ? "Strategy" : "Strategies"}
+            </span>
+            {vault?.type === VaultTypes.Vault ? (
               <StrategyBadge
                 info={vault.strategyInfo}
                 specific={vault.strategySpecific}
               />
-            </div>
-          )}
+            ) : (
+              <MetaVaultStrategies strategies={vault?.strategies} />
+            )}
+          </div>
+
           <div className="flex items-center justify-between">
             <span className="text-[#97979A] text-[14px]">APR</span>
             <div
