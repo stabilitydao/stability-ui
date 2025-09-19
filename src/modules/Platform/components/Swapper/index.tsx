@@ -186,7 +186,7 @@ const Swapper = (): JSX.Element => {
     tokenOutData && setTokenOutSymbol(tokenOutData.symbol);
     setRewrite(true);
   };
-  console.log(deployments);
+
   const handleSubmit = async () => {
     try {
       resetTxState();
