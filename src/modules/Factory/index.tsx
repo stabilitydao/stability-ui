@@ -37,7 +37,7 @@ const Factory = (): JSX.Element => {
     if ($publicClient && isCorrectNetwork) {
       const variants: TBuildVariant[] = [];
 
-      const STEP = 10;
+      const STEP = $currentChainID == "146" ? 2 : 10;
 
       let whatToBuild: any[] = [];
       let wtbLength = 0;
@@ -52,7 +52,10 @@ const Factory = (): JSX.Element => {
         });
 
         from += STEP;
-
+        console.log(frontendContracts[$currentChainID], [
+          BigInt(from),
+          BigInt(STEP),
+        ]);
         if (!wtbLength) {
           wtbLength = Number(_whatToBuild[0]);
           whatToBuild[0] = _whatToBuild[0];
@@ -66,7 +69,7 @@ const Factory = (): JSX.Element => {
           whatToBuild[i].push(..._whatToBuild[i]);
         }
       } while (from < wtbLength);
-
+      console.log(whatToBuild);
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[2].length; i++) {
           const initParams: TInitParams = {
