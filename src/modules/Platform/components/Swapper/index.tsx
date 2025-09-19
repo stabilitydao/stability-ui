@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import axios from "axios";
 
@@ -10,7 +10,7 @@ import {
   TxStatus,
 } from "@ui";
 
-import { getShortAddress } from "@utils";
+import { getShortAddress, useModalClickOutside } from "@utils";
 
 import { BC_POOL_TABLE, POOL_TABLE } from "@constants";
 
@@ -40,6 +40,8 @@ const Swapper = (): JSX.Element => {
   const BCPoolTableStates = BC_POOL_TABLE;
 
   const $currentChainID = useStore(currentChainID);
+
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const [poolTableData, setPoolTableData] = useState<TPoolTable[]>([]);
   const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);
@@ -328,7 +330,7 @@ const Swapper = (): JSX.Element => {
 
   useEffect(() => {
     initTablesData();
-  }, []);
+  }, [$currentChainID]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -388,6 +390,8 @@ const Swapper = (): JSX.Element => {
     $account,
   ]);
 
+  useModalClickOutside(modalRef, () => setShowModal((prev) => !prev));
+
   return (
     <>
       <TxStatusModal
@@ -401,7 +405,10 @@ const Swapper = (): JSX.Element => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-          <div className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl">
+          <div
+            ref={modalRef}
+            className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl"
+          >
             <h2 className="text-xl font-semibold mb-4">
               {isAdding ? "Add Pool" : "Edit Pool"}
             </h2>

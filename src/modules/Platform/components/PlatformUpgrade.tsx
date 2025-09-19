@@ -8,7 +8,7 @@ import { getShortAddress } from "@utils";
 
 import { ExplorerLink } from "@ui";
 
-import { platformVersions, publicClient } from "@store";
+import { platformVersions, publicClient, currentChainID } from "@store";
 
 import { CHAINS } from "@constants";
 
@@ -17,8 +17,7 @@ import { PlatformABI } from "@web3";
 import type { TPendingPlatformUpgrade, TUpgradesTable, TAddress } from "@types";
 
 const PlatformUpgrade = (): JSX.Element => {
-  const $currentChainID = "146";
-  // const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
 
   const $publicClient = useStore(publicClient);

@@ -19,7 +19,7 @@ import { formatNumber } from "@utils";
 
 import { CountersBlockCompact, Skeleton } from "@ui";
 
-import { apiData, platformVersions } from "@store";
+import { apiData, platformVersions, currentChainID } from "@store";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
@@ -27,8 +27,7 @@ import packageJson from "../../../package.json";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
 
 const Platform = (): JSX.Element => {
-  const $currentChainID = "146";
-  // const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID);
   const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
 
