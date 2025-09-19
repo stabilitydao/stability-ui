@@ -302,54 +302,59 @@ const ROUTES = {
 
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
+    //   symbol: "Stability wmetaUSD",
+    //   link: "https://stability.market/?market=wmetaUSD",
+    // },
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
       symbol: "Stability wmetaUSD",
-      link: "https://stability.market/?market=wmetaUSD",
+      link: "https://stability.market/?market=wmetaUSD2",
     },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-      symbol: "Silo wmetaUSD - USDC",
-      link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
-      symbol: "Silo wmetaUSD - scUSD",
-      link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
-      symbol: "Enclabs wmetaUSD",
-      link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-      symbol: "Euler wmetaUSD",
-      link: "https://app.euler.finance/vault/0x6F11663766bB213003cD74EB09ff4c67145023c5?network=sonic",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-      symbol: "Euler wmetaUSD - USDC (looper)",
-      link: "https://app.euler.finance/positions/0x6F11663766bB213003cD74EB09ff4c67145023c5/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic&tab=multiply",
-    },
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
+    //   symbol: "Silo wmetaUSD - USDC",
+    //   link: "https://v2.silo.finance/markets/sonic/wmetausd-usdc-121?action=deposit",
+    // },
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
+    //   symbol: "Silo wmetaUSD - scUSD",
+    //   link: "https://v2.silo.finance/markets/sonic/wmetausd-scusd-125?action=deposit",
+    // },
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/enclabs.svg`,
+    //   symbol: "Enclabs wmetaUSD",
+    //   link: "https://www.enclabs.finance/#/core-pool/market/0x1D801dC616C79c499C5d38c998Ef2D0D6Cf868e8?chainId=146",
+    // },
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+    //   symbol: "Euler wmetaUSD",
+    //   link: "https://app.euler.finance/vault/0x6F11663766bB213003cD74EB09ff4c67145023c5?network=sonic",
+    // },
+    // {
+    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+    //   symbol: "Euler wmetaUSD - USDC (looper)",
+    //   link: "https://app.euler.finance/positions/0x6F11663766bB213003cD74EB09ff4c67145023c5/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic&tab=multiply",
+    // },
   ],
-  "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
-    {
-      logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png",
-      symbol: "Silo wmetaS - S",
-      link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-      symbol: "Euler wmetaS",
-      link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
-    },
-    {
-      logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
-      symbol: "Euler wmetaS - wS (looper)",
-      link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
-    },
-  ],
+  // "0x4444444420d9de54d69b3997b7d6a31d2bf63f32": [
+  //   {
+  //     logo: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png",
+  //     symbol: "Silo wmetaS - S",
+  //     link: "https://v2.silo.finance/markets/sonic/wmetas-s-128?action=deposit",
+  //   },
+  //   {
+  //     logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+  //     symbol: "Euler wmetaS",
+  //     link: "https://app.euler.finance/vault/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E?network=sonic",
+  //   },
+  //   {
+  //     logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/euler.svg`,
+  //     symbol: "Euler wmetaS - wS (looper)",
+  //     link: "https://app.euler.finance/positions/0xC37fa1c70D77bdEd373C551a92bAbcee44a9d04E/0x9144C0F0614dD0acE859C61CC37e5386d2Ada43A?network=sonic&tab=multiply",
+  //   },
+  // ],
 };
 
 const SOCIALS = [
@@ -374,6 +379,8 @@ const SOCIALS = [
     link: "https://t.me/stabilitydao",
   },
 ];
+
+const PRICES_ORDER = ["STBL", "BTC", "ETH", "AVAX", "S"];
 
 export {
   APRsType,
@@ -430,4 +437,5 @@ export {
   MARKET_TABLE,
   MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
+  PRICES_ORDER,
 };

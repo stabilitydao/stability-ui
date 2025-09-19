@@ -10,6 +10,8 @@ import { TextSkeleton } from "./Skeletons/TextSkeleton";
 
 import { cn, formatNumber } from "@utils";
 
+import { PRICES_ORDER } from "@constants";
+
 import { marketPrices } from "@store";
 
 import type { TMarketPrice } from "@types";
@@ -53,10 +55,17 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
 
   useEffect(() => {
     if ($marketPrices) {
-      const sortedPrices = Object.entries($marketPrices).sort(
-        (a, b) => Number(b[1].price) - Number(a[1].price)
-      );
+      const sortedPrices: [string, TMarketPrice][] = Object.entries(
+        $marketPrices
+      ).sort(([a], [b]) => {
+        const indexA = PRICES_ORDER.indexOf(a.toUpperCase());
+        const indexB = PRICES_ORDER.indexOf(b.toUpperCase());
 
+        return (
+          (indexA === -1 ? PRICES_ORDER.length : indexA) -
+          (indexB === -1 ? PRICES_ORDER.length : indexB)
+        );
+      });
       setPrices(sortedPrices);
     }
   }, [$marketPrices]);

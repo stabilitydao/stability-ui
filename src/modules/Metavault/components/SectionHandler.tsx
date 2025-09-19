@@ -5,13 +5,13 @@ import { MetaVaultSectionTypes, MetaVaultDisplayTypes } from "@types";
 type TProps = {
   activeSection: MetaVaultSectionTypes;
   displayType: MetaVaultDisplayTypes;
-  setActiveSection: React.Dispatch<React.SetStateAction<MetaVaultSectionTypes>>;
+  changeSection: (section: MetaVaultSectionTypes) => void;
 };
 
 const SectionHandler: React.FC<TProps> = ({
   activeSection,
   displayType,
-  setActiveSection,
+  changeSection,
 }) => {
   if (displayType === MetaVaultDisplayTypes.Lite) {
     return null;
@@ -26,7 +26,7 @@ const SectionHandler: React.FC<TProps> = ({
             ? "bg-[#232429] rounded-t-lg sm:rounded-tr-none"
             : "text-[#7C7E81]"
         )}
-        onClick={() => setActiveSection(MetaVaultSectionTypes.Operations)}
+        onClick={() => changeSection(MetaVaultSectionTypes.Operations)}
       >
         Operations
       </div>
@@ -37,7 +37,7 @@ const SectionHandler: React.FC<TProps> = ({
             ? "bg-[#232429]"
             : "text-[#7C7E81]"
         )}
-        onClick={() => setActiveSection(MetaVaultSectionTypes.Allocations)}
+        onClick={() => changeSection(MetaVaultSectionTypes.Allocations)}
       >
         Allocations
       </div>
@@ -48,7 +48,7 @@ const SectionHandler: React.FC<TProps> = ({
             ? "bg-[#232429] rounded-b-lg sm:rounded-bl-none"
             : "text-[#7C7E81]"
         )}
-        onClick={() => setActiveSection(MetaVaultSectionTypes.Charts)}
+        onClick={() => changeSection(MetaVaultSectionTypes.Charts)}
       >
         Historical Rates
       </div>

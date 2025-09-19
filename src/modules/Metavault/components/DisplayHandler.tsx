@@ -4,10 +4,10 @@ import { MetaVaultDisplayTypes } from "@types";
 
 type TProps = {
   displayType: MetaVaultDisplayTypes;
-  setDisplayType: React.Dispatch<React.SetStateAction<MetaVaultDisplayTypes>>;
+  changeDisplay: (type: MetaVaultDisplayTypes) => void;
 };
 
-const DisplayHandler: React.FC<TProps> = ({ displayType, setDisplayType }) => {
+const DisplayHandler: React.FC<TProps> = ({ displayType, changeDisplay }) => {
   return (
     <div className="flex items-center text-[14px] leading-5 max-w-[220px] h-10">
       <div
@@ -17,7 +17,7 @@ const DisplayHandler: React.FC<TProps> = ({ displayType, setDisplayType }) => {
             ? "bg-[#232429] font-semibold"
             : "text-[#7C7E81] font-medium"
         )}
-        onClick={() => setDisplayType(MetaVaultDisplayTypes.Lite)}
+        onClick={() => changeDisplay(MetaVaultDisplayTypes.Lite)}
       >
         Lite
       </div>
@@ -28,7 +28,7 @@ const DisplayHandler: React.FC<TProps> = ({ displayType, setDisplayType }) => {
             ? "bg-[#232429] font-semibold"
             : "text-[#7C7E81] font-medium"
         )}
-        onClick={() => setDisplayType(MetaVaultDisplayTypes.Pro)}
+        onClick={() => changeDisplay(MetaVaultDisplayTypes.Pro)}
       >
         Pro
       </div>

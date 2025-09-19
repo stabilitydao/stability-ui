@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { Form } from "./components/Form";
-// import { LendingMarkets } from "./components/LendingMarkets";
+import { LendingMarkets } from "./components/LendingMarkets";
 import { Table } from "./components/Table";
 import { Contracts } from "./components/Contracts";
 import { Chart } from "./components/Chart";
@@ -47,6 +47,29 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
 
+  const newUrl = new URL(window.location.href);
+  const params = new URLSearchParams(newUrl.search);
+
+  const displayUrl = params.get("display") ?? "";
+  const sectionUrl = params.get("section") ?? "";
+
+  let defaultDisplay = MetaVaultDisplayTypes.Lite;
+  let defaultSection = MetaVaultSectionTypes.Operations;
+
+  if (displayUrl === MetaVaultDisplayTypes.Pro) {
+    defaultDisplay = MetaVaultDisplayTypes.Pro;
+  }
+
+  if (
+    [
+      MetaVaultSectionTypes.Operations,
+      MetaVaultSectionTypes.Allocations,
+      MetaVaultSectionTypes.Charts,
+    ].includes(sectionUrl as MetaVaultSectionTypes)
+  ) {
+    defaultSection = sectionUrl as MetaVaultSectionTypes;
+  }
+
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
   const [localVaults, setLocalVaults] = useState<TVault[]>([]);
@@ -58,10 +81,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
-  const [displayType, setDisplayType] = useState(MetaVaultDisplayTypes.Lite);
-  const [activeSection, setActiveSection] = useState(
-    MetaVaultSectionTypes.Operations
-  );
+  const [displayType, setDisplayType] = useState(defaultDisplay);
+  const [activeSection, setActiveSection] = useState(defaultSection);
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -95,6 +116,29 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       setTableStates(PROTOCOLS_TABLE);
     }
     setTableType(type);
+  };
+
+  const changeDisplay = (type: MetaVaultDisplayTypes) => {
+    if (type === MetaVaultDisplayTypes.Pro) {
+      params.set("display", type);
+    } else {
+      params.delete("display");
+      params.delete("section");
+    }
+
+    newUrl.search = `?${params.toString()}`;
+    window.history.pushState({}, "", newUrl.toString());
+
+    setDisplayType(type);
+  };
+
+  const changeSection = (section: MetaVaultSectionTypes) => {
+    params.set("section", section);
+
+    newUrl.search = `?${params.toString()}`;
+    window.history.pushState({}, "", newUrl.toString());
+
+    setActiveSection(section);
   };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
@@ -143,7 +187,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     setTableStates(table);
   };
 
-  const init = async () => {
+  const initMetavault = async () => {
     const chainId = "146";
     const metaVaultList = $metaVaults[chainId];
 
@@ -298,7 +342,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
 
   useEffect(() => {
     if ($isVaultsLoaded) {
-      init();
+      initMetavault();
       console.log(aprModal);
     }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
@@ -326,7 +370,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               <h2 className="page-title__font text-start">{symbol}</h2>
               <DisplayHandler
                 displayType={displayType}
-                setDisplayType={setDisplayType}
+                changeDisplay={changeDisplay}
               />
             </div>
 
@@ -440,7 +484,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       <SectionHandler
         activeSection={activeSection}
         displayType={displayType}
-        setActiveSection={setActiveSection}
+        changeSection={changeSection}
       />
 
       {displayType === MetaVaultDisplayTypes.Lite ? (
@@ -465,7 +509,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
             <Form metaVault={localMetaVault} displayType={displayType} />
             <Contracts metavault={metavault} />
-            {/* <LendingMarkets metavault={metavault} /> */}
+            <LendingMarkets metavault={metavault} />
           </div>
         </div>
       ) : (
@@ -474,7 +518,10 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             <div className="flex items-start flex-col md:flex-row gap-6 w-full">
               <Form metaVault={localMetaVault} displayType={displayType} />
 
-              <Contracts metavault={metavault} />
+              <div className="w-full flex flex-col gap-6">
+                <Contracts metavault={metavault} />
+                <LendingMarkets metavault={metavault} />
+              </div>
             </div>
           ) : activeSection === MetaVaultSectionTypes.Allocations ? (
             <Table
