@@ -52,10 +52,7 @@ const Factory = (): JSX.Element => {
         });
 
         from += STEP;
-        console.log(frontendContracts[$currentChainID], [
-          BigInt(from),
-          BigInt(STEP),
-        ]);
+
         if (!wtbLength) {
           wtbLength = Number(_whatToBuild[0]);
           whatToBuild[0] = _whatToBuild[0];
@@ -69,7 +66,7 @@ const Factory = (): JSX.Element => {
           whatToBuild[i].push(..._whatToBuild[i]);
         }
       } while (from < wtbLength);
-      console.log(whatToBuild);
+
       if (whatToBuild?.length) {
         for (let i = 0; i < whatToBuild[2].length; i++) {
           const initParams: TInitParams = {
