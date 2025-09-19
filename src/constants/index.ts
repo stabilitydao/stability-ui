@@ -221,6 +221,10 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x9040643a179157ea835706ee31c492680fb3ab3e": "K3",
   "0x0e5b52afa8acda11f2996a2094afe73fd5503d81": "Re7",
   "0x2c51d2c9857f7b52daee8cc3540487daa249e605": "Keyring",
+  "0xe5019af6e2db85229a7572a01f3714a2fb70f607": "MEV",
+  "0x0afe245a43f6a3914aa0dc8435457734c6edb971": "MEV",
+  "0x7b5fffe819871f2127e4884798d83adb5db1be64": "Varlamore",
+  "0xda57af45bf0b7c4de4a5bc66ca993cab704aa6a1": "Varlamore",
 };
 
 const BIG_INT_VALUES = {
