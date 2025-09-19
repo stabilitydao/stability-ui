@@ -1730,7 +1730,8 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
             );
             const amountInUSD =
               amountInTokens *
-              Number($assetsPrices[network][localAssets[index]].price);
+              Number($assetsPrices[network][localAssets[index]]?.price);
+
             return {
               symbol: tokenData?.symbol,
               logo: tokenData?.logoURI,
@@ -2470,7 +2471,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                               underlyingToken?.address != option[0]
                                 ? (
                                     Number(
-                                      $assetsPrices[network][asset].price
+                                      $assetsPrices[network][asset]?.price
                                     ) * Number(inputs[asset])
                                   ).toFixed(2)
                                 : 0}
@@ -2591,7 +2592,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                   Number(inputs[option[0]]) > 0 &&
                   underlyingToken?.address !== option[0]
                     ? (
-                        Number($assetsPrices[network][option[0]].price) *
+                        Number($assetsPrices[network][option[0]]?.price) *
                         Number(inputs[option[0]])
                       ).toFixed(2)
                     : 0}
@@ -3113,7 +3114,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
                                         )
                                       : 0)) *
                                   Number(
-                                    $assetsPrices[network][option[0]].price
+                                    $assetsPrices[network][option[0]]?.price
                                   )
                                 ).toFixed(2)})`}</p>
                               </div>
