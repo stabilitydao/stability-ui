@@ -19,9 +19,7 @@ import { GRAPH_ENDPOINTS } from "src/constants/env";
 import type { TAddress, TTableColumn, TPoolTable } from "@types";
 
 import {
-  createPublicClient,
   formatUnits,
-  http,
   type Address,
   type Hash,
   type TransactionReceipt,
@@ -30,11 +28,10 @@ import {
 import { useStore } from "@nanostores/react";
 import { writeContract } from "@wagmi/core";
 import { wagmiConfig, SwapperABI } from "@web3";
-import { connected, account, currentChainID } from "@store";
+import { connected, account, currentChainID, publicClient } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { deployments } from "@stabilitydao/stability";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
-import { sonic } from "viem/chains";
 import { FaGasPump, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 
@@ -105,12 +102,7 @@ const Swapper = (): JSX.Element => {
   const $connected = useStore(connected);
   const $account = useStore(account);
 
-  const _publicClient = createPublicClient({
-    chain: sonic,
-    transport: http(
-      import.meta.env.PUBLIC_SONIC_RPC || "https://sonic.drpc.org"
-    ),
-  });
+  const $publicClient = useStore(publicClient);
 
   /* ───────── UI / modal state ───────── */
   const [simulationStatus, setSimulationStatus] = useState<
@@ -194,7 +186,7 @@ const Swapper = (): JSX.Element => {
     tokenOutData && setTokenOutSymbol(tokenOutData.symbol);
     setRewrite(true);
   };
-
+  console.log(deployments);
   const handleSubmit = async () => {
     try {
       resetTxState();
@@ -208,7 +200,8 @@ const Swapper = (): JSX.Element => {
       setTxStatus("pending");
 
       const contractAddress: Address =
-        "0xe52Fcf607A8328106723804De1ef65Da512771Be";
+        deployments?.[$currentChainID]?.core?.swapper;
+
       const functionName = "addPools";
       const args = [
         [
@@ -223,7 +216,7 @@ const Swapper = (): JSX.Element => {
       ] as const;
 
       setSimulationStatus("loading");
-      await _publicClient.simulateContract({
+      await $publicClient.simulateContract({
         address: contractAddress,
         abi: SwapperABI,
         functionName,
@@ -245,7 +238,7 @@ const Swapper = (): JSX.Element => {
       setTxStatus("pending");
 
       const receipt: TransactionReceipt =
-        await _publicClient.waitForTransactionReceipt({ hash });
+        await $publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status === "success") {
         setTxStatus("success");
       } else {
@@ -277,7 +270,8 @@ const Swapper = (): JSX.Element => {
       }
 
       const contractAddress: Address =
-        "0xe52Fcf607A8328106723804De1ef65Da512771Be";
+        deployments?.[$currentChainID]?.core?.swapper;
+
       const functionName = "removePool";
       const args = [tokenIn] as const;
 
@@ -285,7 +279,7 @@ const Swapper = (): JSX.Element => {
       setTxStatus("pending");
 
       setSimulationStatus("loading");
-      await _publicClient.simulateContract({
+      await $publicClient.simulateContract({
         address: contractAddress,
         abi: SwapperABI,
         functionName,
@@ -293,7 +287,7 @@ const Swapper = (): JSX.Element => {
         account: $account as TAddress,
       });
 
-      const est = await _publicClient.estimateContractGas({
+      const est = await $publicClient.estimateContractGas({
         address: contractAddress,
         abi: SwapperABI,
         functionName,
@@ -315,7 +309,7 @@ const Swapper = (): JSX.Element => {
       setTxStatus("pending");
 
       const receipt: TransactionReceipt =
-        await _publicClient.waitForTransactionReceipt({ hash });
+        await $publicClient.waitForTransactionReceipt({ hash });
       if (receipt.status === "success") {
         setTxStatus("success");
       } else {
@@ -350,8 +344,8 @@ const Swapper = (): JSX.Element => {
         return;
 
       try {
-        const est = await _publicClient.estimateContractGas({
-          address: "0xe52Fcf607A8328106723804De1ef65Da512771Be",
+        const est = await $publicClient.estimateContractGas({
+          address: deployments?.[$currentChainID]?.core?.swapper,
           abi: SwapperABI,
           functionName: "addPools",
           args: [
@@ -367,7 +361,7 @@ const Swapper = (): JSX.Element => {
           ] as const,
           account: $account as TAddress,
         });
-        const gasPrice = await _publicClient.getGasPrice();
+        const gasPrice = await $publicClient.getGasPrice();
         const totalFee = est * gasPrice;
         setGasEstimate(totalFee);
       } catch (err) {
