@@ -16,6 +16,9 @@ import { ProtocolModal } from "./components/Modals/ProtocolModal";
 
 import { TextSkeleton } from "@ui";
 
+import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+import { updateQueryParams } from "./functions/updateQueryParams";
+
 import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
@@ -47,28 +50,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
 
-  const newUrl = new URL(window.location.href);
-  const params = new URLSearchParams(newUrl.search);
-
-  const displayUrl = params.get("display") ?? "";
-  const sectionUrl = params.get("section") ?? "";
-
-  let defaultDisplay = MetaVaultDisplayTypes.Lite;
-  let defaultSection = MetaVaultSectionTypes.Operations;
-
-  if (displayUrl === MetaVaultDisplayTypes.Pro) {
-    defaultDisplay = MetaVaultDisplayTypes.Pro;
-  }
-
-  if (
-    [
-      MetaVaultSectionTypes.Operations,
-      MetaVaultSectionTypes.Allocations,
-      MetaVaultSectionTypes.Charts,
-    ].includes(sectionUrl as MetaVaultSectionTypes)
-  ) {
-    defaultSection = sectionUrl as MetaVaultSectionTypes;
-  }
+  const { display, section } = getInitialStateFromUrl();
 
   const [isLocalVaultsLoaded, setIsLocalVaultsLoaded] = useState(false);
 
@@ -81,8 +63,8 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   const [localMetaVault, setLocalMetaVault] = useState<TMetaVault>({});
 
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
-  const [displayType, setDisplayType] = useState(defaultDisplay);
-  const [activeSection, setActiveSection] = useState(defaultSection);
+  const [displayType, setDisplayType] = useState(display);
+  const [activeSection, setActiveSection] = useState(section);
 
   const [aprModal, setAprModal] = useState({
     earningData: {} as TEarningData,
@@ -116,28 +98,22 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
       setTableStates(PROTOCOLS_TABLE);
     }
     setTableType(type);
+
+    updateQueryParams({ table: type });
   };
 
   const changeDisplay = (type: MetaVaultDisplayTypes) => {
     if (type === MetaVaultDisplayTypes.Pro) {
-      params.set("display", type);
+      updateQueryParams({ display: type });
     } else {
-      params.delete("display");
-      params.delete("section");
+      updateQueryParams({ display: null, section: null });
     }
-
-    newUrl.search = `?${params.toString()}`;
-    window.history.pushState({}, "", newUrl.toString());
 
     setDisplayType(type);
   };
 
   const changeSection = (section: MetaVaultSectionTypes) => {
-    params.set("section", section);
-
-    newUrl.search = `?${params.toString()}`;
-    window.history.pushState({}, "", newUrl.toString());
-
+    updateQueryParams({ section });
     setActiveSection(section);
   };
 
