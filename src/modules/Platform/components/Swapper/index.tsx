@@ -32,6 +32,7 @@ import { writeContract } from "@wagmi/core";
 import { wagmiConfig, SwapperABI } from "@web3";
 import { connected, account, currentChainID } from "@store";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { deployments } from "@stabilitydao/stability";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { sonic } from "viem/chains";
 import { FaGasPump, FaRegEdit } from "react-icons/fa";
@@ -79,30 +80,9 @@ const Swapper = (): JSX.Element => {
     }
   };
 
-  const AMM_ADAPTERS = [
-    {
-      name: "Solidly (Equalizer, SwapX classic)",
-      address: "0xE3374041F173FFCB0026A82C6EEf94409F713Cf9",
-    },
-    {
-      name: "AlgebraV4 (SwapX CL)",
-      address: "0xcb2dfcaec4F1a4c61c5D09100482109574E6b8C7",
-    },
-    {
-      name: "UniswapV3 (Shadow)",
-      address: "0xAf95468B1a624605bbFb862B0FB6e9C73Ad847b8",
-    },
-    { name: "ERC4626", address: "0xB7192f4b8f741E21b9022D2F8Fd19Ca8c94E7774" },
-    {
-      name: "BalancerV3Stable",
-      address: "0xcd85425fF6C07cF09Ca6Ac8F683E8164F27C143c",
-    },
-    {
-      name: "BalancerWeighted",
-      address: "0x7D6641cf68E5169c11d91266D3E410130dE70B9E",
-    },
-    { name: "Pendle", address: "0x9fcE12c813fC2280A800e8683b918de121B2437B" },
-  ];
+  const AMM_ADAPTERS = Object.entries(
+    deployments?.[$currentChainID]?.ammAdapters
+  ).map(([name, address]) => ({ name, address }));
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(
