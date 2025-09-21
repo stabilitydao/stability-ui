@@ -462,7 +462,7 @@ const LEVERAGE_FARMING_TABLE: TTableColumn[] = [
 
 const MARKET_TABLE: TTableColumn[] = [
   {
-    name: "Network",
+    name: "Market",
     keyName: "",
     sortType: "none",
     dataType: "string",

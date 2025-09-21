@@ -14,6 +14,7 @@ import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
 interface IProps {
+  isProDisplay: boolean;
   APRs: {
     APR: string;
     APY?: string;
@@ -29,6 +30,7 @@ interface IProps {
 }
 
 const Vault: React.FC<IProps> = ({
+  isProDisplay,
   APRs,
   vault,
   activeVault,
@@ -59,10 +61,10 @@ const Vault: React.FC<IProps> = ({
       : rawProtocol;
 
   return (
-    <div className={cn("border-t border-[#23252A]")}>
+    <div className="border-t border-[#23252A]">
       <a
         className={cn(
-          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default min-[860px]:cursor-pointer",
+          "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer",
           isDimmed ? "opacity-30" : "opacity-100"
         )}
         href={
@@ -71,17 +73,25 @@ const Vault: React.FC<IProps> = ({
             : `/metavaults/metavault/${vault.address}`
         }
         onClick={(e) => {
-          if (window.innerWidth <= 860) {
+          if (!isProDisplay && window.innerWidth <= 860) {
             e.preventDefault();
             setExpandedData((prev) => !prev);
           }
         }}
       >
-        <div className="flex items-center w-full min-[860px]:w-[40%] justify-between px-4">
+        <div
+          className={cn(
+            "flex items-center justify-between px-4",
+            isProDisplay
+              ? "sticky bg-[#101012] lg:bg-transparent top-0 left-0 z-10 h-[56px] w-[200px] border-r border-[#23252A] md:border-r-0 md:w-[40%]"
+              : "w-full md:w-[40%]"
+          )}
+        >
           <div
             className={cn(
               "flex items-center gap-3",
-              inserted && "ml-3 min-[860px]:ml-5"
+              inserted && "ml-3 md:ml-5",
+              isProDisplay ? "gap-2 md:gap-3" : "gap-3"
             )}
           >
             <div className="flex items-center justify-center">
@@ -91,9 +101,11 @@ const Vault: React.FC<IProps> = ({
                     <img
                       src={asset?.logo}
                       alt={asset?.symbol}
-                      className={`w-8 h-8 rounded-full flex-shrink-0 ${
+                      className={cn(
+                        "rounded-full flex-shrink-0",
+                        isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8",
                         !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
-                      }`}
+                      )}
                       key={asset?.logo + index}
                     />
                   ))}
@@ -102,30 +114,41 @@ const Vault: React.FC<IProps> = ({
                     src={protocol?.logoSrc}
                     alt={protocol?.name}
                     title={protocol?.name}
-                    className="w-8 h-8 rounded-full flex-shrink-0 ml-1"
+                    className={cn(
+                      "rounded-full flex-shrink-0 ml-1",
+                      isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8"
+                    )}
                   />
                 </div>
               ) : (
                 <img
-                  className="w-8 h-8 rounded-full flex-shrink-0"
+                  className={cn(
+                    "rounded-full flex-shrink-0",
+                    isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8"
+                  )}
                   src={`/features/${vault.symbol}.png`}
                   alt="logo"
                 />
               )}
             </div>
             <span
-              className="font-semibold text-[16px] truncate overflow-hidden whitespace-nowrap max-w-[200px] min-[860px]:max-w-full"
+              className={cn(
+                "font-semibold truncate overflow-hidden whitespace-nowrap max-w-[200px] md:max-w-full",
+                isProDisplay ? "text-[12px] md:text-[16px]" : " text-[16px]"
+              )}
               title={symbol}
             >
               {symbol}
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-1 flex-shrink-0">
-            <div className="block min-[860px]:hidden ml-2">
-              <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
+          {!isProDisplay && (
+            <div className="flex items-center justify-center gap-1 flex-shrink-0">
+              <div className="block md:hidden ml-2">
+                <ArrowIcon isActive={true} rotate={expandedData ? 180 : 0} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div
           onClick={(e) => {
@@ -142,8 +165,9 @@ const Vault: React.FC<IProps> = ({
             }
           }}
           className={cn(
-            "px-4 w-[15%] hidden min-[860px]:block",
-            vault.type === VaultTypes.Vault && "tooltip cursor-help"
+            "px-4 w-[15%]",
+            vault.type === VaultTypes.Vault && "tooltip cursor-help",
+            isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
           )}
         >
           <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
@@ -240,7 +264,12 @@ const Vault: React.FC<IProps> = ({
             <i></i>
           </div>
         </div>
-        <div className="px-4 text-right text-[14px] w-[15%] hidden min-[860px]:block">
+        <div
+          className={cn(
+            "px-4 text-right text-[14px] w-[15%]",
+            isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
+          )}
+        >
           <span>
             {formatNumber(
               vault?.proportions?.allocation as number,
@@ -248,7 +277,12 @@ const Vault: React.FC<IProps> = ({
             )?.slice(1)}
           </span>
         </div>
-        <div className="px-4 text-right text-[14px] w-[30%] hidden min-[860px]:block">
+        <div
+          className={cn(
+            "px-4 text-right text-[14px] w-[30%]",
+            isProDisplay ? "w-[200px] md:w-[30%]" : "hidden md:block"
+          )}
+        >
           {(vault?.proportions?.current || vault?.proportions?.target) && (
             <span>
               {Number(vault.proportions?.current).toFixed(2)}% /{" "}
@@ -258,7 +292,7 @@ const Vault: React.FC<IProps> = ({
         </div>
       </a>
       {expandedData ? (
-        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] min-[860px]:hidden">
+        <div className="flex flex-col items-center justify-between gap-1 px-4 py-2 bg-[#18191c] border-t border-[#23252A] md:hidden">
           {vault.type === VaultTypes.Vault && (
             <div className="flex items-center justify-between w-full">
               <span className="text-[#909193] text-[14px] leading-5 font-medium">

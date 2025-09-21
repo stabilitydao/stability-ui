@@ -467,6 +467,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex items-start justify-between flex-col-reverse xl:flex-row gap-6">
           <div className="flex flex-col gap-4 w-full xl:w-[850px]">
             <Table
+              displayType={displayType}
               tableType={tableType}
               changeTables={changeTables}
               tableStates={tableStates}
@@ -501,6 +502,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             </div>
           ) : activeSection === MetaVaultSectionTypes.Allocations ? (
             <Table
+              displayType={displayType}
               tableType={tableType}
               changeTables={changeTables}
               tableStates={tableStates}

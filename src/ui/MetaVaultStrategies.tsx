@@ -1,37 +1,62 @@
-import { cn } from "@utils";
-
-import { getStrategyProtocols, StrategyShortId } from "@stabilitydao/stability";
+import {
+  getStrategyProtocols,
+  StrategyShortId,
+  strategies,
+} from "@stabilitydao/stability";
 
 interface IProps {
-  strategies: string[];
+  strategiesIDs: string[];
 }
 
-const MetaVaultStrategies: React.FC<IProps> = ({ strategies }) => {
+const MetaVaultStrategies: React.FC<IProps> = ({ strategiesIDs }) => {
   const protocols =
-    strategies?.flatMap((cur) =>
-      getStrategyProtocols(cur as StrategyShortId)
+    strategiesIDs?.flatMap((id) =>
+      getStrategyProtocols(id as StrategyShortId)
     ) ?? [];
 
-  const strategiesData = Array.from(
-    new Map(protocols.map((item) => [item.name, item])).values()
+  const strategyImgMap = protocols.reduce<Record<string, string>>(
+    (acc, protocol) => {
+      protocol.strategies?.forEach((sId) => {
+        acc[sId] = protocol.img;
+      });
+      return acc;
+    },
+    {}
   );
 
+  const _strategies = strategiesIDs.map((id) => ({
+    ...strategies[id],
+    img: strategyImgMap[id],
+  }));
+
   return (
-    <div className="bg-[#18191C] border border-[#35363B] rounded-lg max-w-[80px]">
-      <div className="py-1 px-2 flex items-center">
-        {strategiesData.map((strategy, index) => (
+    <div className="flex items-center gap-2">
+      {_strategies.map((strategy, index) => (
+        <div
+          key={strategy.id + index}
+          style={{
+            backgroundColor: strategy.bgColor + "66",
+            border: `1px solid ${strategy.bgColor}`,
+          }}
+          className="px-1 rounded-[4px] h-6 flex items-center gap-1 text-[12px]"
+        >
+          <span
+            style={{
+              color: strategy.color,
+            }}
+            title={strategy.id}
+          >
+            {strategy.shortId}
+          </span>
+
           <img
-            key={strategy.name}
+            className="rounded-full w-4 h-4"
             src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategy.img}`}
-            alt={strategy.name}
-            title={strategy.name}
-            className={cn(
-              "h-4 w-4 rounded-full bg-[#252528]",
-              !!index && "ml-[-4px]"
-            )}
+            alt={strategy.id}
+            title={strategy.id}
           />
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };

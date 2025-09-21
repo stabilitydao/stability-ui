@@ -1,6 +1,6 @@
 import { StrategyBadge, MetaVaultStrategies } from "@ui";
 
-import { formatNumber } from "@utils";
+import { formatNumber, cn } from "@utils";
 
 import { CHAINS, SILO_POINTS, VAULTS_WITH_NAME } from "@constants";
 
@@ -149,14 +149,19 @@ const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
             )}
           </div>
         </div>
-        <div className="px-2 md:px-4 w-[150px] md:w-[17.5%]">
+        <div
+          className={cn(
+            "w-[150px] md:w-[17.5%]",
+            vault?.type === VaultTypes.Vault ? "px-2 md:px-4" : "pl-2 md:pl-4"
+          )}
+        >
           {vault?.type === VaultTypes.Vault ? (
             <StrategyBadge
               info={vault.strategyInfo}
               specific={vault.strategySpecific}
             />
           ) : (
-            <MetaVaultStrategies strategies={vault?.strategies} />
+            <MetaVaultStrategies strategiesIDs={vault?.strategies} />
           )}
         </div>
         <div
