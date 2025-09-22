@@ -5,7 +5,7 @@ import { useStore } from "@nanostores/react";
 import { currentChainID, metaVaults, publicClient, vaults } from "@store";
 import { cn } from "@utils";
 
-import { writeContract } from "@wagmi/core";
+import { simulateContract, writeContract } from "@wagmi/core";
 
 import {
   IMetaVaultABI,
@@ -70,6 +70,8 @@ const MetavaultsManagement = (): JSX.Element => {
   };
 
   ///
+
+  const [newMetaVaultAddress, setNewMetaVaultAddress] = useState("");
 
   const [activeSection, setActiveSection] = useState("deploy");
 
@@ -185,6 +187,51 @@ const MetavaultsManagement = (): JSX.Element => {
       console.log(_addVault);
     } catch (error) {
       console.log("Add Vault error:", error);
+    }
+  };
+
+  const simulateDeployMetaVault = async () => {
+    try {
+      const factoryAddress =
+        deployments[$currentChainID]?.core?.metaVaultFactory;
+
+      const saltAddress = getAddress(saltInput);
+      const pegAsset = getAddress(pegAssetInput);
+      const name = nameInput;
+      const symbol = symbolInput;
+      const _vaults = vaultsList.map((vault) => getAddress(vault));
+      const _proportions = proportionsList.map((proportion) =>
+        parseUnits(proportion, 16)
+      );
+
+      console.log(
+        saltAddress,
+        metaVaultType,
+        pegAsset,
+        nameInput,
+        symbolInput,
+        _vaults,
+        _proportions
+      );
+
+      const { result } = await simulateContract(wagmiConfig, {
+        address: factoryAddress,
+        abi: IMetaVaultFactoryABI,
+        functionName: "deployMetaVault",
+        args: [
+          saltAddress,
+          metaVaultType,
+          pegAsset,
+          name,
+          symbol,
+          _vaults,
+          _proportions,
+        ],
+      });
+
+      setNewMetaVaultAddress(result);
+    } catch (error) {
+      console.log("Deplpoy Meta Vault error:", error);
     }
   };
 
@@ -363,11 +410,11 @@ const MetavaultsManagement = (): JSX.Element => {
         {activeSection === "deploy" && (
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <div className="flex flex-col items-start justify-between w-[85%]">
+              <div className="flex flex-col items-start justify-between w-[30%]">
                 Salt
               </div>
 
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
                 <input
                   type="text"
                   placeholder="0"
@@ -408,11 +455,11 @@ const MetavaultsManagement = (): JSX.Element => {
               </div>
             </div>
             <div className="flex gap-2">
-              <div className="flex flex-col items-start justify-between w-[85%]">
+              <div className="flex flex-col items-start justify-between w-[30%]">
                 pegAsset
               </div>
 
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
                 <input
                   type="text"
                   placeholder="0"
@@ -423,11 +470,11 @@ const MetavaultsManagement = (): JSX.Element => {
               </label>
             </div>
             <div className="flex gap-2">
-              <div className="flex flex-col items-start justify-between w-[85%]">
+              <div className="flex flex-col items-start justify-between w-[30%]">
                 Name
               </div>
 
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
                 <input
                   type="text"
                   placeholder="0"
@@ -438,11 +485,11 @@ const MetavaultsManagement = (): JSX.Element => {
               </label>
             </div>
             <div className="flex gap-2">
-              <div className="flex flex-col items-start justify-between w-[85%]">
+              <div className="flex flex-col items-start justify-between w-[30%]">
                 Symbol
               </div>
 
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
                 <input
                   type="text"
                   placeholder="0"
@@ -596,15 +643,29 @@ const MetavaultsManagement = (): JSX.Element => {
             Add Vault
           </button>
         ) : activeSection === "deploy" ? (
-          <button
-            className={cn(
-              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
-            )}
-            type="button"
-            onClick={deployMetaVault}
-          >
-            Deploy Meta Vault
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              className={cn(
+                "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
+              )}
+              type="button"
+              onClick={simulateDeployMetaVault}
+            >
+              Simulate
+            </button>
+            {newMetaVaultAddress ? (
+              <p>Simulation result: {newMetaVaultAddress}</p>
+            ) : null}
+            <button
+              className={cn(
+                "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
+              )}
+              type="button"
+              onClick={deployMetaVault}
+            >
+              Deploy Meta Vault
+            </button>
+          </div>
         ) : null}
 
         {addVaultData.isActive && (
