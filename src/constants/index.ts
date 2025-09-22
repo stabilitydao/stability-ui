@@ -225,6 +225,8 @@ const STRATEGY_SPECIFIC_SUBSTITUTE: {
   "0x0afe245a43f6a3914aa0dc8435457734c6edb971": "MEV",
   "0x7b5fffe819871f2127e4884798d83adb5db1be64": "Varlamore",
   "0xda57af45bf0b7c4de4a5bc66ca993cab704aa6a1": "Varlamore",
+  "0x058779961ae874d29f9cecfd29df7456164a0f64": "Mainstreet",
+  "0x2120a3159df9f3b6276f276e4cee8f47cf548c2f": "Mainstreet Greenhouse",
 };
 
 const BIG_INT_VALUES = {
