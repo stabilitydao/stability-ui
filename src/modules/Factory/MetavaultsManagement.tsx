@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { metaVaults, publicClient, vaults } from "@store";
+import { currentChainID, metaVaults, publicClient, vaults } from "@store";
 import { cn } from "@utils";
 
 import { writeContract } from "@wagmi/core";
@@ -13,6 +13,7 @@ import {
   VaultABI,
   wagmiConfig,
   platforms,
+  IMetaVaultFactoryABI,
 } from "@web3";
 
 import { VAULTS_WITH_NAME } from "@constants";
@@ -21,10 +22,15 @@ import { TimeDifferenceIndicator } from "@ui";
 
 import { getAddress, parseUnits } from "viem";
 
+import { deployments } from "@stabilitydao/stability";
+
+import { VaultTypes } from "@types";
+
 const MetavaultsManagement = (): JSX.Element => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $publicClient = useStore(publicClient);
+  const $currentChainID = useStore(currentChainID);
 
   const [activeMetaVaults, setActiveMetaVaults] = useState([]);
 
@@ -34,7 +40,38 @@ const MetavaultsManagement = (): JSX.Element => {
   const [vaultInput, setVaultInput] = useState("");
   const [newProportionInput, setNewProportionInput] = useState("");
 
-  const [activeSection, setActiveSection] = useState("vaults");
+  /// deploy Meta Vaults
+
+  const [saltInput, setSaltInput] = useState("");
+  const [pegAssetInput, setPegAssetInput] = useState("");
+  const [nameInput, setNameInput] = useState("");
+  const [symbolInput, setSymbolInput] = useState("");
+
+  const [metaVaultType, setMetaVaultType] = useState(VaultTypes.MetaVault);
+
+  const [vaultsList, setVaultsList] = useState<string[]>([""]);
+  const [proportionsList, setProportionsList] = useState<string[]>([""]);
+
+  const handleVaultChange = (index: number, value: string) => {
+    const updated = [...vaultsList];
+    updated[index] = value;
+    setVaultsList(updated);
+  };
+
+  const handleProportionChange = (index: number, value: string) => {
+    const updated = [...proportionsList];
+    updated[index] = value;
+    setProportionsList(updated);
+  };
+
+  const addRow = () => {
+    setVaultsList([...vaultsList, ""]);
+    setProportionsList([...proportionsList, ""]);
+  };
+
+  ///
+
+  const [activeSection, setActiveSection] = useState("deploy");
 
   const [addVaultData, setAddVaultData] = useState({
     isActive: false,
@@ -65,7 +102,7 @@ const MetavaultsManagement = (): JSX.Element => {
 
       console.log(_action);
     } catch (error) {
-      console.log("Error:", error);
+      console.log("Set proportion error:", error);
     }
   };
 
@@ -86,7 +123,7 @@ const MetavaultsManagement = (): JSX.Element => {
       });
 
       const vaultCustomFee = await $publicClient?.readContract({
-        address: platforms[146],
+        address: platforms[$currentChainID],
         abi: PlatformABI,
         functionName: "getCustomVaultFee",
         args: [vaultAddress],
@@ -123,7 +160,7 @@ const MetavaultsManagement = (): JSX.Element => {
 
       if (vaultCustomFee != BigInt(20000)) {
         const setCustomVaultFee = await writeContract(wagmiConfig, {
-          address: platforms[146],
+          address: platforms[$currentChainID],
           abi: PlatformABI,
           functionName: "setCustomVaultFee",
           args: [vaultAddress, BigInt(20000)],
@@ -147,44 +184,92 @@ const MetavaultsManagement = (): JSX.Element => {
 
       console.log(_addVault);
     } catch (error) {
-      console.log("Error:", error);
+      console.log("Add Vault error:", error);
+    }
+  };
+
+  const deployMetaVault = async () => {
+    try {
+      const factoryAddress =
+        deployments[$currentChainID]?.core?.metaVaultFactory;
+
+      const saltAddress = getAddress(saltInput);
+      const pegAsset = getAddress(pegAssetInput);
+      const name = nameInput;
+      const symbol = symbolInput;
+      const _vaults = vaultsList.map((vault) => getAddress(vault));
+      const _proportions = proportionsList.map((proportion) =>
+        parseUnits(proportion, 16)
+      );
+
+      console.log(
+        saltAddress,
+        metaVaultType,
+        pegAsset,
+        nameInput,
+        symbolInput,
+        _vaults,
+        _proportions
+      );
+
+      const _deployVault = await writeContract(wagmiConfig, {
+        address: factoryAddress,
+        abi: IMetaVaultFactoryABI,
+        functionName: "deployMetaVault",
+        args: [
+          saltAddress,
+          metaVaultType,
+          pegAsset,
+          name,
+          symbol,
+          _vaults,
+          _proportions,
+        ],
+      });
+
+      console.log(_deployVault);
+    } catch (error) {
+      console.log("Deplpoy Meta Vault error:", error);
     }
   };
 
   const getData = async () => {
     try {
-      const _metaVaultsWithProportions = $metaVaults[146].map((mv) => {
-        const proportions = mv.vaultsData.map((data) => {
-          const vault = $vaults[146][data.address];
+      const _metaVaultsWithProportions = $metaVaults[$currentChainID].map(
+        (mv) => {
+          const proportions = mv.vaultsData.map((data) => {
+            const vault = $vaults[$currentChainID][data.address];
 
-          const symbol = vault
-            ? vault?.symbol
-            : $metaVaults[146].find((_mv) => _mv.address === data.address)
-                ?.symbol;
+            const symbol = vault
+              ? vault?.symbol
+              : $metaVaults[$currentChainID].find(
+                  (_mv) => _mv.address === data.address
+                )?.symbol;
 
-          const newObj = {
-            currentProportions: (
-              Number(data.proportions.current) * 100
-            ).toFixed(2),
-            targetProportions: (Number(data.proportions.target) * 100).toFixed(
-              2
-            ),
-          };
-          const allData = { address: data.address, symbol, ...newObj };
+            const newObj = {
+              currentProportions: (
+                Number(data.proportions.current) * 100
+              ).toFixed(2),
+              targetProportions: (
+                Number(data.proportions.target) * 100
+              ).toFixed(2),
+            };
+            const allData = { address: data.address, symbol, ...newObj };
 
-          if (vault) {
-            const lastHardWork = vault.lastHardWork;
-            const strategy = vault.strategyInfo.shortId;
-            const APR = vault.sortAPR;
+            if (vault) {
+              const lastHardWork = vault.lastHardWork;
+              const strategy = vault.strategyInfo.shortId;
+              const APR = vault.sortAPR;
 
-            return { ...allData, lastHardWork, strategy, APR };
-          }
+              return { ...allData, lastHardWork, strategy, APR };
+            }
 
-          return allData;
-        });
+            return allData;
+          });
 
-        return { ...mv, proportions };
-      });
+          return { ...mv, proportions };
+        }
+      );
 
       setActiveMetaVaults(_metaVaultsWithProportions);
       setCurrentMetaVault(_metaVaultsWithProportions[0]);
@@ -212,7 +297,7 @@ const MetavaultsManagement = (): JSX.Element => {
   }, [activeSection, currentMetaVault]);
 
   useEffect(() => {
-    if ($metaVaults[146] && $vaults[146]) {
+    if ($metaVaults[$currentChainID] && $vaults[$currentChainID]) {
       getData();
     }
   }, [$metaVaults]);
@@ -221,6 +306,17 @@ const MetavaultsManagement = (): JSX.Element => {
     <div className="flex flex-col max-w-[1200px] w-full">
       <div className="bg-[#18191C] border border-[#232429] rounded-lg p-4 flex flex-col gap-4 w-[800px]">
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              activeSection != "deploy"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("deploy")}
+          >
+            Deploy Meta Vault
+          </span>
           <span
             className={cn(
               "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
@@ -245,22 +341,154 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {activeMetaVaults.map((metaVault) => (
-            <p
-              key={metaVault.address}
-              className={cn(
-                "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
-                currentMetaVault?.address === metaVault?.address
-                  ? "text-white border !border-[#2C2E33] bg-[#22242A]"
-                  : "text-[#97979A] border !border-[#23252A]"
-              )}
-              onClick={() => setCurrentMetaVault(metaVault)}
-            >
-              {metaVault.symbol}
-            </p>
-          ))}
-        </div>
+        {activeSection !== "deploy" && (
+          <div className="flex items-center gap-2">
+            {activeMetaVaults.map((metaVault) => (
+              <p
+                key={metaVault.address}
+                className={cn(
+                  "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
+                  currentMetaVault?.address === metaVault?.address
+                    ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                    : "text-[#97979A] border !border-[#23252A]"
+                )}
+                onClick={() => setCurrentMetaVault(metaVault)}
+              >
+                {metaVault.symbol}
+              </p>
+            ))}
+          </div>
+        )}
+
+        {activeSection === "deploy" && (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[85%]">
+                Salt
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={saltInput}
+                  onChange={(e) => setSaltInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[85%]">
+                Type
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
+                    metaVaultType === VaultTypes.MetaVault
+                      ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                      : "text-[#97979A] border !border-[#23252A]"
+                  )}
+                  onClick={() => setMetaVaultType(VaultTypes.MetaVault)}
+                >
+                  {VaultTypes.MetaVault}
+                </span>
+                <span
+                  className={cn(
+                    "whitespace-nowrap cursor-pointer z-20 text-center px-3 md:px-4 py-2 rounded-lg",
+                    metaVaultType === VaultTypes.MultiVault
+                      ? "text-white border !border-[#2C2E33] bg-[#22242A]"
+                      : "text-[#97979A] border !border-[#23252A]"
+                  )}
+                  onClick={() => setMetaVaultType(VaultTypes.MultiVault)}
+                >
+                  {VaultTypes.MultiVault}
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[85%]">
+                pegAsset
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={pegAssetInput}
+                  onChange={(e) => setPegAssetInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[85%]">
+                Name
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[85%]">
+                Symbol
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={symbolInput}
+                  onChange={(e) => setSymbolInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+            <div className="flex flex-col gap-4">
+              {vaultsList.map((vault, index) => (
+                <div key={index} className="flex gap-2">
+                  <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-1/2">
+                    <input
+                      type="text"
+                      placeholder="Vault"
+                      value={vault}
+                      onChange={(e) => handleVaultChange(index, e.target.value)}
+                      className="bg-transparent text-2xl font-semibold outline-none w-full"
+                    />
+                  </label>
+
+                  <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-1/2">
+                    <input
+                      type="text"
+                      placeholder="Proportion"
+                      value={proportionsList[index]}
+                      onChange={(e) =>
+                        handleProportionChange(index, e.target.value)
+                      }
+                      className="bg-transparent text-2xl font-semibold outline-none w-full"
+                    />
+                  </label>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addRow}
+                className="flex items-center gap-1 text-[#816FEA] font-medium"
+              >
+                Add Vault
+              </button>
+            </div>
+          </div>
+        )}
 
         {activeSection === "vaults" && (
           <div className="flex gap-2">
@@ -280,52 +508,54 @@ const MetavaultsManagement = (): JSX.Element => {
           </div>
         )}
 
-        <div className="flex flex-col gap-2">
-          {currentMetaVault?.proportions?.map((proportion) => (
-            <div key={proportion.address} className="flex gap-2">
-              <div className="flex items-start justify-between w-[85%]">
-                <div className="flex flex-col">
-                  <p className="flex items-center gap-1">
+        {activeSection !== "deploy" && (
+          <div className="flex flex-col gap-2">
+            {currentMetaVault?.proportions?.map((proportion) => (
+              <div key={proportion.address} className="flex gap-2">
+                <div className="flex items-start justify-between w-[85%]">
+                  <div className="flex flex-col">
+                    <p className="flex items-center gap-1">
+                      <span>
+                        {VAULTS_WITH_NAME[proportion.address] ??
+                          proportion.symbol}
+                      </span>
+                      {proportion.strategy ? (
+                        <span>- {proportion.strategy}</span>
+                      ) : null}
+                    </p>
                     <span>
-                      {VAULTS_WITH_NAME[proportion.address] ??
-                        proportion.symbol}
+                      {proportion.currentProportions}% /{" "}
+                      {proportion.targetProportions}% / $
+                      {(
+                        (Number(currentMetaVault.tvl) / 100) *
+                        proportion.currentProportions
+                      ).toFixed(2)}
                     </span>
-                    {proportion.strategy ? (
-                      <span>- {proportion.strategy}</span>
-                    ) : null}
-                  </p>
-                  <span>
-                    {proportion.currentProportions}% /{" "}
-                    {proportion.targetProportions}% / $
-                    {(
-                      (Number(currentMetaVault.tvl) / 100) *
-                      proportion.currentProportions
-                    ).toFixed(2)}
-                  </span>
-                </div>
-
-                {proportion?.APR ? (
-                  <div className="flex flex-col items-end gap-1">
-                    <span>{proportion.APR}%</span>{" "}
-                    <TimeDifferenceIndicator unix={proportion.lastHardWork} />
                   </div>
-                ) : null}
+
+                  {proportion?.APR ? (
+                    <div className="flex flex-col items-end gap-1">
+                      <span>{proportion.APR}%</span>{" "}
+                      <TimeDifferenceIndicator unix={proportion.lastHardWork} />
+                    </div>
+                  ) : null}
+                </div>
+                <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                  <input
+                    type="text"
+                    placeholder="0"
+                    value={values[proportion.address] || ""}
+                    onChange={(e) => handleInputChange(proportion.address, e)}
+                    className={cn(
+                      "bg-transparent text-2xl font-semibold outline-none w-full",
+                      !Number(values[proportion.address]) && "text-[#97979A]"
+                    )}
+                  />
+                </label>
               </div>
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
-                <input
-                  type="text"
-                  placeholder="0"
-                  value={values[proportion.address] || ""}
-                  onChange={(e) => handleInputChange(proportion.address, e)}
-                  className={cn(
-                    "bg-transparent text-2xl font-semibold outline-none w-full",
-                    !Number(values[proportion.address]) && "text-[#97979A]"
-                  )}
-                />
-              </label>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {activeSection === "vaults" && (
           <div className="flex gap-2">
@@ -364,6 +594,16 @@ const MetavaultsManagement = (): JSX.Element => {
             onClick={addVault}
           >
             Add Vault
+          </button>
+        ) : activeSection === "deploy" ? (
+          <button
+            className={cn(
+              "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
+            )}
+            type="button"
+            onClick={deployMetaVault}
+          >
+            Deploy Meta Vault
           </button>
         ) : null}
 
