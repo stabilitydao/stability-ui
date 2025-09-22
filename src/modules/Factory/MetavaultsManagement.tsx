@@ -195,7 +195,7 @@ const MetavaultsManagement = (): JSX.Element => {
       const factoryAddress =
         deployments[$currentChainID]?.core?.metaVaultFactory;
 
-      const saltAddress = getAddress(saltInput);
+      const saltAddress = saltInput;
       const pegAsset = getAddress(pegAssetInput);
       const name = nameInput;
       const symbol = symbolInput;
@@ -240,7 +240,7 @@ const MetavaultsManagement = (): JSX.Element => {
       const factoryAddress =
         deployments[$currentChainID]?.core?.metaVaultFactory;
 
-      const saltAddress = getAddress(saltInput);
+      const saltAddress = saltInput;
       const pegAsset = getAddress(pegAssetInput);
       const name = nameInput;
       const symbol = symbolInput;
