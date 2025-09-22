@@ -52,6 +52,9 @@ const MetavaultsManagement = (): JSX.Element => {
   const [vaultsList, setVaultsList] = useState<string[]>([""]);
   const [proportionsList, setProportionsList] = useState<string[]>([""]);
 
+  const [wrapperSaltInput, setWrapperSaltInput] = useState("");
+  const [wrapperMetaVaultInput, setWrapperMetaVaultInput] = useState("");
+
   const handleVaultChange = (index: number, value: string) => {
     const updated = [...vaultsList];
     updated[index] = value;
@@ -194,44 +197,64 @@ const MetavaultsManagement = (): JSX.Element => {
     try {
       const factoryAddress =
         deployments[$currentChainID]?.core?.metaVaultFactory;
+      if (activeSection === "deploy") {
+        const saltAddress = saltInput;
+        const pegAsset = getAddress(pegAssetInput);
+        const name = nameInput;
+        const symbol = symbolInput;
+        const _vaults = vaultsList.map((vault) => getAddress(vault));
+        const _proportions = proportionsList.map((proportion) =>
+          parseUnits(proportion, 16)
+        );
 
-      const saltAddress = saltInput;
-      const pegAsset = getAddress(pegAssetInput);
-      const name = nameInput;
-      const symbol = symbolInput;
-      const _vaults = vaultsList.map((vault) => getAddress(vault));
-      const _proportions = proportionsList.map((proportion) =>
-        parseUnits(proportion, 16)
-      );
-
-      console.log(
-        saltAddress,
-        metaVaultType,
-        pegAsset,
-        nameInput,
-        symbolInput,
-        _vaults,
-        _proportions
-      );
-
-      const { result } = await simulateContract(wagmiConfig, {
-        address: factoryAddress,
-        abi: IMetaVaultFactoryABI,
-        functionName: "deployMetaVault",
-        args: [
+        console.log(
           saltAddress,
           metaVaultType,
           pegAsset,
-          name,
-          symbol,
+          nameInput,
+          symbolInput,
           _vaults,
-          _proportions,
-        ],
-      });
+          _proportions
+        );
 
-      setNewMetaVaultAddress(result);
+        const { result } = await simulateContract(wagmiConfig, {
+          address: factoryAddress,
+          abi: IMetaVaultFactoryABI,
+          functionName: "deployMetaVault",
+          args: [
+            saltAddress,
+            metaVaultType,
+            pegAsset,
+            name,
+            symbol,
+            _vaults,
+            _proportions,
+          ],
+        });
+
+        setNewMetaVaultAddress(result);
+      } else {
+        const _salt = wrapperSaltInput;
+        const _metaVault = getAddress(wrapperMetaVaultInput);
+
+        console.log(_salt, _metaVault);
+
+        const { result } = await simulateContract(wagmiConfig, {
+          address: factoryAddress,
+          abi: IMetaVaultFactoryABI,
+          functionName: "deployWrapper",
+          args: [_salt, _metaVault],
+        });
+
+        setNewMetaVaultAddress(result);
+      }
     } catch (error) {
-      console.log("Deplpoy Meta Vault error:", error);
+      console.log(
+        activeSection === "deploy"
+          ? "Simulate Deplpoy Meta Vault error:"
+          : "Simulate Wrap Meta Vault error:",
+        error
+      );
     }
   };
 
@@ -240,41 +263,56 @@ const MetavaultsManagement = (): JSX.Element => {
       const factoryAddress =
         deployments[$currentChainID]?.core?.metaVaultFactory;
 
-      const saltAddress = saltInput;
-      const pegAsset = getAddress(pegAssetInput);
-      const name = nameInput;
-      const symbol = symbolInput;
-      const _vaults = vaultsList.map((vault) => getAddress(vault));
-      const _proportions = proportionsList.map((proportion) =>
-        parseUnits(proportion, 16)
-      );
+      if (activeSection === "deploy") {
+        const saltAddress = saltInput;
+        const pegAsset = getAddress(pegAssetInput);
+        const name = nameInput;
+        const symbol = symbolInput;
+        const _vaults = vaultsList.map((vault) => getAddress(vault));
+        const _proportions = proportionsList.map((proportion) =>
+          parseUnits(proportion, 16)
+        );
 
-      console.log(
-        saltAddress,
-        metaVaultType,
-        pegAsset,
-        nameInput,
-        symbolInput,
-        _vaults,
-        _proportions
-      );
-
-      const _deployVault = await writeContract(wagmiConfig, {
-        address: factoryAddress,
-        abi: IMetaVaultFactoryABI,
-        functionName: "deployMetaVault",
-        args: [
+        console.log(
           saltAddress,
           metaVaultType,
           pegAsset,
-          name,
-          symbol,
+          nameInput,
+          symbolInput,
           _vaults,
-          _proportions,
-        ],
-      });
+          _proportions
+        );
 
-      console.log(_deployVault);
+        const _deployVault = await writeContract(wagmiConfig, {
+          address: factoryAddress,
+          abi: IMetaVaultFactoryABI,
+          functionName: "deployMetaVault",
+          args: [
+            saltAddress,
+            metaVaultType,
+            pegAsset,
+            name,
+            symbol,
+            _vaults,
+            _proportions,
+          ],
+        });
+
+        console.log(_deployVault);
+      } else {
+        const _salt = wrapperSaltInput;
+        const _metaVault = getAddress(wrapperMetaVaultInput);
+
+        console.log(_salt, _metaVault);
+
+        const _deployWrapper = await writeContract(wagmiConfig, {
+          address: factoryAddress,
+          abi: IMetaVaultFactoryABI,
+          functionName: "deployWrapper",
+          args: [_salt, _metaVault],
+        });
+        console.log(_deployWrapper);
+      }
     } catch (error) {
       console.log("Deplpoy Meta Vault error:", error);
     }
@@ -355,7 +393,7 @@ const MetavaultsManagement = (): JSX.Element => {
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
               activeSection != "deploy"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -366,7 +404,18 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              activeSection != "deployWrapper"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("deployWrapper")}
+          >
+            Deploy Wrapper
+          </span>
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
               activeSection != "vaults"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -377,7 +426,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
               activeSection != "proportions"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -388,7 +437,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
         </div>
 
-        {activeSection !== "deploy" && (
+        {activeSection !== "deploy" && activeSection !== "deployWrapper" && (
           <div className="flex items-center gap-2">
             {activeMetaVaults.map((metaVault) => (
               <p
@@ -537,6 +586,42 @@ const MetavaultsManagement = (): JSX.Element => {
           </div>
         )}
 
+        {activeSection === "deployWrapper" && (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[30%]">
+                Salt
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={wrapperSaltInput}
+                  onChange={(e) => setWrapperSaltInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+
+            <div className="flex gap-2">
+              <div className="flex flex-col items-start justify-between w-[30%]">
+                Meta Vault Address
+              </div>
+
+              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
+                <input
+                  type="text"
+                  placeholder="0"
+                  value={wrapperMetaVaultInput}
+                  onChange={(e) => setWrapperMetaVaultInput(e.target.value)}
+                  className="bg-transparent text-2xl font-semibold outline-none w-full"
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
         {activeSection === "vaults" && (
           <div className="flex gap-2">
             <div className="flex flex-col items-start justify-between w-[85%]">
@@ -555,7 +640,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </div>
         )}
 
-        {activeSection !== "deploy" && (
+        {activeSection !== "deploy" && activeSection !== "deployWrapper" && (
           <div className="flex flex-col gap-2">
             {currentMetaVault?.proportions?.map((proportion) => (
               <div key={proportion.address} className="flex gap-2">
@@ -642,7 +727,7 @@ const MetavaultsManagement = (): JSX.Element => {
           >
             Add Vault
           </button>
-        ) : activeSection === "deploy" ? (
+        ) : activeSection === "deploy" || activeSection === "deployWrapper" ? (
           <div className="flex flex-col gap-3">
             <button
               className={cn(
@@ -663,7 +748,9 @@ const MetavaultsManagement = (): JSX.Element => {
               type="button"
               onClick={deployMetaVault}
             >
-              Deploy Meta Vault
+              {activeSection === "deploy"
+                ? "Deploy Meta Vault"
+                : "Deploy Meta Vault Wrapper"}
             </button>
           </div>
         ) : null}
