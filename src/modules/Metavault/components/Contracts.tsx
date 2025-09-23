@@ -11,10 +11,11 @@ import { deployments } from "@stabilitydao/stability";
 import type { TAddress, TContractInfo } from "@types";
 
 interface IProps {
+  network: string;
   metavault: TAddress;
 }
 
-const Contracts: React.FC<IProps> = memo(({ metavault }) => {
+const Contracts: React.FC<IProps> = memo(({ network, metavault }) => {
   const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout>>();
 
   const [contracts, setContracts] = useState<TContractInfo[]>([]);
@@ -53,7 +54,7 @@ const Contracts: React.FC<IProps> = memo(({ metavault }) => {
     if (!metavault) return;
 
     try {
-      const metaVault = deployments?.["146"]?.metaVaults?.find(
+      const metaVault = deployments?.[network]?.metaVaults?.find(
         (mv) => mv?.address?.toLowerCase() === metavault?.toLowerCase()
       );
 
@@ -84,6 +85,8 @@ const Contracts: React.FC<IProps> = memo(({ metavault }) => {
       console.error("Failed to set metavault contracts:", error);
     }
   }, [metavault]);
+
+  if (!contracts.length) return null;
 
   return (
     <div className="w-full">
