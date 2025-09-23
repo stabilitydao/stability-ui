@@ -31,14 +31,8 @@ const Row: React.FC<IProps> = ({ market }) => {
                     alt={market.network.name}
                     className="w-6 h-6 rounded-full"
                   />
-                  <div className="flex items-center gap-2">
-                    <span className="text-[14px] leading-5">
-                      {market.network.name}
-                    </span>
-                    <span className="bg-[#252528] border border-[#58595D] h-5 rounded-[4px] py-0.5 px-2 text-[12px] leading-4 font-medium">
-                      {market.network.id}
-                    </span>
-                  </div>
+
+                  <span className="text-[14px] leading-5">{market.name}</span>
                 </div>
               ) : null}
             </div>

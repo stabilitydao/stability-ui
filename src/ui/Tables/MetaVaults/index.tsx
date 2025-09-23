@@ -12,9 +12,12 @@ import {
   IProtocol,
   VaultTypes,
   IProtocolModal,
+  MetaVaultDisplayTypes,
 } from "@types";
+import { cn } from "@utils";
 
 interface IProps {
+  displayType: MetaVaultDisplayTypes;
   tableType: MetaVaultTableTypes;
   vaults: TVault[];
   protocols: IProtocol[];
@@ -23,6 +26,7 @@ interface IProps {
 }
 
 const MetaVaultsTable: React.FC<IProps> = ({
+  displayType,
   tableType,
   vaults,
   protocols,
@@ -117,15 +121,28 @@ const MetaVaultsTable: React.FC<IProps> = ({
     }
   }, [donutData]);
 
+  const isProDisplay = displayType === MetaVaultDisplayTypes.Pro;
+
   return (
-    <div className="bg-[#101012] flex flex-col md:flex-row md:border-l border-b rounded-b-lg border-[#23252A]">
-      <div className="md:sticky top-[80px] xl3:top-10 h-[220px] border-t border-x md:border-x-0 border-[#23252A] shrink-0">
+    <div
+      className={cn(
+        "bg-[#101012] flex flex-col md:flex-row md:border-l border-b rounded-b-lg border-[#23252A]",
+        isProDisplay && "w-[600px] md:w-full"
+      )}
+    >
+      <div
+        className={cn(
+          "md:sticky top-[80px] xl3:top-10 h-[220px] md:h-auto md:min-h-[220px] border-t border-x md:border-x-0 border-[#23252A] shrink-0",
+          isProDisplay && "hidden min-[860px]:block"
+        )}
+      >
         <Donut
           data={donutData}
           activeSection={activeSection}
           setActiveSection={setActiveSection}
         />
       </div>
+
       <div className="flex flex-col w-full min-h-full border-x border-[#23252A]">
         {tableType === MetaVaultTableTypes.Destinations
           ? vaults.map((vault: TVault, index: number) => {
@@ -133,6 +150,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                 return (
                   <Vault
                     key={`row/${vault.name + index}`}
+                    isProDisplay={isProDisplay}
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
@@ -144,6 +162,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
               return (
                 <div key={`row/${vault.name + index}`}>
                   <Vault
+                    isProDisplay={isProDisplay}
                     APRs={getVaultAPRs(vault)}
                     vault={vault}
                     activeVault={activeSection}
@@ -153,6 +172,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
                     return (
                       <Vault
                         key={`row/${endVault.name + index}`}
+                        isProDisplay={isProDisplay}
                         APRs={getVaultAPRs(endVault)}
                         vault={endVault}
                         activeVault={activeSection}
@@ -167,6 +187,7 @@ const MetaVaultsTable: React.FC<IProps> = ({
           : protocols.map((protocol: IProtocol, index: number) => (
               <Protocol
                 key={`row/${protocol.name + index}`}
+                isProDisplay={isProDisplay}
                 protocol={protocol}
                 activeProtocol={activeSection}
                 setModalState={setProtocolModalState}

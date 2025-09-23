@@ -9,7 +9,7 @@ type TProps = {
 
 const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    Network:
+    Market:
       "sticky left-0 z-10 lg:relative w-[150px] md:w-[20%] bg-[#151618] lg:bg-transparent",
     Asset: "w-[100px] md:w-[15%]",
     "Supply APR": "w-[100px] md:w-[13%] justify-end",

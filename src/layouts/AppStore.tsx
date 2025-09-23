@@ -994,14 +994,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
 
+              const deposited = metaVault.deposited ?? 0;
+
               return {
                 ...metaVault,
                 status: "Active",
                 balanceInUSD: 0,
-                deposited: formatUnits(
-                  metaVault.deposited,
-                  isSMetaVault ? 18 : 6
-                ),
+                deposited: formatUnits(deposited, isSMetaVault ? 18 : 6),
                 gemsAPR,
                 merklAPR,
                 totalAPR,

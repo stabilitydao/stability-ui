@@ -1,28 +1,55 @@
-import type { TTableColumn } from "@types";
+import { cn } from "@utils";
+
+import { MetaVaultDisplayTypes, TTableColumn } from "@types";
 
 type TProps = {
   index: number;
   value: string;
   table: TTableColumn[];
+  displayType: MetaVaultDisplayTypes;
   sort: (table: TTableColumn[]) => void;
 };
 
-const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
-  const styles: Record<string, string> = {
-    Name: "w-1/2 min-[860px]:w-[40%]",
-    Protocol: "w-1/2 min-[860px]:w-[30%]",
-    APR: "w-1/2 min-[860px]:w-[15%] justify-end",
+const ColumnSort: React.FC<TProps> = ({
+  index,
+  value,
+  table,
+  displayType,
+  sort,
+}) => {
+  const liteStyles: Record<string, string> = {
+    Name: "w-1/2 md:w-[40%]",
+    Protocol: "w-1/2 md:w-[30%]",
+    APR: "w-1/2 md:w-[15%] justify-end",
     Allocation:
       table.length === 6
-        ? "w-1/2 min-[860px]:w-[20%] justify-end"
-        : "hidden min-[860px]:flex w-[15%] justify-end",
-    "Proportions (current / target)":
-      "hidden min-[860px]:flex w-[30%] justify-end",
-    Proportion: "hidden min-[860px]:flex md:w-[20%] justify-end",
-    Audits: "hidden min-[860px]:flex w-[10%] justify-start",
-    Accidents: "hidden min-[860px]:flex w-[10%] justify-start",
-    Lifetime: "hidden min-[860px]:flex w-[10%] justify-start",
+        ? "w-1/2 md:w-[20%] justify-end"
+        : "hidden md:flex w-[15%] justify-end",
+    "Proportions (current / target)": "hidden md:flex w-[30%] justify-end",
+    Proportion: "hidden md:flex md:w-[20%] justify-end",
+    Audits: "hidden md:flex w-[10%] justify-start",
+    Accidents: "hidden md:flex w-[10%] justify-start",
+    Lifetime: "hidden md:flex w-[10%] justify-start",
   };
+
+  const proStyles: Record<string, string> = {
+    Name: "sticky left-0 z-10 lg:relative w-[200px] md:w-[40%] bg-[#151618] lg:bg-transparent",
+    Protocol:
+      "sticky left-0 z-10 lg:relative w-[100px] md:w-[30%] bg-[#151618] lg:bg-transparent",
+    APR: "w-[100px] md:w-[15%] justify-end",
+    Allocation:
+      table.length === 6
+        ? "w-[100px] md:w-[20%] justify-end"
+        : "w-[100px] md:w-[15%] justify-end",
+    "Proportions (current / target)": "w-[200px] md:w-[30%] justify-end",
+    Proportion: "w-[100px] md:w-[20%] justify-end",
+    Audits: "w-[100px] md:w-[10%] justify-start",
+    Accidents: "w-[100px] md:w-[10%] justify-start",
+    Lifetime: "w-[100px] md:w-[10%] justify-start",
+  };
+
+  const styles =
+    displayType === MetaVaultDisplayTypes.Lite ? liteStyles : proStyles;
 
   const tabController = () => {
     if (table[index].unsortable) return;
@@ -69,14 +96,21 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     );
     sort(updatedTable);
   };
+
   return (
     <div
       onClick={tabController}
-      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-4 py-2 whitespace-nowrap ${styles[value] || "text-center"}`}
+      className={cn(
+        "flex items-center text-[12px] font-manrope font-semibold px-4 py-2 whitespace-nowrap",
+        !table[index].unsortable && "cursor-pointer",
+        styles[value] || "text-center"
+      )}
       data-testid="sort"
     >
       <p
-        className={`${table[index].sortType !== "none" ? "text-white" : "text-[#97979A]"}`}
+        className={cn(
+          table[index].sortType !== "none" ? "text-white" : "text-[#97979A]"
+        )}
       >
         {value}
       </p>

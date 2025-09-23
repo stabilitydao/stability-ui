@@ -22,6 +22,7 @@ import IXSTBLABI from "./abi/IXSTBLABI.ts";
 import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
 import SwapperABI from "./abi/SwapperABI.ts";
+import IMetaVaultFactoryABI from "./abi/IMetaVaultFactoryABI.js";
 
 import type { TAddress } from "@types";
 
@@ -144,4 +145,5 @@ export {
   WrappedMetaVaultABI,
   SwapperABI,
   factories,
+  IMetaVaultFactoryABI,
 };

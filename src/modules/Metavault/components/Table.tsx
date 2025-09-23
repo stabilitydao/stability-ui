@@ -11,9 +11,11 @@ import {
   TVault,
   TAPRModal,
   IProtocolModal,
+  MetaVaultDisplayTypes,
 } from "@types";
 
 type TProps = {
+  displayType: MetaVaultDisplayTypes;
   tableType: MetaVaultTableTypes;
   changeTables: (tableTypes: MetaVaultTableTypes) => void;
   tableStates: TTableColumn[];
@@ -27,6 +29,7 @@ type TProps = {
 };
 
 const Table: React.FC<TProps> = ({
+  displayType,
   tableType,
   changeTables,
   tableStates,
@@ -38,6 +41,8 @@ const Table: React.FC<TProps> = ({
   setAPRModal,
   setProtocolModal,
 }) => {
+  const isProDisplay = displayType === MetaVaultDisplayTypes.Pro;
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3">
@@ -74,14 +79,27 @@ const Table: React.FC<TProps> = ({
           </span>
         </div>
       </div>
-      <div>
-        <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:pl-[220px]">
+      <div
+        className={cn(
+          isProDisplay &&
+            "overflow-x-auto md:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar"
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]",
+            isProDisplay
+              ? "min-[860px]:pl-[220px] w-[600px] md:w-full"
+              : "md:pl-[220px]"
+          )}
+        >
           {tableStates.map((value: TTableColumn, index: number) => (
             <ColumnSort
               key={value.name + index}
               index={index}
               value={value.name}
               table={tableStates}
+              displayType={displayType}
               sort={tableHandler}
             />
           ))}
@@ -96,6 +114,7 @@ const Table: React.FC<TProps> = ({
             </div>
           ) : allVaults?.length ? (
             <MetaVaultsTable
+              displayType={displayType}
               tableType={tableType}
               vaults={vaults}
               protocols={protocols}

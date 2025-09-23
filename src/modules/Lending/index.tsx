@@ -160,7 +160,6 @@ const Lending = (): JSX.Element => {
 
   const initMarkets = async () => {
     if ($markets) {
-      console.log($markets);
       const allMarkets = activeNetworks.flatMap((network) =>
         Object.entries($markets[network.id] ?? {}).map(([name, assets]) => {
           const formattedAssets = Object.entries(assets)

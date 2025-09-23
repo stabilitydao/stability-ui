@@ -413,6 +413,7 @@ const Farms = (): JSX.Element => {
           <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
             <thead className="bg-accent-950 text-neutral-600 h-[36px]">
               <tr className="text-[12px] font-bold uppercase text-center">
+                <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Pool</th>
                 <th className="px-4 py-3">Strategy Logic ID</th>
@@ -424,6 +425,7 @@ const Farms = (): JSX.Element => {
             <tbody className="text-[14px] text-center">
               {farms.map((farm, i) => (
                 <tr key={i} className="h-[48px] hover:bg-accent-950">
+                  <td className="px-4 py-3">{i}</td>
                   <td className="px-4 py-3">{farm.status.toString()}</td>
                   <td className="px-4 py-3">
                     {getShortAddress(farm.pool, 6, 6)}
