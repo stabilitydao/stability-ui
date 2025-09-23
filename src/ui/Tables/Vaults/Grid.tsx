@@ -115,7 +115,7 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
                 specific={vault.strategySpecific}
               />
             ) : (
-              <MetaVaultStrategies strategiesIDs={vault?.strategies} />
+              <MetaVaultStrategies strategies={vault?.strategies} />
             )}
           </div>
 

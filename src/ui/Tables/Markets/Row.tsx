@@ -25,9 +25,15 @@ const Row: React.FC<IProps> = ({ market }) => {
           >
             <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
               {!index ? (
-                <span className="text-[14px] leading-5">
-                  {market.name} Market
-                </span>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={market.network.logoURI}
+                    alt={market.network.name}
+                    className="w-6 h-6 rounded-full"
+                  />
+
+                  <span className="text-[14px] leading-5">{market.name}</span>
+                </div>
               ) : null}
             </div>
             <div className="px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2">

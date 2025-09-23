@@ -105,39 +105,10 @@ const Strategy: React.FC<IProps> = memo(({ network, vault }) => {
     <div>
       <HeadingText text="Strategy" scale={2} styles="text-left mb-3 md:mb-4" />
       <div className="flex flex-col items-start gap-3 md:gap-4 p-4 md:p-6 bg-[#101012] rounded-lg border border-[#23252A]">
-        <div className="flex items-center justify-between w-full">
-          <StrategyBadge
-            info={vault.strategyInfo}
-            specific={vault.strategySpecific}
-          />
-
-          <div
-            style={{
-              backgroundColor: vault.strategyInfo.bgColor + "66",
-              border: `1px solid ${vault.strategyInfo.bgColor}`,
-            }}
-            className="px-2 py-1 rounded-lg flex items-center text-[12px] leading-4 font-medium"
-          >
-            {vault.yearnProtocols.length ? (
-              <div className="flex py-2 gap-2">
-                {vault.yearnProtocols.map((protocol) => (
-                  <img
-                    key={protocol.link}
-                    src={protocol.link}
-                    alt={protocol.title}
-                    title={protocol.title}
-                    className="h-6 w-6 rounded-full"
-                  />
-                ))}
-              </div>
-            ) : (
-              <p>
-                {vault.strategyInfo.id}
-                {vault.strategySpecific ? " " + vault.strategySpecific : ""}
-              </p>
-            )}
-          </div>
-        </div>
+        <StrategyBadge
+          info={vault.strategyInfo}
+          specific={vault.strategySpecific}
+        />
 
         {vault.strategyDescription && (
           <div className="flex flex-col gap-1">

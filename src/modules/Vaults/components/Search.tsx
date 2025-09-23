@@ -78,7 +78,7 @@ const Search: React.FC<IProps> = ({
 
       <input
         type="text"
-        className="text-[#97979A] text-[10px] md:text-[14px] leading-5 font-medium bg-transparent w-full transition-all duration-300 h-[28px] pr-7 pl-8"
+        className="text-[#97979A] text-[14px] md:text-[16px] placeholder:text-[10px] md:placeholder:text-[14px] leading-5 font-medium bg-transparent w-full transition-all duration-300 h-[28px] pr-7 pl-8"
         placeholder="Search assets"
         ref={search}
         onChange={() => tableHandler()}

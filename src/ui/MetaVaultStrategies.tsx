@@ -1,61 +1,29 @@
-import {
-  getStrategyProtocols,
-  StrategyShortId,
-  strategies,
-} from "@stabilitydao/stability";
+import { getStrategyProtocols, StrategyShortId } from "@stabilitydao/stability";
 
 interface IProps {
-  strategiesIDs: string[];
+  strategies: string[];
 }
 
-const MetaVaultStrategies: React.FC<IProps> = ({ strategiesIDs }) => {
+const MetaVaultStrategies: React.FC<IProps> = ({ strategies }) => {
   const protocols =
-    strategiesIDs?.flatMap((id) =>
-      getStrategyProtocols(id as StrategyShortId)
+    strategies?.flatMap((cur) =>
+      getStrategyProtocols(cur as StrategyShortId)
     ) ?? [];
 
-  const strategyImgMap = protocols.reduce<Record<string, string>>(
-    (acc, protocol) => {
-      protocol.strategies?.forEach((sId) => {
-        acc[sId] = protocol.img;
-      });
-      return acc;
-    },
-    {}
+  const strategiesData = Array.from(
+    new Map(protocols.map((item) => [item.name, item])).values()
   );
 
-  const _strategies = strategiesIDs.map((id) => ({
-    ...strategies[id],
-    img: strategyImgMap[id],
-  }));
-
   return (
-    <div className="flex items-center gap-2">
-      {_strategies.map((strategy, index) => (
-        <div
-          key={strategy.id + index}
-          style={{
-            backgroundColor: strategy.bgColor + "66",
-            border: `1px solid ${strategy.bgColor}`,
-          }}
-          className="px-1 rounded-[4px] h-6 flex items-center gap-1 text-[12px]"
-        >
-          <span
-            style={{
-              color: strategy.color,
-            }}
-            title={strategy.id}
-          >
-            {strategy.shortId}
-          </span>
-
-          <img
-            className="rounded-full w-4 h-4"
-            src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategy.img}`}
-            alt={strategy.id}
-            title={strategy.id}
-          />
-        </div>
+    <div className="py-1 px-2 flex items-center">
+      {strategiesData.map((strategy) => (
+        <img
+          key={strategy.name}
+          src={`https://raw.githubusercontent.com/stabilitydao/.github/main/assets/${strategy.img}`}
+          alt={strategy.name}
+          title={strategy.name}
+          className="h-4 w-4 rounded-full bg-[#252528]"
+        />
       ))}
     </div>
   );
