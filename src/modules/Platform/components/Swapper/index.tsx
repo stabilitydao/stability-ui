@@ -234,6 +234,7 @@ const Swapper = (): JSX.Element => {
         abi: SwapperABI,
         functionName,
         args,
+        gas: BigInt(700000),
         // ...(gasEstimate && { gas: gasEstimate }),
       });
       setTxHash(hash);
