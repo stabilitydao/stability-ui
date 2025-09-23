@@ -60,6 +60,11 @@ const Vault: React.FC<IProps> = ({
       ? PROTOCOLS.enclabs
       : rawProtocol;
 
+  const link =
+    vault?.type === VaultTypes.Vault
+      ? `/vaults/vault/${vault.network}/${vault.address}`
+      : `/metavaults/metavault/${vault.network}/${vault.address}`;
+
   return (
     <div className="border-t border-[#23252A]">
       <a
@@ -67,11 +72,7 @@ const Vault: React.FC<IProps> = ({
           "text-center bg-[#101012] h-[56px] font-medium relative flex items-center cursor-default md:cursor-pointer",
           isDimmed ? "opacity-30" : "opacity-100"
         )}
-        href={
-          vault.type === VaultTypes.Vault
-            ? `/vaults/vault/${vault.network}/${vault.address}`
-            : `/metavaults/metavault/${vault.address}`
-        }
+        href={link}
         onClick={(e) => {
           if (!isProDisplay && window.innerWidth <= 860) {
             e.preventDefault();
@@ -356,11 +357,7 @@ const Vault: React.FC<IProps> = ({
           </div>
 
           <a
-            href={
-              vault.type === VaultTypes.Vault
-                ? `/vaults/vault/${vault.network}/${vault.address}`
-                : `/metavaults/metavault/${vault.address}`
-            }
+            href={link}
             className="text-[#816FEA] text-[14px] leading-4 font-medium flex items-center justify-end gap-1 w-full mt-1"
           >
             {vault.type === VaultTypes.Vault ? "View Vault" : "View Meta Vault"}

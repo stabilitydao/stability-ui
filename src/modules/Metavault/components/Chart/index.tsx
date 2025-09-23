@@ -26,9 +26,11 @@ import {
 type TSegment = keyof typeof TIMESTAMPS_IN_SECONDS;
 
 const Chart = ({
+  network,
   symbol,
   display,
 }: {
+  network: string;
   symbol: string;
   display: MetaVaultDisplayTypes;
 }): JSX.Element => {
@@ -156,6 +158,8 @@ const Chart = ({
   useEffect(() => {
     getData();
   }, []);
+
+  if (network === "43114") return null;
 
   return (
     <div className="flex flex-col gap-4 mt-2">

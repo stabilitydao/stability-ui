@@ -23,7 +23,12 @@ import { cn, formatNumber, dataSorter } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
-import { METAVAULT_TABLE, PROTOCOLS, PROTOCOLS_TABLE } from "@constants";
+import {
+  METAVAULT_TABLE,
+  PROTOCOLS,
+  PROTOCOLS_TABLE,
+  CHAINS,
+} from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
 
@@ -42,10 +47,11 @@ import {
 } from "@types";
 
 interface IProps {
+  network: string;
   metavault: TAddress;
 }
 
-const Metavault: React.FC<IProps> = ({ metavault }) => {
+const Metavault: React.FC<IProps> = ({ network, metavault }) => {
   const $metaVaults = useStore(metaVaults);
   const $vaults = useStore(vaults);
   const $isVaultsLoaded = useStore(isVaultsLoaded);
@@ -164,8 +170,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
   };
 
   const initMetavault = async () => {
-    const chainId = "146";
-    const metaVaultList = $metaVaults[chainId];
+    const metaVaultList = $metaVaults[network];
 
     if (!metaVaultList || !$vaults) return;
 
@@ -211,7 +216,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           const vaultsData = entry.vaults
             .map((v) => {
               const addr = v.address.toLowerCase();
-              const vault = $vaults[chainId][addr];
+              const vault = $vaults[network][addr];
               const subProp = v.proportions;
 
               const current = subProp.current * 100;
@@ -238,7 +243,7 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
           };
         }
 
-        const vault = $vaults[chainId][vaultAddr];
+        const vault = $vaults[network][vaultAddr];
 
         return {
           ...vault,
@@ -333,9 +338,11 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
     }
   }, [localMetaVault]);
 
-  const symbol = deployments?.["146"]?.metaVaults?.find(
+  const symbol = deployments?.[network]?.metaVaults?.find(
     (mv) => mv.address.toLowerCase() === metavault
   )?.symbol;
+
+  const chain = CHAINS.find(({ id }) => id == network);
 
   return (
     <div className="mx-auto flex flex-col gap-6 pb-6 xl:min-w-[1230px]">
@@ -416,21 +423,22 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
                 </div>
               )}
             </div>
-
-            <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium">
-                Chain
-              </span>
-              <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
-                <img
-                  className="w-6 h-6"
-                  src="/sonic.png"
-                  alt="Sonic chain"
-                  title="Sonic chain"
-                />
-                <span>Sonic</span>
+            {chain ? (
+              <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
+                <span className="text-[#97979A] text-[14px] leading-5 font-medium">
+                  Chain
+                </span>
+                <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
+                  <img
+                    className="w-6 h-6"
+                    src={chain.logoURI}
+                    alt={chain.name}
+                    title={chain.name}
+                  />
+                  <span>{chain.name}</span>
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {!!localMetaVault?.sonicPoints && (
               <div className="flex flex-col gap-2 w-1/2 md:w-auto mt-2 md:mt-0">
@@ -480,12 +488,20 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
               setProtocolModal={setProtocolModal}
             />
 
-            <Chart symbol={symbol as string} display={displayType} />
+            <Chart
+              network={network}
+              symbol={symbol as string}
+              display={displayType}
+            />
           </div>
 
           <div className="flex flex-col gap-5 w-full xl:w-[352px] mt-0 xl:mt-[60px]">
-            <Form metaVault={localMetaVault} displayType={displayType} />
-            <Contracts metavault={metavault} />
+            <Form
+              network={network}
+              metaVault={localMetaVault}
+              displayType={displayType}
+            />
+            <Contracts network={network} metavault={metavault} />
             <LendingMarkets metavault={metavault} />
           </div>
         </div>
@@ -493,10 +509,14 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
         <div className="flex items-center justify-between">
           {activeSection === MetaVaultSectionTypes.Operations ? (
             <div className="flex items-start flex-col md:flex-row gap-6 w-full">
-              <Form metaVault={localMetaVault} displayType={displayType} />
+              <Form
+                network={network}
+                metaVault={localMetaVault}
+                displayType={displayType}
+              />
 
               <div className="w-full flex flex-col gap-6">
-                <Contracts metavault={metavault} />
+                <Contracts network={network} metavault={metavault} />
                 <LendingMarkets metavault={metavault} />
               </div>
             </div>
@@ -516,7 +536,11 @@ const Metavault: React.FC<IProps> = ({ metavault }) => {
             />
           ) : (
             <div className="w-full">
-              <Chart symbol={symbol as string} display={displayType} />
+              <Chart
+                network={network}
+                symbol={symbol as string}
+                display={displayType}
+              />
             </div>
           )}
         </div>

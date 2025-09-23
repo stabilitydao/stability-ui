@@ -52,11 +52,12 @@ import {
 } from "@types";
 
 interface IProps {
+  network: string;
   metaVault: TMetaVault;
   displayType: MetaVaultDisplayTypes;
 }
 
-const Form: React.FC<IProps> = ({ metaVault, displayType }) => {
+const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $lastTx = useStore(lastTx);
@@ -699,7 +700,7 @@ const Form: React.FC<IProps> = ({ metaVault, displayType }) => {
         unwrap: {},
       };
 
-      const chainBalances = $assetsBalances[146] ?? {};
+      const chainBalances = $assetsBalances[network] ?? {};
 
       assetsForDeposit.forEach((address) => {
         const key = address.toLowerCase();

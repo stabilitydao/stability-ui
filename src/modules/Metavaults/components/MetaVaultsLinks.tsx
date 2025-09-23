@@ -33,7 +33,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
         return (
           <a
             key={metaVault.address}
-            href={`/metavaults/metavault/${metaVault.address.toLowerCase()}`}
+            href={`/metavaults/metavault/${metaVault.network}/${metaVault.address.toLowerCase()}`}
             className={cn(
               "rounded-lg border border-[#23252A] max-w-[352px]",
               metaVault?.symbol === "metaUSD" ? "metaUSD" : "metaS"
