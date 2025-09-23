@@ -235,7 +235,7 @@ const Swapper = (): JSX.Element => {
         functionName,
         args,
         gas: BigInt(700000),
-        // ...(gasEstimate && { gas: gasEstimate }),
+        ...(gasEstimate && { gasLimit: gasEstimate }),
       });
       setTxHash(hash);
       setTxStatus("pending");
@@ -306,7 +306,7 @@ const Swapper = (): JSX.Element => {
         abi: SwapperABI,
         functionName,
         args,
-        // gas: est,
+        gasLimit: est,
       });
       setTxHash(hash);
       setTxStatus("pending");
