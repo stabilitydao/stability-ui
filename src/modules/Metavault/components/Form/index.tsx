@@ -854,6 +854,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         </div> */}
         <ActionButton
           type={button}
+          network={network}
           transactionInProgress={transactionInProgress}
           needConfirm={needConfirm}
           actionFunction={formHandler}
