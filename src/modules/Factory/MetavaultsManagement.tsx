@@ -163,7 +163,7 @@ const MetavaultsManagement = (): JSX.Element => {
         console.log(setLastBlockDefenseDisabled);
       }
 
-      if (vaultCustomFee != BigInt(20000)) {
+      if (vaultCustomFee != BigInt(20000) && $currentChainID == "146") {
         const setCustomVaultFee = await writeContract(wagmiConfig, {
           address: platforms[$currentChainID],
           abi: PlatformABI,
@@ -771,12 +771,14 @@ const MetavaultsManagement = (): JSX.Element => {
                   ? "no(already executed)"
                   : "yes(need tx)"}
               </span>
-              <span>
-                Is Correct Current Custom Fee:{" "}
-                {addVaultData.customVaultFee != 20000
-                  ? `no(need tx, current fee: ${addVaultData.customVaultFee})`
-                  : `yes (already executed), current fee: ${addVaultData.customVaultFee}`}
-              </span>
+              {$currentChainID == "146" ? (
+                <span>
+                  Is Correct Current Custom Fee:{" "}
+                  {addVaultData.customVaultFee != 20000
+                    ? `no(need tx, current fee: ${addVaultData.customVaultFee})`
+                    : `yes (already executed), current fee: ${addVaultData.customVaultFee}`}
+                </span>
+              ) : null}
             </div>
           </div>
         )}

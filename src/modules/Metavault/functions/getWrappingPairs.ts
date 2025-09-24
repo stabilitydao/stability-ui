@@ -22,6 +22,10 @@ export const getWrappingPairs = (
         address: "0xffffffff2fcbefae12f1372c56edc769bd411685",
         symbol: "wmetawS",
       },
+      "0x22226a3c59c52f6768cd44b97b88167217c12222": {
+        address: "0xcCCCaBc3370633AD166669b27A71eB3aE4bFCcCc",
+        symbol: "wmetaUSDC",
+      },
     };
 
     return { wrap, unwrap: unwrapMap[vault.address] ?? {} };
@@ -30,10 +34,6 @@ export const getWrappingPairs = (
   const wrap = vault;
 
   const unwrapMap: Record<TAddress, TTokenData> = {
-    "0x22226a3c59c52f6768cd44b97b88167217c12222": {
-      address: "0xcCCCaBc3370633AD166669b27A71eB3aE4bFCcCc",
-      symbol: "wmetaUSDC",
-    },
     "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": {
       address: "0xaaaaaaaac311d0572bffb4772fe985a750e88805",
       symbol: "wmetaUSD",
