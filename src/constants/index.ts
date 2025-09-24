@@ -270,6 +270,8 @@ const VAULTS_WITH_NAME = {
   "0xefdf0f2b8d056009bd50125b76567110ad52ec91": "Enclabs USDC",
   "0xc7efc499c2fed657251455443cd0767607e8e45e": "Enclabs wS",
   "0x396ebcaa1005a5bf1829cba82e853a5ea51ab937": "Enclabs scUSD",
+  "0x8c0476605302b153792a3c2bd55ec4e70eb8482a":
+    "Stability smsUSD Silo Leverage 141 USDC x6.5",
 };
 
 const PATHS = [

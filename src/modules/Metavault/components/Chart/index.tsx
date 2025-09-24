@@ -128,7 +128,9 @@ const Chart = ({
 
   const getData = async () => {
     try {
-      const req = await axios.get(`${seeds[0]}/metavault/${symbol}/chart`);
+      const req = await axios.get(
+        `${seeds[0]}/metavault/${network}/${symbol}/chart`
+      );
 
       const res = req.data;
 
@@ -158,8 +160,6 @@ const Chart = ({
   useEffect(() => {
     getData();
   }, []);
-
-  if (network === "43114") return null;
 
   return (
     <div className="flex flex-col gap-4 mt-2">

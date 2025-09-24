@@ -29,9 +29,9 @@ import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 import {
   IMetaVaultABI,
   ERC20ABI,
-  sonicClient,
   wagmiConfig,
   WrappedMetaVaultABI,
+  web3clients,
 } from "@web3";
 
 import {
@@ -63,6 +63,8 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
   const $lastTx = useStore(lastTx);
   const $assetsPrices = useStore(assetsPrices);
   const $assetsBalances = useStore(assetsBalances);
+
+  const client = web3clients[network as keyof typeof web3clients];
 
   const [actionType, setActionType] = useState<TransactionTypes>(
     TransactionTypes.Deposit
@@ -124,7 +126,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         ? WrappedMetaVaultABI
         : IMetaVaultABI;
 
-      const gas = await sonicClient.estimateContractGas({
+      const gas = await client.estimateContractGas({
         address: address,
         abi: abi,
         functionName: functionName,
@@ -147,7 +149,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
   };
 
   const getAllowance = async (token: string, spender: string) =>
-    await sonicClient.readContract({
+    await client.readContract({
       address: token as TAddress,
       abi: ERC20ABI,
       functionName: "allowance",
@@ -155,7 +157,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
     });
 
   const getBalance = async (address: string, abi: any) =>
-    (await sonicClient.readContract({
+    (await client.readContract({
       address: address as TAddress,
       abi,
       functionName: "balanceOf",
@@ -304,7 +306,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
           isDeposit ? metaVault.address : activeAsset.unwrap.address,
         ];
 
-        const newAllowance = await sonicClient.readContract({
+        const newAllowance = await client.readContract({
           address: allowanceAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -331,7 +333,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
           ? activeAsset.deposit.address
           : activeAsset.wrap.address;
 
-        const newAllowance = await sonicClient.readContract({
+        const newAllowance = await client.readContract({
           address: tokenAddress,
           abi: ERC20ABI,
           functionName: "allowance",
@@ -567,7 +569,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
     try {
       setNeedConfirm(true);
 
-      const assets = (await sonicClient.readContract({
+      const assets = (await client.readContract({
         address: activeAsset.unwrap.address,
         abi: WrappedMetaVaultABI,
         functionName: "convertToAssets",
@@ -644,17 +646,17 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
     try {
       const [assetsForDeposit, assetsForWithdraw, maxWithdrawAmountTx] =
         await Promise.all([
-          sonicClient.readContract({
+          client.readContract({
             address: metaVault.address,
             abi: IMetaVaultABI,
             functionName: "assetsForDeposit",
           }),
-          sonicClient.readContract({
+          client.readContract({
             address: metaVault.address,
             abi: IMetaVaultABI,
             functionName: "assetsForWithdraw",
           }),
-          sonicClient.readContract({
+          client.readContract({
             address: metaVault.address,
             abi: IMetaVaultABI,
             functionName: "maxWithdrawAmountTx",
@@ -790,6 +792,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         )}
       >
         <TabSwitcher actionType={actionType} setActionType={setActionType} />
+
         <TokensDisplay
           actionType={actionType}
           type={metaVault.type}
@@ -825,33 +828,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
             </div>
           ) : null}
         </label>
-        {/* {actionType === TransactionTypes.Withdraw && (
-          <div className="text-[#909193] text-[14px] leading-5 font-medium mb-3">
-            Max withdraw next tx: {formatNumber(maxWithdraw, "format")}
-          </div>
-        )} */}
-        {/* <div className="flex flex-col gap-2 mb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-[#97979A] text-[16px] leading-6">
-                Max Slippage
-              </span>
-              <img src="/icons/questionmark.svg" alt="Question mark" />
-            </div>
-            <span className="text-[16px] leading-6 font-semibold">0.50%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-[#97979A] text-[16px] leading-6">
-                Completion time
-              </span>
-              <img src="/icons/questionmark.svg" alt="Question mark" />
-            </div>
-            <span className="text-[16px] leading-6 font-semibold">
-              ~ 48 hours
-            </span>
-          </div>
-        </div> */}
+
         <ActionButton
           type={button}
           network={network}

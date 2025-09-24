@@ -270,10 +270,13 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
             const isSiloMatch =
               protocol?.name === "Silo V2" && strategy.includes("Silo");
 
+            const isEulerMatch =
+              protocol?.name === "Euler V2" && strategy.includes("Euler");
+
             const isStrategyMatch = protocol?.name.includes(strategy);
 
-            if (isSiloMatch || isStrategyMatch) {
-              allocation += Number(v.tvl || 0);
+            if (isEulerMatch || isSiloMatch || isStrategyMatch) {
+              allocation += Number(v.proportions.allocation || 0);
             }
           });
         });
@@ -287,8 +290,8 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
         let audits = protocol?.audits ?? [];
 
         if (protocol?.name.includes("Aave")) {
-          creationDate =
-            integrations.stability.protocols.stabilityMarket.creationDate;
+          creationDate = integrations.stability.protocols.stabilityMarket
+            .creationDate as number;
 
           audits = integrations.stability.protocols.stabilityMarket.audits;
         }
@@ -302,7 +305,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
       0
     );
 
-    const allocationsWithPercent = protocolsAllocation
+    const _protocols = protocolsAllocation
       .map((p) => ({
         ...p,
         value: totalAllocation > 0 ? (p.allocation / totalAllocation) * 100 : 0,
@@ -315,8 +318,8 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);
-    setLocalProtocols(allocationsWithPercent);
-    setFilteredProtocols(allocationsWithPercent);
+    setLocalProtocols(_protocols);
+    setFilteredProtocols(_protocols);
     setLocalMetaVault({ ...metaVault, protocols: checkedProtocols });
     setIsLocalVaultsLoaded(true);
   };

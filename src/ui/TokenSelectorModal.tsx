@@ -129,6 +129,7 @@ export const TokenSelectorModal = ({
             </div>
           </button>
         ))}
+
         {!filteredTokens.length && (
           <p className="text-center text-sm text-[#97979A]">No results</p>
         )}

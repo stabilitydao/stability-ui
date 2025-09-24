@@ -287,6 +287,8 @@ type TVault = {
 
   leverage?: number;
 
+  farmId: number;
+
   ///// meta vault
   proportions?: { current: number; target: number; allocation: number };
   vaults?: TVault[];
