@@ -197,7 +197,7 @@ const Contracts: React.FC<IProps> = memo(({ vault, network }) => {
                   )}
                 </div>
 
-                <span className="text-[14px] leading-5 font-semibold">
+                <span className="text-[14px] leading-5 font-semibold max-w-[75px] truncate md:max-w-full md:whitespace-normal">
                   {symbol}
                 </span>
               </div>

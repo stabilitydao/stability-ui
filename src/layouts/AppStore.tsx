@@ -778,6 +778,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             leverageLending: vault?.leverageLending,
             liveAPR,
             assetAPR,
+            farmId: vault?.farmId,
           };
 
         return vaults;

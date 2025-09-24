@@ -12,6 +12,7 @@ import { connected, currentChainID } from "@store";
 
 interface IProps {
   type: string;
+  network?: string;
   transactionInProgress: boolean;
   needConfirm: boolean;
   actionFunction: () => Promise<void>;
@@ -19,6 +20,7 @@ interface IProps {
 
 const ActionButton: React.FC<IProps> = ({
   type,
+  network = "146",
   transactionInProgress,
   needConfirm,
   actionFunction,
@@ -47,7 +49,7 @@ const ActionButton: React.FC<IProps> = ({
     <div>
       {$connected ? (
         <>
-          {$currentChainID === "146" ? (
+          {$currentChainID == network ? (
             <>
               {actionTypes.includes(type) ? (
                 <button
@@ -115,7 +117,7 @@ const ActionButton: React.FC<IProps> = ({
               className={cn(
                 "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
               )}
-              onClick={() => switchChain({ chainId: 146 })}
+              onClick={() => switchChain({ chainId: Number(network) })}
             >
               <p className="px-6 py-4">Switch Network </p>
             </button>

@@ -51,7 +51,7 @@ const isWeb3Load = atom<boolean>(true);
 
 const apiData = atom<any>();
 
-const currentChainID = atom("146");
+const currentChainID = atom();
 
 // deepMaps
 

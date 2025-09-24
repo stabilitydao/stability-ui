@@ -6,6 +6,8 @@ import { ArrowIcon } from "@ui";
 
 import { cn, getTokenData } from "@utils";
 
+import { CHAINS } from "@constants";
+
 import { deployments } from "@stabilitydao/stability";
 
 import type { TAddress, TContractInfo } from "@types";
@@ -86,6 +88,8 @@ const Contracts: React.FC<IProps> = memo(({ network, metavault }) => {
     }
   }, [metavault]);
 
+  const explorer = CHAINS.find(({ id }) => id == network)?.explorer;
+
   if (!contracts.length) return null;
 
   return (
@@ -151,7 +155,7 @@ const Contracts: React.FC<IProps> = memo(({ network, metavault }) => {
 
               <a
                 className="flex items-center px-1 py-1 whitespace-nowrap flex-shrink-0 w-[26px] h-[26px]"
-                href={`https://sonicscan.org/address/${address}`}
+                href={`${explorer}${address}`}
                 target="_blank"
               >
                 <img src="/icons/link.png" alt="External link icon" />
