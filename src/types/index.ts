@@ -799,6 +799,13 @@ export enum VaultTypes {
   MultiVault = "MultiVault",
 }
 
+export enum MarketSectionTypes {
+  Deposit = "Deposit",
+  Borrow = "Borrow",
+  Leverage = "Leverage",
+  Information = "Information",
+}
+
 export enum TimelineTypes {
   Day = "DAY",
   Week = "WEEK",

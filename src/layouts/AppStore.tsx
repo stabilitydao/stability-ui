@@ -1099,7 +1099,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   useEffect(() => {
     if (!$metaVaults) {
       const metaVaultsWithName = deployments["146"].metaVaults?.map(
-        (metaV) => ({ ...metaV, name: getTokenData(metaV.address)?.name })
+        (metaV) => ({
+          ...metaV,
+          name: getTokenData(metaV.address)?.name,
+          network: "146",
+        })
       );
 
       metaVaults.set({ "146": metaVaultsWithName });
