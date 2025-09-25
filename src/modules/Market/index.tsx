@@ -4,13 +4,15 @@ import { useStore } from "@nanostores/react";
 
 import { WagmiLayout } from "@layouts";
 
+import { SectionSelector, AssetSelector } from "./components";
+
 import { FullPageLoader, ErrorMessage } from "@ui";
 
-import { getTokenData } from "@utils";
+import { CHAINS } from "@constants";
 
 import { markets, error } from "@store";
 
-import { TMarket, TMarketAsset, TTokenData } from "@types";
+import { MarketSectionTypes, TMarket, TMarketAsset } from "@types";
 
 interface IProps {
   network: string;
@@ -21,7 +23,15 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
+  const chain = CHAINS.find(({ id }) => id == network);
+
   const [localMarket, setLocalMarket] = useState<TMarket>();
+
+  const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
+
+  const [activeSection, setActiveSection] = useState<MarketSectionTypes>(
+    MarketSectionTypes.Deposit
+  );
 
   useEffect(() => {
     if ($markets && market) {
@@ -35,89 +45,123 @@ const Market: React.FC<IProps> = ({ network, market }) => {
             Number(b.supplyTVL) - Number(a.supplyTVL)
         );
 
-      setLocalMarket({ name: market, assets: marketAssets });
+      setLocalMarket({
+        name: market,
+        assets: marketAssets as TMarketAsset[],
+      } as TMarket);
     }
   }, [$markets]);
 
+  useEffect(() => {
+    if (localMarket && !activeAsset) {
+      setActiveAsset(localMarket?.assets[0]);
+    }
+  }, [localMarket]);
+
   return market && localMarket ? (
     <WagmiLayout>
-      <div className="w-full mx-auto font-manrope flex gap-6">
+      <div className="w-full mx-auto font-manrope">
         <div>
-          <div className="flex flex-col items-start gap-4 w-full lg:justify-between flex-wrap font-manrope">
+          <div className="flex flex-col items-start gap-6">
             <h1 className="page-title__font">{localMarket.name} Market</h1>
-            <div className="flex items-center gap-2">
-              {localMarket.assets.map((asset) => {
-                const assetData = getTokenData(asset.address) as TTokenData;
-
-                return (
-                  <div key={asset.address} className="flex items-center gap-2">
+            <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
+              <div className="flex items-center py-[10px]">
+                <div className="flex items-center gap-3 px-4 border-r border-r-[#232429]">
+                  <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
+                    Network / ID:
+                  </span>
+                  <div className="flex items-center gap-2">
                     <img
-                      src={assetData.logoURI}
-                      alt={assetData.symbol}
-                      className="w-8 h-8 rounded-full"
+                      src={chain?.logoURI}
+                      alt={chain?.name}
+                      className="w-5 h-5 rounded-full"
                     />
-                    <span>{assetData.symbol}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          {/* <div className="flex items-center justigy-center w-full flex-col xl:flex-row">
-            <InfoBar network={network} vault={localVault} />
 
-            <div className="flex flex-col gap-5 xl:hidden my-5 w-full">
-              <InvestForm network={network} vault={localVault} />
-              <div className="hidden lg:flex">
-                <Contracts vault={localVault} network={network} />
+                    <span className="text-[14px] leading-5 font-semibold">
+                      {chain?.name}
+                    </span>
+
+                    <span className="text-[12px] leading-4 font-medium bg-[#2B2C2F] border border-[#58595D] rounded px-2 py-[2px]">
+                      {chain?.id}
+                    </span>
+                  </div>
+                </div>
+                <a
+                  className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
+                  href="#"
+                >
+                  <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
+                    Risk report
+                  </span>
+
+                  <img
+                    src="/icons/purple_link.png"
+                    alt="Check risk report"
+                    className="w-4 h-4"
+                  />
+                </a>
+                <a
+                  className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
+                  href="#"
+                >
+                  <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
+                    0x78...Deea
+                  </span>
+
+                  <img
+                    src="/icons/purple_link.png"
+                    alt="address"
+                    className="w-4 h-4"
+                  />
+                </a>
+                <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
+                    Reviewed
+                  </span>
+
+                  <img
+                    src="/icons/circle_question.png"
+                    alt="Question icon"
+                    className="w-4 h-4"
+                  />
+                </div>
+                <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
+                    Immutable & Permissionless
+                  </span>
+
+                  <img
+                    src="/icons/circle_question.png"
+                    alt="Question icon"
+                    className="w-4 h-4"
+                  />
+                </div>
+                <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
+                    Isolated risk
+                  </span>
+
+                  <img
+                    src="/icons/circle_question.png"
+                    alt="Question icon"
+                    className="w-4 h-4"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <HistoricalRate
-            network={network}
-            address={vault.toLowerCase() as TAddress}
-            created={Number(localVault.created)}
-            vaultStrategy={localVault.strategy}
-            lastHardWork={Number(localVault.lastHardWork)}
-          />
-
-          <YieldRates vault={localVault} />
-
-          <div className="flex lg:hidden">
-            <Contracts vault={localVault} network={network} />
-          </div>
-
-          <div className="flex md:flex-nowrap flex-wrap gap-6 w-full my-6">
-            <div className="w-full xl:w-1/2">
-              <VaultInfo network={network} vault={localVault} />
-            </div>
-            <div className="w-full xl:w-1/2">
-              <Strategy network={network} vault={localVault} />
+            <div className="w-full flex items-center justify-between gap-10">
+              <AssetSelector
+                assets={localMarket.assets}
+                activeAsset={activeAsset}
+                setActiveAsset={setActiveAsset}
+              />
+              <SectionSelector
+                activeSection={activeSection}
+                setActiveSection={setActiveSection}
+              />
             </div>
           </div>
-          {isLeverageLending && <LeverageLending vault={localVault} />}
-          {(localVault.assets.length > 1 && localVault?.pool?.tvl) || isALM ? (
-            <div className="my-6 flex flex-col gap-6 w-full">
-              {localVault.assets.length > 1 && localVault?.pool?.tvl && (
-                <LiquidityPool network={network} vault={localVault} />
-              )}
-
-              {isALM && <UnderlyingALM network={network} vault={localVault} />}
-            </div>
-          ) : null}
-
-          <Assets
-            network={network}
-            assets={localVault?.assets}
-            launched={localVault.launchDate}
-            pricesOnCreation={localVault.assetsPricesOnCreation}
-            strategy={localVault?.strategyAddress}
-          />*/}
         </div>
-
-        {/* <div className="hidden xl:flex flex-col gap-5">
-          <InvestForm network={network} vault={localVault} />
-          <Contracts vault={localVault} network={network} />
-        </div> */}
       </div>
     </WagmiLayout>
   ) : (

@@ -193,6 +193,23 @@ const MetavaultsManagement = (): JSX.Element => {
     }
   };
 
+  const removeVault = async (vault) => {
+    try {
+      const vaultAddress = getAddress(vault.address);
+
+      const _removeVault = await writeContract(wagmiConfig, {
+        address: currentMetaVault.address,
+        abi: IMetaVaultABI,
+        functionName: "removeVault",
+        args: [vaultAddress],
+      });
+
+      console.log(_removeVault);
+    } catch (error) {
+      console.log("Remove Vault error:", error);
+    }
+  };
+
   const simulateDeployMetaVault = async () => {
     try {
       const factoryAddress =
@@ -393,7 +410,7 @@ const MetavaultsManagement = (): JSX.Element => {
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/5",
               activeSection != "deploy"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -404,7 +421,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/5",
               activeSection != "deployWrapper"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -415,7 +432,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/5",
               activeSection != "vaults"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -426,7 +443,7 @@ const MetavaultsManagement = (): JSX.Element => {
           </span>
           <span
             className={cn(
-              "h-10 text-center rounded-lg flex items-center justify-center w-1/4",
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/5",
               activeSection != "proportions"
                 ? "text-[#6A6B6F] cursor-pointer"
                 : "bg-[#232429] border border-[#2C2E33]"
@@ -434,6 +451,17 @@ const MetavaultsManagement = (): JSX.Element => {
             onClick={() => setActiveSection("proportions")}
           >
             Change Proportions
+          </span>
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/5",
+              activeSection != "removeVault"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("removeVault")}
+          >
+            Remove Vault from MetaVault
           </span>
         </div>
 
@@ -640,52 +668,97 @@ const MetavaultsManagement = (): JSX.Element => {
           </div>
         )}
 
-        {activeSection !== "deploy" && activeSection !== "deployWrapper" && (
-          <div className="flex flex-col gap-2">
-            {currentMetaVault?.proportions?.map((proportion) => (
-              <div key={proportion.address} className="flex gap-2">
-                <div className="flex items-start justify-between w-[85%]">
-                  <div className="flex flex-col">
-                    <p className="flex items-center gap-1">
+        {activeSection !== "deploy" &&
+          activeSection !== "deployWrapper" &&
+          activeSection !== "removeVault" && (
+            <div className="flex flex-col gap-2">
+              {currentMetaVault?.proportions?.map((proportion) => (
+                <div key={proportion.address} className="flex gap-2">
+                  <div className="flex items-start justify-between w-[85%]">
+                    <div className="flex flex-col">
+                      <p className="flex items-center gap-1">
+                        <span>
+                          {VAULTS_WITH_NAME[proportion.address] ??
+                            proportion.symbol}
+                        </span>
+                        {proportion.strategy ? (
+                          <span>- {proportion.strategy}</span>
+                        ) : null}
+                      </p>
                       <span>
-                        {VAULTS_WITH_NAME[proportion.address] ??
-                          proportion.symbol}
+                        {proportion.currentProportions}% /{" "}
+                        {proportion.targetProportions}% / $
+                        {(
+                          (Number(currentMetaVault.tvl) / 100) *
+                          proportion.currentProportions
+                        ).toFixed(2)}
                       </span>
-                      {proportion.strategy ? (
-                        <span>- {proportion.strategy}</span>
-                      ) : null}
-                    </p>
-                    <span>
-                      {proportion.currentProportions}% /{" "}
-                      {proportion.targetProportions}% / $
-                      {(
-                        (Number(currentMetaVault.tvl) / 100) *
-                        proportion.currentProportions
-                      ).toFixed(2)}
-                    </span>
-                  </div>
-
-                  {proportion?.APR ? (
-                    <div className="flex flex-col items-end gap-1">
-                      <span>{proportion.APR}%</span>{" "}
-                      <TimeDifferenceIndicator unix={proportion.lastHardWork} />
                     </div>
-                  ) : null}
+
+                    {proportion?.APR ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <span>{proportion.APR}%</span>{" "}
+                        <TimeDifferenceIndicator
+                          unix={proportion.lastHardWork}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                  <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
+                    <input
+                      type="text"
+                      placeholder="0"
+                      value={values[proportion.address] || ""}
+                      onChange={(e) => handleInputChange(proportion.address, e)}
+                      className={cn(
+                        "bg-transparent text-2xl font-semibold outline-none w-full",
+                        !Number(values[proportion.address]) && "text-[#97979A]"
+                      )}
+                    />
+                  </label>
                 </div>
-                <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[15%]">
-                  <input
-                    type="text"
-                    placeholder="0"
-                    value={values[proportion.address] || ""}
-                    onChange={(e) => handleInputChange(proportion.address, e)}
+              ))}
+            </div>
+          )}
+
+        {activeSection === "removeVault" && (
+          <div className="flex flex-col gap-2">
+            {currentMetaVault?.proportions
+              ?.filter((proportion) => !Number(proportion.currentProportions))
+              ?.map((proportion) => (
+                <div key={proportion.address} className="flex gap-2">
+                  <div className="flex items-start justify-between w-[70%]">
+                    <div className="flex flex-col">
+                      <p className="flex items-center gap-1">
+                        <span>
+                          {VAULTS_WITH_NAME[proportion.address] ??
+                            proportion.symbol}
+                        </span>
+                        {proportion.strategy ? (
+                          <span>- {proportion.strategy}</span>
+                        ) : null}
+                      </p>
+                      <span>
+                        {proportion.currentProportions}% /{" "}
+                        {proportion.targetProportions}% / $
+                        {(
+                          (Number(currentMetaVault.tvl) / 100) *
+                          proportion.currentProportions
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
                     className={cn(
-                      "bg-transparent text-2xl font-semibold outline-none w-full",
-                      !Number(values[proportion.address]) && "text-[#97979A]"
+                      "bg-[#5E6AD2] rounded-lg text-[16px] leading-5 font-bold py-5 w-[30%]"
                     )}
-                  />
-                </label>
-              </div>
-            ))}
+                    type="button"
+                    onClick={() => removeVault(proportion)}
+                  >
+                    Remove Vault
+                  </button>
+                </div>
+              ))}
           </div>
         )}
 

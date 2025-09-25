@@ -1,819 +1,1422 @@
 export default [
   {
-    inputs: [{ internalType: "address", name: "target", type: "address" }],
-    name: "AddressEmptyCode",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "AddressInsufficientBalance",
-    type: "error",
-  },
-  { inputs: [], name: "AlreadyExist", type: "error" },
-  {
-    inputs: [
-      { internalType: "address", name: "spender", type: "address" },
-      { internalType: "uint256", name: "allowance", type: "uint256" },
-      { internalType: "uint256", name: "needed", type: "uint256" },
-    ],
-    name: "ERC20InsufficientAllowance",
-    type: "error",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "sender", type: "address" },
-      { internalType: "uint256", name: "balance", type: "uint256" },
-      { internalType: "uint256", name: "needed", type: "uint256" },
-    ],
-    name: "ERC20InsufficientBalance",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "approver", type: "address" }],
-    name: "ERC20InvalidApprover",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "receiver", type: "address" }],
-    name: "ERC20InvalidReceiver",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "sender", type: "address" }],
-    name: "ERC20InvalidSender",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "address", name: "spender", type: "address" }],
-    name: "ERC20InvalidSpender",
-    type: "error",
-  },
-  { inputs: [], name: "ETHTransferFailed", type: "error" },
-  {
-    inputs: [{ internalType: "uint256", name: "maxSupply", type: "uint256" }],
-    name: "ExceedMaxSupply",
-    type: "error",
-  },
-  {
-    inputs: [
-      { internalType: "uint256", name: "mintToUser", type: "uint256" },
-      { internalType: "uint256", name: "minToMint", type: "uint256" },
-    ],
-    name: "ExceedSlippage",
-    type: "error",
-  },
-  { inputs: [], name: "FailedInnerCall", type: "error" },
-  { inputs: [], name: "IncorrectArrayLength", type: "error" },
-  { inputs: [], name: "IncorrectInitParams", type: "error" },
-  {
-    inputs: [{ internalType: "uint256", name: "ltv", type: "uint256" }],
-    name: "IncorrectLtv",
-    type: "error",
-  },
-  { inputs: [], name: "IncorrectMsgSender", type: "error" },
-  { inputs: [], name: "IncorrectProportions", type: "error" },
-  { inputs: [], name: "IncorrectRebalanceArgs", type: "error" },
-  { inputs: [], name: "IncorrectVault", type: "error" },
-  { inputs: [], name: "IncorrectZeroArgument", type: "error" },
-  { inputs: [], name: "InsufficientBalance", type: "error" },
-  { inputs: [], name: "InvalidInitialization", type: "error" },
-  {
-    inputs: [
-      { internalType: "uint256", name: "amount", type: "uint256" },
-      { internalType: "uint256", name: "maxAmount", type: "uint256" },
-    ],
-    name: "MaxAmountForWithdrawPerTxReached",
-    type: "error",
-  },
-  { inputs: [], name: "NotExist", type: "error" },
-  { inputs: [], name: "NotFactory", type: "error" },
-  { inputs: [], name: "NotGovernance", type: "error" },
-  { inputs: [], name: "NotGovernanceAndNotMultisig", type: "error" },
-  { inputs: [], name: "NotInitializing", type: "error" },
-  { inputs: [], name: "NotMultisig", type: "error" },
-  { inputs: [], name: "NotOperator", type: "error" },
-  { inputs: [], name: "NotPlatform", type: "error" },
-  { inputs: [], name: "NotSupported", type: "error" },
-  { inputs: [], name: "NotTheOwner", type: "error" },
-  { inputs: [], name: "NotVault", type: "error" },
-  { inputs: [], name: "ReentrancyGuardReentrantCall", type: "error" },
-  {
-    inputs: [{ internalType: "address", name: "token", type: "address" }],
-    name: "SafeERC20FailedOperation",
-    type: "error",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "value", type: "uint256" }],
-    name: "TooLowValue",
-    type: "error",
-  },
-  {
-    inputs: [
-      { internalType: "uint256", name: "amountUsd", type: "uint256" },
-      { internalType: "uint256", name: "threshold", type: "uint256" },
-    ],
-    name: "UsdAmountLessThreshold",
-    type: "error",
-  },
-  { inputs: [], name: "WaitAFewBlocks", type: "error" },
-  {
-    inputs: [
+    type: "function",
+    name: "USD_THRESHOLD",
+    inputs: [],
+    outputs: [
       {
-        internalType: "uint256",
-        name: "amountToWithdraw",
+        name: "",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
-    name: "ZeroSharesToBurn",
-    type: "error",
+    stateMutability: "view",
   },
   {
-    anonymous: false,
+    type: "function",
+    name: "addVault",
     inputs: [
       {
-        indexed: false,
-        internalType: "uint256",
-        name: "sharePrice",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "apr",
-        type: "int256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "lastStoredSharePrice",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "duration",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "tvl",
-        type: "uint256",
-      },
-    ],
-    name: "APR",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
         name: "vault",
         type: "address",
+        internalType: "address",
+      },
+      {
+        name: "newTargetProportions",
+        type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "AddVault",
-    type: "event",
+    outputs: [],
+    stateMutability: "nonpayable",
   },
   {
-    anonymous: false,
+    type: "function",
+    name: "allowance",
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
         name: "owner",
         type: "address",
+        internalType: "address",
       },
       {
-        indexed: true,
-        internalType: "address",
         name: "spender",
         type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "approve",
+    inputs: [
+      {
+        name: "spender",
+        type: "address",
+        internalType: "address",
       },
       {
-        indexed: false,
-        internalType: "uint256",
         name: "value",
         type: "uint256",
+        internalType: "uint256",
       },
     ],
-    name: "Approval",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
+    outputs: [
       {
-        indexed: false,
-        internalType: "address",
-        name: "platform",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "ts",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "block",
-        type: "uint256",
+        name: "",
+        type: "bool",
+        internalType: "bool",
       },
     ],
-    name: "ContractInitialized",
-    type: "event",
+    stateMutability: "nonpayable",
   },
   {
-    anonymous: false,
+    type: "function",
+    name: "assets",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address[]",
+        internalType: "address[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "assetsForDeposit",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address[]",
+        internalType: "address[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "assetsForWithdraw",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address[]",
+        internalType: "address[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "balanceOf",
     inputs: [
       {
-        indexed: true,
-        internalType: "address",
         name: "account",
         type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "assets",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "amounts",
-        type: "uint256[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "mintAmount",
-        type: "uint256",
-      },
-    ],
-    name: "DepositAssets",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint64",
-        name: "version",
-        type: "uint64",
-      },
-    ],
-    name: "Initialized",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "maxShares",
-        type: "uint256",
-      },
-    ],
-    name: "MaxSupply",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "withdrawShares",
-        type: "uint256[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "depositAmountsProportions",
-        type: "uint256[]",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "cost",
-        type: "int256",
-      },
-    ],
-    name: "Rebalance",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "proportions",
-        type: "uint256[]",
-      },
-    ],
-    name: "TargetProportions",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
         internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
       },
     ],
-    name: "Transfer",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "string",
-        name: "newName",
-        type: "string",
-      },
-    ],
-    name: "VaultName",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "string",
-        name: "newSymbol",
-        type: "string",
-      },
-    ],
-    name: "VaultSymbol",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "assets",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "sharesAmount",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256[]",
-        name: "amountsOut",
-        type: "uint256[]",
-      },
-    ],
-    name: "WithdrawAssets",
-    type: "event",
-  },
-  {
-    inputs: [],
-    name: "CONTROLLABLE_VERSION",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "USD_THRESHOLD",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "VERSION",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "vault", type: "address" },
-      {
-        internalType: "uint256[]",
-        name: "newTargetProportions",
-        type: "uint256[]",
-      },
-    ],
-    name: "addVault",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "owner", type: "address" },
-      { internalType: "address", name: "spender", type: "address" },
-    ],
-    name: "allowance",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address", name: "spender", type: "address" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-    ],
-    name: "approve",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "assets",
-    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "assetsForDeposit",
-    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "assetsForWithdraw",
-    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "createdBlock",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "currentProportions",
     outputs: [
       {
-        internalType: "uint256[]",
-        name: "proportions",
-        type: "uint256[]",
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
       },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
-    name: "decimals",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "pure",
     type: "function",
-  },
-  {
+    name: "cachePrices",
     inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
       {
+        name: "clear",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "changeWhitelist",
+    inputs: [
+      {
+        name: "addr",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "addToWhitelist",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "currentProportions",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256[]",
         internalType: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "decimals",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint8",
+        internalType: "uint8",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "depositAssets",
+    inputs: [
+      {
+        name: "assets_",
+        type: "address[]",
+
+        internalType: "address[]",
+      },
+      {
         name: "amountsMax",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
-      { internalType: "uint256", name: "minSharesOut", type: "uint256" },
-      { internalType: "address", name: "receiver", type: "address" },
+      {
+        name: "minSharesOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "receiver",
+        type: "address",
+        internalType: "address",
+      },
     ],
-    name: "depositAssets",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "emitAPR",
+    inputs: [],
     outputs: [
-      { internalType: "uint256", name: "sharePrice", type: "uint256" },
-      { internalType: "int256", name: "apr", type: "int256" },
       {
+        name: "sharePrice",
+        type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "apr",
+        type: "int256",
+        internalType: "int256",
+      },
+      {
         name: "lastStoredSharePrice",
         type: "uint256",
+        internalType: "uint256",
       },
-      { internalType: "uint256", name: "duration", type: "uint256" },
+      {
+        name: "duration",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
+    type: "function",
+    name: "initialize",
     inputs: [
-      { internalType: "address", name: "platform_", type: "address" },
-      { internalType: "string", name: "type_", type: "string" },
-      { internalType: "address", name: "pegAsset_", type: "address" },
-      { internalType: "string", name: "name_", type: "string" },
-      { internalType: "string", name: "symbol_", type: "string" },
-      { internalType: "address[]", name: "vaults_", type: "address[]" },
       {
-        internalType: "uint256[]",
+        name: "platform_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "type_",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "pegAsset_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "name_",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "symbol_",
+        type: "string",
+        internalType: "string",
+      },
+      {
+        name: "vaults_",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
         name: "proportions_",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "internalSharePrice",
+    inputs: [],
     outputs: [
-      { internalType: "uint256", name: "sharePrice", type: "uint256" },
-      { internalType: "int256", name: "apr", type: "int256" },
       {
+        name: "sharePrice",
+        type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "apr",
+        type: "int256",
+        internalType: "int256",
+      },
+      {
         name: "storedSharePrice",
         type: "uint256",
+        internalType: "uint256",
       },
-      { internalType: "uint256", name: "storedTime", type: "uint256" },
+      {
+        name: "storedTime",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "lastBlockDefenseDisabled",
     inputs: [],
-    name: "maxWithdrawAmountTx",
-    outputs: [{ internalType: "uint256", name: "maxAmount", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "name",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "pegAsset",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "platform",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
-      { internalType: "uint256[]", name: "amountsMax", type: "uint256[]" },
-    ],
-    name: "previewDepositAssets",
     outputs: [
       {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "maxDeposit",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "maxAmounts",
+        type: "uint256[]",
         internalType: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "maxWithdraw",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "mode",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "maxWithdraw",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "amount",
+
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "maxWithdrawAmountTx",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "maxWithdrawUnderlying",
+    inputs: [
+      {
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "account",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "name",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "pegAsset",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "previewDepositAssets",
+    inputs: [
+      {
+        name: "assets_",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "amountsMax",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    outputs: [
+      {
         name: "amountsConsumed",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
-      { internalType: "uint256", name: "sharesOut", type: "uint256" },
-      { internalType: "uint256", name: "valueOut", type: "uint256" },
+      {
+        name: "sharesOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "valueOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "price",
+    inputs: [],
     outputs: [
-      { internalType: "uint256", name: "price_", type: "uint256" },
-      { internalType: "bool", name: "trusted_", type: "bool" },
+      {
+        name: "price_",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "trusted",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
+    type: "function",
+    name: "rebalance",
     inputs: [
       {
-        internalType: "uint256[]",
         name: "withdrawShares",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
       {
-        internalType: "uint256[]",
         name: "depositAmountsProportions",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "rebalance",
     outputs: [
       {
-        internalType: "uint256[]",
         name: "proportions",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
-      { internalType: "int256", name: "cost", type: "int256" },
+      {
+        name: "cost",
+        type: "int256",
+        internalType: "int256",
+      },
     ],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "newName", type: "string" }],
-    name: "setName",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
-  },
-  {
-    inputs: [{ internalType: "string", name: "newSymbol", type: "string" }],
-    name: "setSymbol",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
+    name: "recoveryToken",
     inputs: [
       {
-        internalType: "uint256[]",
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "removeVault",
+    inputs: [
+      {
+        name: "vault",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setLastBlockDefenseDisabled",
+    inputs: [
+      {
+        name: "isDisabled",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+
+  {
+    type: "function",
+    name: "setLastBlockDefenseDisabledTx",
+    inputs: [
+      {
+        name: "disableMode",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setName",
+    inputs: [
+      {
+        name: "newName",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setRecoveryToken",
+    inputs: [
+      {
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "recoveryToken_",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setSymbol",
+    inputs: [
+      {
+        name: "newSymbol",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setTargetProportions",
+    inputs: [
+      {
         name: "newTargetProportions",
         type: "uint256[]",
+        internalType: "uint256[]",
       },
     ],
-    name: "setTargetProportions",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [{ internalType: "bytes4", name: "interfaceId", type: "bytes4" }],
-    name: "supportsInterface",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
     type: "function",
-  },
-  {
-    inputs: [],
     name: "symbol",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+        internalType: "string",
+      },
+    ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "targetProportions",
-    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "totalSupply",
-    outputs: [{ internalType: "uint256", name: "_tvl", type: "uint256" }],
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [
-      { internalType: "address", name: "to", type: "address" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-    ],
+    type: "function",
     name: "transfer",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    inputs: [
+      {
+        name: "to",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "value",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [
-      { internalType: "address", name: "from", type: "address" },
-      { internalType: "address", name: "to", type: "address" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-    ],
+    type: "function",
     name: "transferFrom",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    inputs: [
+      {
+        name: "from",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "to",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "value",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
     stateMutability: "nonpayable",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "tvl",
+    inputs: [],
     outputs: [
-      { internalType: "uint256", name: "tvl_", type: "uint256" },
-      { internalType: "bool", name: "trusted_", type: "bool" },
+      {
+        name: "tvl_",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "trusted",
+        type: "bool",
+        internalType: "bool",
+      },
     ],
     stateMutability: "view",
-    type: "function",
   },
   {
-    inputs: [],
+    type: "function",
     name: "vaultForDeposit",
-    outputs: [{ internalType: "address", name: "target", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
-    name: "vaultForWithdraw",
-    outputs: [{ internalType: "address", name: "target", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "vaultType",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "vaults",
-    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-      {
-        internalType: "uint256[]",
-        name: "minAssetAmountsOut",
-        type: "uint256[]",
-      },
-    ],
-    name: "withdrawAssets",
-    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      { internalType: "address[]", name: "assets_", type: "address[]" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
-      {
-        internalType: "uint256[]",
-        name: "minAssetAmountsOut",
-        type: "uint256[]",
-      },
-      { internalType: "address", name: "receiver", type: "address" },
-      { internalType: "address", name: "owner", type: "address" },
-    ],
-    name: "withdrawAssets",
     outputs: [
-      { internalType: "uint256[]", name: "amountsOut", type: "uint256[]" },
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "vaultForWithdraw",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "vaultType",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+        internalType: "string",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "vaults",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "address[]",
+        internalType: "address[]",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "whitelisted",
+    inputs: [
+      {
+        name: "addr",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "withdrawAssets",
+    inputs: [
+      {
+        name: "assets_",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "amountShares",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minAssetAmountsOut",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
     ],
     stateMutability: "nonpayable",
-    type: "function",
   },
-] as const;
+  {
+    type: "function",
+    name: "withdrawAssets",
+    inputs: [
+      {
+        name: "assets_",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "amountShares",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minAssetAmountsOut",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+      {
+        name: "receiver",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "withdrawUnderlying",
+    inputs: [
+      {
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minUnderlyingOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "receiver",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "owner",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+    outputs: [
+      {
+        name: "underlyingOut",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "withdrawUnderlyingEmergency",
+    inputs: [
+      {
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "owners",
+        type: "address[]",
+        internalType: "address[]",
+      },
+      {
+        name: "amounts",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+      {
+        name: "minUnderlyingOut",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+      {
+        name: "pausedRecoveryTokens",
+        type: "bool[]",
+        internalType: "bool[]",
+      },
+    ],
+    outputs: [
+      {
+        name: "amountOut",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+      {
+        name: "recoveryAmountOut",
+        type: "uint256[]",
+        internalType: "uint256[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    name: "APR",
+    inputs: [
+      {
+        name: "sharePrice",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "apr",
+        type: "int256",
+        indexed: false,
+        internalType: "int256",
+      },
+      {
+        name: "lastStoredSharePrice",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "duration",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "tvl",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "AddVault",
+    inputs: [
+      {
+        name: "vault",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Approval",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "spender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "value",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "DepositAssets",
+    inputs: [
+      {
+        name: "account",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "assets",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+      {
+        name: "amounts",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+      {
+        name: "mintAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "LastBlockDefenseDisabled",
+    inputs: [
+      {
+        name: "isDisabled",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "MaxSupply",
+    inputs: [
+      {
+        name: "maxShares",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Rebalance",
+    inputs: [
+      {
+        name: "withdrawShares",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+      {
+        name: "depositAmountsProportions",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+      {
+        name: "cost",
+        type: "int256",
+        indexed: false,
+        internalType: "int256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "RemoveVault",
+    inputs: [
+      {
+        name: "vault",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "TargetProportions",
+
+    inputs: [
+      {
+        name: "proportions",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Transfer",
+    inputs: [
+      {
+        name: "from",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "to",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "value",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "VaultName",
+    inputs: [
+      {
+        name: "newName",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "VaultSymbol",
+    inputs: [
+      {
+        name: "newSymbol",
+        type: "string",
+        indexed: false,
+        internalType: "string",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "WhitelistChanged",
+    inputs: [
+      {
+        name: "owner",
+        type: "address",
+        indexed: false,
+        internalType: "address",
+      },
+      {
+        name: "whitelisted",
+        type: "bool",
+        indexed: false,
+        internalType: "bool",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "WithdrawAssets",
+    inputs: [
+      {
+        name: "sender",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "owner",
+        type: "address",
+        indexed: true,
+        internalType: "address",
+      },
+      {
+        name: "assets",
+        type: "address[]",
+        indexed: false,
+        internalType: "address[]",
+      },
+      {
+        name: "sharesAmount",
+        type: "uint256",
+        indexed: false,
+        internalType: "uint256",
+      },
+      {
+        name: "amountsOut",
+        type: "uint256[]",
+        indexed: false,
+        internalType: "uint256[]",
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "error",
+    name: "ExceedMaxSupply",
+    inputs: [
+      {
+        name: "maxSupply",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "ExceedSlippage",
+    inputs: [
+      {
+        name: "mintToUser",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "minToMint",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "IncorrectProportions",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "IncorrectRebalanceArgs",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "IncorrectVault",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "MaxAmountForWithdrawPerTxReached",
+    inputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "maxAmount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "NotSupported",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "NotWhitelisted",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "RecoveryTokenNotSet",
+    inputs: [
+      {
+        name: "cVault_",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+
+    name: "TooHighAmount",
+    inputs: [
+      {
+        name: "amount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "maxAmount",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "UsdAmountLessThreshold",
+    inputs: [
+      {
+        name: "amountUsd",
+        type: "uint256",
+        internalType: "uint256",
+      },
+      {
+        name: "threshold",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "VaultNotFound",
+    inputs: [
+      {
+        name: "vault",
+        type: "address",
+        internalType: "address",
+      },
+    ],
+  },
+  {
+    type: "error",
+    name: "WaitAFewBlocks",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "ZeroSharesToBurn",
+    inputs: [
+      {
+        name: "amountToWithdraw",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+  },
+];
