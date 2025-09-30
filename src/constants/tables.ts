@@ -507,6 +507,35 @@ const MARKET_TABLE: TTableColumn[] = [
   },
 ];
 
+const MARKET_USERS_TABLE: TTableColumn[] = [
+  {
+    name: "User",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+
+  {
+    name: "Collateral",
+    keyName: "collateral",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Debt",
+    keyName: "debt",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "LTV",
+    keyName: "LTV",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -537,4 +566,5 @@ export {
   MARKET_TABLE,
   MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
+  MARKET_USERS_TABLE,
 };

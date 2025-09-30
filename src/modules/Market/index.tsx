@@ -23,8 +23,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
-  const chain = CHAINS.find(({ id }) => id == network);
-
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
   const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
@@ -45,8 +43,11 @@ const Market: React.FC<IProps> = ({ network, market }) => {
             Number(b.supplyTVL) - Number(a.supplyTVL)
         );
 
+      const chain = CHAINS.find(({ id }) => id == network);
+
       setLocalMarket({
         name: market,
+        network: chain,
         assets: marketAssets as TMarketAsset[],
       } as TMarket);
     }
@@ -75,17 +76,17 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                     </span>
                     <div className="flex items-center gap-2">
                       <img
-                        src={chain?.logoURI}
-                        alt={chain?.name}
+                        src={localMarket?.network?.logoURI}
+                        alt={localMarket?.network?.name}
                         className="w-5 h-5 rounded-full"
                       />
 
                       <span className="text-[14px] leading-5 font-semibold">
-                        {chain?.name}
+                        {localMarket?.network?.name}
                       </span>
 
                       <span className="text-[12px] leading-4 font-medium bg-[#2B2C2F] border border-[#58595D] rounded px-2 py-[2px]">
-                        {chain?.id}
+                        {localMarket?.network?.id}
                       </span>
                     </div>
                   </div>
@@ -159,12 +160,18 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   setActiveAsset={setActiveAsset}
                 />
                 <SectionSelector
+                  market={market}
                   activeSection={activeSection}
                   setActiveSection={setActiveSection}
                 />
               </div>
             </div>
-            <MarketTabs section={activeSection} asset={activeAsset} />
+            <MarketTabs
+              network={network}
+              market={market}
+              section={activeSection}
+              asset={activeAsset}
+            />
           </div>
         </div>
       </div>
