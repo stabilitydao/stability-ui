@@ -365,19 +365,25 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
 
           APRArray = {
-            latest: APR,
-            daily: determineAPR(
-              vault?.income?.apr24h,
-              dailyTotalAPRWithFees,
-              APR,
-              vault.strategyShortId
-            ),
-            weekly: determineAPR(
-              vault?.income?.aprWeek,
-              weeklyTotalAPRWithFees,
-              APR,
-              vault.strategyShortId
-            ),
+            latest: Number(APR) < 0 ? "0" : APR,
+            daily:
+              Number(dailyTotalAPRWithFees) < 0
+                ? "0"
+                : determineAPR(
+                    vault?.income?.apr24h,
+                    dailyTotalAPRWithFees,
+                    APR,
+                    vault.strategyShortId
+                  ),
+            weekly:
+              Number(weeklyTotalAPRWithFees) < 0
+                ? "0"
+                : determineAPR(
+                    vault?.income?.aprWeek,
+                    weeklyTotalAPRWithFees,
+                    APR,
+                    vault.strategyShortId
+                  ),
           };
 
           gemsAPR = {
@@ -434,6 +440,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
             weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
           };
+
           // strategyName != "CF"
           //   ? {
           //       latest: Number(dailyAPR).toFixed(2),
@@ -443,19 +450,25 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           //   : { latest: "-", daily: "-", weekly: "-" };
 
           farmAPR = {
-            latest: APRWithoutFees,
-            daily: determineAPR(
-              vault?.income?.apr24h,
-              dailyFarmApr,
-              APRWithoutFees,
-              vault.strategyShortId
-            ),
-            weekly: determineAPR(
-              vault?.income?.aprWeek,
-              weeklyFarmApr,
-              APRWithoutFees,
-              vault.strategyShortId
-            ),
+            latest: Number(APRWithoutFees) < 0 ? "0" : APRWithoutFees,
+            daily:
+              Number(dailyFarmApr) < 0
+                ? "0"
+                : determineAPR(
+                    vault?.income?.apr24h,
+                    dailyFarmApr,
+                    APRWithoutFees,
+                    vault.strategyShortId
+                  ),
+            weekly:
+              Number(weeklyFarmApr) < 0
+                ? "0"
+                : determineAPR(
+                    vault?.income?.aprWeek,
+                    weeklyFarmApr,
+                    APRWithoutFees,
+                    vault.strategyShortId
+                  ),
           };
         }
 
