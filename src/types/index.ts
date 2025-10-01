@@ -277,7 +277,7 @@ type TVault = {
   vsHoldAPR: number;
   assetsVsHold: THoldData[];
   isVsActive: boolean;
-  yearnProtocols: TYearnProtocol[];
+  // yearnProtocols: TYearnProtocol[];
   network: string;
   sonicPoints: undefined | number;
   ringsPoints: undefined | number;
