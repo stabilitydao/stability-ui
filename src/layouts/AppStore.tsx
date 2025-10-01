@@ -66,16 +66,16 @@ import {
 } from "@utils";
 
 import {
-  YEARN_PROTOCOLS,
+  // YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
-  BIG_INT_VALUES,
+  // BIG_INT_VALUES,
 } from "@constants";
 
 import type {
   TAddress,
   THoldData,
-  TYearnProtocol,
+  // TYearnProtocol,
   TVaults,
   TMultichainPrices,
   TAPIData,
@@ -196,13 +196,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           vault.assets as TAddress[]
         );
 
-        const strategyName = strategyInfo?.shortId;
+        // const strategyName = strategyInfo?.shortId;
 
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
-          (_: string) => BigInt(_)
-        );
+        // const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
+        //   (_: string) => BigInt(_)
+        // );
 
         let dailyAPR = 0;
         let rebalances = {};
@@ -298,7 +298,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           weekly: "0",
         };
 
-        const fee = vault?.almFee?.income || 0;
+        // const fee = vault?.almFee?.income || 0;
 
         if (daysFromLastHardWork < 3) {
           dailyFarmApr = vault.income?.apr24h
@@ -314,42 +314,43 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             poolSwapFeesAPRWeekly =
               underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
           }
-          if (strategyName === "IQMF" || strategyName === "IRMF") {
-            //////
-            poolSwapFeesAPRDaily =
-              Number(
-                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
 
-            poolSwapFeesAPRWeekly =
-              Number(
-                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
+          // if (strategyName === "IQMF" || strategyName === "IRMF") {
+          //   //////
+          //   poolSwapFeesAPRDaily =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
 
-            dailyAPR =
-              Number(
-                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
+          //   poolSwapFeesAPRWeekly =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
 
-            if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
-            if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
-            if (!dailyAPR) dailyAPR = 0;
-          }
+          //   dailyAPR =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
+
+          //   if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
+          //   if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
+          //   if (!dailyAPR) dailyAPR = 0;
+          // }
 
           APR = (Number(vault?.income?.aprLatest) + Number(dailyAPR)).toFixed(
             2
@@ -364,25 +365,19 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             Number(poolSwapFeesAPRWeekly) + Number(weeklyFarmApr);
 
           APRArray = {
-            latest: Number(APR) < 0 ? "0" : APR,
-            daily:
-              Number(dailyTotalAPRWithFees) < 0
-                ? "0"
-                : determineAPR(
-                    vault?.income?.apr24h,
-                    dailyTotalAPRWithFees,
-                    APR,
-                    vault.strategyShortId
-                  ),
-            weekly:
-              Number(weeklyTotalAPRWithFees) < 0
-                ? "0"
-                : determineAPR(
-                    vault?.income?.aprWeek,
-                    weeklyTotalAPRWithFees,
-                    APR,
-                    vault.strategyShortId
-                  ),
+            latest: APR,
+            daily: determineAPR(
+              vault?.income?.apr24h,
+              dailyTotalAPRWithFees,
+              APR,
+              vault.strategyShortId
+            ),
+            weekly: determineAPR(
+              vault?.income?.aprWeek,
+              weeklyTotalAPRWithFees,
+              APR,
+              vault.strategyShortId
+            ),
           };
 
           gemsAPR = {
@@ -434,35 +429,33 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   ),
           };
 
-          poolSwapFeesAPR =
-            strategyName != "CF"
-              ? {
-                  latest: Number(dailyAPR).toFixed(2),
-                  daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
-                  weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
-                }
-              : { latest: "-", daily: "-", weekly: "-" };
+          poolSwapFeesAPR = {
+            latest: Number(dailyAPR).toFixed(2),
+            daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+            weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
+          };
+          // strategyName != "CF"
+          //   ? {
+          //       latest: Number(dailyAPR).toFixed(2),
+          //       daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+          //       weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
+          //     }
+          //   : { latest: "-", daily: "-", weekly: "-" };
 
           farmAPR = {
-            latest: Number(APRWithoutFees) < 0 ? "0" : APRWithoutFees,
-            daily:
-              Number(dailyFarmApr) < 0
-                ? "0"
-                : determineAPR(
-                    vault?.income?.apr24h,
-                    dailyFarmApr,
-                    APRWithoutFees,
-                    vault.strategyShortId
-                  ),
-            weekly:
-              Number(weeklyFarmApr) < 0
-                ? "0"
-                : determineAPR(
-                    vault?.income?.aprWeek,
-                    weeklyFarmApr,
-                    APRWithoutFees,
-                    vault.strategyShortId
-                  ),
+            latest: APRWithoutFees,
+            daily: determineAPR(
+              vault?.income?.apr24h,
+              dailyFarmApr,
+              APRWithoutFees,
+              vault.strategyShortId
+            ),
+            weekly: determineAPR(
+              vault?.income?.aprWeek,
+              weeklyFarmApr,
+              APRWithoutFees,
+              vault.strategyShortId
+            ),
           };
         }
 
@@ -557,54 +550,54 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const isVsActive = daysFromCreation >= 10 && !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
-        let yearnProtocols: TYearnProtocol[] = [];
+        // let yearnProtocols: TYearnProtocol[] = [];
 
-        if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
-          YEARN_PROTOCOLS.map((protocol: string) => {
-            if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
-              switch (protocol) {
-                case "aave":
-                  yearnProtocols.push({
-                    title: "Aave",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
-                  });
-                  break;
-                case "compound":
-                  yearnProtocols.push({
-                    title: "Compound",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
-                  });
-                  break;
-                case "stargate":
-                  yearnProtocols.push({
-                    title: "Stargate",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
-                  });
-                  break;
-                case "stmatic":
-                  yearnProtocols.push({
-                    title: "Lido",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
-                  });
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
-        }
+        // if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
+        //   YEARN_PROTOCOLS.map((protocol: string) => {
+        //     if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
+        //       switch (protocol) {
+        //         case "aave":
+        //           yearnProtocols.push({
+        //             title: "Aave",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
+        //           });
+        //           break;
+        //         case "compound":
+        //           yearnProtocols.push({
+        //             title: "Compound",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
+        //           });
+        //           break;
+        //         case "stargate":
+        //           yearnProtocols.push({
+        //             title: "Stargate",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
+        //           });
+        //           break;
+        //         case "stmatic":
+        //           yearnProtocols.push({
+        //             title: "Lido",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
+        //           });
+        //           break;
+        //         default:
+        //           break;
+        //       }
+        //     }
+        //   });
+        // }
 
         if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()]) {
           strategySpecific =
             STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()];
         } else {
-          strategySpecific =
-            strategyInfo?.shortId === "DQMF"
-              ? (vault?.strategySpecific?.replace(
-                  /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
-                  ""
-                ) as string)
-              : (vault?.strategySpecific as string);
+          strategySpecific = vault?.strategySpecific as string;
+          // strategyInfo?.shortId === "DQMF"
+          //   ? (vault?.strategySpecific?.replace(
+          //       /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
+          //       ""
+          //     ) as string)
+          //   : (vault?.strategySpecific as string);
         }
         /////
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
@@ -771,7 +764,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             vsHoldAPR: Number(vsHoldAPR),
             assetsVsHold,
             isVsActive,
-            yearnProtocols,
+            // yearnProtocols,
             network: chainID,
             sonicPoints,
             ringsPoints,

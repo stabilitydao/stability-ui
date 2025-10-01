@@ -7,17 +7,22 @@ import { MARKET_SECTIONS } from "../../constants";
 import { MarketSectionTypes } from "@types";
 
 type TProps = {
+  market: string;
   activeSection: MarketSectionTypes;
   setActiveSection: Dispatch<SetStateAction<MarketSectionTypes>>;
 };
 
 const SectionSelector: React.FC<TProps> = ({
+  market,
   activeSection,
   setActiveSection,
 }) => {
   return (
     <div className="flex items-center gap-2">
       {MARKET_SECTIONS.map((section: MarketSectionTypes) => {
+        // temp
+        if (section === "Users" && market === "Main") return null;
+
         return (
           <div
             key={section}

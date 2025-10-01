@@ -1,4 +1,6 @@
-import { AssetSelector } from "./selectors/AssetSelector";
-import { SectionSelector } from "./selectors/SectionSelector";
+import { AssetSelector } from "./Selectors/AssetSelector";
+import { SectionSelector } from "./Selectors/SectionSelector";
 
-export { AssetSelector, SectionSelector };
+import { MarketTabs } from "./MarketTabs";
+
+export { AssetSelector, SectionSelector, MarketTabs };

@@ -277,7 +277,7 @@ type TVault = {
   vsHoldAPR: number;
   assetsVsHold: THoldData[];
   isVsActive: boolean;
-  yearnProtocols: TYearnProtocol[];
+  // yearnProtocols: TYearnProtocol[];
   network: string;
   sonicPoints: undefined | number;
   ringsPoints: undefined | number;
@@ -365,6 +365,13 @@ type TLeaderboard = {
       earned: number;
     };
   };
+};
+
+type TMarketUser = {
+  address: TAddress;
+  collateral: number;
+  debt: number;
+  LTV: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -619,7 +626,8 @@ type TTableData =
   | TTableStrategy[]
   | TLeaderboard[]
   | IExtendedYieldContest[]
-  | TPoolTable[];
+  | TPoolTable[]
+  | TMarketUser[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
@@ -628,7 +636,8 @@ type TDispatchedTableData =
   | Dispatch<SetStateAction<TTableStrategy[]>>
   | Dispatch<SetStateAction<TLeaderboard[]>>
   | Dispatch<SetStateAction<IExtendedYieldContest[]>>
-  | Dispatch<SetStateAction<TPoolTable[]>>;
+  | Dispatch<SetStateAction<TPoolTable[]>>
+  | Dispatch<SetStateAction<TMarketUser[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -804,6 +813,7 @@ export enum MarketSectionTypes {
   Borrow = "Borrow",
   Leverage = "Leverage",
   Information = "Information",
+  Users = "Users",
 }
 
 export enum TimelineTypes {
@@ -902,4 +912,5 @@ export type {
   TMarketAsset,
   TNetwork,
   TChartNames,
+  TMarketUser,
 };

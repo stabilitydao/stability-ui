@@ -45,6 +45,10 @@ const TableColumnSort: React.FC<TProps> = ({
     ID: "flex w-[10%] justify-start px-2 md:px-4",
     Chain: "flex w-[30%] md:w-[25%] justify-start px-2 md:px-4",
     TVL: "flex w-[15%] justify-start px-2 md:px-4",
+    User: "w-1/4 flex justify-start px-2 md:px-4",
+    Collateral: "w-1/4 flex justify-end px-2 md:px-4",
+    Debt: "w-1/4 flex justify-end px-2 md:px-4",
+    LTV: "w-1/4 flex justify-end px-2 md:px-4",
   };
 
   const tabController = () => {
