@@ -12,7 +12,7 @@ import { dataSorter } from "@utils";
 
 import { CHAINS, MARKET_TABLE } from "@constants";
 
-import { TTableColumn, TMarket, TMarketAsset } from "@types";
+import { TTableColumn, TMarket } from "@types";
 
 const Lending = (): JSX.Element => {
   const $isMarketsLoaded = useStore(isMarketsLoaded);
