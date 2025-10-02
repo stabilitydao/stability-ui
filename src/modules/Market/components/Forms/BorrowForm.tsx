@@ -10,7 +10,7 @@ const BorrowForm: React.FC<TProps> = ({ asset }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   return (
-    <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-6 w-1/3">
+    <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
           Borrow {assetData?.symbol}

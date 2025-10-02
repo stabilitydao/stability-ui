@@ -45,19 +45,25 @@ const Row: React.FC<IProps> = ({ market }) => {
               <span>{assetData?.symbol}</span>
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
-              {formatNumber(asset.supplyAPR, "format")}%
+              {!!Number(asset.supplyAPR) &&
+                `${formatNumber(asset.supplyAPR, "format")}%`}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
-              {formatNumber(asset.borrowAPR, "format")}%
+              {!!Number(asset.borrowAPR) &&
+                `${formatNumber(asset.borrowAPR, "format")}%`}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
-              {formatNumber(asset.supplyTVL, "abbreviate")}
+              {!!Number(asset.supplyTVL) &&
+                formatNumber(asset.supplyTVL, "abbreviate")}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
-              {formatNumber(asset.borrowTVL, "abbreviate")}
+              {!!Number(asset.borrowTVL) &&
+                formatNumber(asset.borrowTVL, "abbreviate")}
             </div>
             <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
-              {asset.maxLtv}% / {asset.liquidationThreshold}%
+              {!!Number(asset.maxLtv) &&
+                !!Number(asset.liquidationThreshold) &&
+                `${asset.maxLtv}% / ${asset.liquidationThreshold}%`}
             </div>
           </div>
         );

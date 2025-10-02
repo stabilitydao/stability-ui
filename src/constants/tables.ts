@@ -12,10 +12,6 @@ const FARMING_TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
 ];
 
-const MARKET_TABLE_FILTERS: TTableFilters[] = [
-  { name: "Markets", type: "dropdown", state: true },
-];
-
 const TABLE: TTableColumn[] = [
   {
     name: "Strategy",
@@ -564,7 +560,6 @@ export {
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
 };
