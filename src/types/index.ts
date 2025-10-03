@@ -761,6 +761,7 @@ type TMarketAsset = {
   supplyTVL: string;
   maxLtv: string;
   liquidationThreshold: string;
+  utilization: number;
 };
 
 type TMarket = {
@@ -771,6 +772,7 @@ type TMarket = {
   borrowAPR?: number;
   supplyTVL?: number;
   borrowTVL?: number;
+  utilization?: number;
 };
 
 // enums
@@ -811,7 +813,7 @@ export enum VaultTypes {
 export enum MarketSectionTypes {
   Deposit = "Deposit",
   Borrow = "Borrow",
-  Leverage = "Leverage",
+  // Leverage = "Leverage",
   Information = "Information",
   Users = "Users",
 }

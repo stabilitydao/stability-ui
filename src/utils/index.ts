@@ -30,6 +30,7 @@ import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
+import { updateQueryParams } from "./functions/updateQueryParams";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -69,4 +70,5 @@ export {
   getTransactionReceipt,
   copyAddress,
   exactToFixed,
+  updateQueryParams,
 };

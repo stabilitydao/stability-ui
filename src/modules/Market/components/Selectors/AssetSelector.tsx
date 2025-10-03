@@ -4,24 +4,36 @@ import { Dispatch, SetStateAction } from "react";
 
 import { motion } from "framer-motion";
 
-import { cn, getTokenData } from "@utils";
+import { cn, getTokenData, updateQueryParams } from "@utils";
 
-import { TMarketAsset, TTokenData } from "@types";
+import { TMarketAsset, TTokenData, MarketSectionTypes } from "@types";
 
 type TProps = {
   assets: TMarketAsset[];
+  activeSection: MarketSectionTypes;
   activeAsset: TMarketAsset | undefined;
   setActiveAsset: Dispatch<SetStateAction<TMarketAsset | undefined>>;
 };
 
 const AssetSelector: React.FC<TProps> = ({
   assets,
+  activeSection,
   activeAsset,
   setActiveAsset,
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
+
+  const changeAsset = (asset: TMarketAsset) => {
+    if (asset.address === assets[0].address) {
+      updateQueryParams({ asset: null });
+    } else {
+      updateQueryParams({ asset: asset.address });
+    }
+
+    setActiveAsset(asset);
+  };
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -32,7 +44,13 @@ const AssetSelector: React.FC<TProps> = ({
   }, []);
 
   return (
-    <div className="w-full md:w-auto overflow-hidden md:overflow-visible">
+    <div
+      className={cn(
+        "w-full md:w-auto overflow-hidden md:overflow-visible",
+        activeSection === MarketSectionTypes.Users &&
+          "opacity-0 pointer-events-none"
+      )}
+    >
       <motion.div
         ref={carouselRef}
         className="block md:hidden cursor-grab overflow-hidden"
@@ -55,7 +73,7 @@ const AssetSelector: React.FC<TProps> = ({
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
-                onClick={() => setActiveAsset(asset)}
+                onClick={() => changeAsset(asset)}
               >
                 <img
                   src={assetData.logoURI}
@@ -91,7 +109,7 @@ const AssetSelector: React.FC<TProps> = ({
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
-              onClick={() => setActiveAsset(asset)}
+              onClick={() => changeAsset(asset)}
             >
               <img
                 src={assetData.logoURI}

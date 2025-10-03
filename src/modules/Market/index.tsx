@@ -8,6 +8,8 @@ import { SectionSelector, AssetSelector, MarketTabs } from "./components";
 
 import { FullPageLoader, ErrorMessage } from "@ui";
 
+import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+
 import { CHAINS } from "@constants";
 
 import { markets, error } from "@store";
@@ -23,13 +25,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
+  const { asset, section } = getInitialStateFromUrl();
+
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
   const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
 
-  const [activeSection, setActiveSection] = useState<MarketSectionTypes>(
-    MarketSectionTypes.Deposit
-  );
+  const [activeSection, setActiveSection] =
+    useState<MarketSectionTypes>(section);
 
   useEffect(() => {
     if ($markets && market) {
@@ -55,7 +58,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   useEffect(() => {
     if (localMarket && !activeAsset) {
-      setActiveAsset(localMarket?.assets[0]);
+      if (asset) {
+        const urlAsset = localMarket?.assets.find(
+          ({ address }) => asset === address
+        );
+        setActiveAsset(urlAsset ? urlAsset : localMarket?.assets[0]);
+      } else {
+        setActiveAsset(localMarket?.assets[0]);
+      }
     }
   }, [localMarket]);
 
@@ -153,9 +163,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col lg:flex-row">
+              <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col-reverse lg:flex-row">
                 <AssetSelector
                   assets={localMarket.assets}
+                  activeSection={activeSection}
                   activeAsset={activeAsset}
                   setActiveAsset={setActiveAsset}
                 />

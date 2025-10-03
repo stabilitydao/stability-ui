@@ -1,3 +1,5 @@
+import { ProgressCircle } from "@ui";
+
 import { cn, formatNumber, getTokenData } from "@utils";
 
 import { TMarket, TMarketAsset } from "@types";
@@ -18,12 +20,9 @@ const Row: React.FC<IProps> = ({ market }) => {
         return (
           <div
             key={market.name + asset.address}
-            className={cn(
-              "text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center",
-              market.assets.length - 1 != index && "border-b border-b-[#23252A]"
-            )}
+            className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center"
           >
-            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A] lg:border-r-0">
+            <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A]">
               {!index ? (
                 <div className="flex items-center gap-3">
                   <img
@@ -32,11 +31,19 @@ const Row: React.FC<IProps> = ({ market }) => {
                     className="w-6 h-6 rounded-full"
                   />
 
-                  <span className="text-[14px] leading-5">{market.name}</span>
+                  <span className="text-[12px] leading-4 md:text-[14px] md:leading-5">
+                    {market.name}
+                  </span>
                 </div>
               ) : null}
             </div>
-            <div className="px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2">
+            <div
+              className={cn(
+                "px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2 h-full",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
               <img
                 src={assetData?.logoURI}
                 alt={assetData?.symbol}
@@ -44,23 +51,53 @@ const Row: React.FC<IProps> = ({ market }) => {
               />
               <span>{assetData?.symbol}</span>
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
+            <div
+              className={cn(
+                "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
               {!!Number(asset.supplyAPR) &&
                 `${formatNumber(asset.supplyAPR, "format")}%`}
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
+            <div
+              className={cn(
+                "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
               {!!Number(asset.borrowAPR) &&
                 `${formatNumber(asset.borrowAPR, "format")}%`}
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[100px] md:w-[13%]">
+            <div
+              className={cn(
+                "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
               {!!Number(asset.supplyTVL) &&
                 formatNumber(asset.supplyTVL, "abbreviate")}
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
-              {!!Number(asset.borrowTVL) &&
-                formatNumber(asset.borrowTVL, "abbreviate")}
+            <div
+              className={cn(
+                "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
+              <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
+              <span>{asset.utilization.toFixed(2)}%</span>
             </div>
-            <div className="px-2 md:px-4 text-right text-[16px] w-[150px] md:w-[13%]">
+            <div
+              className={cn(
+                "px-2 md:px-4 flex items-center justify-end text-[16px] w-[150px] md:w-[13%] h-full whitespace-nowrap",
+                market.assets.length - 1 != index &&
+                  "border-b border-b-[#23252A]"
+              )}
+            >
               {!!Number(asset.maxLtv) &&
                 !!Number(asset.liquidationThreshold) &&
                 `${asset.maxLtv}% / ${asset.liquidationThreshold}%`}

@@ -85,8 +85,16 @@ const Lending = (): JSX.Element => {
         Object.entries($markets[network.id] ?? {}).map(([name, assets]) => {
           const formattedAssets = Object.entries(assets).map(
             ([address, data]) => {
+              const utilization = Number(data?.supplyTVL)
+                ? Math.min(
+                    (Number(data?.borrowTVL) / Number(data?.supplyTVL)) * 100,
+                    100
+                  )
+                : 0;
+
               return {
                 address,
+                utilization,
                 ...data,
               };
             }
@@ -109,6 +117,10 @@ const Lending = (): JSX.Element => {
             ...formattedAssets.map((asset) => Number(asset.maxLtv) || 0)
           );
 
+          const utilization = Math.max(
+            ...formattedAssets.map((asset) => Number(asset.utilization) || 0)
+          );
+
           return {
             name,
             assets: formattedAssets,
@@ -118,6 +130,7 @@ const Lending = (): JSX.Element => {
             borrowTVL,
             network,
             LTV,
+            utilization,
           };
         })
       );

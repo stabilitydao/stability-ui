@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { motion } from "framer-motion";
 
-import { cn } from "@utils";
+import { cn, updateQueryParams } from "@utils";
 
 import { MARKET_SECTIONS } from "../../constants";
 
@@ -24,6 +24,16 @@ const SectionSelector: React.FC<TProps> = ({
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
+
+  const changeSection = (section: MarketSectionTypes) => {
+    if (section === MarketSectionTypes.Deposit) {
+      updateQueryParams({ section: null });
+    } else {
+      updateQueryParams({ section });
+    }
+
+    setActiveSection(section);
+  };
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -58,7 +68,7 @@ const SectionSelector: React.FC<TProps> = ({
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
-                onClick={() => setActiveSection(section)}
+                onClick={() => changeSection(section)}
               >
                 <span
                   className={cn(
@@ -88,7 +98,7 @@ const SectionSelector: React.FC<TProps> = ({
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
-              onClick={() => setActiveSection(section)}
+              onClick={() => changeSection(section)}
             >
               <span
                 className={cn(

@@ -1,6 +1,6 @@
 import { DepositTab } from "./Tabs/DepositTab";
 import { BorrowTab } from "./Tabs/BorrowTab";
-import { LeverageTab } from "./Tabs/LeverageTab";
+// import { LeverageTab } from "./Tabs/LeverageTab";
 import { InformationTab } from "./Tabs/InformationTab";
 import { UsersTab } from "./Tabs/UsersTab";
 
@@ -19,8 +19,8 @@ const MarketTabs: React.FC<TProps> = ({ network, market, section, asset }) => {
       return <DepositTab asset={asset} />;
     case MarketSectionTypes.Borrow:
       return <BorrowTab asset={asset} />;
-    case MarketSectionTypes.Leverage:
-      return <LeverageTab asset={asset} />;
+    // case MarketSectionTypes.Leverage:
+    //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:
       return <InformationTab asset={asset} />;
     case MarketSectionTypes.Users:

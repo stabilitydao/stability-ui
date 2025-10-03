@@ -17,9 +17,8 @@ import { ProtocolModal } from "./components/Modals/ProtocolModal";
 import { TextSkeleton } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
-import { updateQueryParams } from "./functions/updateQueryParams";
 
-import { cn, formatNumber, dataSorter } from "@utils";
+import { cn, formatNumber, dataSorter, updateQueryParams } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
