@@ -1,4 +1,6 @@
-export const updateQueryParams = (updates: Record<string, string | null>) => {
+export const updateQueryParams = (
+  updates: Record<string, string | null>
+): void => {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
 

@@ -96,9 +96,9 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
                   />
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user.collateral <= 0.01
-                    ? user.collateral.toFixed(4)
-                    : formatNumber(user.collateral.toFixed(), "format")}
+                  {user.collateral
+                    ? formatNumber(user.collateral, "abbreviate")?.slice(1)
+                    : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
                   {user.debt
@@ -106,7 +106,7 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
                     : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user.LTV ? `${(user.LTV * 100).toFixed()}%` : ""}
+                  {user.LTV ? `${(user.LTV * 100).toFixed(2)}%` : ""}
                 </div>
               </div>
             ))}

@@ -11,14 +11,14 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start gap-6 w-full">
-        <div className="flex flex-col gap-3 w-1/2">
+      <div className="flex items-start flex-col lg:flex-row gap-6 w-full">
+        <div className="flex flex-col gap-3 w-full lg:w-1/2">
           <div className="flex items-center gap-3 text-[24px] leading-8 font-medium">
             <span>{assetData?.symbol}</span>
             <span className="text-[#7C7E81]">{assetData?.name}</span>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-6 w-full font-medium">
+            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-4 md:gap-6 w-full font-medium">
               <div className="w-1/2 flex flex-col items-start">
                 <span className="text-[#7C7E81] text-[14px] leading-5">
                   Supply APR
@@ -32,8 +32,8 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
                 <span className="text-[32px] leading-10">6.2%</span>
               </div>
             </div>
-            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start gap-6 w-full font-medium">
-              <div className="w-1/2 flex flex-col items-start gap-2">
+            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col md:flex-row gap-2 md:gap-6 w-full font-medium">
+              <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
                 <div className="flex items-center justify-between text-[16px] leading-6 w-full">
                   <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
                     <span>Utilization</span>
@@ -91,7 +91,7 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-1/2 flex flex-col items-start gap-2">
+              <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
                 <div className="flex items-center justify-between text-[16px] leading-6 w-full">
                   <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
                     <span>Oracle</span>
@@ -180,13 +180,13 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-3 w-1/2">
+        <div className="flex flex-col gap-3 w-full lg:w-1/2">
           <div className="flex items-center gap-3 text-[24px] leading-8 font-medium">
             <span>S</span>
             <span className="text-[#7C7E81]">Sonic</span>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-6 w-full font-medium">
+            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-4 md:gap-6 w-full font-medium">
               <div className="w-1/2 flex flex-col items-start">
                 <span className="text-[#7C7E81] text-[14px] leading-5">
                   Supply APR
@@ -200,8 +200,8 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
                 <span className="text-[32px] leading-10">6.2%</span>
               </div>
             </div>
-            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start gap-6 w-full font-medium">
-              <div className="w-1/2 flex flex-col items-start gap-2">
+            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col md:flex-row gap-2 md:gap-6 w-full font-medium">
+              <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
                 <div className="flex items-center justify-between text-[16px] leading-6 w-full">
                   <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
                     <span>Utilization</span>
@@ -259,7 +259,7 @@ const InformationTab: React.FC<TProps> = ({ asset }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-1/2 flex flex-col items-start gap-2">
+              <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
                 <div className="flex items-center justify-between text-[16px] leading-6 w-full">
                   <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
                     <span>Oracle</span>

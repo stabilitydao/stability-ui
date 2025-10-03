@@ -1,3 +1,5 @@
+import { cn } from "@utils";
+
 import type { TTableColumn } from "@types";
 
 type TProps = {
@@ -15,7 +17,7 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     "Supply APR": "w-[100px] md:w-[13%] justify-end",
     "Borrow APR": "w-[100px] md:w-[13%] justify-end",
     "Supply TVL": "w-[100px] md:w-[13%] justify-end",
-    "Available to borrow": "w-[150px] md:w-[13%] text-center justify-end",
+    Utilization: "w-[150px] md:w-[13%] text-center justify-end",
     "maxLTV / LT": "w-[150px] md:w-[13%] justify-end",
   };
 
@@ -67,11 +69,17 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   return (
     <div
       onClick={tabController}
-      className={`flex items-center text-[12px] font-manrope font-semibold ${table[index].unsortable ? "" : "cursor-pointer"} px-2 md:px-4 py-2 ${styles[value] || "text-center"}`}
+      className={cn(
+        "whitespace-nowrap flex items-center text-[12px] font-manrope font-semibold px-2 md:px-4 py-2",
+        !table[index].unsortable && "cursor-pointer",
+        styles[value] || "text-center"
+      )}
       data-testid="sort"
     >
       <p
-        className={`${table[index].sortType !== "none" ? "text-white" : "text-[#97979A]"}`}
+        className={cn(
+          table[index].sortType !== "none" ? "text-white" : "text-[#97979A]"
+        )}
       >
         {value}
       </p>

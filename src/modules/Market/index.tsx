@@ -8,6 +8,8 @@ import { SectionSelector, AssetSelector, MarketTabs } from "./components";
 
 import { FullPageLoader, ErrorMessage } from "@ui";
 
+import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+
 import { CHAINS } from "@constants";
 
 import { markets, error } from "@store";
@@ -23,13 +25,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
+  const { asset, section } = getInitialStateFromUrl();
+
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
   const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
 
-  const [activeSection, setActiveSection] = useState<MarketSectionTypes>(
-    MarketSectionTypes.Deposit
-  );
+  const [activeSection, setActiveSection] =
+    useState<MarketSectionTypes>(section);
 
   useEffect(() => {
     if ($markets && market) {
@@ -55,7 +58,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   useEffect(() => {
     if (localMarket && !activeAsset) {
-      setActiveAsset(localMarket?.assets[0]);
+      if (asset) {
+        const urlAsset = localMarket?.assets.find(
+          ({ address }) => asset === address
+        );
+        setActiveAsset(urlAsset ? urlAsset : localMarket?.assets[0]);
+      } else {
+        setActiveAsset(localMarket?.assets[0]);
+      }
     }
   }, [localMarket]);
 
@@ -69,8 +79,8 @@ const Market: React.FC<IProps> = ({ network, market }) => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
-                <div className="flex items-center py-[10px]">
-                  <div className="flex items-center gap-3 px-4 border-r border-r-[#232429]">
+                <div className="flex items-center px-4 pt-4 pb-[10px] md:px-0 md:py-[10px] flex-wrap gap-2">
+                  <div className="flex items-center gap-3 pl-2 pr-4  border-r border-r-[#232429]">
                     <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
                       Network / ID:
                     </span>
@@ -91,7 +101,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                     </div>
                   </div>
                   <a
-                    className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
+                    className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
                     href="#"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
@@ -105,7 +115,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                     />
                   </a>
                   <a
-                    className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
+                    className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
                     href="#"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
@@ -118,7 +128,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                       className="w-4 h-4"
                     />
                   </a>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
                     <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
                       Reviewed
                     </span>
@@ -129,7 +139,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                       className="w-4 h-4"
                     />
                   </div>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
                     <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
                       Immutable & Permissionless
                     </span>
@@ -140,7 +150,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                       className="w-4 h-4"
                     />
                   </div>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
+                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
                     <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
                       Isolated risk
                     </span>
@@ -153,9 +163,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-full flex items-center justify-between gap-10">
+              <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col-reverse lg:flex-row">
                 <AssetSelector
                   assets={localMarket.assets}
+                  activeSection={activeSection}
                   activeAsset={activeAsset}
                   setActiveAsset={setActiveAsset}
                 />

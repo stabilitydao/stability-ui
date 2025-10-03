@@ -24,6 +24,7 @@ import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
+import { ProgressCircle } from "./ProgressCircle";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -122,4 +123,5 @@ export {
   ChartTimelineSwitcher,
   MarketsTable,
   MetaVaultStrategies,
+  ProgressCircle,
 };
