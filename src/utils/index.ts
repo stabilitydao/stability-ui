@@ -35,6 +35,7 @@ import { updateQueryParams } from "./functions/updateQueryParams";
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
+import { useWindowWidth } from "./hooks/useWindowWidth";
 
 export {
   getTokenData,
@@ -71,4 +72,5 @@ export {
   copyAddress,
   exactToFixed,
   updateQueryParams,
+  useWindowWidth,
 };

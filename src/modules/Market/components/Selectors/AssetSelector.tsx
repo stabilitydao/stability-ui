@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction } from "react";
 
 import { motion } from "framer-motion";
 
-import { cn, getTokenData, updateQueryParams } from "@utils";
+import { cn, getTokenData, updateQueryParams, useWindowWidth } from "@utils";
 
 import { TMarketAsset, TTokenData, MarketSectionTypes } from "@types";
 
@@ -25,6 +25,8 @@ const AssetSelector: React.FC<TProps> = ({
 
   const [width, setWidth] = useState(0);
 
+  const windowWidth = useWindowWidth();
+
   const changeAsset = (asset: TMarketAsset) => {
     if (asset.address === assets[0].address) {
       updateQueryParams({ asset: null });
@@ -43,12 +45,17 @@ const AssetSelector: React.FC<TProps> = ({
     }
   }, []);
 
+  const isHidden =
+    activeSection === MarketSectionTypes.Users ||
+    (assets.length === 2 &&
+      windowWidth >= 1024 &&
+      activeSection === MarketSectionTypes.Information);
+
   return (
     <div
       className={cn(
         "w-full md:w-auto overflow-hidden md:overflow-visible",
-        activeSection === MarketSectionTypes.Users &&
-          "opacity-0 pointer-events-none"
+        isHidden && "opacity-0 pointer-events-none"
       )}
     >
       <motion.div

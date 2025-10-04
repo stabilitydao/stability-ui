@@ -180,6 +180,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
             <MarketTabs
               network={network}
               market={market}
+              marketData={localMarket}
               section={activeSection}
               asset={activeAsset}
             />

@@ -11,7 +11,9 @@ type TProps = {
 const DepositForm: React.FC<TProps> = ({ asset }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
-  return (
+  const isUnderDevelopment = true;
+
+  return !isUnderDevelopment ? (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
@@ -85,6 +87,12 @@ const DepositForm: React.FC<TProps> = ({ asset }) => {
                            needConfirm={needConfirm}
                            actionFunction={formHandler}
                          />  */}
+    </div>
+  ) : (
+    <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 h-[340px]">
+      <span className="font-bold text-[20px] leading-6 flex items-center justify-center text-center h-full">
+        This form is under development
+      </span>
     </div>
   );
 };

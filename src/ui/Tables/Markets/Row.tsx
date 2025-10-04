@@ -79,7 +79,7 @@ const Row: React.FC<IProps> = ({ market }) => {
               )}
             >
               {!!Number(asset.supplyTVL) &&
-                formatNumber(asset.supplyTVL, "abbreviate")}
+                formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}
             </div>
             <div
               className={cn(

@@ -751,6 +751,7 @@ type TMarketPrices = Record<string, TMarketPrice>;
 
 type TMarketAsset = {
   address: TAddress;
+  aToken: TAddress;
   borrowAPR: string;
   borrowCap: string;
   borrowTVL: string;

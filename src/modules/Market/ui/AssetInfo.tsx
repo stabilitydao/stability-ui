@@ -1,0 +1,175 @@
+import { AddressField } from "./AddressField";
+
+import { getTokenData, cn } from "@utils";
+
+import type { TMarketAsset, TAddress, TNetwork } from "@types";
+
+type TProps = {
+  asset: TMarketAsset;
+  isSingleAsset?: boolean;
+  network: TNetwork;
+};
+
+const AssetInfo: React.FC<TProps> = ({
+  asset,
+  isSingleAsset = false,
+  network,
+}) => {
+  const assetData = getTokenData(asset?.address as TAddress);
+
+  // const aTokenData = getTokenData(asset?.aToken as TAddress);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3",
+        isSingleAsset ? "w-full" : "w-full lg:w-1/2"
+      )}
+    >
+      <div className="flex items-center gap-3 text-[24px] leading-8 font-medium">
+        <span>{assetData?.symbol}</span>
+        <span className="text-[#7C7E81]">{assetData?.name}</span>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-4 md:gap-6 w-full font-medium">
+          <div className="w-1/2 flex flex-col items-start">
+            <span className="text-[#7C7E81] text-[14px] leading-5">
+              Supply APR
+            </span>
+            <span className="text-[32px] leading-10">
+              {Number(asset?.supplyAPR).toFixed(2)}%
+            </span>
+          </div>
+          <div className="w-1/2 flex flex-col items-start">
+            <span className="text-[#7C7E81] text-[14px] leading-5">
+              Borrow APR
+            </span>
+            <span className="text-[32px] leading-10">
+              {Number(asset?.borrowAPR).toFixed(2)}%
+            </span>
+          </div>
+        </div>
+        <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col md:flex-row gap-2 md:gap-6 w-full font-medium">
+          <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Utilization</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">32%</span>
+            </div>
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>IRM</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">Dynamic IRM</span>
+            </div>
+            <div className="flex items-start justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Available to borrow</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="font-semibold">97%</span>
+                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
+                  $26.8m
+                </span>
+              </div>
+            </div>
+            <div className="flex items-start justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>{assetData?.symbol} TVL</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="font-semibold">
+                  122.4m {assetData?.symbol}
+                </span>
+                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
+                  $39.8m
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Oracle</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">Red Stone</span>
+            </div>
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Max LTV</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">95%</span>
+            </div>
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Liquidation threshold</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">97%</span>
+            </div>
+            <div className="flex items-center justify-between text-[16px] leading-6 w-full">
+              <div className="text-[#7C7E81] flex items-center gap-2 font-medium">
+                <span>Liquidation fee</span>
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-4 h-4"
+                />
+              </div>
+              <span className="font-semibold">2.5%</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col items-start gap-2 w-full font-medium text-[16px] leading-6">
+          <AddressField
+            symbol={assetData?.symbol as string}
+            address={assetData?.address as TAddress}
+            explorer={network.explorer}
+          />
+          <AddressField
+            symbol="aToken"
+            address={asset?.aToken as TAddress}
+            explorer={network.explorer}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export { AssetInfo };
