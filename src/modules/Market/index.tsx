@@ -6,7 +6,7 @@ import { WagmiLayout } from "@layouts";
 
 import { SectionSelector, AssetSelector, MarketTabs } from "./components";
 
-import { FullPageLoader, ErrorMessage } from "@ui";
+import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
 
@@ -102,12 +102,12 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                   <a
                     className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
-                    href="#"
+                    href="https://riskreport.com"
+                    target="_blank"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
                       Risk report
                     </span>
-
                     <img
                       src="/icons/purple_link.png"
                       alt="Check risk report"
@@ -116,49 +116,38 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </a>
                   <a
                     className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
-                    href="#"
+                    href={`${localMarket?.network?.explorer}address`}
+                    target="_blank"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
                       0x78...Deea
                     </span>
-
                     <img
                       src="/icons/purple_link.png"
                       alt="address"
                       className="w-4 h-4"
                     />
                   </a>
-                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Reviewed
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <CustomTooltip
+                      name="Reviewed"
+                      description="desc"
+                      isMediumText={true}
                     />
                   </div>
-                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Immutable & Permissionless
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <CustomTooltip
+                      name="Immutable & Permissionless"
+                      description="desc"
+                      isMediumText={true}
                     />
                   </div>
-                  <div className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Isolated risk
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <CustomTooltip
+                      name="Isolated risk"
+                      description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
+                  Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
+                      isMediumText={true}
                     />
                   </div>
                 </div>

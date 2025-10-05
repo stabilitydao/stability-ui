@@ -58,6 +58,8 @@ import { Socials } from "./Socials";
 
 import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
 
+import { CustomTooltip } from "./CustomTooltip";
+
 //////// todo: delete
 
 import {
@@ -124,4 +126,5 @@ export {
   MarketsTable,
   MetaVaultStrategies,
   ProgressCircle,
+  CustomTooltip,
 };

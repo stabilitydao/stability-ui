@@ -252,18 +252,19 @@ const {
 		border-radius: 6px;
 	}
 
-	/* TOOLTIP */
+	/* TOOLTIPS */
 
 	.tooltip {
     	position:relative;
 	}
 
 	.tippy-box[data-theme~="custom"] {
-		background-color: #26282f !important; 
-		color: white !important;
+		background-color: #111114 !important; 
+		padding: 12px;
+		border: 1px solid #232429;
 	}
 	.tippy-box[data-theme~="custom"] .tippy-arrow {
-  		color:#26282f !important; 
+  		color: transparent !important;
 	}
 
 	.tooltip .visible__tooltip {
@@ -282,20 +283,6 @@ const {
 		box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.18), 0px 2px 5px 0px rgba(0, 0, 0, 0.18), 0px 3px 8px 0px rgba(0, 0, 0, 0.18), 0px 20px 20px -8px rgba(0, 0, 0, 0.18);
 		display:none;
 		pointer-events: none;
-	}
-	.toLeft {
-		top:230px !important;
-		left:-140px !important;
-	}
-	.toCenter {
-		top:110px !important;
-		left:100px !important;
-		width:350px !important;
-	}
-	.toLeftPlatform {
-		top:140px !important;
-		left:-240px !important;
-		width:370px !important;
 	}
 	.tooltip:hover .visible__tooltip {
 		display:block;
@@ -321,12 +308,6 @@ const {
 		left:50%;
 		transform:translate(-50%,-50%) rotate(45deg);
 		background-color:#26282f;
-	}
-	.toLeft i::after {
-  		display: none !important;
-	}
-	.toLeftPlatform i::after {
-  		display: none !important;
 	}
 	.visible__tooltip:hover {
 		display: none !important;

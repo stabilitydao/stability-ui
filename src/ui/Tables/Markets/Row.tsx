@@ -1,8 +1,13 @@
+import Tippy from "@tippyjs/react";
+
 import { ProgressCircle } from "@ui";
 
 import { cn, formatNumber, getTokenData } from "@utils";
 
 import { TMarket, TMarketAsset } from "@types";
+
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/shift-away.css";
 
 interface IProps {
   market: TMarket;
@@ -81,16 +86,25 @@ const Row: React.FC<IProps> = ({ market }) => {
               {!!Number(asset.supplyTVL) &&
                 formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}
             </div>
-            <div
-              className={cn(
-                "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
-                market.assets.length - 1 != index &&
-                  "border-b border-b-[#23252A]"
-              )}
+            <Tippy
+              content="desc"
+              placement="top"
+              animation="shift-away"
+              interactive={true}
+              delay={[100, 50]}
+              theme="custom"
             >
-              <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
-              <span>{asset.utilization.toFixed(2)}%</span>
-            </div>
+              <div
+                className={cn(
+                  "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
+                  market.assets.length - 1 != index &&
+                    "border-b border-b-[#23252A]"
+                )}
+              >
+                <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
+                <span>{asset.utilization.toFixed(2)}%</span>
+              </div>
+            </Tippy>
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[150px] md:w-[13%] h-full whitespace-nowrap",
