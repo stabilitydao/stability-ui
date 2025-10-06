@@ -16,7 +16,7 @@ const AssetsInfo: React.FC<TProps> = ({ activeAsset, assets, network }) => {
     return (
       <div className="flex items-start flex-col lg:flex-row gap-6 w-full">
         {assets.map((asset) => (
-          <AssetInfo key={asset.asset} asset={asset} network={network} />
+          <AssetInfo key={asset?.asset} asset={asset} network={network} />
         ))}
       </div>
     );

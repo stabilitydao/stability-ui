@@ -25,7 +25,7 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col gap-2 w-full font-medium text-[16px] leading-6">
           <div className="w-full flex items-center justify-between">
             <span className="text-[#7C7E81]">Market ID</span>
-            <span className="font-semibold">{market.name}</span>
+            <span className="font-semibold">{market?.name}</span>
           </div>
           {/* <AddressField
             symbol="Market"
@@ -39,7 +39,7 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
               description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
                               Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
             />
-            <span className="font-semibold">{market.deployed}</span>
+            <span className="font-semibold">{market?.deployed}</span>
           </div>
         </div>
       </div>

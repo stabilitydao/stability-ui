@@ -78,10 +78,10 @@ const AssetInfo: React.FC<TProps> = ({
                 />
                 <div className="flex flex-col items-end">
                   <span className="font-semibold">
-                    {formatNumber(asset.borrowTVL, "abbreviate")?.slice(1)}
+                    {formatNumber(asset?.borrowTVL, "abbreviate")?.slice(1)}
                   </span>
                   <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                    {formatNumber(asset.borrowTVLInUSD, "abbreviate")}
+                    {formatNumber(asset?.borrowTVLInUSD, "abbreviate")}
                   </span>
                 </div>
               </div>
@@ -92,17 +92,17 @@ const AssetInfo: React.FC<TProps> = ({
                 description="desc"
               />
               <span className="font-semibold">
-                {formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}{" "}
+                {formatNumber(asset?.supplyTVL, "abbreviate")?.slice(1)}{" "}
               </span>
             </div>
-            {!!Number(asset.cap) && (
+            {!!Number(asset?.cap) && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip
                   name={`${assetData?.symbol} Cap`}
                   description="desc"
                 />
                 <span className="font-semibold">
-                  {formatNumber(asset.cap, "abbreviate")?.slice(1)}{" "}
+                  {formatNumber(asset?.cap, "abbreviate")?.slice(1)}{" "}
                 </span>
               </div>
             )}
@@ -147,13 +147,13 @@ const AssetInfo: React.FC<TProps> = ({
           <AddressField
             symbol={assetData?.symbol as string}
             address={assetData?.address as TAddress}
-            explorer={network.explorer}
+            explorer={network?.explorer}
           />
 
           <AddressField
             symbol={asset?.aTokenSymbol as string}
             address={asset?.aToken as TAddress}
-            explorer={network.explorer}
+            explorer={network?.explorer}
           />
 
           {mintApp && (

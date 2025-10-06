@@ -37,10 +37,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     useState<MarketSectionTypes>(section);
 
   const handleAssetChange = (asset: TMarketAsset) => {
-    if (asset.asset === localMarket.assets[0].asset) {
+    if (asset?.asset === localMarket?.assets?.[0]?.asset) {
       updateQueryParams({ asset: null });
     } else {
-      updateQueryParams({ asset: asset.asset });
+      updateQueryParams({ asset: asset?.asset });
     }
 
     setActiveAsset(asset);
@@ -55,7 +55,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
     // temp
     if (section === MarketSectionTypes.Borrow && !activeAsset?.isBorrowable) {
-      const borrowableAssets = localMarket?.assets.filter(
+      const borrowableAssets = localMarket?.assets?.filter(
         ({ isBorrowable }) => isBorrowable
       );
       handleAssetChange(borrowableAssets[0]);
@@ -66,13 +66,13 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   useEffect(() => {
     if ($markets && market) {
-      const _market = $markets[network].find(
+      const _market = $markets[network]?.find(
         ({ marketId }) => marketId === market
       );
 
-      const marketAssets = _market?.reserves.sort(
+      const marketAssets = _market?.reserves?.sort(
         (a: TMarketAsset, b: TMarketAsset) =>
-          Number(b.supplyTVL) - Number(a.supplyTVL)
+          Number(b?.supplyTVL) - Number(a?.supplyTVL)
       );
 
       const chain = CHAINS.find(({ id }) => id == network);
@@ -80,10 +80,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       setLocalMarket({
         name: market,
         network: chain,
-        engine: _market.engine,
-        pool: _market.pool,
-        protocolDataProvider: _market.protocolDataProvider,
-        deployed: _market.deployed,
+        engine: _market?.engine,
+        pool: _market?.pool,
+        protocolDataProvider: _market?.protocolDataProvider,
+        deployed: _market?.deployed,
         assets: marketAssets as TMarketAsset[],
       } as TMarket);
     }
@@ -92,7 +92,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   useEffect(() => {
     if (localMarket && !activeAsset) {
       if (asset) {
-        const urlAsset = localMarket?.assets.find((_) => asset === _.asset);
+        const urlAsset = localMarket?.assets?.find((_) => asset === _?.asset);
         setActiveAsset(urlAsset ? urlAsset : localMarket?.assets[0]);
       } else {
         setActiveAsset(localMarket?.assets[0]);
@@ -104,7 +104,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     <WagmiLayout>
       <div className="w-full mx-auto font-manrope pb-5">
         <div>
-          <h1 className="page-title__font text-start">{localMarket.name}</h1>
+          <h1 className="page-title__font text-start">{localMarket?.name}</h1>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
@@ -162,7 +162,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               </div>
               <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col-reverse lg:flex-row">
                 <AssetSelector
-                  assets={localMarket.assets}
+                  assets={localMarket?.assets}
                   activeSection={activeSection}
                   activeAsset={activeAsset}
                   handleAssetChange={handleAssetChange}

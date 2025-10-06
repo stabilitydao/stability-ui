@@ -12,7 +12,7 @@ export const getInitialStateFromUrl = (): {
 
   const validSections = [
     MarketSectionTypes.Borrow,
-    MarketSectionTypes.Leverage,
+    // MarketSectionTypes.Leverage,
     MarketSectionTypes.Information,
     MarketSectionTypes.Users,
   ];

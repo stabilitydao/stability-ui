@@ -59,7 +59,7 @@ const Lending = (): JSX.Element => {
 
     let sortedMarkets = localMarkets.sort(
       (a: TMarket, b: TMarket) =>
-        Number(b.supplyTVLInUSD) - Number(a.supplyTVLInUSD)
+        Number(b?.supplyTVLInUSD) - Number(a?.supplyTVLInUSD)
     );
 
     //sort
@@ -87,36 +87,36 @@ const Lending = (): JSX.Element => {
         if (!networkMarkets) return [];
 
         return networkMarkets.map((market) => {
-          const formattedAssets = market.reserves.map((reserve) => {
+          const formattedAssets = market?.reserves?.map((reserve) => {
             return {
               ...reserve,
-              address: reserve.asset,
+              address: reserve?.asset,
             };
           });
 
           const supplyAPR = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.supplyAPR) || 0)
+            ...formattedAssets.map((asset) => Number(asset?.supplyAPR) || 0)
           );
 
           const borrowAPR = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.borrowAPR) || 0)
+            ...formattedAssets.map((asset) => Number(asset?.borrowAPR) || 0)
           );
 
           const supplyTVL = formattedAssets.reduce(
-            (acc, cur) => acc + Number(cur.supplyTVLInUSD),
+            (acc, cur) => acc + Number(cur?.supplyTVLInUSD),
             0
           );
 
           const borrowTVL = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.borrowTVL) || 0)
+            ...formattedAssets.map((asset) => Number(asset?.borrowTVL) || 0)
           );
 
           const LTV = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.maxLtv) || 0)
+            ...formattedAssets.map((asset) => Number(asset?.maxLtv) || 0)
           );
 
           const utilization = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.utilization) || 0)
+            ...formattedAssets.map((asset) => Number(asset?.utilization) || 0)
           );
 
           return {
@@ -136,7 +136,7 @@ const Lending = (): JSX.Element => {
       if (!params.get("sort")) {
         allMarkets = allMarkets.sort(
           (a: TMarket, b: TMarket) =>
-            Number(b.supplyTVLInUSD) - Number(a.supplyTVLInUSD)
+            Number(b?.supplyTVLInUSD) - Number(a?.supplyTVLInUSD)
         );
       }
 

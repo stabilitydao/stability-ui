@@ -57,7 +57,7 @@ const AssetSelector: React.FC<TProps> = ({
           whileTap={{ cursor: "grabbing" }}
         >
           {assets.map((asset) => {
-            const assetData = getTokenData(asset.asset) as TTokenData;
+            const assetData = getTokenData(asset?.asset) as TTokenData;
 
             if (
               !asset?.isBorrowable &&
@@ -68,29 +68,29 @@ const AssetSelector: React.FC<TProps> = ({
 
             return (
               <motion.div
-                key={asset.asset}
+                key={asset?.asset}
                 className={cn(
                   "min-w-[80px] flex-shrink-0 flex items-center gap-2 py-2 px-3 rounded-lg border",
-                  asset.asset === activeAsset?.asset
+                  asset?.asset === activeAsset?.asset
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
                 onClick={() => handleAssetChange(asset)}
               >
                 <img
-                  src={assetData.logoURI}
-                  alt={assetData.symbol}
+                  src={assetData?.logoURI}
+                  alt={assetData?.symbol}
                   className="w-5 h-5 rounded-full pointer-events-none select-none"
                 />
                 <span
                   className={cn(
                     "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                    asset.asset === activeAsset?.asset
+                    asset?.asset === activeAsset?.asset
                       ? "text-white"
                       : "text-[#7C7E81]"
                   )}
                 >
-                  {assetData.symbol}
+                  {assetData?.symbol}
                 </span>
               </motion.div>
             );
@@ -100,7 +100,7 @@ const AssetSelector: React.FC<TProps> = ({
 
       <div className="hidden md:flex items-center gap-2 flex-wrap">
         {assets.map((asset) => {
-          const assetData = getTokenData(asset.asset) as TTokenData;
+          const assetData = getTokenData(asset?.asset) as TTokenData;
 
           if (
             !asset?.isBorrowable &&
@@ -111,24 +111,24 @@ const AssetSelector: React.FC<TProps> = ({
 
           return (
             <div
-              key={asset.asset}
+              key={asset?.asset}
               className={cn(
                 "flex items-center gap-2 py-2 px-3 rounded-lg border cursor-pointer",
-                asset.asset === activeAsset?.asset
+                asset?.asset === activeAsset?.asset
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
               onClick={() => handleAssetChange(asset)}
             >
               <img
-                src={assetData.logoURI}
-                alt={assetData.symbol}
+                src={assetData?.logoURI}
+                alt={assetData?.symbol}
                 className="w-5 h-5 rounded-full pointer-events-none select-none"
               />
               <span
                 className={cn(
                   "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                  asset.asset === activeAsset?.asset
+                  asset?.asset === activeAsset?.asset
                     ? "text-white"
                     : "text-[#7C7E81]"
                 )}

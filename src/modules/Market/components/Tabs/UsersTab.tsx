@@ -79,16 +79,16 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
           <div>
             {currentTabData.map((user: TMarketUser) => (
               <div
-                key={user.address}
+                key={user?.address}
                 className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
               >
                 <div
                   className={`group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
                   style={{ fontFamily: "monospace" }}
-                  title={user.address}
-                  onClick={() => copyAddress(user.address)}
+                  title={user?.address}
+                  onClick={() => copyAddress(user?.address)}
                 >
-                  {getShortAddress(user.address, 6, 4)}
+                  {getShortAddress(user?.address, 6, 4)}
                   <img
                     className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     src="/icons/copy.png"
@@ -96,17 +96,17 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
                   />
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user.collateral
-                    ? formatNumber(user.collateral, "abbreviate")?.slice(1)
+                  {user?.collateral
+                    ? formatNumber(user?.collateral, "abbreviate")?.slice(1)
                     : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user.debt
-                    ? formatNumber(user.debt, "abbreviate")?.slice(1)
+                  {user?.debt
+                    ? formatNumber(user?.debt, "abbreviate")?.slice(1)
                     : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user.LTV ? `${(user.LTV * 100).toFixed(2)}%` : ""}
+                  {user?.LTV ? `${(user?.LTV * 100).toFixed(2)}%` : ""}
                 </div>
               </div>
             ))}
