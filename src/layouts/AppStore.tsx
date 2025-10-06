@@ -104,7 +104,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $metaVaults = useStore(metaVaults);
-  const $markets = useStore(markets);
+  // const $markets = useStore(markets);
 
   let isError = false;
 

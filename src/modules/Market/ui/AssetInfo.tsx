@@ -141,6 +141,12 @@ const AssetInfo: React.FC<TProps> = ({
                 </span>
               </div>
             )}
+            {asset?.isBorrowable && (
+              <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip name="Reserve factor" description="desc" />
+                <span className="font-semibold">{asset?.reserveFactor}%</span>
+              </div>
+            )}
           </div>
         </div>
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col items-start gap-2 w-full font-medium text-[16px] leading-6">

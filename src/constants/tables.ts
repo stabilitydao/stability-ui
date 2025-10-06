@@ -485,7 +485,7 @@ const MARKET_TABLE: TTableColumn[] = [
   },
   {
     name: "Supply TVL",
-    keyName: "supplyTVL",
+    keyName: "supplyTVLInUSD",
     sortType: "none",
     dataType: "number",
   },

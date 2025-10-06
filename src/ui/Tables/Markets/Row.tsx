@@ -86,7 +86,7 @@ const Row: React.FC<IProps> = ({ market }) => {
               {!!Number(asset?.supplyTVLInUSD) &&
                 formatNumber(asset?.supplyTVLInUSD, "abbreviate")}
             </div>
-            {Number(asset?.supplyTVLInUSD) ? (
+            {Number(asset?.utilization) ? (
               <Tippy
                 content="desc"
                 placement="top"

@@ -102,7 +102,7 @@ const Lending = (): JSX.Element => {
             ...formattedAssets.map((asset) => Number(asset?.borrowAPR) || 0)
           );
 
-          const supplyTVL = formattedAssets.reduce(
+          const supplyTVLInUSD = formattedAssets.reduce(
             (acc, cur) => acc + Number(cur?.supplyTVLInUSD),
             0
           );
@@ -124,7 +124,7 @@ const Lending = (): JSX.Element => {
             assets: formattedAssets,
             supplyAPR,
             borrowAPR,
-            supplyTVL,
+            supplyTVLInUSD,
             borrowTVL,
             network,
             LTV,
