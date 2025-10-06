@@ -19,6 +19,7 @@ import {
   seeds,
   StrategyShortId,
   sonicWhitelistedAssets,
+  lendingMarkets,
 } from "@stabilitydao/stability";
 
 import {
@@ -87,6 +88,7 @@ import type {
   TTokens,
   TMetaVault,
   TMarketPrices,
+  TMarket,
   // TAsset,
 } from "@types";
 
@@ -102,6 +104,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $metaVaults = useStore(metaVaults);
+  const $markets = useStore(markets);
 
   let isError = false;
 
@@ -110,6 +113,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   } = {};
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
+
+  const localMarkets: { [network: string]: TMarket[] } = {};
 
   let prices: TMultichainPrices = {};
 
@@ -804,7 +809,56 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const _marketPrices: TMarketPrices = {};
 
     /***** MARKETS *****/
-    markets.set(stabilityAPIData.markets);
+    await Promise.all(
+      Object.keys(stabilityAPIData.markets as TMarket[]).map(async (key) => {
+        const chain = CHAINS.find(({ id }) => id === key);
+        if (!chain) return;
+        /////***** SET MARKETS DATA *****/////
+        const APIMarketsData = Object.values(
+          stabilityAPIData?.markets?.[chain.id]
+        );
+
+        if (APIMarketsData.length) {
+          const _markets = APIMarketsData.map((market) => {
+            const libMarket = lendingMarkets.find(
+              ({ id }) => id === market.marketId
+            );
+
+            const engine = libMarket?.engine ? libMarket?.engine : "";
+
+            const pool = libMarket?.pool ? libMarket?.pool : "";
+
+            const protocolDataProvider = libMarket?.protocolDataProvider
+              ? libMarket?.protocolDataProvider
+              : "";
+
+            const _reserves = libMarket?.reserves
+              ? libMarket?.reserves.map((reserve) => {
+                  return {
+                    ...reserve,
+                    ...market.reserves[reserve.asset.toLowerCase()],
+                  };
+                })
+              : Object.entries(market.reserves).map(([asset, data]) => ({
+                  asset,
+                  ...data,
+                }));
+
+            return {
+              marketId: market.marketId,
+              engine,
+              pool,
+              protocolDataProvider,
+              reserves: _reserves,
+            };
+          });
+
+          localMarkets[chain.id] = _markets;
+        }
+      })
+    );
+
+    markets.set(localMarkets);
     isMarketsLoaded.set(true);
 
     /***** PRICES *****/
@@ -1114,6 +1168,23 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
       metaVaults.set({ "146": metaVaultsWithName });
     }
+
+    // if (!$markets) {
+    //   const localMarkets = lendingMarkets.reduce<{
+    //     [chainId: string]: TMarket[];
+    //   }>((acc, market) => {
+    //     const chainId = market.chainId;
+
+    //     if (!acc[chainId]) {
+    //       acc[chainId] = [];
+    //     }
+
+    //     acc[chainId].push(market);
+    //     return acc;
+    //   }, {});
+
+    //   markets.set(localMarkets);
+    // }
 
     fetchAllData();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);

@@ -80,35 +80,41 @@ const Lending = (): JSX.Element => {
   };
 
   const initMarkets = async () => {
-    if ($markets) {
-      let allMarkets = activeNetworks.flatMap((network) =>
-        Object.entries($markets[network.id] ?? {}).map(([name, assets]) => {
-          const formattedAssets = Object.entries(assets).map(
-            ([address, data]) => {
-              const utilization = Number(data?.supplyTVL)
-                ? Math.min(
-                    (Number(data?.borrowTVL) / Number(data?.supplyTVL)) * 100,
-                    100
-                  )
-                : 0;
+    if ($markets && $isMarketsLoaded) {
+      let allMarkets = activeNetworks.flatMap((network) => {
+        const networkMarkets = $markets[network.id];
+        if (!networkMarkets) return [];
 
-              return {
-                address,
-                utilization,
-                ...data,
-              };
-            }
-          );
+        return networkMarkets.map((market) => {
+          const formattedAssets = market.reserves.map((reserve) => {
+            const utilization = Number(reserve?.supplyTVL)
+              ? Math.min(
+                  (Number(reserve?.borrowTVL) / Number(reserve?.supplyTVL)) *
+                    100,
+                  100
+                )
+              : 0;
+
+            return {
+              address: reserve.asset,
+              utilization,
+              ...reserve,
+            };
+          });
 
           const supplyAPR = Math.max(
             ...formattedAssets.map((asset) => Number(asset.supplyAPR) || 0)
           );
+
           const borrowAPR = Math.max(
             ...formattedAssets.map((asset) => Number(asset.borrowAPR) || 0)
           );
-          const supplyTVL = Math.max(
-            ...formattedAssets.map((asset) => Number(asset.supplyTVL) || 0)
+
+          const supplyTVL = formattedAssets.reduce(
+            (acc, cur) => acc + Number(cur.supplyTVL),
+            0
           );
+
           const borrowTVL = Math.max(
             ...formattedAssets.map((asset) => Number(asset.borrowTVL) || 0)
           );
@@ -122,7 +128,7 @@ const Lending = (): JSX.Element => {
           );
 
           return {
-            name,
+            name: market.marketId,
             assets: formattedAssets,
             supplyAPR,
             borrowAPR,
@@ -132,8 +138,8 @@ const Lending = (): JSX.Element => {
             LTV,
             utilization,
           };
-        })
-      );
+        });
+      });
 
       if (!params.get("sort")) {
         allMarkets = allMarkets.sort(
@@ -149,7 +155,7 @@ const Lending = (): JSX.Element => {
 
   useEffect(() => {
     initMarkets();
-  }, [$markets]);
+  }, [$markets, $isMarketsLoaded]);
 
   const isLoading = useMemo(() => {
     return !$isMarketsLoaded || !isLocalMarketsLoaded;

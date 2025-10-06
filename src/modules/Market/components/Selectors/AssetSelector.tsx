@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
-import { Dispatch, SetStateAction } from "react";
-
 import { motion } from "framer-motion";
 
-import { cn, getTokenData, updateQueryParams, useWindowWidth } from "@utils";
+import { cn, getTokenData, useWindowWidth } from "@utils";
 
 import { TMarketAsset, TTokenData, MarketSectionTypes } from "@types";
 
@@ -12,30 +10,20 @@ type TProps = {
   assets: TMarketAsset[];
   activeSection: MarketSectionTypes;
   activeAsset: TMarketAsset | undefined;
-  setActiveAsset: Dispatch<SetStateAction<TMarketAsset | undefined>>;
+  handleAssetChange: (asset: TMarketAsset) => void;
 };
 
 const AssetSelector: React.FC<TProps> = ({
   assets,
   activeSection,
   activeAsset,
-  setActiveAsset,
+  handleAssetChange,
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
 
   const windowWidth = useWindowWidth();
-
-  const changeAsset = (asset: TMarketAsset) => {
-    if (asset.address === assets[0].address) {
-      updateQueryParams({ asset: null });
-    } else {
-      updateQueryParams({ asset: asset.address });
-    }
-
-    setActiveAsset(asset);
-  };
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -69,18 +57,25 @@ const AssetSelector: React.FC<TProps> = ({
           whileTap={{ cursor: "grabbing" }}
         >
           {assets.map((asset) => {
-            const assetData = getTokenData(asset.address) as TTokenData;
+            const assetData = getTokenData(asset.asset) as TTokenData;
+
+            if (
+              !asset.isBorrowable &&
+              activeSection === MarketSectionTypes.Borrow
+            ) {
+              return null;
+            }
 
             return (
               <motion.div
-                key={asset.address}
+                key={asset.asset}
                 className={cn(
                   "min-w-[80px] flex-shrink-0 flex items-center gap-2 py-2 px-3 rounded-lg border",
-                  asset.address === activeAsset?.address
+                  asset.asset === activeAsset?.asset
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
-                onClick={() => changeAsset(asset)}
+                onClick={() => handleAssetChange(asset)}
               >
                 <img
                   src={assetData.logoURI}
@@ -90,7 +85,7 @@ const AssetSelector: React.FC<TProps> = ({
                 <span
                   className={cn(
                     "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                    asset.address === activeAsset?.address
+                    asset.asset === activeAsset?.asset
                       ? "text-white"
                       : "text-[#7C7E81]"
                   )}
@@ -105,18 +100,25 @@ const AssetSelector: React.FC<TProps> = ({
 
       <div className="hidden md:flex items-center gap-2 flex-wrap">
         {assets.map((asset) => {
-          const assetData = getTokenData(asset.address) as TTokenData;
+          const assetData = getTokenData(asset.asset) as TTokenData;
+
+          if (
+            !asset.isBorrowable &&
+            activeSection === MarketSectionTypes.Borrow
+          ) {
+            return null;
+          }
 
           return (
             <div
-              key={asset.address}
+              key={asset.asset}
               className={cn(
                 "flex items-center gap-2 py-2 px-3 rounded-lg border cursor-pointer",
-                asset.address === activeAsset?.address
+                asset.asset === activeAsset?.asset
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
-              onClick={() => changeAsset(asset)}
+              onClick={() => handleAssetChange(asset)}
             >
               <img
                 src={assetData.logoURI}
@@ -126,7 +128,7 @@ const AssetSelector: React.FC<TProps> = ({
               <span
                 className={cn(
                   "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                  asset.address === activeAsset?.address
+                  asset.asset === activeAsset?.asset
                     ? "text-white"
                     : "text-[#7C7E81]"
                 )}

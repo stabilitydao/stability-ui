@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 
-import { Dispatch, SetStateAction } from "react";
-
 import { motion } from "framer-motion";
 
-import { cn, updateQueryParams } from "@utils";
+import { cn } from "@utils";
 
 import { MARKET_SECTIONS } from "../../constants";
 
@@ -13,27 +11,17 @@ import { MarketSectionTypes } from "@types";
 type TProps = {
   market: string;
   activeSection: MarketSectionTypes;
-  setActiveSection: Dispatch<SetStateAction<MarketSectionTypes>>;
+  handleSectionChange: (section: MarketSectionTypes) => void;
 };
 
 const SectionSelector: React.FC<TProps> = ({
   market,
   activeSection,
-  setActiveSection,
+  handleSectionChange,
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
-
-  const changeSection = (section: MarketSectionTypes) => {
-    if (section === MarketSectionTypes.Deposit) {
-      updateQueryParams({ section: null });
-    } else {
-      updateQueryParams({ section });
-    }
-
-    setActiveSection(section);
-  };
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -68,7 +56,7 @@ const SectionSelector: React.FC<TProps> = ({
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
-                onClick={() => changeSection(section)}
+                onClick={() => handleSectionChange(section)}
               >
                 <span
                   className={cn(
@@ -98,7 +86,7 @@ const SectionSelector: React.FC<TProps> = ({
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
-              onClick={() => changeSection(section)}
+              onClick={() => handleSectionChange(section)}
             >
               <span
                 className={cn(

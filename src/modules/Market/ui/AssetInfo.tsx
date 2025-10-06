@@ -2,7 +2,7 @@ import { AddressField } from "./AddressField";
 
 import { CustomTooltip } from "@ui";
 
-import { getTokenData, cn } from "@utils";
+import { getTokenData, cn, formatNumber } from "@utils";
 
 import type { TMarketAsset, TAddress, TNetwork } from "@types";
 
@@ -17,9 +17,12 @@ const AssetInfo: React.FC<TProps> = ({
   isSingleAsset = false,
   network,
 }) => {
-  const assetData = getTokenData(asset?.address as TAddress);
+  const assetData = getTokenData(asset?.asset as TAddress);
+  console.log(asset);
 
-  // const aTokenData = getTokenData(asset?.aToken as TAddress);
+  const utilization = Number(asset?.supplyTVL)
+    ? Math.min((Number(asset?.borrowTVL) / Number(asset?.supplyTVL)) * 100, 100)
+    : 0;
 
   return (
     <div
@@ -55,18 +58,21 @@ const AssetInfo: React.FC<TProps> = ({
           <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Utilization" description="desc" />
-              <span className="font-semibold">32%</span>
+              <span className="font-semibold">{utilization}%</span>
             </div>
-            <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+            {/* <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="IRM" description="desc" />
               <span className="font-semibold">Dynamic IRM</span>
-            </div>
+            </div> */}
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Available to borrow" description="desc" />
+              <CustomTooltip
+                name="Available to borrow"
+                description="desc"
+                isMediumText={true}
+              />
               <div className="flex flex-col items-end">
-                <span className="font-semibold">97%</span>
-                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                  $26.8m
+                <span className="font-semibold">
+                  {formatNumber(asset.borrowTVL, "abbreviate")?.slice(1)}
                 </span>
               </div>
             </div>
@@ -75,28 +81,23 @@ const AssetInfo: React.FC<TProps> = ({
                 name={`${assetData?.symbol} TVL`}
                 description="desc"
               />
-              <div className="flex flex-col items-end">
-                <span className="font-semibold">
-                  122.4m {assetData?.symbol}
-                </span>
-                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                  $39.8m
-                </span>
-              </div>
+              <span className="font-semibold">122.4m {assetData?.symbol}</span>
             </div>
           </div>
           <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Oracle" description="desc" />
-              <span className="font-semibold">Red Stone</span>
+              <span className="font-semibold">{asset?.oracleName}</span>
             </div>
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Max LTV" description="desc" />
-              <span className="font-semibold">95%</span>
+              <span className="font-semibold">{asset?.maxLtv}%</span>
             </div>
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Liquidation threshold" description="desc" />
-              <span className="font-semibold">97%</span>
+              <span className="font-semibold">
+                {asset?.liquidationThreshold}%
+              </span>
             </div>
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Liquidation fee" description="desc" />
@@ -110,8 +111,9 @@ const AssetInfo: React.FC<TProps> = ({
             address={assetData?.address as TAddress}
             explorer={network.explorer}
           />
+
           <AddressField
-            symbol="aToken"
+            symbol={asset?.aTokenSymbol as string}
             address={asset?.aToken as TAddress}
             explorer={network.explorer}
           />

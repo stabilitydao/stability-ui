@@ -86,25 +86,36 @@ const Row: React.FC<IProps> = ({ market }) => {
               {!!Number(asset.supplyTVL) &&
                 formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}
             </div>
-            <Tippy
-              content="desc"
-              placement="top"
-              animation="shift-away"
-              interactive={true}
-              delay={[100, 50]}
-              theme="custom"
-            >
+            {Number(asset.supplyTVL) ? (
+              <Tippy
+                content="desc"
+                placement="top"
+                animation="shift-away"
+                interactive={true}
+                delay={[100, 50]}
+                theme="custom"
+              >
+                <div
+                  className={cn(
+                    "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
+                    market.assets.length - 1 != index &&
+                      "border-b border-b-[#23252A]"
+                  )}
+                >
+                  <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
+                  <span>{asset.utilization.toFixed(2)}%</span>
+                </div>
+              </Tippy>
+            ) : (
               <div
                 className={cn(
-                  "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
+                  "px-2 md:px-4 w-[150px] md:w-[13%] h-full",
                   market.assets.length - 1 != index &&
                     "border-b border-b-[#23252A]"
                 )}
-              >
-                <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
-                <span>{asset.utilization.toFixed(2)}%</span>
-              </div>
-            </Tippy>
+              />
+            )}
+
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[150px] md:w-[13%] h-full whitespace-nowrap",

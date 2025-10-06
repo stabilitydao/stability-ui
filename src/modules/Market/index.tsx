@@ -10,6 +10,8 @@ import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
 
+import { updateQueryParams, getShortAddress } from "@utils";
+
 import { CHAINS } from "@constants";
 
 import { markets, error } from "@store";
@@ -34,23 +36,53 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const [activeSection, setActiveSection] =
     useState<MarketSectionTypes>(section);
 
+  const handleAssetChange = (asset: TMarketAsset) => {
+    if (asset.asset === localMarket.assets[0].asset) {
+      updateQueryParams({ asset: null });
+    } else {
+      updateQueryParams({ asset: asset.asset });
+    }
+
+    setActiveAsset(asset);
+  };
+
+  const handleSectionChange = (section: MarketSectionTypes) => {
+    if (section === MarketSectionTypes.Deposit) {
+      updateQueryParams({ section: null });
+    } else {
+      updateQueryParams({ section });
+    }
+
+    // temp
+    if (section === MarketSectionTypes.Borrow && !activeAsset?.isBorrowable) {
+      const borrowableAssets = localMarket?.assets.filter(
+        ({ isBorrowable }) => isBorrowable
+      );
+      handleAssetChange(borrowableAssets[0]);
+    }
+
+    setActiveSection(section);
+  };
+
   useEffect(() => {
     if ($markets && market) {
-      const marketAssets = Object.entries($markets[network][market])
-        .map(([address, data]) => ({
-          address,
-          ...data,
-        }))
-        .sort(
-          (a: TMarketAsset, b: TMarketAsset) =>
-            Number(b.supplyTVL) - Number(a.supplyTVL)
-        );
+      const _market = $markets[network].find(
+        ({ marketId }) => marketId === market
+      );
+
+      const marketAssets = _market?.reserves.sort(
+        (a: TMarketAsset, b: TMarketAsset) =>
+          Number(b.supplyTVL) - Number(a.supplyTVL)
+      );
 
       const chain = CHAINS.find(({ id }) => id == network);
 
       setLocalMarket({
         name: market,
         network: chain,
+        engine: _market.engine,
+        pool: _market.pool,
+        protocolDataProvider: _market.protocolDataProvider,
         assets: marketAssets as TMarketAsset[],
       } as TMarket);
     }
@@ -59,9 +91,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   useEffect(() => {
     if (localMarket && !activeAsset) {
       if (asset) {
-        const urlAsset = localMarket?.assets.find(
-          ({ address }) => asset === address
-        );
+        const urlAsset = localMarket?.assets.find((_) => asset === _.asset);
         setActiveAsset(urlAsset ? urlAsset : localMarket?.assets[0]);
       } else {
         setActiveAsset(localMarket?.assets[0]);
@@ -102,25 +132,11 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                   <a
                     className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
-                    href="https://riskreport.com"
+                    href={`${localMarket?.network?.explorer}${localMarket?.pool}`}
                     target="_blank"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
-                      Risk report
-                    </span>
-                    <img
-                      src="/icons/purple_link.png"
-                      alt="Check risk report"
-                      className="w-4 h-4"
-                    />
-                  </a>
-                  <a
-                    className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
-                    href={`${localMarket?.network?.explorer}address`}
-                    target="_blank"
-                  >
-                    <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
-                      0x78...Deea
+                      Pool: {getShortAddress(localMarket?.pool ?? "", 6, 4)}
                     </span>
                     <img
                       src="/icons/purple_link.png"
@@ -130,21 +146,15 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </a>
                   <div className="pl-2 pr-4 border-r border-r-[#232429]">
                     <CustomTooltip
-                      name="Reviewed"
-                      description="desc"
-                      isMediumText={true}
-                    />
-                  </div>
-                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
-                    <CustomTooltip
-                      name="Immutable & Permissionless"
-                      description="desc"
-                      isMediumText={true}
-                    />
-                  </div>
-                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
-                    <CustomTooltip
                       name="Isolated risk"
+                      description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
+                  Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
+                      isMediumText={true}
+                    />
+                  </div>
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <CustomTooltip
+                      name={`Engine: ${localMarket?.engine}`}
                       description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
                   Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
                       isMediumText={true}
@@ -157,12 +167,12 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   assets={localMarket.assets}
                   activeSection={activeSection}
                   activeAsset={activeAsset}
-                  setActiveAsset={setActiveAsset}
+                  handleAssetChange={handleAssetChange}
                 />
                 <SectionSelector
                   market={market}
                   activeSection={activeSection}
-                  setActiveSection={setActiveSection}
+                  handleSectionChange={handleSectionChange}
                 />
               </div>
             </div>
