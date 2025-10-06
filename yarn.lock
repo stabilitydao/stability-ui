@@ -1802,10 +1802,10 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@stabilitydao/stability@=0.42.1":
-  version "0.42.1"
-  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.42.1.tgz#194bee75e606af8356a2a0d39a2988e14dd1a10e"
-  integrity sha512-TxO/UTjEwKyfsgmNPKrpK1/mYm8UzXaKlVXRpw2O012EHkzaFKy7IhyB+jAYltSlL9nHziml2jzPD/PkKPdvWQ==
+"@stabilitydao/stability@=0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@stabilitydao/stability/-/stability-0.42.3.tgz#51817cce75a93612def57a8993e44ff71a08726d"
+  integrity sha512-GKjSXE1bzMpz8Gfkzu0aMfEw/BXu3Ms2ymGRv0TzdrI0cfGUmJWcZA/1XFXOJZTu5igAff334KHvOw9u2/+pqA==
 
 "@stablelib/aead@^1.0.1":
   version "1.0.1"

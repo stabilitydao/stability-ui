@@ -832,6 +832,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               ? libMarket?.protocolDataProvider
               : "";
 
+            const deployed = libMarket?.deployed ? libMarket?.deployed : "";
+
             const _reserves = libMarket?.reserves
               ? libMarket?.reserves.map((reserve) => {
                   return {
@@ -849,6 +851,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
               engine,
               pool,
               protocolDataProvider,
+              deployed,
               reserves: _reserves,
             };
           });

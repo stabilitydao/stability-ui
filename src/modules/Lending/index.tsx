@@ -58,7 +58,8 @@ const Lending = (): JSX.Element => {
     });
 
     let sortedMarkets = localMarkets.sort(
-      (a: TMarket, b: TMarket) => Number(b.supplyTVL) - Number(a.supplyTVL)
+      (a: TMarket, b: TMarket) =>
+        Number(b.supplyTVLInUSD) - Number(a.supplyTVLInUSD)
     );
 
     //sort
@@ -87,18 +88,9 @@ const Lending = (): JSX.Element => {
 
         return networkMarkets.map((market) => {
           const formattedAssets = market.reserves.map((reserve) => {
-            const utilization = Number(reserve?.supplyTVL)
-              ? Math.min(
-                  (Number(reserve?.borrowTVL) / Number(reserve?.supplyTVL)) *
-                    100,
-                  100
-                )
-              : 0;
-
             return {
-              address: reserve.asset,
-              utilization,
               ...reserve,
+              address: reserve.asset,
             };
           });
 
@@ -111,7 +103,7 @@ const Lending = (): JSX.Element => {
           );
 
           const supplyTVL = formattedAssets.reduce(
-            (acc, cur) => acc + Number(cur.supplyTVL),
+            (acc, cur) => acc + Number(cur.supplyTVLInUSD),
             0
           );
 
@@ -143,7 +135,8 @@ const Lending = (): JSX.Element => {
 
       if (!params.get("sort")) {
         allMarkets = allMarkets.sort(
-          (a: TMarket, b: TMarket) => Number(b.supplyTVL) - Number(a.supplyTVL)
+          (a: TMarket, b: TMarket) =>
+            Number(b.supplyTVLInUSD) - Number(a.supplyTVLInUSD)
         );
       }
 

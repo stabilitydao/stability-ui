@@ -83,6 +83,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         engine: _market.engine,
         pool: _market.pool,
         protocolDataProvider: _market.protocolDataProvider,
+        deployed: _market.deployed,
         assets: marketAssets as TMarketAsset[],
       } as TMarket);
     }
@@ -103,16 +104,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     <WagmiLayout>
       <div className="w-full mx-auto font-manrope pb-5">
         <div>
-          <h1 className="page-title__font text-start">
-            {localMarket.name} Market
-          </h1>
+          <h1 className="page-title__font text-start">{localMarket.name}</h1>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
                 <div className="flex items-center px-4 pt-4 pb-[10px] md:px-0 md:py-[10px] flex-wrap gap-2">
                   <div className="flex items-center gap-3 pl-2 pr-4  border-r border-r-[#232429]">
                     <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                      Network / ID:
+                      Chain:
                     </span>
                     <div className="flex items-center gap-2">
                       <img

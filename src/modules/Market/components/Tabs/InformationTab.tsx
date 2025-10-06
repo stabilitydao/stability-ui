@@ -1,4 +1,6 @@
-import { AssetsInfo, AddressField } from "../../ui";
+import { CustomTooltip } from "@ui";
+
+import { AssetsInfo } from "../../ui";
 
 import type { TMarket, TMarketAsset } from "@types";
 
@@ -23,61 +25,21 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col gap-2 w-full font-medium text-[16px] leading-6">
           <div className="w-full flex items-center justify-between">
             <span className="text-[#7C7E81]">Market ID</span>
-            <span className="font-semibold">3</span>
+            <span className="font-semibold">{market.name}</span>
           </div>
-          <AddressField
+          {/* <AddressField
             symbol="Market"
             address="0xE5DA20F15420aD15DE0fa650600aFc998bbE3955"
             explorer={market.network.explorer}
-          />
+          /> */}
+
           <div className="w-full flex items-center justify-between">
-            <div className="text-[#7C7E81] flex items-center gap-2">
-              <span>Reviewed</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
-            </div>
-            <span className="font-semibold">Yes</span>
-          </div>
-          <div className="w-full flex items-center justify-between">
-            <div className="text-[#7C7E81] flex items-center gap-2">
-              <span>Deployed</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
-            </div>
-            <span className="font-semibold">January 9, 2025</span>
-          </div>
-          <AddressField
-            symbol="Deployer"
-            address="0xE5DA20F15420aD15DE0fa650600aFc998bbE3955"
-            explorer={market.network.explorer}
-          />
-          <div className="w-full flex items-center justify-between">
-            <div className="text-[#7C7E81] flex items-center gap-2">
-              <span>Protocol fee</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
-            </div>
-            <span className="font-semibold">15%</span>
-          </div>
-          <div className="w-full flex items-center justify-between">
-            <div className="text-[#7C7E81] flex items-center gap-2">
-              <span>Deployer fee</span>
-              <img
-                src="/icons/circle_question.png"
-                alt="Question icon"
-                className="w-4 h-4"
-              />
-            </div>
-            <span className="font-semibold">0%</span>
+            <CustomTooltip
+              name="Deployed"
+              description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
+                              Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
+            />
+            <span className="font-semibold">{market.deployed}</span>
           </div>
         </div>
       </div>

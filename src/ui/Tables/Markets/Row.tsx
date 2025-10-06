@@ -83,10 +83,10 @@ const Row: React.FC<IProps> = ({ market }) => {
                   "border-b border-b-[#23252A]"
               )}
             >
-              {!!Number(asset.supplyTVL) &&
-                formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}
+              {!!Number(asset.supplyTVLInUSD) &&
+                formatNumber(asset.supplyTVLInUSD, "abbreviate")}
             </div>
-            {Number(asset.supplyTVL) ? (
+            {Number(asset.supplyTVLInUSD) ? (
               <Tippy
                 content="desc"
                 placement="top"
@@ -102,8 +102,10 @@ const Row: React.FC<IProps> = ({ market }) => {
                       "border-b border-b-[#23252A]"
                   )}
                 >
-                  <ProgressCircle percentage={+asset.utilization.toFixed(2)} />
-                  <span>{asset.utilization.toFixed(2)}%</span>
+                  <ProgressCircle
+                    percentage={Number(Number(asset.utilization).toFixed(2))}
+                  />
+                  <span>{Number(asset.utilization).toFixed(2)}%</span>
                 </div>
               </Tippy>
             ) : (

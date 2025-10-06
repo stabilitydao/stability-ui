@@ -100,6 +100,7 @@ type TTokenData = {
   decimals: number;
   logoURI: string;
   tags?: string[];
+  mintApp?: string;
 };
 
 type TOptionInfo = {

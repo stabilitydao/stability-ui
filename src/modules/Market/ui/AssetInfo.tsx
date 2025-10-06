@@ -6,6 +6,8 @@ import { getTokenData, cn, formatNumber } from "@utils";
 
 import type { TMarketAsset, TAddress, TNetwork } from "@types";
 
+import { assets } from "@stabilitydao/stability";
+
 type TProps = {
   asset: TMarketAsset;
   isSingleAsset?: boolean;
@@ -18,11 +20,10 @@ const AssetInfo: React.FC<TProps> = ({
   network,
 }) => {
   const assetData = getTokenData(asset?.asset as TAddress);
-  console.log(asset);
 
-  const utilization = Number(asset?.supplyTVL)
-    ? Math.min((Number(asset?.borrowTVL) / Number(asset?.supplyTVL)) * 100, 100)
-    : 0;
+  const mintApp = assets.find(
+    ({ symbol }) => symbol === assetData?.symbol
+  )?.mintApp;
 
   return (
     <div
@@ -58,7 +59,9 @@ const AssetInfo: React.FC<TProps> = ({
           <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Utilization" description="desc" />
-              <span className="font-semibold">{utilization}%</span>
+              <span className="font-semibold">
+                {Number(asset?.utilization).toFixed(2)}%
+              </span>
             </div>
             {/* <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="IRM" description="desc" />
@@ -74,6 +77,9 @@ const AssetInfo: React.FC<TProps> = ({
                 <span className="font-semibold">
                   {formatNumber(asset.borrowTVL, "abbreviate")?.slice(1)}
                 </span>
+                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
+                  {formatNumber(asset.borrowTVLInUSD, "abbreviate")}
+                </span>
               </div>
             </div>
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
@@ -81,13 +87,18 @@ const AssetInfo: React.FC<TProps> = ({
                 name={`${assetData?.symbol} TVL`}
                 description="desc"
               />
-              <span className="font-semibold">122.4m {assetData?.symbol}</span>
+              <span className="font-semibold">
+                {formatNumber(asset.cap, "abbreviate")?.slice(1)}{" "}
+                {assetData?.symbol}
+              </span>
             </div>
           </div>
           <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Oracle" description="desc" />
-              <span className="font-semibold">{asset?.oracleName}</span>
+              <span className="font-semibold truncated-text">
+                {asset?.oracleName}
+              </span>
             </div>
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Max LTV" description="desc" />
@@ -100,8 +111,8 @@ const AssetInfo: React.FC<TProps> = ({
               </span>
             </div>
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Liquidation fee" description="desc" />
-              <span className="font-semibold">2.5%</span>
+              <CustomTooltip name="Liquidation bonus" description="desc" />
+              <span className="font-semibold">{asset?.liquidationBonus}%</span>
             </div>
           </div>
         </div>
@@ -117,6 +128,23 @@ const AssetInfo: React.FC<TProps> = ({
             address={asset?.aToken as TAddress}
             explorer={network.explorer}
           />
+
+          {mintApp && (
+            <div className="flex items-center justify-between w-full">
+              <span className="text-[#7C7E81]">Mint</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[#9180F4]">{assetData?.symbol}</span>
+
+                <a href={mintApp} target="_blank">
+                  <img
+                    src="/icons/purple_link.png"
+                    alt="external link"
+                    className="w-3 h-3 cursor-pointer"
+                  />
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

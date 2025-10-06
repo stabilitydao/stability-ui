@@ -106,7 +106,7 @@ const Breadcrumbs = (): JSX.Element => {
       const marketName = decodeURIComponent(marketNameRaw);
 
       add("Lending", "lending");
-      add(`${marketName} Market`);
+      add(marketName);
     }
 
     setPaths(crumbs);
