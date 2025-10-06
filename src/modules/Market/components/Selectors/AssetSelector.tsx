@@ -4,13 +4,13 @@ import { motion } from "framer-motion";
 
 import { cn, getTokenData, useWindowWidth } from "@utils";
 
-import { TMarketAsset, TTokenData, MarketSectionTypes } from "@types";
+import { TMarketReserve, TTokenData, MarketSectionTypes } from "@types";
 
 type TProps = {
-  assets: TMarketAsset[];
+  assets: TMarketReserve[];
   activeSection: MarketSectionTypes;
-  activeAsset: TMarketAsset | undefined;
-  handleAssetChange: (asset: TMarketAsset) => void;
+  activeAsset: TMarketReserve | undefined;
+  handleAssetChange: (asset: TMarketReserve) => void;
 };
 
 const AssetSelector: React.FC<TProps> = ({
@@ -57,7 +57,7 @@ const AssetSelector: React.FC<TProps> = ({
           whileTap={{ cursor: "grabbing" }}
         >
           {assets.map((asset) => {
-            const assetData = getTokenData(asset?.asset) as TTokenData;
+            const assetData = getTokenData(asset?.address) as TTokenData;
 
             if (
               !asset?.isBorrowable &&
@@ -68,10 +68,10 @@ const AssetSelector: React.FC<TProps> = ({
 
             return (
               <motion.div
-                key={asset?.asset}
+                key={asset?.address}
                 className={cn(
                   "min-w-[80px] flex-shrink-0 flex items-center gap-2 py-2 px-3 rounded-lg border",
-                  asset?.asset === activeAsset?.asset
+                  asset?.address === activeAsset?.address
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
@@ -85,7 +85,7 @@ const AssetSelector: React.FC<TProps> = ({
                 <span
                   className={cn(
                     "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                    asset?.asset === activeAsset?.asset
+                    asset?.address === activeAsset?.address
                       ? "text-white"
                       : "text-[#7C7E81]"
                   )}
@@ -100,7 +100,7 @@ const AssetSelector: React.FC<TProps> = ({
 
       <div className="hidden md:flex items-center gap-2 flex-wrap">
         {assets.map((asset) => {
-          const assetData = getTokenData(asset?.asset) as TTokenData;
+          const assetData = getTokenData(asset?.address) as TTokenData;
 
           if (
             !asset?.isBorrowable &&
@@ -111,10 +111,10 @@ const AssetSelector: React.FC<TProps> = ({
 
           return (
             <div
-              key={asset?.asset}
+              key={asset?.address}
               className={cn(
                 "flex items-center gap-2 py-2 px-3 rounded-lg border cursor-pointer",
-                asset?.asset === activeAsset?.asset
+                asset?.address === activeAsset?.address
                   ? "bg-[#232429] border-[#35363B]"
                   : " bg-transparent border-[#232429]"
               )}
@@ -128,7 +128,7 @@ const AssetSelector: React.FC<TProps> = ({
               <span
                 className={cn(
                   "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                  asset?.asset === activeAsset?.asset
+                  asset?.address === activeAsset?.address
                     ? "text-white"
                     : "text-[#7C7E81]"
                 )}

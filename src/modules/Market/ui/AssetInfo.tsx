@@ -4,12 +4,12 @@ import { CustomTooltip } from "@ui";
 
 import { getTokenData, cn, formatNumber } from "@utils";
 
-import type { TMarketAsset, TAddress, TNetwork } from "@types";
+import type { TMarketReserve, TAddress, TNetwork } from "@types";
 
 import { assets } from "@stabilitydao/stability";
 
 type TProps = {
-  asset: TMarketAsset;
+  asset: TMarketReserve;
   isSingleAsset?: boolean;
   network: TNetwork;
 };
@@ -19,7 +19,7 @@ const AssetInfo: React.FC<TProps> = ({
   isSingleAsset = false,
   network,
 }) => {
-  const assetData = getTokenData(asset?.asset as TAddress);
+  const assetData = getTokenData(asset?.address as TAddress);
 
   const mintApp = assets.find(
     ({ symbol }) => symbol === assetData?.symbol

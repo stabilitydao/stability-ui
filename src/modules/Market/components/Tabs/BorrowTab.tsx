@@ -1,10 +1,10 @@
 import { BasicPositionStats } from "../Stats/BasicPositionStats";
 import { BorrowForm } from "../Forms/BorrowForm";
 
-import type { TMarketAsset } from "@types";
+import type { TMarketReserve } from "@types";
 
 type TProps = {
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const BorrowTab: React.FC<TProps> = ({ asset }) => {

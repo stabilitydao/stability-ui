@@ -2,12 +2,12 @@ import { CustomTooltip } from "@ui";
 
 import { AssetsInfo } from "../../ui";
 
-import type { TMarket, TMarketAsset } from "@types";
+import type { TMarket, TMarketReserve } from "@types";
 
 type TProps = {
   market: TMarket;
-  activeAsset: TMarketAsset | undefined;
-  assets: TMarketAsset[] | undefined;
+  activeAsset: TMarketReserve | undefined;
+  assets: TMarketReserve[] | undefined;
 };
 
 const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
@@ -25,7 +25,7 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col gap-2 w-full font-medium text-[16px] leading-6">
           <div className="w-full flex items-center justify-between">
             <span className="text-[#7C7E81]">Market ID</span>
-            <span className="font-semibold">{market?.name}</span>
+            <span className="font-semibold">{market?.marketId}</span>
           </div>
           {/* <AddressField
             symbol="Market"

@@ -1,10 +1,10 @@
 import { BasicPositionStats } from "../Stats/BasicPositionStats";
 import { DepositForm } from "../Forms/DepositForm";
 
-import type { TMarketAsset } from "@types";
+import type { TMarketReserve } from "@types";
 
 type TProps = {
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const DepositTab: React.FC<TProps> = ({ asset }) => {

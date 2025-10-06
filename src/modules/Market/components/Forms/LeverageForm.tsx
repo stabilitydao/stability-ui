@@ -4,10 +4,10 @@ import { Toggler } from "@ui";
 
 import { cn, getTokenData } from "@utils";
 
-import type { TMarketAsset, TAddress } from "@types";
+import type { TMarketReserve, TAddress } from "@types";
 
 type TProps = {
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const LeverageForm: React.FC<TProps> = ({ asset }) => {

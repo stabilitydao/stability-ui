@@ -2,10 +2,10 @@ import { CustomTooltip } from "@ui";
 
 import { getTokenData } from "@utils";
 
-import type { TMarketAsset, TAddress } from "@types";
+import type { TMarketReserve, TAddress } from "@types";
 
 type TProps = {
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const BasicPositionStats: React.FC<TProps> = ({ asset }) => {

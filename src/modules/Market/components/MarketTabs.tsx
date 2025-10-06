@@ -4,14 +4,14 @@ import { BorrowTab } from "./Tabs/BorrowTab";
 import { InformationTab } from "./Tabs/InformationTab";
 import { UsersTab } from "./Tabs/UsersTab";
 
-import { MarketSectionTypes, TMarketAsset, TMarket } from "@types";
+import { MarketSectionTypes, TMarketReserve, TMarket } from "@types";
 
 type TProps = {
   network: string;
   market: string;
   marketData: TMarket;
   section: MarketSectionTypes;
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const MarketTabs: React.FC<TProps> = ({
@@ -33,7 +33,7 @@ const MarketTabs: React.FC<TProps> = ({
         <InformationTab
           market={marketData}
           activeAsset={asset}
-          assets={marketData?.assets}
+          assets={marketData?.reserves}
         />
       );
     case MarketSectionTypes.Users:

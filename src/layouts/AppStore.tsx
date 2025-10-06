@@ -64,6 +64,7 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  loadMarketsData,
 } from "@utils";
 
 import {
@@ -79,7 +80,6 @@ import type {
   // TYearnProtocol,
   TVaults,
   TMultichainPrices,
-  TAPIData,
   TPriceInfo,
   TVaultDataKey,
   TFrontendBalances,
@@ -92,7 +92,13 @@ import type {
   // TAsset,
 } from "@types";
 
-import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+import type {
+  Vaults,
+  Vault,
+  MarketData,
+  ApiMainReply,
+  MetaVaults,
+} from "@stabilitydao/stability/out/api.types";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { isConnected, address } = useAccount();
@@ -104,7 +110,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $metaVaults = useStore(metaVaults);
-  // const $markets = useStore(markets);
+  const $markets = useStore(markets);
 
   let isError = false;
 
@@ -114,11 +120,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
-  const localMarkets: { [network: string]: TMarket[] } = {};
+  let localMarkets: { [network: string]: TMarket[] } = {};
 
   let prices: TMultichainPrices = {};
 
-  let stabilityAPIData: TAPIData = {};
+  let stabilityAPIData: ApiMainReply = {};
 
   const handleError = (errType: string, description: string) => {
     error.set({ state: true, type: errType, description });
@@ -809,56 +815,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const _marketPrices: TMarketPrices = {};
 
     /***** MARKETS *****/
-    await Promise.all(
-      Object.keys(stabilityAPIData.markets as TMarket[]).map(async (key) => {
-        const chain = CHAINS.find(({ id }) => id === key);
-        if (!chain) return;
-        /////***** SET MARKETS DATA *****/////
-        const APIMarketsData = Object.values(
-          stabilityAPIData?.markets?.[chain.id]
-        );
-
-        if (APIMarketsData.length) {
-          const _markets = APIMarketsData.map((market) => {
-            const libMarket = lendingMarkets.find(
-              ({ id }) => id === market.marketId
-            );
-
-            const engine = libMarket?.engine ? libMarket?.engine : "";
-
-            const pool = libMarket?.pool ? libMarket?.pool : "";
-
-            const protocolDataProvider = libMarket?.protocolDataProvider
-              ? libMarket?.protocolDataProvider
-              : "";
-
-            const deployed = libMarket?.deployed ? libMarket?.deployed : "";
-
-            const _reserves = libMarket?.reserves
-              ? libMarket?.reserves.map((reserve) => {
-                  return {
-                    ...reserve,
-                    ...market.reserves[reserve.asset.toLowerCase()],
-                  };
-                })
-              : Object.entries(market.reserves).map(([asset, data]) => ({
-                  asset,
-                  ...data,
-                }));
-
-            return {
-              marketId: market.marketId,
-              engine,
-              pool,
-              protocolDataProvider,
-              deployed,
-              reserves: _reserves,
-            };
-          });
-
-          localMarkets[chain.id] = _markets;
-        }
-      })
+    const localMarkets = await loadMarketsData(
+      stabilityAPIData.markets as MarketData
     );
 
     markets.set(localMarkets);
@@ -881,7 +839,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
+      Object.keys(stabilityAPIData?.vaults as Vaults).map(async (key) => {
         const chain = CHAINS.find(({ id }) => id === key);
         if (!chain) return;
         /////***** SET VAULTS DATA *****/////
@@ -892,17 +850,17 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         /////***** SET PLATFORM DATA *****/////
 
         vaultsTokens[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
+          stabilityAPIData?.platforms?.[+chain.id]?.bcAssets ?? [];
 
         versions[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
+          stabilityAPIData?.platforms?.[+chain.id]?.versions?.platform ?? "";
 
         platformData[chain.id] = {
           platform: platforms[chain.id],
           factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
-          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPermitToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPermitToken as TAddress,
-          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPayPerVaultToken as TAddress,
           zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
         };
@@ -1014,7 +972,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** META VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.metaVaults as TMetaVault[]).map(
+      Object.keys(stabilityAPIData?.metaVaults as MetaVaults).map(
         async (key) => {
           const chain = CHAINS.find(({ id }) => id === key);
           if (!chain) return;
@@ -1037,10 +995,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               let sonicPoints = 0;
 
-              if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+              if (["metaUSD", "metaS"].includes(metaVault?.symbol)) {
                 const multiplier =
                   stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
-                    metaVault.address
+                    metaVault?.address
                   ] || 0;
 
                 if (multiplier) {
@@ -1159,7 +1117,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     connected.set(isConnected);
   };
 
-  useEffect(() => {
+  const init = async () => {
     if (!$metaVaults) {
       const metaVaultsWithName = deployments["146"].metaVaults?.map(
         (metaV) => ({
@@ -1172,24 +1130,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       metaVaults.set({ "146": metaVaultsWithName });
     }
 
-    // if (!$markets) {
-    //   const localMarkets = lendingMarkets.reduce<{
-    //     [chainId: string]: TMarket[];
-    //   }>((acc, market) => {
-    //     const chainId = market.chainId;
-
-    //     if (!acc[chainId]) {
-    //       acc[chainId] = [];
-    //     }
-
-    //     acc[chainId].push(market);
-    //     return acc;
-    //   }, {});
-
-    //   markets.set(localMarkets);
-    // }
+    if (!$markets) {
+      const localMarkets = await loadMarketsData({});
+      markets.set(localMarkets);
+    }
 
     fetchAllData();
+  };
+
+  useEffect(() => {
+    init();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (

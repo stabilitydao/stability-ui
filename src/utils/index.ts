@@ -31,6 +31,7 @@ import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
 import { updateQueryParams } from "./functions/updateQueryParams";
+import { loadMarketsData } from "./functions/loadMarketsData";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -73,4 +74,5 @@ export {
   exactToFixed,
   updateQueryParams,
   useWindowWidth,
+  loadMarketsData,
 };

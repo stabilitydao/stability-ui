@@ -16,7 +16,7 @@ import { CHAINS } from "@constants";
 
 import { markets, error } from "@store";
 
-import { MarketSectionTypes, TMarket, TMarketAsset } from "@types";
+import { MarketSectionTypes, TMarket, TMarketReserve } from "@types";
 
 interface IProps {
   network: string;
@@ -31,16 +31,16 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
-  const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
+  const [activeAsset, setActiveAsset] = useState<TMarketReserve | undefined>();
 
   const [activeSection, setActiveSection] =
     useState<MarketSectionTypes>(section);
 
-  const handleAssetChange = (asset: TMarketAsset) => {
-    if (asset?.asset === localMarket?.assets?.[0]?.asset) {
+  const handleAssetChange = (asset: TMarketReserve) => {
+    if (asset?.address === localMarket?.reserves?.[0]?.address) {
       updateQueryParams({ asset: null });
     } else {
-      updateQueryParams({ asset: asset?.asset });
+      updateQueryParams({ asset: asset?.address });
     }
 
     setActiveAsset(asset);
@@ -53,12 +53,12 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       updateQueryParams({ section });
     }
 
-    // temp
     if (section === MarketSectionTypes.Borrow && !activeAsset?.isBorrowable) {
-      const borrowableAssets = localMarket?.assets?.filter(
+      const borrowableAssets = localMarket?.reserves?.filter(
         ({ isBorrowable }) => isBorrowable
       );
-      handleAssetChange(borrowableAssets[0]);
+
+      handleAssetChange(borrowableAssets?.[0] as TMarketReserve);
     }
 
     setActiveSection(section);
@@ -70,21 +70,21 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         ({ marketId }) => marketId === market
       );
 
-      const marketAssets = _market?.reserves?.sort(
-        (a: TMarketAsset, b: TMarketAsset) =>
+      const marketReserves = _market?.reserves?.sort(
+        (a: TMarketReserve, b: TMarketReserve) =>
           Number(b?.supplyTVL) - Number(a?.supplyTVL)
       );
 
       const chain = CHAINS.find(({ id }) => id == network);
 
       setLocalMarket({
-        name: market,
+        marketId: market,
         network: chain,
         engine: _market?.engine,
         pool: _market?.pool,
         protocolDataProvider: _market?.protocolDataProvider,
         deployed: _market?.deployed,
-        assets: marketAssets as TMarketAsset[],
+        reserves: marketReserves as TMarketReserve[],
       } as TMarket);
     }
   }, [$markets]);
@@ -92,10 +92,12 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   useEffect(() => {
     if (localMarket && !activeAsset) {
       if (asset) {
-        const urlAsset = localMarket?.assets?.find((_) => asset === _?.asset);
-        setActiveAsset(urlAsset ? urlAsset : localMarket?.assets[0]);
+        const urlAsset = localMarket?.reserves?.find(
+          ({ address }) => asset === address
+        );
+        setActiveAsset(urlAsset ? urlAsset : localMarket?.reserves[0]);
       } else {
-        setActiveAsset(localMarket?.assets[0]);
+        setActiveAsset(localMarket?.reserves[0]);
       }
     }
   }, [localMarket]);
@@ -104,7 +106,9 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     <WagmiLayout>
       <div className="w-full mx-auto font-manrope pb-5">
         <div>
-          <h1 className="page-title__font text-start">{localMarket?.name}</h1>
+          <h1 className="page-title__font text-start">
+            {localMarket?.marketId}
+          </h1>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
@@ -162,7 +166,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               </div>
               <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col-reverse lg:flex-row">
                 <AssetSelector
-                  assets={localMarket?.assets}
+                  assets={localMarket?.reserves}
                   activeSection={activeSection}
                   activeAsset={activeAsset}
                   handleAssetChange={handleAssetChange}

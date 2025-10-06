@@ -2,11 +2,11 @@ import { AssetInfo } from "./AssetInfo";
 
 import { useWindowWidth } from "@utils";
 
-import type { TMarketAsset, TNetwork } from "@types";
+import type { TMarketReserve, TNetwork } from "@types";
 
 type TProps = {
-  activeAsset: TMarketAsset | undefined;
-  assets: TMarketAsset[] | undefined;
+  activeAsset: TMarketReserve | undefined;
+  assets: TMarketReserve[] | undefined;
   network: TNetwork;
 };
 
@@ -16,7 +16,7 @@ const AssetsInfo: React.FC<TProps> = ({ activeAsset, assets, network }) => {
     return (
       <div className="flex items-start flex-col lg:flex-row gap-6 w-full">
         {assets.map((asset) => (
-          <AssetInfo key={asset?.asset} asset={asset} network={network} />
+          <AssetInfo key={asset?.address} asset={asset} network={network} />
         ))}
       </div>
     );
@@ -24,7 +24,7 @@ const AssetsInfo: React.FC<TProps> = ({ activeAsset, assets, network }) => {
 
   return (
     <AssetInfo
-      asset={activeAsset as TMarketAsset}
+      asset={activeAsset as TMarketReserve}
       isSingleAsset={true}
       network={network}
     />

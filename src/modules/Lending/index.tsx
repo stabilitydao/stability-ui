@@ -67,8 +67,8 @@ const Lending = (): JSX.Element => {
       if (state.sortType !== "none") {
         sortedMarkets = [...sortedMarkets].sort((a, b) =>
           dataSorter(
-            String(a[state.keyName]),
-            String(b[state.keyName]),
+            String(a[state.keyName as keyof TMarket]),
+            String(b[state.keyName as keyof TMarket]),
             state.dataType,
             state.sortType
           )
@@ -86,42 +86,39 @@ const Lending = (): JSX.Element => {
         const networkMarkets = $markets[network.id];
         if (!networkMarkets) return [];
 
-        return networkMarkets.map((market) => {
-          const formattedAssets = market?.reserves?.map((reserve) => {
-            return {
-              ...reserve,
-              address: reserve?.asset,
-            };
-          });
+        return networkMarkets.map((market: TMarket) => {
+          const marketId = market.marketId;
+
+          const reserves = market?.reserves;
 
           const supplyAPR = Math.max(
-            ...formattedAssets.map((asset) => Number(asset?.supplyAPR) || 0)
+            ...reserves?.map((asset) => Number(asset?.supplyAPR) || 0)
           );
 
           const borrowAPR = Math.max(
-            ...formattedAssets.map((asset) => Number(asset?.borrowAPR) || 0)
+            ...reserves?.map((asset) => Number(asset?.borrowAPR) || 0)
           );
 
-          const supplyTVLInUSD = formattedAssets.reduce(
+          const supplyTVLInUSD = reserves?.reduce(
             (acc, cur) => acc + Number(cur?.supplyTVLInUSD),
             0
           );
 
           const borrowTVL = Math.max(
-            ...formattedAssets.map((asset) => Number(asset?.borrowTVL) || 0)
+            ...reserves?.map((asset) => Number(asset?.borrowTVL) || 0)
           );
 
           const LTV = Math.max(
-            ...formattedAssets.map((asset) => Number(asset?.maxLtv) || 0)
+            ...reserves?.map((asset) => Number(asset?.maxLtv) || 0)
           );
 
           const utilization = Math.max(
-            ...formattedAssets.map((asset) => Number(asset?.utilization) || 0)
+            ...reserves?.map((asset) => Number(asset?.utilization) || 0)
           );
 
           return {
-            name: market.marketId,
-            assets: formattedAssets,
+            marketId,
+            reserves,
             supplyAPR,
             borrowAPR,
             supplyTVLInUSD,

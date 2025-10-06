@@ -647,35 +647,6 @@ type TSort = {
   setTableData: TDispatchedTableData;
 };
 
-//// API
-
-type TAPIData = {
-  title?: string;
-  // about?: string;
-  status?: string;
-  // services?: string[];
-  assetPrices?: TMultichainPrices;
-  vaults?: TVaults;
-  metaVaults?: TMetaVault[];
-  underlyings?: TVaults;
-  platforms?: {
-    [chainID: string]: {
-      buildingPermitToken: TAddress;
-      buildingPayPerVaultToken: TAddress;
-      bcAssets: TAddress[];
-      versions: {
-        platform: string;
-        strategy: {
-          [strategyId: string]: string;
-        };
-      };
-    };
-  };
-  rewards?: { gemsAprMultiplier: number };
-  prices?: TMarketPrices;
-  error?: string;
-};
-
 type TVLRange = { min: number; max: number };
 
 type TContests = {
@@ -750,29 +721,55 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
-type TMarketAsset = {
+type TMarketReserve = {
+  // lib data
   address: TAddress;
   aToken: TAddress;
-  borrowAPR: string;
-  borrowCap: string;
-  borrowTVL: string;
-  cap: string;
+  aTokenSymbol: string;
+  isBorrowable: boolean;
+  oracle: TAddress;
+  oracleName: string;
+  treasury: TAddress;
+
+  // backend data
   name: string;
+  debtToken: TAddress;
   price: string;
+
   supplyAPR: string;
+  borrowAPR: string;
+
   supplyTVL: string;
+  supplyTVLInUSD: string;
+
+  borrowTVL: string;
+  borrowTVLInUSD: string;
+
+  cap: string;
+  borrowCap: string;
+
+  reserveFactor: string;
   maxLtv: string;
   liquidationThreshold: string;
-  utilization: number;
+  liquidationBonus: string;
+  utilization: string;
 };
 
 type TMarket = {
-  name: string;
-  assets: TMarketAsset[];
-  network: TNetwork;
+  marketId: string;
+  reserves: TMarketReserve[];
+  deployed: string;
+  engine: string;
+  pool: TAddress;
+  protocolDataProvider: TAddress;
+
+  network?: TNetwork;
+
+  // table sort
   supplyAPR?: number;
   borrowAPR?: number;
   supplyTVL?: number;
+  supplyTVLInUSD?: number;
   borrowTVL?: number;
   utilization?: number;
 };
@@ -871,7 +868,6 @@ export type {
   TUpgradesTable,
   TYearnProtocol,
   TPriceInfo,
-  TAPIData,
   TEarningData,
   TChartPayload,
   TVaultDataKey,
@@ -913,7 +909,7 @@ export type {
   TActiveChart,
   IProtocolModal,
   TMarket,
-  TMarketAsset,
+  TMarketReserve,
   TNetwork,
   TChartNames,
   TMarketUser,
