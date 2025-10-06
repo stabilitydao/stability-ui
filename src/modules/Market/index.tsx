@@ -152,12 +152,11 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                     />
                   </div>
                   <div className="pl-2 pr-4 border-r border-r-[#232429]">
-                    <CustomTooltip
-                      name={`Engine: ${localMarket?.engine}`}
-                      description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
-                  Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
-                      isMediumText={true}
-                    />
+                    <div className="flex items-center">
+                      <span className="font-medium text-[14px] leading-5 text-[#7C7E81]">
+                        Engine: {localMarket?.engine}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

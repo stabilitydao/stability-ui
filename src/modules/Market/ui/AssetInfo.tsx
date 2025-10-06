@@ -46,7 +46,7 @@ const AssetInfo: React.FC<TProps> = ({
               {Number(asset?.supplyAPR).toFixed(2)}%
             </span>
           </div>
-          {asset.isBorrowable && (
+          {asset?.isBorrowable && (
             <div className="w-1/2 flex flex-col items-start">
               <span className="text-[#7C7E81] text-[14px] leading-5">
                 Borrow APR
@@ -69,7 +69,7 @@ const AssetInfo: React.FC<TProps> = ({
               <CustomTooltip name="IRM" description="desc" />
               <span className="font-semibold">Dynamic IRM</span>
             </div> */}
-            {asset.isBorrowable && (
+            {asset?.isBorrowable && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip
                   name="Available to borrow"

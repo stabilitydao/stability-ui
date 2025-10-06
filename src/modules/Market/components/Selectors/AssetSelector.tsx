@@ -60,7 +60,7 @@ const AssetSelector: React.FC<TProps> = ({
             const assetData = getTokenData(asset.asset) as TTokenData;
 
             if (
-              !asset.isBorrowable &&
+              !asset?.isBorrowable &&
               activeSection === MarketSectionTypes.Borrow
             ) {
               return null;
@@ -103,7 +103,7 @@ const AssetSelector: React.FC<TProps> = ({
           const assetData = getTokenData(asset.asset) as TTokenData;
 
           if (
-            !asset.isBorrowable &&
+            !asset?.isBorrowable &&
             activeSection === MarketSectionTypes.Borrow
           ) {
             return null;
