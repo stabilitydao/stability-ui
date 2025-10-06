@@ -11,7 +11,7 @@ type TProps = {
 const AddressField: React.FC<TProps> = ({ symbol, address, explorer }) => {
   return (
     <div className="flex items-center justify-between w-full">
-      <span className="text-[#7C7E81]">{symbol} address</span>
+      <span className="text-[#7C7E81]">{symbol}</span>
       <div className="flex items-center gap-3">
         <span className="text-[#9180F4]">
           {getShortAddress(address ?? "", 6, 4)}

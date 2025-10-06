@@ -32,7 +32,7 @@ const AssetInfo: React.FC<TProps> = ({
         isSingleAsset ? "w-full" : "w-full lg:w-1/2"
       )}
     >
-      <div className="flex items-center gap-3 text-[24px] leading-8 font-medium">
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3 text-[24px] leading-8 font-medium">
         <span>{assetData?.symbol}</span>
         <span className="text-[#7C7E81]">{assetData?.name}</span>
       </div>
@@ -46,17 +46,19 @@ const AssetInfo: React.FC<TProps> = ({
               {Number(asset?.supplyAPR).toFixed(2)}%
             </span>
           </div>
-          <div className="w-1/2 flex flex-col items-start">
-            <span className="text-[#7C7E81] text-[14px] leading-5">
-              Borrow APR
-            </span>
-            <span className="text-[32px] leading-10">
-              {Number(asset?.borrowAPR).toFixed(2)}%
-            </span>
-          </div>
+          {asset.isBorrowable && (
+            <div className="w-1/2 flex flex-col items-start">
+              <span className="text-[#7C7E81] text-[14px] leading-5">
+                Borrow APR
+              </span>
+              <span className="text-[32px] leading-10">
+                {Number(asset?.borrowAPR).toFixed(2)}%
+              </span>
+            </div>
+          )}
         </div>
-        <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col md:flex-row gap-2 md:gap-6 w-full font-medium">
-          <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
+        <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 w-full font-medium">
+          <div className="w-full flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Utilization" description="desc" />
               <span className="font-semibold">
@@ -67,53 +69,78 @@ const AssetInfo: React.FC<TProps> = ({
               <CustomTooltip name="IRM" description="desc" />
               <span className="font-semibold">Dynamic IRM</span>
             </div> */}
-            <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip
-                name="Available to borrow"
-                description="desc"
-                isMediumText={true}
-              />
-              <div className="flex flex-col items-end">
-                <span className="font-semibold">
-                  {formatNumber(asset.borrowTVL, "abbreviate")?.slice(1)}
-                </span>
-                <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                  {formatNumber(asset.borrowTVLInUSD, "abbreviate")}
-                </span>
+            {asset.isBorrowable && (
+              <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip
+                  name="Available to borrow"
+                  description="desc"
+                  isMediumText={true}
+                />
+                <div className="flex flex-col items-end">
+                  <span className="font-semibold">
+                    {formatNumber(asset.borrowTVL, "abbreviate")?.slice(1)}
+                  </span>
+                  <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
+                    {formatNumber(asset.borrowTVLInUSD, "abbreviate")}
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip
                 name={`${assetData?.symbol} TVL`}
                 description="desc"
               />
               <span className="font-semibold">
-                {formatNumber(asset.cap, "abbreviate")?.slice(1)}{" "}
-                {assetData?.symbol}
+                {formatNumber(asset.supplyTVL, "abbreviate")?.slice(1)}{" "}
               </span>
             </div>
+            {!!Number(asset.cap) && (
+              <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip
+                  name={`${assetData?.symbol} Cap`}
+                  description="desc"
+                />
+                <span className="font-semibold">
+                  {formatNumber(asset.cap, "abbreviate")?.slice(1)}{" "}
+                </span>
+              </div>
+            )}
           </div>
-          <div className="w-full md:w-1/2 flex flex-col items-start gap-2">
+          <div className="w-full flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="Oracle" description="desc" />
-              <span className="font-semibold truncated-text">
+              <span className="font-semibold truncated-text text-end">
                 {asset?.oracleName}
               </span>
             </div>
-            <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Max LTV" description="desc" />
-              <span className="font-semibold">{asset?.maxLtv}%</span>
-            </div>
-            <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Liquidation threshold" description="desc" />
-              <span className="font-semibold">
-                {asset?.liquidationThreshold}%
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Liquidation bonus" description="desc" />
-              <span className="font-semibold">{asset?.liquidationBonus}%</span>
-            </div>
+            {!!Number(asset?.maxLtv) && (
+              <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip name="Max LTV" description="desc" />
+                <span className="font-semibold">{asset?.maxLtv}%</span>
+              </div>
+            )}
+
+            {!!Number(asset?.liquidationThreshold) && (
+              <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip
+                  name="Liquidation threshold"
+                  description="desc"
+                />
+                <span className="font-semibold">
+                  {asset?.liquidationThreshold}%
+                </span>
+              </div>
+            )}
+
+            {!!Number(asset?.liquidationBonus) && (
+              <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip name="Liquidation bonus" description="desc" />
+                <span className="font-semibold">
+                  {asset?.liquidationBonus}%
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col items-start gap-2 w-full font-medium text-[16px] leading-6">
