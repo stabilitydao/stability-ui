@@ -19,7 +19,6 @@ import {
   seeds,
   StrategyShortId,
   sonicWhitelistedAssets,
-  lendingMarkets,
 } from "@stabilitydao/stability";
 
 import {
@@ -815,7 +814,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const _marketPrices: TMarketPrices = {};
 
     /***** MARKETS *****/
-    const localMarkets = await loadMarketsData(
+    localMarkets = await loadMarketsData(
       stabilityAPIData.markets as MarketData
     );
 
@@ -1131,7 +1130,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     }
 
     if (!$markets) {
-      const localMarkets = await loadMarketsData({});
+      localMarkets = await loadMarketsData({});
       markets.set(localMarkets);
     }
 
