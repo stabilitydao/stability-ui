@@ -47,54 +47,54 @@ const Swapper = (): JSX.Element => {
   const [poolTableData, setPoolTableData] = useState<TPoolTable[]>([]);
   const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);
 
-  const initTablesData = async () => {
-    try {
-      const GRAPH_URL = GRAPH_ENDPOINTS[$currentChainID];
+  // const initTablesData = async () => {
+  //   try {
+  //     const GRAPH_URL = GRAPH_ENDPOINTS[$currentChainID];
 
-      const GRAPH_QUERY = `{
-              bcpoolEntities {
-                  pool
-                  id
-                  ammAdapter
-                  tokenIn
-                  tokenOut
-              }
-              poolEntities {
-                  ammAdapter
-                  assetAdded
-                  id
-                  tokenIn
-                  tokenOut
-              }}`;
+  //     const GRAPH_QUERY = `{
+  //             bcpoolEntities {
+  //                 pool
+  //                 id
+  //                 ammAdapter
+  //                 tokenIn
+  //                 tokenOut
+  //             }
+  //             poolEntities {
+  //                 ammAdapter
+  //                 assetAdded
+  //                 id
+  //                 tokenIn
+  //                 tokenOut
+  //             }}`;
 
-      const graphResponse = await axios.post(GRAPH_URL, {
-        query: GRAPH_QUERY,
-      });
+  //     const graphResponse = await axios.post(GRAPH_URL, {
+  //       query: GRAPH_QUERY,
+  //     });
 
-      const data = graphResponse.data.data;
+  //     const data = graphResponse.data.data;
 
-      setPoolTableData(data.poolEntities);
-      setBCPoolTableData(data.bcpoolEntities);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     setPoolTableData(data.poolEntities);
+  //     setBCPoolTableData(data.bcpoolEntities);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-  const AMM_ADAPTERS = useMemo(() => {
-    const adapters = deployments?.[$currentChainID]?.ammAdapters;
-    if (!adapters) return [];
+  // const AMM_ADAPTERS = useMemo(() => {
+  //   const adapters = deployments?.[$currentChainID]?.ammAdapters;
+  //   if (!adapters) return [];
 
-    return Object.entries(adapters).map(([name, address]) => ({
-      name,
-      address,
-    }));
-  }, [$currentChainID, deployments]);
+  //   return Object.entries(adapters).map(([name, address]) => ({
+  //     name,
+  //     address,
+  //   }));
+  // }, [$currentChainID, deployments]);
 
-  function getNameByAddress(address: string): string | undefined {
-    return AMM_ADAPTERS.find(
-      (a) => a.address.toLowerCase() === address.toLowerCase()
-    )?.name;
-  }
+  // function getNameByAddress(address: string): string | undefined {
+  //   return AMM_ADAPTERS.find(
+  //     (a) => a.address.toLowerCase() === address.toLowerCase()
+  //   )?.name;
+  // }
 
   const tokenlist = tokenlistAll.tokens.filter(
     (token) => token.chainId == $currentChainID
@@ -337,66 +337,66 @@ const Swapper = (): JSX.Element => {
   };
 
   useEffect(() => {
-    initTablesData();
+    // initTablesData();
   }, [$currentChainID]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
+  // useEffect(() => {
+  //   let interval: NodeJS.Timeout;
 
-    async function updateGasEstimate() {
-      if (
-        !poolAddress ||
-        !selectedAdapter ||
-        !finalTokenIn ||
-        !finalTokenOut ||
-        !$account
-      )
-        return;
+  //   async function updateGasEstimate() {
+  //     if (
+  //       !poolAddress ||
+  //       !selectedAdapter ||
+  //       !finalTokenIn ||
+  //       !finalTokenOut ||
+  //       !$account
+  //     )
+  //       return;
 
-      try {
-        const est = await $publicClient.estimateContractGas({
-          address: deployments?.[$currentChainID]?.core?.swapper,
-          abi: SwapperABI,
-          functionName: "addPools",
-          args: [
-            [
-              {
-                pool: poolAddress as Address,
-                ammAdapter: selectedAdapter as Address,
-                tokenIn: finalTokenIn as Address,
-                tokenOut: finalTokenOut as Address,
-              },
-            ],
-            rewrite,
-          ] as const,
-          account: $account as TAddress,
-        });
-        const gasPrice = await $publicClient.getGasPrice();
-        const totalFee = est * gasPrice;
-        setGasEstimate(totalFee);
-      } catch (err) {
-        console.error("Gas estimate failed", err);
-        setGasEstimate(null);
-      }
-    }
+  //     try {
+  //       const est = await $publicClient.estimateContractGas({
+  //         address: deployments?.[$currentChainID]?.core?.swapper,
+  //         abi: SwapperABI,
+  //         functionName: "addPools",
+  //         args: [
+  //           [
+  //             {
+  //               pool: poolAddress as Address,
+  //               ammAdapter: selectedAdapter as Address,
+  //               tokenIn: finalTokenIn as Address,
+  //               tokenOut: finalTokenOut as Address,
+  //             },
+  //           ],
+  //           rewrite,
+  //         ] as const,
+  //         account: $account as TAddress,
+  //       });
+  //       const gasPrice = await $publicClient.getGasPrice();
+  //       const totalFee = est * gasPrice;
+  //       setGasEstimate(totalFee);
+  //     } catch (err) {
+  //       console.error("Gas estimate failed", err);
+  //       setGasEstimate(null);
+  //     }
+  //   }
 
-    // run immediately
-    updateGasEstimate();
+  //   // run immediately
+  //   updateGasEstimate();
 
-    // refresh every 15 seconds
-    interval = setInterval(updateGasEstimate, 15000);
+  //   // refresh every 15 seconds
+  //   interval = setInterval(updateGasEstimate, 15000);
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [
-    poolAddress,
-    selectedAdapter,
-    finalTokenIn,
-    finalTokenOut,
-    rewrite,
-    $account,
-  ]);
+  //   return () => {
+  //     if (interval) clearInterval(interval);
+  //   };
+  // }, [
+  //   poolAddress,
+  //   selectedAdapter,
+  //   finalTokenIn,
+  //   finalTokenOut,
+  //   rewrite,
+  //   $account,
+  // ]);
 
   useModalClickOutside(modalRef, () => setShowModal((prev) => !prev));
 
@@ -411,7 +411,7 @@ const Swapper = (): JSX.Element => {
       />
 
       {/* Modal */}
-      {showModal && (
+      {/* {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
           <div
             ref={modalRef}
@@ -440,11 +440,11 @@ const Swapper = (): JSX.Element => {
                   className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                 >
                   <option value="">Select an adapter</option>
-                  {/* {AMM_ADAPTERS?.map((option) => (
+                  {AMM_ADAPTERS?.map((option) => (
                     <option key={option.address} value={option.address}>
                       {option.name}
                     </option>
-                  ))} */}
+                  ))}
                 </select>
               </label>
 
@@ -566,7 +566,7 @@ const Swapper = (): JSX.Element => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
         <HeadingText text="Swapper" scale={1} />
@@ -586,7 +586,7 @@ const Swapper = (): JSX.Element => {
               </button>
             </div>
 
-            {poolTableData.length ? (
+            {/* {poolTableData.length ? (
               <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
                 <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
                   <thead className="bg-accent-950 text-neutral-600 h-[36px]">
@@ -750,7 +750,7 @@ const Swapper = (): JSX.Element => {
               </div>
             ) : (
               <HeadingText text="No Blue Chip Pools" scale={2} />
-            )}
+            )} */}
           </>
         ) : (
           <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
