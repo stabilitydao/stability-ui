@@ -81,6 +81,9 @@ const Swapper = (): JSX.Element => {
   };
 
   const AMM_ADAPTERS = useMemo(() => {
+    console.log("Deployments:", deployments);
+    console.log("CurrentChainID:", $currentChainID);
+    console.log("Adapters:", deployments?.[$currentChainID]?.ammAdapters);
     if (
       typeof $currentChainID !== "string" ||
       !deployments ||
