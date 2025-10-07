@@ -81,16 +81,14 @@ const Swapper = (): JSX.Element => {
   };
 
   const AMM_ADAPTERS = useMemo(() => {
-    if (!$currentChainID || !deployments?.[$currentChainID]?.ammAdapters) {
-      return [];
-    }
+    const adapters = deployments?.[$currentChainID]?.ammAdapters;
 
-    return Object.entries(deployments[$currentChainID].ammAdapters).map(
-      ([name, address]) => ({
-        name,
-        address,
-      })
-    );
+    if (!adapters) return [];
+
+    return Object.entries(adapters).map(([name, address]) => ({
+      name,
+      address,
+    }));
   }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
