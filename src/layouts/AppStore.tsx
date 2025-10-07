@@ -822,8 +822,8 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     isMarketsLoaded.set(true);
 
     /***** PRICES *****/
-    if (stabilityAPIData.prices) {
-      Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
+    if (stabilityAPIData?.prices) {
+      Object.entries(stabilityAPIData?.prices).forEach(([key, value]) => {
         const isIntegerPrice = ["BTC", "ETH"].includes(key);
         _marketPrices[key] = {
           ...value,

@@ -36,7 +36,7 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
       );
 
       if (req.data) {
-        const _users = Object.entries(req.data).map(([address, data]) => ({
+        const _users = Object.entries(req?.data).map(([address, data]) => ({
           address,
           collateral: data?.aTokenBalanceUsd ?? 0,
           debt: data?.debtTokenBalanceUsd ?? 0,
