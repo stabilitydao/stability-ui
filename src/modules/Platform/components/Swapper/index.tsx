@@ -82,7 +82,6 @@ const Swapper = (): JSX.Element => {
 
   const AMM_ADAPTERS = useMemo(() => {
     const adapters = deployments?.[$currentChainID]?.ammAdapters;
-    console.log("adapters1", adapters);
     if (!adapters) return [];
 
     return Object.entries(adapters).map(([name, address]) => ({

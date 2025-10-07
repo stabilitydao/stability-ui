@@ -194,7 +194,6 @@ const Platform = (): JSX.Element => {
 
         {isAlert && (
           <div className="flex flex-col gap-3">
-            {console.log("alerts1")}
             {Object.entries(
               $apiData?.network?.healthCheckReview?.alerts || {}
             ).map(([key, value], index) => (
@@ -202,7 +201,6 @@ const Platform = (): JSX.Element => {
                 key={index}
                 className="p-3 bg-[#111114] border border-[#232429] rounded-lg"
               >
-                {console.log("alerts", index)}
                 <p className="font-semibold">{key}</p>
 
                 {typeof value === "object" && value !== null ? (
