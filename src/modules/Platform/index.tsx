@@ -1,30 +1,33 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-import { useStore } from "@nanostores/react";
+import {useStore} from "@nanostores/react";
 
-import { PlatformUpgrade } from "./components/PlatformUpgrade";
+import {PlatformUpgrade} from "./components/PlatformUpgrade";
 
 import {
+  AgentId,
   type ApiMainReply,
   assets,
   ChainStatus,
   chainStatusInfo,
+  getAgent,
   getChainsTotals,
   getStrategiesTotals,
   integrations,
   seeds,
 } from "@stabilitydao/stability";
 
-import { formatNumber } from "@utils";
+import {formatNumber} from "@utils";
 
-import { CountersBlockCompact, Skeleton } from "@ui";
+import {CountersBlockCompact, Skeleton} from "@ui";
 
-import { apiData, platformVersions, currentChainID } from "@store";
+import {apiData, currentChainID, platformVersions} from "@store";
 
 import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
 
 import packageJson from "../../../package.json";
-import { NodeState } from "@stabilitydao/stability/out/api.types";
+import {NodeState} from "@stabilitydao/stability/out/api.types";
+import {IBuilderAgent} from "@stabilitydao/stability/out/agents";
 
 const Platform = (): JSX.Element => {
   const $currentChainID = useStore(currentChainID);
@@ -173,26 +176,56 @@ const Platform = (): JSX.Element => {
   const isAlert = $apiData?.network.status == "Alert";
   const isOk = $apiData?.network.status == "OK";
 
+  const builderAgent: IBuilderAgent = getAgent('BUILDER' as AgentId)
+
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
-      <div className="flex flex-col w-full items-center">
-        <div className="flex text-[14px] h-[30px] items-center">
-          <span className="bg-gray-700 px-[10px]">Platform status</span>
-          <span
-            className="font-bold px-[10px]"
-            style={{
-              backgroundColor: isAlert
-                ? "#ff8d00"
-                : isOk
-                  ? "#1f851f"
-                  : "#444444",
-            }}
-          >
+      <h2>Summary</h2>
+
+      <div className="flex w-full gap-[20px]">
+        <div className="flex flex-col lg:w-1/2 bg-accent-900 p-[10px] min-h-[200px]">
+          <div>Asset management</div>
+          <div>
+            <div>Vaults: {$apiData?.total.activeVaults}, {formatNumber($apiData?.total.tvl || 0, "abbreviate")}</div>
+            <div>MetaVaults: {'6'}</div>
+            <div>Lending markets: {'5'}</div>
+          </div>
+        </div>
+        <div className="flex flex-col lg:w-1/2 bg-accent-900 p-[10px] min-h-[200px]">
+          <div>Tokenomics</div>
+          <div>
+            <div>$STBL</div>
+            <div>Staked xSTBL</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Agents</h2>
+
+      <div className="flex w-full flex-wrap">
+        <div className="flex flex-col lg:w-1/2  p-[10px]">
+          <div className="flex flex-col bg-accent-900 min-h-[400px]">
+            <div>Stability Operator</div>
+            <div>
+
+              <div className="flex flex-col w-full">
+                <div className="flex text-[14px] h-[30px] items-center">
+                  <span className="bg-gray-700 px-[10px]">Platform status</span>
+                  <span
+                    className="font-bold px-[10px]"
+                    style={{
+                      backgroundColor: isAlert
+                        ? "#ff8d00"
+                        : isOk
+                          ? "#1f851f"
+                          : "#444444",
+                    }}
+                  >
             {$apiData?.network.status}
           </span>
-        </div>
+                </div>
 
-        {isAlert && (
+                {/*{isAlert && (
           <div className="flex flex-col gap-3">
             {Object.entries(
               $apiData?.network.healthCheckReview?.alerts || {}
@@ -215,8 +248,67 @@ const Platform = (): JSX.Element => {
               </div>
             ))}
           </div>
-        )}
+        )}*/}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col lg:w-1/2 p-[10px]">
+          <div className="flex flex-col bg-accent-900 min-h-[400px]">
+            <div>Stability Builder</div>
+            <div>
+              {builderAgent.repo.map(repo => (
+                <div>{repo}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col lg:w-1/2 p-[10px]">
+          <div className="flex bg-accent-900 min-h-[200px]">
+            <div>Yield Tracker</div>
+
+          </div>
+        </div>
       </div>
+
+      <h2>Knowledge</h2>
+
+      <div className="flex flex-wrap gap-[30px]">
+
+        <a
+          className="bg-accent-950 hover:bg-[#1B0D45] p-[26px] rounded-[32px] inline-flex w-[200px] justify-center"
+          href="/chains"
+          title="View all blockchains"
+        >
+          Chains
+        </a>
+
+        <a
+          className="bg-accent-950 hover:bg-[#1B0D45] p-[26px] rounded-[32px] inline-flex w-[200px] justify-center"
+          href="/integrations"
+          title="View all organizations and protocols"
+        >
+          Protocols
+        </a>
+
+        <a
+          className="bg-accent-950 hover:bg-[#1B0D45] p-[26px] rounded-[32px] inline-flex w-[200px] justify-center"
+          href="/assets"
+          title="View all assets"
+        >
+          Assets
+        </a>
+
+        <a
+          className="bg-accent-950 hover:bg-[#1B0D45] p-[26px] rounded-[32px] inline-flex w-[200px] justify-center"
+          href="/strategies"
+          title="View all strategies"
+        >
+          Strategies
+        </a>
+      </div>
+
+
 
       <div className="px-6 hidden">
         <div className="flex p-[16px] gap-[8px] bg-accent-950 rounded-[10px] w-full">
@@ -249,23 +341,7 @@ const Platform = (): JSX.Element => {
 
       <PlatformUpgrade />
 
-      <div className="flex flex-wrap justify-center p-[36px]">
-        {platformData.map(({ name, content }) => (
-          <div
-            key={name}
-            className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col"
-          >
-            {content ? (
-              <div className="text-[36px]">{content}</div>
-            ) : (
-              <Skeleton />
-            )}
-            <div className="flex self-center justify-center text-[16px]">
-              {name}
-            </div>
-          </div>
-        ))}
-      </div>
+      <h2>Administrate</h2>
 
       <div className="flex flex-wrap">
         <CountersBlockCompact
@@ -280,33 +356,6 @@ const Platform = (): JSX.Element => {
           linkTitle="Go to Swapper"
           counters={swapperInfo}
         />
-        <CountersBlockCompact
-          title="Assets"
-          link="/assets"
-          linkTitle="View all assets"
-          counters={assetsInfo}
-        />
-
-        <CountersBlockCompact
-          title="Strategies"
-          link="/strategies"
-          linkTitle="Go to strategies"
-          counters={strategiesInfo}
-        />
-
-        <CountersBlockCompact
-          title="Chains"
-          link="/chains"
-          linkTitle="View all blockchains"
-          counters={chainsInfo}
-        />
-
-        <CountersBlockCompact
-          title="Integrations"
-          link="/integrations"
-          linkTitle="View all organizations and protocols"
-          counters={integrationInfo}
-        />
 
         <CountersBlockCompact
           title="Factory"
@@ -316,50 +365,6 @@ const Platform = (): JSX.Element => {
         />
       </div>
 
-      <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>
-      <div className="mb-10 flex items-center gap-2">
-        <div className="flex flex-col w-full">
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
-            href="https://github.com/stabilitydao/stability-contracts"
-            target="_blank"
-            title="Go to smart contracts source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              💎 Stability Platform {$platformVersions[$currentChainID]}
-            </span>
-          </a>
-
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
-            href="https://github.com/stabilitydao/stability"
-            target="_blank"
-            title="Go to library source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              📦 Stability Integration Library{" "}
-              {packageJson.dependencies["@stabilitydao/stability"].replace(
-                "^",
-                ""
-              )}
-            </span>
-          </a>
-
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl mb-6 flex items-center w-full"
-            href="https://github.com/stabilitydao/stability-ui"
-            target="_blank"
-            title="Go to UI source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              👩‍🚀 Stability User Interface {packageJson.version}
-            </span>
-          </a>
-        </div>
-      </div>
     </div>
   );
 };
