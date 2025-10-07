@@ -45,7 +45,7 @@ const SwapForm = (): JSX.Element => {
 
   const [slippage, setSlippage] = useState("");
 
-  const [balance, setBalance] = useState("0");
+  const [tokenData, setTokenData] = useState({ allowance: "0", balance: "0" });
 
   const [lastTx, setLastTx] = useState("");
 
@@ -66,16 +66,8 @@ const SwapForm = (): JSX.Element => {
       const parsedAmount = parseUnits(amount, decimals);
       const parsedSlippage = parseUnits(slippage, 3);
 
-      const allowance = await readContract(wagmiConfig, {
-        address: selectedTokenIn as TAddress,
-        abi: ERC20ABI,
-        functionName: "allowance",
-        args: [$account as TAddress, contractAddress],
-      });
-
-      console.log("Current allowance:", allowance.toString());
-
-      if (allowance < parsedAmount) {
+      console.log(Number(tokenData.allowance), Number(amount));
+      if (Number(tokenData.allowance) < Number(amount)) {
         const approveTx = await writeContract(wagmiConfig, {
           address: selectedTokenIn as TAddress,
           abi: ERC20ABI,
@@ -124,7 +116,7 @@ const SwapForm = (): JSX.Element => {
     setTokenOutSymbol("Select token");
     setAmount("");
     setSlippage("");
-    setBalance("0");
+    setTokenData({ allowance: "0", balance: "0" });
   };
 
   const handleSlippageChange = (e) => {
@@ -143,7 +135,7 @@ const SwapForm = (): JSX.Element => {
     }
   };
 
-  const getTokenBalance = async () => {
+  const getTokenBalanceAndAllowance = async () => {
     const tokenInData = getTokenData(selectedTokenIn);
     try {
       const balance = await readContract(wagmiConfig, {
@@ -153,9 +145,20 @@ const SwapForm = (): JSX.Element => {
         args: [$account as TAddress],
       });
 
+      const allowance = await readContract(wagmiConfig, {
+        address: selectedTokenIn as TAddress,
+        abi: ERC20ABI,
+        functionName: "allowance",
+        args: [$account as TAddress, contractAddress],
+      });
+
+      const formattedAllowance = formatUnits(allowance, tokenInData?.decimals);
       const formattedBalance = formatUnits(balance, tokenInData?.decimals);
 
-      setBalance(formattedBalance);
+      setTokenData({
+        balance: formattedBalance,
+        allowance: formattedAllowance,
+      });
     } catch (error) {
       console.error("Get balance error:", error);
     }
@@ -163,7 +166,7 @@ const SwapForm = (): JSX.Element => {
 
   useEffect(() => {
     if (!!selectedTokenIn) {
-      getTokenBalance();
+      getTokenBalanceAndAllowance();
     }
   }, [selectedTokenIn]);
 
@@ -238,19 +241,18 @@ const SwapForm = (): JSX.Element => {
           inputMode="decimal"
           className="mb-4 w-full rounded-lg bg-[#1D1E23] border border-[#35363B] p-3 text-white outline-none placeholder:text-[#97979A] hover:bg-[#232429] focus:border-[#816FEA] transition-all"
         />
-        {!!Number(balance) && (
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[#97979A] text-[16px] leading-5">
-              Balance: {balance}
-            </span>
-            <button
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-              onClick={() => setAmount(balance)}
-            >
-              Max
-            </button>
-          </div>
-        )}
+
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[#97979A] text-[16px] leading-5">
+            Balance: {tokenData.balance}
+          </span>
+          <button
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => setAmount(tokenData.balance)}
+          >
+            Max
+          </button>
+        </div>
       </div>
 
       <div>
@@ -285,17 +287,35 @@ const SwapForm = (): JSX.Element => {
         </a>
       )}
 
-      <button
-        onClick={() => ($account ? swap() : open())}
-        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 w-full"
-        // disabled={
-        //   simulationStatus === "loading" ||
-        //   txStatus === "wallet" ||
-        //   txStatus === "pending"
-        // }
-      >
-        {$account ? "Swap" : "Connect Wallet"}
-      </button>
+      {$account ? (
+        <>
+          {!Number(amount) ? (
+            <button className="px-3 py-1 text-[#6A6B6F] bg-[#35363B] rounded w-full cursor-default">
+              Enter amount
+            </button>
+          ) : Number(amount) > Number(tokenData?.balance) ? (
+            <button className="px-3 py-1 text-[#6A6B6F] bg-[#35363B] rounded w-full cursor-default">
+              Not enough balance
+            </button>
+          ) : (
+            <button
+              onClick={swap}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 w-full"
+            >
+              {Number(tokenData?.allowance) >= Number(amount)
+                ? "Swap"
+                : "Approve & Swap"}
+            </button>
+          )}
+        </>
+      ) : (
+        <button
+          onClick={() => open()}
+          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 w-full"
+        >
+          Connect Wallet
+        </button>
+      )}
     </div>
   );
 };
