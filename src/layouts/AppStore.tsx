@@ -63,22 +63,22 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  loadMarketsData,
 } from "@utils";
 
 import {
-  YEARN_PROTOCOLS,
+  // YEARN_PROTOCOLS,
   STRATEGY_SPECIFIC_SUBSTITUTE,
   CHAINS,
-  BIG_INT_VALUES,
+  // BIG_INT_VALUES,
 } from "@constants";
 
 import type {
   TAddress,
   THoldData,
-  TYearnProtocol,
+  // TYearnProtocol,
   TVaults,
   TMultichainPrices,
-  TAPIData,
   TPriceInfo,
   TVaultDataKey,
   TFrontendBalances,
@@ -87,10 +87,17 @@ import type {
   TTokens,
   TMetaVault,
   TMarketPrices,
+  TMarket,
   // TAsset,
 } from "@types";
 
-import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+import type {
+  Vaults,
+  Vault,
+  MarketData,
+  ApiMainReply,
+  MetaVaults,
+} from "@stabilitydao/stability/out/api.types";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { isConnected, address } = useAccount();
@@ -102,6 +109,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $metaVaults = useStore(metaVaults);
+  const $markets = useStore(markets);
 
   let isError = false;
 
@@ -111,9 +119,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
+  let localMarkets: { [network: string]: TMarket[] } = {};
+
   let prices: TMultichainPrices = {};
 
-  let stabilityAPIData: TAPIData = {};
+  let stabilityAPIData: ApiMainReply = {};
 
   const handleError = (errType: string, description: string) => {
     error.set({ state: true, type: errType, description });
@@ -196,13 +206,13 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           vault.assets as TAddress[]
         );
 
-        const strategyName = strategyInfo?.shortId;
+        // const strategyName = strategyInfo?.shortId;
 
         const NOW = Math.floor(Date.now() / 1000);
 
-        const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
-          (_: string) => BigInt(_)
-        );
+        // const almRebalanceEntity = vault?.almRebalanceRawData?.[0]?.map(
+        //   (_: string) => BigInt(_)
+        // );
 
         let dailyAPR = 0;
         let rebalances = {};
@@ -298,7 +308,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           weekly: "0",
         };
 
-        const fee = vault?.almFee?.income || 0;
+        // const fee = vault?.almFee?.income || 0;
 
         if (daysFromLastHardWork < 3) {
           dailyFarmApr = vault.income?.apr24h
@@ -314,42 +324,43 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             poolSwapFeesAPRWeekly =
               underlying?.apr?.weekly || underlying?.apr?.monthly || 0;
           }
-          if (strategyName === "IQMF" || strategyName === "IRMF") {
-            //////
-            poolSwapFeesAPRDaily =
-              Number(
-                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
 
-            poolSwapFeesAPRWeekly =
-              Number(
-                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
+          // if (strategyName === "IQMF" || strategyName === "IRMF") {
+          //   //////
+          //   poolSwapFeesAPRDaily =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[0] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
 
-            dailyAPR =
-              Number(
-                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-              ) -
-              (Number(
-                formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
-              ) /
-                100) *
-                fee;
+          //   poolSwapFeesAPRWeekly =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[2] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
 
-            if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
-            if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
-            if (!dailyAPR) dailyAPR = 0;
-          }
+          //   dailyAPR =
+          //     Number(
+          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+          //     ) -
+          //     (Number(
+          //       formatUnits(almRebalanceEntity?.[1] || BIG_INT_VALUES.ZERO, 8)
+          //     ) /
+          //       100) *
+          //       fee;
+
+          //   if (!poolSwapFeesAPRDaily) poolSwapFeesAPRDaily = 0;
+          //   if (!poolSwapFeesAPRWeekly) poolSwapFeesAPRWeekly = 0;
+          //   if (!dailyAPR) dailyAPR = 0;
+          // }
 
           APR = (Number(vault?.income?.aprLatest) + Number(dailyAPR)).toFixed(
             2
@@ -434,14 +445,19 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                   ),
           };
 
-          poolSwapFeesAPR =
-            strategyName != "CF"
-              ? {
-                  latest: Number(dailyAPR).toFixed(2),
-                  daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
-                  weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
-                }
-              : { latest: "-", daily: "-", weekly: "-" };
+          poolSwapFeesAPR = {
+            latest: Number(dailyAPR).toFixed(2),
+            daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+            weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
+          };
+
+          // strategyName != "CF"
+          //   ? {
+          //       latest: Number(dailyAPR).toFixed(2),
+          //       daily: `${poolSwapFeesAPRDaily.toFixed(2)}`,
+          //       weekly: `${poolSwapFeesAPRWeekly.toFixed(2)}`,
+          //     }
+          //   : { latest: "-", daily: "-", weekly: "-" };
 
           farmAPR = {
             latest: Number(APRWithoutFees) < 0 ? "0" : APRWithoutFees,
@@ -557,54 +573,54 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         const isVsActive = daysFromCreation >= 10 && !!Number(vault.sharePrice);
 
         /////***** YEARN PROTOCOLS *****/////
-        let yearnProtocols: TYearnProtocol[] = [];
+        // let yearnProtocols: TYearnProtocol[] = [];
 
-        if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
-          YEARN_PROTOCOLS.map((protocol: string) => {
-            if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
-              switch (protocol) {
-                case "aave":
-                  yearnProtocols.push({
-                    title: "Aave",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
-                  });
-                  break;
-                case "compound":
-                  yearnProtocols.push({
-                    title: "Compound",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
-                  });
-                  break;
-                case "stargate":
-                  yearnProtocols.push({
-                    title: "Stargate",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
-                  });
-                  break;
-                case "stmatic":
-                  yearnProtocols.push({
-                    title: "Lido",
-                    link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
-                  });
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
-        }
+        // if (vault.strategySpecific && strategyInfo?.shortId === "Y") {
+        //   YEARN_PROTOCOLS.map((protocol: string) => {
+        //     if (vault?.strategySpecific?.toLowerCase().includes(protocol)) {
+        //       switch (protocol) {
+        //         case "aave":
+        //           yearnProtocols.push({
+        //             title: "Aave",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Aave.png",
+        //           });
+        //           break;
+        //         case "compound":
+        //           yearnProtocols.push({
+        //             title: "Compound",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Compound.png",
+        //           });
+        //           break;
+        //         case "stargate":
+        //           yearnProtocols.push({
+        //             title: "Stargate",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stargate.svg",
+        //           });
+        //           break;
+        //         case "stmatic":
+        //           yearnProtocols.push({
+        //             title: "Lido",
+        //             link: "https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Lido.svg",
+        //           });
+        //           break;
+        //         default:
+        //           break;
+        //       }
+        //     }
+        //   });
+        // }
 
         if (STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()]) {
           strategySpecific =
             STRATEGY_SPECIFIC_SUBSTITUTE[vault.address.toLowerCase()];
         } else {
-          strategySpecific =
-            strategyInfo?.shortId === "DQMF"
-              ? (vault?.strategySpecific?.replace(
-                  /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
-                  ""
-                ) as string)
-              : (vault?.strategySpecific as string);
+          strategySpecific = vault?.strategySpecific as string;
+          // strategyInfo?.shortId === "DQMF"
+          //   ? (vault?.strategySpecific?.replace(
+          //       /\s*0x[a-fA-F0-9]+\.\.[a-fA-F0-9]+\s*/,
+          //       ""
+          //     ) as string)
+          //   : (vault?.strategySpecific as string);
         }
         /////
         const assetsSymbol = assets.map((asset) => asset?.symbol).join("+");
@@ -771,13 +787,14 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
             vsHoldAPR: Number(vsHoldAPR),
             assetsVsHold,
             isVsActive,
-            yearnProtocols,
+            // yearnProtocols,
             network: chainID,
             sonicPoints,
             ringsPoints,
             leverageLending: vault?.leverageLending,
             liveAPR,
             assetAPR,
+            farmId: vault?.farmId,
           };
 
         return vaults;
@@ -797,12 +814,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const _marketPrices: TMarketPrices = {};
 
     /***** MARKETS *****/
-    markets.set(stabilityAPIData.markets);
+    localMarkets = await loadMarketsData(
+      stabilityAPIData.markets as MarketData
+    );
+
+    markets.set(localMarkets);
     isMarketsLoaded.set(true);
 
     /***** PRICES *****/
-    if (stabilityAPIData.prices) {
-      Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
+    if (stabilityAPIData?.prices) {
+      Object.entries(stabilityAPIData?.prices).forEach(([key, value]) => {
         const isIntegerPrice = ["BTC", "ETH"].includes(key);
         _marketPrices[key] = {
           ...value,
@@ -817,7 +838,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
+      Object.keys(stabilityAPIData?.vaults as Vaults).map(async (key) => {
         const chain = CHAINS.find(({ id }) => id === key);
         if (!chain) return;
         /////***** SET VAULTS DATA *****/////
@@ -828,17 +849,17 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         /////***** SET PLATFORM DATA *****/////
 
         vaultsTokens[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
+          stabilityAPIData?.platforms?.[+chain.id]?.bcAssets ?? [];
 
         versions[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
+          stabilityAPIData?.platforms?.[+chain.id]?.versions?.platform ?? "";
 
         platformData[chain.id] = {
           platform: platforms[chain.id],
           factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
-          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPermitToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPermitToken as TAddress,
-          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPayPerVaultToken as TAddress,
           zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
         };
@@ -950,7 +971,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** META VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.metaVaults as TMetaVault[]).map(
+      Object.keys(stabilityAPIData?.metaVaults as MetaVaults).map(
         async (key) => {
           const chain = CHAINS.find(({ id }) => id === key);
           if (!chain) return;
@@ -973,10 +994,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               let sonicPoints = 0;
 
-              if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+              if (["metaUSD", "metaS"].includes(metaVault?.symbol)) {
                 const multiplier =
                   stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
-                    metaVault.address
+                    metaVault?.address
                   ] || 0;
 
                 if (multiplier) {
@@ -1095,16 +1116,29 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     connected.set(isConnected);
   };
 
-  useEffect(() => {
+  const init = async () => {
     if (!$metaVaults) {
       const metaVaultsWithName = deployments["146"].metaVaults?.map(
-        (metaV) => ({ ...metaV, name: getTokenData(metaV.address)?.name })
+        (metaV) => ({
+          ...metaV,
+          name: getTokenData(metaV.address)?.name,
+          network: "146",
+        })
       );
 
       metaVaults.set({ "146": metaVaultsWithName });
     }
 
+    if (!$markets) {
+      localMarkets = await loadMarketsData({});
+      markets.set(localMarkets);
+    }
+
     fetchAllData();
+  };
+
+  useEffect(() => {
+    init();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (

@@ -15,7 +15,7 @@ const MarketsTable: React.FC<IProps> = ({ markets }) => {
   return (
     <div className="flex flex-col gap-4">
       {markets.map((market: TMarket, index: number) => {
-        return <Row key={`row/${market.name + index}`} market={market} />;
+        return <Row key={`row/${market.marketId + index}`} market={market} />;
       })}
     </div>
   );

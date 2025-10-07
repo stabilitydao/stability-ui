@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import {
   HeadingText,
   FullPageLoader,
   TokenSelectorModal,
-  Token,
   TxStatusModal,
   TxStatus,
 } from "@ui";
@@ -17,7 +16,7 @@ import {
   formatUnits,
 } from "viem";
 
-import { getShortAddress, useModalClickOutside } from "@utils";
+import { getShortAddress } from "@utils";
 
 import { useStore } from "@nanostores/react";
 
@@ -30,7 +29,13 @@ import {
 
 import { wagmiConfig, FactoryABI } from "@web3";
 
-import { connected, account, currentChainID, publicClient } from "@store";
+import {
+  connected,
+  account,
+  currentChainID,
+  publicClient,
+  vaults,
+} from "@store";
 
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 
@@ -49,6 +54,8 @@ import {
 
 import { CHAINS } from "@constants";
 
+import { TAddress, TVault } from "@types";
+
 type Farm = {
   status: bigint;
   pool: Address;
@@ -62,16 +69,20 @@ type Farm = {
     nums: number[];
     ticks: number[];
   };
+  farmId: number | undefined;
+  vaults: TAddress[];
 };
 
 const defaultFarm: Farm = {
-  status: 0n,
+  status: BigInt(0),
   pool: zeroAddress,
   strategyLogicId: "",
   rewardAssets: [],
   addresses: [],
   nums: [],
   ticks: [],
+  farmId: undefined,
+  vaults: [],
 };
 
 const Farms = (): JSX.Element => {
@@ -81,6 +92,7 @@ const Farms = (): JSX.Element => {
   const $account = useStore(account);
   const $currentChainID = useStore(currentChainID);
   const $publicClient = useStore(publicClient);
+  const $vaults = useStore(vaults);
 
   const [farms, setFarms] = useState<Farm[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -89,6 +101,8 @@ const Farms = (): JSX.Element => {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+
+  const [customRewards, setCustomRewards] = useState<string[]>([]);
 
   /* ───────── UI / modal state ───────── */
   const [simulationStatus, setSimulationStatus] = useState<
@@ -101,8 +115,6 @@ const Farms = (): JSX.Element => {
 
   const [liveFarmingStrategies, setLiveFarmingStrategies] = useState([]);
 
-  const modalRef = useRef<HTMLDivElement>(null);
-
   const tokenlist = tokenlistAll.tokens.filter(
     (token) => token.chainId == $currentChainID
   );
@@ -113,6 +125,16 @@ const Farms = (): JSX.Element => {
     );
   }
 
+  const addCustomReward = () => {
+    setCustomRewards([...customRewards, ""]);
+  };
+
+  const handleRewardChange = (index: number, value: string) => {
+    const updated = [...customRewards];
+    updated[index] = value;
+    setCustomRewards(updated);
+  };
+
   const fetchFarms = async () => {
     try {
       const result = await readContract(wagmiConfig, {
@@ -121,7 +143,19 @@ const Farms = (): JSX.Element => {
         functionName: "farms",
       });
 
-      setFarms(result as Farm[]);
+      const vaults: TVault[] = $vaults[$currentChainID]
+        ? Object.values($vaults[$currentChainID])
+        : [];
+
+      const _farms = result.map((farm, index) => ({
+        ...farm,
+        farmId: index,
+        vaults: vaults
+          .filter((vault) => vault?.farmId == index)
+          .map((vault) => vault?.address),
+      }));
+
+      setFarms(_farms);
     } catch (err) {
       console.error("Failed to fetch farms:", err);
       setFarms([]);
@@ -140,11 +174,11 @@ const Farms = (): JSX.Element => {
   const [isLPStrategy, setIsLPStrategy] = useState(false);
 
   const [showTokenModal, setShowTokenModal] = useState(false);
-  const [rewardAssets, setRewardAssets] = useState<Token[]>([]);
+  const [rewardAssets, setRewardAssets] = useState([]);
   const [showTxModal, setShowTxModal] = useState(false);
 
-  const addToken = (token: Token) => {
-    if (!rewardAssets.find((t: Token) => t.address === token.address)) {
+  const addToken = (token) => {
+    if (!rewardAssets.find((t) => t.address === token.address)) {
       const newAssets = [...rewardAssets, token];
       setRewardAssets(newAssets);
 
@@ -156,9 +190,7 @@ const Farms = (): JSX.Element => {
   };
 
   const removeToken = (tokenAddress: string) => {
-    const newAssets = rewardAssets.filter(
-      (t: Token) => t.address !== tokenAddress
-    );
+    const newAssets = rewardAssets.filter((t) => t.address !== tokenAddress);
     setRewardAssets(newAssets);
 
     handleInputChange(
@@ -167,15 +199,37 @@ const Farms = (): JSX.Element => {
     );
   };
 
-  function getTokensFromAddresses(addresses: string[]): Token[] {
+  function getTokensFromAddresses(addresses: string[]) {
     return addresses
       .map((addr) =>
         tokenlist.find(
           (token) => token.address.toLowerCase() === addr.toLowerCase()
         )
       )
-      .filter((t): t is Token => t !== undefined);
+      .filter((t) => t !== undefined);
   }
+
+  const deployCVault = async (farm: Farm) => {
+    try {
+      const hash = await writeContract(wagmiConfig, {
+        address: factories[$currentChainID],
+        abi: FactoryABI,
+        functionName: "deployVaultAndStrategy",
+        args: [
+          "Compounding",
+          farm.strategyLogicId,
+          [],
+          [],
+          [],
+          [farm.farmId],
+          [],
+        ],
+      });
+      console.log(hash);
+    } catch (error) {
+      console.error("Deploy CVault error:", error);
+    }
+  };
 
   const openEditModal = (farm: Farm, index: number) => {
     const farmStruct = Object.values(strategies).find(
@@ -256,6 +310,7 @@ const Farms = (): JSX.Element => {
     setRewardAssets([]);
     setShowModal(false);
     setShowTxModal(false);
+    setCustomRewards([]);
   };
 
   const handleSubmit = async () => {
@@ -274,7 +329,16 @@ const Farms = (): JSX.Element => {
       setTxStatus("pending");
 
       const { farmStruct, ...farm } = editFarm;
+
       console.log(farmStruct);
+
+      const updatedFarm = {
+        ...farm,
+        rewardAssets: [
+          ...(farm.rewardAssets || []),
+          ...(customRewards || []),
+        ].filter((asset) => asset !== ""),
+      };
 
       try {
         setSimulationStatus("loading");
@@ -282,7 +346,7 @@ const Farms = (): JSX.Element => {
           address: factories[$currentChainID],
           abi: FactoryABI,
           functionName: isAdding ? "addFarms" : "updateFarm",
-          args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
+          args: isAdding ? [[updatedFarm]] : [BigInt(editIndex!), updatedFarm],
           account: $account as Address,
           // ...(gasEstimate && { gas: gasEstimate }),
         });
@@ -305,7 +369,7 @@ const Farms = (): JSX.Element => {
         address: factories[$currentChainID],
         abi: FactoryABI,
         functionName: isAdding ? "addFarms" : "updateFarm",
-        args: isAdding ? [[farm]] : [BigInt(editIndex!), farm],
+        args: isAdding ? [[updatedFarm]] : [BigInt(editIndex!), updatedFarm],
         // ...(gasEstimate && { gas: gasEstimate }),
       });
       setTxHash(hash);
@@ -381,9 +445,7 @@ const Farms = (): JSX.Element => {
 
   useEffect(() => {
     fetchFarms();
-  }, []);
-
-  useModalClickOutside(modalRef, () => setShowModal((prev) => !prev));
+  }, [$vaults]);
 
   if (loading || farms === null) return <FullPageLoader />;
 
@@ -415,7 +477,7 @@ const Farms = (): JSX.Element => {
               <tr className="text-[12px] font-bold uppercase text-center">
                 <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Pool</th>
+                <th className="px-4 py-3">Vault</th>
                 <th className="px-4 py-3">Strategy Logic ID</th>
                 <th className="px-4 py-3">Reward Assets</th>
                 <th className="px-4 py-3">Addresses</th>
@@ -428,7 +490,20 @@ const Farms = (): JSX.Element => {
                   <td className="px-4 py-3">{i}</td>
                   <td className="px-4 py-3">{farm.status.toString()}</td>
                   <td className="px-4 py-3">
-                    {getShortAddress(farm.pool, 6, 6)}
+                    {farm.vaults.length ? (
+                      farm.vaults.map((address, i) => (
+                        <div key={i}>{getShortAddress(address, 6, 6)}</div>
+                      ))
+                    ) : (
+                      <button
+                        onClick={() => {
+                          $connected ? deployCVault(farm) : openConnect();
+                        }}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Deploy CVault
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-3">{farm.strategyLogicId}</td>
                   <td className="px-4 py-3">
@@ -455,6 +530,10 @@ const Farms = (): JSX.Element => {
                     {farm.addresses.map((a, i) => (
                       <div key={i}>{getShortAddress(a, 6, 6)}</div>
                     ))}
+
+                    {farm.pool != zeroAddress ? (
+                      <div>Pool: {getShortAddress(farm.pool, 6, 6)}</div>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
                     <button
@@ -479,10 +558,7 @@ const Farms = (): JSX.Element => {
         {/* Modal */}
         {showModal && editFarm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-            <div
-              ref={modalRef}
-              className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl"
-            >
+            <div className="w-full max-w-[600px] rounded-xl bg-accent-900 p-6 shadow-2xl">
               <h2 className="text-xl font-semibold mb-4">
                 {isAdding ? "Add Farm" : "Edit Farm"}
               </h2>
@@ -562,7 +638,7 @@ const Farms = (): JSX.Element => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {rewardAssets.map((token: Token) => (
+                    {rewardAssets.map((token) => (
                       <div
                         key={token.address}
                         className="flex items-center bg-[#2A2C31] border border-[#3A3C41] rounded-full px-3 py-1 gap-2 text-white"
@@ -584,6 +660,33 @@ const Farms = (): JSX.Element => {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  {customRewards.map((reward, index) => (
+                    <label
+                      key={index}
+                      className="bg-[#1B1D21] p-2 rounded-lg block border border-[#23252A] w-full"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Custom Reward"
+                        value={reward}
+                        onChange={(e) =>
+                          handleRewardChange(index, e.target.value)
+                        }
+                        className="bg-transparent text-lg font-semibold outline-none w-full"
+                      />
+                    </label>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={addCustomReward}
+                    className="flex items-center gap-1 text-[#816FEA] font-medium"
+                  >
+                    Add Custom Reward
+                  </button>
                 </div>
 
                 {editFarm?.farmStruct ? (

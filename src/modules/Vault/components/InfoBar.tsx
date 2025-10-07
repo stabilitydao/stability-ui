@@ -203,7 +203,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                         )}
                       </div>
                     )}
-                    {!!vault.yearnProtocols.length && (
+                    {/* {!!vault.yearnProtocols.length && (
                       <div
                         className="flex gap-0.5"
                         data-testid="infoBarProtocolsLogo"
@@ -218,7 +218,7 @@ const InfoBar: React.FC<IProps> = memo(({ network, vault }) => {
                           />
                         ))}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 }
               />

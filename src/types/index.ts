@@ -100,6 +100,7 @@ type TTokenData = {
   decimals: number;
   logoURI: string;
   tags?: string[];
+  mintApp?: string;
 };
 
 type TOptionInfo = {
@@ -277,7 +278,7 @@ type TVault = {
   vsHoldAPR: number;
   assetsVsHold: THoldData[];
   isVsActive: boolean;
-  yearnProtocols: TYearnProtocol[];
+  // yearnProtocols: TYearnProtocol[];
   network: string;
   sonicPoints: undefined | number;
   ringsPoints: undefined | number;
@@ -286,6 +287,8 @@ type TVault = {
   assetAPR: undefined | number;
 
   leverage?: number;
+
+  farmId: number;
 
   ///// meta vault
   proportions?: { current: number; target: number; allocation: number };
@@ -363,6 +366,13 @@ type TLeaderboard = {
       earned: number;
     };
   };
+};
+
+type TMarketUser = {
+  address: TAddress;
+  collateral: number;
+  debt: number;
+  LTV: number;
 };
 
 type TTAbleFiltersVariant = {
@@ -617,7 +627,8 @@ type TTableData =
   | TTableStrategy[]
   | TLeaderboard[]
   | IExtendedYieldContest[]
-  | TPoolTable[];
+  | TPoolTable[]
+  | TMarketUser[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
@@ -626,42 +637,14 @@ type TDispatchedTableData =
   | Dispatch<SetStateAction<TTableStrategy[]>>
   | Dispatch<SetStateAction<TLeaderboard[]>>
   | Dispatch<SetStateAction<IExtendedYieldContest[]>>
-  | Dispatch<SetStateAction<TPoolTable[]>>;
+  | Dispatch<SetStateAction<TPoolTable[]>>
+  | Dispatch<SetStateAction<TMarketUser[]>>;
 
 type TSort = {
   table: TTableColumn[];
   setTable: Dispatch<SetStateAction<TTableColumn[]>>;
   tableData: TTableData | any;
   setTableData: TDispatchedTableData;
-};
-
-//// API
-
-type TAPIData = {
-  title?: string;
-  // about?: string;
-  status?: string;
-  // services?: string[];
-  assetPrices?: TMultichainPrices;
-  vaults?: TVaults;
-  metaVaults?: TMetaVault[];
-  underlyings?: TVaults;
-  platforms?: {
-    [chainID: string]: {
-      buildingPermitToken: TAddress;
-      buildingPayPerVaultToken: TAddress;
-      bcAssets: TAddress[];
-      versions: {
-        platform: string;
-        strategy: {
-          [strategyId: string]: string;
-        };
-      };
-    };
-  };
-  rewards?: { gemsAprMultiplier: number };
-  prices?: TMarketPrices;
-  error?: string;
 };
 
 type TVLRange = { min: number; max: number };
@@ -738,28 +721,60 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
-type TMarketAsset = {
+type TMarketReserve = {
+  // lib data
   address: TAddress;
-  borrowAPR: string;
-  borrowCap: string;
-  borrowTVL: string;
-  cap: string;
+  aToken: TAddress;
+  aTokenSymbol: string;
+  isBorrowable: boolean;
+  oracle: TAddress;
+  oracleName: string;
+  treasury: TAddress;
+
+  // backend data
   name: string;
+  debtToken: TAddress;
   price: string;
+
   supplyAPR: string;
+  borrowAPR: string;
+
   supplyTVL: string;
+  supplyTVLInUSD: string;
+
+  borrowTVL: string;
+  borrowTVLInUSD: string;
+
+  cap: string;
+  borrowCap: string;
+
+  reserveFactor: string;
   maxLtv: string;
   liquidationThreshold: string;
+  liquidationBonus: string;
+  utilization: string;
+
+  availableToBorrow: string;
+  availableToBorrowInUSD: string;
 };
 
 type TMarket = {
-  name: string;
-  assets: TMarketAsset[];
-  network: TNetwork;
+  marketId: string;
+  reserves: TMarketReserve[];
+  deployed: string;
+  engine: string;
+  pool: TAddress;
+  protocolDataProvider: TAddress;
+
+  network?: TNetwork;
+
+  // table sort
   supplyAPR?: number;
   borrowAPR?: number;
   supplyTVL?: number;
+  supplyTVLInUSD?: number;
   borrowTVL?: number;
+  utilization?: number;
 };
 
 // enums
@@ -795,6 +810,14 @@ export enum VaultTypes {
   Vault = "Vault",
   MetaVault = "MetaVault",
   MultiVault = "MultiVault",
+}
+
+export enum MarketSectionTypes {
+  Deposit = "Deposit",
+  Borrow = "Borrow",
+  // Leverage = "Leverage",
+  Information = "Information",
+  Users = "Users",
 }
 
 export enum TimelineTypes {
@@ -848,7 +871,6 @@ export type {
   TUpgradesTable,
   TYearnProtocol,
   TPriceInfo,
-  TAPIData,
   TEarningData,
   TChartPayload,
   TVaultDataKey,
@@ -890,7 +912,8 @@ export type {
   TActiveChart,
   IProtocolModal,
   TMarket,
-  TMarketAsset,
+  TMarketReserve,
   TNetwork,
   TChartNames,
+  TMarketUser,
 };

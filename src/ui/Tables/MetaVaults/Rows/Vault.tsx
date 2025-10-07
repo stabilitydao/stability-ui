@@ -104,22 +104,26 @@ const Vault: React.FC<IProps> = ({
                       alt={asset?.symbol}
                       className={cn(
                         "rounded-full flex-shrink-0",
-                        isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8",
+                        isProDisplay ? "w-5 h-5 md:w-8 md:h-8 mr-1" : "w-8 h-8",
                         !index && vault.assets.length > 1 && "mr-[-8px] z-[5]"
                       )}
                       key={asset?.logo + index}
                     />
                   ))}
 
-                  <img
-                    src={protocol?.logoSrc}
-                    alt={protocol?.name}
-                    title={protocol?.name}
-                    className={cn(
-                      "rounded-full flex-shrink-0 ml-1",
-                      isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8"
-                    )}
-                  />
+                  {isProDisplay ? (
+                    <StrategyBadge info={vault.strategyInfo} specific="" />
+                  ) : (
+                    <img
+                      src={protocol?.logoSrc}
+                      alt={protocol?.name}
+                      title={protocol?.name}
+                      className={cn(
+                        "rounded-full flex-shrink-0 ml-1",
+                        isProDisplay ? "w-5 h-5 md:w-8 md:h-8" : "w-8 h-8"
+                      )}
+                    />
+                  )}
                 </div>
               ) : (
                 <img
@@ -134,8 +138,11 @@ const Vault: React.FC<IProps> = ({
             </div>
             <span
               className={cn(
-                "font-semibold truncate overflow-hidden whitespace-nowrap max-w-[200px] md:max-w-full",
-                isProDisplay ? "text-[12px] md:text-[16px]" : " text-[16px]"
+                "font-semibold truncate",
+                isProDisplay
+                  ? "text-[12px] hidden md:flex md:text-[16px] md:max-w-[120px] min-[830px]:max-w-[95px]  xl:max-w-full"
+                  : "text-[16px] max-w-[160px] md:max-w-[100px] min-[830px]:max-w-[130px]",
+                !inserted && "flex"
               )}
               title={symbol}
             >
@@ -153,7 +160,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           onClick={(e) => {
-            if (window.innerHeight <= 860 && vault.type === VaultTypes.Vault) {
+            if (window.innerWidth <= 860 && vault.type === VaultTypes.Vault) {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,

@@ -12,10 +12,6 @@ const FARMING_TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
 ];
 
-const MARKET_TABLE_FILTERS: TTableFilters[] = [
-  { name: "Markets", type: "dropdown", state: true },
-];
-
 const TABLE: TTableColumn[] = [
   {
     name: "Strategy",
@@ -489,18 +485,47 @@ const MARKET_TABLE: TTableColumn[] = [
   },
   {
     name: "Supply TVL",
-    keyName: "supplyTVL",
+    keyName: "supplyTVLInUSD",
     sortType: "none",
     dataType: "number",
   },
   {
-    name: "Available to borrow",
-    keyName: "borrowTVL",
+    name: "Utilization",
+    keyName: "utilization",
     sortType: "none",
     dataType: "number",
   },
   {
     name: "maxLTV / LT",
+    keyName: "LTV",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
+const MARKET_USERS_TABLE: TTableColumn[] = [
+  {
+    name: "User",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+
+  {
+    name: "Collateral",
+    keyName: "collateral",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Debt",
+    keyName: "debt",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "LTV",
     keyName: "LTV",
     sortType: "none",
     dataType: "number",
@@ -535,6 +560,6 @@ export {
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
+  MARKET_USERS_TABLE,
 };

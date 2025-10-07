@@ -58,6 +58,7 @@ const Chains = (): JSX.Element => {
       );
 
     if (chains) {
+      console.log("chains1");
       const chainsData = Object.entries(chains).map((chain) => {
         const allChainProtocols = getChainProtocols(chain[0]);
 
@@ -81,6 +82,7 @@ const Chains = (): JSX.Element => {
           tvl: $apiData?.total.chainTvl[chain[0]] || 0,
         };
       });
+      console.log("chains2");
 
       const filteredChainsData = chainStatuses.length
         ? chainsData.filter((chain) =>

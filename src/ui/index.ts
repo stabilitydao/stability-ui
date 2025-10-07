@@ -24,6 +24,7 @@ import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
+import { ProgressCircle } from "./ProgressCircle";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -56,6 +57,8 @@ import { ActionButton } from "./ActionButton";
 import { Socials } from "./Socials";
 
 import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
+
+import { CustomTooltip } from "./CustomTooltip";
 
 //////// todo: delete
 
@@ -122,4 +125,6 @@ export {
   ChartTimelineSwitcher,
   MarketsTable,
   MetaVaultStrategies,
+  ProgressCircle,
+  CustomTooltip,
 };

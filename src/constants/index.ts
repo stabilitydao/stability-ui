@@ -18,8 +18,8 @@ import {
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
+  MARKET_USERS_TABLE,
 } from "./tables";
 
 import {
@@ -270,6 +270,13 @@ const VAULTS_WITH_NAME = {
   "0xefdf0f2b8d056009bd50125b76567110ad52ec91": "Enclabs USDC",
   "0xc7efc499c2fed657251455443cd0767607e8e45e": "Enclabs wS",
   "0x396ebcaa1005a5bf1829cba82e853a5ea51ab937": "Enclabs scUSD",
+  "0x8c0476605302b153792a3c2bd55ec4e70eb8482a":
+    "Stability smsUSD Silo Leverage 141 USDC x6.5",
+  "0xdde1d0db47ed76abbef5a9b7f1851f6015bc2f67": "Mainstreet Greenhouse",
+  "0x2120a3159df9f3b6276f276e4cee8f47cf548c2f": "Mainstreet Greenhouse",
+  "0x058779961ae874d29f9cecfd29df7456164a0f64": "Mainstreet",
+  "0xbe73b6d42fd26bcd0ce3c02585d4a5fe9fea2fd4": "smsUSD, 138",
+  "0xb1e87223f5b080f687b298df4fc8acabd3d1797b": "PT-smsUSD (30 Oct), 141",
 };
 
 const PATHS = [
@@ -277,7 +284,7 @@ const PATHS = [
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
-  // { name: "Lending", path: "lending" },
+  { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboard", path: "leaderboard" },
   { name: "xSTBL", path: "xstbl" },
@@ -441,7 +448,7 @@ export {
   VAULTS_META_TITLES,
   ROUTES,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
   PRICES_ORDER,
+  MARKET_USERS_TABLE,
 };

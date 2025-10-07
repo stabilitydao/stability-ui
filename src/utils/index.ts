@@ -30,10 +30,13 @@ import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
+import { updateQueryParams } from "./functions/updateQueryParams";
+import { loadMarketsData } from "./functions/loadMarketsData";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
+import { useWindowWidth } from "./hooks/useWindowWidth";
 
 export {
   getTokenData,
@@ -69,4 +72,7 @@ export {
   getTransactionReceipt,
   copyAddress,
   exactToFixed,
+  updateQueryParams,
+  useWindowWidth,
+  loadMarketsData,
 };

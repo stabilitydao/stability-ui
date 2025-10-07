@@ -512,7 +512,7 @@ const Vaults = (): JSX.Element => {
           activeNetworksHandler={activeNetworksHandler}
         />
 
-        <div className="flex items-center xl:justify-between gap-2 my-4">
+        <div className="flex items-center justify-between gap-2 my-4">
           <Filters
             filters={tableFilters}
             setFilters={setTableFilters}

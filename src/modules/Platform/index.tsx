@@ -228,7 +228,7 @@ const Platform = (): JSX.Element => {
                 {/*{isAlert && (
           <div className="flex flex-col gap-3">
             {Object.entries(
-              $apiData?.network.healthCheckReview?.alerts || {}
+              $apiData?.network?.healthCheckReview?.alerts || {}
             ).map(([key, value], index) => (
               <div
                 key={index}

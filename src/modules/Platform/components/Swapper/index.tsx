@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import axios from "axios";
 
@@ -34,12 +34,13 @@ import { deployments } from "@stabilitydao/stability";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { FaGasPump, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { SwapForm } from "./SwapForm";
 
 const Swapper = (): JSX.Element => {
   const poolTableStates = POOL_TABLE;
   const BCPoolTableStates = BC_POOL_TABLE;
 
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID) ?? "146";
 
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -79,9 +80,15 @@ const Swapper = (): JSX.Element => {
     }
   };
 
-  const AMM_ADAPTERS = Object.entries(
-    deployments?.[$currentChainID]?.ammAdapters
-  ).map(([name, address]) => ({ name, address }));
+  const AMM_ADAPTERS = useMemo(() => {
+    const adapters = deployments?.[$currentChainID]?.ammAdapters;
+    if (!adapters) return [];
+
+    return Object.entries(adapters).map(([name, address]) => ({
+      name,
+      address,
+    }));
+  }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(
@@ -433,7 +440,7 @@ const Swapper = (): JSX.Element => {
                   className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                 >
                   <option value="">Select an adapter</option>
-                  {AMM_ADAPTERS.map((option) => (
+                  {AMM_ADAPTERS?.map((option) => (
                     <option key={option.address} value={option.address}>
                       {option.name}
                     </option>
@@ -566,6 +573,8 @@ const Swapper = (): JSX.Element => {
 
         {BCPoolTableData.length || poolTableData.length ? (
           <>
+            <SwapForm />
+
             <HeadingText text="Pools" scale={2} />
 
             <div className="flex justify-start">
