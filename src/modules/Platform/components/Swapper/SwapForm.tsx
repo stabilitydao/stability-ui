@@ -8,11 +8,13 @@ import { parseUnits, formatUnits } from "viem";
 
 import { readContract, writeContract } from "@wagmi/core";
 
-import { getTokenData } from "@utils";
+import { getTokenData, getTransactionReceipt } from "@utils";
 
 import { account, currentChainID } from "@store";
 
 import { wagmiConfig, SwapperABI, ERC20ABI } from "@web3";
+
+import { CHAINS } from "@constants";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -31,11 +33,17 @@ const SwapForm = (): JSX.Element => {
   const contractAddress: TAddress =
     deployments?.[$currentChainID]?.core?.swapper;
 
+  const explorer = CHAINS.find(
+    ({ id }) => id == $currentChainID
+  )?.explorer?.slice(0, -8);
+
   const [amount, setAmount] = useState("");
 
   const [slippage, setSlippage] = useState("");
 
   const [balance, setBalance] = useState("0");
+
+  const [lastTx, setLastTx] = useState("");
 
   const [tokenInModalOpen, setTokenInModalOpen] = useState(false);
   const [tokenOutModalOpen, setTokenOutModalOpen] = useState(false);
@@ -94,10 +102,25 @@ const SwapForm = (): JSX.Element => {
         gas: BigInt(700000),
       });
 
+      await getTransactionReceipt(hash);
+
       console.log("Swap tx hash:", hash);
+
+      setLastTx(`${explorer}tx/${hash}`);
+      clearForm();
     } catch (error) {
       console.error("Swap error:", error);
     }
+  };
+
+  const clearForm = () => {
+    setSelectedTokenIn("");
+    setSelectedTokenOut("");
+    setTokenInSymbol("Select token");
+    setTokenOutSymbol("Select token");
+    setAmount("");
+    setSlippage("");
+    setBalance("0");
   };
 
   const handleSlippageChange = (e) => {
@@ -117,7 +140,6 @@ const SwapForm = (): JSX.Element => {
   };
 
   const getTokenBalance = async () => {
-    console.log(selectedTokenIn);
     const tokenInData = getTokenData(selectedTokenIn);
     try {
       const balance = await readContract(wagmiConfig, {
@@ -248,6 +270,16 @@ const SwapForm = (): JSX.Element => {
           setTokenOutSymbol(token.symbol);
         }}
       />
+
+      {!!lastTx && (
+        <a
+          target="_blank"
+          href={lastTx}
+          className="underline text-[#9180F4] my-2"
+        >
+          Check tx
+        </a>
+      )}
 
       <button
         onClick={swap}
