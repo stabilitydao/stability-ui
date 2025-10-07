@@ -47,6 +47,8 @@ const loadMarketsData = async (
         liquidationThreshold: backendData?.liquidationThreshold ?? "0",
         liquidationBonus: backendData?.liquidationBonus ?? "0",
         utilization: backendData?.utilization ?? "0",
+        availableToBorrow: backendData?.availableToBorrow ?? "0",
+        availableToBorrowInUSD: backendData?.availableToBorrowInUSD ?? "0",
       };
     });
 

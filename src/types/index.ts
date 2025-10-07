@@ -753,6 +753,9 @@ type TMarketReserve = {
   liquidationThreshold: string;
   liquidationBonus: string;
   utilization: string;
+
+  availableToBorrow: string;
+  availableToBorrowInUSD: string;
 };
 
 type TMarket = {

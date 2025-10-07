@@ -1,5 +1,7 @@
 import Tippy from "@tippyjs/react";
 
+import { UtilizationTooltip } from "./UtilizationTooltip";
+
 import { ProgressCircle } from "@ui";
 
 import { cn, formatNumber, getTokenData } from "@utils";
@@ -86,7 +88,7 @@ const Row: React.FC<IProps> = ({ market }) => {
             </div>
             {Number(asset?.utilization) ? (
               <Tippy
-                content="desc"
+                content={<UtilizationTooltip asset={asset} />}
                 placement="top"
                 animation="shift-away"
                 interactive={true}

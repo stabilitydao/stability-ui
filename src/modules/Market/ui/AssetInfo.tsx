@@ -78,10 +78,13 @@ const AssetInfo: React.FC<TProps> = ({
                 />
                 <div className="flex flex-col items-end">
                   <span className="font-semibold">
-                    {formatNumber(asset?.borrowTVL, "abbreviate")?.slice(1)}
+                    {formatNumber(
+                      asset?.availableToBorrow,
+                      "abbreviate"
+                    )?.slice(1)}
                   </span>
                   <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                    {formatNumber(asset?.borrowTVLInUSD, "abbreviate")}
+                    {formatNumber(asset?.availableToBorrowInUSD, "abbreviate")}
                   </span>
                 </div>
               </div>

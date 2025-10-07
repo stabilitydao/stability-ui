@@ -34,6 +34,7 @@ import { deployments } from "@stabilitydao/stability";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { FaGasPump, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { SwapForm } from "./SwapForm";
 
 const Swapper = (): JSX.Element => {
   const poolTableStates = POOL_TABLE;
@@ -566,6 +567,8 @@ const Swapper = (): JSX.Element => {
 
         {BCPoolTableData.length || poolTableData.length ? (
           <>
+            <SwapForm />
+
             <HeadingText text="Pools" scale={2} />
 
             <div className="flex justify-start">
