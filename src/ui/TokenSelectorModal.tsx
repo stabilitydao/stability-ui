@@ -3,7 +3,7 @@ import { tokenlist as tokenlistAll } from "@stabilitydao/stability";
 import type { Hash } from "viem";
 import { useModalClickOutside } from "@utils";
 import { useStore } from "@nanostores/react";
-import { currentChainID } from "@store";
+import { account, currentChainID } from "@store";
 import { CHAINS } from "@constants";
 
 export const shorten = (addr: string): string =>
@@ -57,7 +57,8 @@ export const TokenSelectorModal = ({
 }: TokenSelectorModalProps): JSX.Element => {
   const [query, setQuery] = useState("");
 
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID) ?? "146";
+  const $account = useStore(account);
 
   const tokenlist = tokenlistAll.tokens.filter(
     (token) => token.chainId == $currentChainID
@@ -78,7 +79,7 @@ export const TokenSelectorModal = ({
       const result = data.assetPrices?.[$currentChainID] ?? null;
       setAssetPrices(result);
     })();
-  }, []);
+  }, [$account, $currentChainID]);
 
   const filteredTokens = useMemo(() => {
     if (!query) return tokenlist;

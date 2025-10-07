@@ -14,6 +14,8 @@ import { account, currentChainID } from "@store";
 
 import { wagmiConfig, SwapperABI, ERC20ABI } from "@web3";
 
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+
 import { CHAINS } from "@constants";
 
 import { deployments } from "@stabilitydao/stability";
@@ -23,7 +25,9 @@ import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { TAddress } from "@types";
 
 const SwapForm = (): JSX.Element => {
-  const $currentChainID = useStore(currentChainID);
+  const { open } = useWeb3Modal();
+
+  const $currentChainID = useStore(currentChainID) ?? "146";
   const $account = useStore(account);
 
   const tokenlist = tokenlistAll.tokens.filter(
@@ -282,7 +286,7 @@ const SwapForm = (): JSX.Element => {
       )}
 
       <button
-        onClick={swap}
+        onClick={() => ($account ? swap() : open())}
         className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 w-full"
         // disabled={
         //   simulationStatus === "loading" ||
@@ -290,7 +294,7 @@ const SwapForm = (): JSX.Element => {
         //   txStatus === "pending"
         // }
       >
-        Swap
+        {$account ? "Swap" : "Connect Wallet"}
       </button>
     </div>
   );

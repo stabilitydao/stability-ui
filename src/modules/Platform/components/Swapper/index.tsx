@@ -40,7 +40,7 @@ const Swapper = (): JSX.Element => {
   const poolTableStates = POOL_TABLE;
   const BCPoolTableStates = BC_POOL_TABLE;
 
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID) ?? "146";
 
   const modalRef = useRef<HTMLDivElement>(null);
 
