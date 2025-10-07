@@ -56,7 +56,7 @@ const Toast = (): JSX.Element | null => {
         initialTx.status === "success"
           ? setColor("#59CB59")
           : setColor("#B34D61");
-
+        console.log("toast1");
         const array = Object.entries(
           initialTx.tokens as Record<string, TLocalStorageToken>
         ).map(([address, { amount, symbol, logo }]) => ({
@@ -65,7 +65,7 @@ const Toast = (): JSX.Element | null => {
           symbol,
           logo,
         }));
-
+        console.log("toast2");
         setTokens(array);
         setIsVisible(true);
       }

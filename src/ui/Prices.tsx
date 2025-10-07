@@ -55,6 +55,8 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
 
   useEffect(() => {
     if ($marketPrices) {
+      console.log("prices1", $marketPrices);
+
       const sortedPrices: [string, TMarketPrice][] = Object.entries(
         $marketPrices
       ).sort(([a], [b]) => {
@@ -66,6 +68,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
           (indexB === -1 ? PRICES_ORDER.length : indexB)
         );
       });
+      console.log("prices2");
       setPrices(sortedPrices);
     }
   }, [$marketPrices]);

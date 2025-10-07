@@ -80,18 +80,16 @@ const Swapper = (): JSX.Element => {
     }
   };
 
-  const AMM_ADAPTERS = [];
+  const AMM_ADAPTERS = useMemo(() => {
+    const adapters = deployments?.[$currentChainID]?.ammAdapters;
+    console.log("adapters1", adapters);
+    if (!adapters) return [];
 
-  // useMemo(() => {
-  //   const adapters = deployments?.[$currentChainID]?.ammAdapters;
-
-  //   if (!adapters) return [];
-
-  //   return Object.entries(adapters).map(([name, address]) => ({
-  //     name,
-  //     address,
-  //   }));
-  // }, [$currentChainID, deployments]);
+    return Object.entries(adapters).map(([name, address]) => ({
+      name,
+      address,
+    }));
+  }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(

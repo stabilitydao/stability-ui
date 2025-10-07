@@ -28,7 +28,7 @@ const ErrorMessage: React.FC<IProps> = ({
 
   useEffect(() => {
     if ($error.state) {
-      const message = $error.description?.message ?? $error.description;
+      const message = $error?.description?.message ?? $error?.description;
 
       const slicedMessage = `${message?.slice(0, 40)}...`;
 
