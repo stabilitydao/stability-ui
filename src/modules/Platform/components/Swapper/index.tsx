@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import axios from "axios";
 
@@ -80,9 +80,18 @@ const Swapper = (): JSX.Element => {
     }
   };
 
-  const AMM_ADAPTERS = Object.entries(
-    deployments?.[$currentChainID ?? "146"]?.ammAdapters
-  ).map(([name, address]) => ({ name, address }));
+  const AMM_ADAPTERS = useMemo(() => {
+    if (!$currentChainID || !deployments?.[$currentChainID]?.ammAdapters) {
+      return [];
+    }
+
+    return Object.entries(deployments[$currentChainID].ammAdapters).map(
+      ([name, address]) => ({
+        name,
+        address,
+      })
+    );
+  }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(
@@ -434,7 +443,7 @@ const Swapper = (): JSX.Element => {
                   className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                 >
                   <option value="">Select an adapter</option>
-                  {AMM_ADAPTERS.map((option) => (
+                  {AMM_ADAPTERS?.map((option) => (
                     <option key={option.address} value={option.address}>
                       {option.name}
                     </option>
