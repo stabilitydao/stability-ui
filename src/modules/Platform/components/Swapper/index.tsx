@@ -81,7 +81,7 @@ const Swapper = (): JSX.Element => {
   };
 
   const AMM_ADAPTERS = Object.entries(
-    deployments?.[$currentChainID]?.ammAdapters
+    deployments?.[$currentChainID ?? "146"]?.ammAdapters
   ).map(([name, address]) => ({ name, address }));
 
   function getNameByAddress(address: string): string | undefined {
