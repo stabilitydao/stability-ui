@@ -80,16 +80,18 @@ const Swapper = (): JSX.Element => {
     }
   };
 
-  const AMM_ADAPTERS = useMemo(() => {
-    const adapters = deployments?.[$currentChainID]?.ammAdapters;
+  const AMM_ADAPTERS = [];
 
-    if (!adapters) return [];
+  // useMemo(() => {
+  //   const adapters = deployments?.[$currentChainID]?.ammAdapters;
 
-    return Object.entries(adapters).map(([name, address]) => ({
-      name,
-      address,
-    }));
-  }, [$currentChainID, deployments]);
+  //   if (!adapters) return [];
+
+  //   return Object.entries(adapters).map(([name, address]) => ({
+  //     name,
+  //     address,
+  //   }));
+  // }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(
@@ -441,11 +443,11 @@ const Swapper = (): JSX.Element => {
                   className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                 >
                   <option value="">Select an adapter</option>
-                  {AMM_ADAPTERS?.map((option) => (
+                  {/* {AMM_ADAPTERS?.map((option) => (
                     <option key={option.address} value={option.address}>
                       {option.name}
                     </option>
-                  ))}
+                  ))} */}
                 </select>
               </label>
 
