@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useStore } from "@nanostores/react";
-import {deployments, seeds} from "@stabilitydao/stability";
+import { deployments, seeds } from "@stabilitydao/stability";
 
 import { PROTOCOLS, CHAINS } from "@constants";
 
@@ -177,7 +177,7 @@ const PlatformModal: React.FC<IProps> = ({ setModalState }) => {
                           <a
                             key={moduleContract}
                             target="_blank"
-                            href={`${currentChain?.explorer}${address}`}
+                            href={`${currentChain?.explorer}/address/${address}`}
                             title={`Go to ${moduleContract} contract address at block explorer`}
                             className="inline-flex items-center text-[12px] font-bold hover:bg-[#333884] bg-[#222773] rounded-full px-2 lg:px-3 md:py-[3px] mr-1 mb-2"
                           >

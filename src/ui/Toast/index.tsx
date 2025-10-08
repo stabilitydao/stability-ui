@@ -181,7 +181,7 @@ const Toast = (): JSX.Element | null => {
             </div>
             <a
               target="_blank"
-              href={`${explorer}${storeTx?.vault}`}
+              href={`${explorer}/address/${storeTx?.vault}`}
               className="underline"
             >
               {$vaults["146"][storeTx?.vault]?.symbol}
@@ -189,7 +189,7 @@ const Toast = (): JSX.Element | null => {
           </div>
           <a
             target="_blank"
-            href={`${explorer?.slice(0, -8)}tx/${storeTx?.hash}`}
+            href={`${explorer}/tx/${storeTx?.hash}`}
             className="flex items-center gap-2"
           >
             <p className="text-[16px] font-semibold">View on block explorer</p>

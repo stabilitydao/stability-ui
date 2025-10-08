@@ -168,10 +168,7 @@ export const TxStatusModal = ({
 
   const $currentChainID = useStore(currentChainID);
 
-  const link = CHAINS.find(({ id }) => id == $currentChainID)?.explorer?.slice(
-    0,
-    -9
-  );
+  const explorer = CHAINS.find(({ id }) => id == $currentChainID)?.explorer;
 
   const content: JSX.Element = (() => {
     switch (status) {
@@ -187,7 +184,7 @@ export const TxStatusModal = ({
             <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
             {hash && (
               <a
-                href={`${link}/tx/${hash}`}
+                href={`${explorer}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"
@@ -203,7 +200,7 @@ export const TxStatusModal = ({
             <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
             {hash && (
               <a
-                href={`${link}/tx/${hash}`}
+                href={`${explorer}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"

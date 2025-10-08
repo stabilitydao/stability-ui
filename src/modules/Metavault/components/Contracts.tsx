@@ -155,7 +155,7 @@ const Contracts: React.FC<IProps> = memo(({ network, metavault }) => {
 
               <a
                 className="flex items-center px-1 py-1 whitespace-nowrap flex-shrink-0 w-[26px] h-[26px]"
-                href={`${explorer}${address}`}
+                href={`${explorer}/address/${address}`}
                 target="_blank"
               >
                 <img src="/icons/link.png" alt="External link icon" />

@@ -4,6 +4,8 @@ import { CustomTooltip } from "@ui";
 
 import { getTokenData, cn, formatNumber } from "@utils";
 
+import { TOOLTIP_DESCRIPTIONS } from "../constants";
+
 import type { TMarketReserve, TAddress, TNetwork } from "@types";
 
 import { assets } from "@stabilitydao/stability";
@@ -59,23 +61,26 @@ const AssetInfo: React.FC<TProps> = ({
         </div>
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 w-full font-medium">
           <div className="w-full flex flex-col items-start gap-2">
-            <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Utilization" description="desc" />
-              <span className="font-semibold">
-                {Number(asset?.utilization).toFixed(2)}%
-              </span>
-            </div>
+            {asset?.isBorrowable && (
+              <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
+                <CustomTooltip
+                  name="Utilization"
+                  description={TOOLTIP_DESCRIPTIONS.utilization}
+                />
+                <span className="font-semibold">
+                  {Number(asset?.utilization).toFixed(2)}%
+                </span>
+              </div>
+            )}
             {/* <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip name="IRM" description="desc" />
               <span className="font-semibold">Dynamic IRM</span>
             </div> */}
             {asset?.isBorrowable && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
-                <CustomTooltip
-                  name="Available to borrow"
-                  description="desc"
-                  isMediumText={true}
-                />
+                <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                  Available to borrow
+                </span>
                 <div className="flex flex-col items-end">
                   <span className="font-semibold">
                     {formatNumber(
@@ -92,7 +97,7 @@ const AssetInfo: React.FC<TProps> = ({
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip
                 name={`${assetData?.symbol} TVL`}
-                description="desc"
+                description={TOOLTIP_DESCRIPTIONS.assetTVL}
               />
               <span className="font-semibold">
                 {formatNumber(asset?.supplyTVL, "abbreviate")?.slice(1)}{" "}
@@ -119,7 +124,10 @@ const AssetInfo: React.FC<TProps> = ({
             </div>
             {!!Number(asset?.maxLtv) && (
               <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-                <CustomTooltip name="Max LTV" description="desc" />
+                <CustomTooltip
+                  name="Max LTV"
+                  description={TOOLTIP_DESCRIPTIONS.maxLTV}
+                />
                 <span className="font-semibold">{asset?.maxLtv}%</span>
               </div>
             )}
@@ -128,7 +136,7 @@ const AssetInfo: React.FC<TProps> = ({
               <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip
                   name="Liquidation threshold"
-                  description="desc"
+                  description={TOOLTIP_DESCRIPTIONS.liquidationThreshold}
                 />
                 <span className="font-semibold">
                   {asset?.liquidationThreshold}%

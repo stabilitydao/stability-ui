@@ -620,7 +620,7 @@ const Swapper = (): JSX.Element => {
                           >
                             <td className="px-4 py-3 sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
                               <a
-                                href={`${explorer}${id}`}
+                                href={`${explorer}/address/${id}`}
                                 target="_blank"
                                 className="flex items-center gap-2"
                               >

@@ -1,5 +1,3 @@
-import { CustomTooltip } from "@ui";
-
 import { AssetsInfo } from "../../ui";
 
 import type { TMarket, TMarketReserve } from "@types";
@@ -34,11 +32,9 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
           /> */}
 
           <div className="w-full flex items-center justify-between">
-            <CustomTooltip
-              name="Deployed"
-              description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
-                              Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
-            />
+            <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+              Deployed
+            </span>
             <span className="font-semibold">{market?.deployed}</span>
           </div>
         </div>

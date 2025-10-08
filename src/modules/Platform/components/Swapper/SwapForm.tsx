@@ -37,9 +37,7 @@ const SwapForm = (): JSX.Element => {
   const contractAddress: TAddress =
     deployments?.[$currentChainID]?.core?.swapper;
 
-  const explorer = CHAINS.find(
-    ({ id }) => id == $currentChainID
-  )?.explorer?.slice(0, -8);
+  const explorer = CHAINS.find(({ id }) => id == $currentChainID)?.explorer;
 
   const [amount, setAmount] = useState("");
   const [amountOut, setAmountOut] = useState("");
@@ -109,7 +107,7 @@ const SwapForm = (): JSX.Element => {
 
       console.log("Swap tx hash:", hash);
 
-      setLastTx(`${explorer}tx/${hash}`);
+      setLastTx(`${explorer}/tx/${hash}`);
       clearForm();
     } catch (error) {
       console.error("Swap error:", error);
@@ -375,7 +373,7 @@ const SwapForm = (): JSX.Element => {
               return (
                 <div key={data?.pool} className="flex items-center gap-2">
                   <a
-                    href={`${explorer}address/${data?.pool}`}
+                    href={`${explorer}/address/${data?.pool}`}
                     target="_blank"
                     className="flex items-center gap-2"
                   >

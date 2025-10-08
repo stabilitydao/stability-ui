@@ -7,7 +7,7 @@ type TProps = {
   asset: TMarketReserve | undefined;
 };
 
-const DepositTab: React.FC<TProps> = ({ asset }) => {
+const SupplyTab: React.FC<TProps> = ({ asset }) => {
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <DepositForm asset={asset} />
@@ -16,4 +16,4 @@ const DepositTab: React.FC<TProps> = ({ asset }) => {
   );
 };
 
-export { DepositTab };
+export { SupplyTab };
