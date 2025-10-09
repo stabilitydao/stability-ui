@@ -14,6 +14,8 @@ import { updateQueryParams, getShortAddress } from "@utils";
 
 import { CHAINS } from "@constants";
 
+import { TOOLTIP_DESCRIPTIONS } from "./constants";
+
 import { markets, error } from "@store";
 
 import { MarketSectionTypes, TMarket, TMarketReserve } from "@types";
@@ -47,7 +49,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   };
 
   const handleSectionChange = (section: MarketSectionTypes) => {
-    if (section === MarketSectionTypes.Deposit) {
+    if (section === MarketSectionTypes.Supply) {
       updateQueryParams({ section: null });
     } else {
       updateQueryParams({ section });
@@ -104,12 +106,12 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   return market && localMarket ? (
     <WagmiLayout>
-      <div className="w-full mx-auto font-manrope pb-5">
+      <div className="w-full mx-auto font-manrope pb-5 lg:min-w-[900px] xl:min-w-[1230px]">
         <div>
           <h1 className="page-title__font text-start">
             {localMarket?.marketId}
           </h1>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-[-20px]">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
                 <div className="flex items-center px-4 pt-4 pb-[10px] md:px-0 md:py-[10px] flex-wrap gap-2">
@@ -135,7 +137,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                   <a
                     className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
-                    href={`${localMarket?.network?.explorer}${localMarket?.pool}`}
+                    href={`${localMarket?.network?.explorer}/address/${localMarket?.pool}`}
                     target="_blank"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
@@ -150,8 +152,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   <div className="pl-2 pr-4 border-r border-r-[#232429]">
                     <CustomTooltip
                       name="Isolated risk"
-                      description="Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellendus necessitatibus cumque sit obcaecati mollitia voluptas nostrum fugit, dignissimos rem ut veritatis assumenda hic? Ratione odio, numquam nihil incidunt suscipit rerum.
-                  Soluta sit repudiandae aut corporis vel obcaecati aperiam necessitatibus dicta, dolore recusandae, eligendi iure quidem nisi ex quis accusamus sunt. Eligendi atque laborum enim dolore totam voluptatum ipsam ab minima?"
+                      description={TOOLTIP_DESCRIPTIONS.isolatedRisk}
                       isMediumText={true}
                     />
                   </div>
@@ -164,17 +165,17 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-full flex items-start justify-between gap-6 lg:gap-10 flex-col-reverse lg:flex-row">
+              <div className="w-full flex items-start flex-col gap-3">
+                <SectionSelector
+                  market={market}
+                  activeSection={activeSection}
+                  handleSectionChange={handleSectionChange}
+                />
                 <AssetSelector
                   assets={localMarket?.reserves}
                   activeSection={activeSection}
                   activeAsset={activeAsset}
                   handleAssetChange={handleAssetChange}
-                />
-                <SectionSelector
-                  market={market}
-                  activeSection={activeSection}
-                  handleSectionChange={handleSectionChange}
                 />
               </div>
             </div>

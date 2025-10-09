@@ -261,7 +261,7 @@ const LEADERBOARD_TABLE: TTableColumn[] = [
 
 const POOL_TABLE: TTableColumn[] = [
   {
-    name: "ID",
+    name: "Pool",
     keyName: "id",
     sortType: "none",
     dataType: "",

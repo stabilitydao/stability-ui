@@ -813,8 +813,10 @@ export enum VaultTypes {
 }
 
 export enum MarketSectionTypes {
-  Deposit = "Deposit",
+  Supply = "Supply",
+  Withdraw = "Withdraw",
   Borrow = "Borrow",
+  Repay = "Repay",
   // Leverage = "Leverage",
   Information = "Information",
   Users = "Users",

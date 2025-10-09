@@ -159,7 +159,7 @@ const CHAINS = [
     name: chains["146"].name,
     id: "146",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
-    explorer: "https://sonicscan.org/address/",
+    explorer: "https://sonicscan.org",
     nativeCurrency: "S",
     color: "#000000",
     active: true,
@@ -168,7 +168,7 @@ const CHAINS = [
     name: chains["43114"].name,
     id: "43114",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["43114"].img}`,
-    explorer: "https://snowtrace.io/address/",
+    explorer: "https://snowtrace.io",
     nativeCurrency: "AVAX",
     color: "#E84142",
     active: true,
@@ -176,6 +176,7 @@ const CHAINS = [
 ];
 
 const CHAINS_CONFIRMATIONS = {
+  "146": 3,
   "8453": 3,
   "43114": 3,
 };

@@ -11,7 +11,9 @@ export const getInitialStateFromUrl = (): {
   const sectionUrl = params.get("section");
 
   const validSections = [
+    MarketSectionTypes.Withdraw,
     MarketSectionTypes.Borrow,
+    MarketSectionTypes.Repay,
     // MarketSectionTypes.Leverage,
     MarketSectionTypes.Information,
     MarketSectionTypes.Users,
@@ -19,7 +21,7 @@ export const getInitialStateFromUrl = (): {
 
   const section = validSections.includes(sectionUrl as MarketSectionTypes)
     ? (sectionUrl as MarketSectionTypes)
-    : MarketSectionTypes.Deposit;
+    : MarketSectionTypes.Supply;
 
   return { asset: assetUrl, section };
 };

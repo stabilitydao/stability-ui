@@ -210,7 +210,7 @@ const PlatformUpgrade = (): JSX.Element => {
                           <span className="flex items-center">
                             {getShortAddress(upgrade.proxy, 6, 4)}
                             <ExplorerLink
-                              explorer={explorer || ""}
+                              explorer={explorer ?? ""}
                               address={upgrade.proxy}
                             />
                           </span>
@@ -221,7 +221,7 @@ const PlatformUpgrade = (): JSX.Element => {
                           <span className="flex items-center">
                             {getShortAddress(upgrade.oldImplementation, 6, 4)}
                             <ExplorerLink
-                              explorer={explorer || ""}
+                              explorer={explorer ?? ""}
                               address={upgrade.oldImplementation}
                             />
                           </span>
@@ -232,7 +232,7 @@ const PlatformUpgrade = (): JSX.Element => {
                           <span className="flex items-center">
                             {getShortAddress(upgrade.newImplementation, 6, 4)}
                             <ExplorerLink
-                              explorer={explorer || ""}
+                              explorer={explorer ?? ""}
                               address={upgrade.newImplementation}
                             />
                           </span>

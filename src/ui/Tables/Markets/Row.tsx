@@ -4,7 +4,7 @@ import { UtilizationTooltip } from "./UtilizationTooltip";
 
 import { ProgressCircle } from "@ui";
 
-import { cn, formatNumber, getTokenData } from "@utils";
+import { cn, formatNumber, getTokenData, useWindowWidth } from "@utils";
 
 import { TMarket, TMarketReserve } from "@types";
 
@@ -16,6 +16,7 @@ interface IProps {
 }
 
 const Row: React.FC<IProps> = ({ market }) => {
+  const windowWidth = useWindowWidth();
   return (
     <a
       className="border border-[#23252A] rounded-lg min-w-max md:min-w-full"
@@ -100,6 +101,12 @@ const Row: React.FC<IProps> = ({ market }) => {
                     "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
                     isNotLastReserve && "border-b border-b-[#23252A]"
                   )}
+                  onClick={(e) => {
+                    if (windowWidth <= 767) {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }
+                  }}
                 >
                   <ProgressCircle
                     percentage={Number(Number(asset?.utilization).toFixed(2))}

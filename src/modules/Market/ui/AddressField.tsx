@@ -17,7 +17,7 @@ const AddressField: React.FC<TProps> = ({ symbol, address, explorer }) => {
           {getShortAddress(address ?? "", 6, 4)}
         </span>
         <div className="flex items-center gap-2">
-          <a href={`${explorer}${address}`} target="_blank">
+          <a href={`${explorer}/address/${address}`} target="_blank">
             <img
               src="/icons/purple_link.png"
               alt="external link"

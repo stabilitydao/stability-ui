@@ -1,5 +1,7 @@
-import { DepositTab } from "./Tabs/DepositTab";
+import { SupplyTab } from "./Tabs/SupplyTab";
+import { WithdrawTab } from "./Tabs/WithdrawTab";
 import { BorrowTab } from "./Tabs/BorrowTab";
+import { RepayTab } from "./Tabs/RepayTab";
 // import { LeverageTab } from "./Tabs/LeverageTab";
 import { InformationTab } from "./Tabs/InformationTab";
 import { UsersTab } from "./Tabs/UsersTab";
@@ -22,10 +24,14 @@ const MarketTabs: React.FC<TProps> = ({
   asset,
 }) => {
   switch (section) {
-    case MarketSectionTypes.Deposit:
-      return <DepositTab asset={asset} />;
+    case MarketSectionTypes.Supply:
+      return <SupplyTab asset={asset} />;
+    case MarketSectionTypes.Withdraw:
+      return <WithdrawTab asset={asset} />;
     case MarketSectionTypes.Borrow:
       return <BorrowTab asset={asset} />;
+    case MarketSectionTypes.Repay:
+      return <RepayTab asset={asset} />;
     // case MarketSectionTypes.Leverage:
     //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:
