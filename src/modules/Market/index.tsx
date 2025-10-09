@@ -72,11 +72,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         ({ marketId }) => marketId === market
       );
 
-      const marketReserves = _market?.reserves?.sort(
-        (a: TMarketReserve, b: TMarketReserve) =>
-          Number(b?.supplyTVL) - Number(a?.supplyTVL)
-      );
-
       const chain = CHAINS.find(({ id }) => id == network);
 
       setLocalMarket({
@@ -86,7 +81,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         pool: _market?.pool,
         protocolDataProvider: _market?.protocolDataProvider,
         deployed: _market?.deployed,
-        reserves: marketReserves as TMarketReserve[],
+        reserves: _market?.reserves,
       } as TMarket);
     }
   }, [$markets]);

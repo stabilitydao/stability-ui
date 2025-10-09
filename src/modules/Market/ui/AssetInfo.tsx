@@ -103,6 +103,15 @@ const AssetInfo: React.FC<TProps> = ({
                 {formatNumber(asset?.supplyTVL, "abbreviate")?.slice(1)}{" "}
               </span>
             </div>
+            <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
+              <CustomTooltip
+                name={`${assetData?.symbol} TVL, USD`}
+                description={TOOLTIP_DESCRIPTIONS.assetTVLInUSD}
+              />
+              <span className="font-semibold">
+                {formatNumber(asset?.supplyTVLInUSD, "abbreviate")}
+              </span>
+            </div>
             {!!Number(asset?.cap) && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip

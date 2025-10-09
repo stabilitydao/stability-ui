@@ -8,7 +8,7 @@ type TProps = {
   asset: TMarketReserve | undefined;
 };
 
-const DepositForm: React.FC<TProps> = ({ asset }) => {
+const SupplyForm: React.FC<TProps> = ({ asset }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   return (
@@ -89,4 +89,4 @@ const DepositForm: React.FC<TProps> = ({ asset }) => {
   );
 };
 
-export { DepositForm };
+export { SupplyForm };
