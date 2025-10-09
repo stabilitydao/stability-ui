@@ -10,6 +10,8 @@ const TOOLTIP_DESCRIPTIONS = {
   maxLTV: "The maximum amount you can borrow against your collateral.",
   liquidationThreshold:
     "The Liquidation Threshold (LT) is where your loan becomes under-collateralized, and consequently, part of your collateral becomes liquidatable.",
+  borrowableDeposit:
+    "Borrowable deposit (Yes): Deposits can be collateral for loans and accrue interest. Borrowable deposit (No): Deposits can be collateral for loans without generating interest. Withdrawals are possible even when utilization reaches 100%.",
 };
 
 const MARKET_SECTIONS = Object.values(MarketSectionTypes);

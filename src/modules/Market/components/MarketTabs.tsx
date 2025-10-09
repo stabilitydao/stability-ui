@@ -25,7 +25,13 @@ const MarketTabs: React.FC<TProps> = ({
 }) => {
   switch (section) {
     case MarketSectionTypes.Supply:
-      return <SupplyTab asset={asset} />;
+      return (
+        <SupplyTab
+          network={network}
+          asset={asset}
+          assets={marketData?.reserves}
+        />
+      );
     case MarketSectionTypes.Withdraw:
       return <WithdrawTab asset={asset} />;
     case MarketSectionTypes.Borrow:

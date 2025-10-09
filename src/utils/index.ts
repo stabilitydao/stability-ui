@@ -33,6 +33,9 @@ import { exactToFixed } from "./functions/exactToFixed";
 import { updateQueryParams } from "./functions/updateQueryParams";
 import { loadMarketsData } from "./functions/loadMarketsData";
 
+import { getAllowance } from "./functions/getAllowance";
+import { getBalance } from "./functions/getBalance";
+
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
@@ -75,4 +78,6 @@ export {
   updateQueryParams,
   useWindowWidth,
   loadMarketsData,
+  getAllowance,
+  getBalance,
 };

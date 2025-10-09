@@ -20,6 +20,8 @@ import {
   cn,
   exactToFixed,
   setLocalStoreHash,
+  getAllowance,
+  getBalance,
 } from "@utils";
 
 import { getWrappingPairs } from "../../functions/getWrappingPairs";
@@ -148,22 +150,6 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
     return BigInt(10000);
   };
 
-  const getAllowance = async (token: string, spender: string) =>
-    await client.readContract({
-      address: token as TAddress,
-      abi: ERC20ABI,
-      functionName: "allowance",
-      args: [$account as TAddress, spender as TAddress],
-    });
-
-  const getBalance = async (address: string, abi: any) =>
-    (await client.readContract({
-      address: address as TAddress,
-      abi,
-      functionName: "balanceOf",
-      args: [$account as TAddress],
-    })) as bigint;
-
   const errorHandler = (err: Error) => {
     lastTx.set("No transaction hash...");
     if (err instanceof Error) {
@@ -187,17 +173,11 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         2
       );
 
-      handleInputChange({
-        target: {
-          value: balance,
-        },
-      });
+      handleInputChange(balance);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value;
-
+  const handleInputChange = (inputValue: string) => {
     let numericValue = inputValue.replace(/[^0-9.]/g, "");
 
     numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
@@ -681,10 +661,15 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         metaVaultBalance,
         wrapMetaVaultBalance,
       ] = await Promise.all([
-        getAllowance(assetsForDeposit[0], metaVault.address),
-        getAllowance(wrap.address, unwrap.address),
-        getBalance(metaVault.address, IMetaVaultABI),
-        getBalance(unwrap.address, WrappedMetaVaultABI),
+        getAllowance(
+          client,
+          assetsForDeposit?.[0],
+          $account,
+          metaVault.address
+        ),
+        getAllowance(client, wrap.address, $account, unwrap.address),
+        getBalance(client, metaVault.address, $account),
+        getBalance(client, unwrap.address, $account),
       ]);
 
       const decimals =
@@ -805,7 +790,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
               type="text"
               placeholder="0"
               value={value}
-              onChange={handleInputChange}
+              onChange={(e) => handleInputChange(e?.target?.value)}
               className="bg-transparent text-2xl font-semibold outline-none w-full"
             />
             <div

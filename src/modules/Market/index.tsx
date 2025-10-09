@@ -69,7 +69,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   useEffect(() => {
     if ($markets && market) {
       const _market = $markets[network]?.find(
-        ({ marketId }) => marketId === market
+        ({ marketId }: { marketId: string }) => marketId === market
       );
 
       const chain = CHAINS.find(({ id }) => id == network);
