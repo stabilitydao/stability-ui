@@ -20,7 +20,7 @@ const Row: React.FC<IProps> = ({ market }) => {
   return (
     <a
       className="border border-[#23252A] rounded-lg min-w-max md:min-w-full"
-      href={`/lending/146/${market?.marketId}`}
+      href={`/lending/146/${market?.marketId.replace(/\s+/g, "-")}`}
     >
       {market?.reserves?.map((asset: TMarketReserve, index: number) => {
         const assetData = getTokenData(asset?.address);

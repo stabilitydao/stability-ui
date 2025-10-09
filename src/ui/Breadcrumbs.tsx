@@ -103,7 +103,7 @@ const Breadcrumbs = (): JSX.Element => {
     } else if (main === "lending" && rest.length === 2) {
       const [, , marketNameRaw] = currentPath.split("/");
 
-      const marketName = decodeURIComponent(marketNameRaw);
+      const marketName = marketNameRaw.replace(/-/g, " ");
 
       add("Lending", "lending");
       add(marketName);
