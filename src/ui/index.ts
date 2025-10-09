@@ -10,7 +10,6 @@ import { VaultType } from "./VaultType";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
-import { CountersBlockCompact } from "./CountersBlockCompact";
 import { Checkbox } from "./Checkbox";
 import { Toggler } from "./Toggler";
 import { HeadingText } from "./HeadingText";
@@ -92,7 +91,6 @@ export {
   Breadcrumbs,
   RiskIndicator,
   ColorIndicator,
-  CountersBlockCompact,
   Checkbox,
   Toggler,
   HeadingText,

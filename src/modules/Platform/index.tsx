@@ -1,187 +1,31 @@
-import {useEffect, useState} from "react";
+import { useStore } from "@nanostores/react";
 
-import {useStore} from "@nanostores/react";
-
-import {PlatformUpgrade} from "./components/PlatformUpgrade";
+import { PlatformUpgrade } from "./components/PlatformUpgrade";
 
 import {
   AgentId,
   type ApiMainReply,
-  assets,
-  ChainStatus,
-  chainStatusInfo,
   getAgent,
-  getChainsTotals,
-  getStrategiesTotals,
-  integrations,
   seeds,
 } from "@stabilitydao/stability";
 
-import {cn, formatNumber} from "@utils";
+import { cn, formatNumber } from "@utils";
 
-import {CountersBlockCompact, Skeleton} from "@ui";
-
-import {apiData, currentChainID, marketPrices, platformVersions} from "@store";
-
-import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
+import { apiData, marketPrices } from "@store";
 
 //import packageJson from "../../../package.json";
-import {NodeState} from "@stabilitydao/stability/out/api.types";
-import {IBuilderAgent} from "@stabilitydao/stability/out/agents";
-import {MetaVaultTableTypes} from "@types";
+import { NodeState } from "@stabilitydao/stability/out/api.types";
+import { IBuilderAgent } from "@stabilitydao/stability/out/agents";
 
 const Platform = (): JSX.Element => {
-  //const $currentChainID = useStore(currentChainID);
-  //const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
+  const $marketPrices = useStore(marketPrices);
 
-  const chainsTotals = getChainsTotals();
-  const strategiesTotals = getStrategiesTotals();
-
-  const [platformData, setPlatformData] = useState([
-    {
-      name: "AUM",
-      content: "",
-    },
-    {
-      name: "Users earned",
-      content: "",
-    },
-    { name: "Vaults", content: "" },
-  ]);
-
-  let protocolsTotal = 0;
-  for (const defiOrgCode of Object.keys(integrations)) {
-    protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length;
-  }
-
-  const strategiesInfo = [
-    { name: "Live", value: strategiesTotals.LIVE.toString(), color: "#4FAE2D" },
-    {
-      name: "Awaiting deployment",
-      value: strategiesTotals.DEPLOYMENT.toString(),
-      color: "#612FFB",
-    },
-    {
-      name: "Development",
-      value: strategiesTotals.DEVELOPMENT.toString(),
-      color: "#2D67FB",
-    },
-    {
-      name: "Awaiting developer",
-      value: strategiesTotals.AWAITING.toString(),
-      color: "#E1E114",
-    },
-    {
-      name: "Blocked",
-      value: strategiesTotals.BLOCKED.toString(),
-      color: "#E01A1A",
-    },
-    {
-      name: "Proposal",
-      value: strategiesTotals.PROPOSAL.toString(),
-      color: "#FB8B13",
-    },
-  ];
-
-  const chainsInfo = Object.keys(chainStatusInfo).map((status) => ({
-    color: chainStatusInfo[status as ChainStatus].color,
-    name: chainStatusInfo[status as ChainStatus].title,
-    value: chainsTotals[status as ChainStatus].toString(),
-  }));
-
-  const integrationInfo = [
-    {
-      name: "Organizations",
-      value: Object.keys(integrations).length.toString(),
-      color: "#612FFB",
-    },
-    { name: "Protocols", value: protocolsTotal.toString(), color: "#05B5E1" },
-  ];
-
-  const assetsInfo = [
-    { name: "Assets", value: assets.length.toString(), color: "#E1E114" },
-    {
-      name: "Tokenlist items",
-      value: tokenlist.tokens.length.toString(),
-      color: "#2D67FB",
-    },
-  ];
-
-  const networksInfo = [
-    {
-      name: "Nodes online",
-      value: Object.keys($apiData?.network.nodes || [])
-        .filter((machingId) => {
-          const nodeState = $apiData?.network.nodes[machingId] as unknown as
-            | NodeState
-            | undefined;
-          return !!(
-            nodeState?.lastSeen &&
-            new Date().getTime() / 1000 - nodeState.lastSeen < 180
-          );
-        })
-        .length.toString(),
-      color: "#2D67FB",
-    },
-    { name: "Seed nodes", value: seeds.length.toString(), color: "#4FAE2D" },
-  ];
-
-  const factoryInfo = [
-    {
-      name: "Available for building",
-      value: $apiData?.total.vaultForBuilding.toString() || "-",
-      color: "#2D67FB",
-    },
-    {
-      name: "Farms",
-      value: $apiData?.total.farms.toString() || "-",
-      color: "#4FAE2D",
-    },
-  ];
-
-  //todo: get value from backend
-  const swapperInfo = [
-    {
-      name: "Pools",
-      value: "50",
-      color: "#2D67FB",
-    },
-    {
-      name: "Blue Chip Pools",
-      value: "4",
-      color: "#4FAE2D",
-    },
-  ];
-
-  useEffect(() => {
-    if (
-      $apiData?.total?.tvl &&
-      $apiData?.total.usersEarned &&
-      $apiData?.total.activeVaults
-    ) {
-      setPlatformData([
-        {
-          name: "AUM",
-          content: `\$${formatNumber($apiData?.total.tvl || 0, "withSpaces")}`,
-        },
-        {
-          name: "Users earned",
-          content: `\$${formatNumber($apiData?.total.usersEarned.toFixed(0) || 0, "withSpaces")}`,
-        },
-        { name: "Vaults", content: String($apiData?.total.activeVaults) },
-      ]);
-    }
-  }, [$apiData]);
+  const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId);
 
   const isAlert = $apiData?.network.status == "Alert";
   const isOk = $apiData?.network.status == "OK";
-
-  const $marketPrices = useStore(marketPrices);
-  console.log($marketPrices);
   const stblPrice = $marketPrices?.STBL;
-  console.log(stblPrice)
-  const builderAgent: IBuilderAgent = getAgent('BUILDER' as AgentId)
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
@@ -190,112 +34,130 @@ const Platform = (): JSX.Element => {
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-3">
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <span className="flex w-[100px] items-center">
-            <img src="/features/stbl.png" alt="STBL" className="w-[24px] h-[24px] mr-[4px]"/>
+            <img
+              src="/features/stbl.png"
+              alt="STBL"
+              className="w-[24px] h-[24px] mr-[4px]"
+            />
             <span className="font-bold text-[20px]">STBL</span>
           </span>
-          <span className="flex">
-            {stblPrice && (
+          {stblPrice && (
+            <div className="flex">
               <span className="flex">
-              <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Price
-                </span>
-                <div className="font-semibold leading-6 flex items-start gap-0 flex-col mr-[40px]">
-                  <span className="font-bold text-[18px] ">${stblPrice.price}</span>
-                  <span className={cn("text-[16px]", stblPrice.priceChange >= 0 ? "text-[#48C05C]" : "text-[#DE4343]")}>
-                    {stblPrice.priceChange > 0 ? "+" : ""}{stblPrice.priceChange}%
+                <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
+                  <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                    Price
                   </span>
+                  <div className="font-semibold leading-6 flex items-start gap-0 flex-col mr-[40px]">
+                    <span className="font-bold text-[18px] ">
+                      ${stblPrice.price}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[16px]",
+                        stblPrice.priceChange >= 0
+                          ? "text-[#48C05C]"
+                          : "text-[#DE4343]"
+                      )}
+                    >
+                      {stblPrice.priceChange > 0 ? "+" : ""}
+                      {stblPrice.priceChange}%
+                    </span>
+                  </div>
                 </div>
-              </div>
-          </span>
-            )}
+              </span>
 
-            {stblPrice && (
               <span className="flex">
-              <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  FDV
-                </span>
-                <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                  <span className="font-bold text-[18px]">{formatNumber(+stblPrice.price * 100000000, 'abbreviate')}</span>
-                  <span className={cn("text-[16px]", stblPrice.priceChange >= 0 ? "text-[#48C05C]" : "text-[#DE4343]")}>
-                    {stblPrice.priceChange > 0 ? "+" : ""}{formatNumber(stblPrice.priceChange * +stblPrice.price * 100000000 / 100, "abbreviate")}
+                <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
+                  <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                    FDV
                   </span>
+                  <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
+                    <span className="font-bold text-[18px]">
+                      {formatNumber(+stblPrice.price * 100000000, "abbreviate")}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[16px]",
+                        stblPrice.priceChange >= 0
+                          ? "text-[#48C05C]"
+                          : "text-[#DE4343]"
+                      )}
+                    >
+                      {stblPrice.priceChange > 0 ? "+" : ""}
+                      {formatNumber(
+                        (stblPrice.priceChange * +stblPrice.price * 100000000) /
+                          100,
+                        "abbreviate"
+                      )}
+                    </span>
+                  </div>
                 </div>
-              </div>
-          </span>
-            )}
-          </span>
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex w-full lg:w-1/2 items-center  p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <span className="font-bold mr-[40px]">Staked</span>
           <span className="flex">
             <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0 mr-[40px]">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Total
-                </span>
-                <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                  <span className="font-bold text-[18px]">{'??'} STBL</span>
-                  <span className="text-[16px]">
-                    $ ?
-                  </span>
-                </div>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                Total
+              </span>
+              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
+                <span className="font-bold text-[18px]">{"??"} STBL</span>
+                <span className="text-[16px]">$ ?</span>
               </div>
+            </div>
             <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Pending APR
-                </span>
-                <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                  <span className="font-bold text-[18px]">{'??'}%</span>
-                  <span className="text-[16px]">
-                    +/- ?%
-                  </span>
-                </div>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                Pending APR
+              </span>
+              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
+                <span className="font-bold text-[18px]">{"??"}%</span>
+                <span className="text-[16px]">+/- ?%</span>
               </div>
+            </div>
           </span>
         </div>
-
       </div>
 
       <h2 className="text-[26px] font-bold">Protocols</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
         <div className="flex w-full flex-wrap lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="flex font-bold">
-            Yield aggregator
-          </div>
+          <div className="flex font-bold">Yield aggregator</div>
           <div className="flex">
             <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  TVL
-                </span>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                TVL
+              </span>
               <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">{formatNumber($apiData?.total.tvl || 0, "abbreviate")}</span>
+                <span className="font-bold text-[18px]">
+                  {formatNumber($apiData?.total.tvl || 0, "abbreviate")}
+                </span>
                 <span className="text-[16px]">
-                    {$apiData?.total.activeVaults} vaults
-                  </span>
+                  {$apiData?.total.activeVaults} vaults
+                </span>
               </div>
             </div>
           </div>
         </div>
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="flex font-bold">
-            Lending
-          </div>
+          <div className="flex font-bold">Lending</div>
           <div className="flex">
             <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  TVL
-                </span>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                TVL
+              </span>
               <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">{formatNumber($apiData?.total.marketTvl || 0, "abbreviate")}</span>
-                <span className="text-[16px]">
-                    3 markets
-                  </span>
+                <span className="font-bold text-[18px]">
+                  {formatNumber($apiData?.total.marketTvl || 0, "abbreviate")}
+                </span>
+                <span className="text-[16px]">3 markets</span>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -306,11 +168,10 @@ const Platform = (): JSX.Element => {
         <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px]  items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div>Stability Operator</div>
           <div className="flex w-full">
-
             <div className="flex flex-col  min-w-[120px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Status
-                </span>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                Status
+              </span>
               <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
                 <span className="font-bold text-[18px]">
                   <span
@@ -323,32 +184,41 @@ const Platform = (): JSX.Element => {
                           : "#444444",
                     }}
                   >
-            {$apiData?.network.status}
-          </span>
+                    {$apiData?.network.status}
+                  </span>
                 </span>
                 <span className="text-[16px] whitespace-nowrap">
-                    {Object.keys($apiData?.network.healthCheckReview.alerts || []).length} alerts
-                  </span>
+                  {
+                    Object.keys(
+                      $apiData?.network.healthCheckReview.alerts || []
+                    ).length
+                  }{" "}
+                  alerts
+                </span>
               </div>
             </div>
 
             <div className="flex flex-col w-[160px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Machines
-                </span>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                Machines
+              </span>
               <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">{Object.keys($apiData?.network.nodes || [])
-                  .filter((machingId) => {
-                    const nodeState = $apiData?.network.nodes[machingId] as unknown as
-                      | NodeState
-                      | undefined;
-                    return !!(
-                      nodeState?.lastSeen &&
-                      new Date().getTime() / 1000 - nodeState.lastSeen < 180
-                    );
-                  })
-                  .length.toString()}</span>
-                <span className="text-[16px] whitespace-nowrap">{seeds.length} seeds</span>
+                <span className="font-bold text-[18px]">
+                  {Object.keys($apiData?.network.nodes || [])
+                    .filter((machingId) => {
+                      const nodeState = $apiData?.network.nodes[
+                        machingId
+                      ] as unknown as NodeState | undefined;
+                      return !!(
+                        nodeState?.lastSeen &&
+                        new Date().getTime() / 1000 - nodeState.lastSeen < 180
+                      );
+                    })
+                    .length.toString()}
+                </span>
+                <span className="text-[16px] whitespace-nowrap">
+                  {seeds.length} seeds
+                </span>
               </div>
             </div>
           </div>
@@ -357,17 +227,17 @@ const Platform = (): JSX.Element => {
           <div>Stability Builder</div>
           <div className="flex w-full">
             <div className="flex flex-col gap-[10px] min-w-[100px] md:w-auto mt-2 md:mt-0">
-                <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                  Repositories
-                </span>
+              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
+                Repositories
+              </span>
               <div className="font-semibold leading-6 flex items-start gap-0">
-                <span className="font-bold text-[18px]">{builderAgent.repo.length}</span>
-
+                <span className="font-bold text-[18px]">
+                  {builderAgent.repo.length}
+                </span>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
       <h2 className="text-[26px] font-bold">Library</h2>
@@ -406,7 +276,6 @@ const Platform = (): JSX.Element => {
         </a>
       </div>
 
-
       <div className="px-6 hidden">
         <div className="flex p-[16px] gap-[8px] bg-accent-950 rounded-[10px] w-full">
           <svg
@@ -441,7 +310,6 @@ const Platform = (): JSX.Element => {
       <h2 className="text-[26px] font-bold">Service tools</h2>
 
       <div className="flex flex-wrap gap-[30px] mb-5">
-
         <a
           className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
           href="/swapper"
@@ -464,9 +332,7 @@ const Platform = (): JSX.Element => {
         >
           MetaVaults Management
         </a>
-
       </div>
-
     </div>
   );
 };
