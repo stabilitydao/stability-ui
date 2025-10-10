@@ -28,6 +28,7 @@ const MarketTabs: React.FC<TProps> = ({
       return (
         <SupplyTab
           network={network}
+          market={marketData}
           asset={asset}
           assets={marketData?.reserves}
         />

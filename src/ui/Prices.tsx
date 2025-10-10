@@ -189,7 +189,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                   </div>
                 </div>
               ))
-            : [1, 2, 3, 4].map((key) => (
+            : [1, 2, 3, 4, 5].map((key) => (
                 <div
                   className="flex items-center justify-between"
                   key={`skeleton-${key}`}

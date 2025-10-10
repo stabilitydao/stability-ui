@@ -9,7 +9,7 @@ const Toggler: React.FC<IProps> = ({ checked, onChange }) => {
   return (
     <label
       className={cn(
-        "flex items-center justify-between px-[12px] py-2 gap-2 rounded-lg border text-[14px] leading-4 font-medium bg-[#18191C] cursor-pointer",
+        "flex items-center justify-between px-[12px] py-2 gap-2 rounded-lg border text-[14px] leading-4 font-medium bg-[#18191C] cursor-pointer select-none",
         checked
           ? "border-[#2BB656] text-[#2BB656] flex-row"
           : "border-[#232429] text-[#6A6B6F] flex-row-reverse"

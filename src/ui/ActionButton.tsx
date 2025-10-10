@@ -43,6 +43,7 @@ const ActionButton: React.FC<IProps> = ({
     "Approve",
     "Wrap",
     "Unwrap",
+    "Supply",
   ];
 
   return (

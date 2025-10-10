@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
-import { Toggler, CustomTooltip } from "@ui";
+import { writeContract } from "@wagmi/core";
+
+import { ActionButton } from "@ui";
 
 import {
   cn,
@@ -12,23 +14,36 @@ import {
   exactToFixed,
   getBalance,
   formatNumber,
+  getAllowance,
+  getTransactionReceipt,
+  setLocalStoreHash,
 } from "@utils";
 
-import { account, connected, currentChainID } from "@store";
+import { getGasLimit } from "../../functions/getGasLimit";
 
-import { TOOLTIP_DESCRIPTIONS } from "../../constants";
+import { account, connected, currentChainID, lastTx } from "@store";
 
-import { web3clients } from "@web3";
+import { web3clients, wagmiConfig, AavePoolABI, ERC20ABI } from "@web3";
 
-import type { TMarketReserve, TAddress } from "@types";
+import type { TMarketReserve, TMarket, TAddress } from "@types";
+
+import type { Abi } from "viem";
 
 type TProps = {
   network: string;
+  market: TMarket;
   asset: TMarketReserve | undefined;
   assets: TMarketReserve[] | undefined;
 };
 
-const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
+type TReserveData = {
+  balance: string;
+  allowance: string;
+};
+
+type TReservesData = Record<TAddress, TReserveData>;
+
+const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   const client = web3clients[network as keyof typeof web3clients];
@@ -36,50 +51,39 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
   const $connected = useStore(connected);
   const $account = useStore(account);
   const $currentChainID = useStore(currentChainID);
+  const $lastTx = useStore(lastTx);
 
-  const [borrowable, setBorrowable] = useState<boolean>(true);
   const [value, setValue] = useState<string>("");
   const [usdValue, setUsdValue] = useState<string>("$0");
+  const [button, setButton] = useState<string>("");
+  const [transactionInProgress, setTransactionInProgress] =
+    useState<boolean>(false);
 
-  const [balances, setBalances] = useState<Record<TAddress, string>>({});
+  const [needConfirm, setNeedConfirm] = useState<boolean>(false);
 
-  // const getGasLimit = async (
-  //   address: TAddress,
-  //   functionName: string,
-  //   params: any[]
-  // ) => {
-  //   try {
-  //     const abi = [TransactionTypes.Wrap, TransactionTypes.Unwrap].includes(
-  //       actionType
-  //     )
-  //       ? WrappedMetaVaultABI
-  //       : IMetaVaultABI;
+  const [reservesData, setReservesData] = useState<TReservesData>({});
 
-  //     const gas = await client.estimateContractGas({
-  //       address: address,
-  //       abi: abi,
-  //       functionName: functionName,
-  //       args: params,
-  //       account: $account as TAddress,
-  //     });
-
-  //     const gasLimit = BigInt(
-  //       Math.trunc(Number(gas) * Number(DEFAULT_TRANSACTION_SETTINGS.gasLimit))
-  //     );
-
-  //     if (gasLimit) {
-  //       return gasLimit;
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to get gasLimit", error);
-  //   }
-
-  //   return BigInt(10000);
-  // };
+  // todo: add errors on ui
+  const errorHandler = (err: Error) => {
+    refreshForm();
+    lastTx.set("No transaction hash...");
+    if (err instanceof Error) {
+      // const errorData = {
+      //   state: true,
+      //   type: err.name,
+      //   description: getShortMessage(err.message),
+      // };
+    }
+    alert("TX ERROR");
+    console.error("ERROR:", err);
+  };
 
   const refreshForm = () => {
     setValue("");
     setUsdValue("$0");
+    setButton("");
+    setTransactionInProgress(false);
+    setNeedConfirm(false);
   };
 
   const handleInputChange = (inputValue: string) => {
@@ -103,45 +107,23 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
         )
       : "0";
 
-    // const balance = Number(
-    //   Object.values(balances?.[actionType] || {})[0]?.balance || 0
-    // );
-    // const depositAllowance = Number(allowance.deposit || 0);
-    // const wrapAllowance = Number(allowance.wrap || 0);
+    const balance = Number(
+      reservesData?.[asset?.address as TAddress]?.balance ?? 0
+    );
 
-    // if (
-    //   actionType === TransactionTypes.Withdraw &&
-    //   value > Number(maxWithdraw)
-    // ) {
-    //   numericValue = String(maxWithdraw);
-    // }
-    // if (!value) {
-    //   setButton("");
-    // } else if (value > balance) {
-    //   setButton("insufficientBalance");
-    // } else {
-    //   switch (actionType) {
-    //     case TransactionTypes.Deposit:
-    //       setButton(value > depositAllowance ? "Approve" : "Deposit");
-    //       break;
+    const allowance = Number(
+      reservesData[asset?.address as TAddress]?.balance ?? 0
+    );
 
-    //     case TransactionTypes.Withdraw:
-    //       setButton("Withdraw");
-    //       break;
-
-    //     case TransactionTypes.Wrap:
-    //       setButton(value > wrapAllowance ? "Approve" : "Wrap");
-    //       break;
-
-    //     case TransactionTypes.Unwrap:
-    //       setButton("Unwrap");
-    //       break;
-
-    //     default:
-    //       setButton("");
-    //       break;
-    //   }
-    // }
+    if (!value) {
+      setButton("");
+    } else if (value > balance) {
+      setButton("insufficientBalance");
+    } else if (value < allowance) {
+      setButton("Approve");
+    } else {
+      setButton("Supply");
+    }
 
     setValue(numericValue);
     setUsdValue(`$${formattedUsdValue}`);
@@ -150,7 +132,7 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        balances[asset?.address as TAddress] ?? 0,
+        reservesData?.[asset?.address as TAddress]?.balance ?? 0,
         2
       );
 
@@ -158,38 +140,197 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
     }
   };
 
+  const updateAllowance = async (minRequired?: number) => {
+    if (!assetData?.address || !$account) return;
+
+    const rawAllowance = await getAllowance(
+      client,
+      assetData.address,
+      $account,
+      market.pool
+    );
+
+    const allowance = Number(
+      formatUnits(rawAllowance, assetData.decimals ?? 18)
+    );
+
+    setReservesData((prev) => ({
+      ...prev,
+      [assetData.address]: {
+        ...prev[assetData.address],
+        allowance,
+      },
+    }));
+
+    if (minRequired && allowance >= minRequired) {
+      setButton("Supply");
+    }
+  };
+
+  const approve = async () => {
+    setTransactionInProgress(true);
+
+    const amount = Number(value);
+
+    if (!$account || !amount) return;
+
+    try {
+      setNeedConfirm(true);
+
+      const approveSum = parseUnits(String(amount), assetData?.decimals ?? 18);
+
+      const params: [TAddress, bigint] = [market.pool, approveSum];
+
+      const gasLimit = await getGasLimit(
+        client,
+        assetData?.address as TAddress,
+        ERC20ABI,
+        "approve",
+        params,
+        $account
+      );
+
+      const tx = await writeContract(wagmiConfig, {
+        address: assetData?.address as TAddress,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const receipt = await getTransactionReceipt(tx);
+
+      if (receipt?.status === "success") {
+        lastTx.set(receipt?.transactionHash);
+        await updateAllowance(amount);
+      }
+    } catch (error) {
+      setNeedConfirm(false);
+      await updateAllowance(amount);
+
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+
+  const supply = async () => {
+    setTransactionInProgress(true);
+
+    const amount = Number(value);
+
+    if (!$account || !amount) return;
+
+    try {
+      setNeedConfirm(true);
+
+      const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
+
+      const params = [assetData?.address, supplySum, $account, 0];
+
+      const gasLimit = await getGasLimit(
+        client,
+        market.pool,
+        AavePoolABI as Abi,
+        "supply",
+        params,
+        $account as TAddress
+      );
+
+      const tx = await writeContract(wagmiConfig, {
+        address: market.pool,
+        abi: AavePoolABI,
+        functionName: "supply",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const receipt = await getTransactionReceipt(tx);
+
+      let txTokens = {};
+
+      if (assetData?.address) {
+        txTokens = {
+          [assetData.address]: {
+            amount,
+            symbol: assetData.symbol,
+            logo: assetData.logoURI,
+          },
+        };
+      }
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: tx,
+        status: receipt?.status || "reverted",
+        type: "supply",
+        vault: market.pool,
+        tokens: txTokens,
+      });
+
+      if (receipt?.status === "success") {
+        lastTx.set(receipt?.transactionHash);
+
+        refreshForm();
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    }
+    setTransactionInProgress(false);
+  };
+
+  const formHandler = async () => {
+    const actionsMap: Record<string, () => Promise<void>> = {
+      Approve: approve,
+      Supply: supply,
+    };
+
+    const action = actionsMap[button];
+    if (action) {
+      await action();
+    }
+  };
+
   const initData = async () => {
-    if ($connected && $account) {
-      const _balances: Record<TAddress, string> = assets
-        ? Object.fromEntries(
-            await Promise.all(
-              assets.map(async (_asset) => {
-                const decimals = getTokenData(_asset.address)?.decimals ?? 18;
+    if ($connected && $account && assets?.length) {
+      const _reservesData: TReservesData = Object.fromEntries(
+        await Promise.all(
+          assets.map(async (_asset) => {
+            const address = _asset.address as TAddress;
+            const decimals = getTokenData(address)?.decimals ?? 18;
 
-                const _balance = await getBalance(
-                  client,
-                  _asset.address,
-                  $account
-                );
+            const [_balanceRaw, _allowanceRaw] = await Promise.all([
+              getBalance(client, address, $account),
+              getAllowance(client, address, $account, market.pool),
+            ]);
 
-                const formatted = formatUnits(_balance, decimals);
-                return [_asset.address, formatted] as const;
-              })
-            )
-          )
-        : {};
+            const balance = formatUnits(_balanceRaw, decimals);
+            const allowance = formatUnits(_allowanceRaw, decimals);
 
-      setBalances(_balances);
+            return [address, { balance, allowance }] as const;
+          })
+        )
+      );
+
+      setReservesData(_reservesData);
     }
   };
 
   useEffect(() => {
-    initData();
-  }, [$connected, $account, $currentChainID]);
-
-  useEffect(() => {
     refreshForm();
   }, [asset]);
+
+  useEffect(() => {
+    initData();
+  }, [$connected, $account, $currentChainID, $lastTx]);
 
   return (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
@@ -211,17 +352,6 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
           <div className="text-[#7C7E81] font-medium text-[14px] leading-5">
             {usdValue}
           </div>
-          {/* {Object.keys(balances).length &&
-                      !!activeAsset[actionType] ? (
-                        <div className="text-[#97979A] font-semibold text-[16px] leading-6 mt-1">
-                          Balance:{" "}
-                          {formatNumber(
-                            Object.values(balances?.[actionType])[0]?.balance ||
-                              0,
-                            "format"
-                          )}
-                        </div>
-                      ) : null} */}
         </label>
         <div className="flex flex-col gap-2 text-[16px] leading-6">
           <div className="flex items-center justify-between">
@@ -229,7 +359,7 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
             <div className="flex items-start gap-2">
               <span className="font-semibold">
                 {formatNumber(
-                  balances[asset?.address as TAddress] ?? 0,
+                  reservesData[asset?.address as TAddress]?.balance ?? 0,
                   "format"
                 )}{" "}
                 {assetData?.symbol}
@@ -245,36 +375,15 @@ const SupplyForm: React.FC<TProps> = ({ network, asset, assets }) => {
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <CustomTooltip
-              name="Borrowable deposit"
-              description={TOOLTIP_DESCRIPTIONS.borrowableDeposit}
-            />
-            <Toggler
-              checked={borrowable}
-              onChange={() => setBorrowable((prev) => !prev)}
-            />
-          </div>
         </div>
       </div>
-
-      <button
-        className={cn(
-          "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
-        )}
-        type="button"
-      >
-        <div className="flex items-center justify-center gap-2 px-6 py-4">
-          Deposit
-        </div>
-      </button>
-      {/* <ActionButton
-                           type={button}
-                           network={network}
-                           transactionInProgress={transactionInProgress}
-                           needConfirm={needConfirm}
-                           actionFunction={formHandler}
-                         />  */}
+      <ActionButton
+        type={button}
+        network={network}
+        transactionInProgress={transactionInProgress}
+        needConfirm={needConfirm}
+        actionFunction={formHandler}
+      />
     </div>
   );
 };
