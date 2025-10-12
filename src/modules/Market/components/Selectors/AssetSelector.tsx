@@ -61,7 +61,9 @@ const AssetSelector: React.FC<TProps> = ({
 
             if (
               !asset?.isBorrowable &&
-              activeSection === MarketSectionTypes.Borrow
+              [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(
+                activeSection
+              )
             ) {
               return null;
             }
@@ -104,7 +106,9 @@ const AssetSelector: React.FC<TProps> = ({
 
           if (
             !asset?.isBorrowable &&
-            activeSection === MarketSectionTypes.Borrow
+            [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(
+              activeSection
+            )
           ) {
             return null;
           }

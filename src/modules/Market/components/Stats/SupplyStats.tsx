@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 
-import { formatUnits } from "viem";
+// import { formatUnits } from "viem";
 
-import { useStore } from "@nanostores/react";
+// import { useStore } from "@nanostores/react";
 
 import { getTokenData } from "@utils";
 
-import { account, connected, currentChainID, lastTx } from "@store";
+// import { account, connected, currentChainID, lastTx } from "@store";
 
-import { web3clients, AavePoolABI } from "@web3";
+// import { web3clients, AavePoolABI } from "@web3";
 
 import type { TMarketReserve, TAddress, TMarket } from "@types";
 
@@ -22,44 +22,44 @@ type TProps = {
 const SupplyStats: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
-  const client = web3clients[network as keyof typeof web3clients];
+  //   const client = web3clients[network as keyof typeof web3clients];
+  console.log(network, market, assets);
+  //   const [stats, setStats] = useState({});
 
-  const [stats, setStats] = useState({});
+  //   const $connected = useStore(connected);
+  //   const $account = useStore(account);
+  //   const $currentChainID = useStore(currentChainID);
+  //   const $lastTx = useStore(lastTx);
 
-  const $connected = useStore(connected);
-  const $account = useStore(account);
-  const $currentChainID = useStore(currentChainID);
-  const $lastTx = useStore(lastTx);
+  //   const initData = async () => {
+  //     if ($connected && $account) {
+  //       try {
+  //         const userData = (await client.readContract({
+  //           address: market.pool,
+  //           abi: AavePoolABI,
+  //           functionName: "getUserAccountData",
+  //           args: [$account as TAddress],
+  //         })) as bigint;
 
-  const initData = async () => {
-    if ($connected && $account) {
-      try {
-        const userData = (await client.readContract({
-          address: market.pool,
-          abi: AavePoolABI,
-          functionName: "getUserAccountData",
-          args: [$account as TAddress],
-        })) as bigint;
+  //         //      userAccountData: {
+  //         //   totalCollateralBase: userAccountData?.[0],
+  //         //   totalDebtBase: userAccountData?.[1],
+  //         //   availableBorrowsBase: userAccountData?.[2],
+  //         //   currentLiquidationThreshold: userAccountData?.[3],
+  //         //   ltv: userAccountData?.[4],
+  //         //   healthFactor: userAccountData?.[5],
+  //         // },
+  //         console.log(userData);
+  //         console.log(formatUnits(userData[5], 18));
+  //       } catch (error) {
+  //         console.error("Get stats error:", error);
+  //       }
+  //     }
+  //   };
 
-        //      userAccountData: {
-        //   totalCollateralBase: userAccountData?.[0],
-        //   totalDebtBase: userAccountData?.[1],
-        //   availableBorrowsBase: userAccountData?.[2],
-        //   currentLiquidationThreshold: userAccountData?.[3],
-        //   ltv: userAccountData?.[4],
-        //   healthFactor: userAccountData?.[5],
-        // },
-        console.log(userData);
-        console.log(formatUnits(userData[5], 18));
-      } catch (error) {
-        console.error("Get stats error:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    initData();
-  }, [$account, $connected, $lastTx, $currentChainID]);
+  //   useEffect(() => {
+  //     initData();
+  //   }, [$account, $connected, $lastTx, $currentChainID]);
 
   return (
     <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 md:gap-6 w-full lg:w-2/3 font-medium">

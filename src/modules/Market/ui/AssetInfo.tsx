@@ -67,7 +67,12 @@ const AssetInfo: React.FC<TProps> = ({
                   name="Utilization"
                   description={TOOLTIP_DESCRIPTIONS.utilization}
                 />
-                <span className="font-semibold">
+                <span
+                  className={cn(
+                    "font-semibold",
+                    Number(asset?.utilization) === 100 && "text-[#DE4343]"
+                  )}
+                >
                   {Number(asset?.utilization).toFixed(2)}%
                 </span>
               </div>

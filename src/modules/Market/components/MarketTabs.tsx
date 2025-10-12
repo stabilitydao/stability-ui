@@ -34,7 +34,14 @@ const MarketTabs: React.FC<TProps> = ({
         />
       );
     case MarketSectionTypes.Withdraw:
-      return <WithdrawTab asset={asset} />;
+      return (
+        <WithdrawTab
+          network={network}
+          market={marketData}
+          asset={asset}
+          assets={marketData?.reserves}
+        />
+      );
     case MarketSectionTypes.Borrow:
       return <BorrowTab asset={asset} />;
     case MarketSectionTypes.Repay:

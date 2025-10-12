@@ -111,7 +111,13 @@ const Row: React.FC<IProps> = ({ market }) => {
                   <ProgressCircle
                     percentage={Number(Number(asset?.utilization).toFixed(2))}
                   />
-                  <span>{Number(asset?.utilization).toFixed(2)}%</span>
+                  <span
+                    className={cn(
+                      Number(asset.utilization) === 100 && "text-[#DE4343]"
+                    )}
+                  >
+                    {Number(asset?.utilization).toFixed(2)}%
+                  </span>
                 </div>
               </Tippy>
             ) : (
