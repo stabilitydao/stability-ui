@@ -49,6 +49,9 @@ const TableColumnSort: React.FC<TProps> = ({
     Collateral: "w-1/4 flex justify-end px-2 md:px-4",
     Debt: "w-1/4 flex justify-end px-2 md:px-4",
     LTV: "w-1/4 flex justify-end px-2 md:px-4",
+    Liquidated: "w-1/4 flex justify-end px-2 md:px-4",
+    Liquidator: "w-1/4 flex justify-start px-2 md:px-4",
+    Date: "w-1/4 flex justify-end px-2 md:px-4",
   };
 
   const tabController = () => {

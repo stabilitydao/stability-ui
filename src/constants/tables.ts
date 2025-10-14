@@ -532,6 +532,36 @@ const MARKET_USERS_TABLE: TTableColumn[] = [
   },
 ];
 
+const MARKET_LIQUIDATIONS_TABLE: TTableColumn[] = [
+  {
+    name: "User",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+
+  {
+    name: "Liquidator",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Liquidated",
+    keyName: "liquidated",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Date",
+    keyName: "timestamp",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
@@ -562,4 +592,5 @@ export {
   MARKET_TABLE,
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
+  MARKET_LIQUIDATIONS_TABLE,
 };

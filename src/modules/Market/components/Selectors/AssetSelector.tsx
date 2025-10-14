@@ -34,7 +34,9 @@ const AssetSelector: React.FC<TProps> = ({
   }, []);
 
   const isHidden =
-    activeSection === MarketSectionTypes.Users ||
+    [MarketSectionTypes.Users, MarketSectionTypes.Liquidations].includes(
+      activeSection
+    ) ||
     (assets.length === 2 &&
       windowWidth >= 1024 &&
       activeSection === MarketSectionTypes.Information);

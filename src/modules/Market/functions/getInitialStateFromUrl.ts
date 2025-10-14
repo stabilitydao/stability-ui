@@ -17,6 +17,7 @@ export const getInitialStateFromUrl = (): {
     // MarketSectionTypes.Leverage,
     MarketSectionTypes.Information,
     MarketSectionTypes.Users,
+    MarketSectionTypes.Liquidations,
   ];
 
   const section = validSections.includes(sectionUrl as MarketSectionTypes)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 
 import axios from "axios";
 
@@ -6,11 +6,19 @@ import { useStore } from "@nanostores/react";
 
 import { FullPageLoader, TableColumnSort, Pagination } from "@ui";
 
-import { getShortAddress, sortTable, formatNumber, copyAddress } from "@utils";
+import {
+  getShortAddress,
+  sortTable,
+  formatNumber,
+  copyAddress,
+  formatTimestampToDate,
+} from "@utils";
 
-import { MARKET_USERS_TABLE, PAGINATION_LIMIT } from "@constants";
+import { MARKET_LIQUIDATIONS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { account } from "@store";
+
+import { seeds } from "@stabilitydao/stability";
 
 import { TMarketUser, TTableColumn } from "@types";
 
@@ -19,34 +27,36 @@ type TProps = {
   market: string;
 };
 
-const LiquidationsTab: React.FC<TProps> = ({ network, market }) => {
+const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
   const $account = useStore(account);
 
-  const [tableStates, setTableStates] = useState(MARKET_USERS_TABLE);
+  const [tableStates, setTableStates] = useState(MARKET_LIQUIDATIONS_TABLE);
 
   const [tableData, setTableData] = useState<TMarketUser[]>([]);
 
   const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
 
-  const getMarketUsers = async () => {
+  const getMarketLiquidations = async () => {
     try {
       const req = await axios.get(
-        `https://api.stabilitydao.org/lending/${network}/${market}/users`
+        `${seeds[0]}/lending/${network}/${market}/liquidations`
       );
 
       if (req.data) {
-        const _users = Object.entries(req?.data).map(([address, data]) => ({
-          address,
-          collateral: data?.aTokenBalanceUsd ?? 0,
-          debt: data?.debtTokenBalanceUsd ?? 0,
-          LTV: data?.ltv ?? 0,
-        }));
-
-        setTableData(_users as TMarketUser[]);
+        const liquidations = req.data.map((liquidation) => {
+          return {
+            user: liquidation.user,
+            liquidator: liquidation.liquidator,
+            liquidated: liquidation?.liquidatedCollateralAmountInUSD,
+            timestamp: Number(liquidation.blockTimestamp),
+            date: formatTimestampToDate(liquidation?.blockTimestamp, true),
+          };
+        });
+        setTableData(liquidations);
       }
     } catch (error) {
-      console.error("Get market users error:", error);
+      console.error("Get market liquidations error:", error);
     }
   };
 
@@ -55,7 +65,7 @@ const LiquidationsTab: React.FC<TProps> = ({ network, market }) => {
   const currentTabData = tableData.slice(firstTabIndex, lastTabIndex);
 
   useEffect(() => {
-    getMarketUsers();
+    getMarketLiquidations();
   }, []);
 
   return (
@@ -75,20 +85,33 @@ const LiquidationsTab: React.FC<TProps> = ({ network, market }) => {
         ))}
       </div>
       <div>
-        {false ? ( //currentTabData.length
+        {currentTabData.length ? (
           <div>
-            {currentTabData.map((user: TMarketUser) => (
+            {currentTabData.map((liquidation, index) => (
               <div
-                key={user?.address}
+                key={`${liquidation?.user}-${index}`}
                 className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
               >
                 <div
-                  className={`group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
+                  className={`group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === liquidation?.user?.toLowerCase() ? "underline" : ""}`}
                   style={{ fontFamily: "monospace" }}
-                  title={user?.address}
-                  onClick={() => copyAddress(user?.address)}
+                  title={liquidation?.user}
+                  onClick={() => copyAddress(liquidation?.user)}
                 >
-                  {getShortAddress(user?.address, 6, 4)}
+                  {getShortAddress(liquidation?.user, 6, 4)}
+                  <img
+                    className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    src="/icons/copy.png"
+                    alt="Copy icon"
+                  />
+                </div>
+                <div
+                  className="group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer"
+                  style={{ fontFamily: "monospace" }}
+                  title={liquidation?.liquidator}
+                  onClick={() => copyAddress(liquidation?.liquidator)}
+                >
+                  {getShortAddress(liquidation?.liquidator, 6, 4)}
                   <img
                     className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     src="/icons/copy.png"
@@ -96,17 +119,12 @@ const LiquidationsTab: React.FC<TProps> = ({ network, market }) => {
                   />
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.collateral
-                    ? formatNumber(user?.collateral, "abbreviate")?.slice(1)
+                  {liquidation?.liquidated
+                    ? formatNumber(liquidation?.liquidated, "abbreviate")
                     : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.debt
-                    ? formatNumber(user?.debt, "abbreviate")?.slice(1)
-                    : ""}
-                </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.LTV ? `${(user?.LTV * 100).toFixed(2)}%` : ""}
+                  {liquidation?.date}
                 </div>
               </div>
             ))}
@@ -128,6 +146,6 @@ const LiquidationsTab: React.FC<TProps> = ({ network, market }) => {
       />
     </div>
   );
-};
+});
 
 export { LiquidationsTab };

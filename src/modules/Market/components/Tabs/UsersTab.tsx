@@ -12,6 +12,8 @@ import { MARKET_USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
 import { account } from "@store";
 
+import { seeds } from "@stabilitydao/stability";
+
 import { TMarketUser, TTableColumn } from "@types";
 
 type TProps = {
@@ -32,7 +34,7 @@ const UsersTab: React.FC<TProps> = ({ network, market }) => {
   const getMarketUsers = async () => {
     try {
       const req = await axios.get(
-        `https://api.stabilitydao.org/lending/${network}/${market}/users`
+        `${seeds[0]}/lending/${network}/${market}/users`
       );
 
       if (req.data) {
