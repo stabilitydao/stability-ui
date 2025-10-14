@@ -55,7 +55,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       updateQueryParams({ section });
     }
 
-    if (section === MarketSectionTypes.Borrow && !activeAsset?.isBorrowable) {
+    if (
+      [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(section) &&
+      !activeAsset?.isBorrowable
+    ) {
       const borrowableAssets = localMarket?.reserves?.filter(
         ({ isBorrowable }) => isBorrowable
       );
@@ -97,7 +100,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         setActiveAsset(localMarket?.reserves[0]);
       }
     }
-  }, [localMarket]);
+  }, [$markets, localMarket]);
 
   return market && localMarket ? (
     <WagmiLayout>

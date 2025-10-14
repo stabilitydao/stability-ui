@@ -3,6 +3,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Vault, Protocol } from "./Rows";
 import { Donut } from "./Donut";
 
+import { cn } from "@utils";
+
 import { strategies } from "@stabilitydao/stability";
 
 import {
@@ -14,7 +16,6 @@ import {
   IProtocolModal,
   MetaVaultDisplayTypes,
 } from "@types";
-import { cn } from "@utils";
 
 interface IProps {
   displayType: MetaVaultDisplayTypes;
@@ -146,53 +147,62 @@ const MetaVaultsTable: React.FC<IProps> = ({
       <div className="flex flex-col w-full min-h-full border-x border-[#23252A]">
         {tableType === MetaVaultTableTypes.Destinations
           ? vaults.map((vault: TVault, index: number) => {
-              if (vault.type === VaultTypes.Vault) {
-                return (
-                  <Vault
-                    key={`row/${vault.name + index}`}
-                    isProDisplay={isProDisplay}
-                    APRs={getVaultAPRs(vault)}
-                    vault={vault}
-                    activeVault={activeSection}
-                    setModalState={setAPRModalState}
-                  />
-                );
-              }
+              const vaultProportion = vault.proportions;
+              const current = Number(vaultProportion?.current) * 100;
+              const target = Number(vaultProportion?.target) * 100;
+
+              const showInPro = isProDisplay;
+              const showInDefault = !isProDisplay && current > 0.1 && target;
+
+              if (!showInPro && !showInDefault) return null;
+
+              const renderVault = (
+                vaultData: TVault,
+                inserted = false,
+                keySuffix = ""
+              ) => (
+                <Vault
+                  key={`vault-${vaultData.name}-${index}-${keySuffix}`}
+                  isProDisplay={isProDisplay}
+                  APRs={getVaultAPRs(vaultData)}
+                  vault={vaultData}
+                  activeVault={activeSection}
+                  setModalState={setAPRModalState}
+                  inserted={inserted}
+                />
+              );
 
               return (
-                <div key={`row/${vault.name + index}`}>
-                  <Vault
-                    isProDisplay={isProDisplay}
-                    APRs={getVaultAPRs(vault)}
-                    vault={vault}
-                    activeVault={activeSection}
-                    setModalState={setAPRModalState}
-                  />
-                  {vault?.vaults?.map((endVault) => {
-                    return (
-                      <Vault
-                        key={`row/${endVault.name + index}`}
-                        isProDisplay={isProDisplay}
-                        APRs={getVaultAPRs(endVault)}
-                        vault={endVault}
-                        activeVault={activeSection}
-                        setModalState={setAPRModalState}
-                        inserted={true}
-                      />
-                    );
+                <div key={`row-${vault.name}-${index}`}>
+                  {renderVault(vault)}
+
+                  {vault.vaults?.map((endVault, i) => {
+                    const endCurrent =
+                      Number(endVault.proportions?.current ?? 0) * 100;
+
+                    const shouldRenderEnd =
+                      isProDisplay || (!isProDisplay && endCurrent > 0.1);
+
+                    return shouldRenderEnd
+                      ? renderVault(endVault, true, `sub-${i}`)
+                      : null;
                   })}
                 </div>
               );
             })
-          : protocols.map((protocol: IProtocol, index: number) => (
-              <Protocol
-                key={`row/${protocol.name + index}`}
-                isProDisplay={isProDisplay}
-                protocol={protocol}
-                activeProtocol={activeSection}
-                setModalState={setProtocolModalState}
-              />
-            ))}
+          : protocols.map((protocol: IProtocol, index: number) => {
+              if (isProDisplay || (!isProDisplay && !!protocol.allocation)) {
+                return (
+                  <Protocol
+                    key={`row/${protocol.name + index}`}
+                    isProDisplay={isProDisplay}
+                    protocol={protocol}
+                    activeProtocol={activeSection}
+                    setModalState={setProtocolModalState}
+                  />
+                );
+              }
+            })}
       </div>
     </div>
   );

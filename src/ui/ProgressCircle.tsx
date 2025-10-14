@@ -15,6 +15,8 @@ const ProgressCircle: React.FC<IProps> = ({
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
+  const isMax = percentage === 100;
+
   return (
     <svg
       width={size}
@@ -29,7 +31,7 @@ const ProgressCircle: React.FC<IProps> = ({
         cy={size / 2}
       />
       <circle
-        className="stroke-[#9180F4]"
+        className={isMax ? "stroke-[#DE4343]" : "stroke-[#9180F4]"}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}

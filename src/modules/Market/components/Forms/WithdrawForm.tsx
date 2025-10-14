@@ -43,7 +43,7 @@ type TReserveData = {
 
 type TReservesData = Record<TAddress, TReserveData>;
 
-const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
+const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   const client = web3clients[network as keyof typeof web3clients];
@@ -108,11 +108,11 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
       : "0";
 
     const balance = Number(
-      reservesData?.[asset?.address as TAddress]?.balance ?? 0
+      reservesData?.[asset?.aToken as TAddress]?.balance ?? 0
     );
 
     const allowance = Number(
-      reservesData[asset?.address as TAddress]?.balance ?? 0
+      reservesData[asset?.aToken as TAddress]?.balance ?? 0
     );
 
     if (!value) {
@@ -122,7 +122,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     } else if (value < allowance) {
       setButton("Approve");
     } else {
-      setButton("Supply");
+      setButton("Withdraw");
     }
 
     setValue(numericValue);
@@ -132,7 +132,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        reservesData?.[asset?.address as TAddress]?.balance ?? 0,
+        reservesData?.[asset?.aToken as TAddress]?.balance ?? 0,
         2
       );
 
@@ -156,14 +156,14 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
     setReservesData((prev) => ({
       ...prev,
-      [assetData.address]: {
-        ...prev[assetData.address],
+      [asset?.aToken]: {
+        ...prev[asset?.aToken],
         allowance,
       },
     }));
 
     if (minRequired && allowance >= minRequired) {
-      setButton("Supply");
+      setButton("Withdraw");
     }
   };
 
@@ -218,7 +218,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     }
   };
 
-  const supply = async () => {
+  const withdraw = async () => {
     setTransactionInProgress(true);
 
     const amount = Number(value);
@@ -230,13 +230,13 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
       const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
 
-      const params = [assetData?.address, supplySum, $account, 0];
+      const params = [assetData?.address, supplySum, $account];
 
       const gasLimit = await getGasLimit(
         client,
         market.pool,
         AavePoolABI as Abi,
-        "supply",
+        "withdraw",
         params,
         $account as TAddress
       );
@@ -244,7 +244,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
       const tx = await writeContract(wagmiConfig, {
         address: market.pool,
         abi: AavePoolABI,
-        functionName: "supply",
+        functionName: "withdraw",
         args: params,
         gas: gasLimit,
       });
@@ -269,7 +269,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
         timestamp: new Date().getTime(),
         hash: tx,
         status: receipt?.status || "reverted",
-        type: "supply",
+        type: "withdraw",
         vault: market.pool,
         tokens: txTokens,
       });
@@ -290,7 +290,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const formHandler = async () => {
     const actionsMap: Record<string, () => Promise<void>> = {
       Approve: approve,
-      Supply: supply,
+      Withdraw: withdraw,
     };
 
     const action = actionsMap[button];
@@ -304,8 +304,9 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
       const _reservesData: TReservesData = Object.fromEntries(
         await Promise.all(
           assets.map(async (_asset) => {
-            const address = _asset.address as TAddress;
-            const decimals = getTokenData(address)?.decimals ?? 18;
+            console.log(_asset);
+            const address = _asset.aToken as TAddress;
+            const decimals = getTokenData(_asset.address)?.decimals ?? 18;
 
             const [_balanceRaw, _allowanceRaw] = await Promise.all([
               getBalance(client, address, $account),
@@ -336,7 +337,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
-          Supply {assetData?.symbol}
+          Withdraw {assetData?.symbol}
         </span>
 
         <label className="bg-[#18191C] p-4 rounded-lg block border border-[#232429]">
@@ -358,7 +359,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
           <div className="flex items-start gap-2">
             <span className="font-semibold">
               {formatNumber(
-                reservesData[asset?.address as TAddress]?.balance ?? 0,
+                reservesData[asset?.aToken as TAddress]?.balance ?? 0,
                 "format"
               )}{" "}
               {assetData?.symbol}
@@ -386,4 +387,4 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   );
 };
 
-export { SupplyForm };
+export { WithdrawForm };

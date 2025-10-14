@@ -23,6 +23,7 @@ import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
 import SwapperABI from "./abi/SwapperABI.ts";
 import IMetaVaultFactoryABI from "./abi/IMetaVaultFactoryABI.js";
+import AavePoolABI from "./abi/AavePoolABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -102,7 +103,7 @@ const walletClient = createWalletClient({
 
 const sonicClient = createPublicClient({
   chain: sonic,
-  transport: http("https://sonic.drpc.org"),
+  transport: http("https://rpc.soniclabs.com"),
 });
 
 const avalancheClient = createPublicClient({
@@ -146,4 +147,5 @@ export {
   SwapperABI,
   factories,
   IMetaVaultFactoryABI,
+  AavePoolABI,
 };
