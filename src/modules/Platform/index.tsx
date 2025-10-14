@@ -16,24 +16,35 @@ import { apiData, marketPrices } from "@store";
 //import packageJson from "../../../package.json";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
 import { IBuilderAgent } from "@stabilitydao/stability/out/agents";
+import {Indicator} from "./components/Indicator.tsx";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $marketPrices = useStore(marketPrices);
 
-  const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId);
+  const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
 
   const isAlert = $apiData?.network.status == "Alert";
   const isOk = $apiData?.network.status == "OK";
   const stblPrice = $marketPrices?.STBL;
 
+  let totalLendingMarkets = 0
+  Object.keys($apiData?.markets || []).forEach((key) => {
+    // @ts-ignore
+    totalLendingMarkets += Object.keys($apiData?.markets[key]).length;
+  })
+
+  const lastMonthBurnRate = builderAgent.burnRate[builderAgent.burnRate.length - 1]
+
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
+      <PlatformUpgrade />
+
       <h2 className="text-[26px] font-bold">DAO</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-3">
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <span className="flex w-[100px] items-center">
+          <span className="flex items-center mr-[40px]">
             <img
               src="/features/stbl.png"
               alt="STBL"
@@ -41,85 +52,62 @@ const Platform = (): JSX.Element => {
             />
             <span className="font-bold text-[20px]">STBL</span>
           </span>
-          {stblPrice && (
-            <div className="flex">
-              <span className="flex">
-                <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                  <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                    Price
-                  </span>
-                  <div className="font-semibold leading-6 flex items-start gap-0 flex-col mr-[40px]">
-                    <span className="font-bold text-[18px] ">
-                      ${stblPrice.price}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[16px]",
-                        stblPrice.priceChange >= 0
-                          ? "text-[#48C05C]"
-                          : "text-[#DE4343]"
-                      )}
-                    >
-                      {stblPrice.priceChange > 0 ? "+" : ""}
-                      {stblPrice.priceChange}%
-                    </span>
-                  </div>
-                </div>
-              </span>
+          <div className="flex justify-end">
 
-              <span className="flex">
-                <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-                  <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                    FDV
-                  </span>
-                  <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                    <span className="font-bold text-[18px]">
-                      {formatNumber(+stblPrice.price * 100000000, "abbreviate")}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[16px]",
-                        stblPrice.priceChange >= 0
-                          ? "text-[#48C05C]"
-                          : "text-[#DE4343]"
-                      )}
-                    >
+            <Indicator
+              title="Price"
+              value={stblPrice ? stblPrice.price : ''}
+              subValue={stblPrice ? <span
+                className={cn(
+                  "text-[16px]",
+                  stblPrice.priceChange >= 0
+                    ? "text-[#48C05C]"
+                    : "text-[#DE4343]"
+                )}
+              >
                       {stblPrice.priceChange > 0 ? "+" : ""}
-                      {formatNumber(
-                        (stblPrice.priceChange * +stblPrice.price * 100000000) /
-                          100,
-                        "abbreviate"
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </span>
-            </div>
-          )}
+                {stblPrice.priceChange}%
+                    </span> : ''}
+            />
+
+            <Indicator
+              title="FDV"
+              value={stblPrice ? formatNumber(+stblPrice.price * 100000000, "abbreviate") : ''}
+              subValue={stblPrice ? <span
+                className={cn(
+                  "text-[16px]",
+                  stblPrice.priceChange >= 0
+                    ? "text-[#48C05C]"
+                    : "text-[#DE4343]"
+                )}
+              >
+                      {stblPrice.priceChange > 0 ? "+" : ""}
+                {formatNumber(
+                  (stblPrice.priceChange * +stblPrice.price * 100000000) /
+                  100,
+                  "abbreviate"
+                )}
+                    </span> : ''}
+            />
+
+          </div>
         </div>
 
-        <div className="flex w-full lg:w-1/2 items-center  p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+        <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <span className="font-bold mr-[40px]">Staked</span>
-          <span className="flex">
-            <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0 mr-[40px]">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                Total
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">{"??"} STBL</span>
-                <span className="text-[16px]">$ ?</span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                Pending APR
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">{"??"}%</span>
-                <span className="text-[16px]">+/- ?%</span>
-              </div>
-            </div>
-          </span>
+
+          <div className="flex justify-end">
+            <Indicator
+              title="Total"
+              value={$apiData?.total.xSTBLStaked ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateIntegerNotUsd")} STBL` : ' '}
+              subValue={$apiData?.total.xSTBLStaked ? formatNumber(+$apiData?.total.xSTBLStaked * +stblPrice?.price, "abbreviate") : ' '}
+            />
+            <Indicator
+              title="Pending APR"
+              value={$apiData?.total.xSTBLPendingRevenue ? `${formatNumber($apiData?.total.xSTBLPendingAPR, "formatAPR")}%` : ' '}
+              subValue={$apiData?.total.xSTBLPendingRevenue ? formatNumber($apiData?.total.xSTBLPendingRevenue * +stblPrice?.price, "abbreviate") : ' '}
+            />
+          </div>
         </div>
       </div>
 
@@ -128,36 +116,26 @@ const Platform = (): JSX.Element => {
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
         <div className="flex w-full flex-wrap lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="flex font-bold">Yield aggregator</div>
-          <div className="flex">
-            <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                TVL
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">
-                  {formatNumber($apiData?.total.tvl || 0, "abbreviate")}
-                </span>
-                <span className="text-[16px]">
-                  {$apiData?.total.activeVaults} vaults
-                </span>
-              </div>
-            </div>
+          <div className="flex justify-end">
+
+            <Indicator
+              title="TVL"
+              value={$apiData?.total.tvl ? formatNumber($apiData.total.tvl, "abbreviate") : ' '}
+              subValue={$apiData?.total.activeVaults ? `${$apiData?.total.activeVaults} vaults` : ' '}
+            />
+
           </div>
         </div>
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="flex font-bold">Lending</div>
-          <div className="flex">
-            <div className="flex flex-col gap-1 w-[100px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                TVL
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">
-                  {formatNumber($apiData?.total.marketTvl || 0, "abbreviate")}
-                </span>
-                <span className="text-[16px]">3 markets</span>
-              </div>
-            </div>
+          <div className="flex justify-end">
+
+            <Indicator
+              title="TVL"
+              value={$apiData?.total.marketTvl ? formatNumber($apiData.total.marketTvl, "abbreviate") : ' '}
+              subValue={$apiData?.markets ? `${totalLendingMarkets} markets` : ' '}
+            />
+
           </div>
         </div>
       </div>
@@ -165,15 +143,13 @@ const Platform = (): JSX.Element => {
       <h2 className="text-[26px] font-bold">Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
-        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px]  items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div>Stability Operator</div>
+        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold">Stability Operator</div>
           <div className="flex w-full">
-            <div className="flex flex-col  min-w-[120px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                Status
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">
+
+            <Indicator
+              title="Status"
+              value={<span className="font-bold text-[18px]">
                   <span
                     className="font-bold px-[10px]"
                     style={{
@@ -186,56 +162,46 @@ const Platform = (): JSX.Element => {
                   >
                     {$apiData?.network.status}
                   </span>
-                </span>
-                <span className="text-[16px] whitespace-nowrap">
-                  {
-                    Object.keys(
-                      $apiData?.network.healthCheckReview.alerts || []
-                    ).length
-                  }{" "}
-                  alerts
-                </span>
-              </div>
-            </div>
+                </span>}
+              subValue={`${
+                Object.keys(
+                  $apiData?.network.healthCheckReview.alerts || []
+                ).length
+              } alerts`}
+            />
 
-            <div className="flex flex-col w-[160px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                Machines
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-                <span className="font-bold text-[18px]">
-                  {Object.keys($apiData?.network.nodes || [])
-                    .filter((machingId) => {
-                      const nodeState = $apiData?.network.nodes[
-                        machingId
-                      ] as unknown as NodeState | undefined;
-                      return !!(
-                        nodeState?.lastSeen &&
-                        new Date().getTime() / 1000 - nodeState.lastSeen < 180
-                      );
-                    })
-                    .length.toString()}
-                </span>
-                <span className="text-[16px] whitespace-nowrap">
-                  {seeds.length} seeds
-                </span>
-              </div>
-            </div>
+            <Indicator
+              title="Machines"
+              value={Object.keys($apiData?.network.nodes || [])
+                .filter((machingId) => {
+                  const nodeState = $apiData?.network.nodes[
+                    machingId
+                    ] as unknown as NodeState | undefined;
+                  return !!(
+                    nodeState?.lastSeen &&
+                    new Date().getTime() / 1000 - nodeState.lastSeen < 180
+                  );
+                })
+                .length.toString()}
+              subValue={`${seeds.length} seeds`}
+            />
+
           </div>
         </div>
-        <div className="flex w-full flex-wrap lg:w-1/2 items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div>Stability Builder</div>
+        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold">Stability Builder</div>
           <div className="flex w-full">
-            <div className="flex flex-col gap-[10px] min-w-[100px] md:w-auto mt-2 md:mt-0">
-              <span className="text-[#97979A] text-[14px] leading-5 font-medium flex">
-                Repositories
-              </span>
-              <div className="font-semibold leading-6 flex items-start gap-0">
-                <span className="font-bold text-[18px]">
-                  {builderAgent.repo.length}
-                </span>
-              </div>
-            </div>
+            <Indicator
+              title="Repositories"
+              value={builderAgent.repo.length}
+              subValue={`? issues`}
+            />
+            <Indicator
+              title="Burn rate"
+              value={formatNumber(lastMonthBurnRate.usdAmount, "abbreviate")}
+              subValue={lastMonthBurnRate.period}
+            />
+
           </div>
         </div>
       </div>
@@ -304,8 +270,6 @@ const Platform = (): JSX.Element => {
           </div>
         </div>
       </div>
-
-      <PlatformUpgrade />
 
       <h2 className="text-[26px] font-bold">Service tools</h2>
 

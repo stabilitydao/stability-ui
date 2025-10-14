@@ -166,7 +166,7 @@ const PlatformUpgrade = (): JSX.Element => {
       {!!platformUpdates?.newVersion &&
       platformUpdates?.newVersion != $platformVersions[$currentChainID] &&
       !!upgradesTable?.length ? (
-        <div className="p-3 bg-accent-950 rounded-[10px] mx-6">
+        <div className="p-3 bg-[#350a57] rounded-[10px] mx-6">
           <h3 className="mb-2 text-[18px] font-medium">
             Time-locked platform upgrade in progress
           </h3>
