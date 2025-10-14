@@ -28,6 +28,7 @@ import { Metavault } from "./Metavault";
 import { Lending } from "./Lending";
 import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
 import { Market } from "./Market";
+import { StabilityBuilder } from "./Platform";
 
 export {
   Factory,
@@ -60,4 +61,5 @@ export {
   MetavaultsManagement,
   Market,
   Season1,
+  StabilityBuilder,
 };

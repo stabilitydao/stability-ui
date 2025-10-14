@@ -1,0 +1,13 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {StabilityBuilder} from "@modules"
+---
+
+<Layout title="Builder"
+        img="/ogs/pages/agents.png"
+        metaTitle="Stability Builder"
+        metaUrl="https://stability.farm/builder"
+        metaDescription="Stability Builder work space."
+>
+    <StabilityBuilder client:only="react"/>
+</Layout>
