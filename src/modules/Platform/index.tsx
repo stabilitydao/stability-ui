@@ -17,6 +17,7 @@ import { apiData, marketPrices } from "@store";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
 import { IBuilderAgent } from "@stabilitydao/stability/out/agents";
 import {Indicator} from "./components/Indicator.tsx";
+import {StabilityBuilder} from "./components/StabilityBuilder.tsx";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
@@ -40,22 +41,22 @@ const Platform = (): JSX.Element => {
     <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
       <PlatformUpgrade />
 
-      <h2 className="text-[26px] font-bold">DAO</h2>
+      <h2 className="text-[26px] font-bold">🏛️ DAO</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-3">
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <span className="flex items-center mr-[40px]">
+          <span className="flex items-center mr-[40px] mt-[7px]">
             <img
               src="/features/stbl.png"
               alt="STBL"
               className="w-[24px] h-[24px] mr-[4px]"
             />
-            <span className="font-bold text-[20px]">STBL</span>
+            <span className="font-bold mt-[0px] text-[18px]">STBL</span>
           </span>
           <div className="flex justify-end">
 
             <Indicator
-              title="Price"
+              title="🚀 Price"
               value={stblPrice ? stblPrice.price : ''}
               subValue={stblPrice ? <span
                 className={cn(
@@ -94,7 +95,7 @@ const Platform = (): JSX.Element => {
         </div>
 
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <span className="font-bold mr-[40px]">Staked</span>
+          <span className="font-bold mt-[6px] text-[18px]">Staked</span>
 
           <div className="flex justify-end">
             <Indicator
@@ -111,11 +112,11 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <h2 className="text-[26px] font-bold">Protocols</h2>
+      <h2 className="text-[26px] font-bold">💰 Protocols</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
         <div className="flex w-full flex-wrap lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="flex font-bold">Yield aggregator</div>
+          <div className="flex font-bold">🧑‍🌾 Yield aggregator</div>
           <div className="flex justify-end">
 
             <Indicator
@@ -127,7 +128,7 @@ const Platform = (): JSX.Element => {
           </div>
         </div>
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="flex font-bold">Lending</div>
+          <div className="flex font-bold">🏦 Lending</div>
           <div className="flex justify-end">
 
             <Indicator
@@ -140,11 +141,11 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <h2 className="text-[26px] font-bold">Agents</h2>
+      <h2 className="text-[26px] font-bold">🤖 Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
         <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="font-bold">Stability Operator</div>
+          <div className="font-bold flex items-center gap-[10px]">Stability Operator <a target="_blank" href="https://t.me/stability_dao_bot"><img className="w-[20px]" src="/socials/telegram.svg" alt="Telegram" title="Agent's telegram account" /></a></div>
           <div className="flex w-full">
 
             <Indicator
@@ -197,7 +198,7 @@ const Platform = (): JSX.Element => {
               subValue={`? issues`}
             />
             <Indicator
-              title="Burn rate"
+              title="🍞 Burn rate"
               value={formatNumber(lastMonthBurnRate.usdAmount, "abbreviate")}
               subValue={lastMonthBurnRate.period}
             />
@@ -206,7 +207,7 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <h2 className="text-[26px] font-bold">Library</h2>
+      <h2 className="text-[26px] font-bold">📦 Library</h2>
 
       <div className="flex flex-wrap gap-[30px] mb-5">
         <a
@@ -234,7 +235,7 @@ const Platform = (): JSX.Element => {
         </a>
 
         <a
-          className="px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
           href="/strategies"
           title="View all strategies"
         >
@@ -271,7 +272,7 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <h2 className="text-[26px] font-bold">Service tools</h2>
+      <h2 className="text-[26px] font-bold">🛠️ Service tools</h2>
 
       <div className="flex flex-wrap gap-[30px] mb-5">
         <a
@@ -301,4 +302,4 @@ const Platform = (): JSX.Element => {
   );
 };
 
-export { Platform };
+export { Platform, StabilityBuilder };
