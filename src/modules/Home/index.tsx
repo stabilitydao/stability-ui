@@ -62,6 +62,12 @@ const Home = (): JSX.Element => {
               >
                 Leveraged Farming
               </a>
+              <a
+                className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
+                href="/lending"
+              >
+                Lending
+              </a>
             </div>
           </div>
         </main>
