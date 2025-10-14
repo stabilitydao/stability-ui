@@ -5,6 +5,7 @@ import { RepayTab } from "./Tabs/RepayTab";
 // import { LeverageTab } from "./Tabs/LeverageTab";
 import { InformationTab } from "./Tabs/InformationTab";
 import { UsersTab } from "./Tabs/UsersTab";
+import { LiquidationsTab } from "./Tabs/LiquidationsTab";
 
 import { MarketSectionTypes, TMarketReserve, TMarket } from "@types";
 
@@ -43,9 +44,23 @@ const MarketTabs: React.FC<TProps> = ({
         />
       );
     case MarketSectionTypes.Borrow:
-      return <BorrowTab asset={asset} />;
+      return (
+        <BorrowTab
+          network={network}
+          market={marketData}
+          asset={asset}
+          assets={marketData?.reserves}
+        />
+      );
     case MarketSectionTypes.Repay:
-      return <RepayTab asset={asset} />;
+      return (
+        <RepayTab
+          network={network}
+          market={marketData}
+          asset={asset}
+          assets={marketData?.reserves}
+        />
+      );
     // case MarketSectionTypes.Leverage:
     //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:
@@ -58,6 +73,8 @@ const MarketTabs: React.FC<TProps> = ({
       );
     case MarketSectionTypes.Users:
       return <UsersTab network={network} market={market} />;
+    case MarketSectionTypes.Liquidations:
+      return <LiquidationsTab network={network} market={market} />;
     default:
       return null;
   }

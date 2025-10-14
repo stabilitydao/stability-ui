@@ -49,6 +49,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   };
 
   const handleSectionChange = (section: MarketSectionTypes) => {
+    if (section === MarketSectionTypes.Operations) {
+      section = MarketSectionTypes.Supply;
+    }
+
     if (section === MarketSectionTypes.Supply) {
       updateQueryParams({ section: null });
     } else {

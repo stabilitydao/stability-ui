@@ -24,6 +24,7 @@ import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
 import SwapperABI from "./abi/SwapperABI.ts";
 import IMetaVaultFactoryABI from "./abi/IMetaVaultFactoryABI.js";
 import AavePoolABI from "./abi/AavePoolABI.ts";
+import AaveProtocolDataProviderABI from "./abi/AaveProtocolDataProviderABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -148,4 +149,5 @@ export {
   factories,
   IMetaVaultFactoryABI,
   AavePoolABI,
+  AaveProtocolDataProviderABI,
 };

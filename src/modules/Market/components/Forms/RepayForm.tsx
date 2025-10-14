@@ -12,8 +12,8 @@ import {
   cn,
   getTokenData,
   exactToFixed,
-  getBalance,
   formatNumber,
+  getAllowance,
   getTransactionReceipt,
   setLocalStoreHash,
 } from "@utils";
@@ -22,7 +22,13 @@ import { getGasLimit } from "../../functions/getGasLimit";
 
 import { account, connected, currentChainID, lastTx } from "@store";
 
-import { web3clients, wagmiConfig, AavePoolABI } from "@web3";
+import {
+  web3clients,
+  wagmiConfig,
+  AavePoolABI,
+  ERC20ABI,
+  AaveProtocolDataProviderABI,
+} from "@web3";
 
 import type { TMarketReserve, TMarket, TAddress } from "@types";
 
@@ -35,9 +41,14 @@ type TProps = {
   assets: TMarketReserve[] | undefined;
 };
 
-type TReservesData = Record<TAddress, string>;
+type TReserveData = {
+  balance: string;
+  allowance: string;
+};
 
-const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
+type TReservesData = Record<TAddress, TReserveData>;
+
+const RepayForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   const client = web3clients[network as keyof typeof web3clients];
@@ -101,14 +112,22 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
         )
       : "0";
 
-    const balance = Number(reservesData?.[asset?.aToken as TAddress] ?? 0);
+    const balance = Number(
+      reservesData?.[asset?.address as TAddress]?.balance ?? 0
+    );
+
+    const allowance = Number(
+      reservesData[asset?.address as TAddress]?.allowance ?? 0
+    );
 
     if (!value) {
       setButton("");
     } else if (value > balance) {
       setButton("insufficientBalance");
+    } else if (value > allowance) {
+      setButton("Approve");
     } else {
-      setButton("Withdraw");
+      setButton("Repay");
     }
 
     setValue(numericValue);
@@ -118,7 +137,7 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        reservesData?.[asset?.aToken as TAddress] ?? 0,
+        reservesData?.[asset?.address as TAddress]?.balance ?? 0,
         2
       );
 
@@ -126,7 +145,85 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     }
   };
 
-  const withdraw = async () => {
+  const updateAllowance = async (minRequired?: number) => {
+    if (!assetData?.address || !$account) return;
+
+    const rawAllowance = await getAllowance(
+      client,
+      assetData.address,
+      $account,
+      market.pool
+    );
+
+    const allowance = Number(
+      formatUnits(rawAllowance, assetData.decimals ?? 18)
+    );
+
+    setReservesData((prev) => ({
+      ...prev,
+      [assetData.address]: {
+        ...prev[assetData.address],
+        allowance,
+      },
+    }));
+
+    if (minRequired && allowance >= minRequired) {
+      setButton("Repay");
+    }
+  };
+
+  const approve = async () => {
+    setTransactionInProgress(true);
+
+    const amount = Number(value);
+
+    if (!$account || !amount) return;
+
+    try {
+      setNeedConfirm(true);
+
+      const approveSum = parseUnits(String(amount), assetData?.decimals ?? 18);
+
+      const params: [TAddress, bigint] = [market.pool, approveSum];
+
+      const gasLimit = await getGasLimit(
+        client,
+        assetData?.address as TAddress,
+        ERC20ABI,
+        "approve",
+        params,
+        $account
+      );
+
+      const tx = await writeContract(wagmiConfig, {
+        address: assetData?.address as TAddress,
+        abi: ERC20ABI,
+        functionName: "approve",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const receipt = await getTransactionReceipt(tx);
+
+      if (receipt?.status === "success") {
+        lastTx.set(receipt?.transactionHash);
+        await updateAllowance(amount);
+      }
+    } catch (error) {
+      setNeedConfirm(false);
+      await updateAllowance(amount);
+
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+
+  const repay = async () => {
     setTransactionInProgress(true);
 
     const amount = Number(value);
@@ -138,13 +235,13 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
       const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
 
-      const params = [assetData?.address, supplySum, $account];
+      const params = [assetData?.address, supplySum, BigInt(2), $account];
 
       const gasLimit = await getGasLimit(
         client,
         market.pool,
         AavePoolABI as Abi,
-        "withdraw",
+        "repay",
         params,
         $account as TAddress
       );
@@ -152,7 +249,7 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
       const tx = await writeContract(wagmiConfig, {
         address: market.pool,
         abi: AavePoolABI,
-        functionName: "withdraw",
+        functionName: "repay",
         args: params,
         gas: gasLimit,
       });
@@ -177,7 +274,7 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
         timestamp: new Date().getTime(),
         hash: tx,
         status: receipt?.status || "reverted",
-        type: "withdraw",
+        type: "repay",
         vault: market.pool,
         tokens: txTokens,
       });
@@ -197,7 +294,8 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
   const formHandler = async () => {
     const actionsMap: Record<string, () => Promise<void>> = {
-      Withdraw: withdraw,
+      Approve: approve,
+      Repay: repay,
     };
 
     const action = actionsMap[button];
@@ -208,22 +306,42 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
   const initData = async () => {
     if ($connected && $account && assets?.length) {
-      const _reservesData: TReservesData = Object.fromEntries(
-        await Promise.all(
-          assets.map(async (_asset) => {
-            const address = _asset.aToken as TAddress;
-            const decimals = getTokenData(_asset.address)?.decimals ?? 18;
+      try {
+        const _reservesData: TReservesData = Object.fromEntries(
+          await Promise.all(
+            assets.map(async (_asset) => {
+              const address = _asset.address as TAddress;
+              const decimals = getTokenData(address)?.decimals ?? 18;
 
-            const _balanceRaw = await getBalance(client, address, $account);
+              const userData = (await client.readContract({
+                address: market.protocolDataProvider,
+                abi: AaveProtocolDataProviderABI,
+                functionName: "getUserReserveData",
+                args: [_asset.address, $account as TAddress],
+              })) as bigint;
 
-            const balance = formatUnits(_balanceRaw, decimals);
+              const rawVariableDebt = userData[2];
 
-            return [address, balance] as const;
-          })
-        )
-      );
+              const balance = formatUnits(rawVariableDebt, decimals);
 
-      setReservesData(_reservesData);
+              const _allowanceRaw = await getAllowance(
+                client,
+                address,
+                $account,
+                market.pool
+              );
+
+              const allowance = formatUnits(_allowanceRaw, decimals);
+
+              return [address, { balance, allowance }] as const;
+            })
+          )
+        );
+
+        setReservesData(_reservesData);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -239,7 +357,7 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
-          Withdraw {assetData?.symbol}
+          Repay {assetData?.symbol}
         </span>
 
         <label className="bg-[#18191C] p-4 rounded-lg block border border-[#232429]">
@@ -257,13 +375,11 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
           </div>
         </label>
         <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
-          <span className="text-[#7C7E81] font-medium">
-            Available to withdraw
-          </span>
+          <span className="text-[#7C7E81] font-medium">Available to repay</span>
           <div className="flex items-start gap-2">
             <span className="font-semibold">
               {formatNumber(
-                reservesData[asset?.aToken as TAddress] ?? 0,
+                reservesData[asset?.address as TAddress]?.balance ?? 0,
                 "format"
               )}{" "}
               {assetData?.symbol}
@@ -291,4 +407,4 @@ const WithdrawForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   );
 };
 
-export { WithdrawForm };
+export { RepayForm };

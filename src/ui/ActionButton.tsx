@@ -44,6 +44,8 @@ const ActionButton: React.FC<IProps> = ({
     "Wrap",
     "Unwrap",
     "Supply",
+    "Borrow",
+    "Repay",
   ];
 
   return (

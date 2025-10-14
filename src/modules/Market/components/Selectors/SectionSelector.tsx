@@ -19,6 +19,20 @@ const SectionSelector: React.FC<TProps> = ({
   activeSection,
   handleSectionChange,
 }) => {
+  const mobileMainSections = [
+    MarketSectionTypes.Operations,
+    MarketSectionTypes.Information,
+    MarketSectionTypes.Users,
+    MarketSectionTypes.Liquidations,
+  ];
+
+  const operations = [
+    MarketSectionTypes.Supply,
+    MarketSectionTypes.Withdraw,
+    MarketSectionTypes.Borrow,
+    MarketSectionTypes.Repay,
+  ];
+
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
@@ -43,16 +57,20 @@ const SectionSelector: React.FC<TProps> = ({
           dragConstraints={{ right: 0, left: -width }}
           whileTap={{ cursor: "grabbing" }}
         >
-          {MARKET_SECTIONS.map((section: MarketSectionTypes) => {
+          {mobileMainSections.map((section: MarketSectionTypes) => {
             // temp
             if (section === "Users" && market === "Main") return null;
 
+            const isActiveSection =
+              activeSection === section ||
+              (operations.includes(activeSection) && section === "Operations");
+
             return (
               <motion.div
-                key={section}
+                key={`mobile-${section}`}
                 className={cn(
                   "min-w-[70px] flex-shrink-0 flex items-center gap-2 py-2 px-3 rounded-lg border",
-                  activeSection === section
+                  isActiveSection
                     ? "bg-[#232429] border-[#35363B]"
                     : " bg-transparent border-[#232429]"
                 )}
@@ -61,7 +79,7 @@ const SectionSelector: React.FC<TProps> = ({
                 <span
                   className={cn(
                     "text-[14px] leading-5 font-medium pointer-events-none select-none",
-                    activeSection === section ? "text-white" : "text-[#7C7E81]"
+                    isActiveSection ? "text-white" : "text-[#7C7E81]"
                   )}
                 >
                   {section}
@@ -72,14 +90,54 @@ const SectionSelector: React.FC<TProps> = ({
         </motion.div>
       </motion.div>
 
+      {operations.includes(activeSection) ? (
+        <motion.div
+          ref={carouselRef}
+          className="block md:hidden cursor-grab overflow-hidden mt-3"
+        >
+          <motion.div
+            className="flex items-center gap-2"
+            drag="x"
+            dragConstraints={{ right: 0, left: -width }}
+            whileTap={{ cursor: "grabbing" }}
+          >
+            {operations.map((section: MarketSectionTypes) => {
+              return (
+                <motion.div
+                  key={`operation-${section}`}
+                  className={cn(
+                    "min-w-[70px] flex-shrink-0 flex items-center gap-2 py-2 px-3 rounded-lg border",
+                    activeSection === section
+                      ? "bg-[#232429] border-[#35363B]"
+                      : " bg-transparent border-[#232429]"
+                  )}
+                  onClick={() => handleSectionChange(section)}
+                >
+                  <span
+                    className={cn(
+                      "text-[14px] leading-5 font-medium pointer-events-none select-none",
+                      activeSection === section
+                        ? "text-white"
+                        : "text-[#7C7E81]"
+                    )}
+                  >
+                    {section}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </motion.div>
+      ) : null}
+
       <div className="hidden md:flex items-center justify-end gap-2">
-        {MARKET_SECTIONS.map((section: MarketSectionTypes) => {
+        {MARKET_SECTIONS.slice(1).map((section: MarketSectionTypes) => {
           // temp
           if (section === "Users" && market === "Main") return null;
 
           return (
             <div
-              key={section}
+              key={`desktop-${section}`}
               className={cn(
                 "flex items-center gap-2 py-2 px-3 rounded-lg border cursor-pointer",
                 activeSection === section

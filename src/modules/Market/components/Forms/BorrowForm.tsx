@@ -1,17 +1,264 @@
-import { cn, getTokenData } from "@utils";
+import { useState, useEffect } from "react";
 
-import type { TMarketReserve, TAddress } from "@types";
+import { useStore } from "@nanostores/react";
+
+import { formatUnits, parseUnits } from "viem";
+
+import { writeContract } from "@wagmi/core";
+
+import { ActionButton } from "@ui";
+
+import {
+  cn,
+  getTokenData,
+  exactToFixed,
+  getBalance,
+  formatNumber,
+  getTransactionReceipt,
+  setLocalStoreHash,
+} from "@utils";
+
+import { getGasLimit } from "../../functions/getGasLimit";
+
+import { account, connected, currentChainID, lastTx } from "@store";
+
+import { web3clients, wagmiConfig, AavePoolABI } from "@web3";
+
+import type { TMarketReserve, TMarket, TAddress } from "@types";
+
+import type { Abi } from "viem";
 
 type TProps = {
+  network: string;
+  market: TMarket;
   asset: TMarketReserve | undefined;
+  assets: TMarketReserve[] | undefined;
 };
 
-const BorrowForm: React.FC<TProps> = ({ asset }) => {
+type TReservesData = Record<TAddress, string>;
+
+const BorrowForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
-  const isUnderDevelopment = true;
+  const client = web3clients[network as keyof typeof web3clients];
 
-  return !isUnderDevelopment ? (
+  const $connected = useStore(connected);
+  const $account = useStore(account);
+  const $currentChainID = useStore(currentChainID);
+  const $lastTx = useStore(lastTx);
+
+  const [value, setValue] = useState<string>("");
+  const [usdValue, setUsdValue] = useState<string>("$0");
+  const [button, setButton] = useState<string>("");
+  const [transactionInProgress, setTransactionInProgress] =
+    useState<boolean>(false);
+
+  const [needConfirm, setNeedConfirm] = useState<boolean>(false);
+
+  const [reservesData, setReservesData] = useState<TReservesData>({});
+
+  // todo: add errors on ui
+  const errorHandler = (err: Error) => {
+    refreshForm();
+    lastTx.set("No transaction hash...");
+    if (err instanceof Error) {
+      // const errorData = {
+      //   state: true,
+      //   type: err.name,
+      //   description: getShortMessage(err.message),
+      // };
+    }
+    alert("TX ERROR");
+    console.error("ERROR:", err);
+  };
+
+  const refreshForm = () => {
+    setValue("");
+    setUsdValue("$0");
+    setButton("");
+    setTransactionInProgress(false);
+    setNeedConfirm(false);
+  };
+
+  const handleInputChange = (inputValue: string) => {
+    let numericValue = inputValue.replace(/[^0-9.]/g, "");
+
+    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+
+    if (numericValue.startsWith(".")) {
+      numericValue = "0" + numericValue;
+    }
+
+    const value = Number(numericValue);
+    const tokenPrice = Number(asset?.price);
+
+    const _usdValue = value * tokenPrice;
+
+    const formattedUsdValue = !!_usdValue
+      ? formatNumber(
+          value * tokenPrice,
+          _usdValue > 1 ? "abbreviate" : "smallNumbers"
+        )
+      : "0";
+
+    const balance = Number(reservesData?.[asset?.address as TAddress] ?? 0);
+
+    if (!value) {
+      setButton("");
+    } else if (value > balance) {
+      setButton("insufficientBalance");
+    } else {
+      setButton("Borrow");
+    }
+
+    setValue(numericValue);
+    setUsdValue(`$${formattedUsdValue}`);
+  };
+
+  const handleMaxInputChange = () => {
+    if ($connected) {
+      const _maxBalance = exactToFixed(
+        reservesData?.[asset?.address as TAddress] ?? 0,
+        10
+      );
+
+      handleInputChange(_maxBalance);
+    }
+  };
+
+  const borrow = async () => {
+    setTransactionInProgress(true);
+
+    const amount = Number(value);
+
+    if (!$account || !amount) return;
+
+    try {
+      setNeedConfirm(true);
+
+      const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
+
+      const params = [assetData?.address, supplySum, BigInt(2), 0, $account];
+
+      const gasLimit = await getGasLimit(
+        client,
+        market.pool,
+        AavePoolABI as Abi,
+        "borrow",
+        params,
+        $account as TAddress
+      );
+
+      const tx = await writeContract(wagmiConfig, {
+        address: market.pool,
+        abi: AavePoolABI,
+        functionName: "borrow",
+        args: params,
+        gas: gasLimit,
+      });
+
+      setNeedConfirm(false);
+
+      const receipt = await getTransactionReceipt(tx);
+
+      let txTokens = {};
+
+      if (assetData?.address) {
+        txTokens = {
+          [assetData.address]: {
+            amount,
+            symbol: assetData.symbol,
+            logo: assetData.logoURI,
+          },
+        };
+      }
+
+      setLocalStoreHash({
+        timestamp: new Date().getTime(),
+        hash: tx,
+        status: receipt?.status || "reverted",
+        type: "Borrow",
+        vault: market.pool,
+        tokens: txTokens,
+      });
+
+      if (receipt?.status === "success") {
+        lastTx.set(receipt?.transactionHash);
+
+        refreshForm();
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        errorHandler(error);
+      }
+    }
+    setTransactionInProgress(false);
+  };
+
+  const formHandler = async () => {
+    const actionsMap: Record<string, () => Promise<void>> = {
+      Borrow: borrow,
+    };
+
+    const action = actionsMap[button];
+    if (action) {
+      await action();
+    }
+  };
+
+  const initData = async () => {
+    if ($connected && $account && assets?.length) {
+      try {
+        const userData = (await client.readContract({
+          address: market.pool,
+          abi: AavePoolABI,
+          functionName: "getUserAccountData",
+          args: [$account as TAddress],
+        })) as bigint;
+
+        const _reservesData: TReservesData = Object.fromEntries(
+          await Promise.all(
+            assets.map(async (_asset) => {
+              const address = _asset.address as TAddress;
+
+              let balance = "0";
+
+              const availableBorrowsBase = Number(formatUnits(userData[2], 8));
+              const tokenDecimals = _asset.decimals ?? 18;
+              const tokenPrice = Number(_asset.price);
+
+              if (availableBorrowsBase > 0 && tokenPrice > 0) {
+                const rawAmount =
+                  (availableBorrowsBase / tokenPrice) * 10 ** tokenDecimals;
+
+                const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
+
+                const formattedAmount = formatUnits(safeAmount, tokenDecimals);
+
+                balance = String(formattedAmount);
+              }
+
+              return [address, balance] as const;
+            })
+          )
+        );
+
+        setReservesData(_reservesData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    refreshForm();
+  }, [asset]);
+
+  useEffect(() => {
+    initData();
+  }, [$connected, $account, $currentChainID, $lastTx]);
+
+  return (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
@@ -23,43 +270,47 @@ const BorrowForm: React.FC<TProps> = ({ asset }) => {
             <input
               type="text"
               placeholder="0"
-              value="100"
-              // value={value}
-              //onChange={handleInputChange}
+              value={value}
+              onChange={(e) => handleInputChange(e?.target?.value)}
               className="bg-transparent text-2xl font-medium outline-none w-full"
             />
           </div>
           <div className="text-[#7C7E81] font-medium text-[14px] leading-5">
-            $32.84
+            {usdValue}
           </div>
         </label>
-        <div className="flex flex-col gap-2 text-[16px] leading-6">
-          <span className="text-[#7C7E81]">Available in the market</span>
-          <div className="flex flex-col">
+        <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
+          <span className="text-[#7C7E81] font-medium">
+            Available to borrow
+          </span>
+          <div className="flex items-start gap-2">
             <span className="font-semibold">
-              82,264,083 {assetData?.symbol}
+              {formatNumber(
+                reservesData[asset?.address as TAddress] ?? 0,
+                "format"
+              )}{" "}
+              {assetData?.symbol}
             </span>
-            <span className="text-[#7C7E81]">$27m</span>
+            <button
+              className={cn(
+                "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",
+                $connected && "cursor-pointer"
+              )}
+              onClick={handleMaxInputChange}
+            >
+              Max
+            </button>
           </div>
         </div>
       </div>
 
-      <button
-        className={cn(
-          "bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold"
-        )}
-        type="button"
-      >
-        <div className="flex items-center justify-center gap-2 px-6 py-4">
-          Borrow
-        </div>
-      </button>
-    </div>
-  ) : (
-    <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 h-[340px]">
-      <span className="font-bold text-[20px] leading-6 flex items-center justify-center text-center h-full">
-        This form is under development
-      </span>
+      <ActionButton
+        type={button}
+        network={network}
+        transactionInProgress={transactionInProgress}
+        needConfirm={needConfirm}
+        actionFunction={formHandler}
+      />
     </div>
   );
 };

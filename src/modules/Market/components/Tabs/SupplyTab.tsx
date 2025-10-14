@@ -1,5 +1,5 @@
 import { SupplyForm } from "../Forms/SupplyForm";
-import { SupplyStats } from "../Stats/SupplyStats";
+// import { SupplyStats } from "../Stats/SupplyStats";
 
 import type { TMarketReserve, TMarket } from "@types";
 
@@ -19,12 +19,12 @@ const SupplyTab: React.FC<TProps> = ({ network, market, asset, assets }) => {
         asset={asset}
         assets={assets}
       />
-      <SupplyStats
+      {/* <SupplyStats
         network={network}
         market={market}
         asset={asset}
         assets={assets}
-      />
+      /> */}
     </div>
   );
 };

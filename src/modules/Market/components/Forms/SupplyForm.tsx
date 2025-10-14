@@ -112,14 +112,14 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     );
 
     const allowance = Number(
-      reservesData[asset?.address as TAddress]?.balance ?? 0
+      reservesData[asset?.address as TAddress]?.allowance ?? 0
     );
 
     if (!value) {
       setButton("");
     } else if (value > balance) {
       setButton("insufficientBalance");
-    } else if (value < allowance) {
+    } else if (value > allowance) {
       setButton("Approve");
     } else {
       setButton("Supply");

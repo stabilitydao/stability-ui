@@ -284,7 +284,9 @@ const Vault: React.FC<IProps> = ({
             <span>
               {formatNumber(
                 vault?.proportions?.allocation as number,
-                "abbreviate"
+                Number(vault?.proportions?.allocation) < 1
+                  ? "smallNumbers"
+                  : "abbreviate"
               )?.slice(1)}
             </span>
           ) : null}
