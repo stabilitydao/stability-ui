@@ -42,33 +42,11 @@ const Chain: React.FC<IProps> = ({ chain }) => {
 
   const protocols = getChainProtocols(chain.toString());
 
-  const showChainLibIssue =
-    [
-      "AWAITING_DEVELOPER",
-      "AWAITING_DEPLOYMENT",
-      "AWAITING_ISSUE_CREATION",
-      "CHAINLIB_DEVELOPMENT",
-    ].includes(chainData.status) && chainData.chainLibGithubId;
-
   const chainInfo = [
     { name: "Chain ID", content: chain },
     {
       name: "Status",
-      content: !showChainLibIssue ? (
-        <ChainStatus status={chainData.status} />
-      ) : (
-        <div className="flex items-center">
-          <ChainStatus status={chainData.status} />
-          <a
-            className="inline-flex items-center gap-2 bg-accent-800 rounded-full ml-2"
-            href={`https://github.com/stabilitydao/stability-contracts/issues/${chainData.chainLibGithubId}`}
-            target="_blank"
-            title="Go to chain library issue page on Github"
-          >
-            <img src="/icons/github.svg" alt="Github" className="w-[20px]" />
-          </a>
-        </div>
-      ),
+      content: <ChainStatus status={chainData.status} />,
     },
     {
       name: "TVL",

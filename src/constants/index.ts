@@ -174,11 +174,20 @@ const CHAINS = [
     color: "#E84142",
     active: true,
   },
+  {
+    name: chains["9745"].name,
+    id: "9745",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["9745"].img}`,
+    explorer: "https://plasmascan.to",
+    nativeCurrency: "XPL",
+    color: "#FFFFFF",
+    active: true,
+  },
 ];
 
 const CHAINS_CONFIRMATIONS = {
   "146": 3,
-  "8453": 3,
+  "9745": 3,
   "43114": 3,
 };
 

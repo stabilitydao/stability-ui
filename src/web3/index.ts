@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http, createPublicClient } from "viem";
 
-import { avalanche, sonic } from "viem/chains";
+import { avalanche, sonic, plasma } from "viem/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -92,7 +92,7 @@ const metadata = {
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [sonic, avalanche],
+  chains: [sonic, avalanche, plasma],
   projectId: walletConnectProjectId,
   metadata,
 });
@@ -109,12 +109,18 @@ const sonicClient = createPublicClient({
 
 const avalancheClient = createPublicClient({
   chain: avalanche,
-  transport: http("https://api.avax.network/ext/bc/C/rpc"), // https://avalanche-c-chain-rpc.publicnode.com
+  transport: http("https://api.avax.network/ext/bc/C/rpc"),
+});
+
+const plasmaClient = createPublicClient({
+  chain: plasma,
+  transport: http("https://rpc.plasma.to"),
 });
 
 const web3clients = {
   "146": sonicClient,
   "43114": avalancheClient,
+  "9745": plasmaClient,
 };
 
 export {

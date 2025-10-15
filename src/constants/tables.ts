@@ -555,6 +555,12 @@ const MARKET_LIQUIDATIONS_TABLE: TTableColumn[] = [
     dataType: "number",
   },
   {
+    name: "Debt coverred",
+    keyName: "debt",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
     name: "Date",
     keyName: "timestamp",
     sortType: "none",

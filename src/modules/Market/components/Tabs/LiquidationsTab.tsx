@@ -48,7 +48,8 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
           return {
             user: liquidation.user,
             liquidator: liquidation.liquidator,
-            liquidated: liquidation?.liquidatedCollateralAmountInUSD,
+            liquidated: Number(liquidation?.liquidatedCollateralAmountInUSD),
+            debt: Number(liquidation?.debtToCoverInUSD),
             timestamp: Number(liquidation.blockTimestamp),
             date: formatTimestampToDate(liquidation?.blockTimestamp, true),
           };
@@ -106,7 +107,7 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
                   />
                 </div>
                 <div
-                  className="group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer"
+                  className="group px-2 md:px-4 w-1/5 text-start flex items-center gap-1 cursor-pointer"
                   style={{ fontFamily: "monospace" }}
                   title={liquidation?.liquidator}
                   onClick={() => copyAddress(liquidation?.liquidator)}
@@ -118,12 +119,17 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
                     alt="Copy icon"
                   />
                 </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
+                <div className="px-2 md:px-4 w-[17.5%] text-end">
                   {liquidation?.liquidated
                     ? formatNumber(liquidation?.liquidated, "abbreviate")
                     : ""}
                 </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
+                <div className="px-2 md:px-4 w-[17.5%] text-end">
+                  {liquidation?.debt
+                    ? formatNumber(liquidation?.debt, "abbreviate")
+                    : ""}
+                </div>
+                <div className="px-2 md:px-4 w-1/5 text-end">
                   {liquidation?.date}
                 </div>
               </div>
