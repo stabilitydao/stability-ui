@@ -8,10 +8,6 @@ const totalChains = getChainsTotals();
 const totalText = [
     ['Total', Object.keys(chains).length,],
     ['Supported', totalChains.SUPPORTED,],
-    ['Awaiting deployment', totalChains.AWAITING_DEPLOYMENT,],
-    ['Development', totalChains.CHAINLIB_DEVELOPMENT,],
-    ['Awaiting developer', totalChains.AWAITING_DEVELOPER,],
-    ['Awaiting issue', totalChains.AWAITING_ISSUE_CREATION,],
 ].map(text => `${text[0]}: ${text[1]}.`).join(' ')
 ---
 
