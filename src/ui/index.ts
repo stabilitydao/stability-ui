@@ -40,6 +40,9 @@ import {
   ArrowRightIcon,
 } from "./Icons";
 
+import { EmptyTable } from "./Tables/EmptyTable";
+import { LoadTable } from "./Tables/LoadTable";
+
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
@@ -125,4 +128,6 @@ export {
   MetaVaultStrategies,
   ProgressCircle,
   CustomTooltip,
+  EmptyTable,
+  LoadTable,
 };

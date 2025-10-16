@@ -777,6 +777,15 @@ type TMarket = {
   utilization?: number;
 };
 
+type TLiquidation = {
+  user: string;
+  liquidator: string;
+  liquidated: number;
+  debt: number;
+  timestamp: number;
+  date: string;
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -920,4 +929,5 @@ export type {
   TNetwork,
   TChartNames,
   TMarketUser,
+  TLiquidation,
 };

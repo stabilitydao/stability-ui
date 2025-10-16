@@ -18,6 +18,8 @@ import type {
   TVaultDataKey,
   TAPRPeriod,
   TMarketPrices,
+  TLiquidation,
+  TMarketUser,
 } from "@types";
 
 // atoms
@@ -34,6 +36,9 @@ const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
 const marketPrices = atom<TMarketPrices>({});
+
+const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
+const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
@@ -105,4 +110,6 @@ export {
   isNavbar,
   markets,
   isMarketsLoaded,
+  marketsLiquidations,
+  marketsUsers,
 };

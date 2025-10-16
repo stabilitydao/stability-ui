@@ -8,7 +8,7 @@ import "tippy.js/animations/shift-away.css";
 interface IProps {
   name: string;
   description: string;
-  isMediumText?: string;
+  isMediumText?: boolean;
 }
 
 const CustomTooltip: React.FC<IProps> = ({

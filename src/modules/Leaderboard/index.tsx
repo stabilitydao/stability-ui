@@ -4,12 +4,7 @@ import axios from "axios";
 
 import { ClaimSiloPoints } from "./components";
 
-import {
-  ArrowRightIcon,
-  FullPageLoader,
-  TableColumnSort,
-  Pagination,
-} from "@ui";
+import { ArrowRightIcon, TableColumnSort, Pagination, LoadTable } from "@ui";
 
 import { getShortAddress, sortTable, formatNumber, copyAddress } from "@utils";
 
@@ -167,11 +162,7 @@ const Leaderboard = (): JSX.Element => {
                 ))}
               </div>
             ) : (
-              <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
-                <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                  <FullPageLoader />
-                </div>
-              </div>
+              <LoadTable />
             )}
           </div>
           <Pagination

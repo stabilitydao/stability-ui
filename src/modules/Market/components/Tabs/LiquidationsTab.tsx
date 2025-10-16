@@ -1,154 +1,53 @@
-import { useState, useEffect, memo } from "react";
+import { useState, memo, useMemo } from "react";
 
-import axios from "axios";
+import { Pagination } from "@ui";
 
-import { useStore } from "@nanostores/react";
+import { ColumnSort, LiquidationTable } from "../../ui";
 
-import { FullPageLoader, Pagination } from "@ui";
+import { dataSorter, paginateData } from "@utils";
 
-import { ColumnSort } from "../../ui/ColumnSort";
-
-import {
-  getShortAddress,
-  copyAddress,
-  formatTimestampToDate,
-  dataSorter,
-} from "@utils";
-
-import { convertToUSD } from "../../functions/convertToUSD";
+import { useMarketLiquidations } from "../../hooks";
 
 import { MARKET_LIQUIDATIONS_TABLE, PAGINATION_LIMIT } from "@constants";
 
-import { account } from "@store";
-
-import { seeds } from "@stabilitydao/stability";
-
-import { TMarketUser, TTableColumn } from "@types";
+import { TTableColumn, TLiquidation } from "@types";
 
 type TProps = {
   network: string;
   market: string;
 };
 
-const AddressCell = ({
-  address,
-  title,
-  highlighted = false,
-  isSticky = false,
-}: {
-  address: string;
-  title?: string;
-  highlighted?: boolean;
-  isSticky?: boolean;
-}) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    copyAddress(address);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
-  };
-
-  return (
-    <div
-      className={`
-        ${isSticky ? "sticky top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A]" : ""}
-        group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer h-[56px]
-        ${highlighted ? "underline" : ""}
-      `}
-      style={{ fontFamily: "monospace" }}
-      title={title || address}
-      onClick={handleCopy}
-    >
-      {getShortAddress(address, 6, 4)}
-
-      {copied ? (
-        <img
-          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-          src="/icons/checkmark.svg"
-          alt="Checkmark icon"
-        />
-      ) : (
-        <img
-          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-          src="/icons/copy.png"
-          alt="Copy icon"
-        />
-      )}
-    </div>
-  );
-};
-
 const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
-  const $account = useStore(account);
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { data, isLoading } = useMarketLiquidations(network, market);
 
   const [tableStates, setTableStates] = useState(MARKET_LIQUIDATIONS_TABLE);
-
-  const [tableData, setTableData] = useState<TMarketUser[]>([]);
-
-  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
   const [currentTab, setCurrentTab] = useState<number>(1);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
-    //sort
-    let sortedData = [];
-
-    table.forEach((state: TTableColumn) => {
-      if (state.sortType !== "none") {
-        sortedData = [...tableData].sort((a, b) =>
-          dataSorter(
-            String(a[state.keyName]),
-            String(b[state.keyName]),
-            state.dataType,
-            state.sortType
-          )
-        );
-      }
-    });
-
-    setTableData(sortedData);
     setTableStates(table);
   };
 
-  const getMarketLiquidations = async () => {
-    try {
-      const req = await axios.get(
-        `${seeds[0]}/lending/${network}/${market}/liquidations`
-      );
+  const sortedData = useMemo(() => {
+    if (!data) return [];
 
-      if (req.data) {
-        const liquidations = req.data.map((liquidation) => {
-          return {
-            user: liquidation.user,
-            liquidator: liquidation.liquidator,
-            liquidated: Number(liquidation?.liquidatedCollateralAmountInUSD),
-            debt: Number(liquidation?.debtToCoverInUSD),
-            timestamp: Number(liquidation.blockTimestamp),
-            date: formatTimestampToDate(
-              liquidation?.blockTimestamp,
-              true,
-              true
-            ),
-          };
-        });
+    const activeSortColumn = tableStates.find((col) => col.sortType !== "none");
 
-        setTableData(liquidations);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Get market liquidations error:", error);
-    }
-  };
+    if (!activeSortColumn) return data;
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabData = tableData.slice(firstTabIndex, lastTabIndex);
+    const { keyName, dataType, sortType } = activeSortColumn;
 
-  useEffect(() => {
-    getMarketLiquidations();
-  }, []);
+    return [...data].sort((a, b) =>
+      dataSorter(
+        String(a[keyName as keyof TLiquidation]),
+        String(b[keyName as keyof TLiquidation]),
+        dataType,
+        sortType
+      )
+    );
+  }, [data, tableStates]);
+
+  const currentTabData = paginateData(sortedData, currentTab, pagination);
 
   return (
     <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
@@ -164,67 +63,11 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
             />
           ))}
         </div>
-        <div>
-          {isLoading ? (
-            <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
-              <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-                <FullPageLoader />
-              </div>
-            </div>
-          ) : (
-            <div className="w-[750px] md:w-full">
-              {currentTabData.length ? (
-                <div>
-                  {currentTabData.map((liquidation, index) => (
-                    <div
-                      key={`${liquidation?.user}-${index}`}
-                      className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
-                    >
-                      <AddressCell
-                        address={liquidation?.user}
-                        title={liquidation?.user}
-                        highlighted={
-                          $account?.toLowerCase() ===
-                          liquidation?.user?.toLowerCase()
-                        }
-                        isSticky={true}
-                      />
-
-                      <AddressCell
-                        address={liquidation?.liquidator}
-                        title={liquidation?.liquidator}
-                      />
-                      <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
-                        {convertToUSD(liquidation?.liquidated)}
-                      </div>
-                      <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
-                        {convertToUSD(liquidation?.debt)}
-                      </div>
-                      <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
-                        {liquidation?.date}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
-                  <div className="flex flex-col items-center justify-center gap-4">
-                    <img src="/icons/file-search.svg" alt="Not found" />
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-[16px] leading-6 font-semibold">
-                        No liquidations yet
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        <LiquidationTable isLoading={isLoading} data={currentTabData} />
       </div>
       <Pagination
         pagination={pagination}
-        data={tableData}
+        data={data ?? []}
         tab={currentTab}
         setTab={setCurrentTab}
         setPagination={setPagination}

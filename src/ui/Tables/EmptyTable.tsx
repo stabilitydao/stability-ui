@@ -6,10 +6,17 @@ import { DisplayTypes } from "@types";
 
 interface IProps {
   isUserVaults?: boolean;
-  display: DisplayTypes;
+  display?: DisplayTypes;
+  text?: string;
+  description?: string;
 }
 
-const EmptyTable: React.FC<IProps> = ({ isUserVaults = false, display }) => {
+const EmptyTable: React.FC<IProps> = ({
+  isUserVaults = false,
+  display = DisplayTypes.Rows,
+  text = "No results found",
+  description = "Try clearing your filters or changing your search term",
+}) => {
   const { open } = useWeb3Modal();
 
   return (
@@ -41,11 +48,9 @@ const EmptyTable: React.FC<IProps> = ({ isUserVaults = false, display }) => {
         <div className="flex flex-col items-center justify-center gap-4">
           <img src="/icons/file-search.svg" alt="Not found" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-[16px] leading-6 font-semibold">
-              No results found
-            </span>
+            <span className="text-[16px] leading-6 font-semibold">{text}</span>
             <span className="text-[14px] leading-5 font-medium text-[#97979A] text-center">
-              Try clearing your filters or changing your search term
+              {description}
             </span>
           </div>
         </div>
