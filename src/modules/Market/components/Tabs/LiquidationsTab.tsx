@@ -10,11 +10,12 @@ import { ColumnSort } from "../../ui/ColumnSort";
 
 import {
   getShortAddress,
-  formatNumber,
   copyAddress,
   formatTimestampToDate,
   dataSorter,
 } from "@utils";
+
+import { convertToUSD } from "../../functions/convertToUSD";
 
 import { MARKET_LIQUIDATIONS_TABLE, PAGINATION_LIMIT } from "@constants";
 
@@ -27,6 +28,55 @@ import { TMarketUser, TTableColumn } from "@types";
 type TProps = {
   network: string;
   market: string;
+};
+
+const AddressCell = ({
+  address,
+  title,
+  highlighted = false,
+  isSticky = false,
+}: {
+  address: string;
+  title?: string;
+  highlighted?: boolean;
+  isSticky?: boolean;
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    copyAddress(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
+  return (
+    <div
+      className={`
+        ${isSticky ? "sticky top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A]" : ""}
+        group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer h-[56px]
+        ${highlighted ? "underline" : ""}
+      `}
+      style={{ fontFamily: "monospace" }}
+      title={title || address}
+      onClick={handleCopy}
+    >
+      {getShortAddress(address, 6, 4)}
+
+      {copied ? (
+        <img
+          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          src="/icons/checkmark.svg"
+          alt="Checkmark icon"
+        />
+      ) : (
+        <img
+          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          src="/icons/copy.png"
+          alt="Copy icon"
+        />
+      )}
+    </div>
+  );
 };
 
 const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
@@ -76,7 +126,11 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
             liquidated: Number(liquidation?.liquidatedCollateralAmountInUSD),
             debt: Number(liquidation?.debtToCoverInUSD),
             timestamp: Number(liquidation.blockTimestamp),
-            date: formatTimestampToDate(liquidation?.blockTimestamp, true),
+            date: formatTimestampToDate(
+              liquidation?.blockTimestamp,
+              true,
+              true
+            ),
           };
         });
 
@@ -126,41 +180,25 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
                       key={`${liquidation?.user}-${index}`}
                       className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
                     >
-                      <div
-                        className={`sticky bg-[#101012] lg:bg-transparent top-0 left-0 group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer z-10 border-r border-b md:border-r-0 md:border-b-0 border-[#23252A] h-[56px] ${$account?.toLowerCase() === liquidation?.user?.toLowerCase() ? "underline" : ""}`}
-                        style={{ fontFamily: "monospace" }}
+                      <AddressCell
+                        address={liquidation?.user}
                         title={liquidation?.user}
-                        onClick={() => copyAddress(liquidation?.user)}
-                      >
-                        {getShortAddress(liquidation?.user, 6, 4)}
-                        <img
-                          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          src="/icons/copy.png"
-                          alt="Copy icon"
-                        />
-                      </div>
-                      <div
-                        className="group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer"
-                        style={{ fontFamily: "monospace" }}
+                        highlighted={
+                          $account?.toLowerCase() ===
+                          liquidation?.user?.toLowerCase()
+                        }
+                        isSticky={true}
+                      />
+
+                      <AddressCell
+                        address={liquidation?.liquidator}
                         title={liquidation?.liquidator}
-                        onClick={() => copyAddress(liquidation?.liquidator)}
-                      >
-                        {getShortAddress(liquidation?.liquidator, 6, 4)}
-                        <img
-                          className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                          src="/icons/copy.png"
-                          alt="Copy icon"
-                        />
+                      />
+                      <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
+                        {convertToUSD(liquidation?.liquidated)}
                       </div>
                       <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
-                        {liquidation?.liquidated
-                          ? formatNumber(liquidation?.liquidated, "abbreviate")
-                          : ""}
-                      </div>
-                      <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
-                        {liquidation?.debt
-                          ? formatNumber(liquidation?.debt, "abbreviate")
-                          : ""}
+                        {convertToUSD(liquidation?.debt)}
                       </div>
                       <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
                         {liquidation?.date}
