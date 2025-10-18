@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { formatUnits, parseUnits } from "viem";
+import { parseUnits, formatUnits } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
@@ -12,20 +12,19 @@ import {
   cn,
   getTokenData,
   exactToFixed,
-  getBalance,
-  formatNumber,
-  getAllowance,
   getTransactionReceipt,
   setLocalStoreHash,
+  getAllowance,
+  formatNumber,
 } from "@utils";
 
-import { getGasLimit } from "../../functions/getGasLimit";
+import { getGasLimit, convertToUSD } from "../../functions";
 
-import { account, connected, currentChainID, lastTx } from "@store";
+import { account, connected, lastTx } from "@store";
 
 import { web3clients, wagmiConfig, AavePoolABI, ERC20ABI } from "@web3";
 
-import type { TMarketReserve, TMarket, TAddress } from "@types";
+import type { TMarketReserve, TMarket, TAddress, TReservesData } from "@types";
 
 import type { Abi } from "viem";
 
@@ -33,25 +32,16 @@ type TProps = {
   network: string;
   market: TMarket;
   asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
+  userData: TReservesData;
 };
 
-type TReserveData = {
-  balance: string;
-  allowance: string;
-};
-
-type TReservesData = Record<TAddress, TReserveData>;
-
-const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
+const SupplyForm: React.FC<TProps> = ({ network, market, asset, userData }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   const client = web3clients[network as keyof typeof web3clients];
 
   const $connected = useStore(connected);
   const $account = useStore(account);
-  const $currentChainID = useStore(currentChainID);
-  const $lastTx = useStore(lastTx);
 
   const [value, setValue] = useState<string>("");
   const [usdValue, setUsdValue] = useState<string>("$0");
@@ -60,8 +50,6 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     useState<boolean>(false);
 
   const [needConfirm, setNeedConfirm] = useState<boolean>(false);
-
-  const [reservesData, setReservesData] = useState<TReservesData>({});
 
   // todo: add errors on ui
   const errorHandler = (err: Error) => {
@@ -100,19 +88,14 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
 
     const _usdValue = value * tokenPrice;
 
-    const formattedUsdValue = !!_usdValue
-      ? formatNumber(
-          value * tokenPrice,
-          _usdValue > 1 ? "abbreviate" : "smallNumbers"
-        )
-      : "0";
+    const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
     const balance = Number(
-      reservesData?.[asset?.address as TAddress]?.balance ?? 0
+      userData?.[asset?.address as TAddress]?.balance ?? 0
     );
 
     const allowance = Number(
-      reservesData[asset?.address as TAddress]?.allowance ?? 0
+      userData[asset?.address as TAddress]?.allowance ?? 0
     );
 
     if (!value) {
@@ -126,13 +109,13 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     }
 
     setValue(numericValue);
-    setUsdValue(`$${formattedUsdValue}`);
+    setUsdValue(formattedUsdValue);
   };
 
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        reservesData?.[asset?.address as TAddress]?.balance ?? 0,
+        userData?.[asset?.address as TAddress]?.balance ?? 0,
         2
       );
 
@@ -153,14 +136,6 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     const allowance = Number(
       formatUnits(rawAllowance, assetData.decimals ?? 18)
     );
-
-    setReservesData((prev) => ({
-      ...prev,
-      [assetData.address]: {
-        ...prev[assetData.address],
-        allowance,
-      },
-    }));
 
     if (minRequired && allowance >= minRequired) {
       setButton("Supply");
@@ -299,38 +274,9 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
     }
   };
 
-  const initData = async () => {
-    if ($connected && $account && assets?.length) {
-      const _reservesData: TReservesData = Object.fromEntries(
-        await Promise.all(
-          assets.map(async (_asset) => {
-            const address = _asset.address as TAddress;
-            const decimals = getTokenData(address)?.decimals ?? 18;
-
-            const [_balanceRaw, _allowanceRaw] = await Promise.all([
-              getBalance(client, address, $account),
-              getAllowance(client, address, $account, market.pool),
-            ]);
-
-            const balance = formatUnits(_balanceRaw, decimals);
-            const allowance = formatUnits(_allowanceRaw, decimals);
-
-            return [address, { balance, allowance }] as const;
-          })
-        )
-      );
-
-      setReservesData(_reservesData);
-    }
-  };
-
   useEffect(() => {
     refreshForm();
   }, [asset]);
-
-  useEffect(() => {
-    initData();
-  }, [$connected, $account, $currentChainID, $lastTx]);
 
   return (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
@@ -358,7 +304,7 @@ const SupplyForm: React.FC<TProps> = ({ network, market, asset, assets }) => {
           <div className="flex items-start gap-2">
             <span className="font-semibold">
               {formatNumber(
-                reservesData[asset?.address as TAddress]?.balance ?? 0,
+                userData[asset?.address as TAddress]?.balance ?? 0,
                 "format"
               )}{" "}
               {assetData?.symbol}

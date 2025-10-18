@@ -7,7 +7,12 @@ import { InformationTab } from "./Tabs/InformationTab";
 import { UsersTab } from "./Tabs/UsersTab";
 import { LiquidationsTab } from "./Tabs/LiquidationsTab";
 
-import { MarketSectionTypes, TMarketReserve, TMarket } from "@types";
+import {
+  MarketSectionTypes,
+  TMarketReserve,
+  TMarket,
+  TUserReserveStates,
+} from "@types";
 
 type TProps = {
   network: string;
@@ -15,6 +20,7 @@ type TProps = {
   marketData: TMarket;
   section: MarketSectionTypes;
   asset: TMarketReserve | undefined;
+  userReserves: TUserReserveStates;
 };
 
 const MarketTabs: React.FC<TProps> = ({
@@ -23,6 +29,7 @@ const MarketTabs: React.FC<TProps> = ({
   marketData,
   section,
   asset,
+  userReserves,
 }) => {
   switch (section) {
     case MarketSectionTypes.Supply:
@@ -32,6 +39,7 @@ const MarketTabs: React.FC<TProps> = ({
           market={marketData}
           asset={asset}
           assets={marketData?.reserves}
+          userData={userReserves.supply}
         />
       );
     case MarketSectionTypes.Withdraw:
@@ -41,6 +49,7 @@ const MarketTabs: React.FC<TProps> = ({
           market={marketData}
           asset={asset}
           assets={marketData?.reserves}
+          userData={userReserves.withdraw}
         />
       );
     case MarketSectionTypes.Borrow:
@@ -50,6 +59,7 @@ const MarketTabs: React.FC<TProps> = ({
           market={marketData}
           asset={asset}
           assets={marketData?.reserves}
+          userData={userReserves.borrow}
         />
       );
     case MarketSectionTypes.Repay:
@@ -59,6 +69,7 @@ const MarketTabs: React.FC<TProps> = ({
           market={marketData}
           asset={asset}
           assets={marketData?.reserves}
+          userData={userReserves.repay}
         />
       );
     // case MarketSectionTypes.Leverage:

@@ -786,6 +786,20 @@ type TLiquidation = {
   date: string;
 };
 
+type TReserveData = {
+  balance: string;
+  allowance: string;
+};
+
+type TReservesData = Record<TAddress, TReserveData>;
+
+type TUserReserveStates = {
+  supply: TReservesData;
+  withdraw: Record<TAddress, string>;
+  borrow: Record<TAddress, string>;
+  repay: TReservesData;
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -930,4 +944,6 @@ export type {
   TChartNames,
   TMarketUser,
   TLiquidation,
+  TUserReserveStates,
+  TReservesData,
 };
