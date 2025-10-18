@@ -66,7 +66,8 @@ const SupplyStats: React.FC<TProps> = ({
 
     if (!!value) {
       const futureDeposited =
-        Number(userData[asset?.address]?.deposited) + Number(value);
+        Number(userData[asset?.address]?.deposited ?? 0) + Number(value);
+
       _stats.futureDeposited = formatNumber(
         futureDeposited,
         futureDeposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
