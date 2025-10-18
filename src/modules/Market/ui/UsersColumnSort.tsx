@@ -9,13 +9,12 @@ type TProps = {
   sort: (table: TTableColumn[]) => void;
 };
 
-const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
+const UsersColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
   const styles: Record<string, string> = {
-    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
-    Liquidator: "w-[150px] md:w-1/5",
-    Liquidated: "w-[150px] md:w-1/5 justify-end",
-    "Debt coverred": "w-[150px] md:w-1/5 justify-end",
-    Date: "w-[150px] md:w-1/5 justify-end",
+    User: "w-1/4 flex justify-start px-2 md:px-4",
+    Collateral: "w-1/4 flex justify-end px-2 md:px-4",
+    Debt: "w-1/4 flex justify-end px-2 md:px-4",
+    LTV: "w-1/4 flex justify-end px-2 md:px-4",
   };
 
   const tabController = () => {
@@ -102,4 +101,4 @@ const ColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
     </div>
   );
 };
-export { ColumnSort };
+export { UsersColumnSort };

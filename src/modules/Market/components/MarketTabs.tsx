@@ -21,6 +21,7 @@ type TProps = {
   section: MarketSectionTypes;
   asset: TMarketReserve | undefined;
   userReserves: TUserReserveStates;
+  isLoading: boolean;
 };
 
 const MarketTabs: React.FC<TProps> = ({
@@ -30,6 +31,7 @@ const MarketTabs: React.FC<TProps> = ({
   section,
   asset,
   userReserves,
+  isLoading,
 }) => {
   switch (section) {
     case MarketSectionTypes.Supply:
@@ -40,6 +42,7 @@ const MarketTabs: React.FC<TProps> = ({
           asset={asset}
           assets={marketData?.reserves}
           userData={userReserves.supply}
+          isLoading={isLoading}
         />
       );
     case MarketSectionTypes.Withdraw:
@@ -50,6 +53,7 @@ const MarketTabs: React.FC<TProps> = ({
           asset={asset}
           assets={marketData?.reserves}
           userData={userReserves.withdraw}
+          isLoading={isLoading}
         />
       );
     case MarketSectionTypes.Borrow:
@@ -60,6 +64,7 @@ const MarketTabs: React.FC<TProps> = ({
           asset={asset}
           assets={marketData?.reserves}
           userData={userReserves.borrow}
+          isLoading={isLoading}
         />
       );
     case MarketSectionTypes.Repay:
@@ -70,6 +75,7 @@ const MarketTabs: React.FC<TProps> = ({
           asset={asset}
           assets={marketData?.reserves}
           userData={userReserves.repay}
+          isLoading={isLoading}
         />
       );
     // case MarketSectionTypes.Leverage:

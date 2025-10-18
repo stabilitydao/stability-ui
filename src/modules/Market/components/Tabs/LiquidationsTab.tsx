@@ -2,9 +2,14 @@ import { useState, memo, useMemo } from "react";
 
 import { Pagination } from "@ui";
 
-import { ColumnSort, LiquidationTable } from "../../ui";
+import { LiquidationsColumnSort, LiquidationTable } from "../../ui";
 
 import { dataSorter, paginateData } from "@utils";
+
+import {
+  getInitialStateFromUrl,
+  getSortedTableStateFromUrl,
+} from "../../functions";
 
 import { useMarketLiquidations } from "../../hooks";
 
@@ -18,9 +23,16 @@ type TProps = {
 };
 
 const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
+  const { sortType } = getInitialStateFromUrl();
+
   const { data, isLoading } = useMarketLiquidations(network, market);
 
-  const [tableStates, setTableStates] = useState(MARKET_LIQUIDATIONS_TABLE);
+  const initialTableState = getSortedTableStateFromUrl(
+    MARKET_LIQUIDATIONS_TABLE,
+    sortType
+  );
+
+  const [tableStates, setTableStates] = useState(initialTableState);
   const [currentTab, setCurrentTab] = useState<number>(1);
   const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
@@ -54,7 +66,7 @@ const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
       <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">
         <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[750px] md:w-full">
           {tableStates.map((value: TTableColumn, index: number) => (
-            <ColumnSort
+            <LiquidationsColumnSort
               key={value.name + index}
               index={index}
               value={value.name}

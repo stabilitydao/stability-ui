@@ -6,7 +6,7 @@ import { formatUnits, parseUnits } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
-import { ActionButton } from "@ui";
+import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
@@ -18,7 +18,7 @@ import {
   setLocalStoreHash,
 } from "@utils";
 
-import { getGasLimit } from "../../functions/getGasLimit";
+import { convertToUSD, getGasLimit } from "../../functions";
 
 import { account, connected, lastTx } from "@store";
 
@@ -27,16 +27,22 @@ import { web3clients, wagmiConfig, AavePoolABI, ERC20ABI } from "@web3";
 import type { TMarketReserve, TMarket, TAddress, TReservesData } from "@types";
 
 import type { Abi } from "viem";
-import { convertToUSD } from "../../functions";
 
 type TProps = {
   network: string;
   market: TMarket;
   asset: TMarketReserve | undefined;
   userData: TReservesData;
+  isLoading: boolean;
 };
 
-const RepayForm: React.FC<TProps> = ({ network, market, asset, userData }) => {
+const RepayForm: React.FC<TProps> = ({
+  network,
+  market,
+  asset,
+  userData,
+  isLoading,
+}) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
   const client = web3clients[network as keyof typeof web3clients];
@@ -303,13 +309,18 @@ const RepayForm: React.FC<TProps> = ({ network, market, asset, userData }) => {
         <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
           <span className="text-[#7C7E81] font-medium">Available to repay</span>
           <div className="flex items-start gap-2">
-            <span className="font-semibold">
-              {formatNumber(
-                userData[asset?.address as TAddress]?.balance ?? 0,
-                "format"
-              )}{" "}
-              {assetData?.symbol}
-            </span>
+            {isLoading ? (
+              <Skeleton height={24} width={70} />
+            ) : (
+              <span className="font-semibold">
+                {formatNumber(
+                  userData[asset?.address as TAddress]?.balance ?? 0,
+                  "format"
+                )}{" "}
+                {assetData?.symbol}
+              </span>
+            )}
+
             <button
               className={cn(
                 "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",

@@ -789,6 +789,7 @@ type TLiquidation = {
 type TReserveData = {
   balance: string;
   allowance: string;
+  deposited?: string;
 };
 
 type TReservesData = Record<TAddress, TReserveData>;

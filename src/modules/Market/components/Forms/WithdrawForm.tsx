@@ -6,7 +6,7 @@ import { parseUnits } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
-import { ActionButton } from "@ui";
+import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
@@ -32,6 +32,7 @@ type TProps = {
   market: TMarket;
   asset: TMarketReserve | undefined;
   userData: Record<TAddress, string>;
+  isLoading: boolean;
 };
 
 const WithdrawForm: React.FC<TProps> = ({
@@ -39,6 +40,7 @@ const WithdrawForm: React.FC<TProps> = ({
   market,
   asset,
   userData,
+  isLoading,
 }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
@@ -229,13 +231,18 @@ const WithdrawForm: React.FC<TProps> = ({
             Available to withdraw
           </span>
           <div className="flex items-start gap-2">
-            <span className="font-semibold">
-              {formatNumber(
-                userData[asset?.address as TAddress] ?? 0,
-                "format"
-              )}{" "}
-              {assetData?.symbol}
-            </span>
+            {isLoading ? (
+              <Skeleton height={24} width={70} />
+            ) : (
+              <span className="font-semibold">
+                {formatNumber(
+                  userData[asset?.address as TAddress] ?? 0,
+                  "format"
+                )}{" "}
+                {assetData?.symbol}
+              </span>
+            )}
+
             <button
               className={cn(
                 "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",

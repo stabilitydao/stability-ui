@@ -8,6 +8,7 @@ type TProps = {
   asset: TMarketReserve | undefined;
   assets: TMarketReserve[] | undefined;
   userData: Record<TAddress, string>;
+  isLoading: boolean;
 };
 
 const WithdrawTab: React.FC<TProps> = ({
@@ -16,6 +17,7 @@ const WithdrawTab: React.FC<TProps> = ({
   asset,
   assets,
   userData,
+  isLoading,
 }) => {
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
@@ -24,6 +26,7 @@ const WithdrawTab: React.FC<TProps> = ({
         market={market}
         asset={asset}
         userData={userData}
+        isLoading={isLoading}
       />
     </div>
   );

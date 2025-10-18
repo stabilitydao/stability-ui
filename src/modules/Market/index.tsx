@@ -66,6 +66,8 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   const [activeAsset, setActiveAsset] = useState<TMarketReserve | undefined>();
 
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const [userReservesStates, setUserReserveStates] =
     useState<TUserReserveStates>({
       supply: {},
@@ -113,28 +115,13 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   };
 
   const getUserReservesData = async () => {
-    if (!$connected || !$account || !localMarket?.reserves?.length) return null;
+    if (!$connected || !$account || !localMarket?.reserves?.length) {
+      setIsLoading(false);
+      return null;
+    }
 
     try {
-      const supply: Record<string, { balance: string; allowance: string }> =
-        Object.fromEntries(
-          await Promise.all(
-            localMarket.reserves.map(async (asset) => {
-              const address = asset.address as TAddress;
-              const decimals = getTokenData(address)?.decimals ?? 18;
-
-              const [_balanceRaw, _allowanceRaw] = await Promise.all([
-                getBalance(client, address, $account),
-                getAllowance(client, address, $account, localMarket.pool),
-              ]);
-
-              const balance = formatUnits(_balanceRaw, decimals);
-              const allowance = formatUnits(_allowanceRaw, decimals);
-
-              return [address, { balance, allowance }] as const;
-            })
-          )
-        );
+      setIsLoading(true);
 
       const withdraw: Record<string, string> = Object.fromEntries(
         await Promise.all(
@@ -155,6 +142,29 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         )
       );
 
+      const supply: Record<
+        string,
+        { balance: string; allowance: string; deposited: string }
+      > = Object.fromEntries(
+        await Promise.all(
+          localMarket.reserves.map(async (asset) => {
+            const address = asset.address as TAddress;
+            const decimals = getTokenData(address)?.decimals ?? 18;
+
+            const [_balanceRaw, _allowanceRaw] = await Promise.all([
+              getBalance(client, address, $account),
+              getAllowance(client, address, $account, localMarket.pool),
+            ]);
+
+            const balance = formatUnits(_balanceRaw, decimals);
+            const allowance = formatUnits(_allowanceRaw, decimals);
+            const deposited = withdraw[address] ?? "0";
+
+            return [address, { balance, allowance, deposited }] as const;
+          })
+        )
+      );
+
       const userData = (await client.readContract({
         address: localMarket?.pool,
         abi: AavePoolABI,
@@ -169,7 +179,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
         if (!asset.isBorrowable) continue;
 
         const address = asset.address;
-        const tokenDecimals = asset?.decimals ?? 18;
+        const tokenDecimals = getTokenData(address)?.decimals ?? 18;
         const tokenPrice = Number(asset.price);
 
         if (availableBorrowsBase > 0 && tokenPrice > 0) {
@@ -215,6 +225,8 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     } catch (error) {
       console.error("Get user reserve states error:", error);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -238,12 +250,15 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     }
   }, [$markets]);
 
+  console.log(userReservesStates);
+
   useEffect(() => {
     if (localMarket && !activeAsset) {
       if (asset) {
         const urlAsset = localMarket?.reserves?.find(
           ({ address }) => asset === address
         );
+
         setActiveAsset(urlAsset ? urlAsset : localMarket?.reserves[0]);
       } else {
         setActiveAsset(localMarket?.reserves[0]);
@@ -337,6 +352,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               section={activeSection}
               asset={activeAsset}
               userReserves={userReservesStates}
+              isLoading={isLoading}
             />
           </div>
         </div>
