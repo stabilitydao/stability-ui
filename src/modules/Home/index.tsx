@@ -1,7 +1,7 @@
 import "./home.css";
 
 const Home = (): JSX.Element => {
-  //test
+  console.log("test");
   return (
     <div className="w-screen h-screen font-manrope font-light text-[#ECE3DA] flex flex-col home-bg">
       <div className="flex flex-col justify-between flex-1 z-[2]">
