@@ -214,8 +214,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
           reserves: nextReserves,
         };
       });
-
-      console.log("Updated reserves:", updatedReserves);
     } catch (error) {
       console.error("Get user reserve states error:", error);
       return null;
