@@ -26,6 +26,10 @@ export const getWrappingPairs = (
         address: "0xcCCCaBc3370633AD166669b27A71eB3aE4bFCcCc",
         symbol: "wmetaUSDC",
       },
+      "0x1111836d0ff66770f9d9a22fdb7e1f0349501111": {
+        address: "0xaAAaBE1F93b9470C56f17d9Ef4E3fF13bCf9AAAA",
+        symbol: "wmetaUSDT",
+      },
     };
 
     return { wrap, unwrap: unwrapMap[vault.address] ?? {} };

@@ -180,7 +180,7 @@ const CHAINS = [
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["9745"].img}`,
     explorer: "https://plasmascan.to",
     nativeCurrency: "XPL",
-    color: "#FFFFFF",
+    color: "#15322A",
     active: true,
   },
 ];

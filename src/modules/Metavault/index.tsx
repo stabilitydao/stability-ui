@@ -425,7 +425,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
                 </span>
                 <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
                   <img
-                    className="w-6 h-6"
+                    className="w-6 h-6 rounded-full"
                     src={chain.logoURI}
                     alt={chain.name}
                     title={chain.name}

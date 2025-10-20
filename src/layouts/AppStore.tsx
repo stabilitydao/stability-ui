@@ -978,7 +978,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           /////***** SET VAULTS DATA *****/////
           const APIMetaVaultsData = Object.values(
             stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+          ).filter(
+            ({ address }) =>
+              address?.toLowerCase() !=
+              "0x11111527df7335772e6e94cf464473f19e421111"
           );
+          // temp: remove after meta vault statuses update
 
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
@@ -1013,7 +1018,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 }
               }
 
-              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+              totalAPR = Number(metaVault.APR ?? 0) + merklAPR + gemsAPR;
 
               const deposited = metaVault.deposited ?? 0;
 
