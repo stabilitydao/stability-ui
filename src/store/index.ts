@@ -20,6 +20,7 @@ import type {
   TMarketPrices,
   TLiquidation,
   TMarketUser,
+  TUserPoolData,
 } from "@types";
 
 // atoms
@@ -39,6 +40,7 @@ const marketPrices = atom<TMarketPrices>({});
 
 const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
 const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
+const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
@@ -112,4 +114,5 @@ export {
   isMarketsLoaded,
   marketsLiquidations,
   marketsUsers,
+  userPoolsData,
 };

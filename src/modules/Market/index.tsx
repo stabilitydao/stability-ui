@@ -10,6 +10,8 @@ import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions";
 
+import { useUserPoolData } from "./hooks";
+
 import {
   updateQueryParams,
   getShortAddress,
@@ -33,15 +35,9 @@ import {
   currentChainID,
 } from "@store";
 
-import { web3clients, AavePoolABI, AaveProtocolDataProviderABI } from "@web3";
+import { web3clients, AaveProtocolDataProviderABI } from "@web3";
 
-import {
-  MarketSectionTypes,
-  TMarket,
-  TMarketReserve,
-  TAddress,
-  TUserReserveStates,
-} from "@types";
+import { MarketSectionTypes, TMarket, TMarketReserve, TAddress } from "@types";
 
 interface IProps {
   network: string;
@@ -64,17 +60,11 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
+  const { data: userPoolData } = useUserPoolData(network, localMarket?.pool);
+
   const [activeAsset, setActiveAsset] = useState<TMarketReserve | undefined>();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [userReservesStates, setUserReserveStates] =
-    useState<TUserReserveStates>({
-      supply: {},
-      withdraw: {},
-      borrow: {},
-      repay: {},
-    });
 
   const [activeSection, setActiveSection] =
     useState<MarketSectionTypes>(section);
@@ -123,105 +113,72 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     try {
       setIsLoading(true);
 
-      const withdraw: Record<string, string> = Object.fromEntries(
-        await Promise.all(
-          localMarket.reserves.map(async (asset) => {
-            const aTokenAddress = asset.aToken as TAddress;
-            const decimals = getTokenData(asset.address)?.decimals ?? 18;
+      const availableBorrowsBase = userPoolData?.availableBorrowsBase ?? 0;
 
-            const rawBalance = await getBalance(
-              client,
-              aTokenAddress,
-              $account
-            );
-
-            const balance = formatUnits(rawBalance, decimals);
-
-            return [asset.address, balance] as const;
-          })
-        )
-      );
-
-      const supply: Record<
-        string,
-        { balance: string; allowance: string; deposited: string }
-      > = Object.fromEntries(
-        await Promise.all(
-          localMarket.reserves.map(async (asset) => {
-            const address = asset.address as TAddress;
-            const decimals = getTokenData(address)?.decimals ?? 18;
-
-            const [_balanceRaw, _allowanceRaw] = await Promise.all([
-              getBalance(client, address, $account),
-              getAllowance(client, address, $account, localMarket.pool),
-            ]);
-
-            const balance = formatUnits(_balanceRaw, decimals);
-            const allowance = formatUnits(_allowanceRaw, decimals);
-            const deposited = withdraw[address] ?? "0";
-
-            return [address, { balance, allowance, deposited }] as const;
-          })
-        )
-      );
-
-      const userData = (await client.readContract({
-        address: localMarket?.pool,
-        abi: AavePoolABI,
-        functionName: "getUserAccountData",
-        args: [$account],
-      })) as bigint[];
-
-      const availableBorrowsBase = Number(formatUnits(userData[2], 8));
-
-      const borrow: Record<string, string> = {};
       for (const asset of localMarket.reserves) {
-        if (!asset.isBorrowable) continue;
+        const address = asset.address as TAddress;
+        const aTokenAddress = asset.aToken as TAddress;
+        const decimals = getTokenData(address)?.decimals ?? 18;
 
-        const address = asset.address;
-        const tokenDecimals = getTokenData(address)?.decimals ?? 18;
-        const tokenPrice = Number(asset.price);
+        const rawATokenBalance = await getBalance(
+          client,
+          aTokenAddress,
+          $account
+        );
+        const withdraw = formatUnits(rawATokenBalance, decimals);
 
-        if (availableBorrowsBase > 0 && tokenPrice > 0) {
-          const rawAmount =
-            (availableBorrowsBase / tokenPrice) * 10 ** tokenDecimals;
-          const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
-          const formattedAmount = formatUnits(safeAmount, tokenDecimals);
-          borrow[address] = formattedAmount;
-        } else {
-          borrow[address] = "0";
+        const [rawBalance, rawAllowance] = await Promise.all([
+          getBalance(client, address, $account),
+          getAllowance(client, address, $account, localMarket.pool),
+        ]);
+
+        const balance = formatUnits(rawBalance, decimals);
+        const allowance = formatUnits(rawAllowance, decimals);
+        const deposited = withdraw;
+
+        asset.supply = { balance, allowance, deposited };
+        asset.withdraw = { balance: withdraw };
+
+        if (asset.isBorrowable) {
+          const tokenPrice = Number(asset.price);
+          if (availableBorrowsBase > 0 && tokenPrice > 0) {
+            const rawAmount =
+              (availableBorrowsBase / tokenPrice) * 10 ** decimals;
+            const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
+            const formattedAmount = formatUnits(safeAmount, decimals);
+            asset.borrow = { balance: formattedAmount };
+          } else {
+            asset.borrow = { balance: "0" };
+          }
+        }
+
+        if (asset.isBorrowable) {
+          const userReserveData = (await client.readContract({
+            address: localMarket.protocolDataProvider,
+            abi: AaveProtocolDataProviderABI,
+            functionName: "getUserReserveData",
+            args: [address, $account],
+          })) as bigint[];
+
+          const rawVariableDebt = userReserveData[2];
+          const repayBalance = formatUnits(rawVariableDebt, decimals);
+
+          const rawRepayAllowance = await getAllowance(
+            client,
+            address,
+            $account,
+            localMarket.pool
+          );
+          const repayAllowance = formatUnits(rawRepayAllowance, decimals);
+
+          asset.repay = {
+            balance: repayBalance,
+            allowance: repayAllowance,
+          };
         }
       }
 
-      const repay: Record<string, { balance: string; allowance: string }> = {};
-      for (const asset of localMarket.reserves) {
-        if (!asset.isBorrowable) continue;
-
-        const address = asset.address as TAddress;
-        const decimals = getTokenData(address)?.decimals ?? 18;
-
-        const userReserveData = (await client.readContract({
-          address: localMarket.protocolDataProvider,
-          abi: AaveProtocolDataProviderABI,
-          functionName: "getUserReserveData",
-          args: [address, $account],
-        })) as bigint[];
-
-        const rawVariableDebt = userReserveData[2];
-        const balance = formatUnits(rawVariableDebt, decimals);
-
-        const _allowanceRaw = await getAllowance(
-          client,
-          address,
-          $account,
-          localMarket.pool
-        );
-        const allowance = formatUnits(_allowanceRaw, decimals);
-
-        repay[address] = { balance, allowance };
-      }
-
-      setUserReserveStates({ supply, withdraw, borrow, repay });
+      console.log("Updated reserves:", localMarket.reserves);
     } catch (error) {
       console.error("Get user reserve states error:", error);
       return null;
@@ -237,7 +194,15 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       );
 
       const chain = CHAINS.find(({ id }) => id == network);
-
+      console.log({
+        marketId: market,
+        network: chain,
+        engine: _market?.engine,
+        pool: _market?.pool,
+        protocolDataProvider: _market?.protocolDataProvider,
+        deployed: _market?.deployed,
+        reserves: _market?.reserves,
+      });
       setLocalMarket({
         marketId: market,
         network: chain,
@@ -249,8 +214,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       } as TMarket);
     }
   }, [$markets]);
-
-  console.log(userReservesStates);
 
   useEffect(() => {
     if (localMarket && !activeAsset) {
@@ -268,7 +231,14 @@ const Market: React.FC<IProps> = ({ network, market }) => {
 
   useEffect(() => {
     getUserReservesData();
-  }, [localMarket, $lastTx, $account, $connected, $currentChainID]);
+  }, [
+    localMarket,
+    $lastTx,
+    $account,
+    $connected,
+    $currentChainID,
+    userPoolData,
+  ]);
 
   return market && localMarket ? (
     <WagmiLayout>
@@ -345,15 +315,13 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                 />
               </div>
             </div>
-            <MarketTabs
-              network={network}
-              market={market}
+            {/* <MarketTabs
               marketData={localMarket}
               section={activeSection}
               asset={activeAsset}
               userReserves={userReservesStates}
               isLoading={isLoading}
-            />
+            /> */}
           </div>
         </div>
       </div>

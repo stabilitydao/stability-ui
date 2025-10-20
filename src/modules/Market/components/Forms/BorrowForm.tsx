@@ -28,7 +28,6 @@ import type { TMarketReserve, TMarket, TAddress } from "@types";
 import type { Abi } from "viem";
 
 type TProps = {
-  network: string;
   market: TMarket;
   asset: TMarketReserve | undefined;
   userData: Record<TAddress, string>;
@@ -36,7 +35,6 @@ type TProps = {
 };
 
 const BorrowForm: React.FC<TProps> = ({
-  network,
   market,
   asset,
   userData,
@@ -44,7 +42,7 @@ const BorrowForm: React.FC<TProps> = ({
 }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
-  const client = web3clients[network as keyof typeof web3clients];
+  const client = web3clients[market?.network?.id as keyof typeof web3clients];
 
   const $connected = useStore(connected);
   const $account = useStore(account);
@@ -258,7 +256,7 @@ const BorrowForm: React.FC<TProps> = ({
 
       <ActionButton
         type={button}
-        network={network}
+        network={market?.network?.id as string}
         transactionInProgress={transactionInProgress}
         needConfirm={needConfirm}
         actionFunction={formHandler}

@@ -721,6 +721,12 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
+type TUserReserveData = {
+  balance: string;
+  allowance?: string;
+  deposited?: string;
+};
+
 type TMarketReserve = {
   // lib data
   address: TAddress;
@@ -730,6 +736,12 @@ type TMarketReserve = {
   oracle: TAddress;
   oracleName: string;
   treasury: TAddress;
+
+  //userData
+  supply?: TUserReserveData;
+  withdraw?: TUserReserveData;
+  borrow?: TUserReserveData;
+  repay?: TUserReserveData;
 
   // backend data
   name: string;
@@ -786,19 +798,10 @@ type TLiquidation = {
   date: string;
 };
 
-type TReserveData = {
-  balance: string;
-  allowance: string;
-  deposited?: string;
-};
-
-type TReservesData = Record<TAddress, TReserveData>;
-
-type TUserReserveStates = {
-  supply: TReservesData;
-  withdraw: Record<TAddress, string>;
-  borrow: Record<TAddress, string>;
-  repay: TReservesData;
+type TUserPoolData = {
+  ltv: number;
+  healthFactor: number;
+  availableBorrowsBase: number;
 };
 
 // enums
@@ -945,6 +948,5 @@ export type {
   TChartNames,
   TMarketUser,
   TLiquidation,
-  TUserReserveStates,
-  TReservesData,
+  TUserPoolData,
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -28,28 +28,29 @@ import type { TMarketReserve, TMarket, TAddress } from "@types";
 import type { Abi } from "viem";
 
 type TProps = {
-  network: string;
   market: TMarket;
   asset: TMarketReserve | undefined;
   userData: Record<TAddress, string>;
   isLoading: boolean;
+  value: string;
+  setValue: Dispatch<SetStateAction<string>>;
 };
 
 const WithdrawForm: React.FC<TProps> = ({
-  network,
   market,
   asset,
   userData,
   isLoading,
+  value,
+  setValue,
 }) => {
   const assetData = getTokenData(asset?.address as TAddress);
 
-  const client = web3clients[network as keyof typeof web3clients];
+  const client = web3clients[market?.network?.id as keyof typeof web3clients];
 
   const $connected = useStore(connected);
   const $account = useStore(account);
 
-  const [value, setValue] = useState<string>("");
   const [usdValue, setUsdValue] = useState<string>("$0");
   const [button, setButton] = useState<string>("");
   const [transactionInProgress, setTransactionInProgress] =
@@ -257,7 +258,7 @@ const WithdrawForm: React.FC<TProps> = ({
       </div>
       <ActionButton
         type={button}
-        network={network}
+        network={market?.network?.id}
         transactionInProgress={transactionInProgress}
         needConfirm={needConfirm}
         actionFunction={formHandler}

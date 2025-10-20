@@ -1,7 +1,7 @@
 {
   "name": "stability-ui",
   "type": "module",
-  "version": "0.9.102-alpha",
+  "version": "0.9.103-alpha",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
