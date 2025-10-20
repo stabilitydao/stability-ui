@@ -724,7 +724,6 @@ type TMarketPrices = Record<string, TMarketPrice>;
 type TUserReserveData = {
   balance: string;
   allowance?: string;
-  deposited?: string;
 };
 
 type TMarketReserve = {
@@ -738,10 +737,12 @@ type TMarketReserve = {
   treasury: TAddress;
 
   //userData
-  supply?: TUserReserveData;
-  withdraw?: TUserReserveData;
-  borrow?: TUserReserveData;
-  repay?: TUserReserveData;
+  userData: {
+    supply?: TUserReserveData;
+    withdraw?: TUserReserveData;
+    borrow?: TUserReserveData;
+    repay?: TUserReserveData;
+  };
 
   // backend data
   name: string;

@@ -18,14 +18,14 @@ import { MARKET_USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 import { TMarketUser, TTableColumn } from "@types";
 
 type TProps = {
-  network: string;
-  market: string;
+  networkId: string;
+  marketId: string;
 };
 
-const UsersTab: React.FC<TProps> = ({ network, market }) => {
+const UsersTab: React.FC<TProps> = ({ networkId, marketId }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const { data, isLoading } = useMarketUsers(network, market);
+  const { data, isLoading } = useMarketUsers(networkId, marketId);
 
   const initialTableState = getSortedTableStateFromUrl(
     MARKET_USERS_TABLE,

@@ -13,7 +13,7 @@ import { assets } from "@stabilitydao/stability";
 type TProps = {
   asset: TMarketReserve;
   isSingleAsset?: boolean;
-  network: TNetwork;
+  network: TNetwork | undefined;
 };
 
 const AssetInfo: React.FC<TProps> = ({
@@ -178,13 +178,13 @@ const AssetInfo: React.FC<TProps> = ({
           <AddressField
             symbol={assetData?.symbol as string}
             address={assetData?.address as TAddress}
-            explorer={network?.explorer}
+            explorer={network?.explorer ?? ""}
           />
 
           <AddressField
             symbol={asset?.aTokenSymbol as string}
             address={asset?.aToken as TAddress}
-            explorer={network?.explorer}
+            explorer={network?.explorer ?? ""}
           />
 
           {mintApp && (

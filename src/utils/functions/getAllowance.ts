@@ -2,10 +2,8 @@ import { ERC20ABI } from "@web3";
 
 import type { TAddress } from "@types";
 
-import type { PublicClient } from "viem";
-
 export const getAllowance = async (
-  client: PublicClient,
+  client: any,
   tokenAddress: TAddress,
   ownerAddress: TAddress,
   spenderAddress: TAddress

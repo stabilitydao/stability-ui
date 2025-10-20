@@ -10,20 +10,12 @@ import { useUserPoolData } from "../../hooks";
 
 import { account, connected, lastTx, currentChainID } from "@store";
 
-import {
-  TMarketReserve,
-  TAddress,
-  TMarket,
-  TReservesData,
-  MarketSectionTypes,
-} from "@types";
+import { TMarketReserve, TAddress, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
   type: MarketSectionTypes;
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
-  userData: TReservesData | Record<TAddress, string>;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
   value: string;
 };
@@ -31,13 +23,11 @@ type TProps = {
 const CollateralStats: React.FC<TProps> = ({
   type,
   market,
-  asset,
-  assets,
-  userData,
+  activeAsset,
   isLoading,
   value,
 }) => {
-  const assetData = getTokenData(asset?.address as TAddress);
+  const assetData = getTokenData(activeAsset?.address as TAddress);
 
   const $connected = useStore(connected);
   const $account = useStore(account);
@@ -59,15 +49,12 @@ const CollateralStats: React.FC<TProps> = ({
   const handleUserSupplyStats = async () => {
     const _stats = {
       deposited: "0",
-      APR: Number(asset?.supplyAPR).toFixed(2),
+      APR: Number(activeAsset?.supplyAPR).toFixed(2),
       futureDeposited: "0",
       depositedInUSD: "$0",
     };
 
-    const deposited =
-      type === MarketSectionTypes.Supply
-        ? Number(userData[asset?.address]?.deposited ?? 0)
-        : Number(userData[asset?.address] ?? 0);
+    const deposited = Number(activeAsset?.userData?.withdraw?.balance ?? 0);
 
     const inputValue = Number(value);
 
@@ -78,7 +65,7 @@ const CollateralStats: React.FC<TProps> = ({
       );
 
       _stats.depositedInUSD = convertToUSD(
-        deposited * Number(asset?.price ?? 0)
+        deposited * Number(activeAsset?.price ?? 0)
       );
     }
 
@@ -99,7 +86,7 @@ const CollateralStats: React.FC<TProps> = ({
 
   useEffect(() => {
     handleUserSupplyStats();
-  }, [value, asset, userData, $connected, $account, $currentChainID, $lastTx]);
+  }, [value, activeAsset, $connected, $account, $currentChainID, $lastTx]);
 
   return (
     <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 md:gap-6 w-full lg:w-2/3 font-medium">
@@ -156,7 +143,7 @@ const CollateralStats: React.FC<TProps> = ({
               alt="arrow right"
               className="w-4 h-4"
             /> */}
-            <span>{userPoolData?.ltv}%</span>
+            <span>{userPoolData?.ltv ?? 0}%</span>
           </div>
         </div>
         <div className="flex flex-col items-start w-full md:w-1/2">
@@ -170,7 +157,11 @@ const CollateralStats: React.FC<TProps> = ({
               alt="arrow right"
               className="w-4 h-4"
             /> */}
-            <span>{formatHealthFactor(userPoolData?.healthFactor ?? 0)}</span>
+            <span>
+              {$connected
+                ? formatHealthFactor(userPoolData?.healthFactor ?? 0)
+                : "∞"}
+            </span>
           </div>
         </div>
       </div>

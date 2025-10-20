@@ -24,14 +24,13 @@ import { account, connected, lastTx } from "@store";
 
 import { web3clients, wagmiConfig, AavePoolABI, ERC20ABI } from "@web3";
 
-import type { TMarketReserve, TMarket, TAddress, TReservesData } from "@types";
+import type { TMarketReserve, TMarket, TAddress } from "@types";
 
 import type { Abi } from "viem";
 
 type TProps = {
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  userData: TReservesData;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
@@ -39,13 +38,12 @@ type TProps = {
 
 const SupplyForm: React.FC<TProps> = ({
   market,
-  asset,
-  userData,
+  activeAsset,
   isLoading,
   value,
   setValue,
 }) => {
-  const assetData = getTokenData(asset?.address as TAddress);
+  const assetData = getTokenData(activeAsset?.address as TAddress);
 
   const client = web3clients[market?.network?.id as keyof typeof web3clients];
 
@@ -92,19 +90,15 @@ const SupplyForm: React.FC<TProps> = ({
     }
 
     const value = Number(numericValue);
-    const tokenPrice = Number(asset?.price);
+    const tokenPrice = Number(activeAsset?.price);
 
     const _usdValue = value * tokenPrice;
 
     const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
-    const balance = Number(
-      userData?.[asset?.address as TAddress]?.balance ?? 0
-    );
+    const balance = Number(activeAsset?.userData?.supply?.balance ?? 0);
 
-    const allowance = Number(
-      userData[asset?.address as TAddress]?.allowance ?? 0
-    );
+    const allowance = Number(activeAsset?.userData?.supply?.allowance ?? 0);
 
     if (!value) {
       setButton("");
@@ -123,7 +117,7 @@ const SupplyForm: React.FC<TProps> = ({
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        userData?.[asset?.address as TAddress]?.balance ?? 0,
+        activeAsset?.userData?.supply?.balance ?? 0,
         2
       );
 
@@ -284,7 +278,7 @@ const SupplyForm: React.FC<TProps> = ({
 
   useEffect(() => {
     refreshForm();
-  }, [asset]);
+  }, [activeAsset]);
 
   return (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
@@ -315,7 +309,7 @@ const SupplyForm: React.FC<TProps> = ({
             ) : (
               <span className="font-semibold">
                 {formatNumber(
-                  userData[asset?.address as TAddress]?.balance ?? 0,
+                  activeAsset?.userData?.supply?.balance ?? 0,
                   "format"
                 )}{" "}
                 {assetData?.symbol}

@@ -12,14 +12,14 @@ import { MarketSectionTypes, TMarketReserve, TMarket } from "@types";
 type TProps = {
   marketData: TMarket;
   section: MarketSectionTypes;
-  asset: TMarketReserve | undefined;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
 };
 
 const MarketTabs: React.FC<TProps> = ({
   marketData,
   section,
-  asset,
+  activeAsset,
   isLoading,
 }) => {
   switch (section) {
@@ -27,9 +27,7 @@ const MarketTabs: React.FC<TProps> = ({
       return (
         <SupplyTab
           market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-          userData={userReserves.supply}
+          activeAsset={activeAsset}
           isLoading={isLoading}
         />
       );
@@ -37,9 +35,7 @@ const MarketTabs: React.FC<TProps> = ({
       return (
         <WithdrawTab
           market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-          userData={userReserves.withdraw}
+          activeAsset={activeAsset}
           isLoading={isLoading}
         />
       );
@@ -47,9 +43,7 @@ const MarketTabs: React.FC<TProps> = ({
       return (
         <BorrowTab
           market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-          userData={userReserves.borrow}
+          activeAsset={activeAsset}
           isLoading={isLoading}
         />
       );
@@ -57,34 +51,26 @@ const MarketTabs: React.FC<TProps> = ({
       return (
         <RepayTab
           market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-          userData={userReserves.repay}
+          activeAsset={activeAsset}
           isLoading={isLoading}
         />
       );
     // case MarketSectionTypes.Leverage:
     //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:
-      return (
-        <InformationTab
-          market={marketData}
-          activeAsset={asset}
-          assets={marketData?.reserves}
-        />
-      );
+      return <InformationTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Users:
       return (
         <UsersTab
-          network={marketData?.network?.id as string}
-          market={marketData?.marketId}
+          networkId={marketData?.network?.id as string}
+          marketId={marketData?.marketId}
         />
       );
     case MarketSectionTypes.Liquidations:
       return (
         <LiquidationsTab
-          network={marketData?.network?.id as string}
-          market={marketData?.marketId}
+          networkId={marketData?.network?.id as string}
+          marketId={marketData?.marketId}
         />
       );
     default:

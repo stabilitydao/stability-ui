@@ -5,16 +5,15 @@ import type { TMarket, TMarketReserve } from "@types";
 type TProps = {
   market: TMarket;
   activeAsset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
 };
 
-const InformationTab: React.FC<TProps> = ({ market, activeAsset, assets }) => {
+const InformationTab: React.FC<TProps> = ({ market, activeAsset }) => {
   return (
     <div className="flex flex-col gap-6">
       <AssetsInfo
         activeAsset={activeAsset}
-        assets={assets}
-        network={market.network}
+        assets={market?.reserves}
+        network={market?.network}
       />
       <div className="flex flex-col gap-3">
         <span className="text-[24px] leading-8 font-medium">

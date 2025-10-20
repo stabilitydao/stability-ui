@@ -18,14 +18,14 @@ import { MARKET_LIQUIDATIONS_TABLE, PAGINATION_LIMIT } from "@constants";
 import { TTableColumn, TLiquidation } from "@types";
 
 type TProps = {
-  network: string;
-  market: string;
+  networkId: string;
+  marketId: string;
 };
 
-const LiquidationsTab: React.FC<TProps> = memo(({ network, market }) => {
+const LiquidationsTab: React.FC<TProps> = memo(({ networkId, marketId }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const { data, isLoading } = useMarketLiquidations(network, market);
+  const { data, isLoading } = useMarketLiquidations(networkId, marketId);
 
   const initialTableState = getSortedTableStateFromUrl(
     MARKET_LIQUIDATIONS_TABLE,

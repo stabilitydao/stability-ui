@@ -3,36 +3,22 @@ import { useState } from "react";
 import { SupplyForm } from "../Forms/SupplyForm";
 import { CollateralStats } from "../Stats/CollateralStats";
 
-import {
-  TMarketReserve,
-  TMarket,
-  TReservesData,
-  MarketSectionTypes,
-} from "@types";
+import { TMarketReserve, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
-  userData: TReservesData;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
 };
 
-const SupplyTab: React.FC<TProps> = ({
-  market,
-  asset,
-  assets,
-  userData,
-  isLoading,
-}) => {
+const SupplyTab: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
   const [value, setValue] = useState<string>("");
 
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <SupplyForm
         market={market}
-        asset={asset}
-        userData={userData}
+        activeAsset={activeAsset}
         isLoading={isLoading}
         value={value}
         setValue={setValue}
@@ -40,9 +26,7 @@ const SupplyTab: React.FC<TProps> = ({
       <CollateralStats
         type={MarketSectionTypes.Supply}
         market={market}
-        asset={asset}
-        assets={assets}
-        userData={userData}
+        activeAsset={activeAsset}
         isLoading={isLoading}
         value={value}
       />

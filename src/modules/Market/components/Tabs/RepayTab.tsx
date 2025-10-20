@@ -1,29 +1,20 @@
 // import { BasicPositionStats } from "../Stats/BasicPositionStats";
 import { RepayForm } from "../Forms/RepayForm";
 
-import type { TMarketReserve, TMarket, TReservesData } from "@types";
+import type { TMarketReserve, TMarket } from "@types";
 
 type TProps = {
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
-  userData: TReservesData;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
 };
 
-const RepayTab: React.FC<TProps> = ({
-  market,
-  asset,
-  assets,
-  userData,
-  isLoading,
-}) => {
+const RepayTab: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <RepayForm
         market={market}
-        asset={asset}
-        userData={userData}
+        activeAsset={activeAsset}
         isLoading={isLoading}
       />
     </div>

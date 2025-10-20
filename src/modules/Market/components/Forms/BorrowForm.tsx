@@ -29,18 +29,12 @@ import type { Abi } from "viem";
 
 type TProps = {
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  userData: Record<TAddress, string>;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
 };
 
-const BorrowForm: React.FC<TProps> = ({
-  market,
-  asset,
-  userData,
-  isLoading,
-}) => {
-  const assetData = getTokenData(asset?.address as TAddress);
+const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
+  const assetData = getTokenData(activeAsset?.address as TAddress);
 
   const client = web3clients[market?.network?.id as keyof typeof web3clients];
 
@@ -88,13 +82,13 @@ const BorrowForm: React.FC<TProps> = ({
     }
 
     const value = Number(numericValue);
-    const tokenPrice = Number(asset?.price);
+    const tokenPrice = Number(activeAsset?.price);
 
     const _usdValue = value * tokenPrice;
 
     const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
-    const balance = Number(userData?.[asset?.address as TAddress] ?? 0);
+    const balance = Number(activeAsset?.userData?.borrow?.balance ?? 0);
 
     if (!value) {
       setButton("");
@@ -111,7 +105,7 @@ const BorrowForm: React.FC<TProps> = ({
   const handleMaxInputChange = () => {
     if ($connected) {
       const _maxBalance = exactToFixed(
-        userData?.[asset?.address as TAddress] ?? 0,
+        activeAsset?.userData?.borrow?.balance ?? 0,
         10
       );
 
@@ -201,7 +195,7 @@ const BorrowForm: React.FC<TProps> = ({
 
   useEffect(() => {
     refreshForm();
-  }, [asset]);
+  }, [activeAsset]);
 
   return (
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
@@ -234,7 +228,7 @@ const BorrowForm: React.FC<TProps> = ({
             ) : (
               <span className="font-semibold">
                 {formatNumber(
-                  userData[asset?.address as TAddress] ?? 0,
+                  activeAsset?.userData?.borrow?.balance ?? 0,
                   "format"
                 )}{" "}
                 {assetData?.symbol}

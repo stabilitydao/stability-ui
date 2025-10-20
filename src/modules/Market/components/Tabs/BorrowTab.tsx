@@ -1,29 +1,20 @@
 // import { BasicPositionStats } from "../Stats/BasicPositionStats";
 import { BorrowForm } from "../Forms/BorrowForm";
 
-import type { TMarketReserve, TMarket, TAddress } from "@types";
+import type { TMarketReserve, TMarket } from "@types";
 
 type TProps = {
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
-  userData: Record<TAddress, string>;
+  activeAsset: TMarketReserve | undefined;
   isLoading: boolean;
 };
 
-const BorrowTab: React.FC<TProps> = ({
-  market,
-  asset,
-  assets,
-  userData,
-  isLoading,
-}) => {
+const BorrowTab: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <BorrowForm
         market={market}
-        asset={asset}
-        userData={userData}
+        activeAsset={activeAsset}
         isLoading={isLoading}
       />
       {/* <BasicPositionStats asset={asset} /> */}
