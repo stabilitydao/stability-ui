@@ -382,13 +382,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.deposit.address]: {
-          amount: amount,
+          amount: value,
           symbol: activeAsset.deposit.symbol,
           logo: activeAsset.deposit.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -447,13 +448,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.withdraw.address]: {
-          amount: amount,
+          amount: value,
           symbol: activeAsset.withdraw.symbol,
           logo: activeAsset.withdraw.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -516,6 +518,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -585,6 +588,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",

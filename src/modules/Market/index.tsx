@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 
-import deepEqual from "fast-deep-equal";
-
 import { useStore } from "@nanostores/react";
 
 import { WagmiLayout } from "@layouts";
@@ -12,34 +10,15 @@ import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions";
 
-import { useUserPoolData } from "./hooks";
-
-import {
-  updateQueryParams,
-  getShortAddress,
-  getTokenData,
-  getAllowance,
-  getBalance,
-} from "@utils";
-
-import { formatUnits } from "viem";
+import { updateQueryParams, getShortAddress } from "@utils";
 
 import { CHAINS } from "@constants";
 
 import { TOOLTIP_DESCRIPTIONS } from "./constants";
 
-import {
-  markets,
-  error,
-  account,
-  connected,
-  lastTx,
-  currentChainID,
-} from "@store";
+import { markets, error } from "@store";
 
-import { web3clients, AaveProtocolDataProviderABI } from "@web3";
-
-import { MarketSectionTypes, TMarket, TMarketReserve, TAddress } from "@types";
+import { MarketSectionTypes, TMarket, TMarketReserve } from "@types";
 
 interface IProps {
   network: string;
@@ -50,23 +29,11 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
-  const $lastTx = useStore(lastTx);
-  const $currentChainID = useStore(currentChainID);
-
-  const $connected = useStore(connected);
-  const $account = useStore(account);
-
-  const client = web3clients[network as keyof typeof web3clients];
-
   const { asset, section } = getInitialStateFromUrl();
 
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
-  const { data: userPoolData } = useUserPoolData(network, localMarket?.pool);
-
   const [activeAsset, setActiveAsset] = useState<TMarketReserve | undefined>();
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [activeSection, setActiveSection] =
     useState<MarketSectionTypes>(section);
@@ -106,122 +73,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     setActiveSection(section);
   };
 
-  const getUserReservesData = async () => {
-    if (!$connected || !$account || !localMarket?.reserves?.length) {
-      setIsLoading(false);
-      return null;
-    }
-
-    try {
-      setIsLoading(true);
-
-      const availableBorrowsBase = userPoolData?.availableBorrowsBase ?? 0;
-
-      const updatedReserves = await Promise.all(
-        localMarket.reserves.map(async (asset) => {
-          const address = asset.address as TAddress;
-          const aTokenAddress = asset.aToken as TAddress;
-          const decimals = getTokenData(address)?.decimals ?? 18;
-
-          const userData: Record<string, any> = {};
-
-          const rawATokenBalance = await getBalance(
-            client,
-            aTokenAddress,
-            $account
-          );
-          const withdraw = formatUnits(rawATokenBalance, decimals);
-
-          const [rawBalance, rawAllowance] = await Promise.all([
-            getBalance(client, address, $account),
-            getAllowance(client, address, $account, localMarket.pool),
-          ]);
-
-          const balance = formatUnits(rawBalance, decimals);
-          const allowance = formatUnits(rawAllowance, decimals);
-
-          userData.supply = { balance, allowance };
-          userData.withdraw = { balance: withdraw };
-
-          if (asset.isBorrowable) {
-            const tokenPrice = Number(asset.price);
-            if (availableBorrowsBase > 0 && tokenPrice > 0) {
-              const rawAmount =
-                (availableBorrowsBase / tokenPrice) * 10 ** decimals;
-              const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
-              const formattedAmount = formatUnits(safeAmount, decimals);
-              userData.borrow = { balance: formattedAmount };
-            } else {
-              userData.borrow = { balance: "0" };
-            }
-
-            const userReserveData = (await client.readContract({
-              address: localMarket.protocolDataProvider,
-              abi: AaveProtocolDataProviderABI,
-              functionName: "getUserReserveData",
-              args: [address, $account],
-            })) as bigint[];
-
-            const rawVariableDebt = userReserveData[2];
-            const repayBalance = formatUnits(rawVariableDebt, decimals);
-
-            const rawRepayAllowance = await getAllowance(
-              client,
-              address,
-              $account,
-              localMarket.pool
-            );
-            const repayAllowance = formatUnits(rawRepayAllowance, decimals);
-
-            userData.repay = {
-              balance: repayBalance,
-              allowance: repayAllowance,
-            };
-          }
-
-          return {
-            ...asset,
-            userData,
-          };
-        })
-      );
-
-      setActiveAsset((prev) => {
-        if (!prev) return updatedReserves[0];
-
-        const updatedAsset = updatedReserves.find(
-          ({ address }) => address.toLowerCase() === prev.address.toLowerCase()
-        );
-
-        if (!updatedAsset) return updatedReserves[0];
-
-        const isSame = deepEqual(prev, updatedAsset);
-        return isSame ? prev : updatedAsset;
-      });
-
-      setLocalMarket((prev) => {
-        if (!prev) return prev;
-
-        const prevReserves = prev.reserves;
-        const nextReserves = updatedReserves;
-
-        const hasChanged = !deepEqual(prevReserves, nextReserves);
-
-        if (!hasChanged) return prev;
-
-        return {
-          ...prev,
-          reserves: nextReserves,
-        };
-      });
-    } catch (error) {
-      console.error("Get user reserve states error:", error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const initLocalMarket = () => {
     if (!$markets || !market) return;
 
@@ -249,17 +100,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     setLocalMarket(updatedMarket);
     setActiveAsset(defaultAsset || updatedMarket.reserves[0]);
   };
-
-  useEffect(() => {
-    getUserReservesData();
-  }, [
-    localMarket,
-    $lastTx,
-    $account,
-    $connected,
-    $currentChainID,
-    userPoolData,
-  ]);
 
   useEffect(() => {
     initLocalMarket();
@@ -344,7 +184,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               marketData={localMarket}
               section={activeSection}
               activeAsset={activeAsset}
-              isLoading={isLoading}
             />
           </div>
         </div>

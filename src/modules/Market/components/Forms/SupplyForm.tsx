@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, Dispatch, SetStateAction, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  getTokenData,
   exactToFixed,
   getTransactionReceipt,
   setLocalStoreHash,
@@ -19,6 +18,8 @@ import {
 } from "@utils";
 
 import { getGasLimit, convertToUSD } from "../../functions";
+
+import { useUserReservesData, useUserPoolData } from "../../hooks";
 
 import { account, connected, lastTx } from "@store";
 
@@ -31,7 +32,6 @@ import type { Abi } from "viem";
 type TProps = {
   market: TMarket;
   activeAsset: TMarketReserve | undefined;
-  isLoading: boolean;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
 };
@@ -39,13 +39,21 @@ type TProps = {
 const SupplyForm: React.FC<TProps> = ({
   market,
   activeAsset,
-  isLoading,
   value,
   setValue,
 }) => {
-  const assetData = getTokenData(activeAsset?.address as TAddress);
-
   const client = web3clients[market?.network?.id as keyof typeof web3clients];
+
+  const {
+    data: userData,
+    isLoading,
+    refetch: refetchUserReservesData,
+  } = useUserReservesData(market);
+
+  const { refetch: refetchUserPoolData } = useUserPoolData(
+    market?.network?.id as string,
+    market.pool
+  );
 
   const $connected = useStore(connected);
   const $account = useStore(account);
@@ -54,7 +62,6 @@ const SupplyForm: React.FC<TProps> = ({
   const [button, setButton] = useState<string>("");
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
-
   const [needConfirm, setNeedConfirm] = useState<boolean>(false);
 
   // todo: add errors on ui
@@ -96,9 +103,9 @@ const SupplyForm: React.FC<TProps> = ({
 
     const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
-    const balance = Number(activeAsset?.userData?.supply?.balance ?? 0);
+    const balance = Number(reserve?.supply?.balance ?? 0);
 
-    const allowance = Number(activeAsset?.userData?.supply?.allowance ?? 0);
+    const allowance = Number(reserve?.supply?.allowance ?? 0);
 
     if (!value) {
       setButton("");
@@ -116,27 +123,24 @@ const SupplyForm: React.FC<TProps> = ({
 
   const handleMaxInputChange = () => {
     if ($connected) {
-      const _maxBalance = exactToFixed(
-        activeAsset?.userData?.supply?.balance ?? 0,
-        2
-      );
+      const _maxBalance = exactToFixed(reserve?.supply?.balance ?? 0, 2);
 
       handleInputChange(_maxBalance);
     }
   };
 
   const updateAllowance = async (minRequired?: number) => {
-    if (!assetData?.address || !$account) return;
+    if (!activeAsset?.assetData?.address || !$account) return;
 
     const rawAllowance = await getAllowance(
       client,
-      assetData.address,
+      activeAsset?.assetData?.address,
       $account,
       market.pool
     );
 
     const allowance = Number(
-      formatUnits(rawAllowance, assetData.decimals ?? 18)
+      formatUnits(rawAllowance, activeAsset?.assetData?.decimals ?? 18)
     );
 
     if (minRequired && allowance >= minRequired) {
@@ -154,13 +158,16 @@ const SupplyForm: React.FC<TProps> = ({
     try {
       setNeedConfirm(true);
 
-      const approveSum = parseUnits(String(amount), assetData?.decimals ?? 18);
+      const approveSum = parseUnits(
+        String(amount),
+        activeAsset?.assetData?.decimals ?? 18
+      );
 
       const params: [TAddress, bigint] = [market.pool, approveSum];
 
       const gasLimit = await getGasLimit(
         client,
-        assetData?.address as TAddress,
+        activeAsset?.assetData?.address as TAddress,
         ERC20ABI,
         "approve",
         params,
@@ -168,7 +175,7 @@ const SupplyForm: React.FC<TProps> = ({
       );
 
       const tx = await writeContract(wagmiConfig, {
-        address: assetData?.address as TAddress,
+        address: activeAsset?.assetData?.address as TAddress,
         abi: ERC20ABI,
         functionName: "approve",
         args: params,
@@ -180,7 +187,6 @@ const SupplyForm: React.FC<TProps> = ({
       const receipt = await getTransactionReceipt(tx);
 
       if (receipt?.status === "success") {
-        lastTx.set(receipt?.transactionHash);
         await updateAllowance(amount);
       }
     } catch (error) {
@@ -205,9 +211,12 @@ const SupplyForm: React.FC<TProps> = ({
     try {
       setNeedConfirm(true);
 
-      const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
+      const supplySum = parseUnits(
+        String(amount),
+        activeAsset?.assetData?.decimals ?? 18
+      );
 
-      const params = [assetData?.address, supplySum, $account, 0];
+      const params = [activeAsset?.assetData?.address, supplySum, $account, 0];
 
       const gasLimit = await getGasLimit(
         client,
@@ -232,17 +241,18 @@ const SupplyForm: React.FC<TProps> = ({
 
       let txTokens = {};
 
-      if (assetData?.address) {
+      if (activeAsset?.assetData?.address) {
         txTokens = {
-          [assetData.address]: {
+          [activeAsset?.assetData?.address]: {
             amount,
-            symbol: assetData.symbol,
-            logo: assetData.logoURI,
+            symbol: activeAsset?.assetData?.symbol,
+            logo: activeAsset?.assetData?.logoURI,
           },
         };
       }
 
       setLocalStoreHash({
+        chainId: market?.network?.id as string,
         timestamp: new Date().getTime(),
         hash: tx,
         status: receipt?.status || "reverted",
@@ -253,7 +263,6 @@ const SupplyForm: React.FC<TProps> = ({
 
       if (receipt?.status === "success") {
         lastTx.set(receipt?.transactionHash);
-
         refreshForm();
       }
     } catch (error) {
@@ -261,6 +270,9 @@ const SupplyForm: React.FC<TProps> = ({
         errorHandler(error);
       }
     }
+
+    refetchUserReservesData();
+    refetchUserPoolData();
     setTransactionInProgress(false);
   };
 
@@ -276,6 +288,11 @@ const SupplyForm: React.FC<TProps> = ({
     }
   };
 
+  const reserve = useMemo(() => {
+    if (!activeAsset?.address) return undefined;
+    return userData?.[activeAsset.address];
+  }, [activeAsset, userData]);
+
   useEffect(() => {
     refreshForm();
   }, [activeAsset]);
@@ -284,7 +301,7 @@ const SupplyForm: React.FC<TProps> = ({
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
-          Supply {assetData?.symbol}
+          Supply {activeAsset?.assetData?.symbol}
         </span>
 
         <label className="bg-[#18191C] p-4 rounded-lg block border border-[#232429]">
@@ -308,11 +325,8 @@ const SupplyForm: React.FC<TProps> = ({
               <Skeleton height={24} width={70} />
             ) : (
               <span className="font-semibold">
-                {formatNumber(
-                  activeAsset?.userData?.supply?.balance ?? 0,
-                  "format"
-                )}{" "}
-                {assetData?.symbol}
+                {formatNumber(reserve?.supply?.balance ?? 0, "format")}{" "}
+                {activeAsset?.assetData?.symbol}
               </span>
             )}
             <button

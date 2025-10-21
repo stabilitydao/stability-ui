@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, Dispatch, SetStateAction, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  getTokenData,
   exactToFixed,
   formatNumber,
   getTransactionReceipt,
@@ -18,6 +17,8 @@ import {
 } from "@utils";
 
 import { convertToUSD, getGasLimit } from "../../functions";
+
+import { useUserReservesData, useUserPoolData } from "../../hooks";
 
 import { account, connected, lastTx } from "@store";
 
@@ -30,7 +31,6 @@ import type { Abi } from "viem";
 type TProps = {
   market: TMarket;
   activeAsset: TMarketReserve | undefined;
-  isLoading: boolean;
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
 };
@@ -38,13 +38,21 @@ type TProps = {
 const WithdrawForm: React.FC<TProps> = ({
   market,
   activeAsset,
-  isLoading,
   value,
   setValue,
 }) => {
-  const assetData = getTokenData(activeAsset?.address as TAddress);
-
   const client = web3clients[market?.network?.id as keyof typeof web3clients];
+
+  const {
+    data: userData,
+    isLoading,
+    refetch: refetchUserReservesData,
+  } = useUserReservesData(market);
+
+  const { refetch: refetchUserPoolData } = useUserPoolData(
+    market?.network?.id as string,
+    market.pool
+  );
 
   const $connected = useStore(connected);
   const $account = useStore(account);
@@ -95,7 +103,7 @@ const WithdrawForm: React.FC<TProps> = ({
 
     const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
-    const balance = Number(activeAsset?.userData?.withdraw?.balance ?? 0);
+    const balance = Number(reserve?.withdraw?.balance ?? 0);
 
     if (!value) {
       setButton("");
@@ -111,10 +119,7 @@ const WithdrawForm: React.FC<TProps> = ({
 
   const handleMaxInputChange = () => {
     if ($connected) {
-      const _maxBalance = exactToFixed(
-        activeAsset?.userData?.withdraw?.balance ?? 0,
-        2
-      );
+      const _maxBalance = exactToFixed(reserve?.withdraw?.balance ?? 0, 2);
 
       handleInputChange(_maxBalance);
     }
@@ -130,9 +135,12 @@ const WithdrawForm: React.FC<TProps> = ({
     try {
       setNeedConfirm(true);
 
-      const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
+      const withdrawSum = parseUnits(
+        String(amount),
+        activeAsset?.assetData?.decimals ?? 18
+      );
 
-      const params = [assetData?.address, supplySum, $account];
+      const params = [activeAsset?.assetData?.address, withdrawSum, $account];
 
       const gasLimit = await getGasLimit(
         client,
@@ -157,17 +165,18 @@ const WithdrawForm: React.FC<TProps> = ({
 
       let txTokens = {};
 
-      if (assetData?.address) {
+      if (activeAsset?.assetData?.address) {
         txTokens = {
-          [assetData.address]: {
+          [activeAsset?.assetData?.address]: {
             amount,
-            symbol: assetData.symbol,
-            logo: assetData.logoURI,
+            symbol: activeAsset?.assetData?.symbol,
+            logo: activeAsset?.assetData?.logoURI,
           },
         };
       }
 
       setLocalStoreHash({
+        chainId: market?.network?.id as string,
         timestamp: new Date().getTime(),
         hash: tx,
         status: receipt?.status || "reverted",
@@ -186,6 +195,9 @@ const WithdrawForm: React.FC<TProps> = ({
         errorHandler(error);
       }
     }
+
+    refetchUserReservesData();
+    refetchUserPoolData();
     setTransactionInProgress(false);
   };
 
@@ -200,6 +212,11 @@ const WithdrawForm: React.FC<TProps> = ({
     }
   };
 
+  const reserve = useMemo(() => {
+    if (!activeAsset?.address) return undefined;
+    return userData?.[activeAsset.address];
+  }, [activeAsset, userData]);
+
   useEffect(() => {
     refreshForm();
   }, [activeAsset]);
@@ -208,7 +225,7 @@ const WithdrawForm: React.FC<TProps> = ({
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3 md:min-w-[350px]">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
-          Withdraw {assetData?.symbol}
+          Withdraw {activeAsset?.assetData?.symbol}
         </span>
 
         <label className="bg-[#18191C] p-4 rounded-lg block border border-[#232429]">
@@ -234,11 +251,8 @@ const WithdrawForm: React.FC<TProps> = ({
               <Skeleton height={24} width={70} />
             ) : (
               <span className="font-semibold">
-                {formatNumber(
-                  activeAsset?.userData?.withdraw?.balance ?? 0,
-                  "format"
-                )}{" "}
-                {assetData?.symbol}
+                {formatNumber(reserve?.withdraw?.balance ?? 0, "format")}{" "}
+                {activeAsset?.assetData?.symbol}
               </span>
             )}
 

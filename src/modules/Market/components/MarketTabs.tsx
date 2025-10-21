@@ -13,48 +13,18 @@ type TProps = {
   marketData: TMarket;
   section: MarketSectionTypes;
   activeAsset: TMarketReserve | undefined;
-  isLoading: boolean;
 };
 
-const MarketTabs: React.FC<TProps> = ({
-  marketData,
-  section,
-  activeAsset,
-  isLoading,
-}) => {
+const MarketTabs: React.FC<TProps> = ({ marketData, section, activeAsset }) => {
   switch (section) {
     case MarketSectionTypes.Supply:
-      return (
-        <SupplyTab
-          market={marketData}
-          activeAsset={activeAsset}
-          isLoading={isLoading}
-        />
-      );
+      return <SupplyTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Withdraw:
-      return (
-        <WithdrawTab
-          market={marketData}
-          activeAsset={activeAsset}
-          isLoading={isLoading}
-        />
-      );
+      return <WithdrawTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Borrow:
-      return (
-        <BorrowTab
-          market={marketData}
-          activeAsset={activeAsset}
-          isLoading={isLoading}
-        />
-      );
+      return <BorrowTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Repay:
-      return (
-        <RepayTab
-          market={marketData}
-          activeAsset={activeAsset}
-          isLoading={isLoading}
-        />
-      );
+      return <RepayTab market={marketData} activeAsset={activeAsset} />;
     // case MarketSectionTypes.Leverage:
     //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:

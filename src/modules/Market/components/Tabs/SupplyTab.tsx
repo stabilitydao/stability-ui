@@ -1,17 +1,16 @@
 import { useState } from "react";
 
 import { SupplyForm } from "../Forms/SupplyForm";
-import { CollateralStats } from "../Stats/CollateralStats";
+import { BasicStats } from "../Stats/BasicStats";
 
 import { TMarketReserve, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
   market: TMarket;
   activeAsset: TMarketReserve | undefined;
-  isLoading: boolean;
 };
 
-const SupplyTab: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
+const SupplyTab: React.FC<TProps> = ({ market, activeAsset }) => {
   const [value, setValue] = useState<string>("");
 
   return (
@@ -19,15 +18,13 @@ const SupplyTab: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
       <SupplyForm
         market={market}
         activeAsset={activeAsset}
-        isLoading={isLoading}
         value={value}
         setValue={setValue}
       />
-      <CollateralStats
+      <BasicStats
         type={MarketSectionTypes.Supply}
         market={market}
         activeAsset={activeAsset}
-        isLoading={isLoading}
         value={value}
       />
     </div>

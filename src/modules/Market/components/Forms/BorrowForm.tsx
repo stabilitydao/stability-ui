@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  getTokenData,
   exactToFixed,
   formatNumber,
   getTransactionReceipt,
@@ -18,6 +17,8 @@ import {
 } from "@utils";
 
 import { convertToUSD, getGasLimit } from "../../functions";
+
+import { useUserReservesData, useUserPoolData } from "../../hooks";
 
 import { account, connected, lastTx } from "@store";
 
@@ -30,18 +31,32 @@ import type { Abi } from "viem";
 type TProps = {
   market: TMarket;
   activeAsset: TMarketReserve | undefined;
-  isLoading: boolean;
+  value: string;
+  setValue: Dispatch<SetStateAction<string>>;
 };
 
-const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
-  const assetData = getTokenData(activeAsset?.address as TAddress);
-
+const BorrowForm: React.FC<TProps> = ({
+  market,
+  activeAsset,
+  value,
+  setValue,
+}) => {
   const client = web3clients[market?.network?.id as keyof typeof web3clients];
+
+  const {
+    data: userData,
+    isLoading,
+    refetch: refetchUserReservesData,
+  } = useUserReservesData(market);
+
+  const { refetch: refetchUserPoolData } = useUserPoolData(
+    market?.network?.id as string,
+    market.pool
+  );
 
   const $connected = useStore(connected);
   const $account = useStore(account);
 
-  const [value, setValue] = useState<string>("");
   const [usdValue, setUsdValue] = useState<string>("$0");
   const [button, setButton] = useState<string>("");
   const [transactionInProgress, setTransactionInProgress] =
@@ -88,7 +103,7 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
 
     const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
 
-    const balance = Number(activeAsset?.userData?.borrow?.balance ?? 0);
+    const balance = Number(reserve?.borrow?.balance ?? 0);
 
     if (!value) {
       setButton("");
@@ -104,10 +119,7 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
 
   const handleMaxInputChange = () => {
     if ($connected) {
-      const _maxBalance = exactToFixed(
-        activeAsset?.userData?.borrow?.balance ?? 0,
-        10
-      );
+      const _maxBalance = exactToFixed(reserve?.borrow?.balance ?? 0, 10);
 
       handleInputChange(_maxBalance);
     }
@@ -123,9 +135,18 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
     try {
       setNeedConfirm(true);
 
-      const supplySum = parseUnits(String(amount), assetData?.decimals ?? 18);
+      const borrowSum = parseUnits(
+        String(amount),
+        activeAsset?.assetData?.decimals ?? 18
+      );
 
-      const params = [assetData?.address, supplySum, BigInt(2), 0, $account];
+      const params = [
+        activeAsset?.assetData?.address,
+        borrowSum,
+        BigInt(2),
+        0,
+        $account,
+      ];
 
       const gasLimit = await getGasLimit(
         client,
@@ -150,17 +171,18 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
 
       let txTokens = {};
 
-      if (assetData?.address) {
+      if (activeAsset?.assetData?.address) {
         txTokens = {
-          [assetData.address]: {
+          [activeAsset?.assetData?.address]: {
             amount,
-            symbol: assetData.symbol,
-            logo: assetData.logoURI,
+            symbol: activeAsset?.assetData?.symbol,
+            logo: activeAsset?.assetData?.logoURI,
           },
         };
       }
 
       setLocalStoreHash({
+        chainId: market?.network?.id as string,
         timestamp: new Date().getTime(),
         hash: tx,
         status: receipt?.status || "reverted",
@@ -179,6 +201,9 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
         errorHandler(error);
       }
     }
+
+    refetchUserReservesData();
+    refetchUserPoolData();
     setTransactionInProgress(false);
   };
 
@@ -193,6 +218,11 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
     }
   };
 
+  const reserve = useMemo(() => {
+    if (!activeAsset?.address) return undefined;
+    return userData?.[activeAsset.address];
+  }, [activeAsset, userData]);
+
   useEffect(() => {
     refreshForm();
   }, [activeAsset]);
@@ -201,7 +231,7 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
     <div className="flex flex-col gap-6 bg-[#111114] border border-[#232429] rounded-xl p-4 md:p-6 w-full lg:w-1/3">
       <div className="flex flex-col gap-4">
         <span className="font-semibold text-[20px] leading-7">
-          Borrow {assetData?.symbol}
+          Borrow {activeAsset?.assetData?.symbol}
         </span>
 
         <label className="bg-[#18191C] p-4 rounded-lg block border border-[#232429]">
@@ -227,11 +257,8 @@ const BorrowForm: React.FC<TProps> = ({ market, activeAsset, isLoading }) => {
               <Skeleton height={24} width={70} />
             ) : (
               <span className="font-semibold">
-                {formatNumber(
-                  activeAsset?.userData?.borrow?.balance ?? 0,
-                  "format"
-                )}{" "}
-                {assetData?.symbol}
+                {formatNumber(reserve?.borrow?.balance ?? 0, "format")}{" "}
+                {activeAsset?.assetData?.symbol}
               </span>
             )}
 

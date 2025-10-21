@@ -21,6 +21,7 @@ import type {
   TLiquidation,
   TMarketUser,
   TUserPoolData,
+  TUserReservesMap,
 } from "@types";
 
 // atoms
@@ -37,10 +38,6 @@ const vaultData = atom<TVaultDataKey>({});
 const transactionSettings = atom<TSettings>(DEFAULT_TRANSACTION_SETTINGS);
 
 const marketPrices = atom<TMarketPrices>({});
-
-const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
-const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
-const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
 
 const visible = atom<boolean>(true);
 const isVaultsLoaded = atom<boolean>(false);
@@ -65,6 +62,11 @@ const currentChainID = atom();
 const vaults = deepMap<any>(false);
 const metaVaults = deepMap<any>(false);
 const markets = deepMap<any>(false);
+
+const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
+const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
+const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
+const userReservesData = deepMap<Record<string, TUserReservesMap>>({});
 
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
@@ -115,4 +117,5 @@ export {
   marketsLiquidations,
   marketsUsers,
   userPoolsData,
+  userReservesData,
 };

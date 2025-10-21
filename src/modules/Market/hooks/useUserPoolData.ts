@@ -34,7 +34,7 @@ export const useUserPoolData = (
 
   const client = web3clients[network as keyof typeof web3clients];
 
-  const isLoading = $userPoolsData[poolAddress || ""] === undefined;
+  const isLoading = !$userPoolsData[poolAddress || ""];
 
   const fetchUserData = async () => {
     if (!$account || !poolAddress) return;
@@ -47,14 +47,12 @@ export const useUserPoolData = (
         args: [$account],
       })) as bigint[];
 
-      const availableBorrowsBase = Number(formatUnits(userData[2], 8));
       const ltv = Number((Number(userData[4]) / 100).toFixed(2));
       const healthFactor = Number(formatUnits(userData[5], 18));
 
       userPoolsData.setKey(poolAddress, {
         ltv,
         healthFactor,
-        availableBorrowsBase,
       });
     } catch (error) {
       console.error("Get user pool data error:", error);

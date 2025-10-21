@@ -471,6 +471,7 @@ type TSettings = {
 };
 
 type TToast = {
+  chainId: string;
   hash: string;
   status: string;
   timestamp: number;
@@ -726,6 +727,15 @@ type TUserReserveData = {
   allowance?: string;
 };
 
+type TUserReserve = {
+  supply?: TUserReserveData;
+  withdraw?: TUserReserveData;
+  borrow?: TUserReserveData;
+  repay?: TUserReserveData;
+};
+
+type TUserReservesMap = Record<TAddress, TUserReserve>;
+
 type TMarketReserve = {
   // lib data
   address: TAddress;
@@ -735,14 +745,6 @@ type TMarketReserve = {
   oracle: TAddress;
   oracleName: string;
   treasury: TAddress;
-
-  //userData
-  userData: {
-    supply?: TUserReserveData;
-    withdraw?: TUserReserveData;
-    borrow?: TUserReserveData;
-    repay?: TUserReserveData;
-  };
 
   // backend data
   name: string;
@@ -769,6 +771,9 @@ type TMarketReserve = {
 
   availableToBorrow: string;
   availableToBorrowInUSD: string;
+
+  // assetData
+  assetData?: TTokenData;
 };
 
 type TMarket = {
@@ -802,7 +807,6 @@ type TLiquidation = {
 type TUserPoolData = {
   ltv: number;
   healthFactor: number;
-  availableBorrowsBase: number;
 };
 
 // enums
@@ -950,4 +954,6 @@ export type {
   TMarketUser,
   TLiquidation,
   TUserPoolData,
+  TUserReserve,
+  TUserReservesMap,
 };
