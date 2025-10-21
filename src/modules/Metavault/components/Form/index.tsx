@@ -509,7 +509,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.wrap.address]: {
-          amount: shares,
+          amount: value,
           symbol: activeAsset.wrap.symbol,
           logo: activeAsset.wrap.logoURI,
         },
@@ -578,7 +578,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.unwrap.address]: {
-          amount: shares,
+          amount: value,
           symbol: activeAsset.unwrap.symbol,
           logo: activeAsset.unwrap.logoURI,
         },

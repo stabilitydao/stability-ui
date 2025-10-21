@@ -9,7 +9,11 @@ import {
 
 import { cn, formatNumber } from "@utils";
 
-import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
+import {
+  VAULTS_WITH_NAME,
+  PROTOCOLS,
+  META_VAULTS_EXCEPTIONS,
+} from "@constants";
 
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
@@ -54,11 +58,17 @@ const Vault: React.FC<IProps> = ({
   const rawProtocol =
     vault.type === VaultTypes.Vault ? vault?.strategyInfo?.protocols[0] : null;
 
-  const protocol = rawProtocol?.name?.includes("Aave")
+  const _protocolException = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
     : rawProtocol?.name?.includes("Compound")
       ? PROTOCOLS.enclabs
       : rawProtocol;
+
+  const protocol = META_VAULTS_EXCEPTIONS.some(
+    (address) => address === vault.address
+  )
+    ? rawProtocol
+    : _protocolException;
 
   const link =
     vault?.type === VaultTypes.Vault

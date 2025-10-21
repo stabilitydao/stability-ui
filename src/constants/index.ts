@@ -290,6 +290,11 @@ const VAULTS_WITH_NAME = {
   "0xb1e87223f5b080f687b298df4fc8acabd3d1797b": "PT-smsUSD (30 Oct), 141",
 };
 
+const META_VAULTS_EXCEPTIONS = [
+  "0x1111836d0ff66770f9d9a22fdb7e1f0349501111",
+  "0xa881fa6e4d7a338abff52bc3232bf684c2ebc041",
+];
+
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
@@ -463,4 +468,5 @@ export {
   PRICES_ORDER,
   MARKET_USERS_TABLE,
   MARKET_LIQUIDATIONS_TABLE,
+  META_VAULTS_EXCEPTIONS,
 };

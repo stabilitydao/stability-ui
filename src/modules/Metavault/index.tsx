@@ -27,6 +27,7 @@ import {
   PROTOCOLS,
   PROTOCOLS_TABLE,
   CHAINS,
+  META_VAULTS_EXCEPTIONS,
 } from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
@@ -179,15 +180,21 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     if (!metaVault) return;
 
-    const protocols = ["Stability", ...metaVault.protocols]
-      .filter((name) => !name.toLowerCase().includes("aave"))
-      .map((name) =>
-        Object.values(PROTOCOLS).find(
-          (p) =>
-            p.name.replace(" ", "").toLowerCase() ===
-            name.replace(" ", "").toLowerCase()
-        )
-      );
+    const baseProtocols = META_VAULTS_EXCEPTIONS.some(
+      (address) => address === metaVault.address
+    )
+      ? metaVault.protocols
+      : ["Stability", ...metaVault.protocols].filter(
+          (name) => !name.toLowerCase().includes("aave")
+        );
+
+    const protocols = baseProtocols.map((name) =>
+      Object.values(PROTOCOLS).find(
+        (p) =>
+          p.name.replace(" ", "").toLowerCase() ===
+          name.replace(" ", "").toLowerCase()
+      )
+    );
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
