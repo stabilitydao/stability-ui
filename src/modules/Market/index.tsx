@@ -243,11 +243,10 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       reserves: _market.reserves,
     };
 
-    setLocalMarket(updatedMarket);
-
     const defaultAsset =
       asset && updatedMarket.reserves.find(({ address }) => asset === address);
 
+    setLocalMarket(updatedMarket);
     setActiveAsset(defaultAsset || updatedMarket.reserves[0]);
   };
 
