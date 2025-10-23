@@ -54,7 +54,7 @@ import { APRModal } from "./Modals/APRModal";
 
 import { DisplayType } from "./DisplayType";
 
-import { ActionButton } from "./ActionButton";
+import { ActionButton } from "./Buttons";
 
 import { Socials } from "./Socials";
 

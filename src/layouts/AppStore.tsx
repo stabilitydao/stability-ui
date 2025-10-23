@@ -1123,7 +1123,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const init = async () => {
     if (!$metaVaults) {
-      const metaVaultsWithName = deployments["146"].metaVaults?.map(
+      const sonicMetaVaultsWithName = deployments["146"].metaVaults?.map(
         (metaV) => ({
           ...metaV,
           name: getTokenData(metaV.address)?.name,
@@ -1131,7 +1131,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         })
       );
 
-      metaVaults.set({ "146": metaVaultsWithName });
+      const plasmaMetaVaultsWithName = deployments["9745"].metaVaults?.map(
+        (metaV) => ({
+          ...metaV,
+          name: getTokenData(metaV.address)?.name,
+          network: "9745",
+        })
+      );
+
+      metaVaults.set({
+        "146": sonicMetaVaultsWithName,
+        "9745": plasmaMetaVaultsWithName,
+      });
     }
 
     if (!$markets) {
