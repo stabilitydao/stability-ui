@@ -1122,6 +1122,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   };
 
   const init = async () => {
+    // static meta vaults data
     if (!$metaVaults) {
       const sonicMetaVaultsWithName = deployments["146"].metaVaults?.map(
         (metaV) => ({
@@ -1145,6 +1146,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       });
     }
 
+    // static markets data
     if (!$markets) {
       localMarkets = await loadMarketsData({});
       markets.set(localMarkets);

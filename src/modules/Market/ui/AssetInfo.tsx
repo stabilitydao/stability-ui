@@ -121,7 +121,7 @@ const AssetInfo: React.FC<TProps> = ({
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip
                   name={`${assetData?.symbol} Cap`}
-                  description="desc"
+                  description={TOOLTIP_DESCRIPTIONS.tokenCap}
                 />
                 <span className="font-semibold">
                   {formatNumber(asset?.cap, "abbreviate")?.slice(1)}{" "}
@@ -131,7 +131,10 @@ const AssetInfo: React.FC<TProps> = ({
           </div>
           <div className="w-full flex flex-col items-start gap-2">
             <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="Oracle" description="desc" />
+              <CustomTooltip
+                name="Oracle"
+                description={TOOLTIP_DESCRIPTIONS.oracle}
+              />
               <span className="font-semibold truncated-text text-end">
                 {asset?.oracleName}
               </span>
@@ -160,7 +163,10 @@ const AssetInfo: React.FC<TProps> = ({
 
             {!!Number(asset?.liquidationBonus) && (
               <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-                <CustomTooltip name="Liquidation bonus" description="desc" />
+                <CustomTooltip
+                  name="Liquidation bonus"
+                  description={TOOLTIP_DESCRIPTIONS.liquidationBonus}
+                />
                 <span className="font-semibold">
                   {asset?.liquidationBonus}%
                 </span>
@@ -168,7 +174,10 @@ const AssetInfo: React.FC<TProps> = ({
             )}
             {asset?.isBorrowable && (
               <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-                <CustomTooltip name="Reserve factor" description="desc" />
+                <CustomTooltip
+                  name="Reserve factor"
+                  description={TOOLTIP_DESCRIPTIONS.reserveFactor}
+                />
                 <span className="font-semibold">{asset?.reserveFactor}%</span>
               </div>
             )}

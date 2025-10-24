@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -34,10 +34,17 @@ export const useUserPoolData = (
 
   const client = web3clients[network as keyof typeof web3clients];
 
-  const isLoading = !$userPoolsData[poolAddress || ""];
+  const [isLoading, setIsLoading] = useState(
+    !$userPoolsData[poolAddress || ""]
+  );
 
   const fetchUserData = async () => {
-    if (!$account || !poolAddress) return;
+    if (!$account || !poolAddress) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const userData = (await client.readContract({
@@ -56,6 +63,8 @@ export const useUserPoolData = (
       });
     } catch (error) {
       console.error("Get user pool data error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

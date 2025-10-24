@@ -225,14 +225,14 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
             const current = subProp.current * 100;
             const target = subProp.target * 100;
 
-            const allocation = (Number(metaVault.tvl) / 100) * current;
+            const subAllocation = (Number(allocation) / 100) * current;
 
             return {
               ...vault,
               proportions: {
                 current,
                 target,
-                allocation,
+                allocation: subAllocation,
               },
               APR: vault.earningData.apr.latest,
             };
@@ -240,7 +240,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
           return {
             ...subMetaVault,
-            proportions: { current, target, allocation: Number(metaVault.tvl) },
+            proportions: { current, target, allocation },
             vaults: vaultsData,
           };
         }
