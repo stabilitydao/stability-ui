@@ -333,6 +333,7 @@ const RepayForm: React.FC<TProps> = ({
               value={value}
               onChange={(e) => handleInputChange(e?.target?.value)}
               className="bg-transparent text-2xl font-medium outline-none w-full"
+              disabled={!$connected}
             />
           </div>
           <div className="text-[#7C7E81] font-medium text-[14px] leading-5">
