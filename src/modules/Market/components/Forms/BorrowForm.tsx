@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  exactToFixed,
   formatNumber,
   getTransactionReceipt,
   setLocalStoreHash,
@@ -87,42 +86,50 @@ const BorrowForm: React.FC<TProps> = ({
     setNeedConfirm(false);
   };
 
-  const handleInputChange = (inputValue: string) => {
-    let numericValue = inputValue.replace(/[^0-9.]/g, "");
+  const handleInputChange = (rawValue: string) => {
+    if (!$connected) return;
 
-    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+    const availableBalance = Number(reserve?.borrow?.balance ?? 0);
+    const tokenPrice = Number(activeAsset?.price ?? 0);
 
-    if (numericValue.startsWith(".")) {
-      numericValue = "0" + numericValue;
+    if (Number(rawValue) > availableBalance) {
+      rawValue = reserve?.borrow?.balance ?? ("0" as string); // for < 0.000 numbers
     }
 
-    const value = Number(numericValue);
-    const tokenPrice = Number(activeAsset?.price);
+    let input = rawValue.replace(/[^0-9.]/g, "");
 
-    const _usdValue = value * tokenPrice;
+    input = input.replace(/^(\d*\.)(.*)\./, "$1$2");
 
-    const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
+    if (input.startsWith(".")) {
+      input = "0" + input;
+    }
 
-    const balance = Number(reserve?.borrow?.balance ?? 0);
+    const value = Number(input);
+
+    const usdValue = value * tokenPrice;
+    const formattedUsdValue = !!usdValue ? convertToUSD(usdValue) : "$0";
+
+    let nextButton: string = "";
 
     if (!value) {
-      setButton("");
-    } else if (value > balance) {
-      setButton("insufficientBalance");
+      nextButton = "";
+    } else if (value > availableBalance) {
+      nextButton = "insufficientBalance";
     } else {
-      setButton("Borrow");
+      nextButton = "Borrow";
     }
 
-    setValue(numericValue);
+    setValue(input);
     setUsdValue(formattedUsdValue);
+    setButton(nextButton);
   };
 
   const handleMaxInputChange = () => {
-    if ($connected) {
-      const _maxBalance = exactToFixed(reserve?.borrow?.balance ?? 0, 10);
+    if (!$connected) return;
 
-      handleInputChange(_maxBalance);
-    }
+    const availableBalance = reserve?.borrow?.balance ?? "0";
+
+    handleInputChange(availableBalance);
   };
 
   const borrow = async () => {

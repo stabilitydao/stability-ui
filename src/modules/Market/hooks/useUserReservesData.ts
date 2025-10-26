@@ -49,7 +49,11 @@ export const useUserReservesData = (market: TMarket): TResult => {
     try {
       const reservesMap: TUserReservesMap = {};
 
+      let totalCollateralBase = 0;
+      let totalDebtBase = 0;
       let availableBorrowsBase = 0;
+      let liquidationThreshold = 0;
+
       try {
         const userData = (await client.readContract({
           address: pool,
@@ -58,7 +62,10 @@ export const useUserReservesData = (market: TMarket): TResult => {
           args: [$account],
         })) as bigint[];
 
+        totalCollateralBase = Number(formatUnits(userData[0], 8));
+        totalDebtBase = Number(formatUnits(userData[1], 8));
         availableBorrowsBase = Number(formatUnits(userData[2], 8));
+        liquidationThreshold = Number(userData[3]) / 10000;
       } catch (err) {
         console.warn("Failed to get availableBorrowsBase:", err);
       }
@@ -73,7 +80,41 @@ export const useUserReservesData = (market: TMarket): TResult => {
           aTokenAddress,
           $account
         );
+
         const withdraw = formatUnits(rawATokenBalance, decimals);
+
+        let maxWithdraw = "0";
+
+        if (Number(withdraw)) {
+          try {
+            const priceUSD = Number(asset.price);
+
+            if (!!priceUSD) {
+              let maxWithdrawUSD = 0;
+
+              if (!totalDebtBase) {
+                maxWithdrawUSD = Number(withdraw) * priceUSD;
+              } else {
+                const minCollateralUSD = totalDebtBase / liquidationThreshold;
+                maxWithdrawUSD = Math.max(
+                  totalCollateralBase - minCollateralUSD,
+                  0
+                );
+              }
+
+              const maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+
+              const _maxWithdraw = Math.min(
+                maxWithdrawTokens,
+                Number(withdraw)
+              );
+
+              maxWithdraw = _maxWithdraw.toString();
+            }
+          } catch (err) {
+            console.warn("Failed to calculate maxWithdraw:", err);
+          }
+        }
 
         const [rawBalance, rawAllowance] = await Promise.all([
           getBalance(client, address, $account),
@@ -85,7 +126,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
 
         const reserveData: any = {
           supply: { balance, allowance },
-          withdraw: { balance: withdraw },
+          withdraw: { balance: withdraw, maxWithdraw },
         };
 
         if (asset.isBorrowable) {
@@ -111,6 +152,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
           })) as bigint[];
 
           const rawVariableDebt = userReserveData[2];
+
           const repayBalance = formatUnits(rawVariableDebt, decimals);
 
           const rawRepayAllowance = await getAllowance(

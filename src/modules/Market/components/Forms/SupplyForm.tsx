@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  exactToFixed,
   getTransactionReceipt,
   setLocalStoreHash,
   getAllowance,
@@ -87,46 +86,53 @@ const SupplyForm: React.FC<TProps> = ({
     setNeedConfirm(false);
   };
 
-  const handleInputChange = (inputValue: string) => {
-    let numericValue = inputValue.replace(/[^0-9.]/g, "");
+  const handleInputChange = (rawValue: string) => {
+    if (!$connected) return;
 
-    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+    const walletBalance = Number(reserve?.supply?.balance ?? 0);
+    const allowance = Number(reserve?.supply?.allowance ?? 0);
+    const tokenPrice = Number(activeAsset?.price ?? 0);
 
-    if (numericValue.startsWith(".")) {
-      numericValue = "0" + numericValue;
+    if (Number(rawValue) > walletBalance) {
+      rawValue = reserve?.supply?.balance ?? ("0" as string); // for < 0.000 numbers
     }
 
-    const value = Number(numericValue);
-    const tokenPrice = Number(activeAsset?.price);
+    let input = rawValue.replace(/[^0-9.]/g, "");
 
-    const _usdValue = value * tokenPrice;
+    input = input.replace(/^(\d*\.)(.*)\./, "$1$2");
 
-    const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
+    if (input.startsWith(".")) {
+      input = "0" + input;
+    }
 
-    const balance = Number(reserve?.supply?.balance ?? 0);
+    const value = Number(input);
 
-    const allowance = Number(reserve?.supply?.allowance ?? 0);
+    const usdValue = value * tokenPrice;
+    const formattedUsdValue = !!usdValue ? convertToUSD(usdValue) : "$0";
+
+    let nextButton: string = "";
 
     if (!value) {
-      setButton("");
-    } else if (value > balance) {
-      setButton("insufficientBalance");
+      nextButton = "";
+    } else if (value > walletBalance) {
+      nextButton = "insufficientBalance";
     } else if (value > allowance) {
-      setButton("Approve");
+      nextButton = "Approve";
     } else {
-      setButton("Supply");
+      nextButton = "Supply";
     }
 
-    setValue(numericValue);
+    setValue(input);
     setUsdValue(formattedUsdValue);
+    setButton(nextButton);
   };
 
   const handleMaxInputChange = () => {
-    if ($connected) {
-      const _maxBalance = exactToFixed(reserve?.supply?.balance ?? 0, 2);
+    if (!$connected) return;
 
-      handleInputChange(_maxBalance);
-    }
+    const walletBalance = reserve?.supply?.balance ?? "0";
+
+    handleInputChange(walletBalance);
   };
 
   const updateAllowance = async (minRequired?: number) => {

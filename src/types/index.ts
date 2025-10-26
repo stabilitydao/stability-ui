@@ -722,6 +722,11 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
+type TUserReserveWithdrawData = {
+  balance: string;
+  maxWithdraw: string;
+};
+
 type TUserReserveData = {
   balance: string;
   allowance?: string;
@@ -729,7 +734,7 @@ type TUserReserveData = {
 
 type TUserReserve = {
   supply?: TUserReserveData;
-  withdraw?: TUserReserveData;
+  withdraw?: TUserReserveWithdrawData;
   borrow?: TUserReserveData;
   repay?: TUserReserveData;
 };
@@ -805,7 +810,10 @@ type TLiquidation = {
 };
 
 type TUserPoolData = {
-  ltv: number;
+  totalCollateralBase: number;
+  totalDebtBase: number;
+  currentLiquidationThreshold: number;
+  maxLTV: number;
   healthFactor: number;
 };
 

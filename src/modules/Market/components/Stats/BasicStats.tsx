@@ -37,12 +37,16 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     futureBorrowed: "0",
     depositedInUSD: "$0",
     borrowedInUSD: "$0",
+    LTV: "0",
+    futureLTV: "0",
+    healthFactor: "∞",
+    futureHealthFactor: "∞",
     loaded: false,
   });
 
   const { data: userPoolData, isLoading: isPoolLoading } = useUserPoolData(
     market?.network?.id as string,
-    market.pool
+    market?.pool
   );
 
   const { data: userData, isLoading: isReservesLoading } =
@@ -57,26 +61,40 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       futureBorrowed: "0",
       depositedInUSD: "$0",
       borrowedInUSD: "$0",
+      LTV: "0",
+      futureLTV: "0",
+      healthFactor: "∞",
+      futureHealthFactor: "0",
       loaded: true,
     };
 
     const inputValue = Number(value);
+    const price = Number(activeAsset?.price ?? 0);
+
+    const totalCollateral = Number(userPoolData?.totalCollateralBase ?? 0);
+    const totalDebt = Number(userPoolData?.totalDebtBase ?? 0);
+
+    const liquidationThreshold = Number(
+      userPoolData?.currentLiquidationThreshold ?? 0
+    );
+
+    const maxLTV = Number(userPoolData?.maxLTV ?? 0);
+
+    let newCollateral = totalCollateral;
+    let newDebt = totalDebt;
 
     if (isCollateral) {
       const deposited = Number(reserve?.withdraw?.balance ?? 0);
 
-      if (!!deposited) {
+      if (deposited) {
         _stats.deposited = formatNumber(
           deposited,
           deposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
-
-        _stats.depositedInUSD = convertToUSD(
-          deposited * Number(activeAsset?.price ?? 0)
-        );
+        _stats.depositedInUSD = convertToUSD(deposited * price);
       }
 
-      if (!!inputValue) {
+      if (inputValue) {
         const futureDeposited =
           type === MarketSectionTypes.Supply
             ? deposited + inputValue
@@ -86,22 +104,24 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
           futureDeposited,
           futureDeposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
+
+        newCollateral =
+          type === MarketSectionTypes.Supply
+            ? totalCollateral + inputValue * price
+            : totalCollateral - inputValue * price;
       }
     } else {
       const borrowed = Number(reserve?.repay?.balance ?? 0);
 
-      if (!!borrowed) {
+      if (borrowed) {
         _stats.borrowed = formatNumber(
           borrowed,
           borrowed > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
-
-        _stats.borrowedInUSD = convertToUSD(
-          borrowed * Number(activeAsset?.price ?? 0)
-        );
+        _stats.borrowedInUSD = convertToUSD(borrowed * price);
       }
 
-      if (!!inputValue) {
+      if (inputValue) {
         const futureBorrowed =
           type === MarketSectionTypes.Borrow
             ? borrowed + inputValue
@@ -111,7 +131,36 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
           futureBorrowed,
           futureBorrowed > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
+
+        newDebt =
+          type === MarketSectionTypes.Borrow
+            ? totalDebt + inputValue * price
+            : totalDebt - inputValue * price;
       }
+    }
+
+    if (userPoolData?.healthFactor) {
+      _stats.healthFactor = formatHealthFactor(userPoolData?.healthFactor ?? 0);
+    }
+
+    const currentLTV = !!totalCollateral
+      ? (totalDebt / totalCollateral) * 100
+      : 0;
+    _stats.LTV = Math.min(currentLTV, 100).toFixed(2);
+
+    if (inputValue) {
+      const rawFutureLTV = !!newCollateral
+        ? (newDebt / newCollateral) * 100
+        : 0;
+
+      const futureLTV = Math.min(rawFutureLTV, maxLTV);
+
+      const futureHF = !!newDebt
+        ? (newCollateral * liquidationThreshold) / newDebt
+        : Infinity;
+
+      _stats.futureLTV = futureLTV.toFixed(2);
+      _stats.futureHealthFactor = formatHealthFactor(futureHF);
     }
 
     setStats(_stats);
@@ -134,6 +183,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     value,
     activeAsset,
     userData,
+    userPoolData,
     $connected,
     $account,
     $currentChainID,
@@ -141,7 +191,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
   ]);
 
   useEffect(() => {
-    if (stats.loaded && !isReservesLoading) {
+    if (stats.loaded && !isReservesLoading && !isPoolLoading) {
       setIsLoading(false);
     }
   }, [stats, isReservesLoading]);
@@ -215,12 +265,6 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
             Supply APR
           </span>
           <div className="flex items-center gap-2 text-[24px] leading-8">
-            {/* <span className="text-[#7C7E81]">4.2%</span>
-            <img
-              src="/icons/arrow-right.png"
-              alt="arrow right"
-              className="w-4 h-4"
-            /> */}
             {isLoading ? (
               <Skeleton height={32} width={100} />
             ) : (
@@ -232,41 +276,51 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       <div className="flex items-start gap-2 md:gap-6 w-full flex-wrap md:flex-nowrap">
         <div className="flex flex-col items-start w-full md:w-1/2">
           <span className="text-[#7C7E81] text-[16px] leading-6">LTV</span>
-          <div className="flex items-center gap-2 text-[24px] leading-8">
-            {/* <span className="text-[#7C7E81]">4.2%</span>
-            <img
-              src="/icons/arrow-right.png"
-              alt="arrow right"
-              className="w-4 h-4"
-            /> */}
-            {isPoolLoading ? (
-              <Skeleton height={32} width={100} />
-            ) : (
-              <span>{userPoolData?.ltv ?? 0}%</span>
-            )}
-          </div>
+          {isLoading ? (
+            <Skeleton height={32} width={100} />
+          ) : (
+            <>
+              {stats?.futureLTV !== "0" ? (
+                <div className="flex items-center gap-2 text-[24px] leading-8">
+                  <span className="text-[#7C7E81]">{stats.LTV}%</span>
+                  <img
+                    src="/icons/arrow-right.png"
+                    alt="arrow right"
+                    className="w-4 h-4"
+                  />
+                  <span>{stats.futureLTV}%</span>
+                </div>
+              ) : (
+                <span className="text-[24px] leading-8">{stats?.LTV}%</span>
+              )}
+            </>
+          )}
         </div>
         <div className="flex flex-col items-start w-full md:w-1/2">
           <span className="text-[#7C7E81] text-[16px] leading-6">
             Health Factor
           </span>
-          <div className="flex items-center gap-2 text-[24px] leading-8">
-            {/* <span className="text-[#7C7E81]">4.2%</span>
-            <img
-              src="/icons/arrow-right.png"
-              alt="arrow right"
-              className="w-4 h-4"
-            /> */}
-            {isPoolLoading ? (
-              <Skeleton height={32} width={100} />
-            ) : (
-              <span>
-                {$connected
-                  ? formatHealthFactor(userPoolData?.healthFactor ?? 0)
-                  : "∞"}
-              </span>
-            )}
-          </div>
+          {isLoading ? (
+            <Skeleton height={32} width={100} />
+          ) : (
+            <>
+              {stats?.futureHealthFactor !== "0" ? (
+                <div className="flex items-center gap-2 text-[24px] leading-8">
+                  <span className="text-[#7C7E81]">{stats.healthFactor}</span>
+                  <img
+                    src="/icons/arrow-right.png"
+                    alt="arrow right"
+                    className="w-4 h-4"
+                  />
+                  <span>{stats.futureHealthFactor}</span>
+                </div>
+              ) : (
+                <span className="text-[24px] leading-8">
+                  {stats?.healthFactor}
+                </span>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

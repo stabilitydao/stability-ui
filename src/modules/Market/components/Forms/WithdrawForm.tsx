@@ -10,7 +10,6 @@ import { ActionButton, Skeleton } from "@ui";
 
 import {
   cn,
-  exactToFixed,
   formatNumber,
   getTransactionReceipt,
   setLocalStoreHash,
@@ -87,42 +86,50 @@ const WithdrawForm: React.FC<TProps> = ({
     setNeedConfirm(false);
   };
 
-  const handleInputChange = (inputValue: string) => {
-    let numericValue = inputValue.replace(/[^0-9.]/g, "");
+  const handleInputChange = (rawValue: string) => {
+    if (!$connected) return;
 
-    numericValue = numericValue.replace(/^(\d*\.)(.*)\./, "$1$2");
+    const availableBalance = Number(reserve?.withdraw?.balance ?? 0);
+    const tokenPrice = Number(activeAsset?.price ?? 0);
 
-    if (numericValue.startsWith(".")) {
-      numericValue = "0" + numericValue;
+    if (Number(rawValue) > availableBalance) {
+      rawValue = reserve?.withdraw?.balance ?? ("0" as string); // for < 0.000 numbers
     }
 
-    const value = Number(numericValue);
-    const tokenPrice = Number(activeAsset?.price);
+    let input = rawValue.replace(/[^0-9.]/g, "");
 
-    const _usdValue = value * tokenPrice;
+    input = input.replace(/^(\d*\.)(.*)\./, "$1$2");
 
-    const formattedUsdValue = !!_usdValue ? convertToUSD(_usdValue) : "$0";
+    if (input.startsWith(".")) {
+      input = "0" + input;
+    }
 
-    const balance = Number(reserve?.withdraw?.balance ?? 0);
+    const value = Number(input);
+
+    const usdValue = value * tokenPrice;
+    const formattedUsdValue = !!usdValue ? convertToUSD(usdValue) : "$0";
+
+    let nextButton: string = "";
 
     if (!value) {
-      setButton("");
-    } else if (value > balance) {
-      setButton("insufficientBalance");
+      nextButton = "";
+    } else if (value > availableBalance) {
+      nextButton = "insufficientBalance";
     } else {
-      setButton("Withdraw");
+      nextButton = "Withdraw";
     }
 
-    setValue(numericValue);
+    setValue(input);
     setUsdValue(formattedUsdValue);
+    setButton(nextButton);
   };
 
   const handleMaxInputChange = () => {
-    if ($connected) {
-      const _maxBalance = exactToFixed(reserve?.withdraw?.balance ?? 0, 2);
+    if (!$connected) return;
 
-      handleInputChange(_maxBalance);
-    }
+    const availableBalance = reserve?.withdraw?.maxWithdraw ?? "0";
+
+    handleInputChange(availableBalance);
   };
 
   const withdraw = async () => {
@@ -242,29 +249,44 @@ const WithdrawForm: React.FC<TProps> = ({
             {usdValue}
           </div>
         </label>
-        <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
-          <span className="text-[#7C7E81] font-medium">
-            Available to withdraw
-          </span>
-          <div className="flex items-start gap-2">
-            {isLoading ? (
-              <Skeleton height={24} width={70} />
-            ) : (
-              <span className="font-semibold">
-                {formatNumber(reserve?.withdraw?.balance ?? 0, "format")}{" "}
-                {activeAsset?.assetData?.symbol}
-              </span>
-            )}
-
-            <button
-              className={cn(
-                "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",
-                $connected && "cursor-pointer"
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
+            <span className="text-[#7C7E81] font-medium">
+              Available to withdraw
+            </span>
+            <div className="flex items-start gap-2">
+              {isLoading ? (
+                <Skeleton height={24} width={70} />
+              ) : (
+                <span className="font-semibold">
+                  {formatNumber(reserve?.withdraw?.maxWithdraw ?? 0, "format")}{" "}
+                  {activeAsset?.assetData?.symbol}
+                </span>
               )}
-              onClick={handleMaxInputChange}
-            >
-              Max
-            </button>
+
+              <button
+                className={cn(
+                  "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",
+                  $connected && "cursor-pointer"
+                )}
+                onClick={handleMaxInputChange}
+              >
+                Max
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
+            <span className="text-[#7C7E81] font-medium">Supplied balance</span>
+            <div className="flex items-start gap-2">
+              {isLoading ? (
+                <Skeleton height={24} width={70} />
+              ) : (
+                <span className="font-semibold">
+                  {formatNumber(reserve?.withdraw?.balance ?? 0, "format")}{" "}
+                  {activeAsset?.assetData?.symbol}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

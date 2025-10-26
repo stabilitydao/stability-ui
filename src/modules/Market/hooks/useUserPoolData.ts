@@ -54,11 +54,33 @@ export const useUserPoolData = (
         args: [$account],
       })) as bigint[];
 
-      const ltv = Number((Number(userData[4]) / 100).toFixed(2));
-      const healthFactor = Number(formatUnits(userData[5], 18));
+      const [
+        totalCollateralBaseRaw,
+        totalDebtBaseRaw,
+        ,
+        currentLiquidationThresholdRaw,
+        ltvRaw,
+        healthFactorRaw,
+      ] = userData;
+
+      const totalCollateralBase = Number(
+        formatUnits(totalCollateralBaseRaw, 8)
+      );
+
+      const totalDebtBase = Number(formatUnits(totalDebtBaseRaw, 8));
+
+      const currentLiquidationThreshold =
+        Number(currentLiquidationThresholdRaw) / 10000;
+
+      const maxLTV = Number(ltvRaw) / 100;
+
+      const healthFactor = Number(formatUnits(healthFactorRaw, 18));
 
       userPoolsData.setKey(poolAddress, {
-        ltv,
+        totalCollateralBase,
+        totalDebtBase,
+        currentLiquidationThreshold,
+        maxLTV,
         healthFactor,
       });
     } catch (error) {
