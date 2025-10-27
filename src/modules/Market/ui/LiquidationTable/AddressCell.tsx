@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { getShortAddress, copyAddress } from "@utils";
+import { getShortAddress, copyAddress, cn } from "@utils";
 
 import type { TAddress } from "@types";
 
@@ -27,11 +27,12 @@ const AddressCell: React.FC<TProps> = ({
 
   return (
     <div
-      className={`
-        ${isSticky ? "sticky top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A]" : ""}
-        group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer h-[56px]
-        ${highlighted ? "underline" : ""}
-      `}
+      className={cn(
+        "group px-2 md:px-4 w-[100px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer h-[56px]",
+        isSticky &&
+          "sticky top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A] w-[150px]",
+        highlighted && "underline"
+      )}
       style={{ fontFamily: "monospace" }}
       title={title || address}
       onClick={handleCopy}

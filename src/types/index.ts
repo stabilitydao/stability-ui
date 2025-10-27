@@ -777,6 +777,14 @@ type TMarketReserve = {
   availableToBorrow: string;
   availableToBorrowInUSD: string;
 
+  interestStrategy: {
+    address: TAddress;
+    maxVariableBorrowRate: string;
+    optimalUsageRation: string;
+    variableRateSlope1: string;
+    variableRateSlope2: string;
+  };
+
   // assetData
   assetData?: TTokenData;
 };

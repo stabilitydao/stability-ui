@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 
 import { motion } from "framer-motion";
 
-import { cn, getTokenData, useWindowWidth } from "@utils";
+import { cn, useWindowWidth } from "@utils";
 
-import { TMarketReserve, TTokenData, MarketSectionTypes } from "@types";
+import { TMarketReserve, MarketSectionTypes } from "@types";
 
 type TProps = {
   assets: TMarketReserve[];
@@ -29,6 +29,7 @@ const AssetSelector: React.FC<TProps> = ({
     if (carouselRef.current) {
       const scrollWidth = carouselRef.current.scrollWidth;
       const offsetWidth = carouselRef.current.offsetWidth;
+
       setWidth(scrollWidth - offsetWidth);
     }
   }, []);
@@ -59,8 +60,6 @@ const AssetSelector: React.FC<TProps> = ({
           whileTap={{ cursor: "grabbing" }}
         >
           {assets.map((asset) => {
-            const assetData = getTokenData(asset?.address) as TTokenData;
-
             if (
               !asset?.isBorrowable &&
               [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(
@@ -82,8 +81,8 @@ const AssetSelector: React.FC<TProps> = ({
                 onClick={() => handleAssetChange(asset)}
               >
                 <img
-                  src={assetData?.logoURI}
-                  alt={assetData?.symbol}
+                  src={asset?.assetData?.logoURI}
+                  alt={asset?.assetData?.symbol}
                   className="w-5 h-5 rounded-full pointer-events-none select-none"
                 />
                 <span
@@ -94,7 +93,7 @@ const AssetSelector: React.FC<TProps> = ({
                       : "text-[#7C7E81]"
                   )}
                 >
-                  {assetData?.symbol}
+                  {asset?.assetData?.symbol}
                 </span>
               </motion.div>
             );
@@ -104,8 +103,6 @@ const AssetSelector: React.FC<TProps> = ({
 
       <div className="hidden md:flex items-center gap-2 flex-wrap">
         {assets.map((asset) => {
-          const assetData = getTokenData(asset?.address) as TTokenData;
-
           if (
             !asset?.isBorrowable &&
             [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(
@@ -127,8 +124,8 @@ const AssetSelector: React.FC<TProps> = ({
               onClick={() => handleAssetChange(asset)}
             >
               <img
-                src={assetData?.logoURI}
-                alt={assetData?.symbol}
+                src={asset?.assetData?.logoURI}
+                alt={asset?.assetData?.symbol}
                 className="w-5 h-5 rounded-full pointer-events-none select-none"
               />
               <span
@@ -139,7 +136,7 @@ const AssetSelector: React.FC<TProps> = ({
                     : "text-[#7C7E81]"
                 )}
               >
-                {assetData.symbol}
+                {asset?.assetData?.symbol}
               </span>
             </div>
           );

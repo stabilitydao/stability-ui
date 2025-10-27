@@ -2,7 +2,7 @@ import { AddressField } from "./AddressField";
 
 import { CustomTooltip } from "@ui";
 
-import { getTokenData, cn, formatNumber } from "@utils";
+import { cn, formatNumber } from "@utils";
 
 import { convertToUSD } from "../functions";
 
@@ -23,10 +23,8 @@ const AssetInfo: React.FC<TProps> = ({
   isSingleAsset = false,
   network,
 }) => {
-  const assetData = getTokenData(asset?.address as TAddress);
-
   const mintApp = assets.find(
-    ({ symbol }) => symbol === assetData?.symbol
+    ({ symbol }) => symbol === asset?.assetData?.symbol
   )?.mintApp;
 
   return (
@@ -37,8 +35,17 @@ const AssetInfo: React.FC<TProps> = ({
       )}
     >
       <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3 text-[24px] leading-8 font-medium">
-        <span>{assetData?.symbol}</span>
-        <span className="text-[#7C7E81]">{assetData?.name}</span>
+        <div className="flex items-center gap-2">
+          <img
+            src={asset?.assetData?.logoURI}
+            alt={asset?.assetData?.symbol}
+            title={asset?.assetData?.symbol}
+            className="w-8 h-8 rounded-full hidden md:block"
+          />
+          <span>{asset?.assetData?.symbol}</span>
+        </div>
+
+        <span className="text-[#7C7E81]">{asset?.assetData?.name}</span>
       </div>
       <div className="flex flex-col gap-4">
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-center gap-4 md:gap-6 w-full font-medium">
@@ -100,7 +107,7 @@ const AssetInfo: React.FC<TProps> = ({
 
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
-                {assetData?.symbol} Price
+                {asset?.assetData?.symbol} Price
               </span>
               <span className="font-semibold">
                 {convertToUSD(asset?.price)}
@@ -108,7 +115,7 @@ const AssetInfo: React.FC<TProps> = ({
             </div>
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip
-                name={`${assetData?.symbol} TVL`}
+                name={`${asset?.assetData?.symbol} TVL`}
                 description={TOOLTIP_DESCRIPTIONS.assetTVL}
               />
               <span className="font-semibold">
@@ -117,7 +124,7 @@ const AssetInfo: React.FC<TProps> = ({
             </div>
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip
-                name={`${assetData?.symbol} TVL, USD`}
+                name={`${asset?.assetData?.symbol} TVL, USD`}
                 description={TOOLTIP_DESCRIPTIONS.assetTVLInUSD}
               />
               <span className="font-semibold">
@@ -127,7 +134,7 @@ const AssetInfo: React.FC<TProps> = ({
             {!!Number(asset?.cap) && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <CustomTooltip
-                  name={`${assetData?.symbol} Cap`}
+                  name={`${asset?.assetData?.symbol} Cap`}
                   description={TOOLTIP_DESCRIPTIONS.tokenCap}
                 />
                 <span className="font-semibold">
@@ -192,8 +199,8 @@ const AssetInfo: React.FC<TProps> = ({
         </div>
         <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col items-start gap-2 w-full font-medium text-[16px] leading-6">
           <AddressField
-            symbol={assetData?.symbol as string}
-            address={assetData?.address as TAddress}
+            symbol={asset?.assetData?.symbol as string}
+            address={asset?.assetData?.address as TAddress}
             explorer={network?.explorer ?? ""}
           />
 
@@ -207,7 +214,9 @@ const AssetInfo: React.FC<TProps> = ({
             <div className="flex items-center justify-between w-full">
               <span className="text-[#7C7E81]">Mint</span>
               <div className="flex items-center gap-3">
-                <span className="text-[#9180F4]">{assetData?.symbol}</span>
+                <span className="text-[#9180F4]">
+                  {asset?.assetData?.symbol}
+                </span>
 
                 <a href={mintApp} target="_blank">
                   <img
@@ -220,6 +229,59 @@ const AssetInfo: React.FC<TProps> = ({
             </div>
           )}
         </div>
+        {asset?.isBorrowable && (
+          <div className="flex flex-col gap-3">
+            <span className="text-[24px] leading-8 font-medium">IRM</span>
+            <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col items-start gap-2 w-full font-medium text-[16px] leading-6">
+              <div className="w-full flex flex-col items-start gap-2">
+                <div className="flex items-start justify-between w-full gap-2">
+                  <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                    Max variable borrow rate
+                  </span>
+                  <span className="font-semibold">
+                    {Number(
+                      asset?.interestStrategy?.maxVariableBorrowRate
+                    ).toFixed(2)}
+                    %
+                  </span>
+                </div>
+                <div className="flex items-start justify-between w-full gap-2">
+                  <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                    Optimal usage ration
+                  </span>
+                  <span className="font-semibold">
+                    {Number(
+                      asset?.interestStrategy?.optimalUsageRation
+                    ).toFixed(2)}
+                    %
+                  </span>
+                </div>
+                <div className="flex items-start justify-between w-full gap-2">
+                  <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                    Variable rate slope 1
+                  </span>
+                  <span className="font-semibold">
+                    {Number(
+                      asset?.interestStrategy?.variableRateSlope1
+                    ).toFixed(2)}
+                    %
+                  </span>
+                </div>
+                <div className="flex items-start justify-between w-full gap-2">
+                  <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                    Variable rate slope 2
+                  </span>
+                  <span className="font-semibold">
+                    {Number(
+                      asset?.interestStrategy?.variableRateSlope2
+                    ).toFixed(2)}
+                    %
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

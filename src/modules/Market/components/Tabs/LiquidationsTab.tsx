@@ -64,7 +64,7 @@ const LiquidationsTab: React.FC<TProps> = memo(({ networkId, marketId }) => {
   return (
     <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
       <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">
-        <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[750px] md:w-full">
+        <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] w-[650px] md:w-full">
           {tableStates.map((value: TTableColumn, index: number) => (
             <LiquidationsColumnSort
               key={value.name + index}

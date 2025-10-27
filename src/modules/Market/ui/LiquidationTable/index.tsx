@@ -23,7 +23,7 @@ const LiquidationTable: React.FC<TProps> = ({ isLoading, data }) => {
   }
 
   return (
-    <div className="w-[750px] md:w-full">
+    <div className="w-[650px] md:w-full">
       {data.length ? (
         <div>
           {data.map((liquidation, index) => (
@@ -43,7 +43,7 @@ const LiquidationTable: React.FC<TProps> = ({ isLoading, data }) => {
                 address={liquidation?.liquidator}
                 title={liquidation?.liquidator}
               />
-              <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
+              <div className="px-2 md:px-4 w-[100px] md:w-1/5 text-end">
                 {convertToUSD(liquidation?.liquidated)}
               </div>
               <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">

@@ -51,6 +51,7 @@ const loadMarketsData = async (
         utilization: backendData?.utilization ?? "0",
         availableToBorrow: backendData?.availableToBorrow ?? "0",
         availableToBorrowInUSD: backendData?.availableToBorrowInUSD ?? "0",
+        interestStrategy: backendData?.interestStrategyData ?? {},
         assetData: getTokenData(reserve.asset),
       };
     });

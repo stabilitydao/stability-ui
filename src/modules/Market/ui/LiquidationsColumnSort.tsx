@@ -17,8 +17,8 @@ const LiquidationsColumnSort: React.FC<TProps> = ({
 }) => {
   const styles: Record<string, string> = {
     User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
-    Liquidator: "w-[150px] md:w-1/5",
-    Liquidated: "w-[150px] md:w-1/5 justify-end",
+    Liquidator: "w-[100px] md:w-1/5",
+    Liquidated: "w-[100px] md:w-1/5 justify-end",
     "Debt coverred": "w-[150px] md:w-1/5 justify-end",
     Date: "w-[150px] md:w-1/5 justify-end",
   };

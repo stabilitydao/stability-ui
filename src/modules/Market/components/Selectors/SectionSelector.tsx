@@ -39,9 +39,14 @@ const SectionSelector: React.FC<TProps> = ({
 
   useEffect(() => {
     if (carouselRef.current) {
+      const widthScalingFactor = 2;
+
       const scrollWidth = carouselRef.current.scrollWidth;
       const offsetWidth = carouselRef.current.offsetWidth;
-      setWidth(scrollWidth - offsetWidth);
+
+      const maxWidth = (scrollWidth - offsetWidth) * widthScalingFactor;
+
+      setWidth(Math.max(maxWidth, 80));
     }
   }, []);
 
