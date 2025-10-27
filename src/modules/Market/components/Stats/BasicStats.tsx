@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { Skeleton } from "@ui";
+import { StatItem } from "../../ui";
 
 import { formatNumber } from "@utils";
 
@@ -27,21 +27,12 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
   const $currentChainID = useStore(currentChainID);
   const $lastTx = useStore(lastTx);
 
-  const [isLoading, setIsLoading] = useState(true);
-
   const [stats, setStats] = useState({
-    deposited: "0",
-    borrowed: "0",
+    deposited: { current: "0", future: "0", inUSD: "$0" },
+    borrowed: { current: "0", future: "0", inUSD: "$0" },
+    LTV: { current: "0", future: "0" },
+    HF: { current: "∞", future: "0" },
     APR: "0",
-    futureDeposited: "0",
-    futureBorrowed: "0",
-    depositedInUSD: "$0",
-    borrowedInUSD: "$0",
-    LTV: "0",
-    futureLTV: "0",
-    healthFactor: "∞",
-    futureHealthFactor: "∞",
-    loaded: false,
   });
 
   const { data: userPoolData, isLoading: isPoolLoading } = useUserPoolData(
@@ -54,18 +45,11 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
 
   const handleStats = async () => {
     const _stats = {
-      deposited: "0",
-      borrowed: "0",
+      deposited: { current: "0", future: "0", inUSD: "$0" },
+      borrowed: { current: "0", future: "0", inUSD: "$0" },
+      LTV: { current: "0", future: "0" },
+      HF: { current: "∞", future: "0" },
       APR: Number(activeAsset?.supplyAPR).toFixed(2),
-      futureDeposited: "0",
-      futureBorrowed: "0",
-      depositedInUSD: "$0",
-      borrowedInUSD: "$0",
-      LTV: "0",
-      futureLTV: "0",
-      healthFactor: "∞",
-      futureHealthFactor: "0",
-      loaded: true,
     };
 
     const inputValue = Number(value);
@@ -87,11 +71,11 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       const deposited = Number(reserve?.withdraw?.balance ?? 0);
 
       if (deposited) {
-        _stats.deposited = formatNumber(
+        _stats.deposited.current = formatNumber(
           deposited,
           deposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
-        _stats.depositedInUSD = convertToUSD(deposited * price);
+        _stats.deposited.inUSD = convertToUSD(deposited * price);
       }
 
       if (inputValue) {
@@ -100,7 +84,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
             ? deposited + inputValue
             : deposited - inputValue;
 
-        _stats.futureDeposited = formatNumber(
+        _stats.deposited.future = formatNumber(
           futureDeposited,
           futureDeposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
@@ -114,11 +98,11 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       const borrowed = Number(reserve?.repay?.balance ?? 0);
 
       if (borrowed) {
-        _stats.borrowed = formatNumber(
+        _stats.borrowed.current = formatNumber(
           borrowed,
           borrowed > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
-        _stats.borrowedInUSD = convertToUSD(borrowed * price);
+        _stats.borrowed.inUSD = convertToUSD(borrowed * price);
       }
 
       if (inputValue) {
@@ -127,7 +111,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
             ? borrowed + inputValue
             : borrowed - inputValue;
 
-        _stats.futureBorrowed = formatNumber(
+        _stats.borrowed.future = formatNumber(
           futureBorrowed,
           futureBorrowed > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
@@ -140,13 +124,14 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     }
 
     if (userPoolData?.healthFactor) {
-      _stats.healthFactor = formatHealthFactor(userPoolData?.healthFactor ?? 0);
+      _stats.HF.current = formatHealthFactor(userPoolData?.healthFactor ?? 0);
     }
 
     const currentLTV = !!totalCollateral
       ? (totalDebt / totalCollateral) * 100
       : 0;
-    _stats.LTV = Math.min(currentLTV, 100).toFixed(2);
+
+    _stats.LTV.current = Math.min(currentLTV, 100).toFixed(2);
 
     if (inputValue) {
       const rawFutureLTV = !!newCollateral
@@ -159,8 +144,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
         ? (newCollateral * liquidationThreshold) / newDebt
         : Infinity;
 
-      _stats.futureLTV = futureLTV.toFixed(2);
-      _stats.futureHealthFactor = formatHealthFactor(futureHF);
+      _stats.LTV.future = futureLTV.toFixed(2);
+      _stats.HF.future = formatHealthFactor(futureHF);
     }
 
     setStats(_stats);
@@ -190,138 +175,43 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     $lastTx,
   ]);
 
-  useEffect(() => {
-    if (stats.loaded && !isReservesLoading && !isPoolLoading) {
-      setIsLoading(false);
-    }
-  }, [stats, isReservesLoading]);
-
   return (
     <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 md:gap-6 w-full lg:w-2/3 font-medium">
       <div className="flex items-start gap-2 md:gap-6 w-full flex-wrap md:flex-nowrap">
-        <div className="flex flex-col items-start w-full md:w-1/2">
-          <span className="text-[#7C7E81] text-[16px] leading-6">
-            {isCollateral ? "Deposited" : "Borrowed"}
-          </span>
+        <StatItem
+          label={isCollateral ? "Deposited" : "Borrowed"}
+          value={
+            isCollateral ? stats.deposited.current : stats.borrowed.current
+          }
+          futureValue={
+            isCollateral ? stats.deposited.future : stats.borrowed.future
+          }
+          subValue={isCollateral ? stats.deposited.inUSD : stats.borrowed.inUSD}
+          symbol={activeAsset?.assetData?.symbol}
+          isLoading={isPoolLoading || isReservesLoading}
+        />
 
-          {isLoading ? (
-            <Skeleton height={32} width={100} />
-          ) : (
-            <>
-              {isCollateral ? (
-                <>
-                  {stats?.futureDeposited !== "0" ? (
-                    <div className="flex items-center gap-2 text-[24px] leading-8">
-                      <span className="text-[#7C7E81]">{stats.deposited}</span>
-                      <img
-                        src="/icons/arrow-right.png"
-                        alt="arrow right"
-                        className="w-4 h-4"
-                      />
-                      <span>
-                        {stats.futureDeposited} {activeAsset?.assetData?.symbol}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[24px] leading-8">
-                      {stats.deposited} {activeAsset?.assetData?.symbol}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  {stats?.futureBorrowed !== "0" ? (
-                    <div className="flex items-center gap-2 text-[24px] leading-8">
-                      <span className="text-[#7C7E81]">{stats.borrowed}</span>
-                      <img
-                        src="/icons/arrow-right.png"
-                        alt="arrow right"
-                        className="w-4 h-4"
-                      />
-                      <span>
-                        {stats.futureBorrowed} {activeAsset?.assetData?.symbol}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-[24px] leading-8">
-                      {stats.borrowed} {activeAsset?.assetData?.symbol}
-                    </span>
-                  )}
-                </>
-              )}
-            </>
-          )}
-
-          {isLoading ? (
-            <Skeleton height={20} width={50} />
-          ) : (
-            <span className="text-[#7C7E81] text-[14px] leading-5">
-              {isCollateral ? stats.depositedInUSD : stats.borrowedInUSD}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-col items-start w-full md:w-1/2">
-          <span className="text-[#7C7E81] text-[16px] leading-6">
-            Supply APR
-          </span>
-          <div className="flex items-center gap-2 text-[24px] leading-8">
-            {isLoading ? (
-              <Skeleton height={32} width={100} />
-            ) : (
-              <span>{stats.APR}%</span>
-            )}
-          </div>
-        </div>
+        <StatItem
+          label="Supply APR"
+          value={`${stats.APR}%`}
+          isLoading={isPoolLoading || isReservesLoading}
+        />
       </div>
       <div className="flex items-start gap-2 md:gap-6 w-full flex-wrap md:flex-nowrap">
-        <div className="flex flex-col items-start w-full md:w-1/2">
-          <span className="text-[#7C7E81] text-[16px] leading-6">LTV</span>
-          {isLoading ? (
-            <Skeleton height={32} width={100} />
-          ) : (
-            <>
-              {stats?.futureLTV !== "0" ? (
-                <div className="flex items-center gap-2 text-[24px] leading-8">
-                  <span className="text-[#7C7E81]">{stats.LTV}%</span>
-                  <img
-                    src="/icons/arrow-right.png"
-                    alt="arrow right"
-                    className="w-4 h-4"
-                  />
-                  <span>{stats.futureLTV}%</span>
-                </div>
-              ) : (
-                <span className="text-[24px] leading-8">{stats?.LTV}%</span>
-              )}
-            </>
-          )}
-        </div>
-        <div className="flex flex-col items-start w-full md:w-1/2">
-          <span className="text-[#7C7E81] text-[16px] leading-6">
-            Health Factor
-          </span>
-          {isLoading ? (
-            <Skeleton height={32} width={100} />
-          ) : (
-            <>
-              {stats?.futureHealthFactor !== "0" ? (
-                <div className="flex items-center gap-2 text-[24px] leading-8">
-                  <span className="text-[#7C7E81]">{stats.healthFactor}</span>
-                  <img
-                    src="/icons/arrow-right.png"
-                    alt="arrow right"
-                    className="w-4 h-4"
-                  />
-                  <span>{stats.futureHealthFactor}</span>
-                </div>
-              ) : (
-                <span className="text-[24px] leading-8">
-                  {stats?.healthFactor}
-                </span>
-              )}
-            </>
-          )}
-        </div>
+        <StatItem
+          label="LTV"
+          value={`${stats.LTV.current}%`}
+          futureValue={
+            stats.LTV.future !== "0" ? `${stats.LTV.future}%` : undefined
+          }
+          isLoading={isPoolLoading || isReservesLoading}
+        />
+        <StatItem
+          label="Health Factor"
+          value={stats.HF.current}
+          futureValue={stats.HF.future !== "0" ? stats.HF.future : undefined}
+          isLoading={isPoolLoading || isReservesLoading}
+        />
       </div>
     </div>
   );

@@ -49,7 +49,7 @@ const LiquidationTable: React.FC<TProps> = ({ isLoading, data }) => {
               <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
                 {convertToUSD(liquidation?.debt)}
               </div>
-              <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end">
+              <div className="px-2 md:px-4 w-[150px] md:w-1/5 text-end whitespace-nowrap">
                 {liquidation?.date}
               </div>
             </div>

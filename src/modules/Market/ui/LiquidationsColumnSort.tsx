@@ -107,4 +107,5 @@ const LiquidationsColumnSort: React.FC<TProps> = ({
     </div>
   );
 };
+
 export { LiquidationsColumnSort };

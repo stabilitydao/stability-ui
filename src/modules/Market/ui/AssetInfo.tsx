@@ -4,6 +4,8 @@ import { CustomTooltip } from "@ui";
 
 import { getTokenData, cn, formatNumber } from "@utils";
 
+import { convertToUSD } from "../functions";
+
 import { TOOLTIP_DESCRIPTIONS } from "../constants";
 
 import type { TMarketReserve, TAddress, TNetwork } from "@types";
@@ -77,10 +79,6 @@ const AssetInfo: React.FC<TProps> = ({
                 </span>
               </div>
             )}
-            {/* <div className="flex items-center justify-between text-[16px] leading-6 w-full gap-2">
-              <CustomTooltip name="IRM" description="desc" />
-              <span className="font-semibold">Dynamic IRM</span>
-            </div> */}
             {asset?.isBorrowable && (
               <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
                 <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
@@ -99,6 +97,15 @@ const AssetInfo: React.FC<TProps> = ({
                 </div>
               </div>
             )}
+
+            <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
+              <span className="font-medium text-[16px] leading-6 text-[#7C7E81]">
+                {assetData?.symbol} Price
+              </span>
+              <span className="font-semibold">
+                {convertToUSD(asset?.price)}
+              </span>
+            </div>
             <div className="flex items-start justify-between text-[16px] leading-6 w-full gap-2">
               <CustomTooltip
                 name={`${assetData?.symbol} TVL`}
