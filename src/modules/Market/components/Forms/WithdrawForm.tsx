@@ -1,4 +1,11 @@
-import { useState, useEffect, Dispatch, SetStateAction, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useMemo,
+  useRef,
+} from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -6,7 +13,7 @@ import { parseUnits } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
-import { ActionButton, Skeleton } from "@ui";
+import { ActionButton, Skeleton, FormError } from "@ui";
 
 import {
   cn,
@@ -53,6 +60,8 @@ const WithdrawForm: React.FC<TProps> = ({
     market.pool
   );
 
+  const prevAssetAddress = useRef<TAddress | null>(null);
+
   const $connected = useStore(connected);
   const $account = useStore(account);
 
@@ -60,28 +69,20 @@ const WithdrawForm: React.FC<TProps> = ({
   const [button, setButton] = useState<string>("");
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
-
   const [needConfirm, setNeedConfirm] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-  // todo: add errors on ui
   const errorHandler = (err: Error) => {
-    refreshForm();
+    setError(err?.message);
     lastTx.set("No transaction hash...");
-    if (err instanceof Error) {
-      // const errorData = {
-      //   state: true,
-      //   type: err.name,
-      //   description: getShortMessage(err.message),
-      // };
-    }
-    alert("TX ERROR");
     console.error("ERROR:", err);
   };
 
-  const refreshForm = () => {
+  const resetForm = () => {
     setValue("");
     setUsdValue("$0");
     setButton("");
+    setError("");
     setTransactionInProgress(false);
     setNeedConfirm(false);
   };
@@ -195,9 +196,12 @@ const WithdrawForm: React.FC<TProps> = ({
       if (receipt?.status === "success") {
         lastTx.set(receipt?.transactionHash);
 
-        refreshForm();
+        resetForm();
       }
     } catch (error) {
+      setNeedConfirm(false);
+      setButton("Withdraw");
+
       if (error instanceof Error) {
         errorHandler(error);
       }
@@ -225,7 +229,14 @@ const WithdrawForm: React.FC<TProps> = ({
   }, [activeAsset, userData]);
 
   useEffect(() => {
-    refreshForm();
+    if (
+      activeAsset?.address &&
+      activeAsset.address !== prevAssetAddress.current
+    ) {
+      resetForm();
+    }
+
+    prevAssetAddress.current = activeAsset?.address ?? null;
   }, [activeAsset]);
 
   return (
@@ -291,6 +302,9 @@ const WithdrawForm: React.FC<TProps> = ({
           </div>
         </div>
       </div>
+
+      <FormError errorMessage={error} />
+
       <ActionButton
         type={button}
         network={market?.network?.id}

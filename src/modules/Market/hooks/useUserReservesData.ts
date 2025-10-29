@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -14,6 +14,7 @@ import {
   currentChainID,
   lastTx,
   userReservesData,
+  userReservesLoading,
 } from "@store";
 
 import { TAddress, TUserReservesMap, TMarket } from "@types";
@@ -30,21 +31,22 @@ export const useUserReservesData = (market: TMarket): TResult => {
   const $currentChainID = useStore(currentChainID);
   const $lastTx = useStore(lastTx);
   const $userReservesData = useStore(userReservesData);
+  const $userReservesLoading = useStore(userReservesLoading);
 
   const marketId = market.marketId;
   const client = web3clients[market.network?.id as keyof typeof web3clients];
   const pool = market.pool;
   const provider = market.protocolDataProvider;
 
-  const [isLoading, setIsLoading] = useState(!$userReservesData[marketId]);
+  const isLoading = $userReservesLoading[marketId] ?? false;
 
   const fetchUserReservesData = async () => {
     if (!$connected || !$account || !market?.reserves?.length) {
-      setIsLoading(false);
+      userReservesLoading.setKey(marketId, false);
       return;
     }
 
-    setIsLoading(true);
+    userReservesLoading.setKey(marketId, true);
 
     try {
       const reservesMap: TUserReservesMap = {};
@@ -102,7 +104,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
                 );
               }
 
-              const maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+              const maxWithdrawTokens = (maxWithdrawUSD / priceUSD) * 0.999999; // * for safe amount
 
               const _maxWithdraw = Math.min(
                 maxWithdrawTokens,
@@ -177,7 +179,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
     } catch (err) {
       console.error("Failed to fetch user reserves data:", err);
     } finally {
-      setIsLoading(false);
+      userReservesLoading.setKey(marketId, false);
     }
   };
 

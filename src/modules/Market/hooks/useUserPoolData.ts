@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -12,6 +12,7 @@ import {
   currentChainID,
   lastTx,
   userPoolsData,
+  userPoolsLoading,
 } from "@store";
 
 import { TAddress, TUserPoolData } from "@types";
@@ -31,20 +32,20 @@ export const useUserPoolData = (
   const $currentChainID = useStore(currentChainID);
   const $lastTx = useStore(lastTx);
   const $userPoolsData = useStore(userPoolsData);
+  const $userPoolsLoading = useStore(userPoolsLoading);
 
   const client = web3clients[network as keyof typeof web3clients];
+  const key = poolAddress || "";
 
-  const [isLoading, setIsLoading] = useState(
-    !$userPoolsData[poolAddress || ""]
-  );
+  const isLoading = $userPoolsLoading[key] ?? false;
 
-  const fetchUserData = async () => {
+  const fetchUserPoolData = async () => {
     if (!$account || !poolAddress) {
-      setIsLoading(false);
+      userPoolsLoading.setKey(key, false);
       return;
     }
 
-    setIsLoading(true);
+    userPoolsLoading.setKey(key, true);
 
     try {
       const userData = (await client.readContract({
@@ -86,19 +87,19 @@ export const useUserPoolData = (
     } catch (error) {
       console.error("Get user pool data error:", error);
     } finally {
-      setIsLoading(false);
+      userPoolsLoading.setKey(key, false);
     }
   };
 
   useEffect(() => {
-    if (!$userPoolsData[poolAddress || ""]) {
-      fetchUserData();
+    if (!$userPoolsData[key]) {
+      fetchUserPoolData();
     }
   }, [$account, $connected, $currentChainID, $lastTx, poolAddress, network]);
 
   return {
-    data: $userPoolsData[poolAddress || ""],
+    data: $userPoolsData[key],
     isLoading,
-    refetch: fetchUserData,
+    refetch: fetchUserPoolData,
   };
 };

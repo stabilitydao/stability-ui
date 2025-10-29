@@ -1,4 +1,4 @@
-import { atom, deepMap } from "nanostores";
+import { atom, map, deepMap } from "nanostores";
 
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { QueryClient } from "@tanstack/react-query";
@@ -68,6 +68,11 @@ const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
 const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
 const userReservesData = deepMap<Record<string, TUserReservesMap>>({});
 
+// maps for loading states
+
+const userPoolsLoading = map<Record<string, boolean>>({});
+const userReservesLoading = map<Record<string, boolean>>({});
+
 // portfolio
 const aprFilter = atom<TAPRPeriod>("daily");
 
@@ -118,4 +123,6 @@ export {
   marketsUsers,
   userPoolsData,
   userReservesData,
+  userPoolsLoading,
+  userReservesLoading,
 };

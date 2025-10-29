@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  Dispatch,
+  SetStateAction,
+  useRef,
+} from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -6,7 +13,7 @@ import { formatUnits, parseUnits } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
-import { ActionButton, Skeleton } from "@ui";
+import { ActionButton, Skeleton, FormError } from "@ui";
 
 import {
   cn,
@@ -54,6 +61,8 @@ const RepayForm: React.FC<TProps> = ({
     market.pool
   );
 
+  const prevAssetAddress = useRef<TAddress | null>(null);
+
   const $connected = useStore(connected);
   const $account = useStore(account);
 
@@ -62,26 +71,19 @@ const RepayForm: React.FC<TProps> = ({
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
   const [needConfirm, setNeedConfirm] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-  // todo: add errors on ui
   const errorHandler = (err: Error) => {
-    refreshForm();
+    setError(err?.message);
     lastTx.set("No transaction hash...");
-    if (err instanceof Error) {
-      // const errorData = {
-      //   state: true,
-      //   type: err.name,
-      //   description: getShortMessage(err.message),
-      // };
-    }
-    alert("TX ERROR");
     console.error("ERROR:", err);
   };
 
-  const refreshForm = () => {
+  const resetForm = () => {
     setValue("");
     setUsdValue("$0");
     setButton("");
+    setError("");
     setTransactionInProgress(false);
     setNeedConfirm(false);
   };
@@ -284,9 +286,11 @@ const RepayForm: React.FC<TProps> = ({
       if (receipt?.status === "success") {
         lastTx.set(receipt?.transactionHash);
 
-        refreshForm();
+        resetForm();
       }
     } catch (error) {
+      setNeedConfirm(false);
+      setButton("Repay");
       if (error instanceof Error) {
         errorHandler(error);
       }
@@ -315,7 +319,14 @@ const RepayForm: React.FC<TProps> = ({
   }, [activeAsset, userData]);
 
   useEffect(() => {
-    refreshForm();
+    if (
+      activeAsset?.address &&
+      activeAsset.address !== prevAssetAddress.current
+    ) {
+      resetForm();
+    }
+
+    prevAssetAddress.current = activeAsset?.address ?? null;
   }, [activeAsset]);
 
   return (
@@ -388,6 +399,9 @@ const RepayForm: React.FC<TProps> = ({
           </div>
         </div>
       </div>
+
+      <FormError errorMessage={error} />
+
       <ActionButton
         type={button}
         network={market?.network?.id}

@@ -24,6 +24,7 @@ import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
 import { ProgressCircle } from "./ProgressCircle";
+import { FormError } from "./FormError";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -32,6 +33,7 @@ import { Skeleton } from "./Skeletons/Skeleton";
 import { TextSkeleton } from "./Skeletons/TextSkeleton";
 
 import { NavIcon } from "./NavIcon";
+
 import {
   GridIcon,
   RowsIcon,
@@ -130,4 +132,5 @@ export {
   CustomTooltip,
   EmptyTable,
   LoadTable,
+  FormError,
 };
