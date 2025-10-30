@@ -21,6 +21,7 @@ import {
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
   MARKET_LIQUIDATIONS_TABLE,
+  HOLDERS_TABLE,
 } from "./tables";
 
 import {
@@ -302,7 +303,7 @@ const PATHS = [
   { name: "Meta Vaults", path: "metavaults" },
   { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
-  { name: "Leaderboard", path: "leaderboard" },
+  { name: "Leaderboards", path: "leaderboards" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
 ];
@@ -469,4 +470,5 @@ export {
   MARKET_USERS_TABLE,
   MARKET_LIQUIDATIONS_TABLE,
   META_VAULTS_EXCEPTIONS,
+  HOLDERS_TABLE,
 };

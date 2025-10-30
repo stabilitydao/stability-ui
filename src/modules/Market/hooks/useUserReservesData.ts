@@ -104,14 +104,16 @@ export const useUserReservesData = (market: TMarket): TResult => {
                 );
               }
 
-              const maxWithdrawTokens = (maxWithdrawUSD / priceUSD) * 0.999999; // * for safe amount
+              let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
 
-              const _maxWithdraw = Math.min(
-                maxWithdrawTokens,
-                Number(withdraw)
-              );
+              let _maxWithdraw = withdraw;
 
-              maxWithdraw = _maxWithdraw.toString();
+              if (maxWithdrawTokens < Number(withdraw)) {
+                maxWithdrawTokens *= 0.999999; // * for safe amount
+                _maxWithdraw = maxWithdrawTokens.toString();
+              }
+
+              maxWithdraw = _maxWithdraw;
             }
           } catch (err) {
             console.warn("Failed to calculate maxWithdraw:", err);

@@ -34,6 +34,7 @@ import { updateQueryParams } from "./functions/updateQueryParams";
 import { loadMarketsData } from "./functions/loadMarketsData";
 import { paginateData } from "./functions/paginateData";
 import { copyText } from "./functions/copyText";
+import { getShortErrorMessage } from "./functions/getShortErrorMessage";
 
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
@@ -84,4 +85,5 @@ export {
   getBalance,
   paginateData,
   copyText,
+  getShortErrorMessage,
 };

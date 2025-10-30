@@ -36,11 +36,11 @@ const Menu = (): JSX.Element => {
     } else if (isPlatform) {
       setActivePath("platform");
     } else if (
-      currentPath === "leaderboard" ||
+      currentPath === "leaderboards" ||
       currentPath.includes("contests") ||
       currentPath.includes("season-1")
     ) {
-      setActivePath("leaderboard");
+      setActivePath("leaderboards");
     } else if (currentPath.includes("metavaults")) {
       setActivePath("metavaults");
     } else if (currentPath.includes("lending")) {

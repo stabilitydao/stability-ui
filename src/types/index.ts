@@ -879,6 +879,11 @@ export enum TimelineTypes {
   Year = "YEAR",
 }
 
+export enum LeaderboardTableTypes {
+  Holders = "Holders",
+  Users = "Users",
+}
+
 export type {
   TPlatformData,
   TInitParams,
@@ -972,4 +977,5 @@ export type {
   TUserPoolData,
   TUserReserve,
   TUserReservesMap,
+  LeaderboardTableTypes,
 };
