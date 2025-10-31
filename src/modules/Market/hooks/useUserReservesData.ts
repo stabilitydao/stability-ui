@@ -136,8 +136,17 @@ export const useUserReservesData = (market: TMarket): TResult => {
         if (asset.isBorrowable) {
           const tokenPrice = Number(asset.price);
           let borrow = { balance: "0" };
-
+          console.log(
+            "before condition availableBorrowsBase",
+            availableBorrowsBase
+          );
+          console.log("before condition tokenPrice", tokenPrice);
           if (availableBorrowsBase > 0 && tokenPrice > 0) {
+            console.log(
+              "after condition availableBorrowsBase",
+              availableBorrowsBase
+            );
+            console.log("after condition tokenPrice", tokenPrice);
             const rawAmount =
               (availableBorrowsBase / tokenPrice) * 10 ** decimals;
             const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));

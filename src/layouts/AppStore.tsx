@@ -1116,7 +1116,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
       currentChainID.set(String(chain?.id));
     }
 
-    account.set(address);
+    account.set("0x88888887C3ebD4a33E34a15Db4254C74C75E5D4A"); //address);
     publicClient.set(_publicClient);
     connected.set(isConnected);
   };
