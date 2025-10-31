@@ -18,6 +18,7 @@ import { NodeState } from "@stabilitydao/stability/out/api.types";
 import { IBuilderAgent } from "@stabilitydao/stability/out/agents";
 import {Indicator} from "./components/Indicator.tsx";
 import {StabilityBuilder} from "./components/StabilityBuilder.tsx";
+import {StabilityOperator} from "./components/StabilityOperator.tsx";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
@@ -144,7 +145,7 @@ const Platform = (): JSX.Element => {
       <h2 className="text-[26px] font-bold">🤖 Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
-        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+        <a title="Go to Operator's page" href="/operator" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="font-bold flex items-center gap-[10px]">Stability Operator <a target="_blank" href="https://t.me/stability_dao_bot"><img className="w-[20px]" src="/socials/telegram.svg" alt="Telegram" title="Agent's telegram account" /></a></div>
           <div className="flex w-full">
 
@@ -188,8 +189,8 @@ const Platform = (): JSX.Element => {
             />
 
           </div>
-        </div>
-        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+        </a>
+        <a title="Go to Builder's page" href="/builder" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="font-bold">Stability Builder</div>
           <div className="flex w-full">
             <Indicator
@@ -204,7 +205,7 @@ const Platform = (): JSX.Element => {
             />
 
           </div>
-        </div>
+        </a>
       </div>
 
       <h2 className="text-[26px] font-bold">📦 Library</h2>
@@ -302,4 +303,4 @@ const Platform = (): JSX.Element => {
   );
 };
 
-export { Platform, StabilityBuilder };
+export { Platform, StabilityBuilder, StabilityOperator };
