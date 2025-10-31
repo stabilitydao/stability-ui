@@ -31,7 +31,7 @@ const HoldersColumnSort: React.FC<TProps> = ({
   const styles: Record<string, string> = {
     Rank: "hidden md:flex w-[10%] justify-start",
     Address: "w-1/3 md:w-[30%] justify-start px-2 md:px-4",
-    Balance: "w-1/3 md:w-[30%] justify-end px-2 md:px-4",
+    Power: "w-1/3 md:w-[30%] justify-end px-2 md:px-4",
     Percentage: "w-1/3 md:w-[30%] justify-end px-2 md:px-4",
   };
 

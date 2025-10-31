@@ -92,7 +92,9 @@ const HoldersTable = (): JSX.Element => {
                   />
                 </div>
                 <div className="px-2 md:px-4 w-1/3 md:w-[30%] text-end">
-                  {user?.balance ? formatNumber(user?.balance, "format") : ""}
+                  {user?.balance
+                    ? formatNumber(user?.balance, "abbreviate")?.slice(1)
+                    : ""}
                 </div>
                 <div className="px-2 md:px-4 w-1/3 md:w-[30%] text-end">
                   {user?.percentage}%

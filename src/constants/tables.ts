@@ -210,7 +210,7 @@ const HOLDERS_TABLE: TTableColumn[] = [
     unsortable: true,
   },
   {
-    name: "Balance",
+    name: "Power",
     keyName: "balance",
     sortType: "descendentic",
     dataType: "number",

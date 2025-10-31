@@ -977,5 +977,4 @@ export type {
   TUserPoolData,
   TUserReserve,
   TUserReservesMap,
-  LeaderboardTableTypes,
 };
