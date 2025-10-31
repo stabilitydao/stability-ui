@@ -45,6 +45,9 @@ export const useUserReservesData = (market: TMarket): TResult => {
       userReservesLoading.setKey(marketId, false);
       return;
     }
+    console.log("connected:", $connected);
+    console.log("account", $account);
+    console.log(market.reserves);
 
     userReservesLoading.setKey(marketId, true);
 
@@ -73,8 +76,14 @@ export const useUserReservesData = (market: TMarket): TResult => {
       }
 
       for (const asset of market.reserves) {
+        console.log(
+          "-----------------------------",
+          asset?.assetData?.symbol,
+          "-----------------------------"
+        );
         const address = asset.address as TAddress;
         const aTokenAddress = asset.aToken as TAddress;
+        const priceUSD = Number(asset.price);
         const decimals = getTokenData(address)?.decimals ?? 18;
 
         const rawATokenBalance = await getBalance(
@@ -82,39 +91,37 @@ export const useUserReservesData = (market: TMarket): TResult => {
           aTokenAddress,
           $account
         );
-
+        console.log("rawATokenBalance", rawATokenBalance);
         const withdraw = formatUnits(rawATokenBalance, decimals);
+        console.log("withdrawBalance", withdraw);
+        console.log("assetPrice", priceUSD);
 
         let maxWithdraw = "0";
 
-        if (Number(withdraw)) {
+        if (!!priceUSD && !!Number(withdraw)) {
           try {
-            const priceUSD = Number(asset.price);
+            let maxWithdrawUSD = 0;
 
-            if (!!priceUSD) {
-              let maxWithdrawUSD = 0;
-
-              if (!totalDebtBase) {
-                maxWithdrawUSD = Number(withdraw) * priceUSD;
-              } else {
-                const minCollateralUSD = totalDebtBase / liquidationThreshold;
-                maxWithdrawUSD = Math.max(
-                  totalCollateralBase - minCollateralUSD,
-                  0
-                );
-              }
-
-              let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
-
-              let _maxWithdraw = withdraw;
-
-              if (maxWithdrawTokens < Number(withdraw)) {
-                maxWithdrawTokens *= 0.999999; // * for safe amount
-                _maxWithdraw = maxWithdrawTokens.toString();
-              }
-
-              maxWithdraw = _maxWithdraw;
+            if (!totalDebtBase) {
+              maxWithdrawUSD = Number(withdraw) * priceUSD;
+            } else {
+              const minCollateralUSD = totalDebtBase / liquidationThreshold;
+              maxWithdrawUSD = Math.max(
+                totalCollateralBase - minCollateralUSD,
+                0
+              );
             }
+
+            let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+
+            let _maxWithdraw = withdraw;
+
+            if (maxWithdrawTokens < Number(withdraw)) {
+              maxWithdrawTokens *= 0.999999; // * for safe amount
+              _maxWithdraw = maxWithdrawTokens.toString();
+            }
+
+            maxWithdraw = _maxWithdraw;
           } catch (err) {
             console.warn("Failed to calculate maxWithdraw:", err);
           }
@@ -136,17 +143,8 @@ export const useUserReservesData = (market: TMarket): TResult => {
         if (asset.isBorrowable) {
           const tokenPrice = Number(asset.price);
           let borrow = { balance: "0" };
-          console.log(
-            "before condition availableBorrowsBase",
-            availableBorrowsBase
-          );
-          console.log("before condition tokenPrice", tokenPrice);
+
           if (availableBorrowsBase > 0 && tokenPrice > 0) {
-            console.log(
-              "after condition availableBorrowsBase",
-              availableBorrowsBase
-            );
-            console.log("after condition tokenPrice", tokenPrice);
             const rawAmount =
               (availableBorrowsBase / tokenPrice) * 10 ** decimals;
             const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
@@ -195,9 +193,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
   };
 
   useEffect(() => {
-    console.log("before address", $account);
     if (!$userReservesData[marketId]) {
-      console.log("after address", $account);
       fetchUserReservesData();
     }
   }, [$account, $connected, $currentChainID, $lastTx, marketId]);
