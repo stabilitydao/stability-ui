@@ -97,30 +97,28 @@ export const useUserReservesData = (market: TMarket): TResult => {
 
         if (Number(withdraw)) {
           try {
-            if (!!priceUSD) {
-              let maxWithdrawUSD = 0;
+            let maxWithdrawUSD = 0;
 
-              if (!totalDebtBase) {
-                maxWithdrawUSD = Number(withdraw) * priceUSD;
-              } else {
-                const minCollateralUSD = totalDebtBase / liquidationThreshold;
-                maxWithdrawUSD = Math.max(
-                  totalCollateralBase - minCollateralUSD,
-                  0
-                );
-              }
-
-              let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
-
-              let _maxWithdraw = withdraw;
-
-              if (maxWithdrawTokens < Number(withdraw)) {
-                maxWithdrawTokens *= 0.999999; // * for safe amount
-                _maxWithdraw = maxWithdrawTokens.toString();
-              }
-
-              maxWithdraw = _maxWithdraw;
+            if (!totalDebtBase) {
+              maxWithdrawUSD = Number(withdraw) * priceUSD;
+            } else {
+              const minCollateralUSD = totalDebtBase / liquidationThreshold;
+              maxWithdrawUSD = Math.max(
+                totalCollateralBase - minCollateralUSD,
+                0
+              );
             }
+
+            let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+
+            let _maxWithdraw = withdraw;
+
+            if (maxWithdrawTokens < Number(withdraw)) {
+              maxWithdrawTokens *= 0.999999; // * for safe amount
+              _maxWithdraw = maxWithdrawTokens.toString();
+            }
+
+            maxWithdraw = _maxWithdraw;
           } catch (err) {
             console.warn("Failed to calculate maxWithdraw:", err);
           }
