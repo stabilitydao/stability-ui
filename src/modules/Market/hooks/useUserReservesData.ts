@@ -41,13 +41,17 @@ export const useUserReservesData = (market: TMarket): TResult => {
   const isLoading = $userReservesLoading[marketId] ?? false;
 
   const fetchUserReservesData = async () => {
-    if (!$connected || !$account || !market?.reserves?.length) {
+    if (
+      !$connected ||
+      !$account ||
+      !market?.reserves?.length ||
+      !market?.reserves?.every(
+        (reserve) => reserve?.price && reserve?.price != "0"
+      )
+    ) {
       userReservesLoading.setKey(marketId, false);
       return;
     }
-    console.log("connected:", $connected);
-    console.log("account", $account);
-    console.log(market.reserves);
 
     userReservesLoading.setKey(marketId, true);
 
@@ -76,11 +80,6 @@ export const useUserReservesData = (market: TMarket): TResult => {
       }
 
       for (const asset of market.reserves) {
-        console.log(
-          "-----------------------------",
-          asset?.assetData?.symbol,
-          "-----------------------------"
-        );
         const address = asset.address as TAddress;
         const aTokenAddress = asset.aToken as TAddress;
         const priceUSD = Number(asset.price);
@@ -91,37 +90,37 @@ export const useUserReservesData = (market: TMarket): TResult => {
           aTokenAddress,
           $account
         );
-        console.log("rawATokenBalance", rawATokenBalance);
+
         const withdraw = formatUnits(rawATokenBalance, decimals);
-        console.log("withdrawBalance", withdraw);
-        console.log("assetPrice", priceUSD);
 
         let maxWithdraw = "0";
 
-        if (!!priceUSD && !!Number(withdraw)) {
+        if (Number(withdraw)) {
           try {
-            let maxWithdrawUSD = 0;
+            if (!!priceUSD) {
+              let maxWithdrawUSD = 0;
 
-            if (!totalDebtBase) {
-              maxWithdrawUSD = Number(withdraw) * priceUSD;
-            } else {
-              const minCollateralUSD = totalDebtBase / liquidationThreshold;
-              maxWithdrawUSD = Math.max(
-                totalCollateralBase - minCollateralUSD,
-                0
-              );
+              if (!totalDebtBase) {
+                maxWithdrawUSD = Number(withdraw) * priceUSD;
+              } else {
+                const minCollateralUSD = totalDebtBase / liquidationThreshold;
+                maxWithdrawUSD = Math.max(
+                  totalCollateralBase - minCollateralUSD,
+                  0
+                );
+              }
+
+              let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+
+              let _maxWithdraw = withdraw;
+
+              if (maxWithdrawTokens < Number(withdraw)) {
+                maxWithdrawTokens *= 0.999999; // * for safe amount
+                _maxWithdraw = maxWithdrawTokens.toString();
+              }
+
+              maxWithdraw = _maxWithdraw;
             }
-
-            let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
-
-            let _maxWithdraw = withdraw;
-
-            if (maxWithdrawTokens < Number(withdraw)) {
-              maxWithdrawTokens *= 0.999999; // * for safe amount
-              _maxWithdraw = maxWithdrawTokens.toString();
-            }
-
-            maxWithdraw = _maxWithdraw;
           } catch (err) {
             console.warn("Failed to calculate maxWithdraw:", err);
           }
@@ -196,7 +195,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
     if (!$userReservesData[marketId]) {
       fetchUserReservesData();
     }
-  }, [$account, $connected, $currentChainID, $lastTx, marketId]);
+  }, [$account, $connected, $currentChainID, $lastTx, marketId, market]);
 
   return {
     data: $userReservesData[marketId],

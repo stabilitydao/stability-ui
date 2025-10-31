@@ -751,6 +751,9 @@ type TMarketReserve = {
   oracleName: string;
   treasury: TAddress;
 
+  // assetData
+  assetData?: TTokenData;
+
   // backend data
   name: string;
   debtToken: TAddress;
@@ -784,9 +787,6 @@ type TMarketReserve = {
     variableRateSlope1: string;
     variableRateSlope2: string;
   };
-
-  // assetData
-  assetData?: TTokenData;
 };
 
 type TMarket = {
