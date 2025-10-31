@@ -1,129 +1,83 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 
-import axios from "axios";
+import { Pagination } from "@ui";
 
-import { useStore } from "@nanostores/react";
+import { UsersColumnSort, UsersTable } from "../../ui";
 
-import { FullPageLoader, TableColumnSort, Pagination } from "@ui";
+import { paginateData, dataSorter } from "@utils";
 
-import { getShortAddress, sortTable, formatNumber, copyAddress } from "@utils";
+import {
+  getInitialStateFromUrl,
+  getSortedTableStateFromUrl,
+} from "../../functions";
+
+import { useMarketUsers } from "../../hooks";
 
 import { MARKET_USERS_TABLE, PAGINATION_LIMIT } from "@constants";
-
-import { account } from "@store";
-
-import { seeds } from "@stabilitydao/stability";
 
 import { TMarketUser, TTableColumn } from "@types";
 
 type TProps = {
-  network: string;
-  market: string;
+  networkId: string;
+  marketId: string;
 };
 
-const UsersTab: React.FC<TProps> = ({ network, market }) => {
-  const $account = useStore(account);
+const UsersTab: React.FC<TProps> = ({ networkId, marketId }) => {
+  const { sortType } = getInitialStateFromUrl();
 
-  const [tableStates, setTableStates] = useState(MARKET_USERS_TABLE);
+  const { data, isLoading } = useMarketUsers(networkId, marketId);
 
-  const [tableData, setTableData] = useState<TMarketUser[]>([]);
+  const initialTableState = getSortedTableStateFromUrl(
+    MARKET_USERS_TABLE,
+    sortType
+  );
 
-  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
+  const [tableStates, setTableStates] = useState(initialTableState);
   const [currentTab, setCurrentTab] = useState<number>(1);
+  const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
-  const getMarketUsers = async () => {
-    try {
-      const req = await axios.get(
-        `${seeds[0]}/lending/${network}/${market}/users`
-      );
-
-      if (req.data) {
-        const _users = Object.entries(req?.data).map(([address, data]) => ({
-          address,
-          collateral: data?.aTokenBalanceUsd ?? 0,
-          debt: data?.debtTokenBalanceUsd ?? 0,
-          LTV: data?.ltv ?? 0,
-        }));
-
-        setTableData(_users as TMarketUser[]);
-      }
-    } catch (error) {
-      console.error("Get market users error:", error);
-    }
+  const tableHandler = (table: TTableColumn[] = tableStates) => {
+    setTableStates(table);
   };
 
-  const lastTabIndex = currentTab * pagination;
-  const firstTabIndex = lastTabIndex - pagination;
-  const currentTabData = tableData.slice(firstTabIndex, lastTabIndex);
+  const sortedData = useMemo(() => {
+    if (!data) return [];
 
-  useEffect(() => {
-    getMarketUsers();
-  }, []);
+    const activeSortColumn = tableStates.find((col) => col.sortType !== "none");
+
+    if (!activeSortColumn) return data;
+
+    const { keyName, dataType, sortType } = activeSortColumn;
+
+    return [...data].sort((a, b) =>
+      dataSorter(
+        String(a[keyName as keyof TMarketUser]),
+        String(b[keyName as keyof TMarketUser]),
+        dataType,
+        sortType
+      )
+    );
+  }, [data, tableStates]);
+
+  const currentTabData = paginateData(sortedData, currentTab, pagination);
 
   return (
     <div className="pb-5">
       <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px]">
         {tableStates.map((value: TTableColumn, index: number) => (
-          <TableColumnSort
+          <UsersColumnSort
             key={value.name + index}
             index={index}
             value={value.name}
-            sort={sortTable}
             table={tableStates}
-            setTable={setTableStates}
-            tableData={tableData}
-            setTableData={setTableData}
+            sort={tableHandler}
           />
         ))}
       </div>
-      <div>
-        {currentTabData.length ? (
-          <div>
-            {currentTabData.map((user: TMarketUser) => (
-              <div
-                key={user?.address}
-                className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px] leading-5"
-              >
-                <div
-                  className={`group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === user.address ? "underline" : ""}`}
-                  style={{ fontFamily: "monospace" }}
-                  title={user?.address}
-                  onClick={() => copyAddress(user?.address)}
-                >
-                  {getShortAddress(user?.address, 6, 4)}
-                  <img
-                    className="flex-shrink-0 w-6 h-6 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    src="/icons/copy.png"
-                    alt="Copy icon"
-                  />
-                </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.collateral
-                    ? formatNumber(user?.collateral, "abbreviate")?.slice(1)
-                    : ""}
-                </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.debt
-                    ? formatNumber(user?.debt, "abbreviate")?.slice(1)
-                    : ""}
-                </div>
-                <div className="px-2 md:px-4 w-1/4 text-end">
-                  {user?.LTV ? `${(user?.LTV * 100).toFixed(2)}%` : ""}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="relative h-[280px] flex items-center justify-center bg-[#101012] border-x border-t border-[#23252A]">
-            <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">
-              <FullPageLoader />
-            </div>
-          </div>
-        )}
-      </div>
+      <UsersTable isLoading={isLoading} data={currentTabData} />
       <Pagination
         pagination={pagination}
-        data={tableData}
+        data={data ?? []}
         tab={currentTab}
         setTab={setCurrentTab}
         setPagination={setPagination}

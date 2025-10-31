@@ -8,7 +8,7 @@ import { SectionSelector, AssetSelector, MarketTabs } from "./components";
 
 import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
-import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+import { getInitialStateFromUrl } from "./functions";
 
 import { updateQueryParams, getShortAddress } from "@utils";
 
@@ -73,38 +73,37 @@ const Market: React.FC<IProps> = ({ network, market }) => {
     setActiveSection(section);
   };
 
+  const initLocalMarket = () => {
+    if (!$markets || !market) return;
+
+    const _market = $markets[network]?.find(
+      ({ marketId }: { marketId: string }) => marketId === market
+    );
+
+    const chain = CHAINS.find(({ id }) => id == network);
+
+    if (!_market || !chain) return;
+
+    const updatedMarket: TMarket = {
+      marketId: market,
+      network: chain,
+      engine: _market.engine,
+      pool: _market.pool,
+      protocolDataProvider: _market.protocolDataProvider,
+      deployed: _market.deployed,
+      reserves: _market.reserves,
+    };
+
+    const defaultAsset =
+      asset && updatedMarket.reserves.find(({ address }) => asset === address);
+
+    setLocalMarket(updatedMarket);
+    setActiveAsset(defaultAsset || updatedMarket.reserves[0]);
+  };
+
   useEffect(() => {
-    if ($markets && market) {
-      const _market = $markets[network]?.find(
-        ({ marketId }: { marketId: string }) => marketId === market
-      );
-
-      const chain = CHAINS.find(({ id }) => id == network);
-
-      setLocalMarket({
-        marketId: market,
-        network: chain,
-        engine: _market?.engine,
-        pool: _market?.pool,
-        protocolDataProvider: _market?.protocolDataProvider,
-        deployed: _market?.deployed,
-        reserves: _market?.reserves,
-      } as TMarket);
-    }
-  }, [$markets]);
-
-  useEffect(() => {
-    if (localMarket && !activeAsset) {
-      if (asset) {
-        const urlAsset = localMarket?.reserves?.find(
-          ({ address }) => asset === address
-        );
-        setActiveAsset(urlAsset ? urlAsset : localMarket?.reserves[0]);
-      } else {
-        setActiveAsset(localMarket?.reserves[0]);
-      }
-    }
-  }, [$markets, localMarket]);
+    initLocalMarket();
+  }, [$markets, market]);
 
   return market && localMarket ? (
     <WagmiLayout>
@@ -182,11 +181,9 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               </div>
             </div>
             <MarketTabs
-              network={network}
-              market={market}
               marketData={localMarket}
               section={activeSection}
-              asset={activeAsset}
+              activeAsset={activeAsset}
             />
           </div>
         </div>

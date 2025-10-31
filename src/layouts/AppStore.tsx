@@ -978,7 +978,12 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
           /////***** SET VAULTS DATA *****/////
           const APIMetaVaultsData = Object.values(
             stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+          ).filter(
+            ({ address }) =>
+              address?.toLowerCase() !=
+              "0x11111527df7335772e6e94cf464473f19e421111"
           );
+          // temp: remove after meta vault statuses update
 
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
@@ -1013,7 +1018,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 }
               }
 
-              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+              totalAPR = Number(metaVault.APR ?? 0) + merklAPR + gemsAPR;
 
               const deposited = metaVault.deposited ?? 0;
 
@@ -1117,8 +1122,9 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   };
 
   const init = async () => {
+    // static meta vaults data
     if (!$metaVaults) {
-      const metaVaultsWithName = deployments["146"].metaVaults?.map(
+      const sonicMetaVaultsWithName = deployments["146"].metaVaults?.map(
         (metaV) => ({
           ...metaV,
           name: getTokenData(metaV.address)?.name,
@@ -1126,9 +1132,21 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         })
       );
 
-      metaVaults.set({ "146": metaVaultsWithName });
+      const plasmaMetaVaultsWithName = deployments["9745"].metaVaults?.map(
+        (metaV) => ({
+          ...metaV,
+          name: getTokenData(metaV.address)?.name,
+          network: "9745",
+        })
+      );
+
+      metaVaults.set({
+        "146": sonicMetaVaultsWithName,
+        "9745": plasmaMetaVaultsWithName,
+      });
     }
 
+    // static markets data
     if (!$markets) {
       localMarkets = await loadMarketsData({});
       markets.set(localMarkets);

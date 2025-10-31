@@ -382,13 +382,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.deposit.address]: {
-          amount: amount,
+          amount: value,
           symbol: activeAsset.deposit.symbol,
           logo: activeAsset.deposit.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -447,13 +448,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.withdraw.address]: {
-          amount: amount,
+          amount: value,
           symbol: activeAsset.withdraw.symbol,
           logo: activeAsset.withdraw.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -509,13 +511,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.wrap.address]: {
-          amount: shares,
+          amount: value,
           symbol: activeAsset.wrap.symbol,
           logo: activeAsset.wrap.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",
@@ -578,13 +581,14 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
       const txTokens = {
         [activeAsset.unwrap.address]: {
-          amount: shares,
+          amount: value,
           symbol: activeAsset.unwrap.symbol,
           logo: activeAsset.unwrap.logoURI,
         },
       };
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: _action,
         status: transaction?.status || "reverted",

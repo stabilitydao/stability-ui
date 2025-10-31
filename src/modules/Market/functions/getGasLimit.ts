@@ -2,12 +2,12 @@ import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 
 import { TAddress } from "@types";
 
-import type { PublicClient, Abi } from "viem";
+import type { Abi } from "viem";
 
 const FALLBACK_GAS_LIMIT = BigInt(1_000_000);
 
 export const getGasLimit = async (
-  client: PublicClient,
+  client: any,
   address: TAddress,
   abi: Abi,
   functionName: string,

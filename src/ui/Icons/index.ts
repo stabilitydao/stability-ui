@@ -3,7 +3,7 @@ import { VaultsIcon } from "./Vaults";
 import { FarmingIcon } from "./Farming";
 import { MetavaultsIcon } from "./Metavaults";
 import { ALMIcon } from "./ALM";
-import { LeaderboardIcon } from "./Leaderboard";
+import { LeaderboardsIcon } from "./Leaderboards";
 import { XSTBLIcon } from "./XSTBL";
 import { AgentsIcon } from "./Agents";
 import { PlatformIcon } from "./Platform";
@@ -20,7 +20,7 @@ export {
   FarmingIcon,
   MetavaultsIcon,
   ALMIcon,
-  LeaderboardIcon,
+  LeaderboardsIcon,
   XSTBLIcon,
   AgentsIcon,
   PlatformIcon,

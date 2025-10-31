@@ -36,11 +36,15 @@ const Metavaults = (): JSX.Element => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const initMetavaults = async () => {
-    const onlyMetaVaults = $metaVaults["146"].filter(
+    const sonicOnlyMetaVaults = $metaVaults["146"].filter(
       ({ type }: { type: string }) => type === VaultTypes.MetaVault
     );
 
-    setLocalMetaVaults(onlyMetaVaults);
+    const plasmaMetaVaults = $metaVaults["9745"] || [];
+
+    const visibleMetaVaults = [...sonicOnlyMetaVaults, ...plasmaMetaVaults];
+
+    setLocalMetaVaults(visibleMetaVaults);
   };
 
   useEffect(() => {

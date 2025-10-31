@@ -7,7 +7,7 @@ import type { TMarketReserve, TNetwork } from "@types";
 type TProps = {
   activeAsset: TMarketReserve | undefined;
   assets: TMarketReserve[] | undefined;
-  network: TNetwork;
+  network: TNetwork | undefined;
 };
 
 const AssetsInfo: React.FC<TProps> = ({ activeAsset, assets, network }) => {

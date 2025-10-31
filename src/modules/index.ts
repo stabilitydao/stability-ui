@@ -14,8 +14,8 @@ import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
-import { Leaderboard } from "./Leaderboard";
-import { Season1 } from "./Leaderboard/Season1";
+import { Leaderboards } from "./Leaderboards";
+import { Season1 } from "./Leaderboards/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { XSTBL } from "./XSTBL";
@@ -44,7 +44,7 @@ export {
   Network,
   Strategies,
   Node,
-  Leaderboard,
+  Leaderboards,
   Strategy,
   Contests,
   Contest,

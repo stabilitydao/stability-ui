@@ -27,6 +27,7 @@ import {
   PROTOCOLS,
   PROTOCOLS_TABLE,
   CHAINS,
+  META_VAULTS_EXCEPTIONS,
 } from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
@@ -179,15 +180,21 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     if (!metaVault) return;
 
-    const protocols = ["Stability", ...metaVault.protocols]
-      .filter((name) => !name.toLowerCase().includes("aave"))
-      .map((name) =>
-        Object.values(PROTOCOLS).find(
-          (p) =>
-            p.name.replace(" ", "").toLowerCase() ===
-            name.replace(" ", "").toLowerCase()
-        )
-      );
+    const baseProtocols = META_VAULTS_EXCEPTIONS.some(
+      (address) => address === metaVault.address
+    )
+      ? metaVault.protocols
+      : ["Stability", ...metaVault.protocols].filter(
+          (name) => !name.toLowerCase().includes("aave")
+        );
+
+    const protocols = baseProtocols.map((name) =>
+      Object.values(PROTOCOLS).find(
+        (p) =>
+          p.name.replace(" ", "").toLowerCase() ===
+          name.replace(" ", "").toLowerCase()
+      )
+    );
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
@@ -218,14 +225,14 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
             const current = subProp.current * 100;
             const target = subProp.target * 100;
 
-            const allocation = (Number(metaVault.tvl) / 100) * current;
+            const subAllocation = (Number(allocation) / 100) * current;
 
             return {
               ...vault,
               proportions: {
                 current,
                 target,
-                allocation,
+                allocation: subAllocation,
               },
               APR: vault.earningData.apr.latest,
             };
@@ -233,7 +240,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
           return {
             ...subMetaVault,
-            proportions: { current, target, allocation: Number(metaVault.tvl) },
+            proportions: { current, target, allocation },
             vaults: vaultsData,
           };
         }
@@ -425,7 +432,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
                 </span>
                 <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
                   <img
-                    className="w-6 h-6"
+                    className="w-6 h-6 rounded-full"
                     src={chain.logoURI}
                     alt={chain.name}
                     title={chain.name}

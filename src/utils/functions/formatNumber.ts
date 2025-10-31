@@ -62,6 +62,10 @@ export const formatNumber = (value: string | number, type: string): string => {
     case "abbreviateIntegerNotUsd":
       value = Number(value);
 
+      if (value > 1000000000000) {
+        return "1T+";
+      }
+
       while (value >= 1000) {
         value /= 1000;
         suffixNum++;

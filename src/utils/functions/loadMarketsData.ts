@@ -1,8 +1,10 @@
-import type { TMarket, TMarketReserve } from "@types";
+import { getTokenData } from "./getTokenData";
 
 import { lendingMarkets } from "@stabilitydao/stability";
 
 import { MarketData } from "@stabilitydao/stability/out/api.types";
+
+import type { TMarket, TMarketReserve } from "@types";
 
 const loadMarketsData = async (
   markets: MarketData
@@ -49,6 +51,8 @@ const loadMarketsData = async (
         utilization: backendData?.utilization ?? "0",
         availableToBorrow: backendData?.availableToBorrow ?? "0",
         availableToBorrowInUSD: backendData?.availableToBorrowInUSD ?? "0",
+        interestStrategy: backendData?.interestStrategyData ?? {},
+        assetData: getTokenData(reserve.asset),
       };
     });
 

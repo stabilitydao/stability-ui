@@ -1,30 +1,32 @@
-import { SupplyForm } from "../Forms/SupplyForm";
-// import { SupplyStats } from "../Stats/SupplyStats";
+import { useState } from "react";
 
-import type { TMarketReserve, TMarket } from "@types";
+import { SupplyForm } from "../Forms/SupplyForm";
+import { BasicStats } from "../Stats/BasicStats";
+
+import { TMarketReserve, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
-  network: string;
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
+  activeAsset: TMarketReserve | undefined;
 };
 
-const SupplyTab: React.FC<TProps> = ({ network, market, asset, assets }) => {
+const SupplyTab: React.FC<TProps> = ({ market, activeAsset }) => {
+  const [value, setValue] = useState<string>("");
+
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <SupplyForm
-        network={network}
         market={market}
-        asset={asset}
-        assets={assets}
+        activeAsset={activeAsset}
+        value={value}
+        setValue={setValue}
       />
-      {/* <SupplyStats
-        network={network}
+      <BasicStats
+        type={MarketSectionTypes.Supply}
         market={market}
-        asset={asset}
-        assets={assets}
-      /> */}
+        activeAsset={activeAsset}
+        value={value}
+      />
     </div>
   );
 };

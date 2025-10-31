@@ -1,23 +1,30 @@
-// import { BasicPositionStats } from "../Stats/BasicPositionStats";
-import { RepayForm } from "../Forms/RepayForm";
+import { useState } from "react";
 
-import type { TMarketReserve, TMarket } from "@types";
+import { RepayForm } from "../Forms/RepayForm";
+import { BasicStats } from "../Stats/BasicStats";
+
+import { TMarketReserve, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
-  network: string;
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
+  activeAsset: TMarketReserve | undefined;
 };
 
-const RepayTab: React.FC<TProps> = ({ network, market, asset, assets }) => {
+const RepayTab: React.FC<TProps> = ({ market, activeAsset }) => {
+  const [value, setValue] = useState<string>("");
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <RepayForm
-        network={network}
         market={market}
-        asset={asset}
-        assets={assets}
+        activeAsset={activeAsset}
+        value={value}
+        setValue={setValue}
+      />
+      <BasicStats
+        type={MarketSectionTypes.Repay}
+        market={market}
+        activeAsset={activeAsset}
+        value={value}
       />
     </div>
   );

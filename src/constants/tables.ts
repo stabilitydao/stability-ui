@@ -194,6 +194,35 @@ const USERS_TABLE: TTableColumn[] = [
   },
 ];
 
+const HOLDERS_TABLE: TTableColumn[] = [
+  {
+    name: "Rank",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Balance",
+    keyName: "balance",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
+    name: "Percentage",
+    keyName: "percentage",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+];
+
 const CONTESTS_TABLE: TTableColumn[] = [
   {
     name: "Status",
@@ -599,4 +628,5 @@ export {
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
   MARKET_LIQUIDATIONS_TABLE,
+  HOLDERS_TABLE,
 };

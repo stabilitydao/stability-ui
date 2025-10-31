@@ -7,7 +7,7 @@ import {
   XSTBLIcon,
   AgentsIcon,
   PlatformIcon,
-  LeaderboardIcon,
+  LeaderboardsIcon,
   LendingIcon,
 } from "./Icons";
 
@@ -29,8 +29,8 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <MetavaultsIcon color={color} />;
     case "alm":
       return <ALMIcon color={color} />;
-    case "leaderboard":
-      return <LeaderboardIcon color={color} />;
+    case "leaderboards":
+      return <LeaderboardsIcon color={color} />;
     case "xstbl":
       return <XSTBLIcon color={color} />;
     case "agents":

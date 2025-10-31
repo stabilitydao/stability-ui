@@ -1,22 +1,30 @@
-import { WithdrawForm } from "../Forms/WithdrawForm";
+import { useState } from "react";
 
-import type { TMarketReserve, TMarket } from "@types";
+import { WithdrawForm } from "../Forms/WithdrawForm";
+import { BasicStats } from "../Stats/BasicStats";
+
+import { TMarketReserve, TMarket, MarketSectionTypes } from "@types";
 
 type TProps = {
-  network: string;
   market: TMarket;
-  asset: TMarketReserve | undefined;
-  assets: TMarketReserve[] | undefined;
+  activeAsset: TMarketReserve | undefined;
 };
 
-const WithdrawTab: React.FC<TProps> = ({ network, market, asset, assets }) => {
+const WithdrawTab: React.FC<TProps> = ({ market, activeAsset }) => {
+  const [value, setValue] = useState<string>("");
   return (
     <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
       <WithdrawForm
-        network={network}
         market={market}
-        asset={asset}
-        assets={assets}
+        activeAsset={activeAsset}
+        value={value}
+        setValue={setValue}
+      />
+      <BasicStats
+        type={MarketSectionTypes.Withdraw}
+        market={market}
+        activeAsset={activeAsset}
+        value={value}
       />
     </div>
   );

@@ -471,6 +471,7 @@ type TSettings = {
 };
 
 type TToast = {
+  chainId: string;
   hash: string;
   status: string;
   timestamp: number;
@@ -721,6 +722,25 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
+type TUserReserveWithdrawData = {
+  balance: string;
+  maxWithdraw: string;
+};
+
+type TUserReserveData = {
+  balance: string;
+  allowance?: string;
+};
+
+type TUserReserve = {
+  supply?: TUserReserveData;
+  withdraw?: TUserReserveWithdrawData;
+  borrow?: TUserReserveData;
+  repay?: TUserReserveData;
+};
+
+type TUserReservesMap = Record<TAddress, TUserReserve>;
+
 type TMarketReserve = {
   // lib data
   address: TAddress;
@@ -756,6 +776,17 @@ type TMarketReserve = {
 
   availableToBorrow: string;
   availableToBorrowInUSD: string;
+
+  interestStrategy: {
+    address: TAddress;
+    maxVariableBorrowRate: string;
+    optimalUsageRation: string;
+    variableRateSlope1: string;
+    variableRateSlope2: string;
+  };
+
+  // assetData
+  assetData?: TTokenData;
 };
 
 type TMarket = {
@@ -775,6 +806,23 @@ type TMarket = {
   supplyTVLInUSD?: number;
   borrowTVL?: number;
   utilization?: number;
+};
+
+type TLiquidation = {
+  user: string;
+  liquidator: string;
+  liquidated: number;
+  debt: number;
+  timestamp: number;
+  date: string;
+};
+
+type TUserPoolData = {
+  totalCollateralBase: number;
+  totalDebtBase: number;
+  currentLiquidationThreshold: number;
+  maxLTV: number;
+  healthFactor: number;
 };
 
 // enums
@@ -829,6 +877,11 @@ export enum TimelineTypes {
   Week = "WEEK",
   Month = "MONTH",
   Year = "YEAR",
+}
+
+export enum LeaderboardTableTypes {
+  Holders = "Holders",
+  Users = "Users",
 }
 
 export type {
@@ -920,4 +973,9 @@ export type {
   TNetwork,
   TChartNames,
   TMarketUser,
+  TLiquidation,
+  TUserPoolData,
+  TUserReserve,
+  TUserReservesMap,
+  LeaderboardTableTypes,
 };

@@ -1,6 +1,7 @@
 import type { TAddress, TLocalStorageToken } from "@types";
 
 type TProps = {
+  chainId: string;
   hash: TAddress;
   status: string;
   timestamp: number;
@@ -30,6 +31,7 @@ type TProps = {
  * ```
  *
  * @param {Object} obj - The transaction object to store
+ * @param {string} obj.chainId - Chain id
  * @param {string} obj.hash - Transaction hash
  * @param {string} obj.status - Status of the transaction (e.g., "success", "pending")
  * @param {number} obj.timestamp - Timestamp of the transaction

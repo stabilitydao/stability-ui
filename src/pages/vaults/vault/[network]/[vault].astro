@@ -12,7 +12,7 @@ const { network, vault } = Astro.params;
 const vaultTitle = VAULTS_META_TITLES[vault as keyof typeof VAULTS_META_TITLES];
 
 const meta = {
-  title: vaultTitle ? `${vaultTitle}` : "Stability",
+  title: vaultTitle ? `${vaultTitle}` : "Vault",
   img: vaultTitle ? `/ogs/vaults/${network}-${vault}.png` : "/ogs/pages/vaults.png",
   url: `https://stability.farm/vaults/vault/${network}/${vault}`,
   description: vaultTitle 

@@ -13,6 +13,7 @@ createWeb3Modal({
   projectId: walletConnectProjectId,
   chainImages: {
     [146]: "/features/sonic.svg",
+    [9745]: "/features/plasma.svg",
   },
 });
 

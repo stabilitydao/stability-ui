@@ -9,7 +9,13 @@ interface IProps {
 
 const MarketsTable: React.FC<IProps> = ({ markets }) => {
   if (!markets?.length) {
-    return <EmptyTable isUserVaults={false} display={DisplayTypes.Rows} />;
+    return (
+      <EmptyTable
+        display={DisplayTypes.Grid}
+        text="No markets yet"
+        description=""
+      />
+    );
   }
 
   return (

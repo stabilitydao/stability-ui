@@ -3,12 +3,14 @@ import { MarketSectionTypes } from "@types";
 export const getInitialStateFromUrl = (): {
   asset: string;
   section: MarketSectionTypes;
+  sortType: string;
 } => {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
 
   const assetUrl = params.get("asset") as string;
   const sectionUrl = params.get("section");
+  const sortUrl = params.get("sort");
 
   const validSections = [
     MarketSectionTypes.Withdraw,
@@ -24,5 +26,7 @@ export const getInitialStateFromUrl = (): {
     ? (sectionUrl as MarketSectionTypes)
     : MarketSectionTypes.Supply;
 
-  return { asset: assetUrl, section };
+  const sortType = sortUrl ? sortUrl : "";
+
+  return { asset: assetUrl, section, sortType };
 };

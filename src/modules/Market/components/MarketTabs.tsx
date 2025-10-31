@@ -10,71 +10,39 @@ import { LiquidationsTab } from "./Tabs/LiquidationsTab";
 import { MarketSectionTypes, TMarketReserve, TMarket } from "@types";
 
 type TProps = {
-  network: string;
-  market: string;
   marketData: TMarket;
   section: MarketSectionTypes;
-  asset: TMarketReserve | undefined;
+  activeAsset: TMarketReserve | undefined;
 };
 
-const MarketTabs: React.FC<TProps> = ({
-  network,
-  market,
-  marketData,
-  section,
-  asset,
-}) => {
+const MarketTabs: React.FC<TProps> = ({ marketData, section, activeAsset }) => {
   switch (section) {
     case MarketSectionTypes.Supply:
-      return (
-        <SupplyTab
-          network={network}
-          market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-        />
-      );
+      return <SupplyTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Withdraw:
-      return (
-        <WithdrawTab
-          network={network}
-          market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-        />
-      );
+      return <WithdrawTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Borrow:
-      return (
-        <BorrowTab
-          network={network}
-          market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-        />
-      );
+      return <BorrowTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Repay:
-      return (
-        <RepayTab
-          network={network}
-          market={marketData}
-          asset={asset}
-          assets={marketData?.reserves}
-        />
-      );
+      return <RepayTab market={marketData} activeAsset={activeAsset} />;
     // case MarketSectionTypes.Leverage:
     //   return <LeverageTab asset={asset} />;
     case MarketSectionTypes.Information:
+      return <InformationTab market={marketData} activeAsset={activeAsset} />;
+    case MarketSectionTypes.Users:
       return (
-        <InformationTab
-          market={marketData}
-          activeAsset={asset}
-          assets={marketData?.reserves}
+        <UsersTab
+          networkId={marketData?.network?.id as string}
+          marketId={marketData?.marketId}
         />
       );
-    case MarketSectionTypes.Users:
-      return <UsersTab network={network} market={market} />;
     case MarketSectionTypes.Liquidations:
-      return <LiquidationsTab network={network} market={market} />;
+      return (
+        <LiquidationsTab
+          networkId={marketData?.network?.id as string}
+          marketId={marketData?.marketId}
+        />
+      );
     default:
       return null;
   }
