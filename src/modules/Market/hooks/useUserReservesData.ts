@@ -195,7 +195,9 @@ export const useUserReservesData = (market: TMarket): TResult => {
   };
 
   useEffect(() => {
+    console.log("before address", $account);
     if (!$userReservesData[marketId]) {
+      console.log("after address", $account);
       fetchUserReservesData();
     }
   }, [$account, $connected, $currentChainID, $lastTx, marketId]);
