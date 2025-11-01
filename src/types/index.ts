@@ -727,6 +727,11 @@ type TUserReserveWithdrawData = {
   maxWithdraw: string;
 };
 
+type TUserReserveBorrowData = {
+  balance: string;
+  maxBorrow: string;
+};
+
 type TUserReserveData = {
   balance: string;
   allowance?: string;
@@ -735,7 +740,7 @@ type TUserReserveData = {
 type TUserReserve = {
   supply?: TUserReserveData;
   withdraw?: TUserReserveWithdrawData;
-  borrow?: TUserReserveData;
+  borrow?: TUserReserveBorrowData;
   repay?: TUserReserveData;
 };
 
