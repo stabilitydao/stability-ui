@@ -72,8 +72,8 @@ const Vault: React.FC<IProps> = ({
 
   const link =
     vault?.type === VaultTypes.Vault
-      ? `/vaults/vault/${vault.network}/${vault.address}`
-      : `/metavaults/metavault/${vault.network}/${vault.address}`;
+      ? `/vaults/${vault.network}/${vault.address}`
+      : `/metavaults/${vault.network}/${vault.address}`;
 
   return (
     <div className="border-t border-[#23252A]">

@@ -41,8 +41,8 @@ const Breadcrumbs = (): JSX.Element => {
       add(contest?.name || "Unknown Contest");
     } else if (currentPath === "platform") {
       add("Platform", "platform");
-    } else if (main === "vaults" && rest[0] === "vault" && rest.length === 3) {
-      const [, , chainId, vaultAddress] = currentPath.split("/");
+    } else if (main === "vaults" && rest.length === 2) {
+      const [, chainId, vaultAddress] = currentPath.split("/");
 
       const symbol =
         $vaults?.[chainId]?.[vaultAddress?.toLowerCase()]?.symbol || "Vault";
@@ -87,16 +87,16 @@ const Breadcrumbs = (): JSX.Element => {
       add("Metavaults Management");
     } else if (
       main === "metavaults" &&
-      rest[0] === "metavault" &&
-      rest.length === 3 &&
-      $metaVaults[rest[1]]
+      rest.length === 2 &&
+      $metaVaults[rest[0]]
     ) {
-      const [, , network, metaVaultAddress] = currentPath.split("/");
+      const [, network, metaVaultAddress] = currentPath.split("/");
 
       const symbol =
         $metaVaults[network].find(
           ({ address }) => address.toLowerCase() === metaVaultAddress
         )?.name || "Meta Vault";
+      console.log(network, metaVaultAddress);
 
       add("Meta Vaults", "metavaults");
       add(symbol);

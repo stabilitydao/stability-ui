@@ -5,7 +5,5 @@ export const formatHealthFactor = (hf: number): string => {
 
   if (hf > 100) return "∞";
 
-  const level = Math.floor(hf);
-
-  return `${level}+`;
+  return hf.toFixed(2);
 };

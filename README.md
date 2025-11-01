@@ -10,8 +10,8 @@
 | ------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------ |
 | **Landing**                                                                                                         | Development Figma | Index page                                       |
 | **AI**                                                                                                              |                   | Chatbot. AI Router.                              |
-| [**Vaults**](https://stability.farm/)                                                                               | Live              | List of vaults. Portfolio.                       |
-| --- [**Vault**](https://stability.farm/vault/137/0xe319afa4d638f71400d4c7d60d90b0c227a5af48)                        | Live              | Vault page                                       |
+| [**Vaults**](https://stability.farm/vaults)                                                                         | Live              | List of vaults. Portfolio.                       |
+| --- [**Vault**](https://stability.farm/vaults/146/0x709833e5b4b98aab812d175510f94bc91cfabd89)                       | Live              | Vault page                                       |
 | **Boosters**                                                                                                        |                   | Liquid staking wrappers to get farming boosts    |
 | [**Leaderboards**](https://stability.farm/leaderboards)                                                             | Development       | Users portal: active contests, leaderboards, etc |
 | --- [**Contests**](https://stability.farm/contests)                                                                 |                   | All yield contests                               |
