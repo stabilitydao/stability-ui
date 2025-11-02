@@ -265,7 +265,6 @@ const BorrowForm: React.FC<TProps> = ({
           </div>
         </label>
         <div className="flex flex-col gap-2">
-          {" "}
           <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
             <span className="text-[#7C7E81] font-medium">
               Available to borrow
@@ -307,7 +306,7 @@ const BorrowForm: React.FC<TProps> = ({
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}

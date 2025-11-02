@@ -32,7 +32,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     borrowed: { current: "0", future: "0", inUSD: "$0" },
     LTV: { current: "0", future: "0" },
     HF: { current: "∞", future: "0" },
-    APR: "0",
+    APR: { supply: "0", borrow: "0" },
   });
 
   const { data: userPoolData, isLoading: isPoolLoading } = useUserPoolData(
@@ -49,7 +49,10 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       borrowed: { current: "0", future: "0", inUSD: "$0" },
       LTV: { current: "0", future: "0" },
       HF: { current: "∞", future: "0" },
-      APR: Number(activeAsset?.supplyAPR).toFixed(2),
+      APR: {
+        supply: Number(activeAsset?.supplyAPR).toFixed(2),
+        borrow: Number(activeAsset?.borrowAPR).toFixed(2),
+      },
     };
 
     const inputValue = Number(value);
@@ -190,8 +193,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
         />
 
         <StatItem
-          label="Supply APR"
-          value={`${stats.APR}%`}
+          label={isCollateral ? "Supply APR" : "Borrow APR"}
+          value={`${isCollateral ? stats.APR.supply : stats.APR.borrow}%`}
           isLoading={isPoolLoading || isReservesLoading}
         />
       </div>

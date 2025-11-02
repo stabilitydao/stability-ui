@@ -355,7 +355,7 @@ const SupplyForm: React.FC<TProps> = ({
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}
