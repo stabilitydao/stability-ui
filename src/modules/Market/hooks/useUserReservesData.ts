@@ -41,7 +41,14 @@ export const useUserReservesData = (market: TMarket): TResult => {
   const isLoading = $userReservesLoading[marketId] ?? false;
 
   const fetchUserReservesData = async () => {
-    if (!$connected || !$account || !market?.reserves?.length) {
+    if (
+      !$connected ||
+      !$account ||
+      !market?.reserves?.length ||
+      !market?.reserves?.every(
+        (reserve) => reserve?.price && reserve?.price != "0"
+      )
+    ) {
       userReservesLoading.setKey(marketId, false);
       return;
     }
@@ -75,6 +82,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
       for (const asset of market.reserves) {
         const address = asset.address as TAddress;
         const aTokenAddress = asset.aToken as TAddress;
+        const priceUSD = Number(asset.price);
         const decimals = getTokenData(address)?.decimals ?? 18;
 
         const rawATokenBalance = await getBalance(
@@ -89,32 +97,28 @@ export const useUserReservesData = (market: TMarket): TResult => {
 
         if (Number(withdraw)) {
           try {
-            const priceUSD = Number(asset.price);
+            let maxWithdrawUSD = 0;
 
-            if (!!priceUSD) {
-              let maxWithdrawUSD = 0;
-
-              if (!totalDebtBase) {
-                maxWithdrawUSD = Number(withdraw) * priceUSD;
-              } else {
-                const minCollateralUSD = totalDebtBase / liquidationThreshold;
-                maxWithdrawUSD = Math.max(
-                  totalCollateralBase - minCollateralUSD,
-                  0
-                );
-              }
-
-              let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
-
-              let _maxWithdraw = withdraw;
-
-              if (maxWithdrawTokens < Number(withdraw)) {
-                maxWithdrawTokens *= 0.999999; // * for safe amount
-                _maxWithdraw = maxWithdrawTokens.toString();
-              }
-
-              maxWithdraw = _maxWithdraw;
+            if (!totalDebtBase) {
+              maxWithdrawUSD = Number(withdraw) * priceUSD;
+            } else {
+              const minCollateralUSD = totalDebtBase / liquidationThreshold;
+              maxWithdrawUSD = Math.max(
+                totalCollateralBase - minCollateralUSD,
+                0
+              );
             }
+
+            let maxWithdrawTokens = maxWithdrawUSD / priceUSD;
+
+            let _maxWithdraw = withdraw;
+
+            if (maxWithdrawTokens < Number(withdraw)) {
+              maxWithdrawTokens *= 0.999999; // * for safe amount
+              _maxWithdraw = maxWithdrawTokens.toString();
+            }
+
+            maxWithdraw = _maxWithdraw;
           } catch (err) {
             console.warn("Failed to calculate maxWithdraw:", err);
           }
@@ -135,14 +139,25 @@ export const useUserReservesData = (market: TMarket): TResult => {
 
         if (asset.isBorrowable) {
           const tokenPrice = Number(asset.price);
-          let borrow = { balance: "0" };
+          let borrow = { balance: "0", maxBorrow: "0" };
 
           if (availableBorrowsBase > 0 && tokenPrice > 0) {
             const rawAmount =
               (availableBorrowsBase / tokenPrice) * 10 ** decimals;
+
             const safeAmount = BigInt(Math.floor(rawAmount * 0.999999));
+
+            const maxBorrow = formatUnits(safeAmount, decimals);
+
+            const availableToBorrow = Number(asset?.availableToBorrow) ?? 0;
+
+            const canBorrow = String(
+              Math.min(availableToBorrow, Number(maxBorrow))
+            );
+
             borrow = {
-              balance: formatUnits(safeAmount, decimals),
+              balance: canBorrow,
+              maxBorrow,
             };
           }
 
@@ -189,7 +204,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
     if (!$userReservesData[marketId]) {
       fetchUserReservesData();
     }
-  }, [$account, $connected, $currentChainID, $lastTx, marketId]);
+  }, [$account, $connected, $currentChainID, $lastTx, marketId, market]);
 
   return {
     data: $userReservesData[marketId],

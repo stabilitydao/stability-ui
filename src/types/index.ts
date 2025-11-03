@@ -727,6 +727,11 @@ type TUserReserveWithdrawData = {
   maxWithdraw: string;
 };
 
+type TUserReserveBorrowData = {
+  balance: string;
+  maxBorrow: string;
+};
+
 type TUserReserveData = {
   balance: string;
   allowance?: string;
@@ -735,7 +740,7 @@ type TUserReserveData = {
 type TUserReserve = {
   supply?: TUserReserveData;
   withdraw?: TUserReserveWithdrawData;
-  borrow?: TUserReserveData;
+  borrow?: TUserReserveBorrowData;
   repay?: TUserReserveData;
 };
 
@@ -750,6 +755,9 @@ type TMarketReserve = {
   oracle: TAddress;
   oracleName: string;
   treasury: TAddress;
+
+  // assetData
+  assetData?: TTokenData;
 
   // backend data
   name: string;
@@ -784,9 +792,6 @@ type TMarketReserve = {
     variableRateSlope1: string;
     variableRateSlope2: string;
   };
-
-  // assetData
-  assetData?: TTokenData;
 };
 
 type TMarket = {
@@ -977,5 +982,4 @@ export type {
   TUserPoolData,
   TUserReserve,
   TUserReservesMap,
-  LeaderboardTableTypes,
 };

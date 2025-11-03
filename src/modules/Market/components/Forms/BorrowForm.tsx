@@ -207,9 +207,7 @@ const BorrowForm: React.FC<TProps> = ({
     } catch (error) {
       setNeedConfirm(false);
       setButton("Borrow");
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
 
     refetchUserReservesData();
@@ -266,34 +264,49 @@ const BorrowForm: React.FC<TProps> = ({
             {usdValue}
           </div>
         </label>
-        <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
-          <span className="text-[#7C7E81] font-medium">
-            Available to borrow
-          </span>
-          <div className="flex items-start gap-2">
-            {isLoading ? (
-              <Skeleton height={24} width={70} />
-            ) : (
-              <span className="font-semibold">
-                {formatNumber(reserve?.borrow?.balance ?? 0, "format")}{" "}
-                {activeAsset?.assetData?.symbol}
-              </span>
-            )}
-
-            <button
-              className={cn(
-                "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",
-                $connected && "cursor-pointer"
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
+            <span className="text-[#7C7E81] font-medium">
+              Available to borrow
+            </span>
+            <div className="flex items-start gap-2">
+              {isLoading ? (
+                <Skeleton height={24} width={70} />
+              ) : (
+                <span className="font-semibold">
+                  {formatNumber(reserve?.borrow?.balance ?? 0, "format")}{" "}
+                  {activeAsset?.assetData?.symbol}
+                </span>
               )}
-              onClick={handleMaxInputChange}
-            >
-              Max
-            </button>
+
+              <button
+                className={cn(
+                  "py-1 px-2 text-[#7C7E81] text-[12px] leading-4 font-medium bg-[#18191C] border border-[#35363B] rounded-lg cursor-default",
+                  $connected && "cursor-pointer"
+                )}
+                onClick={handleMaxInputChange}
+              >
+                Max
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-[16px] leading-6">
+            <span className="text-[#7C7E81] font-medium">Max borrow</span>
+            <div className="flex items-start gap-2">
+              {isLoading ? (
+                <Skeleton height={24} width={70} />
+              ) : (
+                <span className="font-semibold">
+                  {formatNumber(reserve?.borrow?.maxBorrow ?? 0, "format")}{" "}
+                  {activeAsset?.assetData?.symbol}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}

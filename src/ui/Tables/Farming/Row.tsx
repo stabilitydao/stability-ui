@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const Row: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
-  const link = `/vaults/vault/${vault.network}/${vault.address}`;
+  const link = `/vaults/${vault.network}/${vault.address}`;
 
   const modalData = {
     earningData: vault.earningData,

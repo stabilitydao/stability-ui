@@ -201,10 +201,7 @@ const WithdrawForm: React.FC<TProps> = ({
     } catch (error) {
       setNeedConfirm(false);
       setButton("Withdraw");
-
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
 
     refetchUserReservesData();
@@ -303,7 +300,7 @@ const WithdrawForm: React.FC<TProps> = ({
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}

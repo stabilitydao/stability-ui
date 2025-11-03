@@ -210,9 +210,7 @@ const RepayForm: React.FC<TProps> = ({
       setNeedConfirm(false);
       await updateAllowance(amount);
 
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     } finally {
       setTransactionInProgress(false);
     }
@@ -291,9 +289,7 @@ const RepayForm: React.FC<TProps> = ({
     } catch (error) {
       setNeedConfirm(false);
       setButton("Repay");
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
 
     refetchUserReservesData();
@@ -400,7 +396,7 @@ const RepayForm: React.FC<TProps> = ({
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}

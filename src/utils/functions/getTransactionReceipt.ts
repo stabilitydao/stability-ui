@@ -14,6 +14,8 @@ const getTransactionReceipt = async (
 
   let transactionConfirmations = 3;
 
+  let lastError: unknown = null;
+
   while (transactionConfirmations <= maxConfirmations) {
     await new Promise((resolve) => setTimeout(resolve, interval));
 
@@ -28,14 +30,19 @@ const getTransactionReceipt = async (
       }
     } catch (error) {
       console.error("Error getting transaction status:", error);
+      lastError = error;
     }
 
     transactionConfirmations += 3;
   }
 
-  throw new Error(
-    "Transaction was not confirmed after the maximum number of attempts"
-  );
+  if (lastError instanceof Error) {
+    throw lastError;
+  } else {
+    throw new Error(
+      "Transaction was not confirmed after the maximum number of attempts"
+    );
+  }
 };
 
 export { getTransactionReceipt };

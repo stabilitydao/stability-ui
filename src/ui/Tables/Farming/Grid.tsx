@@ -19,7 +19,7 @@ interface IProps {
 const Grid: React.FC<IProps> = ({ APRs, vault }) => {
   const POINTS = { sonic: vault.sonicPoints, rings: vault.ringsPoints };
 
-  const link = `/vaults/vault/${vault.network}/${vault.address}`;
+  const link = `/vaults/${vault.network}/${vault.address}`;
 
   const currentLtv = vault?.leverageLending?.ltv.toFixed(2) ?? 0;
   const maxLtv = vault?.leverageLending?.maxLtv.toFixed(2) ?? 0;

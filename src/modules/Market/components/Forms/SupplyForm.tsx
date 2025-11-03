@@ -200,10 +200,7 @@ const SupplyForm: React.FC<TProps> = ({
     } catch (error) {
       setNeedConfirm(false);
       await updateAllowance(amount);
-
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     } finally {
       setTransactionInProgress(false);
     }
@@ -276,10 +273,7 @@ const SupplyForm: React.FC<TProps> = ({
     } catch (error) {
       setNeedConfirm(false);
       setButton("Supply");
-
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
 
     refetchUserReservesData();
@@ -361,7 +355,7 @@ const SupplyForm: React.FC<TProps> = ({
         </div>
       </div>
 
-      <FormError errorMessage={error} />
+      <FormError errorMessage={error} setErrorMessage={setError} />
 
       <ActionButton
         type={button}

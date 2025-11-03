@@ -28,11 +28,11 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
   const $lastTx = useStore(lastTx);
 
   const [stats, setStats] = useState({
-    deposited: { current: "0", future: "0", inUSD: "$0" },
+    supplied: { current: "0", future: "0", inUSD: "$0" },
     borrowed: { current: "0", future: "0", inUSD: "$0" },
     LTV: { current: "0", future: "0" },
     HF: { current: "∞", future: "0" },
-    APR: "0",
+    APR: { supply: "0", borrow: "0" },
   });
 
   const { data: userPoolData, isLoading: isPoolLoading } = useUserPoolData(
@@ -45,11 +45,14 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
 
   const handleStats = async () => {
     const _stats = {
-      deposited: { current: "0", future: "0", inUSD: "$0" },
+      supplied: { current: "0", future: "0", inUSD: "$0" },
       borrowed: { current: "0", future: "0", inUSD: "$0" },
       LTV: { current: "0", future: "0" },
       HF: { current: "∞", future: "0" },
-      APR: Number(activeAsset?.supplyAPR).toFixed(2),
+      APR: {
+        supply: Number(activeAsset?.supplyAPR).toFixed(2),
+        borrow: Number(activeAsset?.borrowAPR).toFixed(2),
+      },
     };
 
     const inputValue = Number(value);
@@ -68,25 +71,25 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     let newDebt = totalDebt;
 
     if (isCollateral) {
-      const deposited = Number(reserve?.withdraw?.balance ?? 0);
+      const supplied = Number(reserve?.withdraw?.balance ?? 0);
 
-      if (deposited) {
-        _stats.deposited.current = formatNumber(
-          deposited,
-          deposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
+      if (supplied) {
+        _stats.supplied.current = formatNumber(
+          supplied,
+          supplied > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
-        _stats.deposited.inUSD = convertToUSD(deposited * price);
+        _stats.supplied.inUSD = convertToUSD(supplied * price);
       }
 
       if (inputValue) {
-        const futureDeposited =
+        const futureSupplied =
           type === MarketSectionTypes.Supply
-            ? deposited + inputValue
-            : deposited - inputValue;
+            ? supplied + inputValue
+            : supplied - inputValue;
 
-        _stats.deposited.future = formatNumber(
-          futureDeposited,
-          futureDeposited > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
+        _stats.supplied.future = formatNumber(
+          futureSupplied,
+          futureSupplied > 1 ? "abbreviateIntegerNotUsd" : "smallNumbers"
         );
 
         newCollateral =
@@ -179,21 +182,19 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col gap-2 md:gap-6 w-full lg:w-2/3 font-medium">
       <div className="flex items-start gap-2 md:gap-6 w-full flex-wrap md:flex-nowrap">
         <StatItem
-          label={isCollateral ? "Deposited" : "Borrowed"}
-          value={
-            isCollateral ? stats.deposited.current : stats.borrowed.current
-          }
+          label={isCollateral ? "Supplied" : "Borrowed"}
+          value={isCollateral ? stats.supplied.current : stats.borrowed.current}
           futureValue={
-            isCollateral ? stats.deposited.future : stats.borrowed.future
+            isCollateral ? stats.supplied.future : stats.borrowed.future
           }
-          subValue={isCollateral ? stats.deposited.inUSD : stats.borrowed.inUSD}
+          subValue={isCollateral ? stats.supplied.inUSD : stats.borrowed.inUSD}
           symbol={activeAsset?.assetData?.symbol}
           isLoading={isPoolLoading || isReservesLoading}
         />
 
         <StatItem
-          label="Supply APR"
-          value={`${stats.APR}%`}
+          label={isCollateral ? "Supply APR" : "Borrow APR"}
+          value={`${isCollateral ? stats.APR.supply : stats.APR.borrow}%`}
           isLoading={isPoolLoading || isReservesLoading}
         />
       </div>

@@ -1,0 +1,16 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+import { Market } from "@modules"
+---
+
+
+<Layout 
+  title="STBL Market"
+  img="/ogs/markets/STBL.png"
+  metaTitle="STBL Market"
+  metaUrl="https://stability.farm/lending/146/STBL"
+  metaDescription="Non-custodial Liquidity market"
+>
+  <Market network="146" market="STBL" client:only="react" />
+</Layout>

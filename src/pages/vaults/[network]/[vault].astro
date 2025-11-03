@@ -14,7 +14,7 @@ const vaultTitle = VAULTS_META_TITLES[vault as keyof typeof VAULTS_META_TITLES];
 const meta = {
   title: vaultTitle ? `${vaultTitle}` : "Vault",
   img: vaultTitle ? `/ogs/vaults/${network}-${vault}.png` : "/ogs/pages/vaults.png",
-  url: `https://stability.farm/vaults/vault/${network}/${vault}`,
+  url: `https://stability.farm/vaults/${network}/${vault}`,
   description: vaultTitle 
     ? `Deposit and earn with ${vaultTitle}, powered by Stability.` 
     : "On-chain asset management, liquidity mining and yield farming platform."

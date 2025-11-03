@@ -188,7 +188,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
           (name) => !name.toLowerCase().includes("aave")
         );
 
-    const protocols = baseProtocols.map((name) =>
+    const protocols = baseProtocols.map((name: string) =>
       Object.values(PROTOCOLS).find(
         (p) =>
           p.name.replace(" ", "").toLowerCase() ===
@@ -300,7 +300,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
     });
 
     const totalAllocation = protocolsAllocation.reduce(
-      (sum, p) => sum + p.allocation,
+      (sum: number, p) => sum + p.allocation,
       0
     );
 

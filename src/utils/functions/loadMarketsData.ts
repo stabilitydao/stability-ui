@@ -33,6 +33,7 @@ const loadMarketsData = async (
         oracle: reserve.oracle,
         oracleName: reserve.oracleName,
         treasury: reserve.treasury,
+        assetData: getTokenData(reserve.asset),
         name: backendData?.name ?? "",
         debtToken: backendData?.debtToken ?? "",
         price: backendData?.price ?? "0",
@@ -52,7 +53,6 @@ const loadMarketsData = async (
         availableToBorrow: backendData?.availableToBorrow ?? "0",
         availableToBorrowInUSD: backendData?.availableToBorrowInUSD ?? "0",
         interestStrategy: backendData?.interestStrategyData ?? {},
-        assetData: getTokenData(reserve.asset),
       };
     });
 
