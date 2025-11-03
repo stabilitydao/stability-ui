@@ -56,7 +56,7 @@ const LiquidationTable: React.FC<TProps> = ({ isLoading, data }) => {
           ))}
         </div>
       ) : (
-        <EmptyTable text="No liquidations yet" description="" />
+        <EmptyTable text="No liquidations yet" description="" isSticky={true} />
       )}
     </div>
   );
