@@ -23,12 +23,7 @@ const Leaderboards = (): JSX.Element => {
         <div className="flex flex-col items-start gap-4">
           <h2 className="page-title__font text-start">Leaderboards</h2>
           <h3 className="text-[#97979a] page-description__font">
-            Track user performance across yield vaults.{" "}
-            <br className="hidden lg:block" /> Earn points by participating,
-            ranking on the leaderboard, <br className="hidden lg:block" /> and
-            unlocking exclusive airdrop benefits{" "}
-            <br className="hidden lg:block" /> through smart yield farming
-            strategies
+            Track user performance across Stability ecosystem.
           </h3>
           <ClaimSiloPoints />
         </div>

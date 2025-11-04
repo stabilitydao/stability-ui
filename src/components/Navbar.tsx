@@ -51,10 +51,14 @@ const Navbar = (): JSX.Element => {
     }
   }, []);
 
-  const TVL = useMemo(
+  const AUM = useMemo(
     () =>
       $apiData?.total?.tvl
-        ? formatNumber($apiData?.total.tvl || 0, "abbreviate")
+        ? formatNumber(
+            Number($apiData?.total.tvl ?? 0) +
+              Number($apiData?.total?.marketTvl ?? 0),
+            "abbreviate"
+          )
         : "0",
     [$apiData]
   );
@@ -125,8 +129,8 @@ const Navbar = (): JSX.Element => {
               <div className="flex gap-2">
                 <div className="w-2/3 flex items-center justify-between h-10 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
                   <span className="text-[#A3A4A6]">AUM</span>
-                  {TVL !== "0" ? (
-                    <span className="text-white">{TVL}</span>
+                  {AUM !== "0" ? (
+                    <span className="text-white">{AUM}</span>
                   ) : (
                     <TextSkeleton lineHeight={16} width={50} />
                   )}
