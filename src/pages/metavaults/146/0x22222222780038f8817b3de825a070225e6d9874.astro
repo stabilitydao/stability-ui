@@ -1,0 +1,14 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+import {Metavault} from "@modules";
+---
+
+<Layout title="metaUSDC"
+  img="/ogs/metavaults/metaUSDC.png"
+  metaTitle="On-chain asset management, liquidity mining and yield farming platform."
+  metaUrl="https://stability.farm/metavaults/146/0x22222222780038f8817b3de825a070225e6d9874"
+  metaDescription="Metavaults are automated vaults that combine multiple DeFi protocols and assets into a single strategy while automatically rebalancing positions across integrated DeFi protocols and assets, maximizing returns"
+>
+    <Metavault network="146" metavault="0x22222222780038f8817b3de825a070225e6d9874" client:only="react" />
+</Layout>

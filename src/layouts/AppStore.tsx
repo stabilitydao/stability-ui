@@ -63,6 +63,7 @@ import {
   getLocalStorageData,
   getContractDataWithPagination,
   extractPointsMultiplier,
+  loadMarketsData,
 } from "@utils";
 
 import {
@@ -78,7 +79,6 @@ import type {
   // TYearnProtocol,
   TVaults,
   TMultichainPrices,
-  TAPIData,
   TPriceInfo,
   TVaultDataKey,
   TFrontendBalances,
@@ -87,10 +87,17 @@ import type {
   TTokens,
   TMetaVault,
   TMarketPrices,
+  TMarket,
   // TAsset,
 } from "@types";
 
-import type { Vaults, Vault } from "@stabilitydao/stability/out/api.types";
+import type {
+  Vaults,
+  Vault,
+  MarketData,
+  ApiMainReply,
+  MetaVaults,
+} from "@stabilitydao/stability/out/api.types";
 
 const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const { isConnected, address } = useAccount();
@@ -102,6 +109,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
   const $lastTx = useStore(lastTx);
   const $reload = useStore(reload);
   const $metaVaults = useStore(metaVaults);
+  const $markets = useStore(markets);
 
   let isError = false;
 
@@ -111,9 +119,11 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
   const localMetaVaults: { [network: string]: TMetaVault[] } = {};
 
+  let localMarkets: { [network: string]: TMarket[] } = {};
+
   let prices: TMultichainPrices = {};
 
-  let stabilityAPIData: TAPIData = {};
+  let stabilityAPIData: ApiMainReply = {};
 
   const handleError = (errType: string, description: string) => {
     error.set({ state: true, type: errType, description });
@@ -804,12 +814,16 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     const _marketPrices: TMarketPrices = {};
 
     /***** MARKETS *****/
-    markets.set(stabilityAPIData.markets);
+    localMarkets = await loadMarketsData(
+      stabilityAPIData.markets as MarketData
+    );
+
+    markets.set(localMarkets);
     isMarketsLoaded.set(true);
 
     /***** PRICES *****/
-    if (stabilityAPIData.prices) {
-      Object.entries(stabilityAPIData.prices).forEach(([key, value]) => {
+    if (stabilityAPIData?.prices) {
+      Object.entries(stabilityAPIData?.prices).forEach(([key, value]) => {
         const isIntegerPrice = ["BTC", "ETH"].includes(key);
         _marketPrices[key] = {
           ...value,
@@ -824,7 +838,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.vaults as TVaults).map(async (key) => {
+      Object.keys(stabilityAPIData?.vaults as Vaults).map(async (key) => {
         const chain = CHAINS.find(({ id }) => id === key);
         if (!chain) return;
         /////***** SET VAULTS DATA *****/////
@@ -835,17 +849,17 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         /////***** SET PLATFORM DATA *****/////
 
         vaultsTokens[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.bcAssets ?? [];
+          stabilityAPIData?.platforms?.[+chain.id]?.bcAssets ?? [];
 
         versions[chain.id] =
-          stabilityAPIData?.platforms?.[chain.id]?.versions?.platform ?? "";
+          stabilityAPIData?.platforms?.[+chain.id]?.versions?.platform ?? "";
 
         platformData[chain.id] = {
           platform: platforms[chain.id],
           factory: deployments[chain.id].core.factory.toLowerCase() as TAddress,
-          buildingPermitToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPermitToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPermitToken as TAddress,
-          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[chain.id]
+          buildingPayPerVaultToken: stabilityAPIData?.platforms?.[+chain.id]
             ?.buildingPayPerVaultToken as TAddress,
           zap: deployments[chain.id].core.zap.toLowerCase() as TAddress,
         };
@@ -957,14 +971,19 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** META VAULTS *****/
     await Promise.all(
-      Object.keys(stabilityAPIData?.metaVaults as TMetaVault[]).map(
+      Object.keys(stabilityAPIData?.metaVaults as MetaVaults).map(
         async (key) => {
           const chain = CHAINS.find(({ id }) => id === key);
           if (!chain) return;
           /////***** SET VAULTS DATA *****/////
           const APIMetaVaultsData = Object.values(
             stabilityAPIData?.metaVaults?.[chain.id] as Vaults
+          ).filter(
+            ({ address }) =>
+              address?.toLowerCase() !=
+              "0x11111527df7335772e6e94cf464473f19e421111"
           );
+          // temp: remove after meta vault statuses update
 
           if (APIMetaVaultsData.length) {
             const _metaVaults = APIMetaVaultsData.map((metaVault) => {
@@ -980,10 +999,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
               let sonicPoints = 0;
 
-              if (["metaUSD", "metaS"].includes(metaVault.symbol)) {
+              if (["metaUSD", "metaS"].includes(metaVault?.symbol)) {
                 const multiplier =
                   stabilityAPIData?.rewards?.metaVaultAprMultiplier?.[
-                    metaVault.address
+                    metaVault?.address
                   ] || 0;
 
                 if (multiplier) {
@@ -999,7 +1018,7 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
                 }
               }
 
-              totalAPR = Number(metaVault.APR) + merklAPR + gemsAPR;
+              totalAPR = Number(metaVault.APR ?? 0) + merklAPR + gemsAPR;
 
               const deposited = metaVault.deposited ?? 0;
 
@@ -1102,9 +1121,10 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
     connected.set(isConnected);
   };
 
-  useEffect(() => {
+  const init = async () => {
+    // static meta vaults data
     if (!$metaVaults) {
-      const metaVaultsWithName = deployments["146"].metaVaults?.map(
+      const sonicMetaVaultsWithName = deployments["146"].metaVaults?.map(
         (metaV) => ({
           ...metaV,
           name: getTokenData(metaV.address)?.name,
@@ -1112,10 +1132,31 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
         })
       );
 
-      metaVaults.set({ "146": metaVaultsWithName });
+      const plasmaMetaVaultsWithName = deployments["9745"].metaVaults?.map(
+        (metaV) => ({
+          ...metaV,
+          name: getTokenData(metaV.address)?.name,
+          network: "9745",
+        })
+      );
+
+      metaVaults.set({
+        "146": sonicMetaVaultsWithName,
+        "9745": plasmaMetaVaultsWithName,
+      });
+    }
+
+    // static markets data
+    if (!$markets) {
+      localMarkets = await loadMarketsData({});
+      markets.set(localMarkets);
     }
 
     fetchAllData();
+  };
+
+  useEffect(() => {
+    init();
   }, [address, chain?.id, isConnected, $lastTx, $reload]);
 
   return (

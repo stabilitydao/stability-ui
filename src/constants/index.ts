@@ -18,9 +18,11 @@ import {
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
+  MARKET_LIQUIDATIONS_TABLE,
+  HOLDERS_TABLE,
+  MARKETS_TABLE_FILTERS,
 } from "./tables";
 
 import {
@@ -160,7 +162,7 @@ const CHAINS = [
     name: chains["146"].name,
     id: "146",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["146"].img}`,
-    explorer: "https://sonicscan.org/address/",
+    explorer: "https://sonicscan.org",
     nativeCurrency: "S",
     color: "#000000",
     active: true,
@@ -169,15 +171,25 @@ const CHAINS = [
     name: chains["43114"].name,
     id: "43114",
     logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["43114"].img}`,
-    explorer: "https://snowtrace.io/address/",
+    explorer: "https://snowtrace.io",
     nativeCurrency: "AVAX",
     color: "#E84142",
+    active: true,
+  },
+  {
+    name: chains["9745"].name,
+    id: "9745",
+    logoURI: `https://raw.githubusercontent.com/stabilitydao/.github/main/chains/${chains["9745"].img}`,
+    explorer: "https://plasmascan.to",
+    nativeCurrency: "XPL",
+    color: "#15322A",
     active: true,
   },
 ];
 
 const CHAINS_CONFIRMATIONS = {
-  "8453": 3,
+  "146": 3,
+  "9745": 3,
   "43114": 3,
 };
 
@@ -280,14 +292,19 @@ const VAULTS_WITH_NAME = {
   "0xb1e87223f5b080f687b298df4fc8acabd3d1797b": "PT-smsUSD (30 Oct), 141",
 };
 
+const META_VAULTS_EXCEPTIONS = [
+  "0x1111836d0ff66770f9d9a22fdb7e1f0349501111",
+  "0xa881fa6e4d7a338abff52bc3232bf684c2ebc041",
+];
+
 const PATHS = [
   // { name: "Dashboard", path: "dashboard" },
   { name: "All Vaults", path: "vaults" },
   { name: "Leveraged Farming", path: "leveraged-farming" },
   { name: "Meta Vaults", path: "metavaults" },
-  // { name: "Lending", path: "lending" },
+  { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
-  { name: "Leaderboard", path: "leaderboard" },
+  { name: "Leaderboards", path: "leaderboards" },
   { name: "xSTBL", path: "xstbl" },
   // { name: "Agents", path: "agents" },
 ];
@@ -449,8 +466,11 @@ export {
   VAULTS_META_TITLES,
   ROUTES,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
   PRICES_ORDER,
   MARKET_USERS_TABLE,
+  MARKET_LIQUIDATIONS_TABLE,
+  META_VAULTS_EXCEPTIONS,
+  HOLDERS_TABLE,
+  MARKETS_TABLE_FILTERS,
 };

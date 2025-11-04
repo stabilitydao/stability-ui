@@ -12,8 +12,12 @@ const FARMING_TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
 ];
 
-const MARKET_TABLE_FILTERS: TTableFilters[] = [
-  { name: "Markets", type: "dropdown", state: true },
+const METAVAULTS_FILTERS: TTableFilters[] = [
+  { name: "Flagships", type: "sample", state: true },
+];
+
+const MARKETS_TABLE_FILTERS: TTableFilters[] = [
+  { name: "Active", type: "sample", state: true },
 ];
 
 const TABLE: TTableColumn[] = [
@@ -198,6 +202,35 @@ const USERS_TABLE: TTableColumn[] = [
   },
 ];
 
+const HOLDERS_TABLE: TTableColumn[] = [
+  {
+    name: "Rank",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Address",
+    keyName: "",
+    sortType: "none",
+    dataType: "",
+    unsortable: true,
+  },
+  {
+    name: "Power",
+    keyName: "balance",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+  {
+    name: "Percentage",
+    keyName: "percentage",
+    sortType: "descendentic",
+    dataType: "number",
+  },
+];
+
 const CONTESTS_TABLE: TTableColumn[] = [
   {
     name: "Status",
@@ -265,7 +298,7 @@ const LEADERBOARD_TABLE: TTableColumn[] = [
 
 const POOL_TABLE: TTableColumn[] = [
   {
-    name: "ID",
+    name: "Pool",
     keyName: "id",
     sortType: "none",
     dataType: "",
@@ -489,13 +522,13 @@ const MARKET_TABLE: TTableColumn[] = [
   },
   {
     name: "Supply TVL",
-    keyName: "supplyTVL",
+    keyName: "supplyTVLInUSD",
     sortType: "none",
     dataType: "number",
   },
   {
-    name: "Available to borrow",
-    keyName: "borrowTVL",
+    name: "Utilization",
+    keyName: "utilization",
     sortType: "none",
     dataType: "number",
   },
@@ -536,15 +569,47 @@ const MARKET_USERS_TABLE: TTableColumn[] = [
   },
 ];
 
+const MARKET_LIQUIDATIONS_TABLE: TTableColumn[] = [
+  {
+    name: "User",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+
+  {
+    name: "Liquidator",
+    keyName: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+  {
+    name: "Liquidated",
+    keyName: "liquidated",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Debt coverred",
+    keyName: "debt",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Date",
+    keyName: "timestamp",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const DEFAULT_TABLE_PARAMS = {
   search: 0,
   sort: 0,
   filters: 0,
 };
-
-const METAVAULTS_FILTERS: TTableFilters[] = [
-  { name: "Flagships", type: "sample", state: true },
-];
 
 export {
   TABLE_FILTERS,
@@ -564,7 +629,9 @@ export {
   LEVERAGE_FARMING_TABLE,
   FARMING_TABLE_FILTERS,
   MARKET_TABLE,
-  MARKET_TABLE_FILTERS,
   METAVAULTS_FILTERS,
   MARKET_USERS_TABLE,
+  MARKET_LIQUIDATIONS_TABLE,
+  HOLDERS_TABLE,
+  MARKETS_TABLE_FILTERS,
 };

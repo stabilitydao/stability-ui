@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import axios from "axios";
 
@@ -12,7 +12,7 @@ import {
 
 import { getShortAddress, useModalClickOutside } from "@utils";
 
-import { BC_POOL_TABLE, POOL_TABLE } from "@constants";
+import { POOL_TABLE, CHAINS } from "@constants";
 
 import { GRAPH_ENDPOINTS } from "src/constants/env";
 
@@ -34,17 +34,20 @@ import { deployments } from "@stabilitydao/stability";
 import tokenlistAll from "@stabilitydao/stability/out/stability.tokenlist.json";
 import { FaGasPump, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
+import { SwapForm } from "./SwapForm";
 
 const Swapper = (): JSX.Element => {
   const poolTableStates = POOL_TABLE;
-  const BCPoolTableStates = BC_POOL_TABLE;
+  // const BCPoolTableStates = BC_POOL_TABLE;
 
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID) ?? "146";
+
+  const explorer = CHAINS.find(({ id }) => id == $currentChainID)?.explorer;
 
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [poolTableData, setPoolTableData] = useState<TPoolTable[]>([]);
-  const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);
+  // const [BCPoolTableData, setBCPoolTableData] = useState<TPoolTable[]>([]);
 
   const initTablesData = async () => {
     try {
@@ -73,15 +76,21 @@ const Swapper = (): JSX.Element => {
       const data = graphResponse.data.data;
 
       setPoolTableData(data.poolEntities);
-      setBCPoolTableData(data.bcpoolEntities);
+      // setBCPoolTableData(data.bcpoolEntities);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const AMM_ADAPTERS = Object.entries(
-    deployments?.[$currentChainID]?.ammAdapters
-  ).map(([name, address]) => ({ name, address }));
+  const AMM_ADAPTERS = useMemo(() => {
+    const adapters = deployments?.[$currentChainID]?.ammAdapters;
+    if (!adapters) return [];
+
+    return Object.entries(adapters).map(([name, address]) => ({
+      name,
+      address,
+    }));
+  }, [$currentChainID, deployments]);
 
   function getNameByAddress(address: string): string | undefined {
     return AMM_ADAPTERS.find(
@@ -433,7 +442,7 @@ const Swapper = (): JSX.Element => {
                   className="bg-accent-900 text-xl font-semibold outline-none transition-all w-full"
                 >
                   <option value="">Select an adapter</option>
-                  {AMM_ADAPTERS.map((option) => (
+                  {AMM_ADAPTERS?.map((option) => (
                     <option key={option.address} value={option.address}>
                       {option.name}
                     </option>
@@ -563,9 +572,11 @@ const Swapper = (): JSX.Element => {
 
       <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
         <HeadingText text="Swapper" scale={1} />
-
-        {BCPoolTableData.length || poolTableData.length ? (
+        {/* BCPoolTableData.length || */}
+        {poolTableData.length ? (
           <>
+            <SwapForm />
+
             <HeadingText text="Pools" scale={2} />
 
             <div className="flex justify-start">
@@ -581,10 +592,13 @@ const Swapper = (): JSX.Element => {
               <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
                 <table className="w-full font-manrope table table-auto select-none mb-9 min-w-[700px] md:min-w-full">
                   <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                    <tr className="text-[12px] font-bold uppercase text-center">
+                    <tr className="text-[12px] font-bold uppercase">
                       {poolTableStates.map(
                         (value: TTableColumn, index: number) => (
-                          <th key={value.name + index} className="px-4 py-3">
+                          <th
+                            key={value.name + index}
+                            className="px-4 py-3 text-start"
+                          >
                             {value.name}
                           </th>
                         )
@@ -604,18 +618,28 @@ const Swapper = (): JSX.Element => {
                             className="h-[48px] hover:bg-accent-950" //cursor-pointer
                             key={id}
                           >
-                            <td className="px-4 py-3 text-center sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
-                              {getShortAddress(id, 6, 6)}
+                            <td className="px-4 py-3 sticky md:relative left-0 md:table-cell bg-accent-950 md:bg-transparent z-10">
+                              <a
+                                href={`${explorer}/address/${id}`}
+                                target="_blank"
+                                className="flex items-center gap-2"
+                              >
+                                <span>{getShortAddress(id, 6, 6)}</span>
+                                <img
+                                  src="/icons/purple_link.png"
+                                  alt="external link"
+                                  className="w-3 h-3 cursor-pointer"
+                                />
+                              </a>
                             </td>
-                            <td className="px-4 py-3 text-center">
-                              {ammAdapterName && (
-                                <div>{getNameByAddress(ammAdapter)}</div>
-                              )}
-                              <div>{getShortAddress(ammAdapter, 6, 6)}</div>
+                            <td className="px-4 py-3">
+                              {ammAdapterName
+                                ? getNameByAddress(ammAdapter)
+                                : getShortAddress(ammAdapter, 6, 6)}
                             </td>
-                            <td className="px-4 py-3 text-center">
+                            <td className="px-4 py-3">
                               {tokenInData ? (
-                                <div className="flex items-center justify-center gap-3">
+                                <div className="flex items-center justify-start gap-3">
                                   <img
                                     src={tokenInData.logoURI}
                                     alt={tokenInData.symbol}
@@ -627,9 +651,9 @@ const Swapper = (): JSX.Element => {
                                 getShortAddress(tokenIn, 6, 6)
                               )}
                             </td>
-                            <td className="px-4 py-3 text-center">
+                            <td className="px-4 py-3">
                               {tokenOutData ? (
-                                <div className="flex items-center justify-center gap-3">
+                                <div className="flex items-center justify-start gap-3">
                                   <img
                                     src={tokenOutData.logoURI}
                                     alt={tokenOutData.symbol}
@@ -642,7 +666,7 @@ const Swapper = (): JSX.Element => {
                               )}
                             </td>
 
-                            <td className="px-4 py-3 text-center">
+                            <td className="px-4 py-3">
                               <div className="flex flex-row my-auto gap-4">
                                 <button
                                   onClick={() => {
@@ -689,7 +713,7 @@ const Swapper = (): JSX.Element => {
               <HeadingText text="No Pools" scale={2} />
             )}
 
-            {BCPoolTableData.length ? (
+            {/* {BCPoolTableData.length ? (
               <div>
                 <HeadingText text="Blue Chip Pools" scale={2} />
                 <div className="overflow-x-auto md:overflow-x-visible md:min-w-[700px] mt-5">
@@ -741,7 +765,7 @@ const Swapper = (): JSX.Element => {
               </div>
             ) : (
               <HeadingText text="No Blue Chip Pools" scale={2} />
-            )}
+            )} */}
           </>
         ) : (
           <div className="absolute left-[50%] top-[50%] translate-y-[-50%] transform translate-x-[-50%]">

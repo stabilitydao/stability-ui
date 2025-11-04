@@ -29,20 +29,20 @@ const Breadcrumbs = (): JSX.Element => {
     if (pathFromConst) {
       add(pathFromConst.name, currentPath);
     } else if (currentPath === "contests") {
-      add("Leaderboard", "leaderboard");
+      add("Leaderboards", "leaderboards");
       add("Contests", "contests");
     } else if (rest[0] === "season-1") {
-      add("Leaderboard", "leaderboard");
+      add("Leaderboards", "leaderboards");
       add("Season 1", "season-1");
     } else if (main === "contests" && rest.length === 1) {
       const contest = contests[rest[0]];
-      add("Leaderboard", "leaderboard");
+      add("Leaderboards", "leaderboards");
       add("Contests", "contests");
       add(contest?.name || "Unknown Contest");
     } else if (currentPath === "platform") {
       add("Platform", "platform");
-    } else if (main === "vaults" && rest[0] === "vault" && rest.length === 3) {
-      const [, , chainId, vaultAddress] = currentPath.split("/");
+    } else if (main === "vaults" && rest.length === 2) {
+      const [, chainId, vaultAddress] = currentPath.split("/");
 
       const symbol =
         $vaults?.[chainId]?.[vaultAddress?.toLowerCase()]?.symbol || "Vault";
@@ -87,25 +87,35 @@ const Breadcrumbs = (): JSX.Element => {
       add("Metavaults Management");
     } else if (
       main === "metavaults" &&
-      rest[0] === "metavault" &&
-      rest.length === 3 &&
-      $metaVaults[rest[1]]
+      rest.length === 2 &&
+      $metaVaults[rest[0]]
     ) {
-      const [, , network, metaVaultAddress] = currentPath.split("/");
+      const [, network, metaVaultAddress] = currentPath.split("/");
 
       const symbol =
         $metaVaults[network].find(
+          // @ts-ignore
           ({ address }) => address.toLowerCase() === metaVaultAddress
         )?.name || "Meta Vault";
+      console.log(network, metaVaultAddress);
 
       add("Meta Vaults", "metavaults");
       add(symbol);
     } else if (main === "lending" && rest.length === 2) {
-      const [, , marketName] = currentPath.split("/");
+      const [, , marketNameRaw] = currentPath.split("/");
+
+      const marketName = marketNameRaw.replace(/-/g, " ");
 
       add("Lending", "lending");
-      add(`${marketName} Market`);
+      add(marketName);
+    } else if (main === "operator") {
+      add("Platform", "platform");
+      add("Operator");
+    } else if (main === "builder") {
+      add("Platform", "platform");
+      add("Builder");
     }
+
 
     setPaths(crumbs);
   }, [currentPath, $vaults, $metaVaults]);

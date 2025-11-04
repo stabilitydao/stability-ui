@@ -1,68 +1,30 @@
-import type { TTAbleFiltersVariant, TTableFilters, TMarket } from "@types";
-
-/**
- * Initializes the filters for a table based on the vault data, URL parameters, and network selection
- *
- * @example
- * ```
- * const markets = [
- *   { name: "main" },
- *   { name: "someName" },
- * ];
- * const filters = [{ name: "Markets", variants: [] }];
- * initFilters(markets, filters, setTableFilters);
- * ```
- *
- * @param {any[]} markets - An array of market objects, used to extract unique strategy short names for filtering
- * @param {TTableFilters[]} tableFilters - Current state of the table filters, which will be updated
- * @param {React.Dispatch<React.SetStateAction<TTableFilters[]>>} setTableFilters - Function to update the table filters
- */
+import type { TMarket, TTableFilters, TTableActiveParams } from "@types";
 
 export const initFilters = (
   markets: TMarket[],
   tableFilters: TTableFilters[],
   setTableFilters: React.Dispatch<React.SetStateAction<TTableFilters[]>>,
-  networksHandler: (chains: string[]) => void
+  networksHandler: (chains: string[]) => void,
+  setTableParams: React.Dispatch<React.SetStateAction<TTableActiveParams>>
 ): void => {
-  const marketsNames = markets.map((market) => market.name);
-
-  const convertedMarketNames = marketsNames.map((name) => ({
-    name,
-    state: false,
-  }));
-
-  let newFilters = tableFilters.map((f) =>
-    f.name === "Markets" ? { ...f, variants: convertedMarketNames } : f
-  );
-
-  //set URL filters
   const searchParams = new URLSearchParams(window.location.search);
 
-  const marketsParams = searchParams
-    .get("markets")
-    ?.split(",")
-    ?.map((market) => market);
+  let newFilters = tableFilters;
 
-  const chainsParam = searchParams.getAll("chain");
+  const statusParam: boolean = !!searchParams.get("deprecated");
 
-  if (marketsParams?.length) {
-    newFilters = newFilters.map((f) => {
-      return f.name.toLowerCase() === "markets"
-        ? {
-            ...f,
-            variants:
-              f.variants?.map((variant: TTAbleFiltersVariant) => {
-                return marketsParams.includes(variant.name)
-                  ? { ...variant, state: true }
-                  : { ...variant, state: false };
-              }) || [],
-          }
-        : f;
-    });
+  newFilters = newFilters.map((f) => {
+    if (f.name.toLowerCase() === "active") {
+      return { ...f, state: !statusParam };
+    }
+    return f;
+  });
+
+  let activeFiltersCount = 0;
+
+  if (activeFiltersCount) {
+    setTableParams((prev) => ({ ...prev, filters: activeFiltersCount }));
   }
 
-  if (chainsParam.length) {
-    networksHandler(chainsParam);
-  }
   setTableFilters(newFilters);
 };

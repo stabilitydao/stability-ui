@@ -30,10 +30,19 @@ import { capitalize } from "./functions/capilatize";
 import { getTransactionReceipt } from "./functions/getTransactionReceipt";
 import { copyAddress } from "./functions/copyAddress";
 import { exactToFixed } from "./functions/exactToFixed";
+import { updateQueryParams } from "./functions/updateQueryParams";
+import { loadMarketsData } from "./functions/loadMarketsData";
+import { paginateData } from "./functions/paginateData";
+import { copyText } from "./functions/copyText";
+import { getShortErrorMessage } from "./functions/getShortErrorMessage";
+
+import { getAllowance } from "./functions/getAllowance";
+import { getBalance } from "./functions/getBalance";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
+import { useWindowWidth } from "./hooks/useWindowWidth";
 
 export {
   getTokenData,
@@ -69,4 +78,12 @@ export {
   getTransactionReceipt,
   copyAddress,
   exactToFixed,
+  updateQueryParams,
+  useWindowWidth,
+  loadMarketsData,
+  getAllowance,
+  getBalance,
+  paginateData,
+  copyText,
+  getShortErrorMessage,
 };

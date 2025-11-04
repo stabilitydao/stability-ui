@@ -16,28 +16,9 @@ const CHAINS_INFO = [
     active: false,
   },
   {
-    name: "Awaiting deployment",
-    length: TOTAL_CHAINS.AWAITING_DEPLOYMENT,
-    bgColor: chainStatusInfo.AWAITING_DEPLOYMENT.color,
-    active: false,
-  },
-  {
     name: "Development",
-    length: TOTAL_CHAINS.CHAINLIB_DEVELOPMENT,
-    bgColor: chainStatusInfo.CHAINLIB_DEVELOPMENT.color,
-
-    active: false,
-  },
-  {
-    name: "Awaiting developer",
-    length: TOTAL_CHAINS.AWAITING_DEVELOPER,
-    bgColor: chainStatusInfo.AWAITING_DEVELOPER.color,
-    active: false,
-  },
-  {
-    name: "Awaiting issue",
-    length: TOTAL_CHAINS.AWAITING_ISSUE_CREATION,
-    bgColor: chainStatusInfo.AWAITING_ISSUE_CREATION.color,
+    length: TOTAL_CHAINS.DEVELOPMENT,
+    bgColor: chainStatusInfo.DEVELOPMENT.color,
     active: false,
   },
   {
@@ -56,8 +37,8 @@ const STRATEGIES_INFO = [
     active: false,
   },
   {
-    name: "Awaiting deployment",
-    length: TOTAL_STRATEGIES.DEPLOYMENT,
+    name: "Ready",
+    length: TOTAL_STRATEGIES.READY,
     bgColor: "#612FFB",
     active: false,
   },
@@ -68,50 +49,31 @@ const STRATEGIES_INFO = [
     active: false,
   },
   {
-    name: "Awaiting developer",
-    length: TOTAL_STRATEGIES.AWAITING,
-    bgColor: "#E1E114",
-    active: false,
-  },
-  {
-    name: "Blocked",
-    length: TOTAL_STRATEGIES.BLOCKED,
+    name: "Cancelled",
+    length: TOTAL_STRATEGIES.CANCELLED,
     bgColor: "#E01A1A",
-    active: false,
-  },
-  {
-    name: "Proposal",
-    length: TOTAL_STRATEGIES.PROPOSAL,
-    bgColor: "#FB8B13",
     active: false,
   },
 ];
 
 const STATE_COLORS = {
   LIVE: "bg-green-800",
-  DEPLOYMENT: "bg-violet-800",
   DEVELOPMENT: "bg-blue-700",
-  AWAITING: "bg-orange-900",
-  BLOCKED: "bg-red-900",
-  PROPOSAL: "bg-yellow-800",
+  READY: "bg-orange-900",
+  CANCELLED: "bg-red-900",
 };
 
 const CHAIN_STATUSES = {
   Supported: "SUPPORTED",
-  "Awaiting deployment": "AWAITING_DEPLOYMENT",
-  Development: "CHAINLIB_DEVELOPMENT",
-  "Awaiting developer": "AWAITING_DEVELOPER",
-  "Awaiting issue": "AWAITING_ISSUE_CREATION",
+  Development: "DEVELOPMENT",
   "Not supported": "NOT_SUPPORTED",
 };
 
 const STRATEGY_STATUSES = {
   Live: "LIVE",
-  "Awaiting deployment": "DEPLOYMENT",
+  Ready: "READY",
   Development: "DEVELOPMENT",
-  "Awaiting developer": "AWAITING",
-  Blocked: "BLOCKED",
-  Proposal: "PROPOSAL",
+  Cancelled: "CANCELED",
 };
 
 export {

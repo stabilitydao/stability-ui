@@ -1,0 +1,34 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+import { Vault } from "@modules"
+
+import { VAULTS_META_TITLES } from "@constants";
+
+import type {TAddress} from '@types';
+
+const { network, vault } = Astro.params;
+
+const vaultTitle = VAULTS_META_TITLES[vault as keyof typeof VAULTS_META_TITLES];
+
+const meta = {
+  title: vaultTitle ? `${vaultTitle}` : "Vault",
+  img: vaultTitle ? `/ogs/vaults/${network}-${vault}.png` : "/ogs/pages/vaults.png",
+  url: `https://stability.farm/vaults/${network}/${vault}`,
+  description: vaultTitle 
+    ? `Deposit and earn with ${vaultTitle}, powered by Stability.` 
+    : "On-chain asset management, liquidity mining and yield farming platform."
+}
+
+---
+<Layout 
+  title={meta.title} 
+  img={meta.img} 
+  metaTitle={meta.title} 
+  metaUrl={meta.url} 
+  metaDescription={meta.description}
+>
+  <div class="max-w-[1200px]">
+    <Vault network={network} vault={vault as TAddress} client:only="react" />
+  </div>
+</Layout>

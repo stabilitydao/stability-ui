@@ -10,7 +10,6 @@ import { VaultType } from "./VaultType";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ColorIndicator } from "./ColorIndicator";
 import { RiskIndicator } from "./RiskIndicator";
-import { CountersBlockCompact } from "./CountersBlockCompact";
 import { Checkbox } from "./Checkbox";
 import { Toggler } from "./Toggler";
 import { HeadingText } from "./HeadingText";
@@ -24,6 +23,8 @@ import { Pagination } from "./Pagination";
 import { StrategyBadge } from "./StrategyBadge";
 import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
+import { ProgressCircle } from "./ProgressCircle";
+import { FormError } from "./FormError";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -32,6 +33,7 @@ import { Skeleton } from "./Skeletons/Skeleton";
 import { TextSkeleton } from "./Skeletons/TextSkeleton";
 
 import { NavIcon } from "./NavIcon";
+
 import {
   GridIcon,
   RowsIcon,
@@ -39,6 +41,9 @@ import {
   FiltersIcon,
   ArrowRightIcon,
 } from "./Icons";
+
+import { EmptyTable } from "./Tables/EmptyTable";
+import { LoadTable } from "./Tables/LoadTable";
 
 import { VaultsTable } from "./Tables/Vaults";
 import { MetaVaultsTable } from "./Tables/MetaVaults";
@@ -51,11 +56,13 @@ import { APRModal } from "./Modals/APRModal";
 
 import { DisplayType } from "./DisplayType";
 
-import { ActionButton } from "./ActionButton";
+import { ActionButton } from "./Buttons";
 
 import { Socials } from "./Socials";
 
 import { AxisTick, ChartTooltip, ChartTimelineSwitcher } from "./Chart";
+
+import { CustomTooltip } from "./CustomTooltip";
 
 //////// todo: delete
 
@@ -89,7 +96,6 @@ export {
   Breadcrumbs,
   RiskIndicator,
   ColorIndicator,
-  CountersBlockCompact,
   Checkbox,
   Toggler,
   HeadingText,
@@ -122,4 +128,9 @@ export {
   ChartTimelineSwitcher,
   MarketsTable,
   MetaVaultStrategies,
+  ProgressCircle,
+  CustomTooltip,
+  EmptyTable,
+  LoadTable,
+  FormError,
 };

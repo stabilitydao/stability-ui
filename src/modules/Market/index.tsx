@@ -6,13 +6,19 @@ import { WagmiLayout } from "@layouts";
 
 import { SectionSelector, AssetSelector, MarketTabs } from "./components";
 
-import { FullPageLoader, ErrorMessage } from "@ui";
+import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
+
+import { getInitialStateFromUrl } from "./functions";
+
+import { updateQueryParams, getShortAddress } from "@utils";
 
 import { CHAINS } from "@constants";
 
+import { TOOLTIP_DESCRIPTIONS } from "./constants";
+
 import { markets, error } from "@store";
 
-import { MarketSectionTypes, TMarket, TMarketAsset } from "@types";
+import { MarketSectionTypes, TMarket, TMarketReserve } from "@types";
 
 interface IProps {
   network: string;
@@ -23,56 +29,96 @@ const Market: React.FC<IProps> = ({ network, market }) => {
   const $markets = useStore(markets);
   const $error = useStore(error);
 
+  const { asset, section } = getInitialStateFromUrl();
+
   const [localMarket, setLocalMarket] = useState<TMarket>();
 
-  const [activeAsset, setActiveAsset] = useState<TMarketAsset | undefined>();
+  const [activeAsset, setActiveAsset] = useState<TMarketReserve | undefined>();
 
-  const [activeSection, setActiveSection] = useState<MarketSectionTypes>(
-    MarketSectionTypes.Deposit
-  );
+  const [activeSection, setActiveSection] =
+    useState<MarketSectionTypes>(section);
+
+  const handleAssetChange = (asset: TMarketReserve) => {
+    if (asset?.address === localMarket?.reserves?.[0]?.address) {
+      updateQueryParams({ asset: null });
+    } else {
+      updateQueryParams({ asset: asset?.address });
+    }
+
+    setActiveAsset(asset);
+  };
+
+  const handleSectionChange = (section: MarketSectionTypes) => {
+    if (section === MarketSectionTypes.Operations) {
+      section = MarketSectionTypes.Supply;
+    }
+
+    if (section === MarketSectionTypes.Supply) {
+      updateQueryParams({ section: null });
+    } else {
+      updateQueryParams({ section });
+    }
+
+    if (
+      [MarketSectionTypes.Borrow, MarketSectionTypes.Repay].includes(section) &&
+      !activeAsset?.isBorrowable
+    ) {
+      const borrowableAssets = localMarket?.reserves?.filter(
+        ({ isBorrowable }) => isBorrowable
+      );
+
+      handleAssetChange(borrowableAssets?.[0] as TMarketReserve);
+    }
+
+    setActiveSection(section);
+  };
+
+  const initLocalMarket = () => {
+    if (!$markets || !market) return;
+
+    const _market = $markets[network]?.find(
+      ({ marketId }: { marketId: string }) => marketId === market
+    );
+
+    const chain = CHAINS.find(({ id }) => id == network);
+
+    if (!_market || !chain) return;
+
+    const updatedMarket: TMarket = {
+      marketId: market,
+      network: chain,
+      engine: _market.engine,
+      pool: _market.pool,
+      protocolDataProvider: _market.protocolDataProvider,
+      deployed: _market.deployed,
+      reserves: _market.reserves,
+    };
+
+    const defaultAsset =
+      asset && updatedMarket.reserves.find(({ address }) => asset === address);
+
+    setLocalMarket(updatedMarket);
+    setActiveAsset(defaultAsset || updatedMarket.reserves[0]);
+  };
 
   useEffect(() => {
-    if ($markets && market) {
-      const marketAssets = Object.entries($markets[network][market])
-        .map(([address, data]) => ({
-          address,
-          ...data,
-        }))
-        .sort(
-          (a: TMarketAsset, b: TMarketAsset) =>
-            Number(b.supplyTVL) - Number(a.supplyTVL)
-        );
-
-      const chain = CHAINS.find(({ id }) => id == network);
-
-      setLocalMarket({
-        name: market,
-        network: chain,
-        assets: marketAssets as TMarketAsset[],
-      } as TMarket);
-    }
-  }, [$markets]);
-
-  useEffect(() => {
-    if (localMarket && !activeAsset) {
-      setActiveAsset(localMarket?.assets[0]);
-    }
-  }, [localMarket]);
+    initLocalMarket();
+  }, [$markets, market]);
 
   return market && localMarket ? (
     <WagmiLayout>
-      <div className="w-full mx-auto font-manrope pb-5">
+      <div className="w-full mx-auto font-manrope pb-5 lg:min-w-[900px] xl:min-w-[1230px]">
         <div>
           <h1 className="page-title__font text-start">
-            {localMarket.name} Market
+            {localMarket?.marketId}
           </h1>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-[-20px]">
             <div className="flex flex-col items-start gap-6">
               <div className="bg-[#18191C] border border-[#232429] rounded-xl w-full">
-                <div className="flex items-center py-[10px]">
-                  <div className="flex items-center gap-3 px-4 border-r border-r-[#232429]">
+                <div className="flex items-center px-4 pt-4 pb-[10px] md:px-0 md:py-[10px] flex-wrap gap-2">
+                  <div className="flex items-center gap-3 pl-2 pr-4  border-r border-r-[#232429]">
                     <span className="text-[#7C7E81] text-[14px] leading-5 font-medium">
-                      Network / ID:
+                      Chain:
                     </span>
                     <div className="flex items-center gap-2">
                       <img
@@ -91,86 +137,53 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                     </div>
                   </div>
                   <a
-                    className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
-                    href="#"
+                    className="flex items-center gap-2 pl-2 pr-4 border-r border-r-[#232429]"
+                    href={`${localMarket?.network?.explorer}/address/${localMarket?.pool}`}
+                    target="_blank"
                   >
                     <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
-                      Risk report
+                      Pool: {getShortAddress(localMarket?.pool ?? "", 6, 4)}
                     </span>
-
-                    <img
-                      src="/icons/purple_link.png"
-                      alt="Check risk report"
-                      className="w-4 h-4"
-                    />
-                  </a>
-                  <a
-                    className="flex items-center gap-2 px-4 border-r border-r-[#232429]"
-                    href="#"
-                  >
-                    <span className="text-[14px] leading-5 font-medium text-[#9180F4]">
-                      0x78...Deea
-                    </span>
-
                     <img
                       src="/icons/purple_link.png"
                       alt="address"
                       className="w-4 h-4"
                     />
                   </a>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Reviewed
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <CustomTooltip
+                      name="Isolated risk"
+                      description={TOOLTIP_DESCRIPTIONS.isolatedRisk}
+                      isMediumText={true}
                     />
                   </div>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Immutable & Permissionless
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 px-4 border-r border-r-[#232429]">
-                    <span className="text-[14px] leading-5 font-medium text-[#7C7E81]">
-                      Isolated risk
-                    </span>
-
-                    <img
-                      src="/icons/circle_question.png"
-                      alt="Question icon"
-                      className="w-4 h-4"
-                    />
+                  <div className="pl-2 pr-4 border-r border-r-[#232429]">
+                    <div className="flex items-center">
+                      <span className="font-medium text-[14px] leading-5 text-[#7C7E81]">
+                        Engine: {localMarket?.engine}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="w-full flex items-center justify-between gap-10">
-                <AssetSelector
-                  assets={localMarket.assets}
-                  activeAsset={activeAsset}
-                  setActiveAsset={setActiveAsset}
-                />
+              <div className="w-full flex items-start flex-col gap-3">
                 <SectionSelector
                   market={market}
                   activeSection={activeSection}
-                  setActiveSection={setActiveSection}
+                  handleSectionChange={handleSectionChange}
+                />
+                <AssetSelector
+                  assets={localMarket?.reserves}
+                  activeSection={activeSection}
+                  activeAsset={activeAsset}
+                  handleAssetChange={handleAssetChange}
                 />
               </div>
             </div>
             <MarketTabs
-              network={network}
-              market={market}
+              marketData={localMarket}
               section={activeSection}
-              asset={activeAsset}
+              activeAsset={activeAsset}
             />
           </div>
         </div>

@@ -16,7 +16,7 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
       <a
         data-testid="contractLinkBtn"
         className="flex items-center px-1 py-1 whitespace-nowrap"
-        href={`${explorer}${address}`}
+        href={`${explorer}/address/${address}`}
         target="_blank"
         title="Go to explorer"
       >

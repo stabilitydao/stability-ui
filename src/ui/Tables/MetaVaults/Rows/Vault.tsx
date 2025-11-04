@@ -9,7 +9,11 @@ import {
 
 import { cn, formatNumber } from "@utils";
 
-import { VAULTS_WITH_NAME, PROTOCOLS } from "@constants";
+import {
+  VAULTS_WITH_NAME,
+  PROTOCOLS,
+  META_VAULTS_EXCEPTIONS,
+} from "@constants";
 
 import { TVault, TAPRModal, VaultTypes } from "@types";
 
@@ -54,16 +58,22 @@ const Vault: React.FC<IProps> = ({
   const rawProtocol =
     vault.type === VaultTypes.Vault ? vault?.strategyInfo?.protocols[0] : null;
 
-  const protocol = rawProtocol?.name?.includes("Aave")
+  const _protocolException = rawProtocol?.name?.includes("Aave")
     ? PROTOCOLS.stability
     : rawProtocol?.name?.includes("Compound")
       ? PROTOCOLS.enclabs
       : rawProtocol;
 
+  const protocol = META_VAULTS_EXCEPTIONS.some(
+    (address) => address === vault.address
+  )
+    ? rawProtocol
+    : _protocolException;
+
   const link =
     vault?.type === VaultTypes.Vault
-      ? `/vaults/vault/${vault.network}/${vault.address}`
-      : `/metavaults/metavault/${vault.network}/${vault.address}`;
+      ? `/vaults/${vault.network}/${vault.address}`
+      : `/metavaults/${vault.network}/${vault.address}`;
 
   return (
     <div className="border-t border-[#23252A]">
@@ -110,9 +120,11 @@ const Vault: React.FC<IProps> = ({
                       key={asset?.logo + index}
                     />
                   ))}
-
                   {isProDisplay ? (
-                    <StrategyBadge info={vault.strategyInfo} specific="" />
+                    <StrategyBadge
+                      info={vault.strategyInfo}
+                      specific={vault.strategySpecific}
+                    />
                   ) : (
                     <img
                       src={protocol?.logoSrc}
@@ -140,7 +152,7 @@ const Vault: React.FC<IProps> = ({
               className={cn(
                 "font-semibold truncate",
                 isProDisplay
-                  ? "text-[12px] hidden md:flex md:text-[16px] md:max-w-[120px] min-[830px]:max-w-[95px]  xl:max-w-full"
+                  ? "text-[12px] hidden xl:flex md:text-[16px] md:max-w-[120px] min-[830px]:max-w-[95px] xl:max-w-full"
                   : "text-[16px] max-w-[160px] md:max-w-[100px] min-[830px]:max-w-[130px]",
                 !inserted && "flex"
               )}
@@ -160,7 +172,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           onClick={(e) => {
-            if (window.innerHeight <= 860 && vault.type === VaultTypes.Vault) {
+            if (window.innerWidth <= 860 && vault.type === VaultTypes.Vault) {
               e.stopPropagation();
               setModalState({
                 earningData: vault.earningData,
@@ -278,12 +290,16 @@ const Vault: React.FC<IProps> = ({
             isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
           )}
         >
-          <span>
-            {formatNumber(
-              vault?.proportions?.allocation as number,
-              "abbreviate"
-            )?.slice(1)}
-          </span>
+          {Number(vault?.proportions?.allocation) ? (
+            <span>
+              {formatNumber(
+                vault?.proportions?.allocation as number,
+                Number(vault?.proportions?.allocation) < 1
+                  ? "smallNumbers"
+                  : "abbreviate"
+              )?.slice(1)}
+            </span>
+          ) : null}
         </div>
         <div
           className={cn(
@@ -291,12 +307,12 @@ const Vault: React.FC<IProps> = ({
             isProDisplay ? "w-[200px] md:w-[30%]" : "hidden md:block"
           )}
         >
-          {(vault?.proportions?.current || vault?.proportions?.target) && (
+          {vault?.proportions?.current || vault?.proportions?.target ? (
             <span>
               {Number(vault.proportions?.current).toFixed(2)}% /{" "}
               {Number(vault.proportions?.target).toFixed(2)}%
             </span>
-          )}
+          ) : null}
         </div>
       </a>
       {expandedData ? (

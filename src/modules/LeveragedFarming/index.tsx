@@ -52,7 +52,6 @@ const LeveragedFarming = (): JSX.Element => {
   const [activeTableParams, setActiveTableParams] =
     useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
 
-  const [allParams, setAllParams] = useState<number>(0);
   const [pagination, setPagination] = useState<number>(PAGINATION_LIMIT);
 
   const [aprModal, setAprModal] = useState({
@@ -256,7 +255,7 @@ const LeveragedFarming = (): JSX.Element => {
   };
 
   const initVaults = async () => {
-    if ($vaults) {
+    if ($vaults && $isVaultsLoaded) {
       const allVaults = Object.values($vaults[146]) || [];
 
       const vaults: TVault[] = allVaults
@@ -297,17 +296,6 @@ const LeveragedFarming = (): JSX.Element => {
   useEffect(() => {
     initVaults();
   }, [$vaults, $isVaultsLoaded]);
-
-  useEffect(() => {
-    const _allParams = Object.values(activeTableParams).reduce(
-      (acc, cur) => (acc += cur),
-      0
-    );
-
-    if (allParams != _allParams) {
-      setAllParams(_allParams);
-    }
-  }, [activeTableParams]);
 
   const isLoading = useMemo(() => {
     return !$isVaultsLoaded || !isLocalVaultsLoaded;

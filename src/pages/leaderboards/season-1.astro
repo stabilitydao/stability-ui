@@ -1,0 +1,14 @@
+---
+import {Season1} from '@modules';
+import Layout from '@layouts/Layout.astro';
+---
+
+
+<Layout title="Leaderboards" 
+  img="/ogs/pages/leaderboards.png"
+  metaTitle="Leaderboards"
+  metaUrl="https://stability.farm/leaderboards/season-1"
+  metaDescription="Track your rank, earnings, and participate in Stability yield contests. Stay updated on leaderboard positions and rewards."
+>
+    <Season1 client:only="react" />
+</Layout>

@@ -1,221 +1,273 @@
-import { useEffect, useState } from "react";
-
 import { useStore } from "@nanostores/react";
 
 import { PlatformUpgrade } from "./components/PlatformUpgrade";
 
 import {
+  AgentId,
   type ApiMainReply,
-  assets,
-  ChainStatus,
-  chainStatusInfo,
-  getChainsTotals,
-  getStrategiesTotals,
-  integrations,
+  getAgent,
   seeds,
 } from "@stabilitydao/stability";
 
-import { formatNumber } from "@utils";
+import { cn, formatNumber } from "@utils";
 
-import { CountersBlockCompact, Skeleton } from "@ui";
+import { apiData, marketPrices } from "@store";
 
-import { apiData, platformVersions, currentChainID } from "@store";
-
-import tokenlist from "@stabilitydao/stability/out/stability.tokenlist.json";
-
-import packageJson from "../../../package.json";
+//import packageJson from "../../../package.json";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
+import { IBuilderAgent } from "@stabilitydao/stability";
+import {Indicator} from "./components/Indicator.tsx";
+import {StabilityBuilder} from "./components/StabilityBuilder.tsx";
+import {StabilityOperator} from "./components/StabilityOperator.tsx";
+import {IOperatorAgent} from "@stabilitydao/stability/out/agents";
 
 const Platform = (): JSX.Element => {
-  const $currentChainID = useStore(currentChainID);
-  const $platformVersions = useStore(platformVersions);
   const $apiData: ApiMainReply | undefined = useStore(apiData);
+  const $marketPrices = useStore(marketPrices);
 
-  const chainsTotals = getChainsTotals();
-  const strategiesTotals = getStrategiesTotals();
-
-  const [platformData, setPlatformData] = useState([
-    {
-      name: "AUM",
-      content: "",
-    },
-    {
-      name: "Users earned",
-      content: "",
-    },
-    { name: "Vaults", content: "" },
-  ]);
-
-  let protocolsTotal = 0;
-  for (const defiOrgCode of Object.keys(integrations)) {
-    protocolsTotal += Object.keys(integrations[defiOrgCode].protocols).length;
-  }
-
-  const strategiesInfo = [
-    { name: "Live", value: strategiesTotals.LIVE.toString(), color: "#4FAE2D" },
-    {
-      name: "Awaiting deployment",
-      value: strategiesTotals.DEPLOYMENT.toString(),
-      color: "#612FFB",
-    },
-    {
-      name: "Development",
-      value: strategiesTotals.DEVELOPMENT.toString(),
-      color: "#2D67FB",
-    },
-    {
-      name: "Awaiting developer",
-      value: strategiesTotals.AWAITING.toString(),
-      color: "#E1E114",
-    },
-    {
-      name: "Blocked",
-      value: strategiesTotals.BLOCKED.toString(),
-      color: "#E01A1A",
-    },
-    {
-      name: "Proposal",
-      value: strategiesTotals.PROPOSAL.toString(),
-      color: "#FB8B13",
-    },
-  ];
-
-  const chainsInfo = Object.keys(chainStatusInfo).map((status) => ({
-    color: chainStatusInfo[status as ChainStatus].color,
-    name: chainStatusInfo[status as ChainStatus].title,
-    value: chainsTotals[status as ChainStatus].toString(),
-  }));
-
-  const integrationInfo = [
-    {
-      name: "Organizations",
-      value: Object.keys(integrations).length.toString(),
-      color: "#612FFB",
-    },
-    { name: "Protocols", value: protocolsTotal.toString(), color: "#05B5E1" },
-  ];
-
-  const assetsInfo = [
-    { name: "Assets", value: assets.length.toString(), color: "#E1E114" },
-    {
-      name: "Tokenlist items",
-      value: tokenlist.tokens.length.toString(),
-      color: "#2D67FB",
-    },
-  ];
-
-  const networksInfo = [
-    {
-      name: "Nodes online",
-      value: Object.keys($apiData?.network.nodes || [])
-        .filter((machingId) => {
-          const nodeState = $apiData?.network.nodes[machingId] as unknown as
-            | NodeState
-            | undefined;
-          return !!(
-            nodeState?.lastSeen &&
-            new Date().getTime() / 1000 - nodeState.lastSeen < 180
-          );
-        })
-        .length.toString(),
-      color: "#2D67FB",
-    },
-    { name: "Seed nodes", value: seeds.length.toString(), color: "#4FAE2D" },
-  ];
-
-  const factoryInfo = [
-    {
-      name: "Available for building",
-      value: $apiData?.total.vaultForBuilding.toString() || "-",
-      color: "#2D67FB",
-    },
-    {
-      name: "Farms",
-      value: $apiData?.total.farms.toString() || "-",
-      color: "#4FAE2D",
-    },
-  ];
-
-  //todo: get value from backend
-  const swapperInfo = [
-    {
-      name: "Pools",
-      value: "50",
-      color: "#2D67FB",
-    },
-    {
-      name: "Blue Chip Pools",
-      value: "4",
-      color: "#4FAE2D",
-    },
-  ];
-
-  useEffect(() => {
-    if (
-      $apiData?.total?.tvl &&
-      $apiData?.total.usersEarned &&
-      $apiData?.total.activeVaults
-    ) {
-      setPlatformData([
-        {
-          name: "AUM",
-          content: `\$${formatNumber($apiData?.total.tvl || 0, "withSpaces")}`,
-        },
-        {
-          name: "Users earned",
-          content: `\$${formatNumber($apiData?.total.usersEarned.toFixed(0) || 0, "withSpaces")}`,
-        },
-        { name: "Vaults", content: String($apiData?.total.activeVaults) },
-      ]);
-    }
-  }, [$apiData]);
+  const operatorAgent: IOperatorAgent = getAgent("OPERATOR" as AgentId) as IOperatorAgent;
+  const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
 
   const isAlert = $apiData?.network.status == "Alert";
   const isOk = $apiData?.network.status == "OK";
+  const stblPrice = $marketPrices?.STBL;
+
+  let totalLendingMarkets = 0
+  Object.keys($apiData?.markets || []).forEach((key) => {
+    // @ts-ignore
+    totalLendingMarkets += Object.keys($apiData?.markets[key]).length;
+  })
+
+  const lastMonthBurnRate = builderAgent.burnRate[builderAgent.burnRate.length - 1]
 
   return (
-    <div className="flex flex-col max-w-[1200px] w-full gap-[36px]">
-      <div className="flex flex-col w-full items-center">
-        <div className="flex text-[14px] h-[30px] items-center">
-          <span className="bg-gray-700 px-[10px]">Platform status</span>
-          <span
-            className="font-bold px-[10px]"
-            style={{
-              backgroundColor: isAlert
-                ? "#ff8d00"
-                : isOk
-                  ? "#1f851f"
-                  : "#444444",
-            }}
-          >
-            {$apiData?.network.status}
+    <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
+      <PlatformUpgrade />
+
+      <h2 className="text-[26px] font-bold">🏛️ DAO</h2>
+
+      <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-3">
+        <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <span className="flex items-center mr-[40px] mt-[7px]">
+            <img
+              src="/features/stbl.png"
+              alt="STBL"
+              className="w-[24px] h-[24px] mr-[4px]"
+            />
+            <span className="font-bold mt-[0px] text-[18px]">STBL</span>
           </span>
+          <div className="flex justify-end">
+
+            <Indicator
+              title="🚀 Price"
+              value={stblPrice ? stblPrice.price : ''}
+              subValue={stblPrice ? <span
+                className={cn(
+                  "text-[16px]",
+                  stblPrice.priceChange >= 0
+                    ? "text-[#48C05C]"
+                    : "text-[#DE4343]"
+                )}
+              >
+                      {stblPrice.priceChange > 0 ? "+" : ""}
+                {stblPrice.priceChange}%
+                    </span> : ''}
+            />
+
+            <Indicator
+              title="FDV"
+              value={stblPrice ? formatNumber(+stblPrice.price * 100000000, "abbreviate") : ''}
+              subValue={stblPrice ? <span
+                className={cn(
+                  "text-[16px]",
+                  stblPrice.priceChange >= 0
+                    ? "text-[#48C05C]"
+                    : "text-[#DE4343]"
+                )}
+              >
+                      {stblPrice.priceChange > 0 ? "+" : ""}
+                {formatNumber(
+                  (stblPrice.priceChange * +stblPrice.price * 100000000) /
+                  100,
+                  "abbreviate"
+                )}
+                    </span> : ''}
+            />
+
+          </div>
         </div>
 
-        {isAlert && (
-          <div className="flex flex-col gap-3">
-            {Object.entries(
-              $apiData?.network.healthCheckReview?.alerts || {}
-            ).map(([key, value], index) => (
-              <div
-                key={index}
-                className="p-3 bg-[#111114] border border-[#232429] rounded-lg"
-              >
-                <p className="font-semibold">{key}</p>
+        <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <span className="font-bold mt-[6px] text-[18px]">Staked</span>
 
-                {typeof value === "object" && value !== null ? (
-                  <div className="ml-3">
-                    <pre className="bg-gray-800 text-green-400 p-2 rounded-lg">
-                      <code>{JSON.stringify(value, null, 2)}</code>
-                    </pre>
-                  </div>
-                ) : (
-                  <p>{String(value)}</p>
-                )}
-              </div>
-            ))}
+          <div className="flex justify-end">
+            <Indicator
+              title="Total"
+              value={$apiData?.total.xSTBLStaked ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateNotUsd")}` : ' '}
+              subValue={$apiData?.total.xSTBLStaked ? formatNumber(+$apiData?.total.xSTBLStaked * +stblPrice?.price, "abbreviate") : ' '}
+            />
+            <Indicator
+              title="Pending APR"
+              value={$apiData?.total.xSTBLPendingRevenue ? `${formatNumber($apiData?.total.xSTBLPendingAPR, "formatAPR")}%` : ' '}
+              subValue={$apiData?.total.xSTBLPendingRevenue ? formatNumber($apiData?.total.xSTBLPendingRevenue * +stblPrice?.price, "abbreviate") : ' '}
+            />
           </div>
-        )}
+        </div>
+      </div>
+
+      <h2 className="text-[26px] font-bold">💰 Protocols</h2>
+
+      <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
+        <div className="flex w-full flex-wrap lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="flex font-bold">🧑‍🌾 Yield aggregator</div>
+          <div className="flex justify-end">
+
+            <Indicator
+              title="TVL"
+              value={$apiData?.total.tvl ? formatNumber($apiData.total.tvl, "abbreviate") : ' '}
+              subValue={$apiData?.total.activeVaults ? `${$apiData?.total.activeVaults} vaults` : ' '}
+            />
+
+          </div>
+        </div>
+        <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="flex font-bold">🏦 Lending</div>
+          <div className="flex justify-end">
+
+            <Indicator
+              title="TVL"
+              value={$apiData?.total.marketTvl ? formatNumber($apiData.total.marketTvl, "abbreviate") : ' '}
+              subValue={$apiData?.markets ? `${totalLendingMarkets} markets` : ' '}
+            />
+
+          </div>
+        </div>
+      </div>
+
+      <h2 className="text-[26px] font-bold">🤖 Agents</h2>
+
+      <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
+        <a title="Go to Operator's page" href="/operator" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold flex items-center">
+            <img
+              className="w-[32px] h-[32px] mr-[10px]"
+              src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${operatorAgent.image}`}
+              alt={builderAgent.name}
+            />
+            Stability Operator
+          </div>
+          <div className="flex w-full">
+
+            <Indicator
+              title="Status"
+              value={<span className="font-bold text-[18px]">
+                  <span
+                    className="font-bold px-[10px]"
+                    style={{
+                      backgroundColor: isAlert
+                        ? "#ff8d00"
+                        : isOk
+                          ? "#1f851f"
+                          : "#444444",
+                    }}
+                  >
+                    {$apiData?.network.status}
+                  </span>
+                </span>}
+              subValue={`${
+                Object.keys(
+                  $apiData?.network.healthCheckReview.alerts || []
+                ).length
+              } alerts`}
+            />
+
+            <Indicator
+              title="Machines"
+              value={Object.keys($apiData?.network.nodes || [])
+                .filter((machingId) => {
+                  const nodeState = $apiData?.network.nodes[
+                    machingId
+                    ] as unknown as NodeState | undefined;
+                  return !!(
+                    nodeState?.lastSeen &&
+                    new Date().getTime() / 1000 - nodeState.lastSeen < 180
+                  );
+                })
+                .length.toString()}
+              subValue={`${seeds.length} seeds`}
+            />
+
+          </div>
+        </a>
+        <a title="Go to Builder's page" href="/builder" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold flex items-center">
+            <img
+              className="w-[32px] h-[32px] mr-[10px]"
+              src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${builderAgent.image}`}
+              alt={builderAgent.name}
+            />
+            Stability Builder
+          </div>
+          <div className="flex w-full">
+            <Indicator
+              title="🍞 Burn rate"
+              value={formatNumber(lastMonthBurnRate.usdAmount, "abbreviate")}
+              subValue={lastMonthBurnRate.period}
+            />
+            <Indicator
+              title="Repositories"
+              value={builderAgent.repo.length}
+              subValue={`🚧 issues`}
+            />
+            <Indicator
+              title="Pools"
+              value={builderAgent.pools.length}
+              subValue={'🚧 tasks'}
+            />
+            <Indicator
+              title="Conveyors"
+              value={builderAgent.conveyors.length}
+              subValue={'🚧 tasks'}
+            />
+
+          </div>
+        </a>
+      </div>
+
+      <h2 className="text-[26px] font-bold">📦 Library</h2>
+
+      <div className="flex flex-wrap gap-[30px] mb-5">
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/chains"
+          title="View all blockchains"
+        >
+          Chains
+        </a>
+
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/integrations"
+          title="View all organizations and protocols"
+        >
+          Integrations
+        </a>
+
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/assets"
+          title="View all assets"
+        >
+          Assets
+        </a>
+
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/strategies"
+          title="View all strategies"
+        >
+          Strategies
+        </a>
       </div>
 
       <div className="px-6 hidden">
@@ -247,121 +299,34 @@ const Platform = (): JSX.Element => {
         </div>
       </div>
 
-      <PlatformUpgrade />
+      <h2 className="text-[26px] font-bold">🛠️ Service tools</h2>
 
-      <div className="flex flex-wrap justify-center p-[36px]">
-        {platformData.map(({ name, content }) => (
-          <div
-            key={name}
-            className="flex w-full sm:w-6/12 md:w-4/12 lg:w-3/12 min-[1440px]:w-4/12 h-[120px] px-[12px] rounded-full text-gray-200 items-center justify-center flex-col"
-          >
-            {content ? (
-              <div className="text-[36px]">{content}</div>
-            ) : (
-              <Skeleton />
-            )}
-            <div className="flex self-center justify-center text-[16px]">
-              {name}
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="flex flex-wrap gap-[30px] mb-5">
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/swapper"
+          title="Go to Swapper"
+        >
+          Swapper
+        </a>
 
-      <div className="flex flex-wrap">
-        <CountersBlockCompact
-          title="Network"
-          link="/network"
-          linkTitle="View Stability Network"
-          counters={networksInfo}
-        />
-        <CountersBlockCompact
-          title="Swapper"
-          link="/swapper"
-          linkTitle="Go to Swapper"
-          counters={swapperInfo}
-        />
-        <CountersBlockCompact
-          title="Assets"
-          link="/assets"
-          linkTitle="View all assets"
-          counters={assetsInfo}
-        />
-
-        <CountersBlockCompact
-          title="Strategies"
-          link="/strategies"
-          linkTitle="Go to strategies"
-          counters={strategiesInfo}
-        />
-
-        <CountersBlockCompact
-          title="Chains"
-          link="/chains"
-          linkTitle="View all blockchains"
-          counters={chainsInfo}
-        />
-
-        <CountersBlockCompact
-          title="Integrations"
-          link="/integrations"
-          linkTitle="View all organizations and protocols"
-          counters={integrationInfo}
-        />
-
-        <CountersBlockCompact
-          title="Factory"
-          link="/factory"
-          linkTitle="Go to Factory"
-          counters={factoryInfo}
-        />
-      </div>
-
-      <h2 className="text-[32px] font-bold text-center mb-0">Software</h2>
-      <div className="mb-10 flex items-center gap-2">
-        <div className="flex flex-col w-full">
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
-            href="https://github.com/stabilitydao/stability-contracts"
-            target="_blank"
-            title="Go to smart contracts source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              💎 Stability Platform {$platformVersions[$currentChainID]}
-            </span>
-          </a>
-
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl flex items-center"
-            href="https://github.com/stabilitydao/stability"
-            target="_blank"
-            title="Go to library source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              📦 Stability Integration Library{" "}
-              {packageJson.dependencies["@stabilitydao/stability"].replace(
-                "^",
-                ""
-              )}
-            </span>
-          </a>
-
-          <a
-            className="hover:bg-[#141033] px-3 py-3 rounded-xl mb-6 flex items-center w-full"
-            href="https://github.com/stabilitydao/stability-ui"
-            target="_blank"
-            title="Go to UI source code on Github"
-          >
-            <img src="/github.svg" alt="GitHub" title="GitHub" />
-            <span className="ml-1">
-              👩‍🚀 Stability User Interface {packageJson.version}
-            </span>
-          </a>
-        </div>
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/factory/farms"
+          title="Go to Farms"
+        >
+          Farms
+        </a>
+        <a
+          className="font-bold px-4 h-10 text-center rounded-lg flex items-center justify-center bg-[#232429] border border-[#2C2E33]"
+          href="/metavaults-management"
+          title="Go to MetaVaults Management"
+        >
+          MetaVaults Management
+        </a>
       </div>
     </div>
   );
 };
 
-export { Platform };
+export { Platform, StabilityBuilder, StabilityOperator };

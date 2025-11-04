@@ -6,6 +6,8 @@ import { Skeleton } from "@ui";
 
 import { formatNumber, cn } from "@utils";
 
+import { CHAINS } from "@constants";
+
 import { isWeb3Load } from "@store";
 
 import type { Dispatch, SetStateAction } from "react";
@@ -30,21 +32,32 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
           TVL = formatNumber(metaVault.tvl, "abbreviate") as string;
         }
 
+        const chain = CHAINS.find(({ id }) => id == metaVault.network);
+
         return (
           <a
             key={metaVault.address}
-            href={`/metavaults/metavault/${metaVault.network}/${metaVault.address.toLowerCase()}`}
+            href={`/metavaults/${metaVault.network}/${metaVault.address.toLowerCase()}`}
             className={cn(
               "rounded-lg border border-[#23252A] max-w-[352px]",
-              metaVault?.symbol === "metaUSD" ? "metaUSD" : "metaS"
+              metaVault?.symbol
             )}
           >
-            <div className="p-4 md:p-6 flex flex-col">
-              <img
-                className="w-12 h-12 md:w-16 md:h-16 rounded-full mb-6 md:mb-10"
-                src={`/features/${metaVault.symbol}.png`}
-                alt="logo"
-              />
+            <div className="p-4 md:p-6 flex flex-col gap-6 md:gap-10">
+              <div className="relative w-12 md:w-16">
+                <img
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-full"
+                  src={`/features/${metaVault.symbol}.png`}
+                  alt="logo"
+                />
+                <img
+                  className="w-6 h-6 rounded-full absolute bottom-0 right-0 bg-black"
+                  src={chain?.logoURI}
+                  alt={chain?.name}
+                  title={chain?.name}
+                />
+              </div>
+
               <div className="flex flex-col gap-6 z-10">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -76,7 +89,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
                       ? "Stablecoins"
                       : metaVault?.symbol?.slice(4)}{" "}
                     deployed across protocols automatically rebalanced for
-                    maximum returns on Sonic
+                    maximum returns on {chain?.name}
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-2 flex-wrap md:flex-nowrap">

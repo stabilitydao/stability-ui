@@ -21,10 +21,7 @@
  * @returns {string | number} Formatted number as a string. For "smallNumbers" type, it can return a number if the value is greater than 0.1
  */
 
-export const formatNumber = (
-  value: string | number,
-  type: string
-): string | number => {
+export const formatNumber = (value: string | number, type: string): string => {
   let changedValue = "";
 
   const suffixes = ["", "K", "M", "B", "T"];
@@ -47,6 +44,22 @@ export const formatNumber = (
       }
       changedValue = "$" + roundedValue;
       break;
+    case "abbreviateNotUsd":
+      value = Number(value);
+
+      while (value >= 1000) {
+        value /= 1000;
+        suffixNum++;
+      }
+
+      const fixedsNotUsd = !!suffixNum ? 2 : 0;
+      let roundedValueNotUsd = value.toFixed(fixedsNotUsd);
+
+      if (suffixNum > 0) {
+        roundedValueNotUsd += suffixes[suffixNum];
+      }
+      changedValue = roundedValueNotUsd;
+      break;
     case "abbreviateInteger":
       value = Number(value);
 
@@ -65,6 +78,10 @@ export const formatNumber = (
     case "abbreviateIntegerNotUsd":
       value = Number(value);
 
+      if (value > 1000000000000) {
+        return "1T+";
+      }
+
       while (value >= 1000) {
         value /= 1000;
         suffixNum++;
@@ -79,7 +96,7 @@ export const formatNumber = (
       break;
     case "chartAbbreviate":
       value = Number(value);
-      if (value <= 0) return 0;
+      if (value <= 0) return "0";
 
       let newValue;
 

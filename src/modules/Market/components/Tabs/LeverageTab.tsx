@@ -1,11 +1,12 @@
 import { LeverageForm } from "../Forms/LeverageForm";
+import { LeveragePositionStats } from "../Stats/LeveragePositionStats";
 
 import { getTokenData } from "@utils";
 
-import type { TMarketAsset, TAddress } from "@types";
+import type { TMarketReserve, TAddress } from "@types";
 
 type TProps = {
-  asset: TMarketAsset | undefined;
+  asset: TMarketReserve | undefined;
 };
 
 const LeverageTab: React.FC<TProps> = ({ asset }) => {
@@ -13,9 +14,13 @@ const LeverageTab: React.FC<TProps> = ({ asset }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <LeverageForm asset={asset} />
-      <div className="flex items-start justify-between gap-6">
-        <div className="flex flex-col items-start gap-4 w-1/3">
+      <div className="flex items-start flex-col lg:flex-row gap-4 lg:gap-6">
+        <LeverageForm asset={asset} />
+        <LeveragePositionStats asset={asset} />
+      </div>
+
+      <div className="flex items-start justify-between gap-6 flex-col lg:flex-row">
+        <div className="flex flex-col items-start gap-4 w-full lg:w-1/3">
           <span className="text-[24px] leading-8 font-medium">S details</span>
           <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col gap-2 w-full font-medium text-[16px] leading-6">
             <div className="w-full flex items-center justify-between">
@@ -78,7 +83,7 @@ const LeverageTab: React.FC<TProps> = ({ asset }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-start gap-4 w-1/3">
+        <div className="flex flex-col items-start gap-4 w-full lg:w-1/3">
           <span className="text-[24px] leading-8 font-medium">
             {assetData?.symbol} details
           </span>
@@ -143,7 +148,7 @@ const LeverageTab: React.FC<TProps> = ({ asset }) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col items-start gap-4 w-1/3">
+        <div className="flex flex-col items-start gap-4 w-full lg:w-1/3">
           <span className="text-[24px] leading-8 font-medium">
             Market info & risk report
           </span>

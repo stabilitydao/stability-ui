@@ -9,13 +9,19 @@ interface IProps {
 
 const MarketsTable: React.FC<IProps> = ({ markets }) => {
   if (!markets?.length) {
-    return <EmptyTable isUserVaults={false} display={DisplayTypes.Rows} />;
+    return (
+      <EmptyTable
+        display={DisplayTypes.Grid}
+        text="No markets yet"
+        description=""
+      />
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
       {markets.map((market: TMarket, index: number) => {
-        return <Row key={`row/${market.name + index}`} market={market} />;
+        return <Row key={`row/${market.marketId + index}`} market={market} />;
       })}
     </div>
   );

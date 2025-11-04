@@ -28,7 +28,13 @@ const VaultsTable: React.FC<IProps> = ({
   setModalState,
 }) => {
   if (!vaults?.length) {
-    return <EmptyTable isUserVaults={isUserVaults} display={display} />;
+    return (
+      <EmptyTable
+        isUserVaults={isUserVaults}
+        display={display}
+        isSticky={true}
+      />
+    );
   }
 
   return (

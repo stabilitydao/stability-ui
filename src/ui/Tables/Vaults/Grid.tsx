@@ -29,8 +29,8 @@ const Grid: React.FC<IProps> = ({ APRs, vault, setModalState }) => {
 
   const link =
     vault?.type === VaultTypes.Vault
-      ? `/vaults/vault/${vault.network}/${vault.address}`
-      : `/metavaults/metavault/${vault.network}/${vault.address}`;
+      ? `/vaults/${vault.network}/${vault.address}`
+      : `/metavaults/${vault.network}/${vault.address}`;
 
   const modalData =
     vault?.type === VaultTypes.Vault

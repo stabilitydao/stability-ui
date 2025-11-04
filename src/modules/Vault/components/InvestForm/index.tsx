@@ -776,6 +776,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           hash: depositAssets,
         });
         setLocalStoreHash({
+          chainId: network,
           timestamp: new Date().getTime(),
           hash: depositAssets,
           status: transaction?.status || "reverted",
@@ -880,6 +881,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
 
         setLocalStoreHash({
+          chainId: network,
           timestamp: new Date().getTime(),
           hash: zapDeposit,
           status: transaction?.status || "reverted",
@@ -1399,6 +1401,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
       );
 
       setLocalStoreHash({
+        chainId: network,
         timestamp: new Date().getTime(),
         hash: depositAssets,
         status: transaction?.status || "reverted",
@@ -1477,6 +1480,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           hash: withdrawAssets,
         });
         setLocalStoreHash({
+          chainId: network,
           timestamp: new Date().getTime(),
           hash: withdrawAssets,
           status: transaction?.status || "reverted",
@@ -1551,6 +1555,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
           hash: withdrawAssets,
         });
         setLocalStoreHash({
+          chainId: network,
           timestamp: new Date().getTime(),
           hash: withdrawAssets,
           status: transaction?.status || "reverted",
@@ -1643,6 +1648,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         );
 
         setLocalStoreHash({
+          chainId: network,
           timestamp: new Date().getTime(),
           hash: zapWithdraw,
           status: transaction?.status || "reverted",

@@ -100,6 +100,7 @@ type TTokenData = {
   decimals: number;
   logoURI: string;
   tags?: string[];
+  mintApp?: string;
 };
 
 type TOptionInfo = {
@@ -470,6 +471,7 @@ type TSettings = {
 };
 
 type TToast = {
+  chainId: string;
   hash: string;
   status: string;
   timestamp: number;
@@ -646,35 +648,6 @@ type TSort = {
   setTableData: TDispatchedTableData;
 };
 
-//// API
-
-type TAPIData = {
-  title?: string;
-  // about?: string;
-  status?: string;
-  // services?: string[];
-  assetPrices?: TMultichainPrices;
-  vaults?: TVaults;
-  metaVaults?: TMetaVault[];
-  underlyings?: TVaults;
-  platforms?: {
-    [chainID: string]: {
-      buildingPermitToken: TAddress;
-      buildingPayPerVaultToken: TAddress;
-      bcAssets: TAddress[];
-      versions: {
-        platform: string;
-        strategy: {
-          [strategyId: string]: string;
-        };
-      };
-    };
-  };
-  rewards?: { gemsAprMultiplier: number };
-  prices?: TMarketPrices;
-  error?: string;
-};
-
 type TVLRange = { min: number; max: number };
 
 type TContests = {
@@ -749,28 +722,113 @@ type TMarketPrice = {
 
 type TMarketPrices = Record<string, TMarketPrice>;
 
-type TMarketAsset = {
+type TUserReserveWithdrawData = {
+  balance: string;
+  maxWithdraw: string;
+};
+
+type TUserReserveBorrowData = {
+  balance: string;
+  maxBorrow: string;
+};
+
+type TUserReserveData = {
+  balance: string;
+  allowance?: string;
+};
+
+type TUserReserve = {
+  supply?: TUserReserveData;
+  withdraw?: TUserReserveWithdrawData;
+  borrow?: TUserReserveBorrowData;
+  repay?: TUserReserveData;
+};
+
+type TUserReservesMap = Record<TAddress, TUserReserve>;
+
+type TMarketReserve = {
+  // lib data
   address: TAddress;
-  borrowAPR: string;
-  borrowCap: string;
-  borrowTVL: string;
-  cap: string;
+  aToken: TAddress;
+  aTokenSymbol: string;
+  isBorrowable: boolean;
+  oracle: TAddress;
+  oracleName: string;
+  treasury: TAddress;
+
+  // assetData
+  assetData?: TTokenData;
+
+  // backend data
   name: string;
+  debtToken: TAddress;
   price: string;
+
   supplyAPR: string;
+  borrowAPR: string;
+
   supplyTVL: string;
+  supplyTVLInUSD: string;
+
+  borrowTVL: string;
+  borrowTVLInUSD: string;
+
+  cap: string;
+  borrowCap: string;
+
+  reserveFactor: string;
   maxLtv: string;
   liquidationThreshold: string;
+  liquidationBonus: string;
+  utilization: string;
+
+  availableToBorrow: string;
+  availableToBorrowInUSD: string;
+
+  interestStrategy: {
+    address: TAddress;
+    maxVariableBorrowRate: string;
+    optimalUsageRation: string;
+    variableRateSlope1: string;
+    variableRateSlope2: string;
+  };
 };
 
 type TMarket = {
-  name: string;
-  assets: TMarketAsset[];
-  network: TNetwork;
+  marketId: string;
+  reserves: TMarketReserve[];
+  deployed: string;
+  deprecated: boolean;
+  engine: string;
+  pool: TAddress;
+  protocolDataProvider: TAddress;
+
+  network?: TNetwork;
+
+  // table sort
   supplyAPR?: number;
   borrowAPR?: number;
   supplyTVL?: number;
+  supplyTVLInUSD?: number;
   borrowTVL?: number;
+  utilization?: number;
+};
+
+type TLiquidation = {
+  user: string;
+  liquidator: string;
+  liquidated: number;
+  debt: number;
+  timestamp: number;
+  date: string;
+};
+
+type TUserPoolData = {
+  totalCollateralBase: number;
+  totalDebtBase: number;
+  currentLiquidationThreshold: number;
+  maxLTV: number;
+  healthFactor: number;
 };
 
 // enums
@@ -809,11 +867,15 @@ export enum VaultTypes {
 }
 
 export enum MarketSectionTypes {
-  Deposit = "Deposit",
+  Operations = "Operations",
+  Supply = "Supply",
+  Withdraw = "Withdraw",
   Borrow = "Borrow",
-  Leverage = "Leverage",
+  Repay = "Repay",
+  // Leverage = "Leverage",
   Information = "Information",
   Users = "Users",
+  Liquidations = "Liquidations",
 }
 
 export enum TimelineTypes {
@@ -821,6 +883,11 @@ export enum TimelineTypes {
   Week = "WEEK",
   Month = "MONTH",
   Year = "YEAR",
+}
+
+export enum LeaderboardTableTypes {
+  Holders = "Holders",
+  Users = "Users",
 }
 
 export type {
@@ -867,7 +934,6 @@ export type {
   TUpgradesTable,
   TYearnProtocol,
   TPriceInfo,
-  TAPIData,
   TEarningData,
   TChartPayload,
   TVaultDataKey,
@@ -909,8 +975,12 @@ export type {
   TActiveChart,
   IProtocolModal,
   TMarket,
-  TMarketAsset,
+  TMarketReserve,
   TNetwork,
   TChartNames,
   TMarketUser,
+  TLiquidation,
+  TUserPoolData,
+  TUserReserve,
+  TUserReservesMap,
 };

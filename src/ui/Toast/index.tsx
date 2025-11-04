@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { vaults, lastTx } from "@store";
+import { lastTx } from "@store";
 
 import type { TLocalStorageToken, TToast } from "@types";
 
@@ -11,11 +11,11 @@ import "./Toast.css";
 import { CHAINS } from "@constants";
 
 const Toast = (): JSX.Element | null => {
-  const $vaults = useStore(vaults);
   const $lastTx = useStore(lastTx);
 
   const [isVisible, setIsVisible] = useState(false);
   const [storeTx, setStoreTx] = useState<TToast>({
+    chainId: "",
     hash: "",
     status: "",
     timestamp: 0,
@@ -72,13 +72,11 @@ const Toast = (): JSX.Element | null => {
     }
   }, [$lastTx]);
 
-  // const explorer = useMemo(() => {
-  //   return CHAINS.find((chain) => chain.id === network)?.explorer;
-  // }, [network]);
+  const explorer = useMemo(() => {
+    return CHAINS.find((chain) => chain.id === storeTx?.chainId)?.explorer;
+  }, [storeTx]);
 
-  const explorer = CHAINS["146"]?.explorer;
-
-  if (isVisible && $vaults) {
+  if (isVisible) {
     return (
       <div key={storeTx.hash} className="toast z-[30]">
         <div className="flex flex-col gap-1 p-3">
@@ -179,17 +177,17 @@ const Toast = (): JSX.Element | null => {
                   ))}
               </div>
             </div>
-            <a
-              target="_blank"
-              href={`${explorer}${storeTx?.vault}`}
-              className="underline"
-            >
-              {$vaults["146"][storeTx?.vault]?.symbol}
-            </a>
+            {/* <a
+            target="_blank"
+            href={`${explorer}/address/${storeTx?.vault}`}
+            className="underline"
+          >
+            {$vaults["146"][storeTx?.vault]?.symbol}
+          </a> */}
           </div>
           <a
             target="_blank"
-            href={`${explorer?.slice(0, -8)}tx/${storeTx?.hash}`}
+            href={`${explorer}/tx/${storeTx?.hash}`}
             className="flex items-center gap-2"
           >
             <p className="text-[16px] font-semibold">View on block explorer</p>

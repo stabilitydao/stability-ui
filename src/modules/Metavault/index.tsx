@@ -17,9 +17,8 @@ import { ProtocolModal } from "./components/Modals/ProtocolModal";
 import { TextSkeleton } from "@ui";
 
 import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
-import { updateQueryParams } from "./functions/updateQueryParams";
 
-import { cn, formatNumber, dataSorter } from "@utils";
+import { cn, formatNumber, dataSorter, updateQueryParams } from "@utils";
 
 import { isVaultsLoaded, metaVaults, vaults } from "@store";
 
@@ -28,6 +27,7 @@ import {
   PROTOCOLS,
   PROTOCOLS_TABLE,
   CHAINS,
+  META_VAULTS_EXCEPTIONS,
 } from "@constants";
 
 import { deployments, integrations } from "@stabilitydao/stability";
@@ -180,15 +180,21 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     if (!metaVault) return;
 
-    const protocols = ["Stability", ...metaVault.protocols]
-      .filter((name) => !name.toLowerCase().includes("aave"))
-      .map((name) =>
-        Object.values(PROTOCOLS).find(
-          (p) =>
-            p.name.replace(" ", "").toLowerCase() ===
-            name.replace(" ", "").toLowerCase()
-        )
-      );
+    const baseProtocols = META_VAULTS_EXCEPTIONS.some(
+      (address) => address === metaVault.address
+    )
+      ? metaVault.protocols
+      : ["Stability", ...metaVault.protocols].filter(
+          (name) => !name.toLowerCase().includes("aave")
+        );
+
+    const protocols = baseProtocols.map((name: string) =>
+      Object.values(PROTOCOLS).find(
+        (p) =>
+          p.name.replace(" ", "").toLowerCase() ===
+          name.replace(" ", "").toLowerCase()
+      )
+    );
 
     const vaults = await Promise.all(
       metaVault.vaultsData.map(async (entry) => {
@@ -204,8 +210,6 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
         const allocation = (Number(metaVault.tvl) / 100) * current;
 
-        if (current <= 0.1 && !target) return null;
-
         if (isMetaVault) {
           const subMetaVault = metaVaultList.find(
             (v: TVault) => v.address === vaultAddr
@@ -213,32 +217,30 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
           if (!subMetaVault) return null;
 
-          const vaultsData = entry.vaults
-            .map((v) => {
-              const addr = v.address.toLowerCase();
-              const vault = $vaults[network][addr];
-              const subProp = v.proportions;
+          const vaultsData = entry.vaults.map((v) => {
+            const addr = v.address.toLowerCase();
+            const vault = $vaults[network][addr];
+            const subProp = v.proportions;
 
-              const current = subProp.current * 100;
-              const target = subProp.target * 100;
+            const current = subProp.current * 100;
+            const target = subProp.target * 100;
 
-              const allocation = (Number(metaVault.tvl) / 100) * current;
+            const subAllocation = (Number(allocation) / 100) * current;
 
-              return {
-                ...vault,
-                proportions: {
-                  current,
-                  target,
-                  allocation,
-                },
-                APR: vault.earningData.apr.latest,
-              };
-            })
-            .filter(({ proportions }) => proportions.current > 0.1);
+            return {
+              ...vault,
+              proportions: {
+                current,
+                target,
+                allocation: subAllocation,
+              },
+              APR: vault.earningData.apr.latest,
+            };
+          });
 
           return {
             ...subMetaVault,
-            proportions: { current, target, allocation: Number(metaVault.tvl) },
+            proportions: { current, target, allocation },
             vaults: vaultsData,
           };
         }
@@ -255,53 +257,50 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     const cleanedVaults = vaults.filter(Boolean);
 
-    const protocolsAllocation = protocols
-      .slice(1)
-      .map((protocol) => {
-        let allocation = 0;
+    const protocolsAllocation = protocols.slice(1).map((protocol) => {
+      let allocation = 0;
 
-        cleanedVaults.forEach((vault) => {
-          const vaultsToCheck =
-            vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
+      cleanedVaults.forEach((vault) => {
+        const vaultsToCheck =
+          vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
 
-          vaultsToCheck.forEach((v) => {
-            const strategy = v.strategy;
+        vaultsToCheck.forEach((v) => {
+          const strategy = v.strategy;
 
-            const isSiloMatch =
-              protocol?.name === "Silo V2" && strategy.includes("Silo");
+          const isSiloMatch =
+            protocol?.name === "Silo V2" && strategy.includes("Silo");
 
-            const isEulerMatch =
-              protocol?.name === "Euler V2" && strategy.includes("Euler");
+          const isEulerMatch =
+            protocol?.name === "Euler V2" && strategy.includes("Euler");
 
-            const isStrategyMatch = protocol?.name.includes(strategy);
+          const isStrategyMatch = protocol?.name.includes(strategy);
 
-            if (isEulerMatch || isSiloMatch || isStrategyMatch) {
-              allocation += Number(v.proportions.allocation || 0);
-            }
-          });
+          if (isEulerMatch || isSiloMatch || isStrategyMatch) {
+            allocation += Number(v.proportions.allocation || 0);
+          }
         });
+      });
 
-        if (protocol?.name.includes("Compound")) {
-          protocol = PROTOCOLS.enclabs;
-        }
+      if (protocol?.name.includes("Compound")) {
+        protocol = PROTOCOLS.enclabs;
+      }
 
-        let creationDate = protocol?.creationDate ?? 0;
+      let creationDate = protocol?.creationDate ?? 0;
 
-        let audits = protocol?.audits ?? [];
+      let audits = protocol?.audits ?? [];
 
-        if (protocol?.name.includes("Aave")) {
-          creationDate = integrations.stability.protocols.stabilityMarket
-            .creationDate as number;
+      if (protocol?.name.includes("Aave")) {
+        creationDate = integrations.stability.protocols.stabilityMarket
+          .creationDate as number;
 
-          audits = integrations.stability.protocols.stabilityMarket.audits;
-        }
+        audits = integrations.stability.protocols.stabilityMarket.audits;
+      }
 
-        return { ...protocol, allocation, creationDate, audits };
-      })
-      .filter((protocol) => !!protocol.allocation);
+      return { ...protocol, allocation, creationDate, audits };
+    });
 
     const totalAllocation = protocolsAllocation.reduce(
-      (sum, p) => sum + p.allocation,
+      (sum: number, p) => sum + p.allocation,
       0
     );
 
@@ -433,7 +432,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
                 </span>
                 <div className="font-semibold text-[18px] leading-6 flex items-center gap-3">
                   <img
-                    className="w-6 h-6"
+                    className="w-6 h-6 rounded-full"
                     src={chain.logoURI}
                     alt={chain.name}
                     title={chain.name}

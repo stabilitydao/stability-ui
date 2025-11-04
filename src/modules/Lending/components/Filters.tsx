@@ -1,173 +1,122 @@
-import { useState, useEffect, useRef, memo } from "react";
+import { useEffect, memo } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
 
-import { Checkbox } from "@ui";
-
-import { cn, useClickOutside } from "@utils";
-
-import type { TTableFilters, TTAbleFiltersVariant } from "@types";
+import type { TTableActiveParams, TTableFilters } from "@types";
 
 interface IProps {
   filters: TTableFilters[];
   setFilters: Dispatch<SetStateAction<TTableFilters[]>>;
+  setTableParams: Dispatch<SetStateAction<TTableActiveParams>>;
 }
 
-const Filters: React.FC<IProps> = memo(({ filters, setFilters }) => {
-  const searchParams = new URLSearchParams(window.location.search);
+const Filters: React.FC<IProps> = memo(
+  ({ filters, setFilters, setTableParams }) => {
+    const searchParams = new URLSearchParams(window.location.search);
 
-  const [dropDownSelector, setDropDownSelector] = useState<boolean>(false);
+    const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
+      const filterName = filters.find((item) => item.name === filter.name);
+      if (!filterName) return;
 
-  const [activeMarkets, setActiveMarkets] = useState(
-    searchParams.get("markets") ? searchParams.get("markets") : "All"
-  );
+      ///// for vaults url filters
+      const newUrl = new URL(window.location.href);
+      const params = new URLSearchParams(newUrl.search);
+      /////
 
-  const dropDownRef = useRef<HTMLDivElement>(null);
+      let updatedFilters: TTableFilters[] = [];
 
-  const activeFiltersHandler = (filter: TTableFilters, option?: string) => {
-    const filterName = filters.find((item) => item.name === filter.name);
-    if (!filterName) return;
+      switch (filter.type) {
+        case "sample":
+          updatedFilters = filters.map((f) =>
+            f.name === filterName.name
+              ? { ...f, state: option !== "All" ? true : false }
+              : f
+          );
 
-    ///// for vaults url filters
-    const newUrl = new URL(window.location.href);
-    const params = new URLSearchParams(newUrl.search);
-    /////
+          const sampleFilter = updatedFilters.find(
+            (f) => f.name === filterName.name
+          );
 
-    let updatedFilters: TTableFilters[] = [];
-
-    switch (filter.type) {
-      case "dropdown":
-        updatedFilters = filters.map((f) =>
-          f.name === filterName.name
-            ? {
-                ...f,
-                variants: f.variants?.map((variant: TTAbleFiltersVariant) =>
-                  variant.name === option
-                    ? { ...variant, state: !variant.state }
-                    : { ...variant }
-                ),
-              }
-            : f
-        );
-
-        updatedFilters = updatedFilters.map((f) =>
-          f.name === filterName.name &&
-          f.variants?.every((variant) => variant.state)
-            ? {
-                ...f,
-                variants: f.variants.map((variant) => ({
-                  ...variant,
-                  state: false,
-                })),
-              }
-            : f
-        );
-
-        const dropDownFilter = updatedFilters.find(
-          (f) => f.name === filterName.name
-        );
-
-        if (dropDownFilter?.name.toLowerCase() === "markets") {
-          const markets =
-            dropDownFilter?.variants?.filter((variant) => variant.state) || [];
-
-          if (markets.length) {
-            params.set("markets", markets.map(({ name }) => name).join(","));
-          } else {
-            params.delete("markets");
+          if (sampleFilter?.name.toLowerCase() === "active") {
+            sampleFilter.state
+              ? params.delete("deprecated")
+              : params.set("deprecated", "true");
           }
+          setFilters(updatedFilters);
+          break;
 
-          // // UI representation
-          if (markets.length) {
-            setActiveMarkets(markets.map(({ name }) => name).join(","));
-          } else {
-            setActiveMarkets("All");
-          }
+        default:
+          console.error("NO FILTER CASE");
+          break;
+      }
+
+      let activeFiltersCount = 0;
+
+      updatedFilters.forEach((filter) => {
+        if (filter.variants) {
+          filter.variants.forEach((variant) => {
+            if (variant.state) {
+              activeFiltersCount++;
+            }
+          });
+        } else if (!filter.state && filter.name === "Active") {
+          activeFiltersCount++;
+        } else if (filter.state && filter.name !== "Active") {
+          activeFiltersCount++;
         }
+      });
 
-        setFilters(updatedFilters);
-        break;
-      default:
-        console.error("NO FILTER CASE");
-        break;
-    }
+      setTableParams((prev) => ({ ...prev, filters: activeFiltersCount }));
 
-    newUrl.search = `?${params.toString()}`;
-    window.history.pushState({}, "", newUrl.toString());
-  };
+      newUrl.search = `?${params.toString()}`;
+      window.history.pushState({}, "", newUrl.toString());
+    };
 
-  useEffect(() => {
-    if (!searchParams.get("markets")) {
-      setActiveMarkets("All");
-    }
-  }, [searchParams]);
+    useEffect(() => {
+      if (!searchParams.get("strategies")) {
+        // setActiveStrategies("All");
+      }
+    }, [searchParams]);
 
-  useClickOutside(dropDownRef, () => setDropDownSelector(false));
-
-  return filters.length ? (
-    <div className="flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold flex-shrink-0">
-      {filters.map((filter: TTableFilters) => (
-        <div data-testid="filter" key={filter.name}>
-          {filter.type === "dropdown" ? (
-            <div className="relative select-none w-[200px]">
+    return filters.length ? (
+      <div className="flex items-center justify-evenly flex-wrap gap-2 select-none font-manrope text-[16px] font-semibold flex-shrink-0">
+        {filters.map((filter: TTableFilters) => (
+          <div data-testid="filter" key={filter.name}>
+            {filter.type === "sample" ? (
               <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDropDownSelector((prevState) => !prevState);
-                }}
-                className="flex items-center justify-between gap-1 px-5 py-[13px] h-[48px] bg-transparent border border-[#23252A] rounded-lg cursor-pointer"
+                key={filter.name}
+                className="flex items-center justify-center bg-transparent border border-[#23252A] h-[48px] rounded-lg"
               >
-                <p className="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap text-[16px]">
-                  <span className="text-[#97979A]">{filter.name}: </span>
-                  <span>{activeMarkets}</span>
-                </p>
-                <img
-                  className={cn(
-                    "transition delay-[50ms] w-4 h-4",
-                    dropDownSelector ? "rotate-[180deg]" : "rotate-[0deg]"
-                  )}
-                  src="/arrow-down.svg"
-                  alt="arrowDown"
-                />
-              </div>
-              <div
-                ref={dropDownRef}
-                className={cn(
-                  "bg-[#1C1D1F] border border-[#383B42] p-[6px] rounded-lg w-full z-20 mt-2",
-                  dropDownSelector
-                    ? "absolute transition delay-[50ms]"
-                    : "hidden"
-                )}
-              >
-                <div className="flex flex-col items-start">
-                  {filter.variants?.map((variant: TTAbleFiltersVariant) => (
-                    <div
-                      key={variant.name}
-                      onClick={() => activeFiltersHandler(filter, variant.name)}
-                      className={cn(
-                        "p-[6px] cursor-pointer w-full flex items-center gap-2"
-                      )}
-                      title={variant.title}
-                    >
-                      <Checkbox
-                        checked={variant.state}
-                        onChange={() =>
-                          activeFiltersHandler(filter, variant.name)
-                        }
-                      />
-                      <span className="text-[14px] leading-[20px] font-medium overflow-hidden text-ellipsis whitespace-nowrap">
-                        {variant.name}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-center p-2">
+                  <p
+                    onClick={() => activeFiltersHandler(filter)}
+                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg  ${
+                      filter.state
+                        ? "bg-[#22242A] border border-[#2C2E33]"
+                        : "text-[#97979A]" //hover
+                    }`}
+                  >
+                    {filter.name}
+                  </p>
+
+                  <p
+                    onClick={() => activeFiltersHandler(filter, "All")}
+                    className={`h-8 px-4 py-1 cursor-pointer rounded-lg ${
+                      !filter.state
+                        ? "bg-[#22242A] border border-[#2C2E33]"
+                        : "text-[#97979A]" //hover
+                    }`}
+                  >
+                    All
+                  </p>
                 </div>
               </div>
-            </div>
-          ) : null}
-        </div>
-      ))}
-    </div>
-  ) : null;
-});
+            ) : null}
+          </div>
+        ))}
+      </div>
+    ) : null;
+  }
+);
 
 export { Filters };

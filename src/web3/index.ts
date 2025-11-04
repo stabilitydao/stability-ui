@@ -2,7 +2,7 @@ import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 
 import { createWalletClient, http, createPublicClient } from "viem";
 
-import { avalanche, sonic } from "viem/chains";
+import { avalanche, sonic, plasma } from "viem/chains";
 
 import { deployments } from "@stabilitydao/stability";
 
@@ -23,6 +23,8 @@ import IMetaVaultABI from "./abi/IMetaVaultABI.ts";
 import WrappedMetaVaultABI from "./abi/WrappedMetaVaultABI.ts";
 import SwapperABI from "./abi/SwapperABI.ts";
 import IMetaVaultFactoryABI from "./abi/IMetaVaultFactoryABI.js";
+import AavePoolABI from "./abi/AavePoolABI.ts";
+import AaveProtocolDataProviderABI from "./abi/AaveProtocolDataProviderABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -85,12 +87,12 @@ const merkleDistributor = deployments[146].tokenomics.merkleDistributor;
 const metadata = {
   name: "Stability",
   description: "Stability Asset Management Platform",
-  url: "https://stability.farm",
+  url: "https://beta.stability.farm", // todo: change to stability.farm
   icons: ["https://stability.farm/logo.svg"],
 };
 
 const wagmiConfig = defaultWagmiConfig({
-  chains: [sonic, avalanche],
+  chains: [sonic, avalanche, plasma],
   projectId: walletConnectProjectId,
   metadata,
 });
@@ -102,17 +104,23 @@ const walletClient = createWalletClient({
 
 const sonicClient = createPublicClient({
   chain: sonic,
-  transport: http("https://sonic.drpc.org"),
+  transport: http("https://rpc.soniclabs.com"),
 });
 
 const avalancheClient = createPublicClient({
   chain: avalanche,
-  transport: http("https://api.avax.network/ext/bc/C/rpc"), // https://avalanche-c-chain-rpc.publicnode.com
+  transport: http("https://api.avax.network/ext/bc/C/rpc"),
+});
+
+const plasmaClient = createPublicClient({
+  chain: plasma,
+  transport: http("https://rpc.plasma.to"),
 });
 
 const web3clients = {
   "146": sonicClient,
   "43114": avalancheClient,
+  "9745": plasmaClient,
 };
 
 export {
@@ -146,4 +154,6 @@ export {
   SwapperABI,
   factories,
   IMetaVaultFactoryABI,
+  AavePoolABI,
+  AaveProtocolDataProviderABI,
 };

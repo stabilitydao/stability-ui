@@ -183,7 +183,7 @@
 
 //         if (contractsInfo[i].logo === "proportions") {
 //           logo =
-//             `https://api.stabilitydao.org/vault/${chainId}/${vaultData.address}/logo.svg`.toLowerCase();
+//             `https://api.stabilitydao.org/${chainId}/${vaultData.address}/logo.svg`.toLowerCase();
 //         }
 //         expect(contractsLogoSrc).toBe(logo);
 //         expect(contractsSymbol).toBe(contractsInfo[i].symbol);

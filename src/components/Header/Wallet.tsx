@@ -125,7 +125,7 @@ const Wallet = (): JSX.Element => {
   };
 
   const initProfile = async () => {
-    if (!$assetsBalances[$currentChainID]) return; // dublicated for TS
+    if (!$currentChainID || !$assetsBalances[$currentChainID]) return; // dublicated for TS
     let profileBalance = 0;
 
     const assets = Object.entries($assetsBalances[$currentChainID])

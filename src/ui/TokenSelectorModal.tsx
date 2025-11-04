@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState, useRef } from "react";
+
+import axios from "axios";
+
 import { tokenlist as tokenlistAll } from "@stabilitydao/stability";
 import type { Hash } from "viem";
 import { useModalClickOutside } from "@utils";
 import { useStore } from "@nanostores/react";
-import { currentChainID } from "@store";
+import { account, currentChainID } from "@store";
 import { CHAINS } from "@constants";
 
 export const shorten = (addr: string): string =>
@@ -56,40 +59,48 @@ export const TokenSelectorModal = ({
   onSelect,
 }: TokenSelectorModalProps): JSX.Element => {
   const [query, setQuery] = useState("");
+  const [assets, setAssets] = useState([]);
 
-  const $currentChainID = useStore(currentChainID);
+  const $currentChainID = useStore(currentChainID) ?? "146";
+  const $account = useStore(account);
 
   const tokenlist = tokenlistAll.tokens.filter(
     (token) => token.chainId == $currentChainID
   );
 
-  type AssetPriceEntry = {
-    price: string;
-    trusted: boolean;
-  };
-  type AssetPricesMap = Record<string, AssetPriceEntry>;
+  const getData = async () => {
+    try {
+      const req = await axios.get("https://api.stability.farm");
 
-  const [assetPrices, setAssetPrices] = useState<AssetPricesMap | null>(null);
+      const data = req.data.assetPrices?.[$currentChainID] ?? null;
+
+      const _assets = tokenlist
+        .map((token) => ({
+          ...token,
+          price: data?.[token.address.toLowerCase()]?.price,
+        }))
+        .filter(({ price }) => price);
+
+      setAssets(_assets);
+    } catch (error) {
+      console.error("Get assets data error:", error);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      const response = await fetch("https://api.stability.farm");
-      const data = await response.json();
-      const result = data.assetPrices?.[$currentChainID] ?? null;
-      setAssetPrices(result);
-    })();
-  }, []);
+    getData();
+  }, [$account, $currentChainID, tokenlist]);
 
   const filteredTokens = useMemo(() => {
-    if (!query) return tokenlist;
+    if (!query) return assets;
     const q = query.toLowerCase().trim();
-    return tokenlist.filter(
+    return assets.filter(
       (t) =>
-        t.symbol.toLowerCase().includes(q) ||
-        (t.name ?? "").toLowerCase().includes(q) ||
-        t.address.toLowerCase().includes(q)
+        t?.symbol.toLowerCase().includes(q) ||
+        (t?.name ?? "").toLowerCase().includes(q) ||
+        t?.address.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, assets]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -124,9 +135,7 @@ export const TokenSelectorModal = ({
                 </div>
               </div>
             </span>
-            <div className="text-sm text-[#97979A]">
-              ${assetPrices?.[token.address.toLowerCase()]?.price}
-            </div>
+            <div className="text-sm text-[#97979A]">${token?.price}</div>
           </button>
         ))}
 
@@ -159,10 +168,7 @@ export const TxStatusModal = ({
 
   const $currentChainID = useStore(currentChainID);
 
-  const link = CHAINS.find(({ id }) => id == $currentChainID)?.explorer?.slice(
-    0,
-    -9
-  );
+  const explorer = CHAINS.find(({ id }) => id == $currentChainID)?.explorer;
 
   const content: JSX.Element = (() => {
     switch (status) {
@@ -178,7 +184,7 @@ export const TxStatusModal = ({
             <p className="mb-2">Transaction sent. Waiting for confirmation…</p>
             {hash && (
               <a
-                href={`${link}/tx/${hash}`}
+                href={`${explorer}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"
@@ -194,7 +200,7 @@ export const TxStatusModal = ({
             <p className="mb-2 text-green-400">✅ Transaction confirmed!</p>
             {hash && (
               <a
-                href={`${link}/tx/${hash}`}
+                href={`${explorer}/tx/${hash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#97979A]"
