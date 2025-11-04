@@ -94,6 +94,7 @@ const Breadcrumbs = (): JSX.Element => {
 
       const symbol =
         $metaVaults[network].find(
+          // @ts-ignore
           ({ address }) => address.toLowerCase() === metaVaultAddress
         )?.name || "Meta Vault";
       console.log(network, metaVaultAddress);
@@ -107,7 +108,14 @@ const Breadcrumbs = (): JSX.Element => {
 
       add("Lending", "lending");
       add(marketName);
+    } else if (main === "operator") {
+      add("Platform", "platform");
+      add("Operator");
+    } else if (main === "builder") {
+      add("Platform", "platform");
+      add("Builder");
     }
+
 
     setPaths(crumbs);
   }, [currentPath, $vaults, $metaVaults]);

@@ -44,6 +44,22 @@ export const formatNumber = (value: string | number, type: string): string => {
       }
       changedValue = "$" + roundedValue;
       break;
+    case "abbreviateNotUsd":
+      value = Number(value);
+
+      while (value >= 1000) {
+        value /= 1000;
+        suffixNum++;
+      }
+
+      const fixedsNotUsd = !!suffixNum ? 2 : 0;
+      let roundedValueNotUsd = value.toFixed(fixedsNotUsd);
+
+      if (suffixNum > 0) {
+        roundedValueNotUsd += suffixes[suffixNum];
+      }
+      changedValue = roundedValueNotUsd;
+      break;
     case "abbreviateInteger":
       value = Number(value);
 

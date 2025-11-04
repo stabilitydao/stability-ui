@@ -15,14 +15,17 @@ import { apiData, marketPrices } from "@store";
 
 //import packageJson from "../../../package.json";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
-import { IBuilderAgent } from "@stabilitydao/stability/out/agents";
+import { IBuilderAgent } from "@stabilitydao/stability";
 import {Indicator} from "./components/Indicator.tsx";
 import {StabilityBuilder} from "./components/StabilityBuilder.tsx";
+import {StabilityOperator} from "./components/StabilityOperator.tsx";
+import {IOperatorAgent} from "@stabilitydao/stability/out/agents";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $marketPrices = useStore(marketPrices);
 
+  const operatorAgent: IOperatorAgent = getAgent("OPERATOR" as AgentId) as IOperatorAgent;
   const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
 
   const isAlert = $apiData?.network.status == "Alert";
@@ -100,7 +103,7 @@ const Platform = (): JSX.Element => {
           <div className="flex justify-end">
             <Indicator
               title="Total"
-              value={$apiData?.total.xSTBLStaked ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateIntegerNotUsd")} STBL` : ' '}
+              value={$apiData?.total.xSTBLStaked ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateNotUsd")}` : ' '}
               subValue={$apiData?.total.xSTBLStaked ? formatNumber(+$apiData?.total.xSTBLStaked * +stblPrice?.price, "abbreviate") : ' '}
             />
             <Indicator
@@ -144,8 +147,15 @@ const Platform = (): JSX.Element => {
       <h2 className="text-[26px] font-bold">🤖 Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
-        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="font-bold flex items-center gap-[10px]">Stability Operator <a target="_blank" href="https://t.me/stability_dao_bot"><img className="w-[20px]" src="/socials/telegram.svg" alt="Telegram" title="Agent's telegram account" /></a></div>
+        <a title="Go to Operator's page" href="/operator" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold flex items-center">
+            <img
+              className="w-[32px] h-[32px] mr-[10px]"
+              src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${operatorAgent.image}`}
+              alt={builderAgent.name}
+            />
+            Stability Operator
+          </div>
           <div className="flex w-full">
 
             <Indicator
@@ -188,23 +198,40 @@ const Platform = (): JSX.Element => {
             />
 
           </div>
-        </div>
-        <div className="flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
-          <div className="font-bold">Stability Builder</div>
-          <div className="flex w-full">
-            <Indicator
-              title="Repositories"
-              value={builderAgent.repo.length}
-              subValue={`? issues`}
+        </a>
+        <a title="Go to Builder's page" href="/builder" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+          <div className="font-bold flex items-center">
+            <img
+              className="w-[32px] h-[32px] mr-[10px]"
+              src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${builderAgent.image}`}
+              alt={builderAgent.name}
             />
+            Stability Builder
+          </div>
+          <div className="flex w-full">
             <Indicator
               title="🍞 Burn rate"
               value={formatNumber(lastMonthBurnRate.usdAmount, "abbreviate")}
               subValue={lastMonthBurnRate.period}
             />
+            <Indicator
+              title="Repositories"
+              value={builderAgent.repo.length}
+              subValue={`🚧 issues`}
+            />
+            <Indicator
+              title="Pools"
+              value={builderAgent.pools.length}
+              subValue={'🚧 tasks'}
+            />
+            <Indicator
+              title="Conveyors"
+              value={builderAgent.conveyors.length}
+              subValue={'🚧 tasks'}
+            />
 
           </div>
-        </div>
+        </a>
       </div>
 
       <h2 className="text-[26px] font-bold">📦 Library</h2>
@@ -302,4 +329,4 @@ const Platform = (): JSX.Element => {
   );
 };
 
-export { Platform, StabilityBuilder };
+export { Platform, StabilityBuilder, StabilityOperator };
