@@ -62,6 +62,7 @@ const loadMarketsData = async (
       pool: libMarket.pool,
       protocolDataProvider: libMarket.protocolDataProvider,
       deployed: libMarket.deployed,
+      deprecated: libMarket?.deprecated ?? false,
       reserves,
     };
 

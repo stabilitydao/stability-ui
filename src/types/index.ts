@@ -798,6 +798,7 @@ type TMarket = {
   marketId: string;
   reserves: TMarketReserve[];
   deployed: string;
+  deprecated: boolean;
   engine: string;
   pool: TAddress;
   protocolDataProvider: TAddress;

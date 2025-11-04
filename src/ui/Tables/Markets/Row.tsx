@@ -34,17 +34,24 @@ const Row: React.FC<IProps> = ({ market }) => {
           >
             <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A]">
               {!index ? (
-                <div className="flex items-center gap-3">
-                  <img
-                    src={market?.network?.logoURI}
-                    alt={market?.network?.name}
-                    className="w-6 h-6 rounded-full"
-                  />
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={market?.network?.logoURI}
+                      alt={market?.network?.name}
+                      className="w-6 h-6 rounded-full"
+                    />
 
-                  <span className="text-[12px] leading-4 md:text-[14px] md:leading-5">
-                    {market?.marketId}
-                  </span>
+                    <span className="text-[12px] leading-4 md:text-[14px] md:leading-5">
+                      {market?.marketId}
+                    </span>
+                  </div>
                 </div>
+              ) : null}
+              {index === 1 && market.deprecated ? (
+                <p className="text-[16px] leading-5 font-semibold text-red-800">
+                  Bad debts
+                </p>
               ) : null}
             </div>
             <div

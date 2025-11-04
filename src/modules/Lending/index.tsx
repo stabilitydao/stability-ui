@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useStore } from "@nanostores/react";
 
 import { ColumnSort } from "./components/ColumnSort";
+import { Filters } from "./components/Filters";
 
 import { FullPageLoader, ErrorMessage, MarketsTable } from "@ui";
 
@@ -10,9 +11,16 @@ import { error, markets, isMarketsLoaded } from "@store";
 
 import { dataSorter } from "@utils";
 
-import { CHAINS, MARKET_TABLE } from "@constants";
+import { initFilters } from "./functions";
 
-import { TTableColumn, TMarket } from "@types";
+import {
+  CHAINS,
+  MARKET_TABLE,
+  MARKETS_TABLE_FILTERS,
+  DEFAULT_TABLE_PARAMS,
+} from "@constants";
+
+import { TTableColumn, TMarket, TTableActiveParams } from "@types";
 
 const Lending = (): JSX.Element => {
   const $isMarketsLoaded = useStore(isMarketsLoaded);
@@ -37,14 +45,66 @@ const Lending = (): JSX.Element => {
     }
   }
 
+  const [activeTableParams, setActiveTableParams] =
+    useState<TTableActiveParams>(DEFAULT_TABLE_PARAMS);
+
   const [localMarkets, setLocalMarkets] = useState<TMarket[]>([]);
   const [filteredMarkets, setFilteredMarkets] = useState<TMarket[]>([]);
 
   const [isLocalMarketsLoaded, setIsLocalMarketsLoaded] = useState(false);
 
   const [tableStates, setTableStates] = useState(MARKET_TABLE);
+  const [tableFilters, setTableFilters] = useState(MARKETS_TABLE_FILTERS);
 
   const activeNetworks = CHAINS.filter(({ active }) => active);
+
+  const activeNetworksHandler = async (chainIDs: string[]) => {
+    //temp
+    console.log(chainIDs);
+
+    // let updatedNetworks = activeNetworks.map((network) =>
+    //   chainIDs.includes(network.id)
+    //     ? { ...network, active: !network.active }
+    //     : network
+    // );
+
+    // const allActive = activeNetworks.every((network) => network.active);
+    // const allInactive = updatedNetworks.every((network) => !network.active);
+
+    // if (allInactive) {
+    //   updatedNetworks = activeNetworks.map((network) => ({
+    //     ...network,
+    //     active: true,
+    //   }));
+    // } else if (allActive) {
+    //   updatedNetworks = activeNetworks.map((network) => ({
+    //     ...network,
+    //     active: chainIDs.includes(network.id),
+    //   }));
+    // }
+
+    // /// URL set
+    // const activeNetworksLength = updatedNetworks.filter(
+    //   (network) => network.active
+    // )?.length;
+
+    // if (activeNetworksLength === updatedNetworks.length) {
+    //   params.delete("chain");
+    // } else {
+    //   params.delete("chain");
+
+    //   updatedNetworks.forEach((network) => {
+    //     if (network.active) {
+    //       params.append("chain", network.id);
+    //     }
+    //   });
+    // }
+
+    // newUrl.search = `?${params.toString()}`;
+    // window.history.pushState({}, "", newUrl.toString());
+
+    // setActiveNetworks(updatedNetworks);
+  };
 
   const tableHandler = (table: TTableColumn[] = tableStates) => {
     if (!$markets) return;
@@ -61,6 +121,24 @@ const Lending = (): JSX.Element => {
       (a: TMarket, b: TMarket) =>
         Number(b?.supplyTVLInUSD) - Number(a?.supplyTVLInUSD)
     );
+
+    //filter
+    tableFilters.forEach((f) => {
+      if (!f.state) return;
+      switch (f.type) {
+        case "sample":
+          if (f.name === "Active") {
+            sortedMarkets = sortedMarkets.filter(
+              (market: TMarket) => !market.deprecated
+            );
+          }
+          break;
+
+        default:
+          console.error("NO FILTER CASE");
+          break;
+      }
+    });
 
     //sort
     table.forEach((state: TTableColumn) => {
@@ -90,6 +168,8 @@ const Lending = (): JSX.Element => {
           const marketId = market.marketId;
 
           const reserves = market?.reserves;
+
+          const deprecated = market.deprecated;
 
           const supplyAPR = Math.max(
             ...reserves?.map((asset) => Number(asset?.supplyAPR) || 0)
@@ -126,6 +206,7 @@ const Lending = (): JSX.Element => {
             network,
             LTV,
             utilization,
+            deprecated,
           };
         });
       });
@@ -137,11 +218,24 @@ const Lending = (): JSX.Element => {
         );
       }
 
+      initFilters(
+        allMarkets,
+        tableFilters,
+        setTableFilters,
+        activeNetworksHandler,
+        setActiveTableParams
+      );
+
       setLocalMarkets(allMarkets);
+
       setFilteredMarkets(allMarkets);
       setIsLocalMarketsLoaded(true);
     }
   };
+
+  useEffect(() => {
+    tableHandler();
+  }, [tableFilters]); //activeNetworks
 
   useEffect(() => {
     initMarkets();
@@ -161,9 +255,16 @@ const Lending = (): JSX.Element => {
         <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
 
         <h2 className="page-title__font text-start mb-2 md:mb-5">Lending</h2>
-        <h3 className="text-[#97979a] page-description__font">
-          Non-custodial on-chain isolated lending markets
-        </h3>
+        <div className="flex items-start md:items-center justify-between flex-col md:flex-row gap-2">
+          <h3 className="text-[#97979a] page-description__font">
+            Non-custodial on-chain isolated lending markets
+          </h3>
+          <Filters
+            filters={tableFilters}
+            setFilters={setTableFilters}
+            setTableParams={setActiveTableParams}
+          />
+        </div>
       </div>
       <div className="pb-5 mt-4 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
         <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">

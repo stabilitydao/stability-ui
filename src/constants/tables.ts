@@ -12,6 +12,14 @@ const FARMING_TABLE_FILTERS: TTableFilters[] = [
   { name: "Strategies", type: "dropdown", state: true },
 ];
 
+const METAVAULTS_FILTERS: TTableFilters[] = [
+  { name: "Flagships", type: "sample", state: true },
+];
+
+const MARKETS_TABLE_FILTERS: TTableFilters[] = [
+  { name: "Active", type: "sample", state: true },
+];
+
 const TABLE: TTableColumn[] = [
   {
     name: "Strategy",
@@ -603,10 +611,6 @@ const DEFAULT_TABLE_PARAMS = {
   filters: 0,
 };
 
-const METAVAULTS_FILTERS: TTableFilters[] = [
-  { name: "Flagships", type: "sample", state: true },
-];
-
 export {
   TABLE_FILTERS,
   TABLE,
@@ -629,4 +633,5 @@ export {
   MARKET_USERS_TABLE,
   MARKET_LIQUIDATIONS_TABLE,
   HOLDERS_TABLE,
+  MARKETS_TABLE_FILTERS,
 };
