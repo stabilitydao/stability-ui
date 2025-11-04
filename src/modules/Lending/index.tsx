@@ -244,7 +244,7 @@ const Lending = (): JSX.Element => {
   const isLoading = useMemo(() => {
     return !$isMarketsLoaded || !isLocalMarketsLoaded;
   }, [isLocalMarketsLoaded, $isMarketsLoaded]);
-
+  console.log(activeTableParams);
   return (
     <>
       <div
