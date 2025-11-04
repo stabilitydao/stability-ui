@@ -50,10 +50,14 @@ const Menu = (): JSX.Element => {
     }
   }, []);
 
-  const TVL = useMemo(
+  const AUM = useMemo(
     () =>
       $apiData?.total?.tvl
-        ? formatNumber($apiData?.total.tvl || 0, "abbreviate")
+        ? formatNumber(
+            Number($apiData?.total.tvl ?? 0) +
+              Number($apiData?.total?.marketTvl ?? 0),
+            "abbreviate"
+          )
         : "0",
     [$apiData]
   );
@@ -126,10 +130,10 @@ const Menu = (): JSX.Element => {
 
               <div className="flex items-center gap-2 w-full">
                 <div className="flex gap-4 w-1/2">
-                  {TVL ? (
+                  {AUM ? (
                     <div className="w-full flex items-center justify-between h-10 gap-2 px-4 border border-[#23252A] rounded-lg text-[14px] leading-4 font-medium">
                       <span className="text-[#A3A4A6]">AUM</span>
-                      <span className="text-white">{TVL}</span>
+                      <span className="text-white">{AUM}</span>
                     </div>
                   ) : null}
                 </div>

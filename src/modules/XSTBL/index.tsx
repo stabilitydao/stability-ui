@@ -22,11 +22,8 @@ const XSTBL = (): JSX.Element => {
         <div>
           <h2 className="page-title__font text-start mb-2 md:mb-5">Staking</h2>
           <h3 className="text-[#97979a] page-description__font">
-            Staking allows users to lock their assets and earn passive rewards
-            <br className="hidden lg:block" /> over time. Participate in network
-            security or protocol incentives while{" "}
-            <br className="hidden lg:block" /> maximizing returns through
-            flexible or fixed-term staking options
+            Convert STBL to xSTBL and lock for 6 months to earn Stability
+            revenue.
           </h3>
         </div>
         <Dashboard />

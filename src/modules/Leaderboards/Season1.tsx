@@ -138,12 +138,7 @@ const Season1 = (): JSX.Element => {
             Top Users <br /> & sGEM1 Rewards
           </h2>
           <h3 className="text-[#97979a] page-description__font">
-            Track user performance across yield vaults, contests, and{" "}
-            <br className="hidden lg:block" /> sGEM1 rewards. Earn points by
-            participating, ranking on the <br className="hidden lg:block" />{" "}
-            leaderboard, and unlocking exclusive airdrop benefits{" "}
-            <br className="hidden lg:block" /> through smart yield farming
-            strategies
+            Track user performance across Stability ecosystem.
           </h3>
           <ClaimSiloPoints />
         </div>

@@ -2,7 +2,7 @@ import Tippy from "@tippyjs/react";
 
 import { UtilizationTooltip } from "./UtilizationTooltip";
 
-import { ProgressCircle } from "@ui";
+import { ProgressCircle, Badge } from "@ui";
 
 import { cn, formatNumber, getTokenData, useWindowWidth } from "@utils";
 
@@ -49,9 +49,7 @@ const Row: React.FC<IProps> = ({ market }) => {
                 </div>
               ) : null}
               {index === 1 && market.deprecated ? (
-                <p className="text-[16px] leading-5 font-semibold text-red-800">
-                  Bad debts
-                </p>
+                <Badge state="error" text="Bad debts" greater={true} />
               ) : null}
             </div>
             <div
