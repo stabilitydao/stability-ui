@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import { useStore } from "@nanostores/react";
 
+import axios from "axios";
+
 import { ActionButton } from "@ui";
 
 import { formatUnits, isAddress } from "viem";
@@ -12,7 +14,7 @@ import { getTokenData, getGasLimit, getTransactionReceipt } from "@utils";
 
 import { connected, account, publicClient, lastTx } from "@store";
 
-import { StabilityDAOABI, wagmiConfig } from "@web3";
+import { StabilityDAOABI, wagmiConfig, VestingABI } from "@web3";
 
 import { assets } from "@stabilitydao/stability";
 
@@ -20,12 +22,18 @@ import type { TAddress } from "@types";
 
 import type { Abi } from "viem";
 
+const SNAPSHOT_API = "https://hub.snapshot.org/graphql";
+
+const VESTING_FOUNDATION = "0x8C42C261A3104cEEFBb388CFd6C1f0E7c9F22062";
+
 const DAO = (): JSX.Element => {
   const [userData, setUserData] = useState({
     balance: "0",
     delegatedTo: "0x0000000000000000000000000000000000000000",
     delegatedToYou: "0",
   });
+
+  const [claimable, setClaimable] = useState("0");
 
   const [value, setValue] = useState<string>("");
 
@@ -127,6 +135,63 @@ const DAO = (): JSX.Element => {
     setTransactionInProgress(false);
   };
 
+  const getVestingData = async () => {
+    try {
+      const releasable = (await $publicClient?.readContract({
+        address: VESTING_FOUNDATION,
+        abi: VestingABI,
+        functionName: "releasable",
+      })) as bigint;
+
+      const formattedReleasable = Number(formatUnits(releasable, 18)).toFixed(
+        2
+      );
+
+      setClaimable(formattedReleasable);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProposals = async () => {
+    const spaceId = "stabilitydao.eth";
+
+    const query = `
+    query Proposals {
+      proposals(
+        first: 20,
+        skip: 0,
+        where: { space_in: ["${spaceId}"] }
+        orderBy: "created"
+        orderDirection: desc
+      ) {
+        id
+        title
+        body
+        choices
+        start
+        end
+        snapshot
+        state
+        author
+        space {
+          id
+          name
+        }
+      }
+    }
+  `;
+
+    try {
+      const { data } = await axios.post(SNAPSHOT_API, {
+        query,
+      });
+      console.log(data?.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const getUserData = async () => {
     if (!$account) return;
 
@@ -174,6 +239,8 @@ const DAO = (): JSX.Element => {
   };
 
   useEffect(() => {
+    getVestingData();
+    getProposals();
     getUserData();
   }, [$account, $connected]);
 
@@ -226,14 +293,32 @@ const DAO = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-5">
         <span className="text-center">Governance</span>
+        <div className="flex flex-col gap-3">
+          <a
+            className="bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold max-w-[130px]"
+            href="https://snapshot.box/#/s:stabilitydao.eth"
+            target="_blank"
+          >
+            <p className="px-6 py-4">Spanpshot</p>
+          </a>
+        </div>
       </div>
       <div className="flex flex-col gap-2">
-        <span className="text-center">Allocators</span>
+        <span className="text-center">Allocators (Coolimg soon)</span>
+        <span>
+          Inter-chain power distribution for MetaVaults allocations voting.
+          Under construction.
+        </span>
       </div>
       <div className="flex flex-col gap-2">
         <span className="text-center">Foundation</span>
+        <div className="flex flex-col gap-3">
+          <span>Total: 30M STBL</span>
+          <span>Claimable: {claimable} STBL</span>
+          <span>Invested: 0 STBL</span>
+        </div>
       </div>
     </div>
   );
