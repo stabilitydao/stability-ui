@@ -29,6 +29,7 @@ import { Lending } from "./Lending";
 import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
 import { Market } from "./Market";
 import { StabilityBuilder, StabilityOperator } from "./Platform";
+import { DAO } from "./DAO";
 
 export {
   Factory,
@@ -63,4 +64,5 @@ export {
   Season1,
   StabilityBuilder,
   StabilityOperator,
+  DAO,
 };

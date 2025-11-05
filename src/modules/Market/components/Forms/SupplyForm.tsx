@@ -21,9 +21,11 @@ import {
   setLocalStoreHash,
   getAllowance,
   formatNumber,
+  truncateDecimals,
+  getGasLimit,
 } from "@utils";
 
-import { getGasLimit, convertToUSD } from "../../functions";
+import { convertToUSD } from "../../functions";
 
 import { useUserReservesData, useUserPoolData } from "../../hooks";
 
@@ -106,6 +108,8 @@ const SupplyForm: React.FC<TProps> = ({
     if (input.startsWith(".")) {
       input = "0" + input;
     }
+
+    input = truncateDecimals(input, activeAsset?.assetData?.decimals ?? 18);
 
     const value = Number(input);
 

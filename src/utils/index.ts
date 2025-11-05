@@ -35,9 +35,11 @@ import { loadMarketsData } from "./functions/loadMarketsData";
 import { paginateData } from "./functions/paginateData";
 import { copyText } from "./functions/copyText";
 import { getShortErrorMessage } from "./functions/getShortErrorMessage";
+import { truncateDecimals } from "./functions/truncateDecimals";
 
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
+import { getGasLimit } from "./functions/getGasLimit";
 
 /* HOOKS */
 import { useClickOutside } from "./hooks/useClickOutside";
@@ -86,4 +88,6 @@ export {
   paginateData,
   copyText,
   getShortErrorMessage,
+  truncateDecimals,
+  getGasLimit,
 };

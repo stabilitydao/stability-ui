@@ -21,9 +21,11 @@ import {
   getAllowance,
   getTransactionReceipt,
   setLocalStoreHash,
+  truncateDecimals,
+  getGasLimit,
 } from "@utils";
 
-import { convertToUSD, getGasLimit } from "../../functions";
+import { convertToUSD } from "../../functions";
 
 import { useUserReservesData, useUserPoolData } from "../../hooks";
 
@@ -109,6 +111,8 @@ const RepayForm: React.FC<TProps> = ({
     if (input.startsWith(".")) {
       input = "0" + input;
     }
+
+    input = truncateDecimals(input, activeAsset?.assetData?.decimals ?? 18);
 
     const value = Number(input);
 

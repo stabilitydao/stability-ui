@@ -78,21 +78,28 @@ export const formatNumber = (value: string | number, type: string): string => {
     case "abbreviateIntegerNotUsd":
       value = Number(value);
 
-      if (value > 1000000000000) {
+      if (value >= 1_000_000_000_000) {
         return "1T+";
       }
 
-      while (value >= 1000) {
+      while (value >= 1000 && suffixNum < suffixes.length - 1) {
         value /= 1000;
         suffixNum++;
       }
 
-      let rounded1 = value.toFixed(0);
+      const truncated = Math.floor(value * 100) / 100;
+
+      let _rounded = truncated.toString();
+
+      if (_rounded.includes(".")) {
+        _rounded = _rounded.replace(/\.?0+$/, "");
+      }
 
       if (suffixNum > 0) {
-        rounded1 += suffixes[suffixNum];
+        _rounded += suffixes[suffixNum];
       }
-      changedValue = rounded1;
+
+      changedValue = _rounded;
       break;
     case "chartAbbreviate":
       value = Number(value);

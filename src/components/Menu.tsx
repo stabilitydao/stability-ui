@@ -99,7 +99,7 @@ const Menu = (): JSX.Element => {
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 max-h-[38vh] overflow-y-auto">
                 {PATHS.map(({ name, path }) => (
                   <div
                     key={name}
