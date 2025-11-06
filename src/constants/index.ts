@@ -290,6 +290,8 @@ const VAULTS_WITH_NAME = {
   "0x058779961ae874d29f9cecfd29df7456164a0f64": "Mainstreet",
   "0xbe73b6d42fd26bcd0ce3c02585d4a5fe9fea2fd4": "smsUSD, 138",
   "0xb1e87223f5b080f687b298df4fc8acabd3d1797b": "PT-smsUSD (30 Oct), 141",
+  "0xff8bd2d55304bfb3a685374a5c20ecdb2a67cab3": "wmetaUSD",
+  "0xde4b29e64e5e5ec5290df2888df5b4565836085f": "STBL",
 };
 
 const META_VAULTS_EXCEPTIONS = [

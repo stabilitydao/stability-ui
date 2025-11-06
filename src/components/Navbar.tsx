@@ -106,7 +106,7 @@ const Navbar = (): JSX.Element => {
                     )}
                   >
                     <a
-                      className="p-4 flex items-center justify-between"
+                      className="px-4 py-3 flex items-center justify-between"
                       href={`/${path}`}
                     >
                       <span

@@ -257,7 +257,10 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
     const cleanedVaults = vaults.filter(Boolean);
 
-    const protocolsAllocation = protocols.slice(1).map((protocol) => {
+    let activeProtocols =
+      metaVault?.symbol === "metaUSD" ? protocols : protocols.slice(1);
+
+    const protocolsAllocation = activeProtocols.map((protocol) => {
       let allocation = 0;
 
       cleanedVaults.forEach((vault) => {
