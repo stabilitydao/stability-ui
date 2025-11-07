@@ -11,7 +11,7 @@ const Socials: React.FC<IProps> = ({ styles = "" }) => {
     <div className={cn("flex items-center gap-4 p-4", styles)}>
       {SOCIALS.map(({ name, logo, link }) => (
         <a key={name} href={link} target="_blank">
-          <img src={logo} alt={name} title={name} />
+          <img className="w-5 h-5" src={logo} alt={name} title={name} />
         </a>
       ))}
     </div>

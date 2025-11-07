@@ -183,7 +183,7 @@ const DAO = (): JSX.Element => {
             href="https://snapshot.box/#/s:stabilitydao.eth"
             target="_blank"
           >
-            <p className="px-6 py-4">Spanpshot</p>
+            <p className="px-6 py-4">Snapshot</p>
           </a>
         </div>
       </div>

@@ -23,7 +23,7 @@ export const getInitialStateFromUrl = (): {
 
   const section = validSections.includes(sectionUrl as MetaVaultSectionTypes)
     ? (sectionUrl as MetaVaultSectionTypes)
-    : MetaVaultSectionTypes.Operations;
+    : MetaVaultSectionTypes.Allocations;
 
   return { display, section };
 };

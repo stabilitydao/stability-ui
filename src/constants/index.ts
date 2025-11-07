@@ -337,15 +337,10 @@ const ROUTES = {
 
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
-    //   symbol: "Stability wmetaUSD",
-    //   link: "https://stability.market/?market=wmetaUSD",
-    // },
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
       symbol: "Stability wmetaUSD",
-      link: "https://stability.market/?market=wmetaUSD2",
+      link: "https://stability.farm/lending/146/wmetaUSD-gen2",
     },
     // {
     //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
@@ -412,6 +407,11 @@ const SOCIALS = [
     name: "Stability Telegram",
     logo: "/socials/telegram.png",
     link: "https://t.me/stabilitydao",
+  },
+  {
+    name: "Stability GitBook",
+    logo: "/socials/gitbook.svg",
+    link: "https://stabilitydao.gitbook.io/stability",
   },
 ];
 
