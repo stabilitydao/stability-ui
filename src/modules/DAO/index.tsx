@@ -202,7 +202,7 @@ const DAO = (): JSX.Element => {
           Under construction.
         </span>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-6">
         <h2 className="text-center text-[26px] font-bold">Foundation</h2>
         <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between min-w-full gap-3">
           <Indicator title="Total" value="30M STBL" />
