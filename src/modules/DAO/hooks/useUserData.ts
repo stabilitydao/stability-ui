@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { formatUnits } from "viem";
+import { formatUnits, zeroAddress } from "viem";
 
 import { getTokenData } from "@utils";
 
@@ -27,7 +27,7 @@ type TResult = {
 export const useUserData = (network: string): TResult => {
   const [data, setData] = useState<TUserData>({
     balance: "0",
-    delegatedTo: "0x0000000000000000000000000000000000000000",
+    delegatedTo: "Self",
     delegatedToYou: "0",
   });
 
@@ -73,7 +73,11 @@ export const useUserData = (network: string): TResult => {
 
       const delegatedToYou = String(Number(formattedVotes) - Number(balance));
 
-      const delegatedTo = delegatesRaw[0];
+      const delegatedTo = [zeroAddress, $account.toLowerCase()].includes(
+        delegatesRaw[0]
+      )
+        ? "Self"
+        : delegatesRaw[0];
 
       setData({
         balance,

@@ -13,32 +13,39 @@ import { cn, formatNumber } from "@utils";
 
 import { apiData, marketPrices } from "@store";
 
+import { Indicator } from "@ui";
+
 //import packageJson from "../../../package.json";
 import { NodeState } from "@stabilitydao/stability/out/api.types";
 import { IBuilderAgent } from "@stabilitydao/stability";
-import {Indicator} from "./components/Indicator.tsx";
-import {StabilityBuilder} from "./components/StabilityBuilder.tsx";
-import {StabilityOperator} from "./components/StabilityOperator.tsx";
-import {IOperatorAgent} from "@stabilitydao/stability/out/agents";
+
+import { StabilityBuilder } from "./components/StabilityBuilder.tsx";
+import { StabilityOperator } from "./components/StabilityOperator.tsx";
+import { IOperatorAgent } from "@stabilitydao/stability/out/agents";
 
 const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $marketPrices = useStore(marketPrices);
 
-  const operatorAgent: IOperatorAgent = getAgent("OPERATOR" as AgentId) as IOperatorAgent;
-  const builderAgent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
+  const operatorAgent: IOperatorAgent = getAgent(
+    "OPERATOR" as AgentId
+  ) as IOperatorAgent;
+  const builderAgent: IBuilderAgent = getAgent(
+    "BUILDER" as AgentId
+  ) as IBuilderAgent;
 
   const isAlert = $apiData?.network.status == "Alert";
   const isOk = $apiData?.network.status == "OK";
   const stblPrice = $marketPrices?.STBL;
 
-  let totalLendingMarkets = 0
+  let totalLendingMarkets = 0;
   Object.keys($apiData?.markets || []).forEach((key) => {
     // @ts-ignore
     totalLendingMarkets += Object.keys($apiData?.markets[key]).length;
-  })
+  });
 
-  const lastMonthBurnRate = builderAgent.burnRate[builderAgent.burnRate.length - 1]
+  const lastMonthBurnRate =
+    builderAgent.burnRate[builderAgent.burnRate.length - 1];
 
   return (
     <div className="flex flex-col max-w-[1200px] w-full gap-[24px] pb-[100px]">
@@ -57,43 +64,57 @@ const Platform = (): JSX.Element => {
             <span className="font-bold mt-[0px] text-[18px]">STBL</span>
           </span>
           <div className="flex justify-end">
-
             <Indicator
               title="🚀 Price"
-              value={stblPrice ? stblPrice.price : ''}
-              subValue={stblPrice ? <span
-                className={cn(
-                  "text-[16px]",
-                  stblPrice.priceChange >= 0
-                    ? "text-[#48C05C]"
-                    : "text-[#DE4343]"
-                )}
-              >
-                      {stblPrice.priceChange > 0 ? "+" : ""}
-                {stblPrice.priceChange}%
-                    </span> : ''}
+              value={stblPrice ? stblPrice.price : ""}
+              subValue={
+                stblPrice ? (
+                  <span
+                    className={cn(
+                      "text-[16px]",
+                      stblPrice.priceChange >= 0
+                        ? "text-[#48C05C]"
+                        : "text-[#DE4343]"
+                    )}
+                  >
+                    {stblPrice.priceChange > 0 ? "+" : ""}
+                    {stblPrice.priceChange}%
+                  </span>
+                ) : (
+                  ""
+                )
+              }
             />
 
             <Indicator
               title="FDV"
-              value={stblPrice ? formatNumber(+stblPrice.price * 100000000, "abbreviate") : ''}
-              subValue={stblPrice ? <span
-                className={cn(
-                  "text-[16px]",
-                  stblPrice.priceChange >= 0
-                    ? "text-[#48C05C]"
-                    : "text-[#DE4343]"
-                )}
-              >
-                      {stblPrice.priceChange > 0 ? "+" : ""}
-                {formatNumber(
-                  (stblPrice.priceChange * +stblPrice.price * 100000000) /
-                  100,
-                  "abbreviate"
-                )}
-                    </span> : ''}
+              value={
+                stblPrice
+                  ? formatNumber(+stblPrice.price * 100000000, "abbreviate")
+                  : ""
+              }
+              subValue={
+                stblPrice ? (
+                  <span
+                    className={cn(
+                      "text-[16px]",
+                      stblPrice.priceChange >= 0
+                        ? "text-[#48C05C]"
+                        : "text-[#DE4343]"
+                    )}
+                  >
+                    {stblPrice.priceChange > 0 ? "+" : ""}
+                    {formatNumber(
+                      (stblPrice.priceChange * +stblPrice.price * 100000000) /
+                        100,
+                      "abbreviate"
+                    )}
+                  </span>
+                ) : (
+                  ""
+                )
+              }
             />
-
           </div>
         </div>
 
@@ -103,13 +124,35 @@ const Platform = (): JSX.Element => {
           <div className="flex justify-end">
             <Indicator
               title="Total"
-              value={$apiData?.total.xSTBLStaked ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateNotUsd")}` : ' '}
-              subValue={$apiData?.total.xSTBLStaked ? formatNumber(+$apiData?.total.xSTBLStaked * +stblPrice?.price, "abbreviate") : ' '}
+              value={
+                $apiData?.total.xSTBLStaked
+                  ? `${formatNumber(+$apiData?.total.xSTBLStaked, "abbreviateNotUsd")}`
+                  : " "
+              }
+              subValue={
+                $apiData?.total.xSTBLStaked
+                  ? formatNumber(
+                      +$apiData?.total.xSTBLStaked * +stblPrice?.price,
+                      "abbreviate"
+                    )
+                  : " "
+              }
             />
             <Indicator
               title="Pending APR"
-              value={$apiData?.total.xSTBLPendingRevenue ? `${formatNumber($apiData?.total.xSTBLPendingAPR, "formatAPR")}%` : ' '}
-              subValue={$apiData?.total.xSTBLPendingRevenue ? formatNumber($apiData?.total.xSTBLPendingRevenue * +stblPrice?.price, "abbreviate") : ' '}
+              value={
+                $apiData?.total.xSTBLPendingRevenue
+                  ? `${formatNumber($apiData?.total.xSTBLPendingAPR, "formatAPR")}%`
+                  : " "
+              }
+              subValue={
+                $apiData?.total.xSTBLPendingRevenue
+                  ? formatNumber(
+                      $apiData?.total.xSTBLPendingRevenue * +stblPrice?.price,
+                      "abbreviate"
+                    )
+                  : " "
+              }
             />
           </div>
         </div>
@@ -121,25 +164,35 @@ const Platform = (): JSX.Element => {
         <div className="flex w-full flex-wrap lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="flex font-bold">🧑‍🌾 Yield aggregator</div>
           <div className="flex justify-end">
-
             <Indicator
               title="TVL"
-              value={$apiData?.total.tvl ? formatNumber($apiData.total.tvl, "abbreviate") : ' '}
-              subValue={$apiData?.total.activeVaults ? `${$apiData?.total.activeVaults} vaults` : ' '}
+              value={
+                $apiData?.total.tvl
+                  ? formatNumber($apiData.total.tvl, "abbreviate")
+                  : " "
+              }
+              subValue={
+                $apiData?.total.activeVaults
+                  ? `${$apiData?.total.activeVaults} vaults`
+                  : " "
+              }
             />
-
           </div>
         </div>
         <div className="flex w-full lg:w-1/2 items-center p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
           <div className="flex font-bold">🏦 Lending</div>
           <div className="flex justify-end">
-
             <Indicator
               title="TVL"
-              value={$apiData?.total.marketTvl ? formatNumber($apiData.total.marketTvl, "abbreviate") : ' '}
-              subValue={$apiData?.markets ? `${totalLendingMarkets} markets` : ' '}
+              value={
+                $apiData?.total.marketTvl
+                  ? formatNumber($apiData.total.marketTvl, "abbreviate")
+                  : " "
+              }
+              subValue={
+                $apiData?.markets ? `${totalLendingMarkets} markets` : " "
+              }
             />
-
           </div>
         </div>
       </div>
@@ -147,7 +200,11 @@ const Platform = (): JSX.Element => {
       <h2 className="text-[26px] font-bold">🤖 Agents</h2>
 
       <div className="flex gap-[24px] flex-wrap lg:flex-nowrap mb-5">
-        <a title="Go to Operator's page" href="/operator" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+        <a
+          title="Go to Operator's page"
+          href="/operator"
+          className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between"
+        >
           <div className="font-bold flex items-center">
             <img
               className="w-[32px] h-[32px] mr-[10px]"
@@ -157,10 +214,10 @@ const Platform = (): JSX.Element => {
             Stability Operator
           </div>
           <div className="flex w-full">
-
             <Indicator
               title="Status"
-              value={<span className="font-bold text-[18px]">
+              value={
+                <span className="font-bold text-[18px]">
                   <span
                     className="font-bold px-[10px]"
                     style={{
@@ -173,11 +230,11 @@ const Platform = (): JSX.Element => {
                   >
                     {$apiData?.network.status}
                   </span>
-                </span>}
+                </span>
+              }
               subValue={`${
-                Object.keys(
-                  $apiData?.network.healthCheckReview.alerts || []
-                ).length
+                Object.keys($apiData?.network.healthCheckReview.alerts || [])
+                  .length
               } alerts`}
             />
 
@@ -187,7 +244,7 @@ const Platform = (): JSX.Element => {
                 .filter((machingId) => {
                   const nodeState = $apiData?.network.nodes[
                     machingId
-                    ] as unknown as NodeState | undefined;
+                  ] as unknown as NodeState | undefined;
                   return !!(
                     nodeState?.lastSeen &&
                     new Date().getTime() / 1000 - nodeState.lastSeen < 180
@@ -196,10 +253,13 @@ const Platform = (): JSX.Element => {
                 .length.toString()}
               subValue={`${seeds.length} seeds`}
             />
-
           </div>
         </a>
-        <a title="Go to Builder's page" href="/builder" className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between">
+        <a
+          title="Go to Builder's page"
+          href="/builder"
+          className="cursor-pointer flex w-full flex-wrap lg:w-1/2 gap-[10px] items-start p-[20px] text-white bg-[#18191C] border border-[#232429] rounded-xl justify-between"
+        >
           <div className="font-bold flex items-center">
             <img
               className="w-[32px] h-[32px] mr-[10px]"
@@ -222,14 +282,13 @@ const Platform = (): JSX.Element => {
             <Indicator
               title="Pools"
               value={builderAgent.pools.length}
-              subValue={'🚧 tasks'}
+              subValue={"🚧 tasks"}
             />
             <Indicator
               title="Conveyors"
               value={builderAgent.conveyors.length}
-              subValue={'🚧 tasks'}
+              subValue={"🚧 tasks"}
             />
-
           </div>
         </a>
       </div>

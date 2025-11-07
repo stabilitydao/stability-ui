@@ -2,13 +2,18 @@ import { useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { ActionButton } from "@ui";
+import { ActionButton, Indicator } from "@ui";
 
 import { isAddress } from "viem";
 
 import { writeContract } from "@wagmi/core";
 
-import { getGasLimit, getTransactionReceipt } from "@utils";
+import {
+  getGasLimit,
+  getTransactionReceipt,
+  getShortAddress,
+  formatNumber,
+} from "@utils";
 
 import { useVestingData, useProposals, useUserData } from "./hooks";
 
@@ -127,56 +132,57 @@ const DAO = (): JSX.Element => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full">
+    <div className="flex flex-col gap-6 w-full pb-[100px]">
       <div>
         <h2 className="page-title__font text-start mb-2 md:mb-5">DAO</h2>
         <h3 className="text-[#97979a] page-description__font">
           Stability Decentralized Autonomous Organization.
         </h3>
       </div>
-      <div className="flex flex-col gap-5">
-        <span className="text-center">Your power</span>
-        <div className="flex flex-col gap-3">
-          <span>Own power: {userData.balance} STBL_DAO</span>
-          <span>Delegated to: {userData.delegatedTo}</span>
-          <span>Delegated to you: {userData.delegatedToYou} STBL_DAO</span>
+      <div className="flex flex-col gap-3">
+        <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col min-w-full gap-6">
+          <div className="flex flex-col gap-2 mb-2 md:mb-0">
+            <span className="text-[24px] leading-8 font-semibold">
+              Your power
+            </span>
+            <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
+              Own power: {userData.balance} STBL_DAO
+            </span>
+            <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
+              Delegated to:{" "}
+              {userData.delegatedTo === "Self"
+                ? userData.delegatedTo
+                : getShortAddress(userData.delegatedTo, 6, 4)}
+            </span>
+            <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
+              Delegated to you: {userData.delegatedToYou} STBL_DAO
+            </span>
+          </div>
+          <div className="flex flex-col justify-between gap-4">
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+              <div className="flex items-center justify-between">
+                <input
+                  type="text"
+                  placeholder="0x..."
+                  value={value}
+                  onChange={(e) => handleInputChange(e?.target?.value)}
+                  className="bg-transparent text-2xl font-medium outline-none w-full"
+                  disabled={!$connected}
+                />
+              </div>
+            </label>
 
-          <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col min-w-full">
-            {/* <div className="flex flex-col gap-2 mb-2 md:mb-0">
-        <span className="text-[24px] leading-8 font-semibold">
-          Instant Exit
-        </span>
-        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-          Instantly exit to STBL, incurring a 50% penalty. This process cannot
-          be reverted, all forfeited STBL is streamed back to stakers.
-        </span>
-      </div> */}
-            <div className="flex flex-col justify-between gap-4">
-              <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-                <div className="flex items-center justify-between">
-                  <input
-                    type="text"
-                    placeholder="0x..."
-                    value={value}
-                    onChange={(e) => handleInputChange(e?.target?.value)}
-                    className="bg-transparent text-2xl font-medium outline-none w-full"
-                    disabled={!$connected}
-                  />
-                </div>
-              </label>
-
-              <ActionButton
-                type={button}
-                transactionInProgress={transactionInProgress}
-                needConfirm={needConfirm}
-                actionFunction={delegate}
-              />
-            </div>
+            <ActionButton
+              type={button}
+              transactionInProgress={transactionInProgress}
+              needConfirm={needConfirm}
+              actionFunction={delegate}
+            />
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-5">
-        <span className="text-center">Governance</span>
+      <div className="flex flex-col gap-6">
+        <h2 className="text-center text-[26px] font-bold">Governance</h2>
         <div className="flex flex-col gap-3">
           <a
             className="bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold max-w-[130px]"
@@ -188,22 +194,25 @@ const DAO = (): JSX.Element => {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <span className="text-center">Allocators (Coolimg soon)</span>
-        <span>
+        <h2 className="text-center text-[26px] font-bold">
+          Allocators (Coolimg soon)
+        </h2>
+        <span className="text-[#97979a] text-[14px] leading-5">
           Inter-chain power distribution for MetaVaults allocations voting.
           Under construction.
         </span>
       </div>
       <div className="flex flex-col gap-2">
-        <span className="text-center">Foundation</span>
-        <div className="flex flex-col gap-3">
-          <span>Total: 30M STBL</span>
-          {isClaimableLoading ? (
-            <span>Loading...</span>
-          ) : (
-            <span>Claimable: {claimable} STBL</span>
-          )}
-          <span>Invested: 0 STBL</span>
+        <h2 className="text-center text-[26px] font-bold">Foundation</h2>
+        <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between min-w-full gap-3">
+          <Indicator title="Total" value="30M STBL" />
+
+          <Indicator
+            title="Claimable"
+            value={`${formatNumber(claimable, "format")} STBL`}
+          />
+
+          <Indicator title="Invested" value="0 STBL" />
         </div>
       </div>
     </div>

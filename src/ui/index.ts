@@ -25,6 +25,7 @@ import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
 import { ProgressCircle } from "./ProgressCircle";
 import { FormError } from "./FormError";
+import { Indicator } from "./Indicator";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -133,4 +134,5 @@ export {
   EmptyTable,
   LoadTable,
   FormError,
+  Indicator,
 };
