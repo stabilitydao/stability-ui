@@ -93,7 +93,7 @@ export const useUserData = (network: string): TResult => {
 
   useEffect(() => {
     fetchUserData();
-  }, []);
+  }, [$account, $connected]);
 
   return { data, isLoading, refetch: fetchUserData };
 };
