@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 import { formatUnits } from "viem";
 
@@ -18,7 +18,7 @@ export const useVestingData = (network: string): TResult => {
 
   const client = web3clients[network as keyof typeof web3clients];
 
-  const fetchVestingData = useCallback(async () => {
+  const fetchVestingData = async () => {
     setIsLoading(true);
 
     try {
@@ -38,11 +38,11 @@ export const useVestingData = (network: string): TResult => {
     } finally {
       setIsLoading(false);
     }
-  }, [client]);
+  };
 
   useEffect(() => {
     fetchVestingData();
-  }, []);
+  }, [client]);
 
   return { data, isLoading, refetch: fetchVestingData };
 };

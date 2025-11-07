@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 import axios from "axios";
 
@@ -31,7 +31,7 @@ export const useProposals = (): TResult => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchProposals = useCallback(async () => {
+  const fetchProposals = async () => {
     setIsLoading(true);
 
     const query = `
@@ -69,7 +69,7 @@ export const useProposals = (): TResult => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchProposals();
