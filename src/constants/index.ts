@@ -290,6 +290,8 @@ const VAULTS_WITH_NAME = {
   "0x058779961ae874d29f9cecfd29df7456164a0f64": "Mainstreet",
   "0xbe73b6d42fd26bcd0ce3c02585d4a5fe9fea2fd4": "smsUSD, 138",
   "0xb1e87223f5b080f687b298df4fc8acabd3d1797b": "PT-smsUSD (30 Oct), 141",
+  "0xff8bd2d55304bfb3a685374a5c20ecdb2a67cab3": "wmetaUSD",
+  "0xde4b29e64e5e5ec5290df2888df5b4565836085f": "STBL",
 };
 
 const META_VAULTS_EXCEPTIONS = [
@@ -306,6 +308,7 @@ const PATHS = [
   // { name: "ALM", path: "alm" },
   { name: "Leaderboards", path: "leaderboards" },
   { name: "xSTBL", path: "xstbl" },
+  // { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },
 ];
 
@@ -317,6 +320,7 @@ const ROUTES = {
     "alm",
     "agents",
     "lending",
+    "dao",
   ],
   platform: [
     "platform",
@@ -333,15 +337,10 @@ const ROUTES = {
 
 const LENDING_MARKETS = {
   "0x1111111199558661bf7ff27b4f1623dc6b91aa3e": [
-    // {
-    //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
-    //   symbol: "Stability wmetaUSD",
-    //   link: "https://stability.market/?market=wmetaUSD",
-    // },
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
       symbol: "Stability wmetaUSD",
-      link: "https://stability.market/?market=wmetaUSD2",
+      link: "https://stability.farm/lending/146/wmetaUSD-gen2",
     },
     // {
     //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,
@@ -408,6 +407,11 @@ const SOCIALS = [
     name: "Stability Telegram",
     logo: "/socials/telegram.png",
     link: "https://t.me/stabilitydao",
+  },
+  {
+    name: "Stability GitBook",
+    logo: "/socials/gitbook.svg",
+    link: "https://stabilitydao.gitbook.io/stability",
   },
 ];
 

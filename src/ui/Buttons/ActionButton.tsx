@@ -46,6 +46,7 @@ const ActionButton: React.FC<IProps> = ({
     "Supply",
     "Borrow",
     "Repay",
+    "Delegate",
   ];
 
   if (!$connected) {
@@ -70,6 +71,10 @@ const ActionButton: React.FC<IProps> = ({
 
   if (type === "disabledCancelVest") {
     return <BaseButton text="Cancel Vest" />;
+  }
+
+  if (type === "enterAddress") {
+    return <BaseButton text="Enter Address" />;
   }
 
   if (actionTypes.includes(type) || type.includes("Claim")) {

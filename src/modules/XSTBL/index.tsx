@@ -20,7 +20,7 @@ const XSTBL = (): JSX.Element => {
     <WagmiLayout>
       <div className="min-w-full lg:min-w-[1000px] xl:min-w-[1200px] max-w-[1400px] font-manrope flex flex-col gap-5 pb-5 lg:pb-20">
         <div>
-          <h2 className="page-title__font text-start mb-2 md:mb-5">Staking</h2>
+          <h2 className="page-title__font text-start mb-2 md:mb-5">xSTBL</h2>
           <h3 className="text-[#97979a] page-description__font">
             Convert STBL to xSTBL and lock for 6 months to earn Stability
             revenue.

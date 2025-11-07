@@ -9,6 +9,7 @@ import {
   PlatformIcon,
   LeaderboardsIcon,
   LendingIcon,
+  DAOIcon,
 } from "./Icons";
 
 interface IProps {
@@ -39,6 +40,8 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <PlatformIcon color={color} />;
     case "lending":
       return <LendingIcon color={color} />;
+    case "dao":
+      return <DAOIcon color={color} />;
     default:
       return null;
   }

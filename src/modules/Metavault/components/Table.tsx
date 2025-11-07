@@ -9,7 +9,6 @@ import {
   MetaVaultTableTypes,
   TTableColumn,
   TVault,
-  TAPRModal,
   IProtocolModal,
   MetaVaultDisplayTypes,
 } from "@types";
@@ -24,7 +23,6 @@ type TProps = {
   allVaults: TVault[];
   vaults: TVault[];
   protocols: IProtocol[];
-  setAPRModal: React.Dispatch<React.SetStateAction<TAPRModal>>;
   setProtocolModal: React.Dispatch<React.SetStateAction<IProtocolModal>>;
 };
 
@@ -38,7 +36,6 @@ const Table: React.FC<TProps> = ({
   allVaults,
   vaults,
   protocols,
-  setAPRModal,
   setProtocolModal,
 }) => {
   const isProDisplay = displayType === MetaVaultDisplayTypes.Pro;
@@ -118,7 +115,6 @@ const Table: React.FC<TProps> = ({
               tableType={tableType}
               vaults={vaults}
               protocols={protocols}
-              setAPRModalState={setAPRModal}
               setProtocolModalState={setProtocolModal}
             />
           ) : (

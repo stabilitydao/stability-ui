@@ -99,7 +99,7 @@ const Menu = (): JSX.Element => {
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 max-h-[48vh] overflow-y-auto">
                 {PATHS.map(({ name, path }) => (
                   <div
                     key={name}
@@ -109,7 +109,7 @@ const Menu = (): JSX.Element => {
                     )}
                   >
                     <a
-                      className="p-4 flex items-center justify-between"
+                      className="px-4 py-3 flex items-center justify-between"
                       href={`/${path}`}
                     >
                       <span

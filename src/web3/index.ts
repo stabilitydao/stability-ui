@@ -25,6 +25,8 @@ import SwapperABI from "./abi/SwapperABI.ts";
 import IMetaVaultFactoryABI from "./abi/IMetaVaultFactoryABI.js";
 import AavePoolABI from "./abi/AavePoolABI.ts";
 import AaveProtocolDataProviderABI from "./abi/AaveProtocolDataProviderABI.ts";
+import StabilityDAOABI from "./abi/StabilityDAOABI.ts";
+import VestingABI from "./abi/VestingABI.ts";
 
 import type { TAddress } from "@types";
 
@@ -156,4 +158,6 @@ export {
   IMetaVaultFactoryABI,
   AavePoolABI,
   AaveProtocolDataProviderABI,
+  StabilityDAOABI,
+  VestingABI,
 };
