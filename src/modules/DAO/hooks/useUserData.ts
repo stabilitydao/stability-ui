@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
@@ -38,7 +38,7 @@ export const useUserData = (network: string): TResult => {
   const $connected = useStore(connected);
   const $account = useStore(account);
 
-  const fetchUserData = useCallback(async () => {
+  const fetchUserData = async () => {
     if (!$account) return;
 
     setIsLoading(true);
@@ -89,7 +89,7 @@ export const useUserData = (network: string): TResult => {
     } finally {
       setIsLoading(false);
     }
-  }, [$account, $connected]);
+  };
 
   useEffect(() => {
     fetchUserData();
