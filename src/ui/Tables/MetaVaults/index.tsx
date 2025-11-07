@@ -9,7 +9,6 @@ import { strategies } from "@stabilitydao/stability";
 
 import {
   TVault,
-  TAPRModal,
   MetaVaultTableTypes,
   IProtocol,
   VaultTypes,
@@ -22,7 +21,6 @@ interface IProps {
   tableType: MetaVaultTableTypes;
   vaults: TVault[];
   protocols: IProtocol[];
-  setAPRModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
   setProtocolModalState: React.Dispatch<React.SetStateAction<IProtocolModal>>;
 }
 
@@ -31,7 +29,6 @@ const MetaVaultsTable: React.FC<IProps> = ({
   tableType,
   vaults,
   protocols,
-  setAPRModalState,
   setProtocolModalState,
 }) => {
   const [activeSection, setActiveSection] = useState({});
@@ -167,7 +164,6 @@ const MetaVaultsTable: React.FC<IProps> = ({
                   APRs={getVaultAPRs(vaultData)}
                   vault={vaultData}
                   activeVault={activeSection}
-                  setModalState={setAPRModalState}
                   inserted={inserted}
                 />
               );

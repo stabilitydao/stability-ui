@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import Tippy from "@tippyjs/react";
+
 import {
   ArrowIcon,
   TimeDifferenceIndicator,
@@ -7,7 +9,7 @@ import {
   ArrowRightIcon,
 } from "@ui";
 
-import { cn, formatNumber } from "@utils";
+import { cn, formatNumber, useWindowWidth } from "@utils";
 
 import {
   VAULTS_WITH_NAME,
@@ -15,7 +17,10 @@ import {
   META_VAULTS_EXCEPTIONS,
 } from "@constants";
 
-import { TVault, TAPRModal, VaultTypes } from "@types";
+import { TVault, VaultTypes } from "@types";
+
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/shift-away.css";
 
 interface IProps {
   isProDisplay: boolean;
@@ -29,7 +34,6 @@ interface IProps {
   };
   vault: TVault;
   activeVault: any;
-  setModalState: React.Dispatch<React.SetStateAction<TAPRModal>>;
   inserted?: boolean;
 }
 
@@ -38,9 +42,10 @@ const Vault: React.FC<IProps> = ({
   APRs,
   vault,
   activeVault,
-  setModalState,
   inserted = false,
 }) => {
+  const windowWidth = useWindowWidth();
+
   const [expandedData, setExpandedData] = useState(false);
 
   const isSTBLVault =
@@ -171,118 +176,117 @@ const Vault: React.FC<IProps> = ({
           )}
         </div>
         <div
-          onClick={(e) => {
-            if (window.innerWidth <= 860 && vault.type === VaultTypes.Vault) {
-              e.stopPropagation();
-              setModalState({
-                earningData: vault.earningData,
-                daily: vault.daily,
-                lastHardWork: vault.lastHardWork,
-                symbol: vault?.risk?.symbol as string,
-                state: true,
-                pool: vault?.pool,
-              });
-            }
-          }}
           className={cn(
             "px-4 w-[15%]",
-            vault.type === VaultTypes.Vault && "tooltip cursor-help",
+            vault.type === VaultTypes.Vault && "cursor-help",
             isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
           )}
+          onClick={(e) => {
+            if (vault.type === VaultTypes.Vault && windowWidth <= 767) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
         >
-          <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
-            <div className="flex flex-col justify-end">
-              <p className="text-[16px]">
-                {formatNumber(APRs.APR, "formatAPR")}%
-              </p>
-              {!!vault?.liveAPR && (
-                <p className="text-[14px] text-[#97979A]">
-                  live. {vault?.liveAPR?.toFixed(2)}%
-                </p>
-              )}
-            </div>
-          </div>
-          <div
-            className={cn(
-              vault.type === VaultTypes.Vault ? "visible__tooltip" : "hidden"
-            )}
-          >
-            <div className="flex items-start flex-col gap-2">
-              <div className="flex flex-col gap-1 w-full">
-                {!!vault?.risk?.isRektStrategy && (
-                  <div className="flex flex-col items-center gap-2 mb-[10px]">
-                    <h3 className="text-[#f52a11] font-bold">
-                      {vault?.risk?.symbol} VAULT
-                    </h3>
-                    <p className="text-[12px] text-start">
-                      Rekt vault regularly incurs losses, potentially leading to
-                      rapid USD value decline, with returns insufficient to
-                      offset the losses.
-                    </p>
-                  </div>
-                )}
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    Total APY
-                  </p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(APRs?.APY ?? 0, "formatAPR")}%
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    Total APR
-                  </p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(APRs.APR, "formatAPR")}%
-                  </p>
-                </div>
-
-                {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
-                  vault?.pool && (
-                    <div className="flex items-center justify-between">
-                      <p className="leading-5 text-[#97979A] font-medium">
-                        Pool swap fees APR
-                      </p>
-                      <p className="text-end font-semibold">
-                        {formatNumber(APRs?.swapFees ?? 0, "formatAPR")}%
+          <Tippy
+            disabled={vault.type !== VaultTypes.Vault}
+            content={
+              <div className="flex items-start flex-col gap-2">
+                <div className="flex flex-col gap-1 w-full">
+                  {!!vault?.risk?.isRektStrategy && (
+                    <div className="flex flex-col items-center gap-2 mb-[10px]">
+                      <h3 className="text-[#f52a11] font-bold">
+                        {vault?.risk?.symbol} VAULT
+                      </h3>
+                      <p className="text-[12px] text-start">
+                        Rekt vault regularly incurs losses, potentially leading
+                        to rapid USD value decline, with returns insufficient to
+                        offset the losses.
                       </p>
                     </div>
                   )}
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">
-                    Strategy APR
-                  </p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(APRs?.strategyAPR ?? 0, "formatAPR")}%
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="leading-5 text-[#97979A] font-medium">Daily</p>
-                  <p className="text-end font-semibold">
-                    {formatNumber(APRs?.dailyAPR ?? 0, "formatAPR")}%
-                  </p>
-                </div>
-                {!isSTBLVault && (
                   <div className="flex items-center justify-between">
                     <p className="leading-5 text-[#97979A] font-medium">
-                      Gems APR
+                      Total APY
                     </p>
                     <p className="text-end font-semibold">
-                      {formatNumber(APRs?.gemsAPR ?? 0, "formatAPR")}%
+                      {formatNumber(APRs?.APY ?? 0, "formatAPR")}%
                     </p>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <p className="leading-5 text-[#97979A] font-medium">
+                      Total APR
+                    </p>
+                    <p className="text-end font-semibold">
+                      {formatNumber(APRs.APR, "formatAPR")}%
+                    </p>
+                  </div>
+
+                  {vault?.earningData?.poolSwapFeesAPR.daily != "-" &&
+                    vault?.pool && (
+                      <div className="flex items-center justify-between">
+                        <p className="leading-5 text-[#97979A] font-medium">
+                          Pool swap fees APR
+                        </p>
+                        <p className="text-end font-semibold">
+                          {formatNumber(APRs?.swapFees ?? 0, "formatAPR")}%
+                        </p>
+                      </div>
+                    )}
+                  <div className="flex items-center justify-between">
+                    <p className="leading-5 text-[#97979A] font-medium">
+                      Strategy APR
+                    </p>
+                    <p className="text-end font-semibold">
+                      {formatNumber(APRs?.strategyAPR ?? 0, "formatAPR")}%
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="leading-5 text-[#97979A] font-medium">
+                      Daily
+                    </p>
+                    <p className="text-end font-semibold">
+                      {formatNumber(APRs?.dailyAPR ?? 0, "formatAPR")}%
+                    </p>
+                  </div>
+                  {!isSTBLVault && (
+                    <div className="flex items-center justify-between">
+                      <p className="leading-5 text-[#97979A] font-medium">
+                        Gems APR
+                      </p>
+                      <p className="text-end font-semibold">
+                        {formatNumber(APRs?.gemsAPR ?? 0, "formatAPR")}%
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between w-full gap-2">
+                  <p className="leading-5 text-[#97979A] font-medium">
+                    Last Hard Work
+                  </p>
+                  <TimeDifferenceIndicator unix={vault.lastHardWork} />
+                </div>
+              </div>
+            }
+            placement="top"
+            animation="shift-away"
+            interactive={true}
+            delay={[100, 50]}
+            theme="custom"
+          >
+            <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
+              <div className="flex flex-col justify-end">
+                <p className="text-[16px]">
+                  {formatNumber(APRs.APR, "formatAPR")}%
+                </p>
+                {!!vault?.liveAPR && (
+                  <p className="text-[14px] text-[#97979A]">
+                    live. {vault?.liveAPR?.toFixed(2)}%
+                  </p>
                 )}
               </div>
-              <div className="flex items-center justify-between w-full">
-                <p className="leading-5 text-[#97979A] font-medium">
-                  Last Hard Work
-                </p>
-                <TimeDifferenceIndicator unix={vault.lastHardWork} />
-              </div>
             </div>
-            <i></i>
-          </div>
+          </Tippy>
         </div>
         <div
           className={cn(

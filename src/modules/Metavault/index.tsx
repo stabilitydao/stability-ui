@@ -36,7 +36,6 @@ import {
   TAddress,
   TTableColumn,
   TVault,
-  TEarningData,
   TMetaVault,
   MetaVaultTableTypes,
   VaultTypes,
@@ -71,15 +70,6 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
   const [tableType, setTableType] = useState(MetaVaultTableTypes.Destinations);
   const [displayType, setDisplayType] = useState(display);
   const [activeSection, setActiveSection] = useState(section);
-
-  const [aprModal, setAprModal] = useState({
-    earningData: {} as TEarningData,
-    daily: 0,
-    lastHardWork: "0",
-    symbol: "",
-    state: false,
-    pool: {},
-  });
 
   const [protocolModal, setProtocolModal] = useState<IProtocolModal>({
     name: "",
@@ -329,7 +319,6 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
   useEffect(() => {
     if ($isVaultsLoaded) {
       initMetavault();
-      console.log(aprModal);
     }
   }, [$vaults, $metaVaults, $isVaultsLoaded]);
 
@@ -489,7 +478,6 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
               allVaults={localVaults}
               vaults={filteredVaults}
               protocols={filteredProtocols}
-              setAPRModal={setAprModal}
               setProtocolModal={setProtocolModal}
             />
 
@@ -536,7 +524,6 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
               allVaults={localVaults}
               vaults={filteredVaults}
               protocols={filteredProtocols}
-              setAPRModal={setAprModal}
               setProtocolModal={setProtocolModal}
             />
           ) : (

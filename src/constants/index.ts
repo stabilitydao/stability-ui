@@ -308,7 +308,7 @@ const PATHS = [
   // { name: "ALM", path: "alm" },
   { name: "Leaderboards", path: "leaderboards" },
   { name: "xSTBL", path: "xstbl" },
-  { name: "DAO", path: "dao" },
+  // { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },
 ];
 
