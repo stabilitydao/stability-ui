@@ -51,6 +51,7 @@ import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
 import { FarmingTable } from "./Tables/Farming";
 import { MarketsTable } from "./Tables/Markets";
+import { ProposalsTable } from "./Tables/Proposals";
 
 import { TextModal } from "./Modals/TextModal";
 import { APRModal } from "./Modals/APRModal";
@@ -135,4 +136,5 @@ export {
   LoadTable,
   FormError,
   Indicator,
+  ProposalsTable,
 };

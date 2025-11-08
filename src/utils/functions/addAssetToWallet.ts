@@ -43,7 +43,7 @@ export const addAssetToWallet = async (
       decimals: decimals,
       symbol: symbol,
     };
-
+    console.log(client);
     if (image) {
       options.image = image;
     }
