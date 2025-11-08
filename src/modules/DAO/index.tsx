@@ -215,6 +215,36 @@ const DAO = (): JSX.Element => {
           <Indicator title="Invested" value="0 STBL" />
         </div>
       </div>
+      <div className="flex flex-col gap-6">
+        <h2 className="text-center text-[26px] font-bold">DAO parameters</h2>
+        <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex flex-col min-w-full gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+              xSTBL instant exit fee
+            </span>
+            <span className="font-semibold">50%</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+              Minimal power
+            </span>
+            <span className="font-semibold">4,000</span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+              Proposal threshold
+            </span>
+            <span className="font-semibold">100,000</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+              Inter-chain power allocation delay
+            </span>
+            <span className="font-semibold">1 day</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

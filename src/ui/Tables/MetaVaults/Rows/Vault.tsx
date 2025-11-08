@@ -177,7 +177,7 @@ const Vault: React.FC<IProps> = ({
         </div>
         <div
           className={cn(
-            "px-4 w-[15%]",
+            "h-full text-center px-4 w-[15%]",
             vault.type === VaultTypes.Vault && "cursor-help",
             isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
           )}
@@ -274,9 +274,9 @@ const Vault: React.FC<IProps> = ({
             delay={[100, 50]}
             theme="custom"
           >
-            <div className="whitespace-nowrap w-full text-end flex items-center justify-end text-[#48c05c]">
-              <div className="flex flex-col justify-end">
-                <p className="text-[16px]">
+            <div className="h-full whitespace-nowrap w-full text-end flex items-center justify-end gap-1 text-[#48c05c]">
+              <div className="flex flex-col items-center justify-end">
+                <p className="text-[16px] text-center">
                   {formatNumber(APRs.APR, "formatAPR")}%
                 </p>
                 {!!vault?.liveAPR && (
@@ -285,13 +285,21 @@ const Vault: React.FC<IProps> = ({
                   </p>
                 )}
               </div>
+              {vault.type === VaultTypes.Vault && (
+                <img
+                  src="/icons/circle_question.png"
+                  alt="Question icon"
+                  className="w-3 h-3"
+                />
+              )}
             </div>
           </Tippy>
         </div>
         <div
           className={cn(
             "px-4 text-right text-[14px] w-[15%]",
-            isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block"
+            isProDisplay ? "w-[100px] md:w-[15%]" : "hidden md:block",
+            Number(vault?.proportions?.allocation) < 1 && "text-[#7C7E81]"
           )}
         >
           {Number(vault?.proportions?.allocation) ? (
@@ -308,7 +316,10 @@ const Vault: React.FC<IProps> = ({
         <div
           className={cn(
             "px-4 text-right text-[14px] w-[30%]",
-            isProDisplay ? "w-[200px] md:w-[30%]" : "hidden md:block"
+            isProDisplay ? "w-[200px] md:w-[30%]" : "hidden md:block",
+            Number(vault?.proportions?.current) < 0.1 &&
+              Number(vault?.proportions?.target) < 0.1 &&
+              "text-[#7C7E81]"
           )}
         >
           {vault?.proportions?.current || vault?.proportions?.target ? (
