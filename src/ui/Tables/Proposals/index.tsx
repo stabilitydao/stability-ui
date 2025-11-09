@@ -1,10 +1,10 @@
 import { EmptyTable } from "../EmptyTable";
 import { Row } from "./Row";
 
-import { DisplayTypes } from "@types";
+import { DisplayTypes, TProposal } from "@types";
 
 interface IProps {
-  proposals: any;
+  proposals: TProposal[];
 }
 
 const ProposalsTable: React.FC<IProps> = ({ proposals }) => {
@@ -19,9 +19,15 @@ const ProposalsTable: React.FC<IProps> = ({ proposals }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {proposals.map((proposal: any, index: number) => {
-        return <Row key={`row/${proposals.id + index}`} proposal={proposal} />;
+    <div className="flex flex-col">
+      {proposals.map((proposal: TProposal, index: number) => {
+        return (
+          <Row
+            key={`row/${proposal.id + index}`}
+            proposal={proposal}
+            isLast={proposals.length === index + 1}
+          />
+        );
       })}
     </div>
   );

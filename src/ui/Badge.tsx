@@ -28,7 +28,7 @@ const Badge: React.FC<IProps> = ({ state, text, greater = false }) => {
 
   return (
     <div
-      className={`flex items-center justify-center rounded-[4px] ${greater ? "max-w-[100px]" : "max-w-[60px]"} ${buttonStyle}`}
+      className={`flex items-center justify-center rounded-[4px] ${greater ? "max-w-[120px]" : "max-w-[60px]"} ${buttonStyle}`}
     >
       <p
         className={`font-manrope font-semibold px-2 ${greater ? "text-[12px] leading-[17px] py-1" : "text-[10px] leading-[10px] py-[2px]"} ${textStyle}`}

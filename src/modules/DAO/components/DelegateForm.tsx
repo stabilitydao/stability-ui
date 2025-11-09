@@ -18,13 +18,13 @@ import { useWalletClient } from "wagmi";
 
 import { writeContract } from "@wagmi/core";
 
-import { useUserData } from "../../hooks";
+import { useUserData } from "../hooks";
 
 import { connected, account, lastTx, publicClient } from "@store";
 
 import { StabilityDAOABI, wagmiConfig } from "@web3";
 
-import { STBL_DAO } from "../../constants";
+import { STBL_DAO } from "../constants";
 
 import type { TAddress } from "@types";
 
@@ -135,7 +135,7 @@ const DelegateForm = () => {
     setTransactionInProgress(false);
   };
   return (
-    <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between flex-col min-w-full gap-6">
+    <div className="bg-[#101012] border border-[#23252A] p-4 md:p-6 rounded-lg flex justify-between flex-col min-w-full gap-6">
       <div className="flex flex-col gap-2 mb-2 md:mb-0">
         <span className="text-[24px] leading-8 font-semibold">Your power</span>
         <div className="flex items-center gap-2">

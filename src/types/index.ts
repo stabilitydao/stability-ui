@@ -831,6 +831,20 @@ type TUserPoolData = {
   healthFactor: number;
 };
 
+type TVote = {
+  choice: string;
+  percent: string;
+  count: number;
+};
+
+type TProposal = {
+  id: string;
+  title: string;
+  state: string;
+  choices: string[];
+  votes: TVote[];
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -983,4 +997,6 @@ export type {
   TUserPoolData,
   TUserReserve,
   TUserReservesMap,
+  TProposal,
+  TVote,
 };

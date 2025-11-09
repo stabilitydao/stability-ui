@@ -2,23 +2,11 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import { countVotes } from "../functions";
+
 import { SPACE_ID, SNAPSHOT_API } from "../constants";
 
-type TProposal = {
-  id: string;
-  title: string;
-  body: string;
-  choices: string[];
-  start: number;
-  end: number;
-  snapshot: string;
-  state: string;
-  author: string;
-  space: {
-    id: string;
-    name: string;
-  };
-};
+import { TProposal } from "@types";
 
 type TResult = {
   data: TProposal[] | undefined;
@@ -28,16 +16,15 @@ type TResult = {
 
 export const useProposals = (): TResult => {
   const [data, setData] = useState<TProposal[]>();
-
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProposals = async () => {
     setIsLoading(true);
 
-    const query = `
+    const proposalsQuery = `
       query Proposals {
         proposals(
-          first: 20,
+          first: 10,
           skip: 0,
           where: { space_in: ["${SPACE_ID}"] }
           orderBy: "created"
@@ -45,25 +32,53 @@ export const useProposals = (): TResult => {
         ) {
           id
           title
-          body
           choices
-          start
-          end
-          snapshot
           state
-          author
-          space {
-            id
-            name
-          }
         }
       }
     `;
 
     try {
-      const { data } = await axios.post(SNAPSHOT_API, { query });
+      const { data } = await axios.post(SNAPSHOT_API, {
+        query: proposalsQuery,
+      });
 
-      setData(data?.data?.proposals ?? []);
+      const proposals: TProposal[] = data?.data?.proposals ?? [];
+
+      const proposalsWithVotes = await Promise.all(
+        proposals.map(async (proposal) => {
+          const votesQuery = `
+            query Votes {
+              votes(
+                first: 100
+                where: { proposal: "${proposal.id}" }
+              ) {
+                id
+                voter
+                choice
+              }
+            }
+          `;
+
+          try {
+            const { data } = await axios.post(SNAPSHOT_API, {
+              query: votesQuery,
+            });
+
+            const votes = countVotes({
+              ...proposal,
+              votes: data?.data?.votes ?? [],
+            });
+
+            return { ...proposal, votes };
+          } catch (err) {
+            console.error(`Error fetching votes for ${proposal.id}:`, err);
+            return { ...proposal, votes: [] };
+          }
+        })
+      );
+
+      setData(proposalsWithVotes);
     } catch (error) {
       console.error("Error fetching proposals:", error);
     } finally {

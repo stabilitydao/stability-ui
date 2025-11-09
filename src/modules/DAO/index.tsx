@@ -2,41 +2,34 @@ import WagmiLayout from "@layouts/WagmiLayout";
 
 import { Indicator } from "@ui";
 
+import { Table, DelegateForm } from "./components";
+
 import { formatNumber } from "@utils";
 
-import { useVestingData, useProposals } from "./hooks";
-
-import { DelegateForm } from "./components/Forms/DelegateForm";
+import { useVestingData } from "./hooks";
 
 const DAO = (): JSX.Element => {
-  const { data: proposals, isLoading: isProposalsLoading } = useProposals();
   const { data: claimable, isLoading: isClaimableLoading } =
     useVestingData("146");
 
   return (
     <WagmiLayout>
-      <div className="flex flex-col gap-6 min-w-full pb-[100px]">
+      <div className="flex flex-col gap-6 min-w-full pb-[100px] lg:min-w-[960px] xl:min-w-[1200px]">
         <div>
           <h2 className="page-title__font text-start mb-2 md:mb-5">DAO</h2>
           <h3 className="text-[#97979a] page-description__font">
             Stability Decentralized Autonomous Organization.
           </h3>
         </div>
-        <div className="flex items-start gap-3 mb-[26px]">
-          {/* */}
+        <div className="flex items-start flex-col lg:flex-row gap-3 mb-[26px]">
+          <div className="w-full lg:w-2/3">
+            <Table />
+          </div>
+          <div className="w-full lg:w-1/3">
+            <DelegateForm />
+          </div>
+        </div>
 
-          <DelegateForm />
-        </div>
-        <div className="flex flex-col gap-2 mb-[26px]">
-          <h2 className="text-center text-[26px] font-bold">Gouvernance</h2>
-          <a
-            className="bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold max-w-[130px]"
-            href="https://snapshot.box/#/s:stabilitydao.eth"
-            target="_blank"
-          >
-            <p className="px-6 py-4">Snapshot</p>
-          </a>
-        </div>
         <div className="flex flex-col gap-2 mb-[26px]">
           <h2 className="text-center text-[26px] font-bold">
             Allocators (Coolimg soon)
