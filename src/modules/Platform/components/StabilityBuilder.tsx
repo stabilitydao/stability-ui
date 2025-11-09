@@ -7,15 +7,16 @@ import axios from "axios";
 
 const StabilityBuilder  = (): JSX.Element => {
   const agent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
-  //const [builderMemory, setBuilderMemory] = useState<IBuilderMemory>();
+  const [builderMemory, setBuilderMemory] = useState<IBuilderMemory>();
 
   const loadBuilderMemory = async () => {
     try {
       const response = await axios.get(`https://builder.stability.farm/api/builder-memory`);
 
-      if (response) {
+      if (response.data) {
 
-        console.log(response);
+        console.log(response.data);
+        setBuilderMemory(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -55,7 +56,10 @@ const StabilityBuilder  = (): JSX.Element => {
           <div className="flex p-[20px] font-bold rounded-t-xl  bg-[#202027]">Repositories</div>
           <div className="flex p-[20px] flex-col">
             {agent.repo.map((value: string) => (
-              <a title="Go to repo" target="_blank" href={`https://github.com/${value}`} className="flex text-[14px]">{value}</a>
+              <div className="flex items-center text-[14px] justify-between">
+                <a title="Go to repo" target="_blank" href={`https://github.com/${value}`} className="flex">{value.replace("stabilitydao/", "")}</a>
+                <a title="Go to issues" target="_blank" href={`https://github.com/${value}/issues`}>{builderMemory?.openIssues.total[value]}</a>
+              </div>
             ))}
           </div>
         </div>
