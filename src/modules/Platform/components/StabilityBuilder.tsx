@@ -1,10 +1,30 @@
 import {formatNumber} from "@utils";
 import {IBuilderAgent} from "@stabilitydao/stability";
 import {AgentId, getAgent} from "@stabilitydao/stability";
-import {IConveyor, IPool} from "@stabilitydao/stability/out/builder";
+import {IBuilderMemory, IConveyor, IPool} from "@stabilitydao/stability/out/builder";
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 const StabilityBuilder  = (): JSX.Element => {
   const agent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
+  //const [builderMemory, setBuilderMemory] = useState<IBuilderMemory>();
+
+  const loadBuilderMemory = async () => {
+    try {
+      const response = await axios.get(`https://builder.stability.farm/api/builder-memory`);
+
+      if (response) {
+
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    loadBuilderMemory();
+  }, []);
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
