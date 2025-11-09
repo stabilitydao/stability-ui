@@ -1,7 +1,7 @@
 interface IProps {
   title: string;
-  value: string|React.ReactNode;
-  subValue: string|React.ReactNode;
+  value: string | React.ReactNode;
+  subValue?: string | React.ReactNode;
 }
 
 const Indicator: React.FC<IProps> = ({ title, value, subValue }) => {
@@ -11,11 +11,11 @@ const Indicator: React.FC<IProps> = ({ title, value, subValue }) => {
         {title}
       </span>
       <div className="font-semibold leading-6 flex items-start gap-0 flex-col">
-        <span className="font-bold text-[18px]">{value ? value : ' '}</span>
-        <span className="text-[16px]">{subValue ?? subValue}</span>
+        <span className="font-bold text-[18px]">{value ?? ""}</span>
+        <span className="text-[16px]">{subValue ?? ""}</span>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export {Indicator}
+export { Indicator };

@@ -34,30 +34,32 @@ const LendingMarkets: React.FC<IProps> = memo(({ metavault }) => {
         </div>
       </div>
       {expandedData &&
-        LENDING_MARKETS[key].map(({ logo, symbol, link }, index: number) => (
-          <a
-            key={link + index}
-            className={cn(
-              "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012] cursor-pointer",
-              LENDING_MARKETS[key].length - 1 === index && "rounded-b-lg"
-            )}
-            href={link}
-            target="_blank"
-          >
-            <div className="px-4 w-full flex items-center gap-2">
-              <img
-                className="w-8 h-8 rounded-full"
-                src={logo}
-                alt="logo"
-                title={symbol}
-              />
+        LENDING_MARKETS[key].map(
+          ({ logo, symbol, link, isBlank }, index: number) => (
+            <a
+              key={link + index}
+              className={cn(
+                "flex h-[64px] items-center text-[16px] border-b border-x border-[#23252A] font-semibold bg-[#101012] cursor-pointer",
+                LENDING_MARKETS[key].length - 1 === index && "rounded-b-lg"
+              )}
+              href={link}
+              target={isBlank ? "_blank" : "_self"}
+            >
+              <div className="px-4 w-full flex items-center gap-2">
+                <img
+                  className="w-8 h-8 rounded-full"
+                  src={logo}
+                  alt="logo"
+                  title={symbol}
+                />
 
-              <span className="text-[14px] leading-5 font-semibold whitespace-nowrap">
-                {symbol}
-              </span>
-            </div>
-          </a>
-        ))}
+                <span className="text-[14px] leading-5 font-semibold whitespace-nowrap">
+                  {symbol}
+                </span>
+              </div>
+            </a>
+          )
+        )}
     </div>
   );
 });

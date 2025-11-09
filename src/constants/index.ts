@@ -308,7 +308,7 @@ const PATHS = [
   // { name: "ALM", path: "alm" },
   { name: "Leaderboards", path: "leaderboards" },
   { name: "xSTBL", path: "xstbl" },
-  // { name: "DAO", path: "dao" },
+  { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },
 ];
 
@@ -340,7 +340,8 @@ const LENDING_MARKETS = {
     {
       logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/Stability.svg`,
       symbol: "Stability wmetaUSD",
-      link: "https://stability.farm/lending/146/wmetaUSD-gen2",
+      link: "/lending/146/wmetaUSD-gen2",
+      isBlank: false,
     },
     // {
     //   logo: `https://raw.githubusercontent.com/stabilitydao/.github/main/assets/silo.png`,

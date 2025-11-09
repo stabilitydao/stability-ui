@@ -25,6 +25,7 @@ import { Prices } from "./Prices";
 import { MetaVaultStrategies } from "./MetaVaultStrategies";
 import { ProgressCircle } from "./ProgressCircle";
 import { FormError } from "./FormError";
+import { Indicator } from "./Indicator";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -50,6 +51,7 @@ import { MetaVaultsTable } from "./Tables/MetaVaults";
 import { ContestsTable } from "./Tables/Contests";
 import { FarmingTable } from "./Tables/Farming";
 import { MarketsTable } from "./Tables/Markets";
+import { ProposalsTable } from "./Tables/Proposals";
 
 import { TextModal } from "./Modals/TextModal";
 import { APRModal } from "./Modals/APRModal";
@@ -133,4 +135,6 @@ export {
   EmptyTable,
   LoadTable,
   FormError,
+  Indicator,
+  ProposalsTable,
 };

@@ -18,8 +18,9 @@ import { CHAINS } from "@constants";
 
 import { connected, currentChainID } from "@store";
 
-import type { TVault } from "@types";
 import { seeds } from "@stabilitydao/stability";
+
+import type { TVault } from "@types";
 
 interface IProps {
   network: string;
