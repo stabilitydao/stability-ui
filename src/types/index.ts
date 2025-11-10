@@ -843,6 +843,8 @@ type TProposal = {
   state: string;
   choices: string[];
   votes: TVote[];
+  start: number;
+  end: number;
 };
 
 // enums

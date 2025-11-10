@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ActionButton } from "@ui";
+import { ActionButton, Indicator } from "@ui";
 
 import { isAddress } from "viem";
 
@@ -30,7 +30,7 @@ import type { TAddress } from "@types";
 
 import type { Abi } from "viem";
 
-const DelegateForm = () => {
+const DelegateForm: React.FC = () => {
   const client = useWalletClient();
 
   const stblDaoData = getTokenData(STBL_DAO);
@@ -100,28 +100,6 @@ const DelegateForm = () => {
 
       const receipt = await getTransactionReceipt(tx);
 
-      let txTokens = {};
-
-      // if (activeAsset?.assetData?.address) {
-      //   txTokens = {
-      //     [activeAsset?.assetData?.address]: {
-      //       amount,
-      //       symbol: activeAsset?.assetData?.symbol,
-      //       logo: activeAsset?.assetData?.logoURI,
-      //     },
-      //   };
-      // }
-
-      // setLocalStoreHash({
-      //   chainId: market?.network?.id as string,
-      //   timestamp: new Date().getTime(),
-      //   hash: tx,
-      //   status: receipt?.status || "reverted",
-      //   type: "supply",
-      //   vault: market.pool,
-      //   tokens: txTokens,
-      // });
-
       if (receipt?.status === "success") {
         lastTx.set(receipt?.transactionHash);
         resetForm();
@@ -129,20 +107,17 @@ const DelegateForm = () => {
     } catch (error) {
       setNeedConfirm(false);
       setButton("Delegate");
-      // errorHandler(error as Error);
     }
 
     setTransactionInProgress(false);
   };
+
   return (
     <div className="bg-[#101012] border border-[#23252A] p-4 md:p-6 rounded-lg flex justify-between flex-col min-w-full gap-6">
       <div className="flex flex-col gap-2 mb-2 md:mb-0">
         <span className="text-[24px] leading-8 font-semibold">Your power</span>
-        <div className="flex items-center gap-2">
-          <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-            Own power: {userData.balance} STBL_DAO
-          </span>
-
+        <div className="flex items-end gap-2">
+          <Indicator title="Own power" value={`${userData.balance} STBL_DAO`} />
           {!!Number(userData.balance) && (
             <button
               onClick={() =>
@@ -154,22 +129,29 @@ const DelegateForm = () => {
                   stblDaoData?.logoURI
                 )
               }
-              className="w-[120px] text-[16px] bg-[#5E6AD2] font-semibold justify-center py-3 rounded-lg"
+              className="text-[16px] bg-[#5E6AD2] font-semibold justify-center rounded-md"
             >
-              Add to wallet
+              <img
+                src="/metamask.svg"
+                alt="MetaMask"
+                title="Add to MetaMask"
+                className="p-2"
+              />
             </button>
           )}
         </div>
-
-        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-          Delegated to:{" "}
-          {userData.delegatedTo === "Self"
-            ? userData.delegatedTo
-            : getShortAddress(userData.delegatedTo, 6, 4)}
-        </span>
-        <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-          Delegated to you: {userData.delegatedToYou} STBL_DAO
-        </span>
+        <Indicator
+          title="Delegated to"
+          value={
+            userData.delegatedTo === "Self"
+              ? userData.delegatedTo
+              : getShortAddress(userData.delegatedTo, 6, 4)
+          }
+        />
+        <Indicator
+          title="Delegated to you"
+          value={`${userData.delegatedToYou} STBL_DAO`}
+        />
       </div>
       <div className="flex flex-col justify-between gap-4">
         <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">

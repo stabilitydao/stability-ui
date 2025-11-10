@@ -36,6 +36,7 @@ import { paginateData } from "./functions/paginateData";
 import { copyText } from "./functions/copyText";
 import { getShortErrorMessage } from "./functions/getShortErrorMessage";
 import { truncateDecimals } from "./functions/truncateDecimals";
+import { formatTime } from "./functions/formatTime";
 
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
@@ -45,6 +46,7 @@ import { getGasLimit } from "./functions/getGasLimit";
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
 import { useWindowWidth } from "./hooks/useWindowWidth";
+import { useTimer } from "./hooks/useTimer";
 
 export {
   getTokenData,
@@ -90,4 +92,6 @@ export {
   getShortErrorMessage,
   truncateDecimals,
   getGasLimit,
+  useTimer,
+  formatTime,
 };

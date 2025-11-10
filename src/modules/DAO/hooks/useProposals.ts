@@ -34,6 +34,8 @@ export const useProposals = (): TResult => {
           title
           choices
           state
+          start
+          end
         }
       }
     `;

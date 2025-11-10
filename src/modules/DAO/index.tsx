@@ -46,7 +46,7 @@ const DAO = (): JSX.Element => {
 
             <Indicator
               title="Claimable"
-              value={`${formatNumber(claimable, "format")} STBL`}
+              value={`${formatNumber(claimable, "abbreviateNotUsd")} STBL`}
             />
 
             <Indicator title="Invested" value="0 STBL" />
