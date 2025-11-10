@@ -114,7 +114,7 @@ export const useUserReservesData = (market: TMarket): TResult => {
             let _maxWithdraw = withdraw;
 
             if (maxWithdrawTokens < Number(withdraw)) {
-              maxWithdrawTokens *= 0.999999; // * for safe amount
+              maxWithdrawTokens *= 0.998999; // * for safe amount
               _maxWithdraw = maxWithdrawTokens.toString();
             }
 

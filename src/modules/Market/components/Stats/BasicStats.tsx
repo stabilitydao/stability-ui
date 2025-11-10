@@ -65,7 +65,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       userPoolData?.currentLiquidationThreshold ?? 0
     );
 
-    const maxLTV = Number(userPoolData?.maxLTV ?? 0);
+    const maxLTV = liquidationThreshold * 100;
 
     let newCollateral = totalCollateral;
     let newDebt = totalDebt;
