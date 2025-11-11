@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ActionButton, Indicator } from "@ui";
+import { ActionButton, Indicator, Skeleton } from "@ui";
 
 import { isAddress } from "viem";
 
@@ -117,7 +117,15 @@ const DelegateForm: React.FC = () => {
       <div className="flex flex-col gap-2 mb-2 md:mb-0">
         <span className="text-[24px] leading-8 font-semibold">Your power</span>
         <div className="flex items-end gap-2">
-          <Indicator title="Own power" value={`${userData.balance} STBL_DAO`} />
+          {isUserDataLoading ? (
+            <Skeleton width={140} height={48} />
+          ) : (
+            <Indicator
+              title="Own power"
+              value={`${userData.balance} STBL_DAO`}
+            />
+          )}
+
           {!!Number(userData.balance) && (
             <button
               onClick={() =>
@@ -140,18 +148,28 @@ const DelegateForm: React.FC = () => {
             </button>
           )}
         </div>
-        <Indicator
-          title="Delegated to"
-          value={
-            userData.delegatedTo === "Self"
-              ? userData.delegatedTo
-              : getShortAddress(userData.delegatedTo, 6, 4)
-          }
-        />
-        <Indicator
-          title="Delegated to you"
-          value={`${userData.delegatedToYou} STBL_DAO`}
-        />
+
+        {isUserDataLoading ? (
+          <Skeleton width={140} height={48} />
+        ) : (
+          <Indicator
+            title="Delegated to"
+            value={
+              userData.delegatedTo === "Self"
+                ? userData.delegatedTo
+                : getShortAddress(userData.delegatedTo, 6, 4)
+            }
+          />
+        )}
+
+        {isUserDataLoading ? (
+          <Skeleton width={140} height={48} />
+        ) : (
+          <Indicator
+            title="Delegated to you"
+            value={`${userData.delegatedToYou} STBL_DAO`}
+          />
+        )}
       </div>
       <div className="flex flex-col justify-between gap-4">
         <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">

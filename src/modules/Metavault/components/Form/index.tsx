@@ -11,7 +11,7 @@ import { useStore } from "@nanostores/react";
 import { TabSwitcher } from "./TabSwitcher";
 import { TokensDisplay } from "./TokensDisplay";
 
-import { ActionButton } from "@ui";
+import { ActionButton, FormError } from "@ui";
 
 import {
   getTokenData,
@@ -114,7 +114,23 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
 
   const [needConfirm, setNeedConfirm] = useState(false);
 
+  const [error, setError] = useState<string>("");
+
   const [maxWithdraw, setMaxWithdraw] = useState(0);
+
+  const resetForm = () => {
+    setValue("");
+    setButton("");
+    setError("");
+    setTransactionInProgress(false);
+    setNeedConfirm(false);
+  };
+
+  const errorHandler = (err: Error) => {
+    setError(err?.message);
+    lastTx.set("No transaction hash...");
+    console.error("ERROR:", err);
+  };
 
   const getGasLimit = async (
     address: TAddress,
@@ -148,22 +164,6 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
     }
 
     return BigInt(10000);
-  };
-
-  const errorHandler = (err: Error) => {
-    lastTx.set("No transaction hash...");
-    if (err instanceof Error) {
-      // const errorData = {
-      //   state: true,
-      //   type: err.name,
-      //   description: getShortMessage(err.message),
-      // };
-    }
-    alert("TX ERROR");
-    setValue("");
-    setButton("");
-    setNeedConfirm(false);
-    console.error("ERROR:", err);
   };
 
   const handleMaxInputChange = () => {
@@ -333,9 +333,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         }
       } catch {}
 
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     } finally {
       setTransactionInProgress(false);
     }
@@ -405,9 +403,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         setButton("");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
     setTransactionInProgress(false);
   };
@@ -471,9 +467,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         setButton("");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
     setTransactionInProgress(false);
   };
@@ -534,9 +528,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         setButton("");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
     setTransactionInProgress(false);
   };
@@ -604,9 +596,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
         setButton("");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        errorHandler(error);
-      }
+      errorHandler(error as Error);
     }
     setTransactionInProgress(false);
   };
@@ -766,8 +756,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
   }, [$account, $lastTx, $assetsPrices, metaVault, $assetsBalances]);
 
   useEffect(() => {
-    setButton("");
-    setValue("");
+    resetForm();
   }, [actionType]);
 
   return (
@@ -817,6 +806,10 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
             </div>
           ) : null}
         </label>
+
+        <div className={cn(!!error && "my-3")}>
+          <FormError errorMessage={error} setErrorMessage={setError} />
+        </div>
 
         <ActionButton
           type={button}

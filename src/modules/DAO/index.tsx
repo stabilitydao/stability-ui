@@ -1,6 +1,6 @@
 import WagmiLayout from "@layouts/WagmiLayout";
 
-import { Indicator } from "@ui";
+import { Indicator, Skeleton } from "@ui";
 
 import { Table, DelegateForm } from "./components";
 
@@ -44,10 +44,14 @@ const DAO = (): JSX.Element => {
           <div className="bg-[#101012] border border-[#23252A] p-6 rounded-lg flex justify-between min-w-full gap-3">
             <Indicator title="Total" value="30M STBL" />
 
-            <Indicator
-              title="Claimable"
-              value={`${formatNumber(claimable, "abbreviateNotUsd")} STBL`}
-            />
+            {isClaimableLoading ? (
+              <Skeleton width={110} height={48} />
+            ) : (
+              <Indicator
+                title="Claimable"
+                value={`${formatNumber(claimable, "abbreviateNotUsd")} STBL`}
+              />
+            )}
 
             <Indicator title="Invested" value="0 STBL" />
           </div>
