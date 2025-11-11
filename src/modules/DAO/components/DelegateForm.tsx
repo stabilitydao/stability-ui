@@ -107,6 +107,7 @@ const DelegateForm: React.FC = () => {
     } catch (error) {
       setNeedConfirm(false);
       setButton("Delegate");
+      console.log("Error:", error);
     }
 
     setTransactionInProgress(false);
