@@ -8,13 +8,10 @@ import {
   getGasLimit,
   getTransactionReceipt,
   getShortAddress,
-  addAssetToWallet,
   getTokenData,
 } from "@utils";
 
 import { useStore } from "@nanostores/react";
-
-import { useWalletClient } from "wagmi";
 
 import { writeContract } from "@wagmi/core";
 
@@ -31,8 +28,6 @@ import type { TAddress } from "@types";
 import type { Abi } from "viem";
 
 const DelegateForm: React.FC = () => {
-  const client = useWalletClient();
-
   const stblDaoData = getTokenData(STBL_DAO);
 
   const $connected = useStore(connected);
@@ -114,106 +109,92 @@ const DelegateForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#101012] border border-[#23252A] p-4 md:p-6 rounded-lg flex justify-between flex-col min-w-full gap-6">
-      <div className="flex flex-col gap-2 mb-2 md:mb-0">
-        <span className="text-[24px] leading-8 font-semibold">Your power</span>
-        <div className="flex items-end gap-2">
+    <div className="bg-[#101012] border border-[#23252A] rounded-lg">
+      <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+        <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+          Voting power
+        </h2>
+      </div>
+      <div className="flex justify-between flex-col min-w-full gap-6 px-4 pb-4 md:px-6 md:pb-6 pt-4">
+        <div className="flex flex-col gap-2 mb-2 md:mb-0">
+          <div className="flex items-end gap-2">
+            {isUserDataLoading ? (
+              <Skeleton width={140} height={48} />
+            ) : (
+              <Indicator
+                title="Own voting power"
+                value={
+                  <p className="flex items-center gap-1">
+                    <img
+                      src={stblDaoData?.logoURI}
+                      alt={stblDaoData?.symbol}
+                      title={stblDaoData?.symbol}
+                      className="w-6 h-6"
+                    />
+                    <span>{userData.balance}</span>
+                  </p>
+                }
+              />
+            )}
+          </div>
+
           {isUserDataLoading ? (
             <Skeleton width={140} height={48} />
           ) : (
             <Indicator
-              title="Own power"
+              title="Delegated to"
               value={
-                <p className="flex items-center gap-1">
-                  <img
-                    src={stblDaoData?.logoURI}
-                    alt={stblDaoData?.symbol}
-                    title={stblDaoData?.symbol}
-                    className="w-6 h-6"
-                  />
-                  <span>{userData.balance}</span>
-                  <span>STBL_DAO</span>
-                </p>
+                userData.delegatedTo === "Self"
+                  ? userData.delegatedTo
+                  : getShortAddress(userData.delegatedTo, 6, 4)
               }
             />
           )}
 
-          {!!Number(userData.balance) && (
-            <img
-              src="/metamask.svg"
-              alt="MetaMask"
-              title="Add to MetaMask"
-              className="w-6 h-6"
-              onClick={() =>
-                addAssetToWallet(
-                  client,
-                  STBL_DAO,
-                  stblDaoData?.decimals ?? 18,
-                  stblDaoData?.symbol ?? "",
-                  stblDaoData?.logoURI
+          {isUserDataLoading ? (
+            <Skeleton width={140} height={48} />
+          ) : (
+            <Indicator
+              title="Delegated to you"
+              value={
+                !!Number(userData.delegatedToYou) ? (
+                  <p className="flex items-center gap-1">
+                    <img
+                      src={stblDaoData?.logoURI}
+                      alt={stblDaoData?.symbol}
+                      title={stblDaoData?.symbol}
+                      className="w-6 h-6"
+                    />
+                    <span>{userData.delegatedToYou}</span>
+                  </p>
+                ) : (
+                  <span className="text-[#97979A]">-</span>
                 )
               }
             />
           )}
         </div>
+        <div className="flex flex-col justify-between gap-4">
+          <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
+            <div className="flex items-center justify-between">
+              <input
+                type="text"
+                placeholder="0x..."
+                value={value}
+                onChange={(e) => handleInputChange(e?.target?.value)}
+                className="bg-transparent text-2xl font-medium outline-none w-full"
+                disabled={!$connected}
+              />
+            </div>
+          </label>
 
-        {isUserDataLoading ? (
-          <Skeleton width={140} height={48} />
-        ) : (
-          <Indicator
-            title="Delegated to"
-            value={
-              userData.delegatedTo === "Self"
-                ? userData.delegatedTo
-                : getShortAddress(userData.delegatedTo, 6, 4)
-            }
+          <ActionButton
+            type={button}
+            transactionInProgress={transactionInProgress}
+            needConfirm={needConfirm}
+            actionFunction={delegate}
           />
-        )}
-
-        {isUserDataLoading ? (
-          <Skeleton width={140} height={48} />
-        ) : (
-          <Indicator
-            title="Delegated to you"
-            value={
-              !!Number(userData.delegatedToYou) ? (
-                <p className="flex items-center gap-1">
-                  <img
-                    src={stblDaoData?.logoURI}
-                    alt={stblDaoData?.symbol}
-                    title={stblDaoData?.symbol}
-                    className="w-6 h-6"
-                  />
-                  <span>{userData.delegatedToYou}</span>
-                  <span>STBL_DAO</span>
-                </p>
-              ) : (
-                <span className="text-[#97979A]">-</span>
-              )
-            }
-          />
-        )}
-      </div>
-      <div className="flex flex-col justify-between gap-4">
-        <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A]">
-          <div className="flex items-center justify-between">
-            <input
-              type="text"
-              placeholder="0x..."
-              value={value}
-              onChange={(e) => handleInputChange(e?.target?.value)}
-              className="bg-transparent text-2xl font-medium outline-none w-full"
-              disabled={!$connected}
-            />
-          </div>
-        </label>
-
-        <ActionButton
-          type={button}
-          transactionInProgress={transactionInProgress}
-          needConfirm={needConfirm}
-          actionFunction={delegate}
-        />
+        </div>
       </div>
     </div>
   );
