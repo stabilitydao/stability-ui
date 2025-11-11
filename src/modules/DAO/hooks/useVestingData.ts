@@ -2,18 +2,20 @@ import { useEffect, useState } from "react";
 
 import { formatUnits } from "viem";
 
-import { VESTING_FOUNDATION } from "../constants";
+import { VESTING_ADDRESSES } from "../constants";
 
 import { VestingABI, web3clients } from "@web3";
 
+import type { TAddress } from "@types";
+
 type TResult = {
-  data: string;
+  data: { foundation: string; community: string };
   isLoading: boolean;
   refetch: () => Promise<void>;
 };
 
 export const useVestingData = (network: string): TResult => {
-  const [data, setData] = useState<string>("0");
+  const [data, setData] = useState({ foundation: "0", community: "0" });
   const [isLoading, setIsLoading] = useState(true);
 
   const client = web3clients[network as keyof typeof web3clients];
@@ -22,17 +24,30 @@ export const useVestingData = (network: string): TResult => {
     setIsLoading(true);
 
     try {
-      const releasable = (await client.readContract({
-        address: VESTING_FOUNDATION,
+      const foundationReleasable = (await client.readContract({
+        address: VESTING_ADDRESSES.foundation as TAddress,
         abi: VestingABI,
         functionName: "releasable",
       })) as bigint;
 
-      const formattedReleasable = Number(formatUnits(releasable, 18)).toFixed(
-        2
-      );
+      const communityReleasable = (await client.readContract({
+        address: VESTING_ADDRESSES.community as TAddress,
+        abi: VestingABI,
+        functionName: "releasable",
+      })) as bigint;
 
-      setData(formattedReleasable);
+      const formattedFoundationReleasable = Number(
+        formatUnits(foundationReleasable, 18)
+      ).toFixed(2);
+
+      const formattedCommunityReleasable = Number(
+        formatUnits(communityReleasable, 18)
+      ).toFixed(2);
+
+      setData({
+        foundation: formattedFoundationReleasable,
+        community: formattedCommunityReleasable,
+      });
     } catch (error) {
       console.error("Get vesting data error:", error);
     } finally {

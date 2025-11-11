@@ -123,12 +123,27 @@ const DelegateForm: React.FC = () => {
           ) : (
             <Indicator
               title="Own power"
-              value={`${userData.balance} STBL_DAO`}
+              value={
+                <p className="flex items-center gap-1">
+                  <img
+                    src={stblDaoData?.logoURI}
+                    alt={stblDaoData?.symbol}
+                    title={stblDaoData?.symbol}
+                    className="w-6 h-6"
+                  />
+                  <span>{userData.balance}</span>
+                  <span>STBL_DAO</span>
+                </p>
+              }
             />
           )}
 
           {!!Number(userData.balance) && (
-            <button
+            <img
+              src="/metamask.svg"
+              alt="MetaMask"
+              title="Add to MetaMask"
+              className="w-6 h-6"
               onClick={() =>
                 addAssetToWallet(
                   client,
@@ -138,15 +153,7 @@ const DelegateForm: React.FC = () => {
                   stblDaoData?.logoURI
                 )
               }
-              className="text-[16px] bg-[#5E6AD2] font-semibold justify-center rounded-md"
-            >
-              <img
-                src="/metamask.svg"
-                alt="MetaMask"
-                title="Add to MetaMask"
-                className="p-2"
-              />
-            </button>
+            />
           )}
         </div>
 
@@ -168,7 +175,22 @@ const DelegateForm: React.FC = () => {
         ) : (
           <Indicator
             title="Delegated to you"
-            value={`${userData.delegatedToYou} STBL_DAO`}
+            value={
+              !!Number(userData.delegatedToYou) ? (
+                <p className="flex items-center gap-1">
+                  <img
+                    src={stblDaoData?.logoURI}
+                    alt={stblDaoData?.symbol}
+                    title={stblDaoData?.symbol}
+                    className="w-6 h-6"
+                  />
+                  <span>{userData.delegatedToYou}</span>
+                  <span>STBL_DAO</span>
+                </p>
+              ) : (
+                <span className="text-[#97979A]">-</span>
+              )
+            }
           />
         )}
       </div>

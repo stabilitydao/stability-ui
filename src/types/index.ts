@@ -606,7 +606,7 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
-type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl";
+type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl" | "vsHodl";
 
 type TActiveChart = {
   name: TChartNames;
@@ -867,6 +867,12 @@ export enum MetaVaultSectionTypes {
   Operations = "operations",
   Allocations = "allocations",
   Charts = "charts",
+}
+
+export enum DAOSectionTypes {
+  Governance = "governance",
+  InterChain = "inter-chain",
+  Tokenomics = "tokenomics",
 }
 
 export enum TransactionTypes {
