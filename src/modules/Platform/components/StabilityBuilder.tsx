@@ -38,84 +38,11 @@ const StabilityBuilder = (): JSX.Element => {
 
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
-      <h1>🏗️🚧 {agent.name}</h1>
+      <h1 className="mb-[10px]">🏗️🚧 {agent.name}</h1>
 
-      <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
-        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
-          <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">
-            Burn rate
-          </div>
-          <div className="flex p-[20px] text-[14px]">
-            <table>
-              <tbody>
-                {agent.burnRate.map(
-                  (value: { period: string; usdAmount: number }) => (
-                    <tr key={value.period}>
-                      <td className="min-w-[160px]">{value.period}</td>
-                      <td className="text-right">
-                        {formatNumber(value.usdAmount, "abbreviate")}
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <h2 className="text-[26px] font-bold mb-[10px]">Development</h2>
 
-        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
-          <div className="flex p-[20px] font-bold rounded-t-xl  bg-[#202027]">
-            Open issues
-          </div>
-          <div className="flex p-[20px] flex-col">
-            {agent.repo.map((value: string) => (
-              <div
-                key={value}
-                className="flex items-center text-[14px] justify-between"
-              >
-                <a
-                  title="Go to repo"
-                  target="_blank"
-                  href={`https://github.com/${value}`}
-                  className="flex"
-                >
-                  {value.replace("stabilitydao/", "")}
-                </a>
-                <a
-                  title="Go to issues"
-                  target="_blank"
-                  href={`https://github.com/${value}/issues`}
-                >
-                  {builderMemory?.openIssues.total[value]}
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
-          <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">
-            Tokenization
-          </div>
-          <div className="flex p-[20px] flex-col gap-[10px]">
-            <div className="flex w-full items-center">
-              <img
-                className="w-[32px] h-[32px] mr-[10px]"
-                src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${agent.image}`}
-                alt={agent.name}
-              />
-              <span className="font-bold">BUILDER</span>
-            </div>
-            <div className="flex">
-              <span className="flex px-[16px] py-[10px] rounded-xl bg-[#1f2b69]">
-                📆 {agent.tokenization}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <h2 className="text-[24px] font-bold mb-[10px]">Pools</h2>
+      <h3 className="text-[22px] font-bold mb-[20px] text-center">Pools</h3>
       <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
         {agent.pools.map((value: IPool) => (
           <div
@@ -143,7 +70,7 @@ const StabilityBuilder = (): JSX.Element => {
         ))}
       </div>
 
-      <h2 className="text-[24px] font-bold mb-[10px]">Conveyors</h2>
+      <h3 className="text-[22px] font-bold mb-[20px] text-center">Conveyors</h3>
       <div className="flex flex-col w-full mb-[50px] gap-[20px]">
         {agent.conveyors.map((conveyor: IConveyor) => (
           <div
@@ -160,14 +87,14 @@ const StabilityBuilder = (): JSX.Element => {
                   className="flex flex-col"
                 >
                   <div className="text-[16px]">{step.name}</div>
-                  <div>
+                  <div className="flex min-h-[38px]">
                     {!!builderMemory &&
                       Object.keys(builderMemory.conveyors[conveyor.name])
                         .filter((taskId) =>
                           Object.keys(
                             (builderMemory as IBuilderMemory).conveyors[
                               conveyor.name
-                            ][taskId]
+                              ][taskId]
                           ).includes(step.name)
                         )
                         .map((taskId) => {
@@ -179,6 +106,83 @@ const StabilityBuilder = (): JSX.Element => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mb-[50px] flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
+        <div className="flex p-[20px] font-bold rounded-t-xl  bg-[#202027]">
+          Open issues
+        </div>
+        <div className="flex p-[20px] flex-col">
+          {agent.repo.map((value: string) => (
+            <div
+              key={value}
+              className="flex items-center text-[14px] justify-between"
+            >
+              <a
+                title="Go to repo"
+                target="_blank"
+                href={`https://github.com/${value}`}
+                className="flex"
+              >
+                {value.replace("stabilitydao/", "")}
+              </a>
+              <a
+                title="Go to issues"
+                target="_blank"
+                href={`https://github.com/${value}/issues`}
+              >
+                {builderMemory?.openIssues.total[value]}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <h2 className="text-[26px] font-bold mb-[20px]">Agent info</h2>
+
+      <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
+        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
+          <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">
+            Burn rate
+          </div>
+          <div className="flex p-[20px] text-[14px]">
+            <table>
+              <tbody>
+                {agent.burnRate.map(
+                  (value: { period: string; usdAmount: number }) => (
+                    <tr key={value.period}>
+                      <td className="min-w-[160px]">{value.period}</td>
+                      <td className="text-right">
+                        {formatNumber(value.usdAmount, "abbreviate")}
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
+          <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">
+            Tokenization
+          </div>
+          <div className="flex p-[20px] flex-col gap-[10px]">
+            <div className="flex w-full items-center">
+              <img
+                className="w-[32px] h-[32px] mr-[10px]"
+                src={`https://raw.githubusercontent.com/stabilitydao/.github/main/tokens/${agent.image}`}
+                alt={agent.name}
+              />
+              <span className="font-bold">BUILDER</span>
+            </div>
+            <div className="flex">
+              <span className="flex px-[16px] py-[10px] rounded-xl bg-[#1f2b69]">
+                📆 {agent.tokenization}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex mt-[100px]"></div>
