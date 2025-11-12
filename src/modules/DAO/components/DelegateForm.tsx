@@ -9,6 +9,7 @@ import {
   getTransactionReceipt,
   getShortAddress,
   getTokenData,
+  formatNumber,
 } from "@utils";
 
 import { useStore } from "@nanostores/react";
@@ -131,7 +132,9 @@ const DelegateForm: React.FC = () => {
                       title={stblDaoData?.symbol}
                       className="w-6 h-6"
                     />
-                    <span>{userData.balance}</span>
+                    <span>
+                      {formatNumber(userData.balance, "abbreviateNotUsd")}
+                    </span>
                   </p>
                 }
               />
@@ -165,7 +168,12 @@ const DelegateForm: React.FC = () => {
                       title={stblDaoData?.symbol}
                       className="w-6 h-6"
                     />
-                    <span>{userData.delegatedToYou}</span>
+                    <span>
+                      {formatNumber(
+                        userData.delegatedToYou,
+                        "abbreviateNotUsd"
+                      )}
+                    </span>
                   </p>
                 ) : (
                   <span className="text-[#97979A]">-</span>
