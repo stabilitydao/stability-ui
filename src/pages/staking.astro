@@ -1,0 +1,13 @@
+---
+import Layout from '@layouts/Layout.astro';
+import {Staking} from "@modules"
+---
+
+<Layout title="Staking"
+  img="/ogs/pages/staking.png"
+  metaTitle="Staking"
+  metaUrl="https://stability.farm/staking"
+  metaDescription="Convert STBL to xSTBL and lock for 6 months to earn Stability revenue."
+>
+  <Staking client:only="react"/>
+</Layout>

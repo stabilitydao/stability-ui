@@ -51,7 +51,10 @@ export const useUserData = (network: string): TResult => {
   const $apiData = useStore(apiData);
 
   const fetchUserData = async () => {
-    if (!$account) return;
+    if (!$account) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
 
