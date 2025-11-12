@@ -6,18 +6,25 @@ import { Indicator, Skeleton } from "@ui";
 
 import { Table, DelegateForm, SectionHandler, Statistics } from "./components";
 
-import { formatNumber } from "@utils";
+import { formatNumber, cn, updateQueryParams } from "@utils";
 
 import { useVestingData } from "./hooks";
+
+import { getInitialStateFromUrl } from "./functions";
 
 import { DAOSectionTypes } from "@types";
 
 const DAO = (): JSX.Element => {
-  const [activeSection, setActiveSection] = useState(
-    DAOSectionTypes.Governance
-  );
-
   const { data: vestingData, isLoading: isLoading } = useVestingData("146");
+
+  const { section } = getInitialStateFromUrl();
+
+  const [activeSection, setActiveSection] = useState(section);
+
+  const changeSection = (section: DAOSectionTypes) => {
+    updateQueryParams({ section });
+    setActiveSection(section);
+  };
 
   return (
     <WagmiLayout>
@@ -33,110 +40,122 @@ const DAO = (): JSX.Element => {
 
         <SectionHandler
           activeSection={activeSection}
-          changeSection={setActiveSection}
+          changeSection={changeSection}
         />
-        {activeSection === DAOSectionTypes.Governance ? (
-          <div className="flex items-start flex-col lg:flex-row gap-3">
-            <div className="w-full lg:w-2/3">
-              <Table />
-            </div>
-            <div className="w-full lg:w-1/3 flex flex-col gap-3">
-              <DelegateForm />
 
-              <div className="bg-[#101012] border border-[#23252A] rounded-lg flex flex-col min-w-full">
-                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
-                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
-                    Parameters
-                  </h2>
+        <div
+          className={cn(
+            "flex items-start flex-col lg:flex-row gap-3",
+            activeSection !== DAOSectionTypes.Governance && "hidden"
+          )}
+        >
+          <div className="w-full lg:w-2/3">
+            <Table />
+          </div>
+          <div className="w-full lg:w-1/3 flex flex-col gap-3">
+            <DelegateForm />
+
+            <div className="bg-[#101012] border border-[#23252A] rounded-lg flex flex-col min-w-full">
+              <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                  Parameters
+                </h2>
+              </div>
+              <div className="flex flex-col min-w-full gap-3 px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+                    xSTBL instant exit fee
+                  </span>
+                  <span className="font-semibold">50%</span>
                 </div>
-                <div className="flex flex-col min-w-full gap-3 px-4 pb-4 md:px-6 md:pb-6 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#97979A] text-[16px] leading-5 font-medium">
-                      xSTBL instant exit fee
-                    </span>
-                    <span className="font-semibold">50%</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#97979A] text-[16px] leading-5 font-medium">
-                      Minimal power
-                    </span>
-                    <span className="font-semibold">4,000</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#97979A] text-[16px] leading-5 font-medium">
-                      Proposal threshold
-                    </span>
-                    <span className="font-semibold">100,000</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#97979A] text-[16px] leading-5 font-medium">
-                      STT bribe
-                    </span>
-                    <span className="font-semibold">10%</span>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+                    Minimal power
+                  </span>
+                  <span className="font-semibold">4,000</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+                    Proposal threshold
+                  </span>
+                  <span className="font-semibold">100,000</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+                    STT bribe
+                  </span>
+                  <span className="font-semibold">10%</span>
                 </div>
               </div>
             </div>
           </div>
-        ) : activeSection === DAOSectionTypes.InterChain ? (
-          <div className="flex flex-col gap-2">
-            <span className="text-[#97979a] text-[14px] leading-5">
-              Inter-chain power distribution for MetaVaults allocations voting.
-            </span>
-            <div className="flex items-center justify-center rounded-[4px] w-full bg-warning-950 border border-warning-400">
-              <p className="font-manrope font-semibold px-2 text-[12px] leading-[17px] py-3 text-warning-400">
-                Under construction
-              </p>
-            </div>
+        </div>
+        <div
+          className={cn(
+            "flex flex-col gap-2",
+            activeSection !== DAOSectionTypes.InterChain && "hidden"
+          )}
+        >
+          <span className="text-[#97979a] text-[14px] leading-5">
+            Inter-chain power distribution for MetaVaults allocations voting.
+          </span>
+          <div className="flex items-center justify-center rounded-[4px] w-full bg-warning-950 border border-warning-400">
+            <p className="font-manrope font-semibold px-2 text-[12px] leading-[17px] py-3 text-warning-400">
+              Under construction
+            </p>
           </div>
-        ) : activeSection === DAOSectionTypes.Tokenomics ? (
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex flex-col gap-6 w-full lg:w-1/2">
-              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
-                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
-                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
-                    Foundation
-                  </h2>
-                </div>
-                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
-                  <Indicator title="Total" value="30M STBL" />
-
-                  {isLoading ? (
-                    <Skeleton width={110} height={48} />
-                  ) : (
-                    <Indicator
-                      title="Claimable"
-                      value={`${formatNumber(vestingData.foundation, "abbreviateNotUsd")} STBL`}
-                    />
-                  )}
-
-                  <Indicator title="Spent" value="0 STBL" />
-                </div>
+        </div>
+        <div
+          className={cn(
+            "flex flex-col lg:flex-row gap-6",
+            activeSection !== DAOSectionTypes.Tokenomics && "hidden"
+          )}
+        >
+          <div className="flex flex-col gap-6 w-full lg:w-1/2">
+            <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+              <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                  Foundation
+                </h2>
               </div>
-            </div>
-            <div className="flex flex-col gap-6 w-full lg:w-1/2">
-              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
-                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
-                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
-                    Community
-                  </h2>
-                </div>
-                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
-                  <Indicator title="Total" value="20M STBL" />
-                  {isLoading ? (
-                    <Skeleton width={110} height={48} />
-                  ) : (
-                    <Indicator
-                      title="Claimable"
-                      value={`${formatNumber(vestingData.community, "abbreviateNotUsd")} STBL`}
-                    />
-                  )}
-                  <Indicator title="Spent" value="28K STBL" />
-                </div>
+              <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                <Indicator title="Total" value="30M STBL" />
+
+                {isLoading ? (
+                  <Skeleton width={110} height={48} />
+                ) : (
+                  <Indicator
+                    title="Claimable"
+                    value={`${formatNumber(vestingData.foundation, "abbreviateNotUsd")} STBL`}
+                  />
+                )}
+
+                <Indicator title="Spent" value="0 STBL" />
               </div>
             </div>
           </div>
-        ) : null}
+          <div className="flex flex-col gap-6 w-full lg:w-1/2">
+            <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+              <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                  Community
+                </h2>
+              </div>
+              <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                <Indicator title="Total" value="20M STBL" />
+                {isLoading ? (
+                  <Skeleton width={110} height={48} />
+                ) : (
+                  <Indicator
+                    title="Claimable"
+                    value={`${formatNumber(vestingData.community, "abbreviateNotUsd")} STBL`}
+                  />
+                )}
+                <Indicator title="Spent" value="28K STBL" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </WagmiLayout>
   );
