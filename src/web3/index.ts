@@ -89,7 +89,7 @@ const merkleDistributor = deployments[146].tokenomics.merkleDistributor;
 const metadata = {
   name: "Stability",
   description: "Stability Asset Management Platform",
-  url: "https://beta.stability.farm", // todo: change to stability.farm
+  url: "https://stability.farm",
   icons: ["https://stability.farm/logo.svg"],
 };
 
