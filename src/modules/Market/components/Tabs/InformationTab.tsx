@@ -1,6 +1,6 @@
-import { AssetsInfo } from "../../ui";
+import { AssetsInfo, AddressField } from "../../ui";
 
-import type { TMarket, TMarketReserve } from "@types";
+import type { TMarket, TMarketReserve, TAddress } from "@types";
 
 type TProps = {
   market: TMarket;
@@ -15,6 +15,7 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset }) => {
         assets={market?.reserves}
         network={market?.network}
       />
+
       <div className="flex flex-col gap-3">
         <span className="text-[24px] leading-8 font-medium">
           Overall details
@@ -32,6 +33,31 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset }) => {
           </div>
         </div>
       </div>
+
+      {!!market?.roles?.length && (
+        <div className="flex flex-col gap-3">
+          <span className="text-[24px] leading-8 font-medium">Roles</span>
+          <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex flex-col gap-2 w-full font-medium text-[16px] leading-6">
+            {market?.roles.map(({ name, addresses }) => (
+              <div
+                key={name}
+                className="w-full flex items-start justify-between flex-wrap md:flex-nowrap"
+              >
+                <span className="text-[#7C7E81]">{name}</span>
+                <div className="flex flex-col gap-1">
+                  {addresses.map((address) => (
+                    <AddressField
+                      key={address}
+                      address={address as TAddress}
+                      explorer={market?.network?.explorer ?? ""}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

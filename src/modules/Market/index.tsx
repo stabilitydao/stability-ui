@@ -92,6 +92,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       protocolDataProvider: _market.protocolDataProvider,
       deployed: _market.deployed,
       reserves: _market.reserves,
+      roles: _market.roles,
     };
 
     const defaultAsset =
