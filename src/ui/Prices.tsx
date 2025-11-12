@@ -94,7 +94,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
             {prices.map(([symbol, data]) => (
               <motion.div
                 key={symbol}
-                className="min-w-[105px] flex-shrink-0 border border-[#23252A] rounded-lg px-2 py-1 flex items-center justify-between"
+                className="min-w-[110px] flex-shrink-0 border border-[#23252A] rounded-lg px-2 py-1 flex items-center justify-between"
               >
                 <div className="flex items-center gap-1">
                   <img
@@ -102,10 +102,10 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                     alt={symbol}
                     className="w-3 h-3"
                   />
-                  <span className="text-[12px] font-semibold">{symbol}</span>
+                  <span className="text-[14px] font-semibold">{symbol}</span>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-[10px] font-semibold">
+                <div className="flex flex-col items-end">
+                  <span className="text-[12px] font-semibold">
                     {formatNumber(
                       data.price,
                       Number(data.price) < 1
@@ -115,7 +115,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                   </span>
                   <span
                     className={cn(
-                      "text-[8px] font-medium",
+                      "text-[10px] font-medium",
                       data.priceChange >= 0
                         ? "text-[#48C05C]"
                         : "text-[#DE4343]"
