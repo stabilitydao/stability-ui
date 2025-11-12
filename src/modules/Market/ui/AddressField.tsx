@@ -1,19 +1,29 @@
-import { getShortAddress, copyAddress } from "@utils";
+import { useState } from "react";
+
+import { getShortAddress, copyAddress, cn } from "@utils";
 
 import type { TAddress } from "@types";
 
 type TProps = {
-  symbol: string;
+  symbol?: string;
   address: TAddress;
   explorer: string;
 };
 
 const AddressField: React.FC<TProps> = ({ symbol, address, explorer }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    copyAddress(address as TAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1000);
+  };
+
   return (
-    <div className="flex items-center justify-between w-full">
-      <span className="text-[#7C7E81]">{symbol}</span>
-      <div className="flex items-center gap-3">
-        <span className="text-[#9180F4]">
+    <div className={cn(!!symbol && "flex items-center justify-between w-full")}>
+      {!!symbol && <span className="text-[#7C7E81]">{symbol}</span>}
+      <div className={cn("flex items-center gap-3", !symbol && "justify-end")}>
+        <span className="text-[#9180F4] cursor-pointer" onClick={handleCopy}>
           {getShortAddress(address ?? "", 6, 4)}
         </span>
         <div className="flex items-center gap-2">
@@ -24,12 +34,21 @@ const AddressField: React.FC<TProps> = ({ symbol, address, explorer }) => {
               className="w-3 h-3 cursor-pointer"
             />
           </a>
-          <img
-            src="/icons/copy.png"
-            alt="copy link"
-            className="w-3 h-3 cursor-pointer"
-            onClick={() => copyAddress(address)}
-          />
+
+          {copied ? (
+            <img
+              className="flex-shrink-0 w-3 h-3"
+              src="/icons/checkmark.svg"
+              alt="Checkmark icon"
+            />
+          ) : (
+            <img
+              src="/icons/copy.png"
+              alt="Copy icon"
+              className="flex-shrink-0 w-3 h-3 cursor-pointer"
+              onClick={handleCopy}
+            />
+          )}
         </div>
       </div>
     </div>
