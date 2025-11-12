@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, TextSkeleton } from "@ui";
+import { Prices, NavIcon, Socials, TextSkeleton, Badge } from "@ui";
 
-import { cn, formatNumber } from "@utils";
+import { cn, formatNumber, useProposals } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
@@ -15,6 +15,8 @@ import { PATHS, ROUTES } from "@constants";
 const Navbar = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1);
+
+  const { isVoting } = useProposals();
 
   const $apiData = useStore(apiData);
 
@@ -109,14 +111,20 @@ const Navbar = (): JSX.Element => {
                       className="px-4 py-3 flex items-center justify-between"
                       href={`/${path}`}
                     >
-                      <span
-                        className={cn(
-                          "text-[#97979A]",
-                          activePath === path && "text-white"
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={cn(
+                            "text-[#97979A]",
+                            activePath === path && "text-white"
+                          )}
+                        >
+                          {name}
+                        </span>
+                        {path === "dao" && isVoting && (
+                          <Badge state="success" text="Voting" />
                         )}
-                      >
-                        {name}
-                      </span>
+                      </div>
+
                       <NavIcon path={path} isActive={activePath === path} />
                     </a>
                   </div>
