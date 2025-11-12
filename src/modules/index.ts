@@ -18,7 +18,7 @@ import { Leaderboards } from "./Leaderboards";
 import { Season1 } from "./Leaderboards/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
-import { XSTBL } from "./XSTBL";
+import { Staking } from "./Staking";
 import { Dashboard } from "./Dashboard";
 import { LeveragedFarming } from "./LeveragedFarming";
 import { Metavaults } from "./Metavaults";
@@ -50,7 +50,7 @@ export {
   Contests,
   Contest,
   Home,
-  XSTBL,
+  Staking,
   Swapper,
   Dashboard,
   LeveragedFarming,

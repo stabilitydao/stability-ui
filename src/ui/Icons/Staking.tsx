@@ -2,7 +2,7 @@ interface IProps {
   color: string;
 }
 
-export const XSTBLIcon: React.FC<IProps> = ({ color }) => {
+export const StakingIcon: React.FC<IProps> = ({ color }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

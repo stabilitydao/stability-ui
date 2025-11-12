@@ -4,7 +4,7 @@ import {
   FarmingIcon,
   MetavaultsIcon,
   ALMIcon,
-  XSTBLIcon,
+  StakingIcon,
   AgentsIcon,
   PlatformIcon,
   LeaderboardsIcon,
@@ -32,8 +32,8 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <ALMIcon color={color} />;
     case "leaderboards":
       return <LeaderboardsIcon color={color} />;
-    case "xstbl":
-      return <XSTBLIcon color={color} />;
+    case "staking":
+      return <StakingIcon color={color} />;
     case "agents":
       return <AgentsIcon color={color} />;
     case "platform":

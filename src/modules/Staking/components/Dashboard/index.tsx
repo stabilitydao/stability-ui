@@ -260,28 +260,6 @@ const Dashboard = (): JSX.Element => {
         <div className="flex-1 flex items-center justify-center bg-[#101012] border border-[#23252A] rounded-lg">
           <div className="flex flex-col items-center justify-center py-6">
             <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-              Total staked
-            </span>
-            {isLoaded ? (
-              <div className="flex flex-col items-center">
-                <span className="text-[32px] leading-10 font-semibold">
-                  {formatNumber(dashboard.totalStaked, "format")}
-                </span>
-                <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                  ~ ${formatNumber(dashboard.totalStakedInUSD, "format")}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <TextSkeleton lineHeight={40} width={160} />
-                <TextSkeleton lineHeight={24} width={80} />
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex-1 flex items-center justify-center bg-[#101012] border border-[#23252A] rounded-lg">
-          <div className="flex flex-col items-center justify-center py-6">
-            <span className="text-[#97979A] text-[16px] leading-6 font-medium">
               Your stake
             </span>
 
@@ -310,6 +288,28 @@ const Dashboard = (): JSX.Element => {
                   </div>
                 )}
               </>
+            ) : (
+              <div className="flex flex-col items-center">
+                <TextSkeleton lineHeight={40} width={160} />
+                <TextSkeleton lineHeight={24} width={80} />
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center bg-[#101012] border border-[#23252A] rounded-lg">
+          <div className="flex flex-col items-center justify-center py-6">
+            <span className="text-[#97979A] text-[16px] leading-6 font-medium">
+              Total staked
+            </span>
+            {isLoaded ? (
+              <div className="flex flex-col items-center">
+                <span className="text-[32px] leading-10 font-semibold">
+                  {formatNumber(dashboard.totalStaked, "format")}
+                </span>
+                <span className="text-[#97979A] text-[16px] leading-6 font-medium">
+                  ~ ${formatNumber(dashboard.totalStakedInUSD, "format")}
+                </span>
+              </div>
             ) : (
               <div className="flex flex-col items-center">
                 <TextSkeleton lineHeight={40} width={160} />

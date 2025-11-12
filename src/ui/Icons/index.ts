@@ -4,7 +4,7 @@ import { FarmingIcon } from "./Farming";
 import { MetavaultsIcon } from "./Metavaults";
 import { ALMIcon } from "./ALM";
 import { LeaderboardsIcon } from "./Leaderboards";
-import { XSTBLIcon } from "./XSTBL";
+import { StakingIcon } from "./Staking";
 import { AgentsIcon } from "./Agents";
 import { PlatformIcon } from "./Platform";
 import { RowsIcon } from "./Rows";
@@ -22,7 +22,7 @@ export {
   MetavaultsIcon,
   ALMIcon,
   LeaderboardsIcon,
-  XSTBLIcon,
+  StakingIcon,
   AgentsIcon,
   PlatformIcon,
   RowsIcon,

@@ -307,14 +307,14 @@ const PATHS = [
   { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
   { name: "Leaderboards", path: "leaderboards" },
-  { name: "xSTBL", path: "xstbl" },
+  { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },
 ];
 
 const ROUTES = {
   basic: [
-    "xstbl",
+    "staking",
     "dashboard",
     "leveraged-farming",
     "alm",
