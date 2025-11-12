@@ -4,7 +4,7 @@ import { lendingMarkets } from "@stabilitydao/stability";
 
 import { MarketData } from "@stabilitydao/stability/out/api.types";
 
-import type { TMarket, TMarketReserve } from "@types";
+import type { TMarket, TMarketReserve, TAddress } from "@types";
 
 const loadMarketsData = async (
   markets: MarketData
@@ -56,6 +56,15 @@ const loadMarketsData = async (
       };
     });
 
+    const roles = apiMarket?.roles
+      ? Object.entries(apiMarket?.roles)
+          .filter(([name]) => name !== "FLASH_BORROWER_ROLE")
+          .map((role) => ({
+            name: role[0],
+            addresses: role[1] as TAddress[],
+          }))
+      : [];
+
     const mergedMarket: TMarket = {
       marketId: marketId,
       engine: libMarket.engine,
@@ -64,6 +73,7 @@ const loadMarketsData = async (
       deployed: libMarket.deployed,
       deprecated: libMarket?.deprecated ?? false,
       reserves,
+      roles,
     };
 
     localMarkets[chainId].push(mergedMarket);
