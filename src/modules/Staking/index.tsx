@@ -22,8 +22,7 @@ const Staking = (): JSX.Element => {
         <div>
           <h2 className="page-title__font text-start mb-2 md:mb-5">Staking</h2>
           <h3 className="text-[#97979a] page-description__font">
-            Convert STBL to xSTBL and lock for 6 months to earn Stability
-            revenue.
+            Convert STBL to xSTBL and stake to earn Stability revenue.
           </h3>
         </div>
         <Dashboard />

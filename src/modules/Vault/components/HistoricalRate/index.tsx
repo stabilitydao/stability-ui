@@ -9,8 +9,6 @@ import { ChartSkeleton, HeadingText, ChartTimelineSwitcher } from "@ui";
 
 import { formatFromBigInt, getTimeDifference, cn } from "@utils";
 
-import { GRAPH_ENDPOINTS } from "src/constants/env";
-
 import { MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
 import { seeds } from "@stabilitydao/stability";
@@ -35,8 +33,6 @@ const HistoricalRate: React.FC<IProps> = memo(
     ].includes(vaultStrategy)
       ? "APR"
       : "Farm APR";
-
-    const isLaverageStrategy = vaultStrategy.toLowerCase().includes("silo");
 
     const daysFromLastHardWork = getTimeDifference(lastHardWork).days;
 
@@ -80,86 +76,14 @@ const HistoricalRate: React.FC<IProps> = memo(
     const getData = async () => {
       const NOW = Math.floor(Date.now() / 1000);
 
-      let DATA = [];
-
-      const LAVERAGE_DATA: {
-        APR: string;
-      }[] = [];
-
-      let entities = 0;
-      let status = true;
-
       try {
-        while (status) {
-          const HISTORY_QUERY = `{
-              vaultHistoryEntities(
-                orderBy: timestamp,
-                orderDirection: asc,
-                where: {address: "${address}", periodVsHoldAPR_not: null}
-                skip: ${entities}
-              ) {
-                  APR
-                  periodVsHoldAPR
-                  sharePrice
-                  TVL
-                  timestamp
-              }}`;
+        const req = await axios.get(
+          `${seeds[0]}/vault/${network}/${address}/chart`
+        );
 
-          const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
-            query: HISTORY_QUERY,
-          });
+        const response = req.data;
 
-          DATA.push(...graphResponse.data.data.vaultHistoryEntities);
-
-          if (graphResponse.data.data.vaultHistoryEntities.length < 100) {
-            status = false;
-          }
-          entities += 100;
-        }
-
-        if (isLaverageStrategy) {
-          status = true;
-          entities = 0;
-
-          while (status) {
-            const HISTORY_QUERY = `{
-              vaultLeverageLendingHistoryEntities(
-                orderBy: timestamp,
-                orderDirection: asc,
-                where: {address: "${address}"}
-                skip: ${entities}
-              ) {
-                APR
-              }}`;
-
-            const graphResponse = await axios.post(GRAPH_ENDPOINTS[network], {
-              query: HISTORY_QUERY,
-            });
-
-            LAVERAGE_DATA.push(
-              ...graphResponse.data.data.vaultLeverageLendingHistoryEntities
-            );
-
-            if (
-              graphResponse.data.data.vaultLeverageLendingHistoryEntities
-                .length < 100
-            ) {
-              status = false;
-            }
-            entities += 100;
-          }
-
-          if (LAVERAGE_DATA.length === DATA.length) {
-            DATA = DATA.map((obj, index) => {
-              return {
-                ...obj,
-                APR: LAVERAGE_DATA[index].APR,
-              };
-            });
-          }
-        }
-        console.log("graph data", DATA);
-        const workedData = DATA.map(formatData);
+        const workedData = response.map(formatData);
 
         let _chartData = workedData.filter(
           (obj) =>
@@ -517,19 +441,7 @@ const HistoricalRate: React.FC<IProps> = memo(
       }
     }, [chartData]);
 
-    const getBackData = async () => {
-      try {
-        const dt = await axios.get(
-          `${seeds[0]}/vault/${network}/${address}/chart`
-        );
-        console.log("backend", dt.data);
-      } catch (err) {
-        console.log("err", err);
-      }
-    };
-
     useEffect(() => {
-      getBackData();
       getData();
     }, []);
 
