@@ -111,21 +111,20 @@ const Navbar = (): JSX.Element => {
                       className="px-4 py-3 flex items-center justify-between"
                       href={`/${path}`}
                     >
+                      <span
+                        className={cn(
+                          "text-[#97979A]",
+                          activePath === path && "text-white"
+                        )}
+                      >
+                        {name}
+                      </span>
                       <div className="flex items-center gap-3">
-                        <span
-                          className={cn(
-                            "text-[#97979A]",
-                            activePath === path && "text-white"
-                          )}
-                        >
-                          {name}
-                        </span>
                         {path === "dao" && isVoting && (
                           <Badge state="success" text="Voting" />
                         )}
+                        <NavIcon path={path} isActive={activePath === path} />
                       </div>
-
-                      <NavIcon path={path} isActive={activePath === path} />
                     </a>
                   </div>
                 ))}
