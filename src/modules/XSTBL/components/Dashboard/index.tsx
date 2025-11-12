@@ -321,7 +321,7 @@ const Dashboard = (): JSX.Element => {
       </div>
       <div className="flex flex-col gap-4">
         <div className="flex items-start md:items-center justify-between flex-col md:flex-row">
-          <h3 className="text-[32px] leading-40 font-semibold">
+          <h3 className="text-[32px] leading-10 font-semibold">
             Sonic Generator
           </h3>
           {isLoaded ? (

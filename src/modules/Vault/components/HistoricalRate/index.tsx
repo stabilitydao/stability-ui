@@ -13,6 +13,8 @@ import { GRAPH_ENDPOINTS } from "src/constants/env";
 
 import { MONTHS, TIMESTAMPS_IN_SECONDS } from "@constants";
 
+import { seeds } from "@stabilitydao/stability";
+
 import { TAddress, TChartData, TActiveChart, TimelineTypes } from "@types";
 
 interface IProps {
@@ -77,7 +79,9 @@ const HistoricalRate: React.FC<IProps> = memo(
 
     const getData = async () => {
       const NOW = Math.floor(Date.now() / 1000);
+
       let DATA = [];
+
       const LAVERAGE_DATA: {
         APR: string;
       }[] = [];
@@ -96,7 +100,6 @@ const HistoricalRate: React.FC<IProps> = memo(
               ) {
                   APR
                   periodVsHoldAPR
-                  address
                   sharePrice
                   TVL
                   timestamp
@@ -155,7 +158,7 @@ const HistoricalRate: React.FC<IProps> = memo(
             });
           }
         }
-
+        console.log("graph data", DATA);
         const workedData = DATA.map(formatData);
 
         let _chartData = workedData.filter(
@@ -167,6 +170,7 @@ const HistoricalRate: React.FC<IProps> = memo(
           setIsData(false);
           return;
         }
+
         setChartData(workedData);
       } catch (error) {
         const err = error as AxiosError;
@@ -513,7 +517,19 @@ const HistoricalRate: React.FC<IProps> = memo(
       }
     }, [chartData]);
 
+    const getBackData = async () => {
+      try {
+        const dt = await axios.get(
+          `${seeds[0]}/vault/${network}/${address}/chart`
+        );
+        console.log("backend", dt.data);
+      } catch (err) {
+        console.log("err", err);
+      }
+    };
+
     useEffect(() => {
+      getBackData();
       getData();
     }, []);
 

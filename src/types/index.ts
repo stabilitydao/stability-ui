@@ -606,7 +606,7 @@ type TStrategyState =
 
 type TFrontendContractData = [bigint, TAddress[], bigint[], bigint[]] | [];
 
-type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl";
+type TChartNames = "" | "sharePrice" | "TVL" | "APR" | "apr" | "tvl" | "vsHodl";
 
 type TActiveChart = {
   name: TChartNames;
@@ -831,6 +831,22 @@ type TUserPoolData = {
   healthFactor: number;
 };
 
+type TVote = {
+  choice: string;
+  percent: string;
+  count: number;
+};
+
+type TProposal = {
+  id: string;
+  title: string;
+  state: string;
+  choices: string[];
+  votes: TVote[];
+  start: number;
+  end: number;
+};
+
 // enums
 export enum DisplayTypes {
   Rows = "rows",
@@ -851,6 +867,12 @@ export enum MetaVaultSectionTypes {
   Operations = "operations",
   Allocations = "allocations",
   Charts = "charts",
+}
+
+export enum DAOSectionTypes {
+  Governance = "governance",
+  InterChain = "inter-chain",
+  Tokenomics = "tokenomics",
 }
 
 export enum TransactionTypes {
@@ -983,4 +1005,6 @@ export type {
   TUserPoolData,
   TUserReserve,
   TUserReservesMap,
+  TProposal,
+  TVote,
 };
