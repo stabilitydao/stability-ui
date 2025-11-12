@@ -86,7 +86,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
           className="cursor-grab overflow-hidden -mx-4 px-4"
         >
           <motion.div
-            className="flex gap-3"
+            className="flex gap-2"
             drag="x"
             dragConstraints={{ right: 0, left: -width }}
             whileTap={{ cursor: "grabbing" }}
@@ -94,18 +94,18 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
             {prices.map(([symbol, data]) => (
               <motion.div
                 key={symbol}
-                className="min-w-[180px] flex-shrink-0 border border-[#23252A] rounded-lg px-4 py-2 flex items-center justify-between"
+                className="min-w-[105px] flex-shrink-0 border border-[#23252A] rounded-lg px-2 py-1 flex items-center justify-between"
               >
-                <div className="flex items-center gap-3 mb-1">
+                <div className="flex items-center gap-1">
                   <img
                     src={`/features/${symbol.toLowerCase()}.png`}
                     alt={symbol}
-                    className="w-6 h-6"
+                    className="w-3 h-3"
                   />
-                  <span className="text-[14px] font-semibold">{symbol}</span>
+                  <span className="text-[12px] font-semibold">{symbol}</span>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-[12px] font-semibold">
+                  <span className="text-[10px] font-semibold">
                     {formatNumber(
                       data.price,
                       Number(data.price) < 1
@@ -115,7 +115,7 @@ const Prices: React.FC<IProps> = ({ isMobile = false }): JSX.Element => {
                   </span>
                   <span
                     className={cn(
-                      "text-[10px] font-medium",
+                      "text-[8px] font-medium",
                       data.priceChange >= 0
                         ? "text-[#48C05C]"
                         : "text-[#DE4343]"
