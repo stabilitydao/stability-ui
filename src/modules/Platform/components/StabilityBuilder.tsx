@@ -27,13 +27,14 @@ const StabilityBuilder  = (): JSX.Element => {
     loadBuilderMemory();
   }, []);
 
+  // @ts-ignore
   return (
     <div className="max-w-[1200px] w-full xl:min-w-[1200px]">
       <h1>🏗️🚧 {agent.name}</h1>
 
       <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
 
-        <div className="flex flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]">
+        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
           <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">Burn rate</div>
           <div className="flex p-[20px] text-[14px]">
             <table>
@@ -52,8 +53,8 @@ const StabilityBuilder  = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="flex flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]">
-          <div className="flex p-[20px] font-bold rounded-t-xl  bg-[#202027]">Repositories</div>
+        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
+          <div className="flex p-[20px] font-bold rounded-t-xl  bg-[#202027]">Open issues</div>
           <div className="flex p-[20px] flex-col">
             {agent.repo.map((value: string) => (
               <div className="flex items-center text-[14px] justify-between">
@@ -64,7 +65,7 @@ const StabilityBuilder  = (): JSX.Element => {
           </div>
         </div>
 
-        <div className="flex flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]">
+        <div className="flex flex-col rounded-xl w-full md:w-5/12 lg:w-[280px] bg-[#111114] border border-[#232429]">
           <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">Tokenization</div>
           <div className="flex p-[20px] flex-col gap-[10px]">
             <div className="flex w-full items-center">
@@ -85,10 +86,15 @@ const StabilityBuilder  = (): JSX.Element => {
       <h2 className="text-[24px] font-bold mb-[10px]">Pools</h2>
       <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
         {agent.pools.map((value: IPool) => (
-          <div className="flex flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]">
+          <div className="flex w-full md:w-5/12 flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]">
             <div className="flex p-[20px] font-bold rounded-t-xl bg-[#202027]">{value.name}</div>
-            <div className="flex p-[20px]">
-              🚧
+            <div className="flex p-[20px] flex-col">
+              {builderMemory?.openIssues.pools[value.name].map(issue => {
+
+                // @ts-ignore
+                return ( <a href={`https://github.com/${issue.repo}/issues/${issue.repoId}`} target="_blank" className="flex text-[14px] w-full">{issue.title}</a>
+                )
+              })}
             </div>
           </div>
         ))}
@@ -99,14 +105,21 @@ const StabilityBuilder  = (): JSX.Element => {
         {agent.conveyors.map((conveyor: IConveyor) => (
           <div className="flex flex-col bg-[#111114] border border-[#232429]">
             <div className="flex p-[20px] gap-[20px] font-bold bg-[#202027]">{conveyor.name}</div>
-            <div className="flex belt flex-nowrap justify-between  p-[20px]">
+            <div className="flex flex-col md:flex-row md:flex-nowrap justify-between  p-[20px]">
               {conveyor.steps.map((step) => (
                 <div className="flex flex-col">
-                  <div>
+                  <div className="text-[16px]">
                     {step.name}
                   </div>
                   <div>
-                    🚧
+                    {!!builderMemory && Object.keys(builderMemory.conveyors[conveyor.name])
+                      .filter(taskId => Object.keys((builderMemory as IBuilderMemory).conveyors[conveyor.name][taskId]).includes(step.name) )
+                      .map(taskId => {
+
+                        return (
+                          <div>{taskId}</div>
+                        )
+                      })}
                   </div>
                 </div>
               ))}
