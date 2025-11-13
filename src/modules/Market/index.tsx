@@ -4,7 +4,12 @@ import { useStore } from "@nanostores/react";
 
 import { WagmiLayout } from "@layouts";
 
-import { SectionSelector, AssetSelector, MarketTabs } from "./components";
+import {
+  SectionSelector,
+  AssetSelector,
+  MarketTabs,
+  Dashboard,
+} from "./components";
 
 import { FullPageLoader, ErrorMessage, CustomTooltip } from "@ui";
 
@@ -167,6 +172,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
                   </div>
                 </div>
               </div>
+              <Dashboard marketData={localMarket} />
               <div className="w-full flex items-start flex-col gap-3">
                 <SectionSelector
                   market={market}
