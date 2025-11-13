@@ -388,6 +388,10 @@ const LENDING_MARKETS = {
   // ],
 };
 
+const SPACE_ID = "stabilitydao.eth";
+
+const SNAPSHOT_API = "https://hub.snapshot.org/graphql";
+
 const SOCIALS = [
   {
     name: "Stability X",
@@ -478,4 +482,6 @@ export {
   META_VAULTS_EXCEPTIONS,
   HOLDERS_TABLE,
   MARKETS_TABLE_FILTERS,
+  SPACE_ID,
+  SNAPSHOT_API,
 };
