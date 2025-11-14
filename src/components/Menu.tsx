@@ -66,8 +66,8 @@ const Menu = (): JSX.Element => {
     [$apiData]
   );
 
-  const isAlert = $apiData?.network.status == "Alert";
-  const isOk = $apiData?.network.status == "OK";
+  const isAlert = $apiData?.network?.status == "Alert";
+  const isOk = $apiData?.network?.status == "OK";
 
   return (
     <div className="block md:hidden">

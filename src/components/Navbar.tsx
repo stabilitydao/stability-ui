@@ -68,9 +68,9 @@ const Navbar = (): JSX.Element => {
   );
 
   const statusColor =
-    $apiData?.network.status == "Alert"
+    $apiData?.network?.status == "Alert"
       ? "#ff8d00"
-      : $apiData?.network.status == "OK"
+      : $apiData?.network?.status == "OK"
         ? "#00ff00"
         : "#1B1D21";
 
