@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, Badge, APRBadge } from "@ui";
+import { Prices, NavIcon, Socials, Badge } from "@ui"; // APRBadge
 
-import { cn, formatNumber, useProposals, useStakingData } from "@utils";
+import { cn, formatNumber, useProposals } from "@utils"; //useStakingData
 
 import { apiData, isNavbar } from "@store";
 
@@ -18,7 +18,7 @@ const Menu = (): JSX.Element => {
 
   const { isVoting } = useProposals();
 
-  const { data: stakingData } = useStakingData();
+  // const { data: stakingData } = useStakingData();
 
   const $isNavbar = useStore(isNavbar);
   const $apiData = useStore(apiData);
@@ -128,9 +128,9 @@ const Menu = (): JSX.Element => {
                         {path === "dao" && isVoting && (
                           <Badge state="success" text="Voting" greater />
                         )}
-                        {path === "staking" && (
+                        {/* {path === "staking" && (
                           <APRBadge APR={stakingData?.APR ?? 0} />
-                        )}
+                        )} */}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>
                     </a>
