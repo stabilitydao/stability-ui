@@ -267,7 +267,7 @@ const Dashboard = (): JSX.Element => {
                       {formatNumber(dashboard.userStaked, "format")}
                     </span>
                     <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                      ~ ${formatNumber(dashboard.userStakedInUSD, "format")}
+                      ${formatNumber(dashboard.userStakedInUSD, "format")}
                     </span>
                   </div>
                 ) : (
@@ -303,7 +303,7 @@ const Dashboard = (): JSX.Element => {
                   {formatNumber(dashboard.totalStaked, "format")}
                 </span>
                 <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                  ~ ${formatNumber(dashboard.totalStakedInUSD, "format")}
+                  ${formatNumber(dashboard.totalStakedInUSD, "format")}
                 </span>
               </div>
             ) : (
