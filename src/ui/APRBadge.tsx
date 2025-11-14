@@ -9,9 +9,11 @@ interface IProps {
 const APRBadge: React.FC<IProps> = ({ APR }) => {
   if (APR < 50) return null;
 
-  const text = `+${formatNumber(APR, "formatAPR")}%`;
+  const text = `APR: ${formatNumber(APR, "formatAPR")}%`;
 
-  return <Badge state={APR >= 100 ? "accent" : "success"} text={text} />;
+  return (
+    <Badge state={APR >= 100 ? "accent" : "success"} text={text} greater />
+  );
 };
 
 export { APRBadge };

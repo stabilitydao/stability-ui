@@ -126,7 +126,7 @@ const Menu = (): JSX.Element => {
                       </span>
                       <div className="flex items-center gap-3">
                         {path === "dao" && isVoting && (
-                          <Badge state="success" text="Voting" />
+                          <Badge state="success" text="Voting" greater />
                         )}
                         {path === "staking" && (
                           <APRBadge APR={stakingData?.APR ?? 0} />

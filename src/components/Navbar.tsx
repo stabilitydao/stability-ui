@@ -126,7 +126,7 @@ const Navbar = (): JSX.Element => {
                           <APRBadge APR={stakingData?.APR ?? 0} />
                         )}
                         {path === "dao" && isVoting && (
-                          <Badge state="success" text="Voting" />
+                          <Badge state="success" text="Voting" greater />
                         )}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>

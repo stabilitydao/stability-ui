@@ -212,7 +212,7 @@ export const formatNumber = (value: string | number, type: string): string => {
       } else if (value >= 10000) {
         changedValue = (value / 1000).toFixed(1) + "K";
       } else {
-        changedValue = value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        changedValue = String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       }
 
       break;
