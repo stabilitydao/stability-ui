@@ -19,7 +19,7 @@ export const useStakingData = (): TResult => {
   const fetchStakingData = async () => {
     try {
       if ($apiData?.total) {
-        const general = $apiData.total;
+        const general = $apiData?.total;
 
         const APR = Number(general?.xSTBLPendingAPR ?? 0);
         const staked = Number(general?.xSTBLStaked ?? 0);
