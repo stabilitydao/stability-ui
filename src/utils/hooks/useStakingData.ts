@@ -18,14 +18,14 @@ export const useStakingData = (): TResult => {
 
   const fetchStakingData = async () => {
     try {
-      if (!$apiData?.total) return;
+      if ($apiData?.total) {
+        const general = $apiData.total;
 
-      const general = $apiData.total;
-
-      const APR = Number(general?.xSTBLPendingAPR ?? 0);
-      const staked = Number(general?.xSTBLStaked ?? 0);
-      // @todo add staked in usd etc and use in staking page
-      stakingData.set({ APR, staked });
+        const APR = Number(general?.xSTBLPendingAPR ?? 0);
+        const staked = Number(general?.xSTBLStaked ?? 0);
+        // @todo add staked in usd etc and use in staking page
+        stakingData.set({ APR, staked });
+      }
     } catch (error) {
       console.error("Error fetching staking data:", error);
     }
