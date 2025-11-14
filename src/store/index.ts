@@ -54,21 +54,21 @@ const reload = atom<boolean>(false);
 const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
 
-const apiData = atom<any>(undefined);
-
 const currentChainID = atom();
+
+const stakingData = atom<TStakingData | undefined>(undefined);
 
 // deepMaps
 
 const vaults = deepMap<any>(false);
 const metaVaults = deepMap<any>(false);
 const markets = deepMap<any>(false);
+const apiData = deepMap<any>(false);
 
 const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
 const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
 const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
 const userReservesData = deepMap<Record<string, TUserReservesMap>>({});
-const stakingData = atom<TStakingData | undefined>(undefined);
 
 // maps for loading states
 

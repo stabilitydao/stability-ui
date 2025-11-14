@@ -18,7 +18,7 @@ const Menu = (): JSX.Element => {
 
   const { isVoting } = useProposals();
 
-  // const { data: stakingData } = useStakingData();
+  const { data: stakingData } = useStakingData();
 
   const $isNavbar = useStore(isNavbar);
   const $apiData = useStore(apiData);
@@ -129,8 +129,7 @@ const Menu = (): JSX.Element => {
                           <Badge state="success" text="Voting" greater />
                         )}
                         {path === "staking" && (
-                          // <APRBadge APR={stakingData?.APR ?? 0} />
-                          <APRBadge APR={100} />
+                          <APRBadge APR={stakingData?.APR ?? 0} />
                         )}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>
