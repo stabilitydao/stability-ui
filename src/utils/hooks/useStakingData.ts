@@ -22,7 +22,7 @@ export const useStakingData = (): TResult => {
 
       const general = $apiData.total;
 
-      const APR = Number(Number(general?.xSTBLPendingAPR ?? 0).toFixed());
+      const APR = Number(general?.xSTBLPendingAPR ?? 0);
       const staked = Number(general?.xSTBLStaked ?? 0);
       // @todo add staked in usd etc and use in staking page
       stakingData.set({ APR, staked });

@@ -1,7 +1,5 @@
 import { Badge } from "./Badge";
 
-import { formatNumber } from "@utils";
-
 interface IProps {
   APR: number;
 }
@@ -9,7 +7,7 @@ interface IProps {
 const APRBadge: React.FC<IProps> = ({ APR }) => {
   if (APR < 50) return null;
 
-  const text = `APR: ${formatNumber(APR, "formatAPR")}%`;
+  const text = `APR ${Number(APR).toFixed()}%`;
 
   return (
     <Badge state={APR >= 100 ? "accent" : "success"} text={text} greater />
