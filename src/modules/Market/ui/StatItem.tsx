@@ -1,9 +1,12 @@
 import { Skeleton } from "@ui";
 
+import { cn } from "@utils";
+
 type TProps = {
   label: string;
   value: string;
   futureValue?: string;
+  valuesColor?: { current: string; future: string };
   subValue?: string;
   isLoading: boolean;
   symbol?: string;
@@ -13,6 +16,7 @@ const StatItem: React.FC<TProps> = ({
   label,
   value,
   futureValue,
+  valuesColor,
   subValue,
   isLoading,
   symbol,
@@ -24,20 +28,28 @@ const StatItem: React.FC<TProps> = ({
         <Skeleton height={32} width={100} />
       ) : futureValue && futureValue !== "0" ? (
         <div className="flex items-center gap-2 text-[24px] leading-8">
-          <span className="text-[#7C7E81]">{value}</span>
+          <span
+            className={cn(
+              valuesColor?.current ? valuesColor?.current : "text-[#7C7E81]"
+            )}
+          >
+            {value}
+          </span>
           <img
             src="/icons/arrow-right.png"
             alt="arrow right"
             className="w-4 h-4"
           />
-          <span>
-            {futureValue} {symbol}
-          </span>
+          <p className="flex items-center gap-1">
+            <span className={valuesColor?.future}>{futureValue}</span>
+            <span>{symbol}</span>
+          </p>
         </div>
       ) : (
-        <span className="text-[24px] leading-8">
-          {value} {symbol}
-        </span>
+        <p className="flex items-center gap-1 text-[24px] leading-8">
+          <span className={valuesColor?.current}> {value}</span>
+          <span>{symbol}</span>
+        </p>
       )}
 
       {!!subValue && (

@@ -373,6 +373,7 @@ type TMarketUser = {
   collateral: number;
   debt: number;
   LTV: number;
+  LTVColor: string;
 };
 
 type TTAbleFiltersVariant = {
@@ -442,6 +443,11 @@ type TUnderlyingData = {
   symbol: string;
   decimals: number;
   logo: string;
+};
+
+type TStakingData = {
+  APR: number;
+  staked: number;
 };
 
 ////          VAULT
@@ -701,7 +707,6 @@ type TStakeDashboard = {
   pendingRebaseInSTBL: number;
   pendingRevenue: number;
   pendingRevenueInSTBL: number;
-  APR: number;
   timestamp: number;
   lendingFeesXSTBL: number;
   lendingFeesUSD: number;
@@ -803,6 +808,7 @@ type TMarket = {
   engine: string;
   pool: TAddress;
   protocolDataProvider: TAddress;
+  isStable: boolean;
 
   network?: TNetwork;
 
@@ -1008,4 +1014,5 @@ export type {
   TUserReservesMap,
   TProposal,
   TVote,
+  TStakingData,
 };

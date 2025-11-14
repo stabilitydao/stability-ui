@@ -15,17 +15,35 @@ import { useMarketUsers } from "../../hooks";
 
 import { MARKET_USERS_TABLE, PAGINATION_LIMIT } from "@constants";
 
-import { TMarketUser, TTableColumn } from "@types";
+import { TMarketUser, TTableColumn, TMarket } from "@types";
 
 type TProps = {
-  networkId: string;
-  marketId: string;
+  market: TMarket;
 };
 
-const UsersTab: React.FC<TProps> = ({ networkId, marketId }) => {
+const UsersTab: React.FC<TProps> = ({ market }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const { data, isLoading } = useMarketUsers(networkId, marketId);
+  const riskData = useMemo(() => {
+    const reserve = market?.reserves?.find(
+      (r) => Number(r.maxLtv) > 0 && Number(r.liquidationThreshold) > 0
+    );
+
+    if (!reserve) {
+      return { maxLTV: 0, LT: 0 };
+    }
+
+    return {
+      maxLTV: Number(reserve.maxLtv),
+      LT: Number(reserve.liquidationThreshold),
+    };
+  }, [market]);
+
+  const { data, isLoading } = useMarketUsers(
+    market?.network?.id as string,
+    market?.marketId,
+    riskData
+  );
 
   const initialTableState = getSortedTableStateFromUrl(
     MARKET_USERS_TABLE,

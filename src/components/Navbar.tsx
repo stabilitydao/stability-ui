@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, TextSkeleton, Badge } from "@ui";
+import { Prices, NavIcon, Socials, TextSkeleton, Badge, APRBadge } from "@ui";
 
-import { cn, formatNumber, useProposals } from "@utils";
+import { cn, formatNumber, useProposals, useStakingData } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
@@ -17,6 +17,8 @@ const Navbar = (): JSX.Element => {
   const currentPath = pathname.slice(1);
 
   const { isVoting } = useProposals();
+
+  const { data: stakingData } = useStakingData();
 
   const $apiData = useStore(apiData);
 
@@ -120,6 +122,9 @@ const Navbar = (): JSX.Element => {
                         {name}
                       </span>
                       <div className="flex items-center gap-3">
+                        {path === "staking" && (
+                          <APRBadge APR={stakingData?.APR ?? 0} />
+                        )}
                         {path === "dao" && isVoting && (
                           <Badge state="success" text="Voting" />
                         )}

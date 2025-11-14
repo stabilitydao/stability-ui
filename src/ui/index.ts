@@ -26,6 +26,7 @@ import { MetaVaultStrategies } from "./MetaVaultStrategies";
 import { ProgressCircle } from "./ProgressCircle";
 import { FormError } from "./FormError";
 import { Indicator } from "./Indicator";
+import { APRBadge } from "./APRBadge";
 
 import { AssetsSkeleton } from "./Skeletons/AssetsSkeleton";
 import { ChartSkeleton } from "./Skeletons/ChartSkeleton";
@@ -137,4 +138,5 @@ export {
   FormError,
   Indicator,
   ProposalsTable,
+  APRBadge,
 };

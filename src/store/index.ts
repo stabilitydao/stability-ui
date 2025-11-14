@@ -22,6 +22,7 @@ import type {
   TMarketUser,
   TUserPoolData,
   TUserReservesMap,
+  TStakingData,
 } from "@types";
 
 // atoms
@@ -67,6 +68,7 @@ const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
 const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
 const userPoolsData = deepMap<Record<string, TUserPoolData>>({});
 const userReservesData = deepMap<Record<string, TUserReservesMap>>({});
+const stakingData = atom<TStakingData | undefined>(undefined);
 
 // maps for loading states
 
@@ -125,4 +127,5 @@ export {
   userReservesData,
   userPoolsLoading,
   userReservesLoading,
+  stakingData,
 };

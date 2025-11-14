@@ -2,7 +2,7 @@ import { AddressCell } from "./AddressCell";
 
 import { LoadTable, EmptyTable } from "@ui";
 
-import { formatNumber } from "@utils";
+import { formatNumber, cn } from "@utils";
 
 import { TMarketUser } from "@types";
 
@@ -36,7 +36,9 @@ const UsersTable: React.FC<TProps> = ({ isLoading, data }) => {
                   ? formatNumber(user?.debt, "abbreviate")?.slice(1)
                   : ""}
               </div>
-              <div className="px-2 md:px-4 w-1/4 text-end">
+              <div
+                className={cn("px-2 md:px-4 w-1/4 text-end", user?.LTVColor)}
+              >
                 {user?.LTV ? `${(user?.LTV * 100).toFixed(2)}%` : ""}
               </div>
             </div>

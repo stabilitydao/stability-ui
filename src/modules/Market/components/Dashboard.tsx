@@ -4,11 +4,15 @@ import { useStore } from "@nanostores/react";
 
 import { Skeleton } from "@ui";
 
-import { formatNumber } from "@utils";
+import { formatNumber, cn } from "@utils";
 
 import { useUserReservesData, useUserPoolData } from "../hooks";
 
-import { formatHealthFactor } from "../functions";
+import {
+  formatHealthFactor,
+  getLTVTextColor,
+  getHFTextColor,
+} from "../functions";
 
 import { connected } from "@store";
 
@@ -31,12 +35,26 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
 
   const [stats, setStats] = useState({
     netWorth: "0",
-    HF: "∞",
+    HF: "10000",
     netAPR: "0",
+    LTV: "0",
+    maxLTV: 0,
+    LT: 0,
   });
+
+  const isIsolatedMarket = marketData?.reserves?.length <= 2;
 
   const initStats = async () => {
     if (!userReservesData || !userPoolData) return;
+
+    const HF = String(userPoolData?.healthFactor ?? 0);
+
+    const totalCollateral = Number(userPoolData?.totalCollateralBase ?? 0);
+    const totalDebt = Number(userPoolData?.totalDebtBase ?? 0);
+
+    const LTV = !!totalCollateral ? (totalDebt / totalCollateral) * 100 : 0;
+    const maxLTV = Number(userPoolData?.maxLTV ?? 0);
+    const LT = Number(userPoolData?.currentLiquidationThreshold ?? 0) * 100;
 
     let totalSupplied = 0;
     let totalBorrowed = 0;
@@ -76,8 +94,6 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
 
     const netWorth = totalSupplied - totalBorrowed;
 
-    const HF = formatHealthFactor(userPoolData?.healthFactor ?? 0);
-
     const netInterestUSD = supplyInterestUSD - borrowInterestUSD;
 
     const netAPR = netWorth > 0 ? netInterestUSD / netWorth : 0;
@@ -86,6 +102,9 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
       netWorth: netWorth.toFixed(2),
       HF,
       netAPR: (netAPR * 100).toFixed(2),
+      LTV: Math.min(LTV, 100).toFixed(2),
+      maxLTV,
+      LT,
     });
   };
 
@@ -97,7 +116,7 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
 
   return (
     <div className="bg-[#111114] border border-[#232429] rounded-xl p-4 flex items-start flex-col w-full font-medium">
-      <div className="flex items-start justify-between gap-5 w-full flex-wrap md:flex-nowrap">
+      <div className="flex items-start gap-5 w-full flex-wrap md:flex-nowrap">
         <div className="flex flex-col items-start">
           <span className="text-[#7C7E81] text-[16px] leading-6">
             Net worth
@@ -111,16 +130,6 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
           )}
         </div>
         <div className="flex flex-col items-start">
-          <span className="text-[#7C7E81] text-[16px] leading-6">
-            Health Factor
-          </span>
-          {isPoolLoading || isReservesLoading ? (
-            <Skeleton height={32} width={100} />
-          ) : (
-            <span className="text-[24px] leading-8">{stats.HF}</span>
-          )}
-        </div>
-        <div className="flex flex-col items-start">
           <span className="text-[#7C7E81] text-[16px] leading-6">Net APR</span>
           {isPoolLoading || isReservesLoading ? (
             <Skeleton height={32} width={100} />
@@ -128,6 +137,40 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
             <span className="text-[24px] leading-8">{stats.netAPR}%</span>
           )}
         </div>
+        <div className="flex flex-col items-start">
+          <span className="text-[#7C7E81] text-[16px] leading-6">
+            Health Factor
+          </span>
+          {isPoolLoading || isReservesLoading ? (
+            <Skeleton height={32} width={100} />
+          ) : (
+            <span
+              className={cn(
+                "text-[24px] leading-8",
+                getHFTextColor(Number(stats.HF), marketData?.isStable)
+              )}
+            >
+              {formatHealthFactor(Number(stats.HF))}
+            </span>
+          )}
+        </div>
+        {isIsolatedMarket && (
+          <div className="flex flex-col items-start">
+            <span className="text-[#7C7E81] text-[16px] leading-6">LTV</span>
+            {isPoolLoading || isReservesLoading ? (
+              <Skeleton height={32} width={100} />
+            ) : (
+              <span
+                className={cn(
+                  "text-[24px] leading-8",
+                  getLTVTextColor(Number(stats.LTV), stats.maxLTV, stats.LT)
+                )}
+              >
+                {stats.LTV}%
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
