@@ -54,7 +54,7 @@ const reload = atom<boolean>(false);
 const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
 
-const apiData = atom<any>();
+const apiData = atom<any>(undefined);
 
 const currentChainID = atom();
 

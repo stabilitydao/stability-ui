@@ -32,14 +32,14 @@ export const useStakingData = (): TResult => {
   };
 
   useEffect(() => {
-    if ($stakingData === undefined) {
+    if ($apiData && !$stakingData) {
       fetchStakingData();
     }
   }, [$apiData]);
 
   return {
     data: $stakingData,
-    isLoading: $stakingData === undefined,
+    isLoading: !$stakingData,
     refetch: fetchStakingData,
   };
 };
