@@ -128,9 +128,9 @@ const Menu = (): JSX.Element => {
                         {path === "dao" && isVoting && (
                           <Badge state="success" text="Voting" greater />
                         )}
-                        {path === "staking" && (
+                        {/* {path === "staking" && (
                           <APRBadge APR={stakingData?.APR ?? 0} />
-                        )}
+                        )} */}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>
                     </a>
