@@ -23,7 +23,10 @@ const AddressField: React.FC<TProps> = ({ symbol, address, explorer }) => {
     <div className={cn(!!symbol && "flex items-center justify-between w-full")}>
       {!!symbol && <span className="text-[#7C7E81]">{symbol}</span>}
       <div className={cn("flex items-center gap-3", !symbol && "justify-end")}>
-        <span className="text-[#9180F4] cursor-pointer" onClick={handleCopy}>
+        <span
+          className="text-[#9180F4] cursor-pointer font-mono"
+          onClick={handleCopy}
+        >
           {getShortAddress(address ?? "", 6, 4)}
         </span>
         <div className="flex items-center gap-2">

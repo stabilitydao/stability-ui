@@ -41,10 +41,10 @@ const InformationTab: React.FC<TProps> = ({ market, activeAsset }) => {
             {market?.roles.map(({ name, addresses }) => (
               <div
                 key={name}
-                className="w-full flex items-start justify-between flex-wrap md:flex-nowrap"
+                className="w-full flex items-start justify-between flex-col md:flex-row"
               >
                 <span className="text-[#7C7E81]">{name}</span>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 ml-5 md:ml-0">
                   {addresses.map((address) => (
                     <AddressField
                       key={address}
