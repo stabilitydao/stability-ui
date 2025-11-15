@@ -15,7 +15,7 @@ import { getInitialStateFromUrl } from "./functions";
 import { DAOSectionTypes } from "@types";
 
 const DAO = (): JSX.Element => {
-  const { data: vestingData, isLoading: isLoading } = useVestingData("146");
+  const { data: vestingData, isLoading } = useVestingData("146");
 
   const { section } = getInitialStateFromUrl();
 

@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials, TextSkeleton, Badge } from "@ui";
+import { Prices, NavIcon, Socials, TextSkeleton, Badge, APRBadge } from "@ui";
 
-import { cn, formatNumber, useProposals } from "@utils";
+import { cn, formatNumber, useProposals, useStakingData } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
@@ -17,6 +17,8 @@ const Navbar = (): JSX.Element => {
   const currentPath = pathname.slice(1);
 
   const { isVoting } = useProposals();
+
+  const { data: stakingData } = useStakingData();
 
   const $apiData = useStore(apiData);
 
@@ -66,9 +68,9 @@ const Navbar = (): JSX.Element => {
   );
 
   const statusColor =
-    $apiData?.network.status == "Alert"
+    $apiData?.network?.status == "Alert"
       ? "#ff8d00"
-      : $apiData?.network.status == "OK"
+      : $apiData?.network?.status == "OK"
         ? "#00ff00"
         : "#1B1D21";
 
@@ -120,8 +122,11 @@ const Navbar = (): JSX.Element => {
                         {name}
                       </span>
                       <div className="flex items-center gap-3">
+                        {path === "staking" && (
+                          <APRBadge APR={stakingData?.APR ?? 0} />
+                        )}
                         {path === "dao" && isVoting && (
-                          <Badge state="success" text="Voting" />
+                          <Badge state="success" text="Voting" greater />
                         )}
                         <NavIcon path={path} isActive={activePath === path} />
                       </div>

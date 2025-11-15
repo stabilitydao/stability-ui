@@ -48,7 +48,9 @@ import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
 import { useWindowWidth } from "./hooks/useWindowWidth";
 import { useTimer } from "./hooks/useTimer";
+
 import { useProposals } from "./hooks/useProposals";
+import { useStakingData } from "./hooks/useStakingData";
 
 export {
   getTokenData,
@@ -98,4 +100,5 @@ export {
   formatTime,
   useProposals,
   countVotes,
+  useStakingData,
 };

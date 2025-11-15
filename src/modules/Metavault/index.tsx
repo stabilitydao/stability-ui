@@ -250,47 +250,52 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
     let activeProtocols =
       metaVault?.symbol === "metaUSD" ? protocols : protocols.slice(1);
 
-    const protocolsAllocation = activeProtocols.map((protocol) => {
-      let allocation = 0;
+    const protocolsAllocation = activeProtocols
+      .map((protocol) => {
+        let allocation = 0;
 
-      cleanedVaults.forEach((vault) => {
-        const vaultsToCheck =
-          vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
+        cleanedVaults.forEach((vault) => {
+          const vaultsToCheck =
+            vault?.type != VaultTypes.Vault ? vault.vaults : [vault];
 
-        vaultsToCheck.forEach((v) => {
-          const strategy = v.strategy;
+          vaultsToCheck.forEach((v) => {
+            const strategy = v.strategy;
 
-          const isSiloMatch =
-            protocol?.name === "Silo V2" && strategy.includes("Silo");
+            const isSiloMatch =
+              protocol?.name === "Silo V2" && strategy.includes("Silo");
 
-          const isEulerMatch =
-            protocol?.name === "Euler V2" && strategy.includes("Euler");
+            const isEulerMatch =
+              protocol?.name === "Euler V2" && strategy.includes("Euler");
 
-          const isStrategyMatch = protocol?.name.includes(strategy);
+            const isAaveMatch =
+              protocol?.name === "Aave V3" && strategy.includes("Aave");
 
-          if (isEulerMatch || isSiloMatch || isStrategyMatch) {
-            allocation += Number(v.proportions.allocation || 0);
-          }
+            const isStrategyMatch = protocol?.name.includes(strategy);
+
+            if (isEulerMatch || isSiloMatch || isAaveMatch || isStrategyMatch) {
+              allocation += Number(v.proportions.allocation || 0);
+            }
+          });
         });
-      });
 
-      if (protocol?.name.includes("Compound")) {
-        protocol = PROTOCOLS.enclabs;
-      }
+        if (protocol?.name.includes("Compound")) {
+          protocol = PROTOCOLS.enclabs;
+        }
 
-      let creationDate = protocol?.creationDate ?? 0;
+        let creationDate = protocol?.creationDate ?? 0;
 
-      let audits = protocol?.audits ?? [];
+        let audits = protocol?.audits ?? [];
 
-      if (protocol?.name.includes("Aave")) {
-        creationDate = integrations.stability.protocols.stabilityMarket
-          .creationDate as number;
+        if (protocol?.name.includes("Aave")) {
+          creationDate = integrations.stability.protocols.stabilityMarket
+            .creationDate as number;
 
-        audits = integrations.stability.protocols.stabilityMarket.audits;
-      }
+          audits = integrations.stability.protocols.stabilityMarket.audits;
+        }
 
-      return { ...protocol, allocation, creationDate, audits };
-    });
+        return { ...protocol, allocation, creationDate, audits };
+      })
+      .filter(({ name }) => name != "Merkl");
 
     const totalAllocation = protocolsAllocation.reduce(
       (sum: number, p) => sum + p.allocation,
@@ -304,9 +309,14 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
       }))
       .sort((a, b) => b.value - a.value);
 
-    const checkedProtocols = protocols.map((protocol) =>
-      protocol?.name.includes("Compound") ? PROTOCOLS.enclabs : protocol
-    );
+    const checkedProtocols = protocols.map((protocol) => {
+      if (protocol?.name.includes("Compound")) {
+        return PROTOCOLS.enclabs;
+      } else if (protocol?.name.includes("Aave")) {
+        return PROTOCOLS.stability;
+      }
+      return protocol;
+    });
 
     setLocalVaults(cleanedVaults);
     setFilteredVaults(cleanedVaults);

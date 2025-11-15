@@ -22,6 +22,7 @@ import type {
   TMarketUser,
   TUserPoolData,
   TUserReservesMap,
+  TStakingData,
 } from "@types";
 
 // atoms
@@ -53,15 +54,16 @@ const reload = atom<boolean>(false);
 const error = atom<TError>(DEFAULT_ERROR);
 const isWeb3Load = atom<boolean>(true);
 
-const apiData = atom<any>();
-
 const currentChainID = atom();
+
+const stakingData = atom<TStakingData | undefined>(undefined);
 
 // deepMaps
 
 const vaults = deepMap<any>(false);
 const metaVaults = deepMap<any>(false);
 const markets = deepMap<any>(false);
+const apiData = deepMap<any>(false);
 
 const marketsLiquidations = deepMap<Record<string, TLiquidation[]>>({});
 const marketsUsers = deepMap<Record<string, TMarketUser[]>>({});
@@ -125,4 +127,5 @@ export {
   userReservesData,
   userPoolsLoading,
   userReservesLoading,
+  stakingData,
 };
