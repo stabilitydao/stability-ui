@@ -54,9 +54,7 @@ const Statistics: React.FC = () => {
                   className="w-6 h-6"
                 />
 
-                <span>
-                  {formatNumber(userData.balance, "abbreviateNotUsd")}
-                </span>
+                <span>{formatNumber(userData.balance, "format")}</span>
 
                 {!!Number(userData.balance) && (
                   <img
@@ -77,7 +75,7 @@ const Statistics: React.FC = () => {
                 )}
               </p>
               <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                {formatNumber(userData.balanceInUSD, "abbreviate")}
+                ${formatNumber(userData.balanceInUSD, "format")}
               </span>
             </div>
           ) : (
@@ -105,12 +103,10 @@ const Statistics: React.FC = () => {
                     className="w-6 h-6"
                   />
 
-                  <span>
-                    {formatNumber(userData.totalSupply, "abbreviateNotUsd")}
-                  </span>
+                  <span>{formatNumber(userData.totalSupply, "format")}</span>
                 </p>
                 <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                  {formatNumber(userData.totalSupplyInUSD, "abbreviate")}
+                  ${formatNumber(userData.totalSupplyInUSD, "format")}
                 </span>
               </div>
             </>

@@ -4,6 +4,8 @@ import { useStore } from "@nanostores/react";
 
 import axios from "axios";
 
+import { getLTVTextColor } from "../functions";
+
 import { marketsUsers } from "@store";
 
 import { seeds } from "@stabilitydao/stability";
@@ -16,7 +18,11 @@ type TResult = {
   refetch: () => void;
 };
 
-export const useMarketUsers = (network: string, market: string): TResult => {
+export const useMarketUsers = (
+  network: string,
+  market: string,
+  riskData: { maxLTV: number; LT: number }
+): TResult => {
   const $marketsUsers = useStore(marketsUsers);
   const data = $marketsUsers[market];
 
@@ -33,6 +39,11 @@ export const useMarketUsers = (network: string, market: string): TResult => {
             collateral: userData?.aTokenBalanceUsd ?? 0,
             debt: userData?.debtTokenBalanceUsd ?? 0,
             LTV: userData?.ltv ?? 0,
+            LTVColor: getLTVTextColor(
+              (userData?.ltv ?? 0) * 100,
+              riskData?.maxLTV,
+              riskData?.LT
+            ),
           })
         );
 
@@ -47,7 +58,7 @@ export const useMarketUsers = (network: string, market: string): TResult => {
     if (data === undefined) {
       fetchUsers();
     }
-  }, [network, market, seeds]);
+  }, [network, market, seeds, riskData]);
 
   return {
     data,

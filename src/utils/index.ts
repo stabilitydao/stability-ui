@@ -37,6 +37,7 @@ import { copyText } from "./functions/copyText";
 import { getShortErrorMessage } from "./functions/getShortErrorMessage";
 import { truncateDecimals } from "./functions/truncateDecimals";
 import { formatTime } from "./functions/formatTime";
+import { countVotes } from "./functions/countVotes";
 
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
@@ -47,6 +48,9 @@ import { useClickOutside } from "./hooks/useClickOutside";
 import { useModalClickOutside } from "./hooks/useModalClickOutside";
 import { useWindowWidth } from "./hooks/useWindowWidth";
 import { useTimer } from "./hooks/useTimer";
+
+import { useProposals } from "./hooks/useProposals";
+import { useStakingData } from "./hooks/useStakingData";
 
 export {
   getTokenData,
@@ -94,4 +98,7 @@ export {
   getGasLimit,
   useTimer,
   formatTime,
+  useProposals,
+  countVotes,
+  useStakingData,
 };

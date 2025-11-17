@@ -17,6 +17,14 @@ const TOOLTIP_DESCRIPTIONS = {
   oracle: "Providing market price and cryptocurrency data",
   tokenCap: "Current value based on the circulating supply",
 };
+
 const MARKET_SECTIONS = Object.values(MarketSectionTypes);
 
-export { MARKET_SECTIONS, TOOLTIP_DESCRIPTIONS };
+const RISK_TEXT_COLORS = {
+  green: "text-[#48C05C]",
+  yellow: "text-[#FFBC00]",
+  orange: "text-warning-400",
+  red: "text-error-400",
+};
+
+export { MARKET_SECTIONS, TOOLTIP_DESCRIPTIONS, RISK_TEXT_COLORS };

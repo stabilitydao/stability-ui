@@ -6,7 +6,12 @@ import { StatItem } from "../../ui";
 
 import { formatNumber } from "@utils";
 
-import { convertToUSD, formatHealthFactor } from "../../functions";
+import {
+  convertToUSD,
+  formatHealthFactor,
+  getLTVTextColor,
+  getHFTextColor,
+} from "../../functions";
 
 import { useUserPoolData, useUserReservesData } from "../../hooks";
 
@@ -33,6 +38,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     LTV: { current: "0", future: "0" },
     HF: { current: "∞", future: "0" },
     APR: { supply: "0", borrow: "0" },
+    maxLTV: 0,
+    LT: 0,
   });
 
   const { data: userPoolData, isLoading: isPoolLoading } = useUserPoolData(
@@ -42,6 +49,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
 
   const { data: userData, isLoading: isReservesLoading } =
     useUserReservesData(market);
+
+  const isIsolatedMarket = market?.reserves?.length <= 2;
 
   const handleStats = async () => {
     const _stats = {
@@ -53,6 +62,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
         supply: Number(activeAsset?.supplyAPR).toFixed(2),
         borrow: Number(activeAsset?.borrowAPR).toFixed(2),
       },
+      maxLTV: 0,
+      LT: 0,
     };
 
     const inputValue = Number(value);
@@ -64,8 +75,12 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
     const liquidationThreshold = Number(
       userPoolData?.currentLiquidationThreshold ?? 0
     );
+    const maxLTV = Number(userPoolData?.maxLTV ?? 0);
 
-    const maxLTV = liquidationThreshold * 100;
+    const LT = liquidationThreshold * 100;
+
+    _stats.LT = LT;
+    _stats.maxLTV = maxLTV;
 
     let newCollateral = totalCollateral;
     let newDebt = totalDebt;
@@ -141,7 +156,7 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
         ? (newDebt / newCollateral) * 100
         : 0;
 
-      const futureLTV = Math.min(rawFutureLTV, maxLTV);
+      const futureLTV = Math.min(rawFutureLTV, LT);
 
       const futureHF = !!newDebt
         ? (newCollateral * liquidationThreshold) / newDebt
@@ -199,18 +214,37 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
         />
       </div>
       <div className="flex items-start gap-2 md:gap-6 w-full flex-wrap md:flex-nowrap">
-        <StatItem
-          label="LTV"
-          value={`${stats.LTV.current}%`}
-          futureValue={
-            stats.LTV.future !== "0" ? `${stats.LTV.future}%` : undefined
-          }
-          isLoading={isPoolLoading || isReservesLoading}
-        />
+        {isIsolatedMarket && (
+          <StatItem
+            label="LTV"
+            value={`${stats.LTV.current}%`}
+            futureValue={
+              stats.LTV.future !== "0" ? `${stats.LTV.future}%` : undefined
+            }
+            valuesColor={{
+              current: getLTVTextColor(
+                Number(stats.LTV.current),
+                stats.maxLTV,
+                stats.LT
+              ),
+              future: getLTVTextColor(
+                Number(stats.LTV.future),
+                stats.maxLTV,
+                stats.LT
+              ),
+            }}
+            isLoading={isPoolLoading || isReservesLoading}
+          />
+        )}
+
         <StatItem
           label="Health Factor"
           value={stats.HF.current}
           futureValue={stats.HF.future !== "0" ? stats.HF.future : undefined}
+          valuesColor={{
+            current: getHFTextColor(Number(stats.HF.current), market?.isStable),
+            future: getHFTextColor(Number(stats.HF.future), market?.isStable),
+          }}
           isLoading={isPoolLoading || isReservesLoading}
         />
       </div>

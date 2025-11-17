@@ -2,20 +2,23 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 
-import { countVotes } from "../functions";
+import { countVotes } from "../functions/countVotes";
 
-import { SPACE_ID, SNAPSHOT_API } from "../constants";
+import { SPACE_ID, SNAPSHOT_API } from "@constants";
 
 import { TProposal } from "@types";
 
 type TResult = {
   data: TProposal[] | undefined;
+  isVoting: boolean;
   isLoading: boolean;
   refetch: () => Promise<void>;
 };
 
 export const useProposals = (): TResult => {
   const [data, setData] = useState<TProposal[]>();
+  const [isVoting, setIsVoting] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchProposals = async () => {
@@ -80,6 +83,10 @@ export const useProposals = (): TResult => {
         })
       );
 
+      setIsVoting(
+        proposalsWithVotes.some((proposal) => proposal.state === "active")
+      );
+
       setData(proposalsWithVotes);
     } catch (error) {
       console.error("Error fetching proposals:", error);
@@ -92,5 +99,5 @@ export const useProposals = (): TResult => {
     fetchProposals();
   }, []);
 
-  return { data, isLoading, refetch: fetchProposals };
+  return { data, isVoting, isLoading, refetch: fetchProposals };
 };

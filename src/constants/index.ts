@@ -297,6 +297,7 @@ const VAULTS_WITH_NAME = {
 const META_VAULTS_EXCEPTIONS = [
   "0x1111836d0ff66770f9d9a22fdb7e1f0349501111",
   "0xa881fa6e4d7a338abff52bc3232bf684c2ebc041",
+  "0x1111111199558661bf7ff27b4f1623dc6b91aa3e",
 ];
 
 const PATHS = [
@@ -388,6 +389,10 @@ const LENDING_MARKETS = {
   // ],
 };
 
+const SPACE_ID = "stabilitydao.eth";
+
+const SNAPSHOT_API = "https://hub.snapshot.org/graphql";
+
 const SOCIALS = [
   {
     name: "Stability X",
@@ -478,4 +483,6 @@ export {
   META_VAULTS_EXCEPTIONS,
   HOLDERS_TABLE,
   MARKETS_TABLE_FILTERS,
+  SPACE_ID,
+  SNAPSHOT_API,
 };

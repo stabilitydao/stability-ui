@@ -823,15 +823,18 @@ const AppStore = (props: React.PropsWithChildren): JSX.Element => {
 
     /***** PRICES *****/
     if (stabilityAPIData?.prices) {
-      Object.entries(stabilityAPIData?.prices).forEach(([key, value]) => {
-        const isIntegerPrice = ["BTC", "ETH"].includes(key);
-        _marketPrices[key] = {
-          ...value,
-          price: isIntegerPrice
-            ? Math.round(parseFloat(value.price)).toString()
-            : value.price,
-        };
-      });
+      // @dev temp filter for AVAX
+      Object.entries(stabilityAPIData?.prices)
+        .filter(([name]) => name !== "AVAX")
+        .forEach(([key, value]) => {
+          const isIntegerPrice = ["BTC", "ETH"].includes(key);
+          _marketPrices[key] = {
+            ...value,
+            price: isIntegerPrice
+              ? Math.round(parseFloat(value.price)).toString()
+              : value.price,
+          };
+        });
 
       marketPrices.set(_marketPrices);
     }

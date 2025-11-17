@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useStore } from "@nanostores/react";
 
-import { Prices, NavIcon, Socials } from "@ui";
+import { Prices, NavIcon, Socials, Badge, APRBadge } from "@ui";
 
-import { cn, formatNumber } from "@utils";
+import { cn, formatNumber, useProposals, useStakingData } from "@utils";
 
 import { apiData, isNavbar } from "@store";
 
@@ -15,6 +15,10 @@ import { PATHS, ROUTES } from "@constants";
 const Menu = (): JSX.Element => {
   const pathname = window.location.pathname;
   const currentPath = pathname.slice(1);
+
+  const { isVoting } = useProposals();
+
+  const { data: stakingData } = useStakingData();
 
   const $isNavbar = useStore(isNavbar);
   const $apiData = useStore(apiData);
@@ -62,8 +66,8 @@ const Menu = (): JSX.Element => {
     [$apiData]
   );
 
-  const isAlert = $apiData?.network.status == "Alert";
-  const isOk = $apiData?.network.status == "OK";
+  const isAlert = $apiData?.network?.status == "Alert";
+  const isOk = $apiData?.network?.status == "OK";
 
   return (
     <div className="block md:hidden">
@@ -120,7 +124,15 @@ const Menu = (): JSX.Element => {
                       >
                         {name}
                       </span>
-                      <NavIcon path={path} isActive={activePath === path} />
+                      <div className="flex items-center gap-3">
+                        {path === "dao" && isVoting && (
+                          <Badge state="success" text="Voting" greater />
+                        )}
+                        {path === "staking" && (
+                          <APRBadge APR={stakingData?.APR ?? 0} />
+                        )}
+                        <NavIcon path={path} isActive={activePath === path} />
+                      </div>
                     </a>
                   </div>
                 ))}

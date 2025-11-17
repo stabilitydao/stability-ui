@@ -1,6 +1,6 @@
 import { FullPageLoader, ProposalsTable } from "@ui";
 
-import { useProposals } from "../hooks";
+import { useProposals } from "@utils";
 
 import type { TProposal } from "@types";
 

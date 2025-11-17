@@ -30,12 +30,7 @@ const MarketTabs: React.FC<TProps> = ({ marketData, section, activeAsset }) => {
     case MarketSectionTypes.Information:
       return <InformationTab market={marketData} activeAsset={activeAsset} />;
     case MarketSectionTypes.Users:
-      return (
-        <UsersTab
-          networkId={marketData?.network?.id as string}
-          marketId={marketData?.marketId}
-        />
-      );
+      return <UsersTab market={marketData} />;
     case MarketSectionTypes.Liquidations:
       return (
         <LiquidationsTab

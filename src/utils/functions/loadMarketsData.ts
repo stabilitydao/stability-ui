@@ -74,6 +74,7 @@ const loadMarketsData = async (
       deprecated: libMarket?.deprecated ?? false,
       reserves,
       roles,
+      isStable: marketId.includes("wmetaUSD"), // temp
     };
 
     localMarkets[chainId].push(mergedMarket);

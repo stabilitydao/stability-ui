@@ -12,7 +12,7 @@ import { TextSkeleton, Skeleton } from "@ui";
 
 import { Timer } from "../../ui";
 
-import { formatNumber } from "@utils";
+import { formatNumber, useStakingData } from "@utils";
 
 import { STABILITY_TOKENS } from "@constants";
 
@@ -33,6 +33,9 @@ const Dashboard = (): JSX.Element => {
   const $account = useStore(account);
   const $assetsPrices = useStore(assetsPrices);
   const $lastTx = useStore(lastTx);
+
+  const { data: stakingData, isLoading: isStakingDataLoading } =
+    useStakingData();
 
   const { open } = useWeb3Modal();
 
@@ -57,7 +60,6 @@ const Dashboard = (): JSX.Element => {
     pendingRevenueInSTBL: 0,
     lendingFeesXSTBL: 0,
     lendingFeesUSD: 0,
-    APR: 0,
     timestamp: 0,
   });
 
@@ -66,7 +68,7 @@ const Dashboard = (): JSX.Element => {
       setIsLoaded(false);
 
       const SECONDS_IN_WEEK = 7 * 24 * 60 * 60;
-      const SECONDS_IN_YEAR = 365 * 24 * 60 * 60;
+
       const currentTimestamp = Math.floor(Date.now() / 1000);
 
       const _balances = { xstbl: "0", stakedXSTBL: "0", earned: "0" };
@@ -82,7 +84,6 @@ const Dashboard = (): JSX.Element => {
         pendingRebaseInSTBL: 0,
         pendingRevenue: 0,
         pendingRevenueInSTBL: 0,
-        APR: 0,
         timestamp: 0,
         lendingFeesXSTBL: 0,
         lendingFeesUSD: 0,
@@ -176,11 +177,6 @@ const Dashboard = (): JSX.Element => {
           allIncome += parsedPendingRevenue;
           _dashboardData.pendingRevenue = parsedPendingRevenue * stblPrice;
           _dashboardData.pendingRevenueInSTBL = parsedPendingRevenue;
-
-          const timePassed =
-            currentTimestamp - (_dashboardData.timestamp - SECONDS_IN_WEEK);
-          _dashboardData.APR =
-            (allIncome / parsedTotal) * (SECONDS_IN_YEAR / timePassed) * 100;
         }
       }
 
@@ -248,9 +244,9 @@ const Dashboard = (): JSX.Element => {
             <span className="text-[#97979A] text-[16px] leading-6 font-medium">
               Pending APR
             </span>
-            {isLoaded ? (
+            {!isStakingDataLoading ? (
               <span className="text-[#48C05C] text-[32px] leading-10 font-semibold">
-                +{formatNumber(dashboard.APR, "formatAPR")}%
+                +{formatNumber(stakingData?.APR ?? 0, "formatAPR")}%
               </span>
             ) : (
               <TextSkeleton lineHeight={40} width={160} />
@@ -271,7 +267,7 @@ const Dashboard = (): JSX.Element => {
                       {formatNumber(dashboard.userStaked, "format")}
                     </span>
                     <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                      ~ ${formatNumber(dashboard.userStakedInUSD, "format")}
+                      ${formatNumber(dashboard.userStakedInUSD, "format")}
                     </span>
                   </div>
                 ) : (
@@ -307,7 +303,7 @@ const Dashboard = (): JSX.Element => {
                   {formatNumber(dashboard.totalStaked, "format")}
                 </span>
                 <span className="text-[#97979A] text-[16px] leading-6 font-medium">
-                  ~ ${formatNumber(dashboard.totalStakedInUSD, "format")}
+                  ${formatNumber(dashboard.totalStakedInUSD, "format")}
                 </span>
               </div>
             ) : (
