@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
+
 import { useStore } from "@nanostores/react";
+
 import axios from "axios";
 
 import { Rewards, ClaimSiloPoints } from "./components";
@@ -32,20 +34,8 @@ import type { ApiMainReply, YieldContest } from "@stabilitydao/stability";
 const Season1 = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $account = useStore(account);
-  // nextPeriod
-  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
 
-  // const periodsData = [
-  //   {
-  //     id: previousPeriod || "",
-  //     ...contests[previousPeriod as keyof YieldContest],
-  //   },
-  //   {
-  //     id: currentPeriod || "",
-  //     ...contests[currentPeriod as keyof YieldContest],
-  //   },
-  //   { id: nextPeriod || "", ...contests[nextPeriod as keyof YieldContest] },
-  // ];
+  const { currentPeriod, previousPeriod } = findAllValidPeriods(contests);
 
   const [activeContest, setActiveContest] = useState(TABLE_TYPES[1]);
 
@@ -145,20 +135,6 @@ const Season1 = (): JSX.Element => {
 
         <Rewards />
       </div>
-
-      {/* <div className="mt-10 mb-6 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[24px] leading-8 font-semibold">Contests</span>
-          <a
-            className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-center gap-2"
-            href="/contests"
-          >
-            View all contests
-            <ArrowRightIcon color={"#5E6AD2"} />
-          </a>
-        </div>
-        <ContestsOverview periodsData={periodsData} />
-      </div> */}
 
       <div className="flex flex-col gap-4 mt-10">
         <div className="flex items-center justify-between">

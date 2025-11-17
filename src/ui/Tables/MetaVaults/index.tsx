@@ -18,6 +18,7 @@ import {
 
 interface IProps {
   displayType: MetaVaultDisplayTypes;
+  hide: boolean;
   tableType: MetaVaultTableTypes;
   vaults: TVault[];
   protocols: IProtocol[];
@@ -26,6 +27,7 @@ interface IProps {
 
 const MetaVaultsTable: React.FC<IProps> = ({
   displayType,
+  hide,
   tableType,
   vaults,
   protocols,
@@ -148,7 +150,8 @@ const MetaVaultsTable: React.FC<IProps> = ({
               const current = Number(vaultProportion?.current) * 100;
               const target = Number(vaultProportion?.target) * 100;
 
-              const showInPro = isProDisplay;
+              const showInPro = isProDisplay ? !hide || current > 0.1 : false;
+
               const showInDefault = !isProDisplay && current > 0.1 && target;
 
               if (!showInPro && !showInDefault) return null;
@@ -176,8 +179,9 @@ const MetaVaultsTable: React.FC<IProps> = ({
                     const endCurrent =
                       Number(endVault.proportions?.current ?? 0) * 100;
 
-                    const shouldRenderEnd =
-                      isProDisplay || (!isProDisplay && endCurrent > 0.1);
+                    const shouldRenderEnd = isProDisplay
+                      ? !hide || endCurrent > 0.1
+                      : endCurrent > 0.1;
 
                     return shouldRenderEnd
                       ? renderVault(endVault, true, `sub-${i}`)
@@ -187,17 +191,23 @@ const MetaVaultsTable: React.FC<IProps> = ({
               );
             })
           : protocols.map((protocol: IProtocol, index: number) => {
-              if (isProDisplay || (!isProDisplay && !!protocol.allocation)) {
-                return (
-                  <Protocol
-                    key={`row/${protocol.name + index}`}
-                    isProDisplay={isProDisplay}
-                    protocol={protocol}
-                    activeProtocol={activeSection}
-                    setModalState={setProtocolModalState}
-                  />
-                );
-              }
+              const showInPro = isProDisplay
+                ? !hide || Number(protocol.allocation) > 0.1
+                : false;
+
+              const showInDefault =
+                !isProDisplay && Number(protocol.allocation) > 0.1;
+
+              if (!showInPro && !showInDefault) return null;
+              return (
+                <Protocol
+                  key={`row/${protocol.name + index}`}
+                  isProDisplay={isProDisplay}
+                  protocol={protocol}
+                  activeProtocol={activeSection}
+                  setModalState={setProtocolModalState}
+                />
+              );
             })}
       </div>
     </div>

@@ -10,7 +10,7 @@ import { marketsUsers } from "@store";
 
 import { seeds } from "@stabilitydao/stability";
 
-import type { TAddress, TMarketUser } from "@types";
+import type { TAddress, TMarket, TMarketUser } from "@types";
 
 type TResult = {
   data: TMarketUser[] | undefined;
@@ -18,18 +18,33 @@ type TResult = {
   refetch: () => void;
 };
 
-export const useMarketUsers = (
-  network: string,
-  market: string,
-  riskData: { maxLTV: number; LT: number }
-): TResult => {
+export const useMarketUsers = (market: TMarket): TResult => {
+  const marketId = market?.marketId;
+  const network = market?.network?.id;
+
   const $marketsUsers = useStore(marketsUsers);
-  const data = $marketsUsers[market];
+
+  const data = $marketsUsers[marketId];
 
   const fetchUsers = async () => {
+    // @dev if we have data but need to refetch LTV color
+    if (data) {
+      const users: TMarketUser[] = data.map((obj) => ({
+        ...obj,
+        LTVColor: getLTVTextColor(
+          obj?.LTV * 100,
+          market.risk.maxLTV,
+          market.risk.LT
+        ),
+      }));
+
+      marketsUsers.setKey(marketId, users);
+      return;
+    }
+
     try {
       const res = await axios.get(
-        `${seeds[0]}/lending/${network}/${market}/users`
+        `${seeds[0]}/lending/${network}/${marketId}/users`
       );
 
       if (res.data) {
@@ -41,13 +56,13 @@ export const useMarketUsers = (
             LTV: userData?.ltv ?? 0,
             LTVColor: getLTVTextColor(
               (userData?.ltv ?? 0) * 100,
-              riskData?.maxLTV,
-              riskData?.LT
+              market.risk.maxLTV,
+              market.risk.LT
             ),
           })
         );
 
-        marketsUsers.setKey(market, users);
+        marketsUsers.setKey(marketId, users);
       }
     } catch (error) {
       console.error("Get market users error:", error);
@@ -55,14 +70,12 @@ export const useMarketUsers = (
   };
 
   useEffect(() => {
-    if (data === undefined) {
-      fetchUsers();
-    }
-  }, [network, market, seeds, riskData]);
+    fetchUsers();
+  }, [market]);
 
   return {
     data,
-    isLoading: data === undefined,
+    isLoading: !data,
     refetch: fetchUsers,
   };
 };

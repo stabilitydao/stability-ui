@@ -86,7 +86,7 @@ const StabilityBuilder = (): JSX.Element => {
                   key={`${step.name}/${conveyor.name}/${index}`}
                   className="flex flex-col"
                 >
-                  <div className="text-[16px]">{step.name}</div>
+                  <div className="text-[16px] mb-[4px]">{step.name}</div>
                   <div className="flex min-h-[38px]">
                     {!!builderMemory &&
                       Object.keys(builderMemory.conveyors[conveyor.name])
@@ -98,7 +98,7 @@ const StabilityBuilder = (): JSX.Element => {
                           ).includes(step.name)
                         )
                         .map((taskId) => {
-                          return <div key={taskId}>{taskId}</div>;
+                          return <div key={taskId} className="inline-flex min-w-[70px] border-[2px] justify-center mr-[10px] rounded-lg font-bold">{taskId}</div>;
                         })}
                   </div>
                 </div>

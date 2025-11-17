@@ -155,7 +155,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
       const gasLimit = BigInt(
         Math.trunc(Number(gas) * Number(DEFAULT_TRANSACTION_SETTINGS.gasLimit))
       );
-
+      console.log(gas);
       if (gasLimit) {
         return gasLimit;
       }
@@ -163,7 +163,7 @@ const Form: React.FC<IProps> = ({ network, metaVault, displayType }) => {
       console.error("Failed to get gasLimit", error);
     }
 
-    return BigInt(10000);
+    return BigInt(100000);
   };
 
   const handleMaxInputChange = () => {

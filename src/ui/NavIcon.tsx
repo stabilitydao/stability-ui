@@ -7,7 +7,6 @@ import {
   StakingIcon,
   AgentsIcon,
   PlatformIcon,
-  LeaderboardsIcon,
   LendingIcon,
   DAOIcon,
 } from "./Icons";
@@ -30,8 +29,6 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <MetavaultsIcon color={color} />;
     case "alm":
       return <ALMIcon color={color} />;
-    case "leaderboards":
-      return <LeaderboardsIcon color={color} />;
     case "staking":
       return <StakingIcon color={color} />;
     case "agents":

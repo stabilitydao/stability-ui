@@ -24,26 +24,7 @@ type TProps = {
 const UsersTab: React.FC<TProps> = ({ market }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const riskData = useMemo(() => {
-    const reserve = market?.reserves?.find(
-      (r) => Number(r.maxLtv) > 0 && Number(r.liquidationThreshold) > 0
-    );
-
-    if (!reserve) {
-      return { maxLTV: 0, LT: 0 };
-    }
-
-    return {
-      maxLTV: Number(reserve.maxLtv),
-      LT: Number(reserve.liquidationThreshold),
-    };
-  }, [market]);
-
-  const { data, isLoading } = useMarketUsers(
-    market?.network?.id as string,
-    market?.marketId,
-    riskData
-  );
+  const { data, isLoading } = useMarketUsers(market);
 
   const initialTableState = getSortedTableStateFromUrl(
     MARKET_USERS_TABLE,

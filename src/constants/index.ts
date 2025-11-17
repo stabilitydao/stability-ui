@@ -198,7 +198,7 @@ const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "5",
   approves: "unlimited",
-  gasLimit: "1.2",
+  gasLimit: "1.4",
 };
 
 const PROTOCOLS = Object.entries(integrations).reduce<
@@ -307,7 +307,6 @@ const PATHS = [
   { name: "Meta Vaults", path: "metavaults" },
   { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
-  { name: "Leaderboards", path: "leaderboards" },
   { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },

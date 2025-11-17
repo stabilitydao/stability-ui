@@ -1,6 +1,8 @@
+import { useState } from "react";
+
 import { ColumnSort } from "./ColumnSort";
 
-import { FullPageLoader, MetaVaultsTable } from "@ui";
+import { Checkbox, FullPageLoader, MetaVaultsTable } from "@ui";
 
 import { cn } from "@utils";
 
@@ -24,6 +26,8 @@ type TProps = {
   vaults: TVault[];
   protocols: IProtocol[];
   setProtocolModal: React.Dispatch<React.SetStateAction<IProtocolModal>>;
+  hide: boolean;
+  changeHide: (hide: boolean) => void;
 };
 
 const Table: React.FC<TProps> = ({
@@ -38,6 +42,8 @@ const Table: React.FC<TProps> = ({
   protocols,
   setProtocolModal,
 }) => {
+  const [hide, setHide] = useState<boolean>(true);
+
   const isProDisplay = displayType === MetaVaultDisplayTypes.Pro;
 
   return (
@@ -46,10 +52,23 @@ const Table: React.FC<TProps> = ({
         <span className="font-semibold text-[24px] leading-8 hidden md:block">
           Allocations
         </span>
-        <div className="flex items-center justify-between md:justify-end">
+        <div className="flex items-center justify-between md:justify-end w-full">
           <span className="font-semibold text-[18px] leading-6 block md:hidden">
             Allocations
           </span>
+          {isProDisplay && (
+            <label className="inline-flex items-center cursor-pointer bg-transparent h-10 border border-[#23252A] rounded-lg">
+              <div className="flex items-center gap-2 px-4">
+                <Checkbox
+                  checked={hide}
+                  onChange={() => setHide((prev) => !prev)}
+                />
+                <span className="text-[14px] leading-5 font-medium">
+                  Hide empty
+                </span>
+              </div>
+            </label>
+          )}
         </div>
         <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429]">
           <span
@@ -112,6 +131,7 @@ const Table: React.FC<TProps> = ({
           ) : allVaults?.length ? (
             <MetaVaultsTable
               displayType={displayType}
+              hide={hide}
               tableType={tableType}
               vaults={vaults}
               protocols={protocols}

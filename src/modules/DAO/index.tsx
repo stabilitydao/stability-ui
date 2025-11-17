@@ -4,7 +4,13 @@ import WagmiLayout from "@layouts/WagmiLayout";
 
 import { Indicator, Skeleton } from "@ui";
 
-import { Table, DelegateForm, SectionHandler, Statistics } from "./components";
+import {
+  Table,
+  DelegateForm,
+  SectionHandler,
+  Statistics,
+  Holders,
+} from "./components";
 
 import { formatNumber, cn, updateQueryParams } from "@utils";
 
@@ -155,6 +161,14 @@ const DAO = (): JSX.Element => {
               </div>
             </div>
           </div>
+        </div>
+        <div
+          className={cn(
+            "w-full",
+            activeSection !== DAOSectionTypes.Holders && "hidden"
+          )}
+        >
+          <Holders />
         </div>
       </div>
     </WagmiLayout>

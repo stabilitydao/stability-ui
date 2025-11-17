@@ -5,6 +5,8 @@ export const getLTVTextColor = (
   maxLTV: number,
   LT: number
 ): string => {
+  if (!maxLTV && !LT) return RISK_TEXT_COLORS.white;
+
   const redThreshold = (maxLTV + LT) / 2;
 
   if (LTV <= maxLTV / 2) {

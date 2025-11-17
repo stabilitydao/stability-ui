@@ -14,15 +14,12 @@ import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
-import { Leaderboards } from "./Leaderboards";
-import { Season1 } from "./Leaderboards/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { Staking } from "./Staking";
 import { Dashboard } from "./Dashboard";
 import { LeveragedFarming } from "./LeveragedFarming";
 import { Metavaults } from "./Metavaults";
-import { ALM } from "./ALM";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
 import { Lending } from "./Lending";
@@ -30,6 +27,8 @@ import { MetavaultsManagement } from "./Factory/MetavaultsManagement";
 import { Market } from "./Market";
 import { StabilityBuilder, StabilityOperator } from "./Platform";
 import { DAO } from "./DAO";
+
+import { Season1, Season2 } from "./Seasons";
 
 export {
   Factory,
@@ -45,7 +44,6 @@ export {
   Network,
   Strategies,
   Node,
-  Leaderboards,
   Strategy,
   Contests,
   Contest,
@@ -55,14 +53,14 @@ export {
   Dashboard,
   LeveragedFarming,
   Metavaults,
-  ALM,
   Agents,
   Metavault,
   Lending,
   MetavaultsManagement,
   Market,
-  Season1,
   StabilityBuilder,
   StabilityOperator,
   DAO,
+  Season1,
+  Season2,
 };

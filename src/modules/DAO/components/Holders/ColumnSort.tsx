@@ -19,7 +19,7 @@ type TProps = {
   setTableData: TDispatchedTableData;
 };
 
-const HoldersColumnSort: React.FC<TProps> = ({
+const ColumnSort: React.FC<TProps> = ({
   index,
   value,
   table,
@@ -102,4 +102,4 @@ const HoldersColumnSort: React.FC<TProps> = ({
   );
 };
 
-export { HoldersColumnSort };
+export { ColumnSort };

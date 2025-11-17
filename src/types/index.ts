@@ -809,6 +809,10 @@ type TMarket = {
   pool: TAddress;
   protocolDataProvider: TAddress;
   isStable: boolean;
+  risk: {
+    maxLTV: number;
+    LT: number;
+  };
 
   network?: TNetwork;
 
@@ -880,6 +884,7 @@ export enum DAOSectionTypes {
   Governance = "governance",
   InterChain = "inter-chain",
   Tokenomics = "tokenomics",
+  Holders = "holders",
 }
 
 export enum TransactionTypes {
@@ -912,11 +917,6 @@ export enum TimelineTypes {
   Week = "WEEK",
   Month = "MONTH",
   Year = "YEAR",
-}
-
-export enum LeaderboardTableTypes {
-  Holders = "Holders",
-  Users = "Users",
 }
 
 export type {

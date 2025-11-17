@@ -99,6 +99,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       reserves: _market.reserves,
       roles: _market.roles,
       isStable: _market.isStable,
+      risk: _market.risk,
     };
 
     const defaultAsset =
@@ -176,7 +177,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               <Dashboard marketData={localMarket} />
               <div className="w-full flex items-start flex-col gap-3">
                 <SectionSelector
-                  market={market}
                   activeSection={activeSection}
                   handleSectionChange={handleSectionChange}
                 />

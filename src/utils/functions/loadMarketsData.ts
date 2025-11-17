@@ -65,6 +65,20 @@ const loadMarketsData = async (
           }))
       : [];
 
+    const reserve = reserves?.find(
+      (r) => Number(r.maxLtv) > 0 && Number(r.liquidationThreshold) > 0
+    );
+
+    const risk = reserve
+      ? {
+          maxLTV: Number(reserve.maxLtv),
+          LT: Number(reserve.liquidationThreshold),
+        }
+      : {
+          maxLTV: 0,
+          LT: 0,
+        };
+
     const mergedMarket: TMarket = {
       marketId: marketId,
       engine: libMarket.engine,
@@ -75,6 +89,7 @@ const loadMarketsData = async (
       reserves,
       roles,
       isStable: marketId.includes("wmetaUSD"), // temp
+      risk,
     };
 
     localMarkets[chainId].push(mergedMarket);
