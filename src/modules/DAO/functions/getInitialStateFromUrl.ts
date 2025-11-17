@@ -12,6 +12,7 @@ export const getInitialStateFromUrl = (): {
     DAOSectionTypes.Governance,
     DAOSectionTypes.InterChain,
     DAOSectionTypes.Tokenomics,
+    DAOSectionTypes.Holders,
   ];
 
   const section = validSections.includes(sectionUrl as DAOSectionTypes)

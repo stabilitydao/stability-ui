@@ -14,8 +14,6 @@ import { Node } from "./Platform/components/Network/Node";
 import { Strategies } from "./Platform/components/Strategies";
 import { Strategy } from "./Platform/components/Strategies/Strategy";
 import { Swapper } from "./Platform/components/Swapper";
-import { Leaderboards } from "./Leaderboards";
-import { Season1 } from "./Leaderboards/Season1";
 import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { Staking } from "./Staking";
@@ -31,6 +29,8 @@ import { Market } from "./Market";
 import { StabilityBuilder, StabilityOperator } from "./Platform";
 import { DAO } from "./DAO";
 
+import { Season1, Season2 } from "./Seasons";
+
 export {
   Factory,
   Farms,
@@ -45,7 +45,6 @@ export {
   Network,
   Strategies,
   Node,
-  Leaderboards,
   Strategy,
   Contests,
   Contest,
@@ -61,8 +60,9 @@ export {
   Lending,
   MetavaultsManagement,
   Market,
-  Season1,
   StabilityBuilder,
   StabilityOperator,
   DAO,
+  Season1,
+  Season2,
 };

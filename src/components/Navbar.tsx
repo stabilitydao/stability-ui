@@ -40,12 +40,6 @@ const Navbar = (): JSX.Element => {
       setActivePath("vaults");
     } else if (isPlatform) {
       setActivePath("platform");
-    } else if (
-      currentPath === "leaderboards" ||
-      currentPath.includes("contests") ||
-      currentPath.includes("season-1")
-    ) {
-      setActivePath("leaderboards");
     } else if (currentPath.includes("metavaults")) {
       setActivePath("metavaults");
     } else if (currentPath.includes("lending")) {

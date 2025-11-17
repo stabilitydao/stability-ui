@@ -29,14 +29,13 @@ const Breadcrumbs = (): JSX.Element => {
     if (pathFromConst) {
       add(pathFromConst.name, currentPath);
     } else if (currentPath === "contests") {
-      add("Leaderboards", "leaderboards");
       add("Contests", "contests");
-    } else if (rest[0] === "season-1") {
-      add("Leaderboards", "leaderboards");
+    } else if (currentPath === "season-1") {
       add("Season 1", "season-1");
+    } else if (currentPath === "season-2") {
+      add("Season 2", "season-2");
     } else if (main === "contests" && rest.length === 1) {
       const contest = contests[rest[0]];
-      add("Leaderboards", "leaderboards");
       add("Contests", "contests");
       add(contest?.name || "Unknown Contest");
     } else if (currentPath === "platform") {
@@ -115,7 +114,6 @@ const Breadcrumbs = (): JSX.Element => {
       add("Platform", "platform");
       add("Builder");
     }
-
 
     setPaths(crumbs);
   }, [currentPath, $vaults, $metaVaults]);

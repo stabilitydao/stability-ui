@@ -34,14 +34,25 @@ const SectionHandler: React.FC<TProps> = ({ activeSection, changeSection }) => {
       </div>
       <div
         className={cn(
-          "w-full text-center py-2 px-4 sm:rounded-r-lg sm:border-y sm:border-r sm:border-[#232429]",
+          "w-full text-center py-2 px-4 sm:border-y sm:border-[#232429]",
           activeSection === DAOSectionTypes.Tokenomics
-            ? "bg-[#232429] rounded-b-lg sm:rounded-bl-none"
+            ? "bg-[#232429]"
             : "text-[#7C7E81]"
         )}
         onClick={() => changeSection(DAOSectionTypes.Tokenomics)}
       >
         Tokenomics
+      </div>
+      <div
+        className={cn(
+          "w-full text-center py-2 px-4 sm:rounded-r-lg sm:border-y sm:border-r sm:border-[#232429]",
+          activeSection === DAOSectionTypes.Holders
+            ? "bg-[#232429] rounded-b-lg sm:rounded-bl-none"
+            : "text-[#7C7E81]"
+        )}
+        onClick={() => changeSection(DAOSectionTypes.Holders)}
+      >
+        Holders
       </div>
     </div>
   );

@@ -307,7 +307,6 @@ const PATHS = [
   { name: "Meta Vaults", path: "metavaults" },
   { name: "Lending", path: "lending" },
   // { name: "ALM", path: "alm" },
-  { name: "Leaderboards", path: "leaderboards" },
   { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
   // { name: "Agents", path: "agents" },

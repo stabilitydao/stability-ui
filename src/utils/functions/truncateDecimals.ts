@@ -2,6 +2,8 @@ export const truncateDecimals = (
   value: number | string,
   decimals: number
 ): string => {
+  if (!Number(value)) return String(value);
+
   value = Number(value);
 
   const factor = 10 ** decimals;
