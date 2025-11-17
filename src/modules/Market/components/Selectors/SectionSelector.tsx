@@ -9,13 +9,11 @@ import { MARKET_SECTIONS } from "../../constants";
 import { MarketSectionTypes } from "@types";
 
 type TProps = {
-  market: string;
   activeSection: MarketSectionTypes;
   handleSectionChange: (section: MarketSectionTypes) => void;
 };
 
 const SectionSelector: React.FC<TProps> = ({
-  market,
   activeSection,
   handleSectionChange,
 }) => {
@@ -63,9 +61,6 @@ const SectionSelector: React.FC<TProps> = ({
           whileTap={{ cursor: "grabbing" }}
         >
           {mobileMainSections.map((section: MarketSectionTypes) => {
-            // temp
-            if (section === "Users" && market === "Main") return null;
-
             const isActiveSection =
               activeSection === section ||
               (operations.includes(activeSection) && section === "Operations");
@@ -137,9 +132,6 @@ const SectionSelector: React.FC<TProps> = ({
 
       <div className="hidden md:flex items-center justify-end gap-2">
         {MARKET_SECTIONS.slice(1).map((section: MarketSectionTypes) => {
-          // temp
-          if (section === "Users" && market === "Main") return null;
-
           return (
             <div
               key={`desktop-${section}`}

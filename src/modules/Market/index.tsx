@@ -176,7 +176,6 @@ const Market: React.FC<IProps> = ({ network, market }) => {
               <Dashboard marketData={localMarket} />
               <div className="w-full flex items-start flex-col gap-3">
                 <SectionSelector
-                  market={market}
                   activeSection={activeSection}
                   handleSectionChange={handleSectionChange}
                 />
