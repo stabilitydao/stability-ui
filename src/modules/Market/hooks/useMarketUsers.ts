@@ -23,9 +23,25 @@ export const useMarketUsers = (market: TMarket): TResult => {
   const network = market?.network?.id;
 
   const $marketsUsers = useStore(marketsUsers);
+
   const data = $marketsUsers[marketId];
 
   const fetchUsers = async () => {
+    // @dev if we have data but need to refetch LTV color
+    if (data) {
+      const users: TMarketUser[] = data.map((obj) => ({
+        ...obj,
+        LTVColor: getLTVTextColor(
+          obj?.LTV * 100,
+          market.risk.maxLTV,
+          market.risk.LT
+        ),
+      }));
+
+      marketsUsers.setKey(marketId, users);
+      return;
+    }
+
     try {
       const res = await axios.get(
         `${seeds[0]}/lending/${network}/${marketId}/users`
@@ -54,9 +70,7 @@ export const useMarketUsers = (market: TMarket): TResult => {
   };
 
   useEffect(() => {
-    if (!data) {
-      fetchUsers();
-    }
+    fetchUsers();
   }, [market]);
 
   return {

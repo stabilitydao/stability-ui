@@ -21,6 +21,7 @@ const TOOLTIP_DESCRIPTIONS = {
 const MARKET_SECTIONS = Object.values(MarketSectionTypes);
 
 const RISK_TEXT_COLORS = {
+  white: "text-[#ffffff]",
   green: "text-[#48C05C]",
   yellow: "text-[#FFBC00]",
   orange: "text-warning-400",

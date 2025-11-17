@@ -55,14 +55,14 @@ export const useMarketLiquidations = (
   };
 
   useEffect(() => {
-    if (data === undefined) {
+    if (!data) {
       fetchLiquidations();
     }
   }, [network, market, seeds]);
 
   return {
     data,
-    isLoading: data === undefined,
+    isLoading: !data,
     refetch: fetchLiquidations,
   };
 };

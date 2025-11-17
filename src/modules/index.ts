@@ -20,7 +20,6 @@ import { Staking } from "./Staking";
 import { Dashboard } from "./Dashboard";
 import { LeveragedFarming } from "./LeveragedFarming";
 import { Metavaults } from "./Metavaults";
-import { ALM } from "./ALM";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
 import { Lending } from "./Lending";
@@ -54,7 +53,6 @@ export {
   Dashboard,
   LeveragedFarming,
   Metavaults,
-  ALM,
   Agents,
   Metavault,
   Lending,
