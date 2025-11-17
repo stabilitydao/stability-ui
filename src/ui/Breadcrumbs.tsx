@@ -96,7 +96,6 @@ const Breadcrumbs = (): JSX.Element => {
           // @ts-ignore
           ({ address }) => address.toLowerCase() === metaVaultAddress
         )?.name || "Meta Vault";
-      console.log(network, metaVaultAddress);
 
       add("Meta Vaults", "metavaults");
       add(symbol);

@@ -198,7 +198,7 @@ const YEARN_PROTOCOLS = ["aave", "stargate", "stmatic", "compound"];
 const DEFAULT_TRANSACTION_SETTINGS = {
   slippage: "5",
   approves: "unlimited",
-  gasLimit: "1.2",
+  gasLimit: "1.4",
 };
 
 const PROTOCOLS = Object.entries(integrations).reduce<
