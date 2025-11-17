@@ -99,6 +99,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       reserves: _market.reserves,
       roles: _market.roles,
       isStable: _market.isStable,
+      risk: _market.risk,
     };
 
     const defaultAsset =

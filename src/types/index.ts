@@ -809,6 +809,10 @@ type TMarket = {
   pool: TAddress;
   protocolDataProvider: TAddress;
   isStable: boolean;
+  risk: {
+    maxLTV: number;
+    LT: number;
+  };
 
   network?: TNetwork;
 
