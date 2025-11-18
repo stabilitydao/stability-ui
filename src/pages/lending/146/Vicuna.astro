@@ -1,0 +1,16 @@
+---
+import Layout from '@layouts/Layout.astro';
+
+import { Market } from "@modules"
+---
+
+
+<Layout 
+  title="Vicuna Market"
+  img="/ogs/markets/Vicuna.png"
+  metaTitle="Vicuna Market"
+  metaUrl="https://stability.farm/lending/146/Vicuna"
+  metaDescription="Non-custodial liquidity market"
+>
+  <Market network="146" market="Vicuna" client:only="react" />
+</Layout>

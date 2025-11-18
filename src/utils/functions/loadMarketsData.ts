@@ -11,7 +11,9 @@ const loadMarketsData = async (
 ): Promise<{ [chainId: string]: TMarket[] }> => {
   const localMarkets: { [chainId: string]: TMarket[] } = {};
 
-  for (const libMarket of lendingMarkets) {
+  const uiMarkets = lendingMarkets.filter((market) => market.show);
+
+  for (const libMarket of uiMarkets) {
     const chainId = libMarket.chainId;
     const marketId = libMarket.id;
 
@@ -82,7 +84,7 @@ const loadMarketsData = async (
     const type =
       reserves.length > 2
         ? MarketTypes.NonIsolated
-        : marketId.includes("wmetaUSD") // temp
+        : libMarket?.stableCoinIsolatedMarket
           ? MarketTypes.Stable
           : MarketTypes.Isolated; // @dev reserves <= 2 by default
 
