@@ -4,16 +4,18 @@ import axios from "axios";
 
 import { formatNumber } from "@utils";
 
-import { AgentId, getAgent, IBuilderAgent } from "@stabilitydao/stability";
+import { Agent, getAgents } from "@stabilitydao/stability";
 
 import {
+  AgentRole,
   IBuilderMemory,
   IConveyor,
   IPool,
-} from "@stabilitydao/stability/out/builder";
+} from "@stabilitydao/stability/out/agents";
 
 const StabilityBuilder = (): JSX.Element => {
-  const agent: IBuilderAgent = getAgent("BUILDER" as AgentId) as IBuilderAgent;
+  const agents: Agent[] = getAgents("BUILDER" as AgentRole) as Agent[];
+  const agent = agents[0];
 
   const [builderMemory, setBuilderMemory] = useState<IBuilderMemory>();
 
@@ -44,7 +46,7 @@ const StabilityBuilder = (): JSX.Element => {
 
       <h3 className="text-[22px] font-bold mb-[20px] text-center">Pools</h3>
       <div className="flex w-full flex-wrap gap-[20px] mb-[50px]">
-        {agent.pools.map((value: IPool) => (
+        {agent.builderData.pools.map((value: IPool) => (
           <div
             key={value.name}
             className="flex w-full md:w-5/12 flex-col rounded-xl lg:w-[280px] bg-[#111114] border border-[#232429]"
@@ -72,7 +74,7 @@ const StabilityBuilder = (): JSX.Element => {
 
       <h3 className="text-[22px] font-bold mb-[20px] text-center">Conveyors</h3>
       <div className="flex flex-col w-full mb-[50px] gap-[20px]">
-        {agent.conveyors.map((conveyor: IConveyor) => (
+        {agent.builderData.conveyors.map((conveyor: IConveyor) => (
           <div
             key={conveyor.name}
             className="flex flex-col bg-[#111114] border border-[#232429]"
@@ -94,11 +96,18 @@ const StabilityBuilder = (): JSX.Element => {
                           Object.keys(
                             (builderMemory as IBuilderMemory).conveyors[
                               conveyor.name
-                              ][taskId]
+                            ][taskId]
                           ).includes(step.name)
                         )
                         .map((taskId) => {
-                          return <div key={taskId} className="inline-flex min-w-[70px] border-[2px] justify-center mr-[10px] rounded-lg font-bold">{taskId}</div>;
+                          return (
+                            <div
+                              key={taskId}
+                              className="inline-flex min-w-[70px] border-[2px] justify-center mr-[10px] rounded-lg font-bold"
+                            >
+                              {taskId}
+                            </div>
+                          );
                         })}
                   </div>
                 </div>
@@ -113,7 +122,7 @@ const StabilityBuilder = (): JSX.Element => {
           Open issues
         </div>
         <div className="flex p-[20px] flex-col">
-          {agent.repo.map((value: string) => (
+          {agent.builderData.repo.map((value: string) => (
             <div
               key={value}
               className="flex items-center text-[14px] justify-between"
@@ -148,7 +157,7 @@ const StabilityBuilder = (): JSX.Element => {
           <div className="flex p-[20px] text-[14px]">
             <table>
               <tbody>
-                {agent.burnRate.map(
+                {agent.builderData.burnRate.map(
                   (value: { period: string; usdAmount: number }) => (
                     <tr key={value.period}>
                       <td className="min-w-[160px]">{value.period}</td>
@@ -178,7 +187,7 @@ const StabilityBuilder = (): JSX.Element => {
             </div>
             <div className="flex">
               <span className="flex px-[16px] py-[10px] rounded-xl bg-[#1f2b69]">
-                📆 {agent.tokenization}
+                📆 {agent.tokenization.eta}
               </span>
             </div>
           </div>

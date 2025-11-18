@@ -13,14 +13,14 @@ import { cn, formatNumber } from "@utils";
 import { apiData, marketPrices } from "@store";
 
 import {
-  AgentId,
+  AgentRole,
   type ApiMainReply,
-  getAgent,
+  getAgents,
   seeds,
   IBuilderAgent,
 } from "@stabilitydao/stability";
 
-import { IOperatorAgent } from "@stabilitydao/stability/out/agents";
+import { IOperatorAgent, Agent } from "@stabilitydao/stability/out/agents";
 
 import { NodeState } from "@stabilitydao/stability/out/api.types";
 
@@ -28,13 +28,16 @@ const Platform = (): JSX.Element => {
   const $apiData: ApiMainReply | undefined = useStore(apiData);
   const $marketPrices = useStore(marketPrices);
 
-  const operatorAgent: IOperatorAgent = getAgent(
-    "OPERATOR" as AgentId
-  ) as IOperatorAgent;
+  const operatorAgents: IOperatorAgent = getAgents(
+    "OPERATOR" as AgentRole
+  ) as Agent[];
 
-  const builderAgent: IBuilderAgent = getAgent(
-    "BUILDER" as AgentId
-  ) as IBuilderAgent;
+  const builderAgents: IBuilderAgent = getAgents(
+    "BUILDER" as AgentRole
+  ) as Agent[];
+
+  const operatorAgent = operatorAgents[0];
+  const builderAgent = builderAgents[0];
 
   const isAlert = $apiData?.network?.status == "Alert";
   const isOk = $apiData?.network?.status == "OK";
