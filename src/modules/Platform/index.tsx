@@ -30,12 +30,13 @@ const Platform = (): JSX.Element => {
   const operatorAgent: IOperatorAgent = getAgent(
     "OPERATOR" as AgentId
   ) as IOperatorAgent;
+
   const builderAgent: IBuilderAgent = getAgent(
     "BUILDER" as AgentId
   ) as IBuilderAgent;
 
-  const isAlert = $apiData?.network.status == "Alert";
-  const isOk = $apiData?.network.status == "OK";
+  const isAlert = $apiData?.network?.status == "Alert";
+  const isOk = $apiData?.network?.status == "OK";
   const stblPrice = $marketPrices?.STBL;
 
   let totalLendingMarkets = 0;
