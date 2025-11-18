@@ -31,7 +31,9 @@ const Menu = (): JSX.Element => {
       ROUTES.platform.some((path) => currentPath.includes(path));
 
     const isVaults =
-      !currentPath.includes("metavaults") && currentPath.includes("vault");
+      !currentPath.includes("metavaults") &&
+      !currentPath.includes("leverage") &&
+      currentPath.includes("vault");
 
     const isBasicPage = ROUTES.basic.includes(currentPath);
 
