@@ -47,12 +47,12 @@ const LiquidationsTab: React.FC<TProps> = memo(({ networkId, marketId }) => {
 
     if (!activeSortColumn) return data;
 
-    const { keyName, dataType, sortType } = activeSortColumn;
+    const { key, dataType, sortType } = activeSortColumn;
 
     return [...data].sort((a, b) =>
       dataSorter(
-        String(a[keyName as keyof TLiquidation]),
-        String(b[keyName as keyof TLiquidation]),
+        String(a[key as keyof TLiquidation]),
+        String(b[key as keyof TLiquidation]),
         dataType,
         sortType
       )

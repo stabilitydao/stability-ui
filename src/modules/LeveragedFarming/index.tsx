@@ -201,7 +201,7 @@ const LeveragedFarming = (): JSX.Element => {
     //sort
     table.forEach((state: TTableColumn) => {
       if (state.sortType !== "none") {
-        if (state.keyName === "earningData") {
+        if (state.key === "earningData") {
           sortedVaults = [...sortedVaults].sort((a, b) => {
             const aAPR =
               a?.type != VaultTypes.Vault
@@ -218,8 +218,8 @@ const LeveragedFarming = (): JSX.Element => {
         } else {
           sortedVaults = [...sortedVaults].sort((a, b) =>
             dataSorter(
-              String(a[state.keyName as keyof TVault]),
-              String(b[state.keyName as keyof TVault]),
+              String(a[state.key as keyof TVault]),
+              String(b[state.key as keyof TVault]),
               state.dataType,
               state.sortType
             )

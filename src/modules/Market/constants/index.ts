@@ -1,4 +1,4 @@
-import { MarketSectionTypes } from "@types";
+import { MarketSectionTypes, MarketTypes } from "@types";
 
 const TOOLTIP_DESCRIPTIONS = {
   isolatedRisk:
@@ -28,4 +28,15 @@ const RISK_TEXT_COLORS = {
   red: "text-error-400",
 };
 
-export { MARKET_SECTIONS, TOOLTIP_DESCRIPTIONS, RISK_TEXT_COLORS };
+const USERS_TABLE_WIDTH = {
+  [MarketTypes.Isolated]: "min-w-[750px]",
+  [MarketTypes.NonIsolated]: "min-w-[650px]",
+  [MarketTypes.Stable]: "min-w-[600px]",
+};
+
+export {
+  MARKET_SECTIONS,
+  TOOLTIP_DESCRIPTIONS,
+  RISK_TEXT_COLORS,
+  USERS_TABLE_WIDTH,
+};

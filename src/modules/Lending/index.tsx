@@ -145,8 +145,8 @@ const Lending = (): JSX.Element => {
       if (state.sortType !== "none") {
         sortedMarkets = [...sortedMarkets].sort((a, b) =>
           dataSorter(
-            String(a[state.keyName as keyof TMarket]),
-            String(b[state.keyName as keyof TMarket]),
+            String(a[state.key as keyof TMarket]),
+            String(b[state.key as keyof TMarket]),
             state.dataType,
             state.sortType
           )
@@ -257,7 +257,7 @@ const Lending = (): JSX.Element => {
         <h2 className="page-title__font text-start mb-2 md:mb-5">Lending</h2>
         <div className="flex items-start md:items-center justify-between flex-col md:flex-row gap-2">
           <h3 className="text-[#97979a] page-description__font">
-            Non-custodial on-chain isolated lending markets
+            Non-custodial on-chain lending markets
           </h3>
           <Filters
             filters={tableFilters}

@@ -1,21 +1,50 @@
 import { cn } from "@utils";
 
-import type { TTableColumn } from "@types";
+import { MarketTypes, TTableColumn } from "@types";
 
 type TProps = {
   index: number;
   value: string;
   table: TTableColumn[];
   sort: (table: TTableColumn[]) => void;
+  marketType: MarketTypes;
 };
 
-const UsersColumnSort: React.FC<TProps> = ({ index, value, table, sort }) => {
-  const styles: Record<string, string> = {
-    User: "w-1/4 flex justify-start px-2 md:px-4",
-    Collateral: "w-1/4 flex justify-end px-2 md:px-4",
-    Debt: "w-1/4 flex justify-end px-2 md:px-4",
-    LTV: "w-1/4 flex justify-end px-2 md:px-4",
-  };
+const stylesMap: Record<MarketTypes, Record<string, string>> = {
+  [MarketTypes.Isolated]: {
+    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
+    Collateral: "w-[100px] md:w-[16%] justify-end",
+    Debt: "w-[100px] md:w-[16%] justify-end",
+    "Health Factor": "w-[150px] md:w-[16%] justify-end",
+    "Liquidation Price": "w-[150px] md:w-[16%] justify-end",
+    LTV: "w-[100px] md:w-[16%] justify-end",
+  },
+
+  [MarketTypes.NonIsolated]: {
+    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
+    Collateral: "w-[100px] md:w-1/5 justify-end",
+    Debt: "w-[100px] md:w-1/5 justify-end",
+    "Health Factor": "w-[150px] md:w-1/5 justify-end",
+    "Liquidation Price": "w-[150px] md:w-1/5 justify-end",
+  },
+
+  [MarketTypes.Stable]: {
+    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
+    Collateral: "w-[100px] md:w-1/5 justify-end",
+    Debt: "w-[100px] md:w-1/5 justify-end",
+    "Health Factor": "w-[150px] md:w-1/5 justify-end",
+    LTV: "w-[100px] md:w-1/5 justify-end",
+  },
+};
+
+const UsersColumnSort: React.FC<TProps> = ({
+  index,
+  value,
+  table,
+  sort,
+  marketType,
+}) => {
+  const styles = stylesMap[marketType] ?? {};
 
   const tabController = () => {
     if (table[index].unsortable) return;

@@ -26,8 +26,6 @@ type TProps = {
   vaults: TVault[];
   protocols: IProtocol[];
   setProtocolModal: React.Dispatch<React.SetStateAction<IProtocolModal>>;
-  hide: boolean;
-  changeHide: (hide: boolean) => void;
 };
 
 const Table: React.FC<TProps> = ({
