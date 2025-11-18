@@ -58,9 +58,9 @@ const Home = (): JSX.Element => {
               </a>
               <a
                 className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"
-                href="/leveraged-farming"
+                href="/leveraged-vaults"
               >
-                Leveraged Farming
+                Leveraged Vaults
               </a>
               <a
                 className="text-white text-[15px] md:text-[20px] leading-[100%] py-[9px] md:py-[15px] px-6 md:px-[45px] bg-[#612FFB] rounded-[5px] font-medium md:ml-[2px]"

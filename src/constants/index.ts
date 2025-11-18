@@ -303,7 +303,7 @@ const META_VAULTS_EXCEPTIONS = [
 const PATHS = [
   { name: "Lending", path: "lending" },
   { name: "Meta Vaults", path: "metavaults" },
-  { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Leveraged Vaults", path: "leveraged-vaults" },
   { name: "All Vaults", path: "vaults" },
   { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
@@ -316,7 +316,7 @@ const ROUTES = {
   basic: [
     "staking",
     "dashboard",
-    "leveraged-farming",
+    "leveraged-vaults",
     "alm",
     "agents",
     "lending",

@@ -18,7 +18,7 @@ import { Contests } from "./Contests";
 import { Contest } from "./Contests/Contest";
 import { Staking } from "./Staking";
 import { Dashboard } from "./Dashboard";
-import { LeveragedFarming } from "./LeveragedFarming";
+import { LeveragedVaults } from "./LeveragedVaults";
 import { Metavaults } from "./Metavaults";
 import { Agents } from "./Agents";
 import { Metavault } from "./Metavault";
@@ -51,7 +51,7 @@ export {
   Staking,
   Swapper,
   Dashboard,
-  LeveragedFarming,
+  LeveragedVaults,
   Metavaults,
   Agents,
   Metavault,
