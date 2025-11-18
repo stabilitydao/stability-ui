@@ -242,8 +242,8 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
           value={stats.HF.current}
           futureValue={stats.HF.future !== "0" ? stats.HF.future : undefined}
           valuesColor={{
-            current: getHFTextColor(Number(stats.HF.current), market?.isStable),
-            future: getHFTextColor(Number(stats.HF.future), market?.isStable),
+            current: getHFTextColor(Number(stats.HF.current), market?.type),
+            future: getHFTextColor(Number(stats.HF.future), market?.type),
           }}
           isLoading={isPoolLoading || isReservesLoading}
         />

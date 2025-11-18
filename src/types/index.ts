@@ -348,7 +348,7 @@ type TxTokens = {
 
 type TTableColumn = {
   name: string;
-  keyName: string;
+  key: string;
   sortType: string;
   dataType: string;
   unsortable?: boolean;
@@ -372,7 +372,9 @@ type TMarketUser = {
   address: TAddress;
   collateral: number;
   debt: number;
+  healthFactor: number;
   LTV: number;
+  liquidationPrice: number;
   LTVColor: string;
 };
 
@@ -808,7 +810,7 @@ type TMarket = {
   engine: string;
   pool: TAddress;
   protocolDataProvider: TAddress;
-  isStable: boolean;
+  type: MarketTypes;
   risk: {
     maxLTV: number;
     LT: number;
@@ -898,6 +900,12 @@ export enum VaultTypes {
   Vault = "Vault",
   MetaVault = "MetaVault",
   MultiVault = "MultiVault",
+}
+
+export enum MarketTypes {
+  Isolated = "Isolated",
+  NonIsolated = "NonIsolated",
+  Stable = "Stable",
 }
 
 export enum MarketSectionTypes {

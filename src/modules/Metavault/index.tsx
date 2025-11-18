@@ -133,7 +133,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
 
         sortedList = table.reduce((acc, state) => {
           if (state.sortType !== "none") {
-            return sortData(acc, state.keyName, state.dataType, state.sortType);
+            return sortData(acc, state.key, state.dataType, state.sortType);
           }
           return acc;
         }, localVaults);
@@ -144,7 +144,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
       case MetaVaultTableTypes.Protocols:
         sortedList = table.reduce((acc, state) => {
           if (state.sortType !== "none") {
-            return sortData(acc, state.keyName, state.dataType, state.sortType);
+            return sortData(acc, state.key, state.dataType, state.sortType);
           }
           return acc;
         }, localProtocols);

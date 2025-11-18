@@ -98,7 +98,7 @@ const Market: React.FC<IProps> = ({ network, market }) => {
       deployed: _market.deployed,
       reserves: _market.reserves,
       roles: _market.roles,
-      isStable: _market.isStable,
+      type: _market.type,
       risk: _market.risk,
     };
 

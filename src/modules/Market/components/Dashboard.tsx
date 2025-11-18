@@ -147,7 +147,7 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
             <span
               className={cn(
                 "text-[24px] leading-8",
-                getHFTextColor(Number(stats.HF), marketData?.isStable)
+                getHFTextColor(Number(stats.HF), marketData?.type)
               )}
             >
               {formatHealthFactor(Number(stats.HF))}

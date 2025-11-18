@@ -4,14 +4,16 @@ import { lendingMarkets } from "@stabilitydao/stability";
 
 import { MarketData } from "@stabilitydao/stability/out/api.types";
 
-import type { TMarket, TMarketReserve, TAddress } from "@types";
+import { TMarket, TMarketReserve, TAddress, MarketTypes } from "@types";
 
 const loadMarketsData = async (
   markets: MarketData
 ): Promise<{ [chainId: string]: TMarket[] }> => {
   const localMarkets: { [chainId: string]: TMarket[] } = {};
 
-  for (const libMarket of lendingMarkets) {
+  const uiMarkets = lendingMarkets.filter((market) => market.show);
+
+  for (const libMarket of uiMarkets) {
     const chainId = libMarket.chainId;
     const marketId = libMarket.id;
 
@@ -79,6 +81,13 @@ const loadMarketsData = async (
           LT: 0,
         };
 
+    const type =
+      reserves.length > 2
+        ? MarketTypes.NonIsolated
+        : libMarket?.stableCoinIsolatedMarket
+          ? MarketTypes.Stable
+          : MarketTypes.Isolated; // @dev reserves <= 2 by default
+
     const mergedMarket: TMarket = {
       marketId: marketId,
       engine: libMarket.engine,
@@ -88,7 +97,7 @@ const loadMarketsData = async (
       deprecated: libMarket?.deprecated ?? false,
       reserves,
       roles,
-      isStable: marketId.includes("wmetaUSD"), // temp
+      type,
       risk,
     };
 

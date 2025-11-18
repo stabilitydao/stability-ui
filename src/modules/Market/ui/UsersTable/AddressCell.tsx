@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { getShortAddress, copyAddress } from "@utils";
+import { getShortAddress, copyAddress, cn } from "@utils";
 
 import { account } from "@store";
 
@@ -25,7 +25,10 @@ const AddressCell: React.FC<TProps> = ({ address }) => {
 
   return (
     <div
-      className={`group px-2 md:px-4 w-1/4 text-start flex items-center gap-1 cursor-pointer ${$account?.toLowerCase() === address ? "underline" : ""}`}
+      className={cn(
+        "sticky h-[56px] top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A] group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer",
+        $account?.toLowerCase() === address && "underline"
+      )}
       style={{ fontFamily: "monospace" }}
       title={address}
       onClick={handleCopy}

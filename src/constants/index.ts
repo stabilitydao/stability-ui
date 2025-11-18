@@ -301,14 +301,14 @@ const META_VAULTS_EXCEPTIONS = [
 ];
 
 const PATHS = [
-  // { name: "Dashboard", path: "dashboard" },
-  { name: "All Vaults", path: "vaults" },
-  { name: "Leveraged Farming", path: "leveraged-farming" },
-  { name: "Meta Vaults", path: "metavaults" },
   { name: "Lending", path: "lending" },
-  // { name: "ALM", path: "alm" },
+  { name: "Meta Vaults", path: "metavaults" },
+  { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "All Vaults", path: "vaults" },
   { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
+  // { name: "ALM", path: "alm" },
+  // { name: "Dashboard", path: "dashboard" },
   // { name: "Agents", path: "agents" },
 ];
 

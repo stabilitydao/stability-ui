@@ -14,8 +14,8 @@ const sortTable = ({
     if (state.sortType !== "none") {
       sortedVaults = [...sortedVaults].sort((a, b) =>
         dataSorter(
-          String(a[state.keyName]),
-          String(b[state.keyName]),
+          String(a[state.key]),
+          String(b[state.key]),
           state.dataType,
           state.sortType
         )

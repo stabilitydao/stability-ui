@@ -72,7 +72,7 @@ const DAO = (): JSX.Element => {
                   <span className="text-[#97979A] text-[16px] leading-5 font-medium">
                     xSTBL instant exit fee
                   </span>
-                  <span className="font-semibold">50%</span>
+                  <span className="font-semibold">80%</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[#97979A] text-[16px] leading-5 font-medium">
@@ -91,6 +91,12 @@ const DAO = (): JSX.Element => {
                     STT bribe
                   </span>
                   <span className="font-semibold">10%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#97979A] text-[16px] leading-5 font-medium">
+                    Recovery revenue share
+                  </span>
+                  <span className="font-semibold">20%</span>
                 </div>
               </div>
             </div>

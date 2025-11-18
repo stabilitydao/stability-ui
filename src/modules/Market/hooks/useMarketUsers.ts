@@ -53,7 +53,9 @@ export const useMarketUsers = (market: TMarket): TResult => {
             address: address as TAddress,
             collateral: userData?.aTokenBalanceUsd ?? 0,
             debt: userData?.debtTokenBalanceUsd ?? 0,
-            LTV: userData?.ltv ?? 0,
+            healthFactor: userData?.healthFactor ?? 0,
+            LTV: (userData?.ltv ?? 0) * 100,
+            liquidationPrice: userData.liquidationPrice ?? 0,
             LTVColor: getLTVTextColor(
               (userData?.ltv ?? 0) * 100,
               market.risk.maxLTV,
