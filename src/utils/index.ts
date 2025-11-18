@@ -38,6 +38,7 @@ import { getShortErrorMessage } from "./functions/getShortErrorMessage";
 import { truncateDecimals } from "./functions/truncateDecimals";
 import { formatTime } from "./functions/formatTime";
 import { countVotes } from "./functions/countVotes";
+import { getSortedTableStateFromUrl } from "./functions/getSortedTableStateFromUrl";
 
 import { getAllowance } from "./functions/getAllowance";
 import { getBalance } from "./functions/getBalance";
@@ -101,4 +102,5 @@ export {
   useProposals,
   countVotes,
   useStakingData,
+  getSortedTableStateFromUrl,
 };

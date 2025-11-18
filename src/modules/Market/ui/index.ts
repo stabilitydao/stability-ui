@@ -1,8 +1,8 @@
 import { AssetsInfo } from "./AssetsInfo";
 import { AddressField } from "./AddressField";
 
-import { LiquidationsColumnSort } from "./LiquidationsColumnSort";
-import { UsersColumnSort } from "./UsersColumnSort";
+import { LiquidationsColumnSort } from "./LiquidationTable/LiquidationsColumnSort";
+import { UsersColumnSort } from "./UsersTable/UsersColumnSort";
 
 import { LiquidationTable } from "./LiquidationTable";
 import { UsersTable } from "./UsersTable";

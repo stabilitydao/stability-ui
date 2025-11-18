@@ -1,5 +1,5 @@
-import type { TChartData } from "@types";
 import { useEffect } from "react";
+
 import {
   BarChart,
   XAxis,
@@ -12,6 +12,8 @@ import {
 } from "recharts";
 
 import { AxisTick, ChartTooltip } from "@ui";
+
+import type { TChartData } from "@types";
 
 interface IProps {
   chart: {

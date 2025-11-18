@@ -2,21 +2,22 @@ import { useState, useEffect, useMemo } from "react";
 
 import { useStore } from "@nanostores/react";
 
-import { Form } from "./components/Form";
-import { LendingMarkets } from "./components/LendingMarkets";
-import { Table } from "./components/Table";
-import { Contracts } from "./components/Contracts";
-import { Chart } from "./components/Chart";
-
-import { DisplayHandler } from "./components/DisplayHandler";
-import { SectionHandler } from "./components/SectionHandler";
-
-import { Modal } from "./components/Modals/Modal";
-import { ProtocolModal } from "./components/Modals/ProtocolModal";
+import {
+  Form,
+  LendingMarkets,
+  Table,
+  Contracts,
+  Chart,
+  Users,
+  DisplayHandler,
+  SectionHandler,
+  Modal,
+  ProtocolModal,
+} from "./components";
 
 import { TextSkeleton } from "@ui";
 
-import { getInitialStateFromUrl } from "./functions/getInitialStateFromUrl";
+import { getInitialStateFromUrl } from "./functions";
 
 import { cn, formatNumber, dataSorter, updateQueryParams } from "@utils";
 
@@ -536,6 +537,8 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
               protocols={filteredProtocols}
               setProtocolModal={setProtocolModal}
             />
+          ) : activeSection === MetaVaultSectionTypes.Users ? (
+            <Users metavault={metavault} />
           ) : (
             <div className="w-full">
               <Chart

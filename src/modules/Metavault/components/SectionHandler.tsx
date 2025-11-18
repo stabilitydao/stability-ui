@@ -43,6 +43,17 @@ const SectionHandler: React.FC<TProps> = ({
       </div>
       <div
         className={cn(
+          "w-full text-start sm:text-center py-2 px-4 sm:border-y sm:border-[#232429]",
+          activeSection === MetaVaultSectionTypes.Users
+            ? "bg-[#232429]"
+            : "text-[#7C7E81]"
+        )}
+        onClick={() => changeSection(MetaVaultSectionTypes.Users)}
+      >
+        Users
+      </div>
+      <div
+        className={cn(
           "w-full text-start sm:text-center py-2 px-4 sm:rounded-r-lg sm:border-y sm:border-r sm:border-[#232429]",
           activeSection === MetaVaultSectionTypes.Operations
             ? "bg-[#232429] rounded-b-lg sm:rounded-bl-none"
