@@ -31,11 +31,7 @@ export const useMarketUsers = (market: TMarket): TResult => {
     if (data) {
       const users: TMarketUser[] = data.map((obj) => ({
         ...obj,
-        LTVColor: getLTVTextColor(
-          obj?.LTV * 100,
-          market.risk.maxLTV,
-          market.risk.LT
-        ),
+        LTVColor: getLTVTextColor(obj?.LTV, market.risk.maxLTV, market.risk.LT),
       }));
 
       marketsUsers.setKey(marketId, users);
