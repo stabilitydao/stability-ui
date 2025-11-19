@@ -15,13 +15,14 @@ import { PAGINATION_LIMIT, METAVAULT_USERS_TABLE } from "@constants";
 import { TAddress, TTableColumn, TMetaVaultUser } from "@types";
 
 type TProps = {
+  network: string;
   metavault: TAddress;
 };
 
-const Users: React.FC<TProps> = ({ metavault }) => {
+const Users: React.FC<TProps> = ({ network, metavault }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const { data, isLoading } = useMetaVaultUsers(metavault);
+  const { data, isLoading } = useMetaVaultUsers(network, metavault);
 
   const initialTableState = getSortedTableStateFromUrl(
     METAVAULT_USERS_TABLE,

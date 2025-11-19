@@ -538,7 +538,7 @@ const Metavault: React.FC<IProps> = ({ network, metavault }) => {
               setProtocolModal={setProtocolModal}
             />
           ) : activeSection === MetaVaultSectionTypes.Users ? (
-            <Users metavault={metavault} />
+            <Users network={network} metavault={metavault} />
           ) : (
             <div className="w-full">
               <Chart

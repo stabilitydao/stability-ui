@@ -16,14 +16,19 @@ type TResult = {
   refetch: () => void;
 };
 
-export const useMetaVaultUsers = (metavault: TAddress): TResult => {
+export const useMetaVaultUsers = (
+  network: string,
+  metavault: TAddress
+): TResult => {
   const $metaVaultsUsers = useStore(metaVaultsUsers);
 
   const data = $metaVaultsUsers[metavault];
 
   const fetchUsers = async () => {
     try {
-      const req = await axios.get(`${seeds[0]}/metavaults/users/${metavault}`);
+      const req = await axios.get(
+        `${seeds[0]}/metavaults/${network}/${metavault}/users`
+      );
 
       const usersData = req?.data;
 
@@ -39,7 +44,7 @@ export const useMetaVaultUsers = (metavault: TAddress): TResult => {
     if (!data) {
       fetchUsers();
     }
-  }, [metavault]);
+  }, [metavault, network]);
 
   return {
     data,
