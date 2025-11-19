@@ -13,18 +13,18 @@ type TProps = {
 const stylesMap: Record<MarketTypes, Record<string, string>> = {
   [MarketTypes.Isolated]: {
     User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
-    Collateral: "w-[100px] md:w-[16%] justify-end",
-    Debt: "w-[100px] md:w-[16%] justify-end",
-    "Health Factor": "w-[150px] md:w-[16%] justify-end",
+    Collateral: "w-[100px] md:w-1/5 justify-end", // 16% after liq price
+    Debt: "w-[100px] md:w-1/5 justify-end", // 16% after liq price
+    "Health Factor": "w-[150px] md:w-1/5 justify-end", // 16% after liq price
     "Liquidation Price": "w-[150px] md:w-[16%] justify-end",
-    LTV: "w-[100px] md:w-[16%] justify-end",
+    LTV: "w-[100px] md:w-1/5 justify-end", // 16% after liq price
   },
 
   [MarketTypes.NonIsolated]: {
-    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/5 bg-[#151618] lg:bg-transparent",
-    Collateral: "w-[100px] md:w-1/5 justify-end",
-    Debt: "w-[100px] md:w-1/5 justify-end",
-    "Health Factor": "w-[150px] md:w-1/5 justify-end",
+    User: "sticky left-0 z-10 lg:relative w-[150px] md:w-1/4 bg-[#151618] lg:bg-transparent", // 1/5 after liq price
+    Collateral: "w-[100px] md:w-1/4 justify-end", // 1/5 after liq price
+    Debt: "w-[100px] md:w-1/4 justify-end", // 1/5 after liq price
+    "Health Factor": "w-[150px] md:w-1/4 justify-end", // 1/5 after liq price
     "Liquidation Price": "w-[150px] md:w-1/5 justify-end",
   },
 

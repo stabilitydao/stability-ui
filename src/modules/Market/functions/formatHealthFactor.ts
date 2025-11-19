@@ -5,5 +5,5 @@ export const formatHealthFactor = (hf: number): string => {
 
   if (hf >= 1000) return "∞";
 
-  return hf.toFixed(2);
+  return hf.toFixed(3);
 };

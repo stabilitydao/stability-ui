@@ -376,6 +376,7 @@ type TMarketUser = {
   LTV: number;
   liquidationPrice: number;
   LTVColor: string;
+  healthFactorColor: string;
 };
 
 type TMetaVaultUser = {

@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react";
 
 import axios from "axios";
 
-import { getLTVTextColor } from "../functions";
+import { getLTVTextColor, getHFTextColor } from "../functions";
 
 import { marketsUsers } from "@store";
 
@@ -27,11 +27,15 @@ export const useMarketUsers = (market: TMarket): TResult => {
   const data = $marketsUsers[marketId];
 
   const fetchUsers = async () => {
-    // @dev if we have data but need to refetch LTV color
+    // @dev if we have data but need to refetch LTV/HF color
     if (data) {
       const users: TMarketUser[] = data.map((obj) => ({
         ...obj,
         LTVColor: getLTVTextColor(obj?.LTV, market.risk.maxLTV, market.risk.LT),
+        healthFactorColor: getHFTextColor(
+          Number(obj?.healthFactor ?? 0),
+          market?.type
+        ),
       }));
 
       marketsUsers.setKey(marketId, users);
@@ -56,6 +60,10 @@ export const useMarketUsers = (market: TMarket): TResult => {
               (userData?.ltv ?? 0) * 100,
               market.risk.maxLTV,
               market.risk.LT
+            ),
+            healthFactorColor: getHFTextColor(
+              Number(userData?.healthFactor ?? 0),
+              market?.type
             ),
           })
         );

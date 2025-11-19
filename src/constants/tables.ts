@@ -596,12 +596,12 @@ const MARKET_USERS_TABLE: TTableColumn[] = [
     sortType: "none",
     dataType: "number",
   },
-  {
-    name: "Liquidation Price",
-    key: "liquidationPrice",
-    sortType: "none",
-    dataType: "number",
-  },
+  // {
+  //   name: "Liquidation Price",
+  //   key: "liquidationPrice",
+  //   sortType: "none",
+  //   dataType: "number",
+  // },
   {
     name: "LTV",
     key: "LTV",

@@ -19,17 +19,17 @@ type TProps = {
 
 const widthMap: Record<MarketTypes, Record<string, string>> = {
   [MarketTypes.Isolated]: {
-    Collateral: "w-[100px] md:w-[16%]",
-    Debt: "w-[100px] md:w-[16%]",
-    "Health Factor": "w-[150px] md:w-[16%]",
-    "Liquidation Price": "w-[150px] md:w-[16%]",
-    LTV: "w-[100px] md:w-[16%]",
+    Collateral: "w-[100px] md:w-1/5", // 16% after liq price
+    Debt: "w-[100px] md:w-1/5", // 16% after liq price
+    "Health Factor": "w-[150px] md:w-1/5", // 16% after liq price
+    "Liquidation Price": "w-[150px] md:w-1/5",
+    LTV: "w-[100px] md:w-1/5", // 16% after liq price
   },
 
   [MarketTypes.NonIsolated]: {
-    Collateral: "w-[100px] md:w-1/5",
-    Debt: "w-[100px] md:w-1/5",
-    "Health Factor": "w-[150px] md:w-1/5",
+    Collateral: "w-[100px] md:w-1/4", // 1/5 after liq price
+    Debt: "w-[100px] md:w-1/4", // 1/5 after liq price
+    "Health Factor": "w-[150px] md:w-1/4", // 1/5 after liq price
     "Liquidation Price": "w-[150px] md:w-1/5",
   },
 
@@ -88,14 +88,15 @@ const UsersTable: React.FC<TProps> = ({
               key={user.address}
               className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px]"
             >
-              <AddressCell address={user.address} />
+              <AddressCell address={user.address} type={marketType} />
               {columnsWithoutUser.map((col) => (
                 <div
                   key={col.name + user.address}
                   className={cn(
                     "px-2 md:px-4 text-end",
                     widthMap[marketType]?.[col.name],
-                    col.name === "LTV" && user.LTVColor
+                    col.name === "LTV" && user.LTVColor,
+                    col.name === "Health Factor" && user.healthFactorColor
                   )}
                 >
                   {renderCell(user, col.name)}
