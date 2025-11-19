@@ -24,7 +24,7 @@ import {
   getBalance,
 } from "@utils";
 
-import { getWrappingPairs } from "../../functions/getWrappingPairs";
+import { getWrappingPairs } from "../../functions";
 
 import { DEFAULT_TRANSACTION_SETTINGS } from "@constants";
 

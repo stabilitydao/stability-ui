@@ -36,11 +36,11 @@ const Metavaults = (): JSX.Element => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const initMetavaults = async () => {
-    const sonicOnlyMetaVaults = $metaVaults["146"].filter(
+    const sonicOnlyMetaVaults = $metaVaults?.["146"]?.filter(
       ({ type }: { type: string }) => type === VaultTypes.MetaVault
     );
 
-    const plasmaMetaVaults = $metaVaults["9745"] || [];
+    const plasmaMetaVaults = $metaVaults?.["9745"] || [];
 
     const visibleMetaVaults = [...sonicOnlyMetaVaults, ...plasmaMetaVaults];
 
@@ -48,7 +48,7 @@ const Metavaults = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if ($metaVaults && $metaVaults["146"].length) {
+    if ($metaVaults && $metaVaults?.["146"]?.length) {
       initMetavaults();
     }
   }, [$metaVaults]);
@@ -98,7 +98,7 @@ const Metavaults = (): JSX.Element => {
               <div className="flex items-center justify-between">
                 <p className="leading-5 text-[#97979A] font-medium">APR</p>
                 <p className="text-end font-semibold">
-                  {modal.APR ? formatNumber(modal.APR, "formatAPR") : 0}%
+                  {modal?.APR ? formatNumber(modal?.APR, "formatAPR") : 0}%
                 </p>
               </div>
               <a
@@ -117,20 +117,20 @@ const Metavaults = (): JSX.Element => {
                   />
                 </div>
                 <p className="text-end font-semibold">
-                  {modal.merklAPR
-                    ? formatNumber(modal.merklAPR, "formatAPR")
+                  {modal?.merklAPR
+                    ? formatNumber(modal?.merklAPR, "formatAPR")
                     : 0}
                   %
                 </p>
               </a>
-              {!!modal.gemsAPR && (
+              {!!modal?.gemsAPR && (
                 <div className="flex items-center justify-between">
                   <p className="leading-5 text-[#97979A] font-medium">
                     sGEM1 APR
                   </p>
                   <p className="text-end font-semibold">
-                    {modal.gemsAPR
-                      ? formatNumber(modal.gemsAPR, "formatAPR")
+                    {modal?.gemsAPR
+                      ? formatNumber(modal?.gemsAPR, "formatAPR")
                       : 0}
                     %
                   </p>
@@ -140,8 +140,8 @@ const Metavaults = (): JSX.Element => {
               <div className="flex items-center justify-between text-[#2BB656]">
                 <p className="leading-5 font-medium">Total APR</p>
                 <p className="text-end font-semibold">
-                  {modal.totalAPR
-                    ? formatNumber(modal.totalAPR, "formatAPR")
+                  {modal?.totalAPR
+                    ? formatNumber(modal?.totalAPR, "formatAPR")
                     : 0}
                   %
                 </p>

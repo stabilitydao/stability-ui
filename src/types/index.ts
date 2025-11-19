@@ -378,6 +378,13 @@ type TMarketUser = {
   LTVColor: string;
 };
 
+type TMetaVaultUser = {
+  address: TAddress;
+  deposit: number;
+  earned: number;
+  points: number;
+};
+
 type TTAbleFiltersVariant = {
   name: string;
   title?: string;
@@ -637,7 +644,8 @@ type TTableData =
   | TLeaderboard[]
   | IExtendedYieldContest[]
   | TPoolTable[]
-  | TMarketUser[];
+  | TMarketUser[]
+  | TMetaVaultUser[];
 
 type TDispatchedTableData =
   | Dispatch<SetStateAction<IChainData[]>>
@@ -647,7 +655,8 @@ type TDispatchedTableData =
   | Dispatch<SetStateAction<TLeaderboard[]>>
   | Dispatch<SetStateAction<IExtendedYieldContest[]>>
   | Dispatch<SetStateAction<TPoolTable[]>>
-  | Dispatch<SetStateAction<TMarketUser[]>>;
+  | Dispatch<SetStateAction<TMarketUser[]>>
+  | Dispatch<SetStateAction<TMetaVaultUser[]>>;
 
 type TSort = {
   table: TTableColumn[];
@@ -880,6 +889,7 @@ export enum MetaVaultSectionTypes {
   Operations = "operations",
   Allocations = "allocations",
   Charts = "charts",
+  Users = "users",
 }
 
 export enum DAOSectionTypes {
@@ -1023,4 +1033,5 @@ export type {
   TProposal,
   TVote,
   TStakingData,
+  TMetaVaultUser,
 };

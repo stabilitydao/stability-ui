@@ -8,8 +8,7 @@ import { ChartCard } from "./ChartCard";
 
 import { ChartTypeHandler } from "./ChartTypeHandler";
 
-import { formatData } from "../../functions/formatData";
-import { buildChartData } from "../../functions/buildChartData";
+import { formatData, buildChartData } from "../../functions";
 
 import { TIMESTAMPS_IN_SECONDS } from "@constants";
 

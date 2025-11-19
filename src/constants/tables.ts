@@ -402,6 +402,35 @@ const METAVAULT_TABLE: TTableColumn[] = [
   },
 ];
 
+const METAVAULT_USERS_TABLE: TTableColumn[] = [
+  {
+    name: "User",
+    key: "",
+    sortType: "none",
+    dataType: "string",
+    unsortable: true,
+  },
+
+  {
+    name: "Deposit",
+    key: "deposit",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Earned",
+    key: "earned",
+    sortType: "none",
+    dataType: "number",
+  },
+  {
+    name: "Points",
+    key: "points",
+    sortType: "none",
+    dataType: "number",
+  },
+];
+
 const PROTOCOLS_TABLE: TTableColumn[] = [
   {
     name: "Protocol",
@@ -646,4 +675,5 @@ export {
   MARKET_LIQUIDATIONS_TABLE,
   HOLDERS_TABLE,
   MARKETS_TABLE_FILTERS,
+  METAVAULT_USERS_TABLE,
 };

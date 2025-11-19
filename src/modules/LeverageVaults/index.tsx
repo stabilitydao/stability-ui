@@ -38,7 +38,7 @@ import {
   VaultTypes,
 } from "@types";
 
-const LeveragedFarming = (): JSX.Element => {
+const LeverageVaults = (): JSX.Element => {
   const $vaults = useStore(vaults);
 
   const $isVaultsLoaded = useStore(isVaultsLoaded);
@@ -311,7 +311,7 @@ const LeveragedFarming = (): JSX.Element => {
         <ErrorMessage type={$error.type} isAlert={true} onlyForChainId={146} />
 
         <h2 className="page-title__font text-start mb-2 md:mb-5">
-          Leveraged Farming
+          Leverage Vaults
         </h2>
         <h3 className="text-[#97979a] page-description__font">
           Enables users to amplify yield by borrowing assets and farming with{" "}
@@ -389,4 +389,4 @@ const LeveragedFarming = (): JSX.Element => {
   );
 };
 
-export { LeveragedFarming };
+export { LeverageVaults };

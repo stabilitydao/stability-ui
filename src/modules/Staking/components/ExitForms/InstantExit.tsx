@@ -126,7 +126,7 @@ const InstantExit: React.FC = () => {
           Instant Exit
         </span>
         <span className="text-[16px] leafing-6 font-medium text-[#97979A]">
-          Instantly exit to STBL, incurring a 50% penalty. This process cannot
+          Instantly exit to STBL, incurring a 80% penalty. This process cannot
           be reverted, all forfeited STBL is streamed back to stakers.
         </span>
       </div>

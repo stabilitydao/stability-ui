@@ -1,6 +1,6 @@
 import { DashboardIcon } from "./Dashboard";
 import { VaultsIcon } from "./Vaults";
-import { FarmingIcon } from "./Farming";
+import { LeverageIcon } from "./Leverage";
 import { MetavaultsIcon } from "./Metavaults";
 import { ALMIcon } from "./ALM";
 import { StakingIcon } from "./Staking";
@@ -17,7 +17,7 @@ import { DAOIcon } from "./DAO";
 export {
   DashboardIcon,
   VaultsIcon,
-  FarmingIcon,
+  LeverageIcon,
   MetavaultsIcon,
   ALMIcon,
   StakingIcon,

@@ -1,7 +1,7 @@
 import {
   DashboardIcon,
   VaultsIcon,
-  FarmingIcon,
+  LeverageIcon,
   MetavaultsIcon,
   ALMIcon,
   StakingIcon,
@@ -23,8 +23,8 @@ const NavIcon: React.FC<IProps> = ({ path, isActive }) => {
       return <DashboardIcon color={color} />;
     case "vaults":
       return <VaultsIcon color={color} />;
-    case "leveraged-farming":
-      return <FarmingIcon color={color} />;
+    case "leverage-vaults":
+      return <LeverageIcon color={color} />;
     case "metavaults":
       return <MetavaultsIcon color={color} />;
     case "alm":

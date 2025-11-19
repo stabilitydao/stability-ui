@@ -2,7 +2,7 @@ interface IProps {
   color: string;
 }
 
-export const FarmingIcon: React.FC<IProps> = ({ color }) => {
+export const LeverageIcon: React.FC<IProps> = ({ color }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -4,12 +4,9 @@ import { Pagination } from "@ui";
 
 import { LiquidationsColumnSort, LiquidationTable } from "../../ui";
 
-import { dataSorter, paginateData } from "@utils";
+import { dataSorter, paginateData, getSortedTableStateFromUrl } from "@utils";
 
-import {
-  getInitialStateFromUrl,
-  getSortedTableStateFromUrl,
-} from "../../functions";
+import { getInitialStateFromUrl } from "../../functions";
 
 import { useMarketLiquidations } from "../../hooks";
 

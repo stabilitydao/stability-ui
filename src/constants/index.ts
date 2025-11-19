@@ -23,6 +23,7 @@ import {
   MARKET_LIQUIDATIONS_TABLE,
   HOLDERS_TABLE,
   MARKETS_TABLE_FILTERS,
+  METAVAULT_USERS_TABLE,
 } from "./tables";
 
 import {
@@ -303,7 +304,7 @@ const META_VAULTS_EXCEPTIONS = [
 const PATHS = [
   { name: "Lending", path: "lending" },
   { name: "Meta Vaults", path: "metavaults" },
-  { name: "Leveraged Farming", path: "leveraged-farming" },
+  { name: "Leverage Vaults", path: "leverage-vaults" },
   { name: "All Vaults", path: "vaults" },
   { name: "Staking", path: "staking" },
   { name: "DAO", path: "dao" },
@@ -316,7 +317,7 @@ const ROUTES = {
   basic: [
     "staking",
     "dashboard",
-    "leveraged-farming",
+    "leverage-vaults",
     "alm",
     "agents",
     "lending",
@@ -484,4 +485,5 @@ export {
   MARKETS_TABLE_FILTERS,
   SPACE_ID,
   SNAPSHOT_API,
+  METAVAULT_USERS_TABLE,
 };

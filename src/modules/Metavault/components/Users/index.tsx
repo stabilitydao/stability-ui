@@ -1,39 +1,31 @@
 import { useState, useMemo } from "react";
 
-import { Pagination } from "@ui";
-
 import { UsersColumnSort, UsersTable } from "../../ui";
 
-import {
-  paginateData,
-  dataSorter,
-  cn,
-  getSortedTableStateFromUrl,
-} from "@utils";
+import { Pagination } from "@ui";
 
-import { getInitialStateFromUrl, getTableColumns } from "../../functions";
+import { paginateData, dataSorter, getSortedTableStateFromUrl } from "@utils";
 
-import { useMarketUsers } from "../../hooks";
+import { useMetaVaultUsers } from "../../hooks";
 
-import { PAGINATION_LIMIT } from "@constants";
+import { getInitialStateFromUrl } from "../../functions";
 
-import { USERS_TABLE_WIDTH } from "../../constants";
+import { PAGINATION_LIMIT, METAVAULT_USERS_TABLE } from "@constants";
 
-import { TMarketUser, TTableColumn, TMarket } from "@types";
+import { TAddress, TTableColumn, TMetaVaultUser } from "@types";
 
 type TProps = {
-  market: TMarket;
+  network: string;
+  metavault: TAddress;
 };
 
-const UsersTab: React.FC<TProps> = ({ market }) => {
+const Users: React.FC<TProps> = ({ network, metavault }) => {
   const { sortType } = getInitialStateFromUrl();
 
-  const columnsByMarketTypes = getTableColumns(market.type);
-
-  const { data, isLoading } = useMarketUsers(market);
+  const { data, isLoading } = useMetaVaultUsers(network, metavault);
 
   const initialTableState = getSortedTableStateFromUrl(
-    columnsByMarketTypes,
+    METAVAULT_USERS_TABLE,
     sortType
   );
 
@@ -56,8 +48,8 @@ const UsersTab: React.FC<TProps> = ({ market }) => {
 
     return [...data].sort((a, b) =>
       dataSorter(
-        String(a[key as keyof TMarketUser]),
-        String(b[key as keyof TMarketUser]),
+        String(a[key as keyof TMetaVaultUser]),
+        String(b[key as keyof TMetaVaultUser]),
         dataType,
         sortType
       )
@@ -67,14 +59,9 @@ const UsersTab: React.FC<TProps> = ({ market }) => {
   const currentTabData = paginateData(sortedData, currentTab, pagination);
 
   return (
-    <div className="pb-5 min-w-full lg:min-w-[960px] xl:min-w-[1200px]">
+    <div className="pb-5 min-w-full">
       <div className="overflow-x-auto md:overflow-x-scroll lg:overflow-x-visible overflow-y-hidden scrollbar-thin scrollbar-thumb-[#46484C] scrollbar-track-[#101012] lg:hide-scrollbar">
-        <div
-          className={cn(
-            "flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:w-full",
-            USERS_TABLE_WIDTH[market.type]
-          )}
-        >
+        <div className="flex items-center bg-[#151618] border border-[#23252A] border-b-0 rounded-t-lg h-[48px] md:w-full w-[450px]">
           {tableStates.map((value: TTableColumn, index: number) => (
             <UsersColumnSort
               key={value.name + index}
@@ -82,16 +69,10 @@ const UsersTab: React.FC<TProps> = ({ market }) => {
               value={value.name}
               table={tableStates}
               sort={tableHandler}
-              marketType={market.type}
             />
           ))}
         </div>
-        <UsersTable
-          isLoading={isLoading}
-          data={currentTabData}
-          marketType={market.type}
-          columns={columnsByMarketTypes}
-        />
+        <UsersTable isLoading={isLoading} data={currentTabData} />
       </div>
       <Pagination
         pagination={pagination}
@@ -104,4 +85,4 @@ const UsersTab: React.FC<TProps> = ({ market }) => {
   );
 };
 
-export { UsersTab };
+export { Users };

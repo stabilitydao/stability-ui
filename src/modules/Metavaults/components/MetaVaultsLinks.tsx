@@ -28,16 +28,16 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-[25px]">
       {metaVaults.map((metaVault) => {
         let TVL = "0";
-        if (metaVault.tvl) {
-          TVL = formatNumber(metaVault.tvl, "abbreviate") as string;
+        if (metaVault?.tvl) {
+          TVL = formatNumber(metaVault?.tvl, "abbreviate") as string;
         }
 
-        const chain = CHAINS.find(({ id }) => id == metaVault.network);
+        const chain = CHAINS.find(({ id }) => id == metaVault?.network);
 
         return (
           <a
-            key={metaVault.address}
-            href={`/metavaults/${metaVault.network}/${metaVault.address.toLowerCase()}`}
+            key={metaVault?.address}
+            href={`/metavaults/${metaVault?.network}/${metaVault?.address?.toLowerCase()}`}
             className={cn(
               "rounded-lg border border-[#23252A] max-w-[352px]",
               metaVault?.symbol
@@ -47,7 +47,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
               <div className="relative w-12 md:w-16">
                 <img
                   className="w-12 h-12 md:w-16 md:h-16 rounded-full"
-                  src={`/features/${metaVault.symbol}.png`}
+                  src={`/features/${metaVault?.symbol}.png`}
                   alt="logo"
                 />
                 <img
@@ -62,9 +62,9 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[24px] font-semibold">
-                      {metaVault.name}
+                      {metaVault?.name}
                     </span>
-                    {!!metaVault.sonicPoints && (
+                    {!!metaVault?.sonicPoints && (
                       <div
                         title="Sonic Activity Points"
                         className="rounded-[4px] border border-[#48c05c] bg-[#192c1e] h-6 flex items-center justify-center"
@@ -77,7 +77,7 @@ const MetaVaultsLinks: React.FC<IProps> = memo(({ metaVaults, setModal }) => {
                           />
 
                           <span className="font-semibold text-[12px]">
-                            AP x{metaVault.sonicPoints}
+                            AP x{metaVault?.sonicPoints}
                           </span>
                         </div>
                       </div>
