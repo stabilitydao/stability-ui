@@ -77,6 +77,8 @@ const UsersTable: React.FC<TProps> = ({
     }
   };
 
+  const columnsWithoutUser = columns.slice(1);
+
   return (
     <div className={cn("md:min-w-full", USERS_TABLE_WIDTH[marketType])}>
       {data.length ? (
@@ -87,7 +89,7 @@ const UsersTable: React.FC<TProps> = ({
               className="border border-[#23252A] border-b-0 text-center bg-[#101012] h-[56px] font-medium relative flex items-center text-[12px] md:text-[16px]"
             >
               <AddressCell address={user.address} />
-              {columns.map((col) => (
+              {columnsWithoutUser.map((col) => (
                 <div
                   key={col.name + user.address}
                   className={cn(
