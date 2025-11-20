@@ -6,14 +6,13 @@ import { getShortAddress, copyAddress, cn } from "@utils";
 
 import { account } from "@store";
 
-import { MarketTypes, TAddress } from "@types";
+import { TAddress } from "@types";
 
 type TProps = {
   address: TAddress;
-  type: MarketTypes; // remove after liq price
 };
 
-const AddressCell: React.FC<TProps> = ({ address, type }) => {
+const AddressCell: React.FC<TProps> = ({ address }) => {
   const $account = useStore(account);
 
   const [copied, setCopied] = useState(false);
@@ -28,7 +27,6 @@ const AddressCell: React.FC<TProps> = ({ address, type }) => {
     <div
       className={cn(
         "sticky h-[56px] top-0 left-0 z-10 bg-[#101012] lg:bg-transparent border-r border-b md:border-r-0 md:border-b-0 border-[#23252A] group px-2 md:px-4 w-[150px] md:w-1/5 text-start flex items-center gap-1 cursor-pointer",
-        type === MarketTypes.NonIsolated && "md:w-1/4",
         $account?.toLowerCase() === address && "underline"
       )}
       style={{ fontFamily: "monospace" }}
