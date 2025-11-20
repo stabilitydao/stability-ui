@@ -30,7 +30,7 @@ const RISK_TEXT_COLORS = {
 
 const USERS_TABLE_WIDTH = {
   [MarketTypes.Isolated]: "min-w-[750px]",
-  [MarketTypes.NonIsolated]: "min-w-[650px]",
+  [MarketTypes.NonIsolated]: "min-w-[600px]",
   [MarketTypes.Stable]: "min-w-[600px]",
 };
 

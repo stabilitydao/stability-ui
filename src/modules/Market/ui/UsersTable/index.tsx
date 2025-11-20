@@ -30,7 +30,7 @@ const widthMap: Record<MarketTypes, Record<string, string>> = {
     Collateral: "w-[100px] md:w-1/5",
     Debt: "w-[100px] md:w-1/5",
     "Health Factor": "w-[150px] md:w-1/5",
-    "Liquidation Price": "w-[150px] md:w-1/5",
+    LTV: "w-[100px] md:w-1/5",
   },
 
   [MarketTypes.Stable]: {

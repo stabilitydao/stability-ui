@@ -3,11 +3,7 @@ import { MARKET_USERS_TABLE } from "@constants";
 import { MarketTypes, TTableColumn } from "@types";
 
 export const getTableColumns = (marketType: MarketTypes): TTableColumn[] => {
-  if (marketType === MarketTypes.NonIsolated) {
-    return MARKET_USERS_TABLE.filter((column) => column.key !== "LTV");
-  }
-
-  if (marketType === MarketTypes.Stable) {
+  if ([MarketTypes.NonIsolated, MarketTypes.Stable].includes(marketType)) {
     return MARKET_USERS_TABLE.filter(
       (column) => column.key !== "liquidationPrice"
     );

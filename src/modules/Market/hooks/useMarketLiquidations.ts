@@ -32,8 +32,8 @@ export const useMarketLiquidations = (
       );
 
       if (req.data) {
-        const liquidations: TLiquidation[] = req.data.map(
-          (liquidation: any) => ({
+        const liquidations: TLiquidation[] = req.data
+          .map((liquidation: any) => ({
             user: liquidation.user,
             liquidator: liquidation.liquidator,
             liquidated: Number(liquidation?.liquidatedCollateralAmountInUSD),
@@ -44,8 +44,10 @@ export const useMarketLiquidations = (
               true,
               true
             ),
-          })
-        );
+          }))
+          .sort(
+            (a: TLiquidation, b: TLiquidation) => b.timestamp - a.timestamp
+          );
 
         marketsLiquidations.setKey(market, liquidations);
       }
