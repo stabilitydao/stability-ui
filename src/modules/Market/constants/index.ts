@@ -24,13 +24,13 @@ const RISK_TEXT_COLORS = {
   white: "text-[#ffffff]",
   green: "text-[#48C05C]",
   yellow: "text-[#FFBC00]",
-  orange: "text-warning-400",
+  orange: "text-warning-600",
   red: "text-error-400",
 };
 
 const USERS_TABLE_WIDTH = {
   [MarketTypes.Isolated]: "min-w-[750px]",
-  [MarketTypes.NonIsolated]: "min-w-[650px]",
+  [MarketTypes.NonIsolated]: "min-w-[600px]",
   [MarketTypes.Stable]: "min-w-[600px]",
 };
 

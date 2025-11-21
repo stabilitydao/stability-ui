@@ -30,7 +30,7 @@ const widthMap: Record<MarketTypes, Record<string, string>> = {
     Collateral: "w-[100px] md:w-1/5",
     Debt: "w-[100px] md:w-1/5",
     "Health Factor": "w-[150px] md:w-1/5",
-    "Liquidation Price": "w-[150px] md:w-1/5",
+    LTV: "w-[100px] md:w-1/5",
   },
 
   [MarketTypes.Stable]: {
@@ -70,7 +70,9 @@ const UsersTable: React.FC<TProps> = ({
           : "";
 
       case "LTV":
-        return user.LTV ? `${user.LTV.toFixed(2)}%` : "";
+        return user.LTV
+          ? `${Number(user.LTV) > 1000 ? ">1000" : user.LTV.toFixed(2)}%`
+          : "";
 
       default:
         return null;
@@ -95,7 +97,8 @@ const UsersTable: React.FC<TProps> = ({
                   className={cn(
                     "px-2 md:px-4 text-end",
                     widthMap[marketType]?.[col.name],
-                    col.name === "LTV" && user.LTVColor
+                    col.name === "LTV" && user.LTVColor,
+                    col.name === "Health Factor" && user.healthFactorColor
                   )}
                 >
                   {renderCell(user, col.name)}

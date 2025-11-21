@@ -149,14 +149,14 @@ const BasicStats: React.FC<TProps> = ({ type, market, activeAsset, value }) => {
       ? (totalDebt / totalCollateral) * 100
       : 0;
 
-    _stats.LTV.current = Math.min(currentLTV, 100).toFixed(2);
+    _stats.LTV.current = Math.min(currentLTV, 1000).toFixed(2);
 
     if (inputValue) {
       const rawFutureLTV = !!newCollateral
         ? (newDebt / newCollateral) * 100
         : 0;
 
-      const futureLTV = Math.min(rawFutureLTV, LT);
+      const futureLTV = Math.min(rawFutureLTV, 1000);
 
       const futureHF = !!newDebt
         ? (newCollateral * liquidationThreshold) / newDebt

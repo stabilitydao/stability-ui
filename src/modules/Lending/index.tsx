@@ -165,11 +165,13 @@ const Lending = (): JSX.Element => {
         if (!networkMarkets) return [];
 
         return networkMarkets.map((market: TMarket) => {
-          const marketId = market.marketId;
+          const marketId = market?.marketId;
 
           const reserves = market?.reserves;
 
-          const deprecated = market.deprecated;
+          const deprecated = market?.deprecated;
+
+          const type = market?.type;
 
           const supplyAPR = Math.max(
             ...reserves?.map((asset) => Number(asset?.supplyAPR) || 0)
@@ -207,6 +209,7 @@ const Lending = (): JSX.Element => {
             LTV,
             utilization,
             deprecated,
+            type,
           };
         });
       });

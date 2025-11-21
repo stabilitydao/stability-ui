@@ -6,7 +6,7 @@ import { getShortAddress, copyAddress, cn } from "@utils";
 
 import { account } from "@store";
 
-import type { TAddress } from "@types";
+import { TAddress } from "@types";
 
 type TProps = {
   address: TAddress;

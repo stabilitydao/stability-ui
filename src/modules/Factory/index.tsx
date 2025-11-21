@@ -1,247 +1,184 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
+
 import { useStore } from "@nanostores/react";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 
-import { WagmiLayout } from "@layouts";
+import { writeContract } from "@wagmi/core";
 
-import { BuildForm } from "./BuildForm";
-
-import { ArrowRightIcon } from "@ui";
-
-import { frontendContracts, IFrontendABI } from "@web3";
-
-import {
-  publicClient,
-  lastTx,
-  account,
-  connected,
-  currentChainID,
-} from "@store";
+import { cn, getTransactionReceipt } from "@utils";
 
 import { CHAINS } from "@constants";
 
-import type { TInitParams, TBuildVariant } from "@types";
+import { factories, FactoryABI, wagmiConfig } from "@web3";
+
+import { currentChainID } from "@store";
+
+import { getChainStrategies, Strategy } from "@stabilitydao/stability";
+
+import { TAddress } from "@types";
 
 const Factory = (): JSX.Element => {
-  const $publicClient = useStore(publicClient);
-  const $account = useStore(account);
-  const $connected = useStore(connected);
   const $currentChainID = useStore(currentChainID);
 
-  const { open } = useWeb3Modal();
+  const [activeSection, setActiveSection] = useState("strategy");
 
-  const [buildVariants, setBuildVariants] = useState<TBuildVariant[]>([]);
-  const [buildIndex, setBuildIndex] = useState<number | undefined>();
+  const [implementationInput, setImplementationInput] = useState("");
+  const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [selectedStrategy, setSelectedStrategy] = useState("");
+  const [lastTx, setLastTx] = useState("");
 
-  const getData = async () => {
-    if ($publicClient && isCorrectNetwork) {
-      const variants: TBuildVariant[] = [];
+  const setStrategyImplementation = async () => {
+    const factoryAddress = factories?.[$currentChainID ?? "146"];
 
-      const STEP = $currentChainID == "146" ? 2 : 10;
+    try {
+      const hash = await writeContract(wagmiConfig, {
+        address: factoryAddress,
+        abi: FactoryABI,
+        functionName: "setStrategyImplementation",
+        args: [selectedStrategy, implementationInput as TAddress],
+      });
 
-      let whatToBuild: any[] = [];
-      let wtbLength = 0;
-      let from = 0;
+      await getTransactionReceipt(hash);
 
-      do {
-        const _whatToBuild = await $publicClient.readContract({
-          address: frontendContracts[$currentChainID],
-          functionName: "whatToBuild",
-          abi: IFrontendABI,
-          args: [BigInt(from), BigInt(STEP)],
-        });
+      console.log("Tx hash:", hash);
 
-        from += STEP;
+      setLastTx(hash);
+    } catch (error) {
+      console.error("setStrategyImplementation error:", error);
+    }
+  };
 
-        if (!wtbLength) {
-          wtbLength = Number(_whatToBuild[0]);
-          whatToBuild[0] = _whatToBuild[0];
+  const setVaultImplementation = async () => {
+    const factoryAddress = factories?.[$currentChainID ?? "146"];
 
-          for (let i = 1; i < _whatToBuild.length; i++) {
-            whatToBuild[i] = [];
-          }
-        }
+    try {
+      const hash = await writeContract(wagmiConfig, {
+        address: factoryAddress,
+        abi: FactoryABI,
+        functionName: "setVaultImplementation",
+        args: ["Compounding", implementationInput as TAddress],
+      });
 
-        for (let i = 1; i < _whatToBuild.length; i++) {
-          whatToBuild[i].push(..._whatToBuild[i]);
-        }
-      } while (from < wtbLength);
+      await getTransactionReceipt(hash);
 
-      if (whatToBuild?.length) {
-        for (let i = 0; i < whatToBuild[2].length; i++) {
-          const initParams: TInitParams = {
-            initVaultAddresses: [],
-            initVaultNums: [],
-            initStrategyAddresses: [],
-            initStrategyNums: [],
-            initStrategyTicks: [],
-          };
-          let paramsLength = whatToBuild[4][i][1] - whatToBuild[4][i][0];
-          for (let j = 0; j < paramsLength; ++j) {
-            initParams.initVaultAddresses[j] =
-              whatToBuild[5][Number(whatToBuild[4][i][0]) + j];
-          }
-          paramsLength = whatToBuild[4][i][3] - whatToBuild[4][i][2];
-          for (let j = 0; j < paramsLength; ++j) {
-            initParams.initVaultNums[j] =
-              whatToBuild[6][Number(whatToBuild[4][i][2]) + j];
-          }
-          paramsLength = whatToBuild[4][i][5] - whatToBuild[4][i][4];
-          for (let j = 0; j < paramsLength; ++j) {
-            initParams.initStrategyAddresses[j] =
-              whatToBuild[7][Number(whatToBuild[4][i][4]) + j];
-          }
-          paramsLength = whatToBuild[4][i][7] - whatToBuild[4][i][6];
-          for (let j = 0; j < paramsLength; ++j) {
-            initParams.initStrategyNums[j] = BigInt(
-              whatToBuild[8][Number(whatToBuild[4][i][6]) + j]
-            );
-          }
-          paramsLength = whatToBuild[4][i][9] - whatToBuild[4][i][8];
-          for (let j = 0; j < paramsLength; ++j) {
-            initParams.initStrategyTicks[j] =
-              whatToBuild[9][Number(whatToBuild[4][i][8]) + j];
-          }
+      console.log("Tx hash:", hash);
 
-          variants.push({
-            vaultType: whatToBuild[2][i],
-            strategyId: whatToBuild[3][i],
-            strategyDesc: whatToBuild[1][i],
-            canBuild: true,
-            initParams,
-          });
-        }
+      setLastTx(hash);
+    } catch (error) {
+      console.error("setVaultImplementation error:", error);
+    }
+  };
 
-        setBuildVariants(variants);
-      }
+  const handleFunctions = async () => {
+    switch (activeSection) {
+      case "vault":
+        setVaultImplementation();
+        break;
+      case "strategy":
+        setStrategyImplementation();
+        break;
+      default:
+        break;
     }
   };
 
   useEffect(() => {
-    getData();
-  }, [$publicClient, lastTx.get()]);
+    if ($currentChainID) {
+      const chain = CHAINS.find(({ id }) => id == $currentChainID);
 
-  const compoundingVaultsForBuilding = buildVariants.filter(
-    (variant) => variant.vaultType === "Compounding"
-  ).length;
+      const _strategies = getChainStrategies(chain?.name).filter(
+        (strategy) => strategy.state !== "CANCELLED"
+      );
 
-  const isCorrectNetwork = useMemo(
-    () => CHAINS.some((item) => item.id == $currentChainID) && $connected,
-    [$connected, $account]
-  );
+      setStrategies(_strategies);
+      setSelectedStrategy(_strategies[0]?.id);
+    }
+  }, [$currentChainID]);
+
+  useEffect(() => {
+    setImplementationInput("");
+    setLastTx("");
+  }, [activeSection]);
+
+  const explorer = CHAINS.find(({ id }) => id == $currentChainID)?.explorer;
 
   return (
-    <WagmiLayout>
-      <a
-        className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 my-5"
-        href="/metavaults-management"
-      >
-        Metavaults Management
-        <ArrowRightIcon color={"#5E6AD2"} />
-      </a>
-
-      <a
-        className="text-[#5E6AD2] text-[16px] leading-6 font-semibold flex items-center justify-end gap-2 my-5"
-        href="/factory/farms"
-      >
-        Farms
-        <ArrowRightIcon color={"#5E6AD2"} />
-      </a>
-      {isCorrectNetwork ? (
-        <div className="flex flex-col items-center">
-          <h2 className="text-[22px] mb-3">Compounding vault</h2>
-          {compoundingVaultsForBuilding ? (
-            <table className="font-manrope">
-              <thead className="bg-accent-950 text-neutral-600 h-[36px]">
-                <tr className="text-[12px] uppercase">
-                  <td className="px-4 py-2">Strategy logic</td>
-                  <td className="px-4 py-2">Strategy description</td>
-                  <td className="px-4 py-2"></td>
-                </tr>
-              </thead>
-              <tbody className="text-[14px]">
-                {buildVariants.map((variant, i) => {
-                  if (variant.vaultType !== "Compounding") {
-                    return;
-                  }
-
-                  return (
-                    <tr
-                      className="h-[48px] hover:bg-accent-950"
-                      key={variant.strategyDesc + i}
-                    >
-                      <td className="px-4 py-3">{variant.strategyId}</td>
-                      <td className="px-4 py-3">{variant.strategyDesc}</td>
-                      <td className="px-4 py-3">
-                        {variant.canBuild && (
-                          <button
-                            className="bg-[#485069] text-[#B4BFDF] border border-[#6376AF] my-[10px] px-3 py-1 rounded-md opacity-70 hover:opacity-100"
-                            onClick={() => {
-                              setBuildIndex(i);
-                            }}
-                          >
-                            Assemble
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          ) : (
-            <div className="bg-[#486556] border-[2px] border-[#488B57] max-w-[500px] flex items-center justify-center flex-col mx-auto py-3 px-5 text-center gap-2 rounded-md">
-              <p>All compounding vaults have already been created. </p>
-              <p>New vaults can be created after developing new strategies.</p>
-            </div>
-          )}
-
-          {buildIndex !== undefined && (
-            <div
-              className="overlay"
-              onClick={() => {
-                setBuildIndex(undefined);
-              }}
-            >
-              <div
-                className="flex flex-col min-w-[300px] min-h-[100px] h-auto z-[120] py-[10px] px-[10px] sm:px-[30px] rounded-md bg-modal mr-0 md:mr-5 "
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <div className="font-bold text-[1.2rem] sm:text-[1.5rem] flex justify-center">
-                  Assembling
-                </div>
-
-                <BuildForm
-                  vaultType={buildVariants[buildIndex]?.vaultType}
-                  strategyId={buildVariants[buildIndex]?.strategyId}
-                  strategyDesc={buildVariants[buildIndex]?.strategyDesc}
-                  initParams={buildVariants[buildIndex]?.initParams}
-                />
-              </div>
-            </div>
-          )}
+    <div className="flex flex-col max-w-[1200px] w-full">
+      <h3 className="mb-4">Set Implementations</h3>
+      <div className="bg-[#18191C] border border-[#232429] rounded-lg p-4 flex flex-col gap-4 w-[800px]">
+        <div className="bg-[#18191C] rounded-lg text-[14px] leading-5 font-medium flex items-center border border-[#232429] w-full mb-6">
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              activeSection != "strategy"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("strategy")}
+          >
+            Strategy
+          </span>
+          <span
+            className={cn(
+              "h-10 text-center rounded-lg flex items-center justify-center w-1/2",
+              activeSection != "vault"
+                ? "text-[#6A6B6F] cursor-pointer"
+                : "bg-[#232429] border border-[#2C2E33]"
+            )}
+            onClick={() => setActiveSection("vault")}
+          >
+            Vault
+          </span>
         </div>
-      ) : $connected ? (
+
+        <div className="flex flex-col gap-2">
+          {activeSection === "strategy" ? (
+            <label className="w-full rounded-lg bg-[#181D21] text-neutral-50 outline-none transition-all block">
+              <select
+                value={selectedStrategy}
+                onChange={(e) => setSelectedStrategy(e.target.value)}
+                className="text-xl font-semibold outline-none transition-all w-full px-3 py-2 bg-[#181D21]"
+              >
+                {strategies.map((option) => (
+                  <option key={option.shortId} value={option.id}>
+                    {option.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          <div className="flex gap-2">
+            <div className="flex flex-col items-start justify-between w-[30%]">
+              Implementation Address
+            </div>
+
+            <label className="bg-[#1B1D21] p-4 rounded-lg block border border-[#23252A] w-[70%]">
+              <input
+                type="text"
+                placeholder="0"
+                value={implementationInput}
+                onChange={(e) => setImplementationInput(e.target.value)}
+                className="bg-transparent text-2xl font-semibold outline-none w-full"
+              />
+            </label>
+          </div>
+        </div>
+
+        {lastTx ? (
+          <a href={`${explorer}/tx/${lastTx}`} target="_blank">
+            Check tx
+          </a>
+        ) : null}
+
         <button
+          className="bg-[#5E6AD2] rounded-lg w-full text-[16px] leading-5 font-bold py-5"
           type="button"
-          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-          onClick={() => open({ view: "Networks" })}
+          onClick={handleFunctions}
         >
-          SWITCH NETWORK
+          Set
         </button>
-      ) : (
-        <button
-          type="button"
-          className="mt-2 w-full flex items-center justify-center bg-[#486556] text-[#B0DDB8] border-[#488B57] py-3 rounded-md"
-          onClick={() => open()}
-        >
-          CONNECT WALLET
-        </button>
-      )}
-    </WagmiLayout>
+      </div>
+    </div>
   );
 };
 export { Factory };

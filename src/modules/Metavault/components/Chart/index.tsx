@@ -37,7 +37,7 @@ const Chart = ({
   const [chartData, setChartData] = useState<TChartData[]>([]);
 
   const [timeline, setTimeline] = useState<TSegment>(
-    TimelineTypes.Week as TSegment
+    TimelineTypes.Month as TSegment //todo: after fix change to week
   );
 
   const [activeChart, setActiveChart] = useState<TActiveChart>({
@@ -92,7 +92,7 @@ const Chart = ({
   const chartHandler = (chartType: string, segment: TSegment = timeline) => {
     const NOW = Math.floor(Date.now() / 1000);
     const TIME: number = TIMESTAMPS_IN_SECONDS[segment];
-    const LAST_TIMESTAMP = chartData[chartData.length - 1].unixTimestamp;
+    const LAST_TIMESTAMP = chartData[chartData.length - 1]?.unixTimestamp;
 
     if (display === MetaVaultDisplayTypes.Lite) {
       const singleChart = buildChartData(chartData, {
@@ -152,7 +152,7 @@ const Chart = ({
 
   useEffect(() => {
     if (chartData.length) {
-      chartHandler("APR", "WEEK");
+      chartHandler("APR", "MONTH"); //todo: after fix change to week
     }
   }, [chartData]);
 

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import Tippy from "@tippyjs/react";
 
 import { UtilizationTooltip } from "./UtilizationTooltip";
@@ -6,7 +8,7 @@ import { ProgressCircle, Badge } from "@ui";
 
 import { cn, formatNumber, getTokenData, useWindowWidth } from "@utils";
 
-import { TMarket, TMarketReserve } from "@types";
+import { MarketTypes, TMarket, TMarketReserve } from "@types";
 
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
@@ -17,20 +19,35 @@ interface IProps {
 
 const Row: React.FC<IProps> = ({ market }) => {
   const windowWidth = useWindowWidth();
+
+  const [showAll, setShowAll] = useState(false);
+
   return (
     <a
       className="border border-[#23252A] rounded-lg min-w-max md:min-w-full"
-      href={`/lending/146/${market?.marketId.replace(/\s+/g, "-")}`}
+      href={`/lending/${market?.network?.id}/${market?.marketId?.replace(/\s+/g, "-")}`}
     >
       {market?.reserves?.map((asset: TMarketReserve, index: number) => {
         const assetData = getTokenData(asset?.address);
 
-        const isNotLastReserve = market?.reserves?.length - 1 != index;
+        const isHidden =
+          market?.type === MarketTypes.NonIsolated && index > 1 && !showAll;
+
+        const lastVisibleIndex =
+          market?.type === MarketTypes.NonIsolated
+            ? Math.min(1, market?.reserves?.length - 1) +
+              (showAll ? market?.reserves?.length - 2 : 0)
+            : market?.reserves?.length - 1;
+
+        const isNotLastVisible = index !== lastVisibleIndex && !isHidden;
 
         return (
           <div
             key={market?.marketId + asset?.address}
-            className="text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center"
+            className={cn(
+              "text-center bg-[#101012] cursor-pointer h-[56px] font-medium relative flex items-center",
+              isHidden && "hidden"
+            )}
           >
             <div className="sticky bg-[#101012] lg:bg-transparent top-0 left-0 flex items-center w-[150px] md:w-[20%] justify-between gap-3 px-2 md:px-4 h-[56px] z-10 border-r border-[#23252A]">
               {!index ? (
@@ -48,14 +65,14 @@ const Row: React.FC<IProps> = ({ market }) => {
                   </div>
                 </div>
               ) : null}
-              {index === 1 && market.deprecated ? (
+              {index === 1 && market?.deprecated ? (
                 <Badge state="error" text="Bad debts" greater={true} />
               ) : null}
             </div>
             <div
               className={cn(
                 "px-2 md:px-4 text-left text-[16px] w-[100px] md:w-[15%] flex items-center gap-2 h-full",
-                isNotLastReserve && "border-b border-b-[#23252A]"
+                isNotLastVisible && "border-b border-b-[#23252A]"
               )}
             >
               <img
@@ -68,7 +85,7 @@ const Row: React.FC<IProps> = ({ market }) => {
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
-                isNotLastReserve && "border-b border-b-[#23252A]"
+                isNotLastVisible && "border-b border-b-[#23252A]"
               )}
             >
               {!!Number(asset?.supplyAPR) &&
@@ -77,7 +94,7 @@ const Row: React.FC<IProps> = ({ market }) => {
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
-                isNotLastReserve && "border-b border-b-[#23252A]"
+                isNotLastVisible && "border-b border-b-[#23252A]"
               )}
             >
               {!!Number(asset?.borrowAPR) &&
@@ -86,7 +103,7 @@ const Row: React.FC<IProps> = ({ market }) => {
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[100px] md:w-[13%] h-full",
-                isNotLastReserve && "border-b border-b-[#23252A]"
+                isNotLastVisible && "border-b border-b-[#23252A]"
               )}
             >
               {!!Number(asset?.supplyTVLInUSD) &&
@@ -104,7 +121,7 @@ const Row: React.FC<IProps> = ({ market }) => {
                 <div
                   className={cn(
                     "px-2 md:px-4 flex items-center justify-end gap-2 text-[16px] w-[150px] md:w-[13%] h-full cursor-help",
-                    isNotLastReserve && "border-b border-b-[#23252A]"
+                    isNotLastVisible && "border-b border-b-[#23252A]"
                   )}
                   onClick={(e) => {
                     if (windowWidth <= 767) {
@@ -118,7 +135,7 @@ const Row: React.FC<IProps> = ({ market }) => {
                   />
                   <span
                     className={cn(
-                      Number(asset.utilization) === 100 && "text-[#DE4343]"
+                      Number(asset?.utilization) === 100 && "text-[#DE4343]"
                     )}
                   >
                     {Number(asset?.utilization).toFixed(2)}%
@@ -129,14 +146,14 @@ const Row: React.FC<IProps> = ({ market }) => {
               <div
                 className={cn(
                   "px-2 md:px-4 w-[150px] md:w-[13%] h-full",
-                  isNotLastReserve && "border-b border-b-[#23252A]"
+                  isNotLastVisible && "border-b border-b-[#23252A]"
                 )}
               />
             )}
             <div
               className={cn(
                 "px-2 md:px-4 flex items-center justify-end text-[16px] w-[150px] md:w-[13%] h-full whitespace-nowrap",
-                isNotLastReserve && "border-b border-b-[#23252A]"
+                isNotLastVisible && "border-b border-b-[#23252A]"
               )}
             >
               {!!Number(asset?.maxLtv) &&
@@ -146,6 +163,31 @@ const Row: React.FC<IProps> = ({ market }) => {
           </div>
         );
       })}
+
+      {market?.type === MarketTypes.NonIsolated ? (
+        <div
+          className="bg-[#101012] border-t border-[#23252A] h-[36px] cursor-pointer flex items-center justify-center"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setShowAll((prev) => !prev);
+          }}
+        >
+          <div className="flex items-center justify-center gap-2 w-full sticky top-0 right-0 left-0 max-w-[300px] md:max-w-full md:relative">
+            <p className="font-medium text-[14px] text-[#9180F4]">
+              {showAll ? "Hide" : `Show all ${market?.reserves?.length}`}
+            </p>
+            <img
+              className={cn(
+                "transition delay-[50ms] w-3 h-3",
+                showAll ? "rotate-[180deg]" : "rotate-[0deg]"
+              )}
+              src="/icons/arrow-down.svg"
+              alt="arrowDown"
+            />
+          </div>
+        </div>
+      ) : null}
     </a>
   );
 };

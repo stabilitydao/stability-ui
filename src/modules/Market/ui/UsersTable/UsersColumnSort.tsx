@@ -25,7 +25,7 @@ const stylesMap: Record<MarketTypes, Record<string, string>> = {
     Collateral: "w-[100px] md:w-1/5 justify-end",
     Debt: "w-[100px] md:w-1/5 justify-end",
     "Health Factor": "w-[150px] md:w-1/5 justify-end",
-    "Liquidation Price": "w-[150px] md:w-1/5 justify-end",
+    LTV: "w-[100px]  md:w-1/5 justify-end",
   },
 
   [MarketTypes.Stable]: {

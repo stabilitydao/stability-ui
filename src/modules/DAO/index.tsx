@@ -119,51 +119,103 @@ const DAO = (): JSX.Element => {
         </div>
         <div
           className={cn(
-            "flex flex-col lg:flex-row gap-6",
             activeSection !== DAOSectionTypes.Tokenomics && "hidden"
           )}
         >
-          <div className="flex flex-col gap-6 w-full lg:w-1/2">
-            <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
-              <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
-                <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
-                  Foundation
-                </h2>
+          <h3 className="text-[26px] leading-8 font-semibold mb-3">
+            Vesting allocations
+          </h3>
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex flex-col gap-6 w-full lg:w-1/2">
+              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                    Foundation
+                  </h2>
+                </div>
+                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                  <Indicator title="Total" value="30M STBL" />
+
+                  {isLoading ? (
+                    <Skeleton width={110} height={48} />
+                  ) : (
+                    <Indicator
+                      title="Claimable"
+                      value={`${formatNumber(vestingData.foundation, "abbreviateNotUsd")} STBL`}
+                    />
+                  )}
+
+                  <Indicator title="Spent" value="0 STBL" />
+
+                  <Indicator title="Unlock speed" value="~20.5K STBL" />
+                </div>
               </div>
-              <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
-                <Indicator title="Total" value="30M STBL" />
+              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                    Investors
+                  </h2>
+                </div>
+                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                  <Indicator title="Total" value="20M STBL" />
 
-                {isLoading ? (
-                  <Skeleton width={110} height={48} />
-                ) : (
-                  <Indicator
-                    title="Claimable"
-                    value={`${formatNumber(vestingData.foundation, "abbreviateNotUsd")} STBL`}
-                  />
-                )}
+                  {isLoading ? (
+                    <Skeleton width={110} height={48} />
+                  ) : (
+                    <Indicator
+                      title="Claimable"
+                      value={`${formatNumber(vestingData.investors, "abbreviateNotUsd")} STBL`}
+                    />
+                  )}
 
-                <Indicator title="Spent" value="0 STBL" />
+                  <Indicator title="Spent" value="0 STBL" />
+
+                  <Indicator title="Unlock speed" value="~54.8K STBL" />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-6 w-full lg:w-1/2">
-            <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
-              <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
-                <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
-                  Community
-                </h2>
+            <div className="flex flex-col gap-6 w-full lg:w-1/2">
+              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                    Community
+                  </h2>
+                </div>
+                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                  <Indicator title="Total" value="20M STBL" />
+                  {isLoading ? (
+                    <Skeleton width={110} height={48} />
+                  ) : (
+                    <Indicator
+                      title="Claimable"
+                      value={`${formatNumber(vestingData.community, "abbreviateNotUsd")} STBL`}
+                    />
+                  )}
+                  <Indicator title="Spent" value="28K STBL" />
+
+                  <Indicator title="Unlock speed" value="~13.7K STBL" />
+                </div>
               </div>
-              <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
-                <Indicator title="Total" value="20M STBL" />
-                {isLoading ? (
-                  <Skeleton width={110} height={48} />
-                ) : (
-                  <Indicator
-                    title="Claimable"
-                    value={`${formatNumber(vestingData.community, "abbreviateNotUsd")} STBL`}
-                  />
-                )}
-                <Indicator title="Spent" value="28K STBL" />
+              <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
+                <div className="bg-[#151618] rounded-t-lg h-[48px] flex items-center justify-start">
+                  <h2 className="text-[20px] leading-6 font-semibold pl-4 md:pl-6">
+                    Team
+                  </h2>
+                </div>
+                <div className="flex justify-between gap-3 flex-wrap md:flex-nowrap px-4 pb-4 md:px-6 md:pb-6 pt-4">
+                  <Indicator title="Total" value="20M STBL" />
+                  {isLoading ? (
+                    <Skeleton width={110} height={48} />
+                  ) : (
+                    <Indicator
+                      title="Claimable"
+                      value={`${formatNumber(vestingData.team, "abbreviateNotUsd")} STBL`}
+                    />
+                  )}
+                  <Indicator title="Spent" value="0 STBL" />
+
+                  <Indicator title="Unlock speed" value="~13.7K STBL" />
+                </div>
               </div>
             </div>
           </div>

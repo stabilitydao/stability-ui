@@ -84,14 +84,6 @@ type TTokens = {
 
 type TFrontendBalances = [bigint, string[], bigint[], bigint[]];
 
-type TInitParams = {
-  initVaultAddresses: string[];
-  initVaultNums: bigint[];
-  initStrategyAddresses: string[];
-  initStrategyNums: bigint[];
-  initStrategyTicks: number[];
-};
-
 type TTokenData = {
   address: TAddress;
   name: string;
@@ -376,6 +368,7 @@ type TMarketUser = {
   LTV: number;
   liquidationPrice: number;
   LTVColor: string;
+  healthFactorColor: string;
 };
 
 type TMetaVaultUser = {
@@ -414,14 +407,6 @@ type TAPRModal = {
   symbol: string;
   state: boolean;
   pool: TPool;
-};
-
-type TBuildVariant = {
-  vaultType: string;
-  strategyId: string;
-  strategyDesc: string;
-  canBuild: boolean;
-  initParams: TInitParams;
 };
 
 type TAddress = `0x${string}`;
@@ -939,7 +924,6 @@ export enum TimelineTypes {
 
 export type {
   TPlatformData,
-  TInitParams,
   TTokenData,
   TVaults,
   TVaultData,
@@ -949,7 +933,6 @@ export type {
   TAsset,
   TTableColumn,
   TAPRModal,
-  TBuildVariant,
   TAddress,
   IProtocol,
   TMultichainPrices,
