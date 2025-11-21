@@ -329,13 +329,11 @@ const Dashboard = (): JSX.Element => {
         <div className="grid grid-cols-1 min-[1080px]:grid-cols-2 gap-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
-              <span className="text-[18px] leading-6 font-semibold">
-                Vault fees
-              </span>
+              <span className="text-[18px] leading-6 font-semibold">VaaS</span>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between gap-1 text-[16px] leading-6 font-medium">
                   <span className="text-[#97979A]">Revenue share</span>
-                  <span className="font-semibold">50%</span>
+                  <span className="font-semibold">80%</span>
                 </div>
 
                 <div className="flex items-center justify-between gap-1 text-[16px] leading-6 font-medium">
@@ -364,7 +362,7 @@ const Dashboard = (): JSX.Element => {
             </div>
             <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
               <span className="text-[18px] leading-6 font-semibold">
-                Lending fees
+                Lending
               </span>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between gap-1 text-[16px] leading-6 font-medium">
@@ -426,7 +424,7 @@ const Dashboard = (): JSX.Element => {
                 </div>
               </div>
             </div>
-            <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
+            {/* <div className="h-full p-4 bg-[#101012] border border-[#23252A] rounded-xl flex flex-col gap-2">
               <span className="text-[18px] leading-6 font-semibold">
                 Agents
               </span>
@@ -444,7 +442,7 @@ const Dashboard = (): JSX.Element => {
                   <span className="font-semibold">$0</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <Chart />
