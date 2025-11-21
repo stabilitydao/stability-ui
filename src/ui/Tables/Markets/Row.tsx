@@ -166,14 +166,19 @@ const Row: React.FC<IProps> = ({ market }) => {
 
       {market?.type === MarketTypes.NonIsolated ? (
         <div
-          className="bg-[#101012] border-t border-[#23252A] h-[36px] cursor-pointer flex items-center justify-center"
+          className="bg-[#101012] border-t border-[#23252A] h-[36px] cursor-pointer flex items-center justify-start md:justify-center"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setShowAll((prev) => !prev);
           }}
         >
-          <div className="flex items-center justify-center gap-2 w-full sticky top-0 right-0 left-0 max-w-[300px] md:max-w-full md:relative">
+          <div
+            className={cn(
+              "flex items-center justify-end md:justify-center gap-2 w-full sticky top-0 right-0 left-0 max-w-[240px] md:max-w-full md:relative",
+              showAll && "max-w-[210px]"
+            )}
+          >
             <p className="font-medium text-[14px] text-[#9180F4]">
               {showAll ? "Hide" : `Show all ${market?.reserves?.length}`}
             </p>

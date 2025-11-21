@@ -147,7 +147,7 @@ const DAO = (): JSX.Element => {
 
                   <Indicator title="Spent" value="0 STBL" />
 
-                  <Indicator title="Unlock speed" value="~20.5K STBL" />
+                  <Indicator title="Monthly unlock" value="~625K STBL" />
                 </div>
               </div>
               <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
@@ -170,7 +170,7 @@ const DAO = (): JSX.Element => {
 
                   <Indicator title="Spent" value="0 STBL" />
 
-                  <Indicator title="Unlock speed" value="~54.8K STBL" />
+                  <Indicator title="Monthly unlock" value="~1.66M STBL" />
                 </div>
               </div>
             </div>
@@ -193,7 +193,7 @@ const DAO = (): JSX.Element => {
                   )}
                   <Indicator title="Spent" value="28K STBL" />
 
-                  <Indicator title="Unlock speed" value="~13.7K STBL" />
+                  <Indicator title="Monthly unlock" value="~416K STBL" />
                 </div>
               </div>
               <div className="bg-[#101012] border border-[#23252A] rounded-lg min-w-full flex flex-col">
@@ -214,7 +214,7 @@ const DAO = (): JSX.Element => {
                   )}
                   <Indicator title="Spent" value="0 STBL" />
 
-                  <Indicator title="Unlock speed" value="~13.7K STBL" />
+                  <Indicator title="Monthly unlock" value="~416K STBL" />
                 </div>
               </div>
             </div>
