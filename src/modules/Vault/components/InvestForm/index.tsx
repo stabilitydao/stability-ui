@@ -492,7 +492,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
         setLoader(false);
         return;
       }
+
       if (asset === underlyingToken?.address) {
+        const underlyingDecimals = underlyingToken?.decimals ?? 18;
+
         try {
           let previewDepositAssets;
           if (["BSF", "BWF", "ASF"].includes(shortId)) {
@@ -500,7 +503,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssetsWrite",
-              args: [[asset as TAddress], [parseUnits(amount, 18)]],
+              args: [
+                [asset as TAddress],
+                [parseUnits(amount, underlyingDecimals)],
+              ],
               account: $account as TAddress,
             });
             previewDepositAssets = previewDepositAssets.result;
@@ -509,7 +515,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
               address: vault.address,
               abi: VaultABI,
               functionName: "previewDepositAssets",
-              args: [[asset as TAddress], [parseUnits(amount, 18)]],
+              args: [
+                [asset as TAddress],
+                [parseUnits(amount, underlyingDecimals)],
+              ],
             });
           }
 
@@ -599,6 +608,7 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
     }, 1000),
     [option, balances, tab]
   );
+
   const zapInputHandler = (amount: string, asset: string) => {
     setInputs(
       (prevInputs: any) =>
@@ -1674,7 +1684,10 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
   const debouncedPreviewWithdraw = useCallback(
     debounce(async (value: string) => {
       const balance = Number(
-        formatUnits($vaultData[network][vault.address].vaultUserBalance, 18)
+        formatUnits(
+          $vaultData?.[network]?.[vault?.address]?.vaultUserBalance,
+          18
+        )
       );
       if (!Number(value)) {
         setWithdrawAmount([]);
@@ -1689,109 +1702,119 @@ const InvestForm: React.FC<IProps> = ({ network, vault }) => {
 
       ///// UNDERLYING TOKEN
       const currentValue = parseUnits(value, 18);
-
-      if (underlyingToken?.address === option[0]) {
-        const { result } = await _publicClient?.simulateContract({
-          address: vault.address,
-          abi: VaultABI,
-          functionName: "withdrawAssets",
-          args: [option as TAddress[], currentValue, [BIG_INT_VALUES.ZERO]],
-          account: $account as TAddress,
-        });
-        setWithdrawAmount([
-          {
-            symbol: underlyingToken?.symbol,
-            logo: underlyingToken?.logoURI,
-            amount: formatUnits(result[0], 18),
-          },
-        ]);
-        setLoader(false);
-        setButton("withdraw");
-      } else {
-        let assetsLength = defaultOption?.assetsArray.map(
-          (_: string) => BIG_INT_VALUES.ZERO
-        );
-        let localAssets = defaultOption?.assetsArray;
-        if (shortId === "IQMF" || shortId === "IRMF") {
-          assetsLength = [BIG_INT_VALUES.ZERO, BIG_INT_VALUES.ZERO];
-          localAssets = vault?.assets.map((asset) => asset?.address);
-        }
-        const { result } = await _publicClient?.simulateContract({
-          address: vault.address,
-          abi: VaultABI,
-          functionName: "withdrawAssets",
-          args: [localAssets as TAddress[], currentValue, assetsLength],
-          account: $account as TAddress,
-        });
-        if (
-          (defaultOption?.assets === option[0] && option.length < 2) ||
-          option.length > 1
-        ) {
-          const preview = result.map((amount: any, index: number) => {
-            const tokenData: TTokenData | any = getTokenData(
-              localAssets[index]
-            );
-            const amountInTokens = Number(
-              formatUnits(amount, tokenData?.decimals)
-            );
-            const amountInUSD =
-              amountInTokens *
-              Number($assetsPrices[network][localAssets[index]]?.price);
-
-            return {
-              symbol: tokenData?.symbol,
-              logo: tokenData?.logoURI,
-              amount: amountInTokens.toFixed(5),
-              amountInUSD: amountInUSD.toFixed(2),
-            };
+      try {
+        if (underlyingToken?.address === option[0]) {
+          const { result } = await _publicClient?.simulateContract({
+            address: vault.address,
+            abi: VaultABI,
+            functionName: "withdrawAssets",
+            args: [option as TAddress[], currentValue, [BIG_INT_VALUES.ZERO]],
+            account: $account as TAddress,
           });
-          setWithdrawAmount(preview);
-          setButton("withdraw");
+          setWithdrawAmount([
+            {
+              symbol: underlyingToken?.symbol,
+              logo: underlyingToken?.logoURI,
+              amount: formatUnits(result[0], 18),
+            },
+          ]);
           setLoader(false);
+          setButton("withdraw");
         } else {
-          try {
-            setLoader(true);
-            const allowanceData: any = formatUnits(
-              await getAssetAllowance(
-                _publicClient,
-                option[0] as TAddress,
-                tab,
-                vault?.address,
-                underlyingToken?.address,
-                $platformsData?.[network]?.zap
-              ),
-              18
-            );
-
-            const promises = result.map(
-              async (amount: bigint, index: number) =>
-                await get1InchRoutes(
-                  network,
-                  localAssets[index] as TAddress,
-                  option[0] as TAddress,
-                  Number(getTokenData(localAssets[index])?.decimals),
-                  amount,
-                  setZapError,
-                  "withdraw"
-                )
-            );
-
-            const outData = await Promise.all(promises);
-            const isAgg = outData.find((data: any) => !!data.agg);
-            setAgg(isAgg?.agg ?? "");
-
-            setZapPreviewWithdraw(outData);
-
-            if (Number(allowanceData) < Number(value)) {
-              setButton("needApprove");
-            } else {
-              setButton("withdraw");
-            }
-          } catch (err) {
-            console.error("WITHDRAW ERROR:", err);
-          } finally {
-            setLoader(false);
+          let assetsLength = defaultOption?.assetsArray.map(
+            (_: string) => BIG_INT_VALUES.ZERO
+          );
+          let localAssets = defaultOption?.assetsArray;
+          if (shortId === "IQMF" || shortId === "IRMF") {
+            assetsLength = [BIG_INT_VALUES.ZERO, BIG_INT_VALUES.ZERO];
+            localAssets = vault?.assets.map((asset) => asset?.address);
           }
+
+          const { result } = await _publicClient?.simulateContract({
+            address: vault.address,
+            abi: VaultABI,
+            functionName: "withdrawAssets",
+            args: [localAssets as TAddress[], currentValue, assetsLength],
+            account: $account as TAddress,
+          });
+
+          if (
+            (defaultOption?.assets === option[0] && option.length < 2) ||
+            option.length > 1
+          ) {
+            const preview = result.map((amount: any, index: number) => {
+              const tokenData: TTokenData | any = getTokenData(
+                localAssets[index]
+              );
+              const amountInTokens = Number(
+                formatUnits(amount, tokenData?.decimals)
+              );
+              const amountInUSD =
+                amountInTokens *
+                Number($assetsPrices[network][localAssets[index]]?.price);
+
+              return {
+                symbol: tokenData?.symbol,
+                logo: tokenData?.logoURI,
+                amount: amountInTokens.toFixed(5),
+                amountInUSD: amountInUSD.toFixed(2),
+              };
+            });
+
+            setWithdrawAmount(preview);
+            setButton("withdraw");
+            setLoader(false);
+          } else {
+            try {
+              setLoader(true);
+              const allowanceData: any = formatUnits(
+                await getAssetAllowance(
+                  _publicClient,
+                  option[0] as TAddress,
+                  tab,
+                  vault?.address,
+                  underlyingToken?.address,
+                  $platformsData?.[network]?.zap
+                ),
+                18
+              );
+
+              const promises = result.map(
+                async (amount: bigint, index: number) =>
+                  await get1InchRoutes(
+                    network,
+                    localAssets[index] as TAddress,
+                    option[0] as TAddress,
+                    Number(getTokenData(localAssets[index])?.decimals),
+                    amount,
+                    setZapError,
+                    "withdraw"
+                  )
+              );
+
+              const outData = await Promise.all(promises);
+              const isAgg = outData.find((data: any) => !!data.agg);
+              setAgg(isAgg?.agg ?? "");
+
+              setZapPreviewWithdraw(outData);
+
+              if (Number(allowanceData) < Number(value)) {
+                setButton("needApprove");
+              } else {
+                setButton("withdraw");
+              }
+            } catch (err) {
+              console.error("WITHDRAW ERROR:", err);
+            } finally {
+              setLoader(false);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Preview withdraw error:", error);
+        setButton("none");
+        if (error instanceof Error) {
+          errorHandler(error);
         }
       }
     }, 1000),
