@@ -48,8 +48,8 @@ export const useMarketUsers = (market: TMarket): TResult => {
       );
 
       if (res.data) {
-        const users: TMarketUser[] = Object.entries(res.data).map(
-          ([address, userData]: [string, any]) => ({
+        const users: TMarketUser[] = Object.entries(res.data)
+          .map(([address, userData]: [string, any]) => ({
             address: address as TAddress,
             collateral: userData?.aTokenBalanceUsd ?? 0,
             debt: userData?.debtTokenBalanceUsd ?? 0,
@@ -65,8 +65,10 @@ export const useMarketUsers = (market: TMarket): TResult => {
               Number(userData?.healthFactor ?? 0),
               market?.type
             ),
-          })
-        );
+          }))
+          .filter(
+            (user) => Number(user.debt) > 0.01 && Number(user.collateral) > 0.01
+          );
 
         marketsUsers.setKey(marketId, users);
       }

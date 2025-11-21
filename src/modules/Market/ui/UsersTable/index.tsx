@@ -70,7 +70,9 @@ const UsersTable: React.FC<TProps> = ({
           : "";
 
       case "LTV":
-        return user.LTV ? `${user.LTV.toFixed(2)}%` : "";
+        return user.LTV
+          ? `${Number(user.LTV) > 1000 ? ">1000" : user.LTV.toFixed(2)}%`
+          : "";
 
       default:
         return null;

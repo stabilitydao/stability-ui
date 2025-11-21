@@ -102,7 +102,7 @@ const Dashboard: React.FC<TProps> = ({ marketData }) => {
       netWorth: netWorth.toFixed(2),
       HF,
       netAPR: (netAPR * 100).toFixed(2),
-      LTV: Math.min(LTV, 100).toFixed(2),
+      LTV: Math.min(LTV, 1000).toFixed(2),
       maxLTV,
       LT,
     });
